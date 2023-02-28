@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
-public class IssueGenericLetterAboutToSubmitHandlerTest {
+class IssueGenericLetterAboutToSubmitHandlerTest {
 
     private IssueGenericLetterAboutToSubmitHandler handler;
     @Mock
@@ -57,7 +57,7 @@ public class IssueGenericLetterAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenThereIsDuplicationInDocumentsSelection_thenRemoveItBeforeSubmit() {
+    void givenThereIsDuplicationInDocumentsSelection_thenRemoveItBeforeSubmit() {
         var list = new ArrayList<DynamicListItem>();
 
         DynamicListItem item1 = new DynamicListItem(DOCUMENT_NAME_1, DOCUMENT_NAME_1);
@@ -80,7 +80,7 @@ public class IssueGenericLetterAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenThereIsDuplicationInOtherPartySelection_thenRemoveItBeforeSubmit() {
+    void givenThereIsDuplicationInOtherPartySelection_thenRemoveItBeforeSubmit() {
         var list = new ArrayList<DynamicListItem>();
 
         var item = new DynamicListItem(DOCUMENT_NAME_1, DOCUMENT_NAME_1);
@@ -99,7 +99,7 @@ public class IssueGenericLetterAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenThereAreNoDuplicatesInDocuments_thenReturnListIntact() {
+    void givenThereAreNoDuplicatesInDocuments_thenReturnListIntact() {
         var list = new ArrayList<DynamicListItem>();
 
         var item1 = new DynamicListItem(DOCUMENT_NAME_1, DOCUMENT_NAME_1);

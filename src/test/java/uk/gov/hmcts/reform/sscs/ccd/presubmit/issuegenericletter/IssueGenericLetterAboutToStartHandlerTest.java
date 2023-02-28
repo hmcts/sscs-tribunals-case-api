@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuegenericletter;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
@@ -87,19 +90,19 @@ public class IssueGenericLetterAboutToStartHandlerTest {
     @ParameterizedTest
     @EnumSource(value = CallbackType.class, names = {"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
-        assertThat(handler.canHandle(callbackType, callback)).isFalse();
+        assertFalse(handler.canHandle(callbackType, callback));
     }
 
     @Test
-    void givenANonCreateBundleEvent_thenReturnFalse() {
+    void givenANonIssueGenericLetter_AboutToStartEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
-        Assertions.assertFalse(handler.canHandle(ABOUT_TO_START, callback));
+        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
 
     @Test
     void givenAValidAboutToSubmitEvent_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(ISSUE_GENERIC_LETTER);
-        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isTrue();
+        assertTrue(handler.canHandle(ABOUT_TO_START, callback));
     }
 
     @Test
@@ -110,7 +113,7 @@ public class IssueGenericLetterAboutToStartHandlerTest {
 
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertThat(isEmpty(result.getData().getGenericLetterText())).isTrue();
+        assertTrue(isEmpty(result.getData().getGenericLetterText()));
     }
 
     @Test
@@ -122,10 +125,10 @@ public class IssueGenericLetterAboutToStartHandlerTest {
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         List<CcdValue<OtherPartySelectionDetails>> otherPartySelection = result.getData().getOtherPartySelection();
-        Assertions.assertEquals(1, otherPartySelection.size());
+        assertEquals(1, otherPartySelection.size());
 
         List<DynamicListItem> listItems = otherPartySelection.get(0).getValue().getOtherPartiesList().getListItems();
-        Assertions.assertEquals(1, listItems.size());
+        assertEquals(1, listItems.size());
         assertThat(listItems.get(0).getCode()).contains(APPOINTEE_ID);
         assertThat(listItems.get(0).getLabel())
                 .contains(APPOINTEE_LAST_NAME, APPOINTEE_FIRST_NAME, OTHER_PARTY_FIRST_NAME, OTHER_PARTY_LAST_NAME);
@@ -140,7 +143,7 @@ public class IssueGenericLetterAboutToStartHandlerTest {
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         List<CcdValue<DocumentSelectionDetails>> documentSelection = result.getData().getDocumentSelection();
-        Assertions.assertEquals(1, documentSelection.size());
-        Assertions.assertEquals(2, documentSelection.get(0).getValue().getDocumentsList().getListItems().size());
+        assertEquals(1, documentSelection.size());
+        assertEquals(2, documentSelection.get(0).getValue().getDocumentsList().getListItems().size());
     }
 }
