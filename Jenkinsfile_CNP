@@ -60,6 +60,7 @@ def secretsForPR = [
                 secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
                 secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
                 secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
+                secret('SERVICE_BUS_CONNECTION_STRING', 'sscs-servicebus-connection-string-tf')
         ],
         's2s-${env}'      : [
                 secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
@@ -73,6 +74,17 @@ def secretsForPR = [
                 secret('idam-data-store-system-user-password', 'IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
                 secret('idam-data-store-system-user-username', 'IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
                 secret('idam-data-store-client-secret', 'IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET')
+        ],
+        'wa-${env}'      : [
+                secret('app-insights-connection-string', 'WA_INSIGHT_CONNECTION_STRING'),
+                secret('ld-secret', 'WA_LAUNCH_DARKLY_SDK_KEY'),
+                secret('s2s-secret-case-event-handler', 'S2S_SECRET_CASE_EVENT_HANDLER'),
+                secret('s2s-secret-task-management-api', 'S2S_SECRET_TASK_MANAGEMENT_API'),
+                secret('s2s-secret-task-monitor', 'S2S_SECRET_TASK_MONITOR'),
+                secret('s2s-secret-workflow-api', 'S2S_SECRET_WORKFLOW_API'),
+                secret('wa-idam-client-secret', 'WA_IDAM_CLIENT_SECRET'),
+                secret('wa-system-username', ' WA_SYSTEM_USERNAME'),
+                secret('wa-system-password', ' WA_SYSTEM_PASSWORD')
         ]
 ]
 
