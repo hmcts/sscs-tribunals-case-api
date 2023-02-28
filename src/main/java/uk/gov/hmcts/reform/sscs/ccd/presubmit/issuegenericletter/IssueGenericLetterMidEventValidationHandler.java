@@ -55,13 +55,12 @@ public class IssueGenericLetterMidEventValidationHandler implements PreSubmitCal
 
     private Set<String> validateAddresses(SscsCaseData caseData) {
         var errors = new HashSet<String>();
-        
-        var appellant = caseData.getAppeal().getAppellant();
-        var appellantAppointee = appellant.getAppointee();
-        
         var sendToAllParties = YesNo.isYes(caseData.getSendToAllParties());
 
         if (sendToAllParties || YesNo.isYes(caseData.getSendToApellant())) {
+            var appellant = caseData.getAppeal().getAppellant();
+            var appellantAppointee = appellant.getAppointee();
+
             if (appellantAppointee != null && isAddressEmpty(appellantAppointee.getAddress())) {
                 errors.add("Address is empty for an appellant appointee");
             } else if (isAddressEmpty(appellant.getAddress())) {

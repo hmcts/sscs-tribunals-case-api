@@ -35,7 +35,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
-public class IssueGenericLetterAboutToStartHandlerTest {
+class IssueGenericLetterAboutToStartHandlerTest {
 
     private IssueGenericLetterAboutToStartHandler handler;
 
