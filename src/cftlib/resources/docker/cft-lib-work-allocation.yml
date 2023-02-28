@@ -36,7 +36,7 @@ services:
       DATA_STORE_DB_USERNAME: postgres
       DATA_STORE_DB_PASSWORD: admin
       SERVICE_BUS_CONNECTION_STRING: ${AZURE_SERVICE_BUS_CONNECTION_STRING:-Endpoint=sb://ccd-servicebus-demo.servicebus.windows.net/;SharedAccessKeyName=SendAndRecieveCCDMessage;SharedAccessKey=REPLACEME}
-      CCD_CASE_EVENTS_DESTINATION: ${AZURE_SERVUCE_BUS_TOPIC_NAME:-wa-case-event-handler-topic-sessions-ft}
+      CCD_CASE_EVENTS_DESTINATION: ${AZURE_SERVICE_BUS_TOPIC_NAME:-wa-case-event-handler-topic-sessions-ft}
     ports:
       - 4456:4456
     networks:

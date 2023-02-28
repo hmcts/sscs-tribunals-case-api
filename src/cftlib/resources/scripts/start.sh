@@ -1,20 +1,17 @@
 #!/bin/bash
 
-declare -A secrets
+# Set environment variable from Azure secret vault
+# Parameters: <Environment variable name> <Vault Name> <Secret Name>
+loadSecret () {
+  export "$1"="$(az keyvault secret show --name "$3" --vault-name $2 --query "value" | sed -e 's/^"//' -e 's/"$//')"
+}
 
-KEY_VAULT_NAME="dg-docassembly-aat"
+echo "Fetching secrets..."
 
-#Key-value array of secrets. key=azure secret name, value=desired environment variable
-secrets=(["docmosis-templates-auth"]="DOCMOSIS_TEMPLATES_ENDPOINT_AUTH"
-["docmosis-access-key"]="DOCMOSIS_ACCESS_KEY")
-
-echo "Fetching secrets from $KEY_VAULT_NAME..."
-
-#Loop through secrets, trimming leading and trailing quotes.
-for i in "${!secrets[@]}"
-do
-  export "${secrets[$i]}"="$(az keyvault secret show --name "$i" --vault-name $KEY_VAULT_NAME --query "value" | sed -e 's/^"//' -e 's/"$//')"
-done
+loadSecret "DOCMOSIS_TEMPLATES_ENDPOINT_AUTH" "dg-docassembly-aat" "docmosis-templates-auth"
+loadSecret "DOCMOSIS_ACCESS_KEY" "dg-docassembly-aat" "docmosis-access-key"
+loadSecret "AZURE_SERVICE_BUS_CONNECTION_STRING" "sscs-aat" "sscs-servicebus-connection-string-tf"
+loadSecret "LAUNCH_DARKLY_SDK_KEY" "wa-aat" "ld-secret"
 
 echo "Secret fetching complete"
 
