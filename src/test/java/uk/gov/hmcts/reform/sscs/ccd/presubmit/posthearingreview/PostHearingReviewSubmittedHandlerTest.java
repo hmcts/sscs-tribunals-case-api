@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.LIBERTY_
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.PERMISSION_TO_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.STATEMENT_OF_REASONS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions.REFUSE;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,12 +31,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PermissionToAppealActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
@@ -127,9 +130,36 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @Test
-    void givenRefusedSetAsideSelected_shouldReturnCallCorrectCallback() {
+    void givenRefusedSetAsideSelected_shouldReturnCallCorrectCallback_andUpdateStates() {
         caseData.getPostHearing().setReviewType(SET_ASIDE);
-        caseData.getPostHearing().getSetAside().setAction(SetAsideActions.REFUSE);
+        caseData.getPostHearing().getSetAside().setAction(REFUSE);
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        SscsCaseData returnedCase = SscsCaseData.builder()
+            .state(State.DORMANT_APPEAL_STATE)
+            .interlocReviewState(InterlocReviewState.NONE)
+            .ccdCaseId("555")
+            .build();
+        when(ccdCallbackMapService.handleCcdCallbackMap(REFUSE, caseData))
+            .thenReturn(returnedCase);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        verify(ccdCallbackMapService, times(1))
+            .handleCcdCallbackMap(REFUSE, caseData);
+
+        assertThat(response.getData().getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
+        assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.NONE);
+    }
+
+    @Test
+    void givenRefusedSetAsideSelected_andStatementOfReasonsRequested_shouldReturnCallCorrectCallback() {
+        caseData.getPostHearing().setReviewType(SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setAction(REFUSE);
 
         caseData.getPostHearing().getSetAside().setRequestStatementOfReasons(YesNo.YES);
 
@@ -195,7 +225,7 @@ class PostHearingReviewSubmittedHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         when(ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData))
-            .thenReturn(SscsCaseData.builder().build());
+            .thenReturn(SscsCaseData.builder().ccdCaseId("123").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
