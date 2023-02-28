@@ -452,18 +452,9 @@ sscs-hearings-api:
       HMC_HEARINGS_TOPIC_NAMESPACE: ${SERVICE_NAME}
       HEARINGS_TOPIC_NAME: "stub-hmc-to-cft"
       HEARINGS_TOPIC_SUBSCRIPTION_NAME: "tribunals-to-hearing-api"
-      HMC_HEARINGS_TOPIC_POLICY_NAME: RootManageSharedAccessKey
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
       TRIBUNALS_EVENT_QUEUE_NAMESPACE: ${SERVICE_NAME}
       TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-queue"
-      TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
-    secrets:
-      TRIBUNALS_EVENT_QUEUE_NAMESPACE:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
-        key: namespaceName
-      TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
-        key: primaryKey
 
 hmc-cft-hearing-service:
   enabled: false
