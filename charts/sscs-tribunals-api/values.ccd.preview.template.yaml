@@ -464,12 +464,6 @@ sscs-hearings-api:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
         key: primaryKey
-      HMC_HEARINGS_TOPIC_NAMESPACE:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: namespaceName
-      HMC_HEARINGS_TOPIC_ACCESS_KEY:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: primaryKey
 
 hmc-cft-hearing-service:
   enabled: false
