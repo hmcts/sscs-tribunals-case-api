@@ -60,7 +60,7 @@ def secretsForPR = [
                 secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
                 secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
                 secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
-                secret('SERVICE_BUS_CONNECTION_STRING', 'sscs-servicebus-connection-string-tf')
+                secret('sscs-servicebus-connection-string-tf', 'SERVICE_BUS_CONNECTION_STRING')
         ],
         's2s-${env}'      : [
                 secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
