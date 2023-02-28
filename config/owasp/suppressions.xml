@@ -7,4 +7,18 @@
     <packageUrl regex="true">^pkg:maven/org\.apache\.qpid/qpid\-jms\-client@.*$</packageUrl>
     <cve>CVE-2016-3094</cve>
   </suppress>
+  <suppress until = "2023-04-01">
+    <notes><![CDATA[
+   file name: jackson-core-2.14.2.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-core@.*$</packageUrl>
+    <cve>CVE-2022-45688</cve>
+  </suppress>
+  <suppress until = "2023-04-01">
+    <notes><![CDATA[
+   file name: json-20220320.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.json/json@.*$</packageUrl>
+    <cve>CVE-2022-45688</cve>
+  </suppress>
 </suppressions>
