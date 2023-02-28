@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -96,10 +97,11 @@ class IssueGenericLetterMidEventValidationHandlerTest {
         caseData.setJointParty(buildJointParty(false));
 
         var result = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        var errors = result.getErrors();
 
         assertNotNull(result);
-        assertFalse(isEmpty(result.getErrors()));
-        assertEquals(4, result.getErrors().size());
+        assertFalse(isEmpty(errors));
+        assertEquals(4, errors.size());
     }
 
     @Test
@@ -108,10 +110,11 @@ class IssueGenericLetterMidEventValidationHandlerTest {
         caseData.setSendToAllParties(YesNo.YES);
 
         var result = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        var errors = result.getErrors();
 
         assertNotNull(result);
-        assertFalse(isEmpty(result.getErrors()));
-        assertEquals(1, result.getErrors().size());
+        assertFalse(isEmpty(errors));
+        assertEquals(1, errors.size());
     }
 
     @Test
@@ -136,10 +139,11 @@ class IssueGenericLetterMidEventValidationHandlerTest {
         caseData.setOtherPartySelection(otherPartySelection);
 
         var result = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        var errors = result.getErrors();
 
         assertNotNull(result);
-        assertFalse(isEmpty(result.getErrors()));
-        assertEquals(1, result.getErrors().size());
+        assertFalse(isEmpty(errors));
+        assertEquals(1, errors.size());
     }
 
     @Test
@@ -157,10 +161,11 @@ class IssueGenericLetterMidEventValidationHandlerTest {
         caseData.setOtherParties(List.of(otherParty));
 
         var result = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        var errors = result.getErrors();
 
         assertNotNull(result);
-        assertFalse(isEmpty(result.getErrors()));
-        assertEquals(1, result.getErrors().size());
+        assertFalse(isEmpty(errors));
+        assertEquals(1, errors.size());
     }
 
     @Test
@@ -170,10 +175,11 @@ class IssueGenericLetterMidEventValidationHandlerTest {
         caseData.setSendToOtherParties(YesNo.NO);
 
         var result = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        var errors = result.getErrors();
 
         assertNotNull(result);
-        assertFalse(isEmpty(result.getErrors()));
-        assertEquals(1, result.getErrors().size());
+        assertFalse(isEmpty(errors));
+        assertEquals(1, errors.size());
     }
 
     private List<CcdValue<OtherParty>> buildOtherParties() {
