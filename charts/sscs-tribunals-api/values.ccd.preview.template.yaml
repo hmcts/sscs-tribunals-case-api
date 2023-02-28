@@ -427,13 +427,13 @@ redis:
 #Turning either hearings api (with either listener on) or cft hearing service on requires
 #service bus to be turned on.
 sscs-hearings-api:
-  enabled: false
+  enabled: true
   java:
     image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     environment:
       ROOT_LOGGING_LEVEL: INFO
-      SSCS_LOG_LEVEL: INFO #Switch to debug to see requests being sent.
+      SSCS_LOG_LEVEL: DEBUG #Switch to debug to see requests being sent.
       SERVICE_BUS_LOG_LEVEL: ERROR
       LOG_OUTPUT: single
       CREATE_CCD_ENDPOINT: false
@@ -528,8 +528,9 @@ servicebus:
       - name: tribunals-to-hearing-api
 
 active-mq:
-    image: rmohr/activemq:5.15.9-alpine
-    ports:
-      - 61616:61616
-      - 8161:8161
-      - 5672:5672
+  enabled: true
+  image: rmohr/activemq:5.15.9-alpine
+  ports:
+    - 61616:61616
+    - 8161:8161
+    - 5672:5672
