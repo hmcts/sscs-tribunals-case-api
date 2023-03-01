@@ -516,6 +516,16 @@ active-mq:
   enabled: true
   image: rmohr/activemq:5.15.9-alpine
   ports:
-    - 61616:61616
-    - 8161:8161
-    - 5672:5672
+    - name: http
+      port: 8161
+      targetPort: 8161
+      nodePort: 32190
+    - name: jms
+      port: 61616
+      targetPort: 61616
+      nodePort: 32191
+    - name: amqp
+      port: 5672
+      targetPort: 5672
+      nodePort: 32192
+  type: NodePort
