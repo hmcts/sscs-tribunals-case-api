@@ -37,7 +37,6 @@ java:
         - name: docmosis-api-key
           alias: PDF_SERVICE_ACCESS_KEY
         - AppInsightsInstrumentationKey
-        - name: hmcts-private-creds
         - name: sscs-servicebus-connection-string-tf
           alias: HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING
   environment:
