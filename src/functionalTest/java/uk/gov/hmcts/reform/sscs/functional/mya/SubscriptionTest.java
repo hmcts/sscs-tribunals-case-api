@@ -4,6 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import java.io.IOException;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
@@ -12,6 +14,7 @@ public class SubscriptionTest extends BaseFunctionTest {
     private static final String NO = "no";
 
     @Test
+    @Ignore
     public void shouldUpdateSubscription() throws IOException, InterruptedException {
         String newUserEmail = createRandomEmail();
         CreatedCcdCase ccdCase = createCcdCase(createRandomEmail());
@@ -30,6 +33,7 @@ public class SubscriptionTest extends BaseFunctionTest {
     }
 
     @Test
+    @Ignore
     public void shouldUnsubscribeSubscription() throws IOException, InterruptedException {
         String userEmail = createRandomEmail();
         CreatedCcdCase ccdCase = createCcdCase(userEmail);

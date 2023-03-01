@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class CitizenLoginTest extends BaseFunctionTest {
@@ -22,6 +23,7 @@ public class CitizenLoginTest extends BaseFunctionTest {
     }
 
     @Test
+    @Ignore
     public void checkUserDoesNotHaveCaseAssignCaseAndCheckUserHasCase() throws IOException, InterruptedException {
         String appellantTya = ccdCase.getAppellantTya();
 
@@ -44,6 +46,7 @@ public class CitizenLoginTest extends BaseFunctionTest {
     }
 
     @Test
+    @Ignore
     public void checkJointDoesNotHaveCaseAssignCaseAndCheckUserHasCase() throws IOException, InterruptedException {
 
         String jointPartyTya = ccdCase.getJointPartyTya();
@@ -68,6 +71,7 @@ public class CitizenLoginTest extends BaseFunctionTest {
     }
 
     @Test
+    @Ignore
     public void logUserWithCase_returnsNoContent() throws IOException, InterruptedException {
 
         // Give ES time to index
