@@ -22,7 +22,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-evidence-share.enabled
   - name: sscs-ccd-callback-orchestrator
-    version: 0.0.27
+    version: 0.0.28
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-ccd-callback-orchestrator.enabled
   - name: ccd
