@@ -448,26 +448,13 @@ sscs-hearings-api:
       #Messaging
       AMQP_CONNECTION_STRING: "amqp://%1s?amqp:idleTimeout=%2d"
       HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX: ""
-      HMC_HEARING_LISTENING_ENABLED: true
-      HMC_HEARINGS_TOPIC_POLICY_NAME: RootManageSharedAccessKey
+      HMC_HEARINGS_LISTENING_ENABLED: true
+      HMC_HEARINGS_TOPIC_NAMESPACE: ${SERVICE_NAME}
       HEARINGS_TOPIC_NAME: "stub-hmc-to-cft"
       HEARINGS_TOPIC_SUBSCRIPTION_NAME: "stub-to-sscs-subscription"
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
+      TRIBUNALS_EVENT_QUEUE_NAMESPACE: ${SERVICE_NAME}
       TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
-      TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
-      secrets:
-        HMC_HEARINGS_TOPIC_NAMESPACE:
-          secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-stub-hmc-to-cft
-          key: namespaceName
-        HMC_HEARINGS_TOPIC_ACCESS_KEY:
-          secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-stub-hmc-to-cft
-          key: primaryKey
-        TRIBUNALS_EVENT_QUEUE_NAMESPACE:
-          secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
-          key: namespaceName
-        TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
-          secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
-          key: primaryKey
 
 hmc-cft-hearing-service:
   enabled: false
@@ -510,7 +497,7 @@ hmc-cft-hearing-service:
 
 #Enable for queues/topics
 servicebus:
-  enabled: true
+  enabled: false
   teamName: sscs
   resourceGroup: sscs-aks
   serviceplan: standard
