@@ -349,18 +349,13 @@ ccd:
       - caseworker-sscs-bulkscan
       - caseworker-sscs-pcqextractor
 
-<<<<<<< HEAD
-  elasticsearch:
-    nameOverride: ${SERVICE_NAME}-es
-    clusterName: "es"
-    replicas: 1
-  logstash:
-    image:
-    tag: ccd-cmc-logstash-latest
-=======
-elastic:
-  enabled: true
->>>>>>> move to ES from CCD chart
+    elasticsearch:
+      nameOverride: ${SERVICE_NAME}-es
+      clusterName: "es"
+      replicas: 1
+    logstash:
+      image:
+      tag: ccd-cmc-logstash-latest
 
 sscs-evidence-share:
   enabled: false
