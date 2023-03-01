@@ -305,7 +305,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.19.1nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S10538-22nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -324,7 +324,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: 5.19.1
+      CCD_DEF_VERSION: S10538-22
     secrets: []
     userRoles:
       - citizen
@@ -449,12 +449,25 @@ sscs-hearings-api:
       AMQP_CONNECTION_STRING: "amqp://%1s?amqp:idleTimeout=%2d"
       HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX: ""
       HMC_HEARING_LISTENING_ENABLED: true
-      HMC_HEARINGS_TOPIC_NAMESPACE: ${SERVICE_NAME}
+      HMC_HEARINGS_TOPIC_POLICY_NAME: RootManageSharedAccessKey
       HEARINGS_TOPIC_NAME: "stub-hmc-to-cft"
-      HEARINGS_TOPIC_SUBSCRIPTION_NAME: "tribunals-to-hearing-api"
+      HEARINGS_TOPIC_SUBSCRIPTION_NAME: "stub-to-sscs-subscription"
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
-      TRIBUNALS_EVENT_QUEUE_NAMESPACE: ${SERVICE_NAME}
-      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-queue"
+      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
+      TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
+      secrets:
+        HMC_HEARINGS_TOPIC_NAMESPACE:
+          secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-stub-hmc-to-cft
+          key: namespaceName
+        HMC_HEARINGS_TOPIC_ACCESS_KEY:
+          secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-stub-hmc-to-cft
+          key: primaryKey
+        TRIBUNALS_EVENT_QUEUE_NAMESPACE:
+          secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
+          key: namespaceName
+        TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
+          secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
+          key: primaryKey
 
 hmc-cft-hearing-service:
   enabled: false
@@ -497,16 +510,16 @@ hmc-cft-hearing-service:
 
 #Enable for queues/topics
 servicebus:
-  enabled: false
+  enabled: true
   teamName: sscs
   resourceGroup: sscs-aks
   serviceplan: standard
   #Each topic/queue matches up to one used in the config above
   setup:
     topics:
-      - name: hmc-to-cft
+      - name: stub-hmc-to-cft
     subscriptions:
-      - name: hmc-to-sscs-subscription
+      - name: stub-to-sscs-subscription
     queues:
       - name: hmc-from-hmi
       - name: hmc-to-hmi
@@ -516,16 +529,6 @@ active-mq:
   enabled: true
   image: rmohr/activemq:5.15.9-alpine
   ports:
-    - name: http
-      port: 8161
-      targetPort: 8161
-      nodePort: 32190
-    - name: jms
-      port: 61616
-      targetPort: 61616
-      nodePort: 32191
-    - name: amqp
-      port: 5672
-      targetPort: 5672
-      nodePort: 32192
-  type: NodePort
+    - 61616:61616
+    - 8161:8161
+    - 5672:5672
