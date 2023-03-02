@@ -10,7 +10,8 @@ public enum FurtherEvidenceActionDynamicListItems {
     ISSUE_FURTHER_EVIDENCE("issueFurtherEvidence", "Issue further evidence to all parties"),
     OTHER_DOCUMENT_MANUAL("otherDocumentManual", "Other document type - action manually"),
     SEND_TO_INTERLOC_REVIEW_BY_JUDGE("sendToInterlocReviewByJudge", "Send to Interloc - Review by Judge"),
-    SEND_TO_INTERLOC_REVIEW_BY_TCW("sendToInterlocReviewByTcw", "Send to Interloc - Review by Tcw");
+    SEND_TO_INTERLOC_REVIEW_BY_TCW("sendToInterlocReviewByTcw", "Send to Interloc - Review by Tcw"),
+    ADMIN_ACTION_CORRECTION("adminActionCorrection", "Admin action correction");
 
     final String code;
     final String label;
