@@ -29,6 +29,8 @@ java:
     CASE_ACCESS_MANAGEMENT_FEATURE: true
     WORK_ALLOCATION_FEATURE: true
     SCHEDULE_LISTING_FEATURE: true
+    ENABLE_JMS: true
+    JMS_HEARINGS_EVENT_QUEUE_NAME: tribunals-to-hearings-queue
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
