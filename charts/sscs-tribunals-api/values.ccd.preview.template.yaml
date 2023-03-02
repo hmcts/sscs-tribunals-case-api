@@ -30,7 +30,9 @@ java:
     WORK_ALLOCATION_FEATURE: true
     SCHEDULE_LISTING_FEATURE: true
     ENABLE_JMS: true
+    JMS_AMQP_CONNECTION_TEMPLATE: amqp://%1s?amqp.idleTimeout=%2d
     JMS_HEARINGS_EVENT_QUEUE_NAME: tribunals-to-hearings-queue
+    JMS_NAMESPACE: ${SERVICE_NAME}
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
