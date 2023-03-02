@@ -60,7 +60,7 @@ public class UpdateListingRequirementsAboutToStartHandler implements PreSubmitCa
                 overrideFields = initialiseOverrideFields();
                 schedulingAndListingFields.setOverrideFields(overrideFields);
             }
-
+            
             HearingInterpreter appellantInterpreter = overrideFields.getAppellantInterpreter();
             DynamicList interpreterLanguages = utils.generateInterpreterLanguageFields(appellantInterpreter.getInterpreterLanguage());
             appellantInterpreter.setInterpreterLanguage(interpreterLanguages);
