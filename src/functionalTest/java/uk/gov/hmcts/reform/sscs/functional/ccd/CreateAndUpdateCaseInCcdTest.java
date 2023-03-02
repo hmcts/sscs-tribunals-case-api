@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
