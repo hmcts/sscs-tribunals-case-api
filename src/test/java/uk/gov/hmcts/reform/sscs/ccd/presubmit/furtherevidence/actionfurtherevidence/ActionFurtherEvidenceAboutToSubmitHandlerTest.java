@@ -281,7 +281,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             .build();
 
         sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
-//        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
