@@ -451,7 +451,7 @@ sscs-hearings-api:
       HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
       #Messaging
       AMQP_CONNECTION_STRING: "amqp://%1s?amqp:idleTimeout=%2d"
-      HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX: ""
+      HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX: ".preview.platform.hmcts.net"
       HMC_HEARINGS_LISTENING_ENABLED: true
       HMC_HEARINGS_TOPIC_NAMESPACE: ${SERVICE_NAME}
       HEARINGS_TOPIC_NAME: "stub-hmc-to-cft"
