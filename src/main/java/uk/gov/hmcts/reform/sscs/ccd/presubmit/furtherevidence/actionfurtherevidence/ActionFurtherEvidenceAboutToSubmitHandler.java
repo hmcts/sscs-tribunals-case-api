@@ -9,9 +9,11 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ADMIN_ACTION_CORRECTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_TCW;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
@@ -116,6 +118,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
         }
 
+        String actionCode = sscsCaseData.getFurtherEvidenceAction().getValue().getCode();
+
         if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
 
             if (isNoOrNull(sscsCaseData.getJointParty().getHasJointParty())) {
@@ -123,10 +127,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     "Document type \"Confidentiality Request\" is invalid as there is no joint party on the case");
             }
 
-            if (!SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode()
-                .equals(sscsCaseData.getFurtherEvidenceAction().getValue().getCode())
-                && !INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode()
-                .equals(sscsCaseData.getFurtherEvidenceAction().getValue().getCode())) {
+            if (!SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode)
+                && !INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode().equals(actionCode)) {
                 preSubmitCallbackResponse.addError(
                     "Further evidence action must be 'Send to Interloc - Review by Judge' or 'Information received for Interloc - send to Judge' for a confidential document");
             }
@@ -141,17 +143,26 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
 
         String scannedDocumentType = scannedDocument.getValue().getType();
-        String actionCode = sscsCaseData.getFurtherEvidenceAction().getValue().getCode();
 
         if (ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType)
-                && !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode)) {
+            && !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode)
+        ) {
             preSubmitCallbackResponse.addError(String
-                    .format("Further evidence action must be set to '%s'",
-                            SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel()));
+                .format("'Further Evidence Action' must be set to '%s'",
+                    SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel()));
+        }
+
+        if (ScannedDocumentType.CORRECTION_APPLICATION.getValue().equals(scannedDocumentType)
+            && !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode)
+            && !ADMIN_ACTION_CORRECTION.getCode().equals(actionCode)
+        ) {
+            preSubmitCallbackResponse.addError(String
+                .format("'Further Evidence Action' must be set to '%s' or '%s'",
+                    SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel(), ADMIN_ACTION_CORRECTION.getLabel()));
         }
 
         if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals(scannedDocumentType)
-                && !OTHER_DOCUMENT_MANUAL.getCode().equals(sscsCaseData.getFurtherEvidenceAction().getValue().getCode())) {
+                && !OTHER_DOCUMENT_MANUAL.getCode().equals(actionCode)) {
             preSubmitCallbackResponse.addError(String
                 .format("Further evidence action must be '%s' for a %s", OTHER_DOCUMENT_MANUAL.getLabel(),
                     URGENT_HEARING_REQUEST.getLabel()));
@@ -230,11 +241,22 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
         }
 
-        if (isSetAsideApplicationRequest(sscsCaseData)) {
+        if (isSetAsideApplication(sscsCaseData)) {
             sscsCaseData.setState(State.POST_HEARING);
             sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
             if (PartyItemList.DWP.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
                 sscsCaseData.setDwpState(DwpState.SET_ASIDE_REQUESTED);
+            }
+        }
+
+        if (isCorrectionApplication(sscsCaseData)) {
+            sscsCaseData.setState(State.POST_HEARING);
+            sscsCaseData.setDwpState(DwpState.CORRECTION_REQUESTED);
+            if (isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())) {
+                sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
+            } else if (isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), ADMIN_ACTION_CORRECTION.getCode())) {
+                sscsCaseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
+                // TODO 10581 navigate user to Admin correction screen
             }
         }
 
@@ -246,14 +268,20 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private boolean isPostponementRequest(SscsCaseData sscsCaseData) {
         return emptyIfNull(sscsCaseData.getScannedDocuments()).stream()
-            .anyMatch(doc -> doc.getValue() != null && StringUtils.isNotBlank(doc.getValue().getType())
-                && doc.getValue().getType().equals(DocumentType.POSTPONEMENT_REQUEST.getValue()));
+            .anyMatch(doc -> doc.getValue() != null && isNotBlank(doc.getValue().getType())
+                && POSTPONEMENT_REQUEST.getValue().equals(doc.getValue().getType()));
     }
 
-    private boolean isSetAsideApplicationRequest(SscsCaseData sscsCaseData) {
+    private boolean isSetAsideApplication(SscsCaseData sscsCaseData) {
         return emptyIfNull(sscsCaseData.getScannedDocuments()).stream()
-                .anyMatch(doc -> doc.getValue() != null && StringUtils.isNotBlank(doc.getValue().getType())
-                        && DocumentType.SET_ASIDE_APPLICATION.getValue().equals(doc.getValue().getType()));
+            .anyMatch(doc -> doc.getValue() != null && isNotBlank(doc.getValue().getType())
+                && SET_ASIDE_APPLICATION.getValue().equals(doc.getValue().getType()));
+    }
+
+    private boolean isCorrectionApplication(SscsCaseData sscsCaseData) {
+        return emptyIfNull(sscsCaseData.getScannedDocuments()).stream()
+            .anyMatch(doc -> doc.getValue() != null && isNotBlank(doc.getValue().getType())
+                && CORRECTION_APPLICATION.getValue().equals(doc.getValue().getType()));
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {
@@ -536,7 +564,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     public static boolean isEvidenceIssuedAndShouldNotBeSentToBulkPrint(DynamicList furtherEvidenceActionList) {
         if (furtherEvidenceActionList != null && furtherEvidenceActionList.getValue() != null
-            && StringUtils.isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
+            && isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
             return ACTIONS_THAT_REQUIRES_EVIDENCE_ISSUED_SET_TO_YES_AND_NOT_BULK_PRINTED.contains(furtherEvidenceActionList.getValue().getCode());
         }
         return false;
@@ -576,19 +604,20 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private DocumentType getSubtype(String originalSenderCode, ScannedDocument scannedDocument) {
-        if (ScannedDocumentType.REINSTATEMENT_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
+        String type = scannedDocument.getValue().getType();
+        if (ScannedDocumentType.REINSTATEMENT_REQUEST.getValue().equals(type)) {
             return REINSTATEMENT_REQUEST;
         }
-        if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
+        if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(type)) {
             return CONFIDENTIALITY_REQUEST;
         }
-        if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
+        if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals(type)) {
             return URGENT_HEARING_REQUEST;
         }
-        if (ScannedDocumentType.POSTPONEMENT_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
+        if (ScannedDocumentType.POSTPONEMENT_REQUEST.getValue().equals(type)) {
             return POSTPONEMENT_REQUEST;
         }
-        if (ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocument.getValue().getType())) {
+        if (ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(type)) {
             return SET_ASIDE_APPLICATION;
         }
 
