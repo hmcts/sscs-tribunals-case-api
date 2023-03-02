@@ -134,8 +134,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
         if (sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) && YesNo.isNoOrNull(sscsCaseData.getDwpFurtherInfo())) {
             sscsCaseData.setInterlocReferralReason(CONFIRM_PANEL_COMPOSITION);
-            // todo: set the whoToReview
-            ccdService.updateCase(sscsCaseData, caseDetails.getId(), EventType.VALID_SEND_TO_INTERLOC.getCcdType(), "Send to interloc", "Send a case to a whoToReview for review", idamService.getIdamTokens());
+            ccdService.updateCase(sscsCaseData, caseDetails.getId(), EventType.VALID_SEND_TO_INTERLOC.getCcdType(), "Send to interloc", "", idamService.getIdamTokens());
             sscsCaseData.setInterlocReferralDate(LocalDate.now());
         }
     }

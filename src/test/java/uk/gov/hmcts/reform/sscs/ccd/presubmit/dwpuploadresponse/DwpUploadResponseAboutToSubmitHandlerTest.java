@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse.DwpUploadResponseAboutToSubmitHandler.NEW_OTHER_PARTY_RESPONSE_DUE_DAYS;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_1;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_2;
@@ -78,6 +79,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.WorkAllocationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
@@ -1149,13 +1151,20 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
         callback.getCaseDetails().getCaseData().setDwpFurtherInfo(NO.getValue());
 
+        List<DynamicListItem> dynamicListItems = new ArrayList<>();
+        dynamicListItems.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
+        dynamicListItems.add(new DynamicListItem(SelectWhoReviewsCase.REVIEW_BY_JUDGE.getId(), SelectWhoReviewsCase.REVIEW_BY_JUDGE.getLabel()));
+
+        DynamicList dynamicList = new DynamicList(new DynamicListItem("", ""), dynamicListItems);
+        sscsCaseData.setSelectWhoReviewsCase(dynamicList);
+
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
-        assertNotNull(response.getData().getInterlocReferralReason());
         assertEquals(CONFIRM_PANEL_COMPOSITION, response.getData().getInterlocReferralReason());
         assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now()));
-        verify(ccdService, times(1)).updateCase(any(SscsCaseData.class), eq(1234L), eq(VALID_SEND_TO_INTERLOC.getCcdType()), eq("Send to interloc"), eq("Send a case to a whoToReview for review"), any());
+        assertEquals(response.getData().getSelectWhoReviewsCase(), dynamicList);
+        verify(ccdService, times(1)).updateCase(any(SscsCaseData.class), eq(1234L), eq(VALID_SEND_TO_INTERLOC.getCcdType()), eq("Send to interloc"), eq(""), any());
     }
 
     @Test
@@ -1168,6 +1177,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().size(), is(0));
         assertNull(response.getData().getInterlocReferralReason());
         assertNull(response.getData().getInterlocReferralDate());
+        assertNull(response.getData().getSelectWhoReviewsCase());
         verify(ccdService, never()).updateCase(any(), any(), any(), any(), any(), any());
     }
 
