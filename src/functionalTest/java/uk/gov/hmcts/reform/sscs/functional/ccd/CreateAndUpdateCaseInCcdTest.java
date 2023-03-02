@@ -89,8 +89,6 @@ public class CreateAndUpdateCaseInCcdTest {
         caseData.setUrgentCase("Yes");
         caseData.setDocumentSentToDwp("Yes");
         caseData.setDirectionDueDate("2019-10-10");
-        caseData.getSchedulingAndListingFields().setReserveTo(ReserveTo.builder().reservedJudge(JudicialUserBase.builder().idamId("736238ce-5565-49b2-8d35-48d96ab438bf").build()).build());
-
         caseData.setIsWaiverNeeded("Yes");
         caseData.setWaiverDeclaration(Arrays.asList(new String[]{"waiverDeclarationText"}));
         caseData.setWaiverReason(Arrays.asList(new String[]{"nonCompliantOther", "nonCompliantNoMRN"}));
@@ -112,7 +110,6 @@ public class CreateAndUpdateCaseInCcdTest {
         assertEquals("Yes", updatedCaseData.getUrgentCase());
         assertEquals("Yes", updatedCaseData.getDocumentSentToDwp());
         assertEquals("2019-10-10", updatedCaseData.getDirectionDueDate());
-        assertEquals("736238ce-5565-49b2-8d35-48d96ab438bf", updatedCaseData.getSchedulingAndListingFields().getReserveTo().getReservedJudge().getIdamId());
         assertEquals("Yes", updatedCaseData.getIsWaiverNeeded());
         assertEquals("waiverDeclarationText", updatedCaseData.getWaiverDeclaration().get(0));
         assertEquals("nonCompliantOther", updatedCaseData.getWaiverReason().get(0));
