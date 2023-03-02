@@ -266,22 +266,22 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return preSubmitCallbackResponse;
     }
 
-    private boolean isPostponementRequest(SscsCaseData sscsCaseData) {
+    private boolean isDocumentType(DocumentType documentType, SscsCaseData sscsCaseData) {
         return emptyIfNull(sscsCaseData.getScannedDocuments()).stream()
             .anyMatch(doc -> doc.getValue() != null && isNotBlank(doc.getValue().getType())
-                && POSTPONEMENT_REQUEST.getValue().equals(doc.getValue().getType()));
+                && documentType.getValue().equals(doc.getValue().getType()));
+    }
+
+    private boolean isPostponementRequest(SscsCaseData sscsCaseData) {
+        return isDocumentType(POSTPONEMENT_REQUEST, sscsCaseData);
     }
 
     private boolean isSetAsideApplication(SscsCaseData sscsCaseData) {
-        return emptyIfNull(sscsCaseData.getScannedDocuments()).stream()
-            .anyMatch(doc -> doc.getValue() != null && isNotBlank(doc.getValue().getType())
-                && SET_ASIDE_APPLICATION.getValue().equals(doc.getValue().getType()));
+        return isDocumentType(SET_ASIDE_APPLICATION, sscsCaseData);
     }
 
     private boolean isCorrectionApplication(SscsCaseData sscsCaseData) {
-        return emptyIfNull(sscsCaseData.getScannedDocuments()).stream()
-            .anyMatch(doc -> doc.getValue() != null && isNotBlank(doc.getValue().getType())
-                && CORRECTION_APPLICATION.getValue().equals(doc.getValue().getType()));
+        return isDocumentType(CORRECTION_APPLICATION, sscsCaseData);
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {
