@@ -445,11 +445,10 @@ sscs-hearings-api:
       HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
       #Messaging
       HMC_HEARINGS_LISTENING_ENABLED: true
-      HMC_HEARINGS_TOPIC_NAME: "stub-hmc-to-cft"
-      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "stub-to-sscs-subscription"
+      HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft"
+      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription"
       HMC_HEARINGS_TOPIC_POLICY_NAME: RootManageSharedAccessKey
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
-      TRIBUNALS_EVENT_QUEUE_NAMESPACE: ${SERVICE_NAME}
       TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearings-api"
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
     secrets:
@@ -514,10 +513,10 @@ servicebus:
   #Each topic/queue matches up to one used in the config above
   setup:
     topics:
-      - name: ${SERVICE_NAME}-hmc-to-cft
+      - name: hmc-to-cft
     subscriptions:
-      - name: ${SERVICE_NAME}-hmc-to-sscs-subscription
+      - name: hmc-to-sscs-subscription
     queues:
-      - name: ${SERVICE_NAME}-hmc-from-hmi
-      - name: ${SERVICE_NAME}-hmc-to-hmi
-      - name: ${SERVICE_NAME}-tribunals-to-hearings-api
+      - name: hmc-from-hmi
+      - name: hmc-to-hmi
+      - name: tribunals-to-hearings-api
