@@ -78,7 +78,9 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
         assertEquals("sendToInterlocReviewByTcw", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "sendToInterlocReviewByTcw"));
 
-        assertEquals(6, response.getData().getFurtherEvidenceAction().getListItems().size());
+        assertEquals("adminActionCorrection", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "adminActionCorrection"));
+
+        assertEquals(7, response.getData().getFurtherEvidenceAction().getListItems().size());
     }
 
     private String getItemCodeInList(DynamicList dynamicList, String item) {
