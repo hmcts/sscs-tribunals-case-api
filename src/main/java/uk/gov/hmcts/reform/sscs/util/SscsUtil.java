@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.JudicialUserItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -100,12 +101,14 @@ public class SscsUtil {
 
     public static void excludePanelMembers(PanelMemberExclusions exclusions, List<JudicialUserBase> panelMembers) {
         if (nonNull(panelMembers)) {
-            List<JudicialUserBase> panelMemberExclusions = exclusions.getExcludedPanelMembers();
+            List<JudicialUserItem> panelMemberItems = panelMembers.stream()
+                .map(JudicialUserItem::new).collect(Collectors.toList());
+            List<JudicialUserItem> panelMemberExclusions = exclusions.getExcludedPanelMembers();
 
             if (isEmpty(panelMemberExclusions)) {
-                exclusions.setExcludedPanelMembers(panelMembers);
+                exclusions.setExcludedPanelMembers(panelMemberItems);
             } else {
-                panelMemberExclusions.addAll(panelMembers.stream()
+                panelMemberExclusions.addAll(panelMemberItems.stream()
                     .filter(not(panelMemberExclusions::contains))
                     .collect(Collectors.toList()));
             }
