@@ -4,9 +4,13 @@ branchName=$1
 
 #Checkout specific branch of wa-standalone-task-bpmn
 git clone https://github.com/hmcts/wa-standalone-task-bpmn.git
-cd wa-standalone-task-bpmn
+
+if [ ! -d "./wa-standalone-task-bpmn" ]; then
+  exit 1
+fi
 
 echo "Switch to ${branchName} branch on wa-standalone-task-bpmn"
+cd wa-standalone-task-bpmn
 git checkout ${branchName}
 cd ..
 

@@ -4,9 +4,13 @@ branchName=$1
 
 #Checkout specific branch of sscs-task-configuration
 git clone https://github.com/hmcts/sscs-task-configuration.git
-cd sscs-task-configuration
+
+if [ ! -d "./sscs-task-configuration" ]; then
+  exit 1
+fi
 
 echo "Switch to ${branchName} branch on sscs-task-configuration"
+cd sscs-task-configuration
 git checkout ${branchName}
 cd ..
 
