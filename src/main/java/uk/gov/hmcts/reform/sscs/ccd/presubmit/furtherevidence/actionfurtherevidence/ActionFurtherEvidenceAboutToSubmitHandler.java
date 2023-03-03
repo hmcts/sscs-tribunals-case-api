@@ -620,6 +620,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(type)) {
             return SET_ASIDE_APPLICATION;
         }
+        if (ScannedDocumentType.CORRECTION_APPLICATION.getValue().equals(type)) {
+            return CORRECTION_APPLICATION;
+        }
 
         String originalSenderStripped  = originalSenderCode.replaceAll("\\d","");
 
