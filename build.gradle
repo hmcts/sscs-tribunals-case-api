@@ -260,7 +260,7 @@ dependencyManagement {
         }
 
         // CVE-2022-41881, CVE-2022-41915
-        dependencySet(group: 'io.netty', version: '4.1.87.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.89.Final') {
             entry 'netty-buffer'
             entry 'netty-common'
             entry 'netty-codec'
