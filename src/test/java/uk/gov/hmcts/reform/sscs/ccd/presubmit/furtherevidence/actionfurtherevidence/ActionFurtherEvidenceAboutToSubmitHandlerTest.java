@@ -233,7 +233,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "setAsideApplication, SET_ASIDE_REQUESTED", 
         "correctionApplication, CORRECTION_REQUESTED"
     })
-    public void giveAValidPostHearingApplicationRequestFromAnFtaUser_thenDwpStateIsUpdated(String documentType, DwpState dwpState) {
+    public void giveAValidPostHearingApplicationRequestFromAnFtaUser_thenDwpStateIsUpdatedAndDocumentIsExpectedType(
+        String documentType,
+        DwpState dwpState
+    ) {
         DynamicListItem sendToInterlocListItem = new DynamicListItem(
                 FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
                 FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
@@ -258,11 +261,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                 ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getDwpState(), is(dwpState));
+        SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
+        assertThat(sscsDocumentDetail.getDocumentType(), is(documentType));
     }
 
     @Test
-    @Parameters({"correctionApplication"})
-    public void giveAValidCorrectionApplicationWithAdminCorrectionActionSelected_thenDwpStateIsUpdated(String documentType) {
+    public void giveAValidCorrectionApplicationWithAdminCorrectionActionSelected_thenDwpStateIsUpdated() {
         DynamicListItem sendToInterlocListItem = new DynamicListItem(
             FurtherEvidenceActionDynamicListItems.ADMIN_ACTION_CORRECTION.getCode(),
             FurtherEvidenceActionDynamicListItems.ADMIN_ACTION_CORRECTION.getLabel());
@@ -272,7 +276,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
 
         ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
-            .type(documentType)
+            .type("correctionApplication")
             .fileName("Test.pdf")
             .url(DOC_LINK)
             .build();
@@ -286,6 +290,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getDwpState(), is(DwpState.CORRECTION_REQUESTED));
+        SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
+        assertThat(sscsDocumentDetail.getDocumentType(), is("correctionApplication"));
+        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.AWAITING_ADMIN_ACTION));
     }
 
     @Test
@@ -320,8 +327,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"correctionApplication"})
-    public void givenAValidCorrectionApplicationWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError(String documentType) {
+    public void givenAValidCorrectionApplicationWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError() {
         DynamicListItem issueEvidenceAction = new DynamicListItem(
             FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getCode(),
             FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getLabel());
@@ -331,7 +337,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.getFurtherEvidenceAction().setValue(issueEvidenceAction);
 
         ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
-            .type(documentType)
+            .type("correctionApplication")
             .fileName("Test.pdf")
             .url(DOC_LINK)
             .build();
