@@ -456,8 +456,8 @@ sscs-hearings-api:
       HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX: ".preview.platform.hmcts.net"
       HMC_HEARINGS_LISTENING_ENABLED: true
       HMC_HEARINGS_TOPIC_NAMESPACE: ${SERVICE_NAME}
-      HEARINGS_TOPIC_NAME: "stub-hmc-to-cft"
-      HEARINGS_TOPIC_SUBSCRIPTION_NAME: "stub-to-sscs-subscription"
+      HMC_HEARINGS_TOPIC_NAME: "stub-hmc-to-cft"
+      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "stub-to-sscs-subscription"
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
       TRIBUNALS_EVENT_QUEUE_NAMESPACE: ${SERVICE_NAME}
       TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
