@@ -564,7 +564,7 @@ wa-task-management-api:
       ROLE_ASSIGNMENT_URL: http://{{ .Release.Name }}-am-role-assignment-service
       POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
       POSTGRES_NAME: cft_task_db
-      POSTGRES_USERNAME: hmcts
+      POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: hmcts
       POSTGRES_CONNECTION_OPTIONS: ""
       CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
