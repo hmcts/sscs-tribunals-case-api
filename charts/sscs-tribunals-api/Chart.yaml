@@ -10,11 +10,11 @@ dependencies:
     version: 4.0.13
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
   - name: idam-pr
-    version: 2.2.6
+    version: 2.3.0
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: idam-pr.enabled
   - name: xui-webapp
-    version: 1.0.1
+    version: 1.0.5
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: xui-webapp.enabled
   - name: sscs-evidence-share
@@ -26,7 +26,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-ccd-callback-orchestrator.enabled
   - name: ccd
-    version: 8.0.23
+    version: 8.0.26
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd.enabled
     tags:
@@ -40,7 +40,7 @@ dependencies:
     repository: "https://charts.bitnami.com/bitnami"
     condition: redis.enabled
   - name: em-ccdorc
-    version: 1.0.15
+    version: 2.0.4
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: em-ccdorc.enabled
   - name: ccd-case-document-am-api
@@ -52,7 +52,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-hearings-api.enabled
   - name: hmc-cft-hearing-service
-    version: 1.6.9
+    version: 1.6.12
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: hmc-cft-hearing-service.enabled
   - name: servicebus
