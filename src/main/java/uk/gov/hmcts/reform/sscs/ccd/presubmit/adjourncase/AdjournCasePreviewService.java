@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -339,12 +340,16 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         if (signedInJudgeName == null) {
             throw new IllegalStateException("Unable to obtain signed in user name");
         }
-        names.add(signedInJudgeName);
+        names.add(StringUtils.getInitalsAndSurnameFromName(signedInJudgeName));
 
         List<JudicialUserBase> panelMembers = caseData.getAdjournment().getPanelMembers();
 
+        panelMembers.add(JudicialUserBase.builder().personalCode("49933315").build());
+
         names.addAll(panelMembers.stream()
-            .map(panelMember -> judicialRefDataService.getJudicialUserFullName(panelMember.getPersonalCode()))
+            .map(panelMember ->
+                judicialRefDataService.getJudicialUserTitleWithInitialsAndLastName(panelMember.getPersonalCode()))
+            .filter(Objects::nonNull)
             .collect(Collectors.toList()));
 
         return StringUtils.getGramaticallyJoinedStrings(names);
