@@ -445,18 +445,18 @@ sscs-hearings-api:
       HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
       #Messaging
       HMC_HEARINGS_LISTENING_ENABLED: true
-      HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft"
-      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription"
+      HMC_HEARINGS_TOPIC_NAME: "stub-hmc-to-cft-{{ .Values.global.environment }}"
+      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "stub-hmc-to-sscs-subscription-{{ .Values.global.environment }}"
       HMC_HEARINGS_TOPIC_POLICY_NAME: RootManageSharedAccessKey
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
-      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearings-api"
+      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api-{{ .Values.global.environment }}"
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
     secrets:
       TRIBUNALS_EVENT_QUEUE_NAMESPACE:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearings-api
+        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
         key: namespaceName
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearings-api
+        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
         key: primaryKey
       HMC_HEARINGS_TOPIC_NAMESPACE:
         secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
@@ -471,10 +471,10 @@ hmc-cft-hearing-service:
     releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
     image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
     environment:
-      HMC_SERVICE_BUS_TOPIC: "stub-hmc-to-cft"
-      HMC_SERVICE_BUS_SUBSCRIPTION: "stub-hmc-to-sscs-subscription"
-      HMC_SERVICE_BUS_QUEUE: stub-hmc-from-hmi
-      HMC_OUTBOUND_SERVICE_BUS_QUEUE: stub-hmc-to-hmi
+      HMC_SERVICE_BUS_TOPIC: "stub-hmc-to-cft-{{ .Values.global.environment }}"
+      HMC_SERVICE_BUS_SUBSCRIPTION: "stub-hmc-to-sscs-subscription-{{ .Values.global.environment }}"
+      HMC_SERVICE_BUS_QUEUE: hmc-from-hmi
+      HMC_OUTBOUND_SERVICE_BUS_QUEUE: hmc-to-hmi
       CFT_HEARING_SERVICE_DB_HOST: "${SERVICE_NAME}-postgresql"
       CFT_HEARING_SERVICE_DB_NAME: "hmc-cft-hearing-service"
       CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
@@ -513,10 +513,10 @@ servicebus:
   #Each topic/queue matches up to one used in the config above
   setup:
     topics:
-      - name: hmc-to-cft
+      - name: "stub-hmc-to-cft-{{ .Values.global.environment }}"
     subscriptions:
-      - name: hmc-to-sscs-subscription
+      - name: "stub-hmc-to-sscs-subscription-{{ .Values.global.environment }}"
     queues:
       - name: hmc-from-hmi
       - name: hmc-to-hmi
-      - name: tribunals-to-hearings-api
+      - name: "tribunals-to-hearing-api-{{ .Values.global.environment }}"

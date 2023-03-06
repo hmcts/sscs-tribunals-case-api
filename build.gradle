@@ -566,7 +566,7 @@ bootWithCCD {
 
     // Local Queue
     environment 'JMS_NAMESPACE', 'localhost:5672'
-    environment 'JMS_HEARINGS_EVENT_QUEUE_NAME', 'tribunals-to-hearings-queue'
+    environment 'JMS_HEARINGS_EVENT_QUEUE_NAME', 'tribunals-to-hearing-queue'
     environment 'JMS_AMQP_CONNECTION_TEMPLATE', 'amqp://%1s?amqp.idleTimeout=%2d'
     environment 'ENABLE_JMS', 'true'
 }
