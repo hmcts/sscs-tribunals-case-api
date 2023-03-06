@@ -370,7 +370,7 @@ dependencies {
 
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.7.1'
 
-    implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.77"
+    implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.78"
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
 
