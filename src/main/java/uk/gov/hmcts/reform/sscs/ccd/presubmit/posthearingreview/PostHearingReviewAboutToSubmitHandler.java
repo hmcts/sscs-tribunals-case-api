@@ -52,6 +52,7 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
         PostHearing postHearing = caseData.getPostHearing();
         if (nonNull(postHearing) && nonNull(postHearing.getSetAside().getAction())) {
             caseData.setState(State.NOT_LISTABLE);
+            caseData.setDwpState(DwpState.SET_ASIDE_GRANTED);
             caseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION);
         }
     }
