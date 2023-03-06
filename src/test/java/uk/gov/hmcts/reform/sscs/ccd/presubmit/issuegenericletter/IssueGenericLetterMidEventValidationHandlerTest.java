@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_GENERIC_LETTER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
 import java.time.LocalDateTime;
@@ -105,6 +106,7 @@ class IssueGenericLetterMidEventValidationHandlerTest {
 
     @Test
     void giveAppellantAppointeeAddressIsEmpty_returnError() {
+        caseData.getAppeal().getAppellant().setIsAppointee(YES);
         caseData.getAppeal().getAppellant().getAppointee().setAddress(null);
         caseData.setSendToAllParties(YesNo.YES);
 

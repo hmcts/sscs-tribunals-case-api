@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuegenericletter;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.HashSet;
 import java.util.List;
@@ -59,9 +60,13 @@ public class IssueGenericLetterMidEventValidationHandler implements PreSubmitCal
 
         if (sendToAllParties || YesNo.isYes(caseData.getSendToApellant())) {
             var appellant = caseData.getAppeal().getAppellant();
-            var appellantAppointee = appellant.getAppointee();
+            var appointee = appellant.getAppointee();
 
-            if (appellantAppointee != null && isAddressEmpty(appellantAppointee.getAddress())) {
+            var hasAppointee = nonNull(appointee) && isYes(appellant.getIsAppointee());
+
+            log.info("Appellant appointee {}", appointee);
+
+            if (hasAppointee && isAddressEmpty(appointee.getAddress())) {
                 errors.add("Address is empty for an appellant appointee");
             } else if (isAddressEmpty(appellant.getAddress())) {
                 errors.add("Address is empty for an appellant");
