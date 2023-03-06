@@ -16,7 +16,7 @@ public class HearingMessagingServiceFactory {
 
     private final JmsTemplate jmsTemplate;
 
-    @Value("${jms.tribunals-to-hearings-api.queue}")
+    @Value("${jms.tribunals-to-hearing-api.queue}")
     private String tribunalsToHearingsQueue;
 
     @Value("${jms.enabled}")
