@@ -451,7 +451,7 @@ sscs-hearings-api:
       HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription"
       HMC_HEARINGS_TOPIC_POLICY_NAME: RootManageSharedAccessKey
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
-      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
+      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api-{{ .Values.global.environment }}"
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
     secrets:
       TRIBUNALS_EVENT_QUEUE_NAMESPACE:
