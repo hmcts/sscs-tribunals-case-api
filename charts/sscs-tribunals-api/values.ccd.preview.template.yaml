@@ -129,6 +129,8 @@ ccd:
       enabled: true
     apiGatewayWeb:
       enabled: true
+    postgresql:
+      enabled: true
     s2s:
       enabled: false
     elastic:
@@ -459,10 +461,10 @@ sscs-hearings-api:
         secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
         key: primaryKey
       HMC_HEARINGS_TOPIC_NAMESPACE:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
+        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-stub-hmc-to-cft
         key: namespaceName
       HMC_HEARINGS_TOPIC_ACCESS_KEY:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
+        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-stub-hmc-to-cft
         key: primaryKey
 
 hmc-cft-hearing-service:
@@ -484,7 +486,7 @@ hmc-cft-hearing-service:
       SPRING_CONFIG_IMPORT : "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
     secrets:
       HMC_SERVICE_BUS_CONNECTION_STRING:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
+        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-stub-hmc-to-cft
         key: connectionString
       HMC_QUEUE_CONNECTION_STRING:
         secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-from-hmi
