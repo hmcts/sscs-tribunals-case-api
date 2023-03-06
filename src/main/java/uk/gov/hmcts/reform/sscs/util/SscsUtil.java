@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -101,8 +102,13 @@ public class SscsUtil {
     public static void excludePanelMembers(PanelMemberExclusions exclusions, List<JudicialUserBase> panelMembers) {
         if (nonNull(panelMembers)) {
             List<JudicialUserItem> panelMemberItems = panelMembers.stream()
+                .filter(Objects::nonNull)
                 .map(JudicialUserItem::new).collect(Collectors.toList());
             List<JudicialUserItem> panelMemberExclusions = exclusions.getExcludedPanelMembers();
+
+            log.info("Excluding {} panel members with IDs {}", panelMemberItems.size(),
+                panelMemberItems.stream()
+                    .map(panelMember -> panelMember.getValue().getPersonalCode()).collect(Collectors.toList()));
 
             if (isEmpty(panelMemberExclusions)) {
                 exclusions.setExcludedPanelMembers(panelMemberItems);
