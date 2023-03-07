@@ -18,6 +18,7 @@ fi
 # Load BPMN files
 for file in $(find ${camundaFilepath} -name '*.bpmn')
 do
+  echo "file=@${camundaFilepath}/$(basename ${file})";
   uploadResponse=$(curl --insecure -v --silent -w "\n%{http_code}" --show-error -X POST \
     ${CAMUNDA_BASE_URL:-http://localhost:9404}/engine-rest/deployment/create \
     -H "Accept: application/json" \
@@ -41,6 +42,7 @@ done
 # Load DMN files
 for file in $(find ${camundaFilepath} -name '*.dmn')
 do
+  echo "file=@${camundaFilepath}/$(basename ${file})";
   uploadResponse=$(curl --insecure -v --silent -w "\n%{http_code}" --show-error -X POST \
     ${CAMUNDA_BASE_URL:-http://localhost:9404}/engine-rest/deployment/create \
     -H "Accept: application/json" \

@@ -19,5 +19,5 @@ if [ ! -d "./camunda" ]; then
   mkdir camunda
 fi
 
-cp -r ./wa-standalone-task-bpmn/src/main/resources/ ./camunda
+cp -r ./wa-standalone-task-bpmn/src/main/resources/*.bpmn ./camunda
 rm -rf ./wa-standalone-task-bpmn
