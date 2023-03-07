@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.DORMANT_APPEAL_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceAboutToSubmitHandler.ACTIONS_THAT_REQUIRES_EVIDENCE_ISSUED_SET_TO_YES_AND_NOT_BULK_PRINTED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceAboutToSubmitHandler.FURTHER_EVIDENCE_RECEIVED;
@@ -1004,6 +1005,37 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(occurs, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
+        assertEquals(0, response.getWarnings().size());
+    }
+
+    @Test
+    @Parameters({"ADMIN_ACTION_CORRECTION","SEND_TO_INTERLOC_REVIEW_BY_JUDGE"})
+    public void shouldSetBundleAdditionForCorrectionApplication(FurtherEvidenceActionDynamicListItems actionType) {
+
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
+
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(actionType.code, actionType.label));
+
+        when(caseDetails.getState()).thenReturn(DORMANT_APPEAL_STATE);
+        when(footerService.getNextBundleAddition(any())).thenReturn("A");
+
+        ScannedDocumentDetails scannedDocumentDetails = ScannedDocumentDetails.builder()
+            .fileName("filename.pdf")
+            .type(ScannedDocumentType.CORRECTION_APPLICATION.getValue())
+            .url(DOC_LINK)
+            .includeInBundle("Yes")
+            .build();
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+            .value(scannedDocumentDetails)
+            .build();
+        List<ScannedDocument> docs = new ArrayList<>();
+
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
         assertEquals(0, response.getWarnings().size());
     }
 
