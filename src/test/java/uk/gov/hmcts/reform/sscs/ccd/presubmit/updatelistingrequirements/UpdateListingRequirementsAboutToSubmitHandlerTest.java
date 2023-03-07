@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -23,12 +25,15 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 
@@ -79,9 +84,9 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", false);
         sscsCaseData = CaseDataUtils.buildCaseData();
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
     }
@@ -97,13 +102,13 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
 
         given(listAssistHearingMessageHelper.sendHearingMessage(
-            anyString(),any(HearingRoute.class),any(HearingState.class),eq(null)))
-            .willReturn(true);
+                anyString(),any(HearingRoute.class),any(HearingState.class),eq(null)))
+                .willReturn(true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
 
@@ -123,13 +128,13 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
 
         given(listAssistHearingMessageHelper.sendHearingMessage(
-            anyString(),any(HearingRoute.class),any(HearingState.class),eq(null)))
-            .willReturn(false);
+                anyString(),any(HearingRoute.class),any(HearingState.class),eq(null)))
+                .willReturn(false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
 
@@ -141,9 +146,9 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
     }
@@ -156,10 +161,56 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
         given(caseDetails.getState()).willReturn(State.UNKNOWN);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void whenIsInterpreterWantedIsNo_interpreterLanguageShouldBeNull() {
+        sscsCaseData = CaseDataUtils.buildCaseData();
+        var overrideFields = getOverrideFields(YesNo.NO);
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
+
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+        var interpreter = response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
+
+        assertNull(interpreter.getInterpreterLanguage());
+    }
+
+    @Test
+    public void whenIsInterpreterWantedIsYes_interpreterLanguageShouldNotBeNull() {
+        sscsCaseData = CaseDataUtils.buildCaseData();
+        var overrideFields = getOverrideFields(YesNo.YES);
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
+
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+        var interpreter = response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
+
+        assertNotNull(interpreter.getInterpreterLanguage());
+    }
+
+    private static OverrideFields getOverrideFields(YesNo yesOrNo) {
+        var testLanguage = new DynamicList("testLanguage");
+
+        var appellantInterpreter = HearingInterpreter.builder()
+                .isInterpreterWanted(yesOrNo)
+                .interpreterLanguage(testLanguage)
+                .build();
+        return OverrideFields.builder()
+                .appellantInterpreter(appellantInterpreter)
+                .build();
     }
 }

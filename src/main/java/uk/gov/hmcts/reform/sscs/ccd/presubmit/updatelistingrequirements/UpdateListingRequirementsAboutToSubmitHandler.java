@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +38,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && (callback.getEvent() == EventType.UPDATE_LISTING_REQUIREMENTS);
+                && (callback.getEvent() == EventType.UPDATE_LISTING_REQUIREMENTS);
     }
 
     @Override
@@ -51,25 +53,27 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        cleanInterpreter(sscsCaseData);
+
         State state = callback.getCaseDetails().getState();
         HearingRoute hearingRoute = sscsCaseData.getSchedulingAndListingFields().getHearingRoute();
 
         if (gapsSwitchOverFeature
-            && state == State.READY_TO_LIST
-            && hearingRoute == LIST_ASSIST
-            && nonNull(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())) {
+                && state == State.READY_TO_LIST
+                && hearingRoute == LIST_ASSIST
+                && nonNull(sscsCaseData.getSchedulingAndListingFields().getOverrideFields())) {
             String caseId = sscsCaseData.getCcdCaseId();
             log.info("UpdateListingRequirements List Assist request, Update Hearing,"
-                    + "amend reasons: {}, for case ID: {}",
-                sscsCaseData.getSchedulingAndListingFields().getAmendReasons(), caseId);
+                            + "amend reasons: {}, for case ID: {}",
+                    sscsCaseData.getSchedulingAndListingFields().getAmendReasons(), caseId);
 
             HearingState hearingState = UPDATE_HEARING;
 
             boolean messageSuccess = listAssistHearingMessageHelper.sendHearingMessage(
-                caseId,
-                hearingRoute,
-                hearingState,
-                null);
+                    caseId,
+                    hearingRoute,
+                    hearingState,
+                    null);
 
             if (messageSuccess) {
                 sscsCaseData.getSchedulingAndListingFields().setHearingState(hearingState);
@@ -78,5 +82,18 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
         return callbackResponse;
+    }
+
+    private void cleanInterpreter(SscsCaseData sscsCaseData) {
+        var schedulingAndListingFields = sscsCaseData.getSchedulingAndListingFields();
+        var overrideFields = schedulingAndListingFields.getOverrideFields();
+
+        if (!isNull(overrideFields)) {
+            var hearingInterpreter = overrideFields.getAppellantInterpreter();
+
+            if (!isNull(hearingInterpreter) && isNoOrNull(hearingInterpreter.getIsInterpreterWanted())) {
+                hearingInterpreter.setInterpreterLanguage(null);
+            }
+        }
     }
 }
