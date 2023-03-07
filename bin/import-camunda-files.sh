@@ -11,8 +11,8 @@ serviceToken=$($(realpath $workspace)/bin/utils/idam-lease-service-token.sh sscs
   $(docker run --rm toolbelt/oathtool --totp -b ${s2sSecret}))
 
 camundaFilepath="$(realpath $workspace)/camunda"
-if [ ! -d ${camundaFilepath} ]
-  echo "Directory with camunda definition files is missing: ${camundaFilepath}"
+if [ ! -d ${camundaFilepath} ]; then
+  echo "Directory with camunda definition files is missing: ${camundaFilepath}";
 fi
 
 # Load BPMN files
@@ -30,7 +30,7 @@ do
   upload_response_content=$(echo "$uploadResponse" | sed '$d')
 
   if [[ "${upload_http_code}" == '200' ]]; then
-    echo "$(basename ${file}) diagram uploaded successfully (${upload_response_content})"
+    echo "$(basename ${file}) diagram uploaded successfully (${upload_response_content})";
     continue;
   fi
 
@@ -55,12 +55,10 @@ do
   upload_response_content=$(echo "$uploadResponse" | sed '$d')
 
   if [[ "${upload_http_code}" == '200' ]]; then
-    echo "$(basename ${file}) diagram uploaded successfully (${upload_response_content})"
+    echo "$(basename ${file}) diagram uploaded successfully (${upload_response_content})";
     continue;
   fi
 
-  echo "$(basename ${file}) upload failed with http code ${upload_http_code} and response (${upload_response_content})"
+  echo "$(basename ${file}) upload failed with http code ${upload_http_code} and response (${upload_response_content})";
   continue;
 done
-
-
