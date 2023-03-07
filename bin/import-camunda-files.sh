@@ -24,7 +24,7 @@ do
     -H "ServiceAuthorization: Bearer ${serviceToken}" \
     -F "deployment-name=$(basename ${file})" \
     -F "deploy-changed-only=true" \
-    -F "file=@${bpmnFilepath}/$(basename ${file})")
+    -F "file=@${camundaFilepath}/$(basename ${file})")
 
   upload_http_code=$(echo "$uploadResponse" | tail -n1)
   upload_response_content=$(echo "$uploadResponse" | sed '$d')
@@ -49,7 +49,7 @@ do
     -F "deploy-changed-only=true" \
     -F "deployment-source=$product" \
     ${tenant_id:+'-F' "tenant-id=$tenant_id"} \
-    -F "file=@${dmnFilepath}/$(basename ${file})")
+    -F "file=@${camundaFilepath}/$(basename ${file})")
 
   upload_http_code=$(echo "$uploadResponse" | tail -n1)
   upload_response_content=$(echo "$uploadResponse" | sed '$d')
