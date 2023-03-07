@@ -5,7 +5,7 @@ workspace=${1}
 tenant_id=${2}
 product=${3}
 
-s2sSecret=${S2S_SECRET:-AABBCCDDEEFFGGHH}
+s2sSecret=${IDAM_S2S_AUTH_TOTP_SECRET:-AABBCCDDEEFFGGHH}
 
 serviceToken=$($(realpath $workspace)/bin/utils/idam-lease-service-token.sh sscs \
   $(docker run --rm toolbelt/oathtool --totp -b ${s2sSecret}))
