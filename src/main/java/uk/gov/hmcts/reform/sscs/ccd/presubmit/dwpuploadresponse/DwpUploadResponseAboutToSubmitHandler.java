@@ -44,11 +44,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
+import uk.gov.hmcts.reform.sscs.service.InterlocService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
@@ -60,6 +62,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     private static final DateTimeFormatter DD_MM_YYYY_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     public static final int NEW_OTHER_PARTY_RESPONSE_DUE_DAYS = 14;
     private final DwpDocumentService dwpDocumentService;
+    private final InterlocService interlocService;
     private final AddNoteService addNoteService;
     private final AddedDocumentsUtil addedDocumentsUtil;
     private final CcdService ccdService;
@@ -69,12 +72,15 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     @Autowired
     public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService,
-                                                 AddedDocumentsUtil addedDocumentsUtil, CcdService ccdService, IdamService idamService) {
+                                                 AddedDocumentsUtil addedDocumentsUtil, CcdService ccdService, IdamService idamService,
+                                                 InterlocService interlocService) {
+
         this.dwpDocumentService = dwpDocumentService;
         this.addNoteService = addNoteService;
         this.addedDocumentsUtil = addedDocumentsUtil;
         this.ccdService = ccdService;
         this.idamService = idamService;
+        this.interlocService = interlocService;
     }
 
     @Override
@@ -115,7 +121,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         checkSscs2AndSscs5Confidentiality(preSubmitCallbackResponse, sscsCaseData);
 
-        setSscs2InterlocProperties(caseDetails);
+        setSscs2InterlocProperties(callback, caseDetails);
 
         if (isValidBenefitTypeForConfidentiality(sscsCaseData)
                 && sscsCaseData.getOtherParties() != null) {
@@ -130,12 +136,20 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         return preSubmitCallbackResponse;
     }
 
-    private void setSscs2InterlocProperties(CaseDetails<SscsCaseData> caseDetails) {
+    private void setSelectWhoReviewsCase(SscsCaseData sscsCaseData) {
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        DynamicListItem dynamicListItem = new DynamicListItem(SelectWhoReviewsCase.REVIEW_BY_JUDGE.getId(), SelectWhoReviewsCase.REVIEW_BY_JUDGE.getLabel());
+        listOptions.add(dynamicListItem);
+        sscsCaseData.setSelectWhoReviewsCase(new DynamicList(dynamicListItem, listOptions));
+    }
+
+    private void setSscs2InterlocProperties(Callback<SscsCaseData> callback, CaseDetails<SscsCaseData> caseDetails) {
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
         if (sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) && YesNo.isNoOrNull(sscsCaseData.getDwpFurtherInfo())) {
             sscsCaseData.setInterlocReferralReason(CONFIRM_PANEL_COMPOSITION);
-            ccdService.updateCase(sscsCaseData, caseDetails.getId(), EventType.VALID_SEND_TO_INTERLOC.getCcdType(), "Send to interloc", "", idamService.getIdamTokens());
             sscsCaseData.setInterlocReferralDate(LocalDate.now());
+            setSelectWhoReviewsCase(sscsCaseData);
+            interlocService.processSendToInterloc(callback, sscsCaseData);
         }
     }
 

@@ -327,7 +327,7 @@ dependencies {
     //remove when secure doc store is live
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
-    
+
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'SSCS-11384-SNAPSHOT'
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.1'
 

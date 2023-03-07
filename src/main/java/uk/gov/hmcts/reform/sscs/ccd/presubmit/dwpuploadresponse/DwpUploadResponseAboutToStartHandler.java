@@ -2,20 +2,17 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 @Slf4j
@@ -45,14 +42,7 @@ public class DwpUploadResponseAboutToStartHandler extends ResponseEventsAboutToS
             preSubmitCallbackResponse.addError("This case cannot be updated by DWP");
         }
 
-        setSelectWhoReviewsCase(sscsCaseData);
         return preSubmitCallbackResponse;
     }
 
-    private void setSelectWhoReviewsCase(SscsCaseData sscsCaseData) {
-        List<DynamicListItem> listOptions = new ArrayList<>();
-        DynamicListItem dynamicListItem = new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel());
-        listOptions.add(dynamicListItem);
-        sscsCaseData.setSelectWhoReviewsCase(new DynamicList(dynamicListItem, listOptions));
-    }
 }
