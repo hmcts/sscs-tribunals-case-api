@@ -51,6 +51,8 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        log.info("#17 {}", sscsCaseData.getSchedulingAndListingFields().getPanelMemberExclusions());
+
         State state = callback.getCaseDetails().getState();
         HearingRoute hearingRoute = sscsCaseData.getSchedulingAndListingFields().getHearingRoute();
 

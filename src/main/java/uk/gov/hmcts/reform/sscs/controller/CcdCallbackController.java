@@ -61,6 +61,8 @@ public class CcdCallbackController {
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
         @RequestBody String message) {
 
+        log.info("#16 {}", message);
+
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
         log.info("About to submit sscs case callback `{}` received for Case ID `{}`", callback.getEvent(),
             callback.getCaseDetails().getId());
