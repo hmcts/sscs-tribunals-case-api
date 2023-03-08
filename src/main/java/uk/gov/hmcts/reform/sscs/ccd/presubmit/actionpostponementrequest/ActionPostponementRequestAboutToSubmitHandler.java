@@ -179,7 +179,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     private void clearTransientFields(SscsCaseData caseData) {
         caseData.setDocumentGeneration(DocumentGeneration.builder().build());
         caseData.setDocumentStaging(DocumentStaging.builder().build());
-        caseData.setReservedToJudge(null);
+        caseData.setReservedToJudgeInterloc(null);
         caseData.setTempNoteDetail(null);
         caseData.setShowRip1DocPage(null);
 

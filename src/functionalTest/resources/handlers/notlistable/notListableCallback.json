@@ -223,7 +223,10 @@
         "phoneNumber": "0300 123 1142",
         "postcode": "LS1 2ED"
       },
-      "reservedToJudge": "Judge Rinder",
+      "reservedToJudgeInterloc": {
+        "idamId" : "736238ce-5565-49b2-8d35-48d96ab438bf",
+        "personalCode" : "49933315"
+      },
       "sscsDocument": [
         {
           "id": "beac0b90-4ff8-479c-95d9-259b2cd9e6ba",
@@ -600,7 +603,7 @@
           "postcode": "PUBLIC"
         }
       },
-      "reservedToJudge": "PUBLIC",
+      "reservedToJudgeInterloc": "PUBLIC",
       "sscsDocument": {
         "classification": "PUBLIC",
         "value": [
@@ -998,7 +1001,7 @@
           "postcode": "PUBLIC"
         }
       },
-      "reservedToJudge": "PUBLIC",
+      "reservedToJudgeInterloc": "PUBLIC",
       "sscsDocument": {
         "classification": "PUBLIC",
         "value": [
@@ -1321,7 +1324,10 @@
         "phoneNumber": "0300 123 1142",
         "postcode": "LS1 2ED"
       },
-      "reservedToJudge": "Judge Rinder",
+      "reservedToJudgeInterloc": {
+        "idamId" : "736238ce-5565-49b2-8d35-48d96ab438bf",
+        "personalCode" : "49933315"
+      },
       "sscsDocument": [
         {
           "id": "beac0b90-4ff8-479c-95d9-259b2cd9e6ba",
@@ -1701,7 +1707,7 @@
           "postcode": "PUBLIC"
         }
       },
-      "reservedToJudge": "PUBLIC",
+      "reservedToJudgeInterloc": "PUBLIC",
       "sscsDocument": {
         "classification": "PUBLIC",
         "value": [
@@ -2099,7 +2105,7 @@
           "postcode": "PUBLIC"
         }
       },
-      "reservedToJudge": "PUBLIC",
+      "reservedToJudgeInterloc": "PUBLIC",
       "sscsDocument": {
         "classification": "PUBLIC",
         "value": [
