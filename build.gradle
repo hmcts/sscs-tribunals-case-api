@@ -44,7 +44,7 @@ tasks.withType(Copy).all { duplicatesStrategy 'warn' }
 mainClassName = 'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication'
 
 pmd {
-    toolVersion = "6.53.0"
+    toolVersion = "6.55.0"
     ignoreFailures = true
     sourceSets = [sourceSets.main, sourceSets.test]
     reportsDir = file("$project.buildDir/reports/pmd")
@@ -255,12 +255,12 @@ task runGitPreCommitTasks {
 dependencyManagement {
     dependencies {
         //CVE-2022-25857
-        dependencySet(group: 'org.yaml', version: '1.33') {
+        dependencySet(group: 'org.yaml', version: '2.0') {
             entry 'snakeyaml'
         }
 
         // CVE-2022-41881, CVE-2022-41915
-        dependencySet(group: 'io.netty', version: '4.1.87.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.89.Final') {
             entry 'netty-buffer'
             entry 'netty-common'
             entry 'netty-codec'
@@ -328,13 +328,13 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '66d4043'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.6.0'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'ccf576f'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.1'
 
-    implementation group: 'com.azure', name: 'azure-core', version: '1.34.0'
-    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.0'
+    implementation group: 'com.azure', name: 'azure-core', version: '1.37.0'
+    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.2'
 
-    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.5.1'
+    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.5.3'
 
     implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.4'
 
@@ -366,18 +366,18 @@ dependencies {
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.7.0'
     implementation group: 'org.apache.tika', name: 'tika-parsers', version: '2.7.0'
 
-    implementation group: 'org.json', name: 'json', version: '20220924'
+    implementation group: 'org.json', name: 'json', version: '20230227'
 
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.7.1'
 
-    implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.77"
+    implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.78"
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
 
     functionalTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
 
-    implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+    implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
 
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
@@ -385,8 +385,8 @@ dependencies {
 
     testImplementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version:  '4.5.14'
 
-    testImplementation group: 'com.azure', name: 'azure-core', version: '1.34.0'
-    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.0'
+    testImplementation group: 'com.azure', name: 'azure-core', version: '1.37.0'
+    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.2'
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.8.1'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.36.0'
@@ -396,16 +396,16 @@ dependencies {
     testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
     // https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy-dep
-    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.12.19'
+    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.14.0'
 
 
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 
-    testImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
-    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
-    functionalTestImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
-    functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
-    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+    testImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
+    functionalTestImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
+    functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
+    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
 
     testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.9.1')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
@@ -424,7 +424,7 @@ dependencies {
     contractTestImplementation sourceSets.test.runtimeClasspath
 
     cftlibImplementation group: 'org.springframework.boot', name: 'spring-boot-devtools'
-    cftlibAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+    cftlibAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
 
 }
 // this is required to force Java running on the Azure Windows Server OS into using
