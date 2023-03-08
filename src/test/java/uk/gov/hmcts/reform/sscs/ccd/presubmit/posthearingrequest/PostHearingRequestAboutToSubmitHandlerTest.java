@@ -41,7 +41,6 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 @ExtendWith(MockitoExtension.class)
 class PostHearingRequestAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
-    public static final String SET_ASIDE_APPLICATION_FROM_FTA_PDF = "Set Aside Application from FTA.pdf";
 
     private PostHearingRequestAboutToSubmitHandler handler;
 
@@ -53,21 +52,12 @@ class PostHearingRequestAboutToSubmitHandlerTest {
 
     private SscsCaseData caseData;
 
-    private SscsDocument expectedDocument;
-
     @Mock
     private FooterService footerService;
 
     @BeforeEach
     void setUp() {
         handler = new PostHearingRequestAboutToSubmitHandler(true, footerService);
-
-        DocumentLink documentLink = DocumentLink.builder()
-            .documentFilename(SET_ASIDE_APPLICATION_FROM_FTA_PDF)
-            .build();
-        DocumentStaging documentStaging = DocumentStaging.builder()
-            .previewDocument(documentLink)
-            .build();
         Appeal appeal = Appeal.builder()
             .mrnDetails(MrnDetails.builder()
                 .dwpIssuingOffice("3")
@@ -78,15 +68,6 @@ class PostHearingRequestAboutToSubmitHandlerTest {
             .state(State.DORMANT_APPEAL_STATE)
             .ccdCaseId("1234")
             .postHearing(PostHearing.builder().build())
-            .documentStaging(documentStaging)
-            .build();
-
-        expectedDocument = SscsDocument.builder()
-            .value(SscsDocumentDetails.builder()
-                .documentLink(documentLink)
-                .documentFileName(documentLink.getDocumentFilename())
-                .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
-                .build())
             .build();
     }
 
@@ -121,6 +102,13 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         caseData.getPostHearing().setRequestType(requestType);
+        DocumentLink documentLink = DocumentLink.builder()
+            .documentFilename(requestType.getDescriptionEn())
+            .build();
+        DocumentStaging documentStaging = DocumentStaging.builder()
+            .previewDocument(documentLink)
+            .build();
+        caseData.setDocumentStaging(documentStaging);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -137,7 +125,6 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         caseData.getPostHearing().setRequestType(requestType);
-        expectedDocument.getValue().setDocumentType(documentType.getValue());
         DocumentLink postHearingDoc = DocumentLink.builder()
             .documentFilename(filename)
             .build();
@@ -145,6 +132,17 @@ class PostHearingRequestAboutToSubmitHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        DocumentLink documentLink = DocumentLink.builder()
+            .documentFilename(filename)
+            .build();
+        SscsDocument expectedDocument = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentLink(documentLink)
+                .documentFileName(filename)
+                .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
+                .documentType(documentType.getValue())
+                .build())
+            .build();
         assertThat(response.getErrors()).isEmpty();
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
             eq(documentType), any(), any(), eq(null), eq(null));
