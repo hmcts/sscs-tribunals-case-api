@@ -57,9 +57,9 @@ public class IssueGenericLetterMidEventValidationHandler implements PreSubmitCal
     private Set<String> validateAddresses(SscsCaseData caseData) {
         var errors = new HashSet<String>();
         var sendToAllParties = YesNo.isYes(caseData.getSendToAllParties());
+        var appellant = caseData.getAppeal().getAppellant();
 
         if (sendToAllParties || YesNo.isYes(caseData.getSendToApellant())) {
-            var appellant = caseData.getAppeal().getAppellant();
             var appointee = appellant.getAppointee();
 
             var hasAppointee = nonNull(appointee) && isYes(appellant.getIsAppointee());
@@ -76,7 +76,9 @@ public class IssueGenericLetterMidEventValidationHandler implements PreSubmitCal
         if ((sendToAllParties && caseData.isThereAJointParty()) || YesNo.isYes(caseData.getSendToJointParty())) {
             var jointParty = caseData.getJointParty();
 
-            if (isAddressEmpty(jointParty.getAddress())) {
+            var address = isYes(jointParty.getJointPartyAddressSameAsAppellant()) ? appellant.getAddress() : jointParty.getAddress();
+
+            if (isAddressEmpty(address)) {
                 errors.add("Address is empty for a joint party");
             }
         }

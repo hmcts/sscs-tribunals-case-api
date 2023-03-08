@@ -88,6 +88,17 @@ class IssueGenericLetterMidEventValidationHandlerTest {
     }
 
     @Test
+    void givenJoinPartyIsSameAsAppellant_andAddressIsValid_errorsShouldBeEmpty() {
+        caseData.getJointParty().setJointPartyAddressSameAsAppellant(YesNo.YES);
+        caseData.setSendToJointParty(YesNo.YES);
+
+        var result = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(result);
+        assertTrue(isEmpty(result.getErrors()));
+    }
+
+    @Test
     void giveAddressIsEmptyForMultipleParties_returnErrors() {
         caseData.getAppeal().getAppellant().setAppointee(null);
         caseData.getAppeal().getAppellant().setAddress(null);
@@ -127,6 +138,33 @@ class IssueGenericLetterMidEventValidationHandlerTest {
         otherParty.getValue().setIsAppointee(YesNo.YES.getValue());
 
         var item = new DynamicListItem(appointee.getId(), null);
+        var list = new ArrayList<DynamicListItem>();
+
+        List<CcdValue<OtherPartySelectionDetails>> otherPartySelection = List.of(
+                new CcdValue<>(new OtherPartySelectionDetails(new DynamicList(item, list)))
+        );
+
+        caseData.setSendToAllParties(YesNo.NO);
+        caseData.setSendToApellant(YesNo.NO);
+        caseData.setSendToOtherParties(YesNo.YES);
+        caseData.setOtherParties(List.of(otherParty));
+        caseData.setOtherPartySelection(otherPartySelection);
+
+        var result = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        var errors = result.getErrors();
+
+        assertNotNull(result);
+        assertFalse(isEmpty(errors));
+        assertEquals(1, errors.size());
+    }
+
+    @Test
+    void givenOtherPartyRepHasEmptyAddress_returnError() {
+        var otherParty = buildOtherParty(false);
+        var rep = otherParty.getValue().getRep();
+        rep.setAddress(null);
+
+        var item = new DynamicListItem(rep.getId(), null);
         var list = new ArrayList<DynamicListItem>();
 
         List<CcdValue<OtherPartySelectionDetails>> otherPartySelection = List.of(
@@ -201,6 +239,7 @@ class IssueGenericLetterMidEventValidationHandlerTest {
                 .build();
 
         Representative rep = Representative.builder()
+                .id(UUID.randomUUID().toString())
                 .name(name)
                 .address(address)
                 .hasRepresentative(YesNo.YES.getValue())
