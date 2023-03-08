@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.UPLOAD;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -31,7 +32,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -115,7 +115,7 @@ class PostHearingRequestAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE"})
+    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE", "CORRECTION"})
     void shouldReturnWithoutError(PostHearingRequestType requestType) {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -187,13 +187,15 @@ class PostHearingRequestAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = PostHearingRequestType.class,
-        names = {"SET_ASIDE"})
+        names = {"SET_ASIDE", "CORRECTION"})
     void givenUploadedDocument_previewDocumentIsRenamedToExpectedPostHearingFormat(PostHearingRequestType postHearingRequestType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
-        caseData.getPostHearing().setRequestType(postHearingRequestType);
-        caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.UPLOAD);
+        PostHearing postHearing = caseData.getPostHearing();
+        postHearing.setRequestType(postHearingRequestType);
+        postHearing.getSetAside().setRequestFormat(UPLOAD);
+        postHearing.getCorrection().setRequestFormat(UPLOAD);
         String dmUrl = "http://dm-store/documents/123";
         DocumentLink uploadedDocument = DocumentLink.builder()
             .documentFilename("A random filename.pdf")

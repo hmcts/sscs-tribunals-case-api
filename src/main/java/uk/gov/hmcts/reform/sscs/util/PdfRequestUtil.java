@@ -160,6 +160,9 @@ public class PdfRequestUtil {
             case SET_ASIDE:
                 documentType = DocumentType.SET_ASIDE_APPLICATION;
                 break;
+            case CORRECTION:
+                documentType = DocumentType.CORRECTION_APPLICATION;
+                break;
             default:
                 throw new IllegalArgumentException("Unexpected request type: " + postHearing.getRequestType());
         }

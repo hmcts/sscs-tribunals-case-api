@@ -91,7 +91,7 @@ class PostHearingRequestMidEventHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE"})
+    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE", "CORRECTION"})
     void givenGenerateNoticeNo_doNothing(PostHearingRequestType requestType) {
         caseData.getDocumentGeneration().setGenerateNotice(NO);
         caseData.getPostHearing().setRequestType(requestType);
@@ -106,7 +106,7 @@ class PostHearingRequestMidEventHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE"})
+    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE", "CORRECTION"})
     void givenGenerateNoticeNull_doNothing(PostHearingRequestType requestType) {
         caseData.getDocumentGeneration().setGenerateNotice(null);
         caseData.getPostHearing().setRequestType(requestType);
