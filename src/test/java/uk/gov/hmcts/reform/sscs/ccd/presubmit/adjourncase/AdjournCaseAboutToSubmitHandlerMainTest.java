@@ -174,6 +174,8 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
 
         assertThat(sscsCaseData.getSchedulingAndListingFields()
             .getPanelMemberExclusions().getExcludedPanelMembers()).hasSize(2);
+        assertThat(sscsCaseData.getSchedulingAndListingFields().getPanelMemberExclusions().getArePanelMembersExcluded())
+            .isEqualTo(YES);
     }
 
 }
