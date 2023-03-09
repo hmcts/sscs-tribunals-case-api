@@ -47,6 +47,7 @@
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Ted",
       "writeFinalDecisionPageSectionReference": "B2",
       "writeFinalDecisionAppellantAttendedQuestion": "Yes",
+      "writeFinalDecisionAppointeeAttendedQuestion": "No",
       "writeFinalDecisionPresentingOfficerAttendedQuestion": "Yes",
       "writeFinalDecisionDetailsOfDecision": "The details of the decision.",
       "writeFinalDecisionAnythingElse": "Something else.",
