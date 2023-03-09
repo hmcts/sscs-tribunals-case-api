@@ -113,6 +113,7 @@ public class SscsUtil {
 
             panelMemberExclusions.addAll(panelMembers.stream()
                 .filter(Objects::nonNull)
+                .distinct()
                 .map(panelMember -> new CollectionItem<>(panelMember.getIdamId(), panelMember))
                 .filter(not(panelMemberExclusions::contains))
                 .collect(Collectors.toList()));
