@@ -20,10 +20,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.JudicialUserItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -144,8 +144,9 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
     @Test
     void givenPanelMembersExcluded_thenAddPanelMembersToExclusionList() {
         sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
-            .excludedPanelMembers(new ArrayList<>(Arrays.asList(new JudicialUserItem(JudicialUserBase.builder().idamId("1").build()),
-                new JudicialUserItem(JudicialUserBase.builder().idamId("2").build())))).build());
+            .excludedPanelMembers(new ArrayList<>(Arrays.asList(
+                new CollectionItem<>("", JudicialUserBase.builder().idamId("1").build()),
+                new CollectionItem<>("", JudicialUserBase.builder().idamId("2").build())))).build());
 
         sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
         sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
@@ -173,6 +174,8 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
 
         assertThat(sscsCaseData.getSchedulingAndListingFields()
             .getPanelMemberExclusions().getExcludedPanelMembers()).hasSize(2);
+        assertThat(sscsCaseData.getSchedulingAndListingFields().getPanelMemberExclusions().getArePanelMembersExcluded())
+            .isEqualTo(YES);
     }
 
 }
