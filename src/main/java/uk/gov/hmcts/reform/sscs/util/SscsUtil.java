@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.function.Predicate.not;
-import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -11,16 +11,17 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.JudicialUserItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -101,23 +102,22 @@ public class SscsUtil {
 
     public static void excludePanelMembers(PanelMemberExclusions exclusions, List<JudicialUserBase> panelMembers) {
         if (nonNull(panelMembers)) {
-            List<JudicialUserItem> panelMemberItems = panelMembers.stream()
-                .filter(Objects::nonNull)
-                .map(JudicialUserItem::new).collect(Collectors.toList());
-            List<JudicialUserItem> panelMemberExclusions = exclusions.getExcludedPanelMembers();
+            List<CollectionItem<JudicialUserBase>> panelMemberExclusions = exclusions.getExcludedPanelMembers();
 
-            log.info("Excluding {} panel members with IDs {}", panelMemberItems.size(),
-                panelMemberItems.stream()
-                    .map(panelMember -> panelMember.getValue().getPersonalCode()).collect(Collectors.toList()));
+            log.info("Excluding {} panel members with Personal Codes {}", panelMembers.size(),
+                panelMembers.stream().map(JudicialUserBase::getPersonalCode).collect(Collectors.toList()));
 
-            if (isEmpty(panelMemberExclusions)) {
-                exclusions.setExcludedPanelMembers(panelMemberItems);
-            } else {
-                panelMemberExclusions.addAll(panelMemberItems.stream()
-                    .filter(not(panelMemberExclusions::contains))
-                    .collect(Collectors.toList()));
+            if (isNull(panelMemberExclusions)) {
+                panelMemberExclusions = new LinkedList<>();
             }
 
+            panelMemberExclusions.addAll(panelMembers.stream()
+                .filter(Objects::nonNull)
+                .map(panelMember -> new CollectionItem<>(panelMember.getIdamId(), panelMember))
+                .filter(not(panelMemberExclusions::contains))
+                .collect(Collectors.toList()));
+
+            exclusions.setExcludedPanelMembers(panelMemberExclusions);
         }
 
         exclusions.setArePanelMembersExcluded(YES);
