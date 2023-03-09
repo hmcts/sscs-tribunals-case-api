@@ -173,6 +173,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionTypeOfHearing(null);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPresentingOfficerAttendedQuestion(null);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppellantAttendedQuestion(null);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppointeeAttendedQuestion(null);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDisabilityQualifiedPanelMemberName(null);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionMedicallyQualifiedPanelMemberName(null);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate(null);
