@@ -152,10 +152,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel()));
         }
 
-        if (ScannedDocumentType.CORRECTION_APPLICATION.getValue().equals(scannedDocumentType)
-            && !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode)
-            && !ADMIN_ACTION_CORRECTION.getCode().equals(actionCode)
-        ) {
+        if (isCorrectionApplicationWithWrongActionCode(actionCode, scannedDocumentType)) {
             preSubmitCallbackResponse.addError(String
                 .format("'Further Evidence Action' must be set to '%s' or '%s'",
                     SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel(), ADMIN_ACTION_CORRECTION.getLabel()));
@@ -178,6 +175,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     .addError("The PDF evidence does not match the Original Sender selected");
             }
         }
+    }
+
+    private static boolean isCorrectionApplicationWithWrongActionCode(String actionCode, String scannedDocumentType) {
+        boolean isDocTypeCorrectionApplication = ScannedDocumentType.CORRECTION_APPLICATION.getValue().equals(scannedDocumentType);
+        boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
+        boolean isNotAdminActionCorrection = !ADMIN_ACTION_CORRECTION.getCode().equals(actionCode);
+        return isDocTypeCorrectionApplication
+            && isNotInterlocReviewByJudge
+            && isNotAdminActionCorrection;
     }
 
     @Override
@@ -252,9 +258,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (isCorrectionApplication(sscsCaseData)) {
             sscsCaseData.setState(State.POST_HEARING);
             sscsCaseData.setDwpState(DwpState.CORRECTION_REQUESTED);
-            if (isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())) {
+
+            if (isSendToInterlocReviewByJudge(sscsCaseData)) {
                 sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
-            } else if (isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), ADMIN_ACTION_CORRECTION.getCode())) {
+            } else if (isAdminActionCorrection(sscsCaseData)) {
                 sscsCaseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
                 // TODO 10581 navigate user to Admin correction screen
             }
@@ -264,6 +271,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             preSubmitCallbackResponse);
 
         return preSubmitCallbackResponse;
+    }
+
+    private boolean isAdminActionCorrection(SscsCaseData sscsCaseData) {
+        return isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), ADMIN_ACTION_CORRECTION.getCode());
+    }
+
+    private boolean isSendToInterlocReviewByJudge(SscsCaseData sscsCaseData) {
+        return isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode());
     }
 
     private boolean isDocumentType(DocumentType documentType, SscsCaseData sscsCaseData) {
@@ -608,23 +623,23 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private DocumentType getSubtype(String originalSenderCode, ScannedDocument scannedDocument) {
-        String type = scannedDocument.getValue().getType();
-        if (ScannedDocumentType.REINSTATEMENT_REQUEST.getValue().equals(type)) {
+        String docType = scannedDocument.getValue().getType();
+        if (ScannedDocumentType.REINSTATEMENT_REQUEST.getValue().equals(docType)) {
             return REINSTATEMENT_REQUEST;
         }
-        if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(type)) {
+        if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(docType)) {
             return CONFIDENTIALITY_REQUEST;
         }
-        if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals(type)) {
+        if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals(docType)) {
             return URGENT_HEARING_REQUEST;
         }
-        if (ScannedDocumentType.POSTPONEMENT_REQUEST.getValue().equals(type)) {
+        if (ScannedDocumentType.POSTPONEMENT_REQUEST.getValue().equals(docType)) {
             return POSTPONEMENT_REQUEST;
         }
-        if (ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(type)) {
+        if (ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(docType)) {
             return SET_ASIDE_APPLICATION;
         }
-        if (ScannedDocumentType.CORRECTION_APPLICATION.getValue().equals(type)) {
+        if (ScannedDocumentType.CORRECTION_APPLICATION.getValue().equals(docType)) {
             return CORRECTION_APPLICATION;
         }
 
