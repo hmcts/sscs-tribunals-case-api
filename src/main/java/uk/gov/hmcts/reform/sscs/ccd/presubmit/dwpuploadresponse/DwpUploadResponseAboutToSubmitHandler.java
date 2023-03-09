@@ -45,8 +45,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
@@ -65,21 +63,16 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     private final InterlocService interlocService;
     private final AddNoteService addNoteService;
     private final AddedDocumentsUtil addedDocumentsUtil;
-    private final CcdService ccdService;
-    private final IdamService idamService;
     private static final Enum<EventType> EVENT_TYPE = EventType.DWP_UPLOAD_RESPONSE;
 
 
     @Autowired
     public DwpUploadResponseAboutToSubmitHandler(DwpDocumentService dwpDocumentService, AddNoteService addNoteService,
-                                                 AddedDocumentsUtil addedDocumentsUtil, CcdService ccdService, IdamService idamService,
-                                                 InterlocService interlocService) {
+                                                 AddedDocumentsUtil addedDocumentsUtil, InterlocService interlocService) {
 
         this.dwpDocumentService = dwpDocumentService;
         this.addNoteService = addNoteService;
         this.addedDocumentsUtil = addedDocumentsUtil;
-        this.ccdService = ccdService;
-        this.idamService = idamService;
         this.interlocService = interlocService;
     }
 

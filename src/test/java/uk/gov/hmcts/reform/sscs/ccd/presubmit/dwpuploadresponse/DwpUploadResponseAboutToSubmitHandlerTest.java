@@ -77,8 +77,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.WorkAllocationFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
@@ -109,12 +107,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     private UserDetailsService userDetailsService;
 
     @Mock
-    private CcdService ccdService;
-
-    @Mock
-    private IdamService idamService;
-
-    @Mock
     private InterlocService interlocService;
 
     private DwpDocumentService dwpDocumentService;
@@ -129,7 +121,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         dwpDocumentService = new DwpDocumentService();
         AddNoteService addNoteService = new AddNoteService(userDetailsService);
         dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            addNoteService, addedDocumentsUtil, ccdService, idamService, interlocService);
+            addNoteService, addedDocumentsUtil, interlocService);
 
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
                 .forename("Chris").surname("Davis").build().getFullName());
@@ -762,7 +754,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenAudioVideoDocuments_shouldComputeCorrectAudioVideoTotals() throws JsonProcessingException {
         dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true), ccdService, idamService, interlocService);
+            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true), interlocService);
 
         List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>();
 
@@ -812,7 +804,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenPreExistingAudioVideoDocuments_shouldComputeCorrectAudioVideoTotalsForAvAddedThisEvent() throws JsonProcessingException {
         dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true), ccdService, idamService, interlocService);
+            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true), interlocService);
 
         List<AudioVideoEvidence> newAudioVideoEvidence = new ArrayList<>();
 
@@ -864,7 +856,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenNoNewAudioVideoDocuments_shouldStillClearAddedDocuments() {
         dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler(dwpDocumentService,
-            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true), ccdService, idamService, interlocService);
+            new AddNoteService(userDetailsService), new AddedDocumentsUtil(true), interlocService);
 
         sscsCaseData.setDwpUploadAudioVideoEvidence(new ArrayList<>());
         sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder()
