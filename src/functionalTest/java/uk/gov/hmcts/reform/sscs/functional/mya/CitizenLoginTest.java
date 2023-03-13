@@ -4,11 +4,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
+@Slf4j
 public class CitizenLoginTest extends BaseFunctionTest {
 
     CreatedCcdCase ccdCase;
