@@ -219,7 +219,7 @@ public class SubmitDraftTest {
     public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() {
         Response response = saveDraft(draftAppeal);
 
-        log.info("givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser response {}", response.print(), response.statusCode());
+        log.info("givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser response {} {}", response.print(), response.statusCode());
 
         response.then()
             .statusCode(anyOf(is(HttpStatus.SC_OK), is(HttpStatus.SC_CREATED)))
@@ -228,7 +228,7 @@ public class SubmitDraftTest {
 
         Response response2 = saveDraft(draftAppeal);
 
-        log.info("givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser response2 {}", response2.print(), response.statusCode());
+        log.info("givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser response2 {} {}", response2.print(), response.statusCode());
 
         response2.then()
             .statusCode(HttpStatus.SC_OK)
