@@ -162,6 +162,8 @@ public class SyaController {
             forceCreateDraft = false;
         }
 
+        log.info("createDraftAppeal {} {}", forceCreateDraft, syaCaseWrapper.getCcdCaseId());
+
         Optional<SaveCaseResult> submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper, forceCreateDraft);
         return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
     }
