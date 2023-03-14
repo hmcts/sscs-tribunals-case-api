@@ -2,19 +2,21 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -46,17 +48,11 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
 
         if (response.getErrors().isEmpty()) {
             postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.DWP);
-            addDocumentToBundle(sscsCaseData, sscsCaseData.getSscsDocument().get(sscsCaseData.getSscsDocument().size() - 1));
+            List<SscsDocument> documents = sscsCaseData.getSscsDocument();
+            SscsUtil.addDocumentToBundle(footerService, sscsCaseData, documents.get(documents.size() - 1));
         }
 
         return response;
-    }
-
-    private void addDocumentToBundle(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
-        DocumentLink url = sscsDocument.getValue().getDocumentLink();
-        DocumentType documentType = DocumentType.fromValue(sscsDocument.getValue().getDocumentType());
-        String dateIssued = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, null, null);
     }
 
     @NotNull
