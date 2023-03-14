@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.util;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.function.Predicate.not;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -17,23 +16,19 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
-import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
-import uk.gov.hmcts.reform.sscs.model.docassembly.PostponeRequestTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @Slf4j
@@ -45,44 +40,6 @@ public class SscsUtil {
 
     public static <T> List<T> mutableEmptyListIfNull(List<T> list) {
         return Optional.ofNullable(list).orElse(new ArrayList<>());
-    }
-
-    public static PreSubmitCallbackResponse<SscsCaseData> processPostponementRequestPdfAndSetPreviewDocument(String userAuthorisation,
-                                                                                                             SscsCaseData sscsCaseData,
-                                                                                                             PreSubmitCallbackResponse<SscsCaseData> response,
-                                                                                                             GenerateFile generateFile,
-                                                                                                             String templateId) {
-
-        log.debug("Executing processPostponementRequestPdfAndSetPreviewDocument for caseId: {}", sscsCaseData.getCcdCaseId());
-        final String requestDetails = sscsCaseData.getPostponementRequest().getPostponementRequestDetails();
-
-        if (isBlank(requestDetails)) {
-            response.addError("Please enter request details to generate a postponement request document");
-            return response;
-        }
-
-        String hearingVenue = sscsCaseData.getPostponementRequest().getPostponementRequestHearingVenue();
-        LocalDate hearingDate = LocalDateTime.parse(sscsCaseData.getPostponementRequest().getPostponementRequestHearingDateAndTime()).toLocalDate();
-
-        String additionalRequestDetails = "Date request received: " + LocalDate.now().format(DATE_TIME_FORMATTER) + "\n"
-            + "Date of Hearing: " + hearingDate.format(DATE_TIME_FORMATTER) + "\n"
-            + "Hearing Venue: " + hearingVenue + "\n"
-            + "Reason for Postponement Request: " + requestDetails + "\n";
-
-        GenerateFileParams params = GenerateFileParams.builder()
-                .renditionOutputLocation(null)
-                .templateId(templateId)
-                .formPayload(PostponeRequestTemplateBody.builder().title(TITLE).text(additionalRequestDetails).build())
-                .userAuthentication(userAuthorisation)
-                .build();
-        final String generatedFileUrl = generateFile.assemble(params);
-        sscsCaseData.getPostponementRequest().setPostponementPreviewDocument(DocumentLink.builder()
-                .documentFilename(FILENAME)
-                .documentBinaryUrl(generatedFileUrl + "/binary")
-                .documentUrl(generatedFileUrl)
-                .build());
-
-        return response;
     }
 
     public static boolean isSAndLCase(SscsCaseData sscsCaseData) {
