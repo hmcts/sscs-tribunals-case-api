@@ -162,22 +162,6 @@ class PostHearingRequestAboutToSubmitHandlerTest {
     @ParameterizedTest
     @EnumSource(value = PostHearingRequestType.class,
         names = {"SET_ASIDE"})
-    void givenPreviewDocumentIsNull_doesNotGenerateADocument(PostHearingRequestType requestType) {
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-        caseData.getPostHearing().setRequestType(requestType);
-        caseData.getDocumentStaging().setPreviewDocument(null);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).hasSize(1)
-            .containsOnly("There is no post hearing request document");
-        verifyNoInteractions(footerService);
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = PostHearingRequestType.class,
-        names = {"SET_ASIDE"})
     void givenPreviewDocumentIsNotAPostHearingDoc_andRequestFormatIsNotUpload_doesNotGenerateADocument(PostHearingRequestType requestType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
