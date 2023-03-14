@@ -207,7 +207,13 @@ ccd:
           secretRef: role-assignment-service-IDAM-ADMIN-SECRET
           key: key
           disabled: true
-
+  elasticsearch:
+    nameOverride: ${SERVICE_NAME}-es
+    clusterName: "es"
+    replicas: 1
+  logstash:
+    image:
+      tag: ccd-sscs-logstash-latest
   ccd-admin-web:
     nodejs:
       image: hmctspublic.azurecr.io/ccd/admin-web:latest
