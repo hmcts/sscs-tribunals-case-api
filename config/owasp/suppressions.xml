@@ -23,6 +23,6 @@
    file name: commons-fileupload-1.4.jar
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/commons\-fileupload/commons\-fileupload@.*$</packageUrl>
-    <cpe>cpe:/a:apache:commons_fileupload</cpe>
+    <cve>CVE-2023-24998</cve>
   </suppress>
 </suppressions>
