@@ -70,21 +70,22 @@ public class CftlibConfig implements CFTLibConfigurer {
              "caseworker-wa-configuration"
         );
         lib.createRoles(
-            "caseworker-sscs",
-            "caseworker-sscs-superuser",
-            "caseworker-sscs-clerk",
-            "caseworker-sscs-systemupdate",
-            "caseworker-sscs-judge",
-            "caseworker-sscs-dwpresponsewriter",
-            "caseworker-sscs-hmrcresponsewriter",
-            "caseworker-sscs-registrar",
-            "caseworker-sscs-callagent",
-            "caseworker-sscs-teamleader",
-            "caseworker-sscs-panelmember",
-            "caseworker-sscs-bulkscan",
-            "caseworker-sscs-anonymouscitizen",
-            "caseworker-sscs-pcqextractor",
-            "citizen"
+                "caseworker-sscs-superuser",
+                "caseworker-sscs-clerk",
+                "caseworker-sscs-systemupdate",
+                "caseworker-sscs-judge",
+                "caseworker-sscs-dwpresponsewriter",
+                "caseworker-sscs-hmrcresponsewriter",
+                "caseworker-sscs-registrar",
+                "caseworker-sscs-callagent",
+                "caseworker-sscs-teamleader",
+                "caseworker-sscs-panelmember",
+                "caseworker-sscs-bulkscan",
+                "caseworker-sscs-anonymouscitizen",
+                "caseworker-sscs-pcqextractor",
+                "citizen",
+                "caseworker-sscs",
+                "caseworker"
         );
         var def = Files.readAllBytes(Path.of("../sscs-ccd-definitions/releases/CCD_SSCSDefinition_vdev_LOCAL.xlsx"));
         lib.importDefinition(def);
