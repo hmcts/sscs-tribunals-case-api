@@ -63,9 +63,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             YesNo callbackReservedDtj = callbackReserveTo.getReservedDistrictTribunalJudge();
             ReserveTo caseDataReserveTo = caseDataSnlFields.getReserveTo();
             caseDataReserveTo.setReservedDistrictTribunalJudge(callbackReservedDtj);
-            if (isNoOrNull(callbackReservedDtj)) {
-                // TODO save callbackReserveTo.getReservedJudge() to caseDataReserveTo SSCS-11395
-            } else {
+            if (!isNoOrNull(callbackReservedDtj)) {
                 caseDataReserveTo.setReservedJudge(null);
             }
         }
