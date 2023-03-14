@@ -67,6 +67,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         "It will be first in the morning session on a date to be fixed";
     public static final String A_STANDARD_TIME_SLOT = "a standard time slot";
     public static final String JUDGE_FULL_NAME = "Judge Full Name";
+    public static final String JUDGE_INITIALS = "J F Name";
     public static final String DATE_2017 = "2017-07-17";
     public static final String DATE_2019 = "2019-10-10";
     public static final String DOCUMENT_URL = "document.url";
@@ -361,12 +362,12 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertThat(parentPayload.getUserName()).isEqualTo(JUDGE_FULL_NAME);
         assertThat(payload.getHeldOn()).isEqualTo(LocalDate.parse(DATE_2017));
         assertThat(payload.getHeldAt()).isEqualTo(CHESTER_MAGISTRATE_S_COURT);
-        assertThat(payload.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME);
+        assertThat(payload.getHeldBefore()).isEqualTo(JUDGE_INITIALS);
         assertThat(payload.getNextHearingDate()).isEqualTo(nextHearingDate);
         assertThat(payload.getNextHearingType()).isEqualTo(nextHearingType);
         assertThat(payload.getNextHearingTimeslot()).isEqualTo(nextHearingTimeslot);
         assertThat(payload.getHeldAt()).isEqualTo(CHESTER_MAGISTRATE_S_COURT);
-        assertThat(payload.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME);
+        assertThat(payload.getHeldBefore()).isEqualTo(JUDGE_INITIALS);
         assertThat(payload.getHeldOn()).isEqualTo(LocalDate.parse(DATE_2017));
         assertThat(payload.getHearingType()).isEqualTo(hearingType);
         assertThat(payload.getAdditionalDirections().get(0)).isEqualTo("something else");
