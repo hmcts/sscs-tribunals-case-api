@@ -104,6 +104,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                     CancellationReason.OTHER);
         }
 
+        sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());
         return preSubmitCallbackResponse;
     }
 
