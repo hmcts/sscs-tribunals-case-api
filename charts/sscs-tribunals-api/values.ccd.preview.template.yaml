@@ -218,7 +218,13 @@ ccd:
           secretRef: role-assignment-service-IDAM-ADMIN-SECRET
           key: key
           disabled: true
-
+  elasticsearch:
+    nameOverride: ${SERVICE_NAME}-es
+    clusterName: "es"
+    replicas: 1
+  logstash:
+    image:
+      tag: ccd-sscs-logstash-latest
   ccd-admin-web:
     nodejs:
       image: hmctspublic.azurecr.io/ccd/admin-web:latest
@@ -353,14 +359,8 @@ ccd:
       - caseworker-sscs-panelmember
       - caseworker-sscs-bulkscan
       - caseworker-sscs-pcqextractor
-
-  elasticsearch:
-    nameOverride: ${SERVICE_NAME}-es
-    clusterName: "es"
-    replicas: 1
-  logstash:
-    image:
-    tag: ccd-cmc-logstash-latest
+elastic:
+  enabled: true
 
 sscs-evidence-share:
   enabled: false
@@ -453,7 +453,7 @@ sscs-hearings-api:
       IDAM_API_URL: "https://idam-api.aat.platform.hmcts.net"
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
       COMMON_REF_API_URL: "http://rd-commondata-api-aat.service.core-compute-aat.internal"
-      JUDICIAL_REF_API_URL: "http://judicial-ref-api-aat.service.core-compute-aat.internal"
+      JUDICIAL_REF_API_URL: "http://rd-judicial-api-aat.service.core-compute-aat.internal"
       EXUI_API_URL: "https://${SERVICE_NAME}-xui"
       HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
       #Messaging

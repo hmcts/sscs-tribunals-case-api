@@ -11,7 +11,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.FILENAME;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -137,7 +136,7 @@ public class PostponementRequestMidEventHandlerTest {
         DocumentLink documentLink = DocumentLink.builder()
                 .documentBinaryUrl(dmUrl + "/binary")
                 .documentUrl(dmUrl)
-                .documentFilename(FILENAME)
+                .documentFilename("Postponement Request.pdf")
                 .build();
         assertThat(sscsCaseData.getPostponementRequest().getPostponementPreviewDocument(), is(documentLink));
     }
