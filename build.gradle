@@ -61,6 +61,7 @@ sourceSets {
         resources {
             srcDir('src/IntegrationTests/resources')
         }
+        finalizedBy jacocoTestReport
     }
     functionalTest {
         java {
@@ -141,7 +142,6 @@ jacocoTestReport {
         xml.destination file("${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml")
         html.outputLocation = layout.buildDirectory.dir("${project.buildDir}/reports/jacoco/test/jacocoTestReport.html")
     }
-    finalizedBy jacocoTestReport
 }
 
 dependencyUpdates.resolutionStrategy = {
