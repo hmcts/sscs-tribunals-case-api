@@ -136,9 +136,6 @@ public class SubmitDraftTest {
             .put("/drafts");
 
         SscsCaseData draft = findCase(citizenIdamTokens).get(0);
-
-        log.info("givenDraftAppealIsSubmitted_shouldSetDwpRegionalCentre {}", draft);
-
         assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
     }
 
@@ -219,16 +216,12 @@ public class SubmitDraftTest {
     public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() {
         Response response = saveDraft(draftAppeal);
 
-        log.info("givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser response {} {}", response.print(), response.statusCode());
-
         response.then()
             .statusCode(anyOf(is(HttpStatus.SC_OK), is(HttpStatus.SC_CREATED)))
             .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
         String responseHeader = response.getHeader(LOCATION_HEADER_NAME);
 
         Response response2 = saveDraft(draftAppeal);
-
-        log.info("givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser response2 {} {}", response2.print(), response.statusCode());
 
         response2.then()
             .statusCode(HttpStatus.SC_OK)

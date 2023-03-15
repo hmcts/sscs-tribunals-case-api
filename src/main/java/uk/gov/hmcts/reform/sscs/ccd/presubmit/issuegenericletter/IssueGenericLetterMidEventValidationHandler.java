@@ -64,8 +64,6 @@ public class IssueGenericLetterMidEventValidationHandler implements PreSubmitCal
 
             var hasAppointee = nonNull(appointee) && isYes(appellant.getIsAppointee());
 
-            log.info("Appellant appointee {}", appointee);
-
             if (hasAppointee && isAddressEmpty(appointee.getAddress())) {
                 errors.add("Address is empty for an appellant appointee");
             } else if (isAddressEmpty(appellant.getAddress())) {
