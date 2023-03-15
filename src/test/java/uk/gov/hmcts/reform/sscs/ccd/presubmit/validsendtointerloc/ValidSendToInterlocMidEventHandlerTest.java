@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
@@ -14,7 +13,6 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.FILENAME;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -136,7 +134,7 @@ public class ValidSendToInterlocMidEventHandlerTest {
         DocumentLink documentLink = DocumentLink.builder()
                 .documentBinaryUrl(dmUrl + "/binary")
                 .documentUrl(dmUrl)
-                .documentFilename(FILENAME)
+                .documentFilename("Postponement Request.pdf")
                 .build();
         assertThat(sscsCaseData.getPostponementRequest().getPostponementPreviewDocument(), is(documentLink));
     }

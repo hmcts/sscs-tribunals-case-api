@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -13,13 +12,17 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -31,14 +34,16 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 
-@RunWith(MockitoJUnitRunner.class)
-public class UpdateListingRequirementsAboutToSubmitHandlerTest {
+@ExtendWith(MockitoExtension.class)
+class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -53,34 +58,37 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
-    public void setUp() {
-        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).dwpIsOfficerAttending("Yes").build();
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
+    @BeforeEach
+    void setUp() {
+        sscsCaseData = SscsCaseData.builder()
+            .appeal(Appeal.builder().build())
+            .dwpIsOfficerAttending("Yes")
+            .build();
     }
 
     @Test
-    public void givenValidCallback_thenReturnTrue() {
+    void givenValidCallback_thenReturnTrue() {
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
     @Test
-    public void givenInvalidCallbackType_thenReturnFalse() {
+    void givenInvalidCallbackType_thenReturnFalse() {
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 
     @Test
-    public void givenInvalidEventType_thenReturnFalse() {
+    void givenInvalidEventType_thenReturnFalse() {
         given(callback.getEvent()).willReturn(EventType.ADD_HEARING);
-
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @Test
-    public void handleUpdateListingRequirementsNonGapsSwitchOverFeature() {
+    void handleUpdateListingRequirementsNonGapsSwitchOverFeature() {
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", false);
         sscsCaseData = CaseDataUtils.buildCaseData();
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
@@ -88,11 +96,15 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
                 callback,
                 USER_AUTHORISATION);
 
-        assertEquals(0, response.getErrors().size());
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
-    public void handleUpdateListingRequirementsGapsSwitchOverFeatureSendSuccessful() {
+    void handleUpdateListingRequirementsGapsSwitchOverFeatureSendSuccessful() {
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
@@ -110,7 +122,7 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
                 callback,
                 USER_AUTHORISATION);
 
-        assertEquals(0, response.getErrors().size());
+        assertThat(response.getErrors()).isEmpty();
 
         assertThat(response.getData()).isNotNull();
         SscsCaseData caseData = response.getData();
@@ -118,7 +130,11 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void handleUpdateListingRequirementsGapsSwitchOverFeatureSendUnsuccessful() {
+    void handleUpdateListingRequirementsGapsSwitchOverFeatureSendUnsuccessful() {
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
@@ -136,13 +152,18 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
                 callback,
                 USER_AUTHORISATION);
 
-        assertEquals(1, response.getErrors().size());
-
+        assertThat(response.getErrors())
+            .hasSize(1)
+            .contains("An error occurred during message publish. Please try again.");
         assertThat(response.getData()).isNotNull();
     }
 
     @Test
-    public void handleUpdateListingRequirementsGapsSwitchOverFeatureNoOverrides() {
+    void handleUpdateListingRequirementsGapsSwitchOverFeatureNoOverrides() {
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
@@ -150,11 +171,15 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
                 callback,
                 USER_AUTHORISATION);
 
-        assertEquals(0, response.getErrors().size());
+        assertThat(response.getErrors()).isEmpty();
     }
 
     @Test
-    public void handleUpdateListingRequirementsGapsSwitchOverFeatureWrongState() {
+    void handleUpdateListingRequirementsGapsSwitchOverFeatureWrongState() {
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         sscsCaseData = CaseDataUtils.buildCaseData();
 
@@ -165,7 +190,29 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
                 callback,
                 USER_AUTHORISATION);
 
-        assertEquals(0, response.getErrors().size());
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = YesNo.class)
+    @NullSource
+    void reservedDistrictTribunalJudge_savesSelectionToCaseData(YesNo reservedDtj) {
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
+        ReserveTo reserveTo = new ReserveTo();
+        reserveTo.setReservedDistrictTribunalJudge(reservedDtj);
+        sscsCaseData.getSchedulingAndListingFields().setReserveTo(reserveTo);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        YesNo result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedDistrictTribunalJudge();
+        assertThat(result).isEqualTo(reservedDtj);
     }
 
     @Test
@@ -212,5 +259,25 @@ public class UpdateListingRequirementsAboutToSubmitHandlerTest {
         return OverrideFields.builder()
                 .appellantInterpreter(appellantInterpreter)
                 .build();
+    }
+
+    void givenReservedDistrictTribunalJudgeIsYesAndReservedJudgeIsNotNull_responseReservedJudgeIsNull() {
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
+        ReserveTo reserveTo = new ReserveTo();
+        reserveTo.setReservedDistrictTribunalJudge(YES);
+        reserveTo.setReservedJudge(new JudicialUserBase("1", "2"));
+        sscsCaseData.getSchedulingAndListingFields().setReserveTo(reserveTo);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        JudicialUserBase result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge();
+        assertThat(result).isNull();
     }
 }

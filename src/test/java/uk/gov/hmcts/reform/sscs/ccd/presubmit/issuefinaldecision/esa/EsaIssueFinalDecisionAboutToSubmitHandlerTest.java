@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
+    
     private IssueFinalDecisionAboutToSubmitHandler handler;
 
     private EsaDecisionNoticeOutcomeService esaecisionNoticeOutcomeService;
@@ -71,7 +72,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    private SscsDocument document;
+    private DocumentLink documentLink;
 
     protected static Validator validator = Validation.byDefaultProvider()
             .configure()
@@ -153,14 +154,12 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(caseDetails.getState()).thenReturn(State.HEARING);
-    }
 
-    private void commonSetUp() {
-        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        String filename = String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+        documentLink = DocumentLink.builder()
+            .documentUrl("bla.com")
+            .documentFilename(filename)
+            .build();
     }
 
     @Test
@@ -171,8 +170,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueFinalDecisionEventForGenerateNoticeFlowWhenAllowedOrRefusedIsNull_ThenDisplayAnError() {
-        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(documentLink);
         callback.getCaseDetails().getCaseData().setWcaAppeal(YES);
         callback.getCaseDetails().getCaseData().setSupportGroupOnlyAppeal("Yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(null);
@@ -239,8 +237,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     public void givenAnIssueFinalDecisionEventForGenerateNoticeFlowWhenAllowedOrRefusedIsNotNull_ThenDoNotDisplayAnError() {
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
                 hearingMessageHelper, true);
-        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(documentLink);
         callback.getCaseDetails().getCaseData().setWcaAppeal(YES);
         callback.getCaseDetails().getCaseData().setSupportGroupOnlyAppeal("Yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -250,7 +247,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
         assertEquals(0, response.getErrors().size());
 
-        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(documentLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null), eq(null));
         verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
         verifyNoMoreInteractions(hearingMessageHelper);
         assertEquals(FINAL_DECISION_ISSUED, response.getData().getDwpState());
@@ -310,8 +307,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         "refused, decisionUpheld"
     })
     public void givenAnIssueFinalDecisionEvent_thenCreateDecisionWithFooterAndClearTransientFields(String allowedOrRefused, String expectedOutcome) {
-        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(documentLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(allowedOrRefused);
@@ -320,7 +316,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
         assertEquals(0, response.getErrors().size());
 
-        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(documentLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null), eq(null));
         assertEquals(FINAL_DECISION_ISSUED, response.getData().getDwpState());
 
         assertEquals(expectedOutcome, response.getData().getOutcome());
@@ -386,8 +382,8 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenANonPdfDecisionNotice_thenDisplayAnError() {
-        DocumentLink docLink = DocumentLink.builder().documentUrl("test.doc").build();
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
+        documentLink = DocumentLink.builder().documentUrl("test.doc").build();
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(documentLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
@@ -414,9 +410,25 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAnIssueFinalDecisionEvent_shouldUpdateStateAndDwpStateWhenStateIsNotReadyToListOrWithFta() {
-        commonSetUp();
+    public void givenAnIssueFinalDecisionEvent_shouldUpdateIssueFinalDecisionDateToToday() {
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        callback.getCaseDetails().getCaseData().setState(State.VOID_STATE);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        assertThat(response.getData().getIssueFinalDecisionDate(), is(LocalDate.now()));
+    }
+
+    @Test
+    public void givenAnIssueFinalDecisionEvent_shouldUpdateStateAndDwpStateWhenStateIsNotReadyToListOrWithFta() {
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         callback.getCaseDetails().getCaseData().setState(State.VOID_STATE);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -426,8 +438,11 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueFinalDecisionEvent_shouldNotUpdateStateAndDwpStateWhenStateIsReadyToList() {
-        commonSetUp();
-
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         callback.getCaseDetails().getCaseData().setState(State.READY_TO_LIST);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.DIRECTION_RESPONDED);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -438,8 +453,11 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueFinalDecisionEvent_shouldNotUpdateStateAndDwpStateWhenStateIsWithFta() {
-        commonSetUp();
-
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         callback.getCaseDetails().getCaseData().setState(State.WITH_DWP);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.DIRECTION_RESPONDED);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
