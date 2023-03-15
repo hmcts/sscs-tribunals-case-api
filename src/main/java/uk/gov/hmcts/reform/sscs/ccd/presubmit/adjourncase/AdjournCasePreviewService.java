@@ -352,6 +352,8 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             .filter(Objects::nonNull)
             .collect(Collectors.toList()));
 
+        log.info("build Held before for {}", names);
+
         return StringUtils.getGramaticallyJoinedStrings(names);
     }
 
