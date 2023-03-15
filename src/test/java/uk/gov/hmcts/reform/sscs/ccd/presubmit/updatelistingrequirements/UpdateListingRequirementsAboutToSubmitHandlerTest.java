@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -216,12 +215,14 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void whenIsInterpreterWantedIsNo_interpreterLanguageShouldBeNull() {
+    void whenIsInterpreterWantedIsNo_interpreterLanguageShouldBeNull() {
         sscsCaseData = CaseDataUtils.buildCaseData();
         var overrideFields = getOverrideFields(YesNo.NO);
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
 
+        given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
                 ABOUT_TO_SUBMIT,
@@ -233,12 +234,14 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void whenIsInterpreterWantedIsYes_interpreterLanguageShouldNotBeNull() {
+    void whenIsInterpreterWantedIsYes_interpreterLanguageShouldNotBeNull() {
         sscsCaseData = CaseDataUtils.buildCaseData();
         var overrideFields = getOverrideFields(YesNo.YES);
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
 
+        given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
                 ABOUT_TO_SUBMIT,
@@ -261,6 +264,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
                 .build();
     }
 
+    @Test
     void givenReservedDistrictTribunalJudgeIsYesAndReservedJudgeIsNotNull_responseReservedJudgeIsNull() {
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);

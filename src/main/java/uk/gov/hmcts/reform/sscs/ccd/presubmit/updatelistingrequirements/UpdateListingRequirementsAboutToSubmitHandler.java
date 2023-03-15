@@ -59,8 +59,6 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         cleanInterpreter(sscsCaseData);
 
-        State state = callback.getCaseDetails().getState();
-        HearingRoute hearingRoute = sscsCaseData.getSchedulingAndListingFields().getHearingRoute();
         ReserveTo callbackReserveTo = callbackResponse.getData().getSchedulingAndListingFields().getReserveTo();
         SchedulingAndListingFields caseDataSnlFields = sscsCaseData.getSchedulingAndListingFields();
 
