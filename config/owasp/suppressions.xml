@@ -13,7 +13,7 @@
   </suppress>
   <suppress until = "2023-04-15">
     <notes><![CDATA[
-   file name: json-20220924.jar
+   file name: json-20230227.jar
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/org\.json/json@.*$</packageUrl>
     <cve>CVE-2022-45688</cve>
