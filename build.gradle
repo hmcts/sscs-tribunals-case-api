@@ -136,9 +136,12 @@ jacocoTestReport {
     executionData(test, integration)
     reports {
         xml.required = true
+        html.required = true
         csv.required = false
         xml.destination file("${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+        html.outputLocation = layout.buildDirectory.dir("${project.buildDir}/reports/jacoco/test/jacocoTestReport.html")
     }
+    finalizedBy jacocoTestReport
 }
 
 dependencyUpdates.resolutionStrategy = {
