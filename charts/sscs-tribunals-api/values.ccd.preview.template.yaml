@@ -379,7 +379,7 @@ sscs-evidence-share:
       CASE_ACCESS_MANAGEMENT_FEATURE: true
 
 sscs-ccd-callback-orchestrator:
-  enabled: false
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/sscs/ccd-callback-orchestrator:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
