@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
@@ -345,10 +346,13 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         List<JudicialUserBase> panelMembers = caseData.getAdjournment().getPanelMembers();
 
         names.addAll(panelMembers.stream()
+            .filter(panelMember -> isNotBlank(panelMember.getPersonalCode()))
             .map(panelMember ->
                 judicialRefDataService.getJudicialUserTitleWithInitialsAndLastName(panelMember.getPersonalCode()))
             .filter(Objects::nonNull)
             .collect(Collectors.toList()));
+
+        log.info("build Held before for {}", names);
 
         return StringUtils.getGramaticallyJoinedStrings(names);
     }
