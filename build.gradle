@@ -61,7 +61,6 @@ sourceSets {
         resources {
             srcDir('src/IntegrationTests/resources')
         }
-        finalizedBy jacocoTestReport
     }
     functionalTest {
         java {
@@ -96,6 +95,7 @@ tasks.withType(Test) {
 task integration(type: Test) {
     setTestClassesDirs(sourceSets.integrationTest.output.classesDirs)
     setClasspath(sourceSets.integrationTest.runtimeClasspath)
+    finalizedBy jacocoTestReport
 }
 
 task functional(type: Test) {
