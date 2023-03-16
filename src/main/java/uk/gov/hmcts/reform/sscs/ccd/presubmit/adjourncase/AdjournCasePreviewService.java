@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
@@ -8,6 +9,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -29,13 +31,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody.AdjournCaseTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
-import uk.gov.hmcts.reform.sscs.service.LanguageService;
+import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
@@ -43,22 +46,24 @@ import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 @Component
 @Slf4j
 public class AdjournCasePreviewService extends IssueNoticeHandler {
-
     private final VenueDataLoader venueDataLoader;
-    private final LanguageService languageService;
+    private final JudicialRefDataService judicialRefDataService;
     private static final String DOCUMENT_DATE_PATTERN = "dd/MM/yyyy";
     public static final String IN_CHAMBERS = "In chambers";
 
     private final SignLanguagesService signLanguagesService;
 
     @Autowired
-    public AdjournCasePreviewService(GenerateFile generateFile, UserDetailsService userDetailsService, VenueDataLoader venueDataLoader,
-                                     LanguageService languageService, @Value("${doc_assembly.adjourn_case}") String templateId,
-                                     SignLanguagesService signLanguagesService) {
+    public AdjournCasePreviewService(GenerateFile generateFile,
+                                     UserDetailsService userDetailsService,
+                                     VenueDataLoader venueDataLoader,
+                                     @Value("${doc_assembly.adjourn_case}") String templateId,
+                                     SignLanguagesService signLanguagesService,
+                                     JudicialRefDataService judicialRefDataService) {
         super(generateFile, userDetailsService, languagePreference -> templateId);
         this.venueDataLoader = venueDataLoader;
-        this.languageService = languageService;
         this.signLanguagesService = signLanguagesService;
+        this.judicialRefDataService = judicialRefDataService;
     }
 
     @Override
@@ -336,16 +341,19 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         if (signedInJudgeName == null) {
             throw new IllegalStateException("Unable to obtain signed in user name");
         }
-        names.add(signedInJudgeName);
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getAdjournment().getDisabilityQualifiedPanelMemberName())) {
-            names.add(caseData.getAdjournment().getDisabilityQualifiedPanelMemberName());
-        }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getAdjournment().getMedicallyQualifiedPanelMemberName())) {
-            names.add(caseData.getAdjournment().getMedicallyQualifiedPanelMemberName());
-        }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getAdjournment().getOtherPanelMemberName())) {
-            names.add(caseData.getAdjournment().getOtherPanelMemberName());
-        }
+        names.add(StringUtils.getInitalsAndSurnameFromName(signedInJudgeName));
+
+        List<JudicialUserBase> panelMembers = caseData.getAdjournment().getPanelMembers();
+
+        names.addAll(panelMembers.stream()
+            .filter(panelMember -> isNotBlank(panelMember.getPersonalCode()))
+            .map(panelMember ->
+                judicialRefDataService.getJudicialUserTitleWithInitialsAndLastName(panelMember.getPersonalCode()))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList()));
+
+        log.info("build Held before for {}", names);
+
         return StringUtils.getGramaticallyJoinedStrings(names);
     }
 

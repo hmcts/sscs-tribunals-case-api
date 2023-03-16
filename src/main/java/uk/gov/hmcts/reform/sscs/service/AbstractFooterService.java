@@ -46,7 +46,7 @@ public abstract class AbstractFooterService<D extends AbstractDocument> {
             footerDetails = new FooterDetails(url, bundleAddition, bundleFileName);
 
         } else {
-            log.info("Could not find {} documentso skipping generating footer", label);
+            log.info("Could not find {} document so skipping generating footer", label);
         }
         return footerDetails;
     }
