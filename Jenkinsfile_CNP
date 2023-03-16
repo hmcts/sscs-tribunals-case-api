@@ -86,6 +86,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 def branchesToSync = ['demo']
 
 withPipeline(type, product, component) {
+    env.GRADLE_OPTS = "--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED"
     if (env.BRANCH_NAME.startsWith("PR")) {
         loadVaultSecrets(secretsForPR)
     } else {
@@ -118,6 +119,49 @@ withPipeline(type, product, component) {
         enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
                         //Disabling due to IDAM OIDC issue. To be investigated under SSCS-10377
                       //AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK])
+    }
+    afterAlways('test') {
+        publishHTML([
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "build/reports/tests/test/",
+                reportFiles          : 'index.html',
+                reportName           : 'Unit Test Report'
+        ])
+        publishHTML([
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "build/reports/tests/integration/",
+                reportFiles          : 'index.html',
+                reportName           : 'Integration Test Report'
+        ])
+        publishHTML([
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "build/reports/tests/integration/",
+                reportFiles          : 'index.html',
+                reportName           : 'Unit Test Report'
+        ])
+        publishHTML([
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "build/reports/pmd/",
+                reportFiles          : 'main.html,test.html,integrationTest.html,contractTest.html,smokeTest.html,functionalTest.html',
+                reportName           : 'PMD Report'
+        ])
+        publishHTML([
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : "build/reports/checkstyle/",
+                reportFiles          : 'main.html,test.html,integrationTest.html,contractTest.html,smokeTest.html,functionalTest.html',
+                reportName           : 'Checkstyle Report'
+        ])
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/**/*'
     }
 
 }
