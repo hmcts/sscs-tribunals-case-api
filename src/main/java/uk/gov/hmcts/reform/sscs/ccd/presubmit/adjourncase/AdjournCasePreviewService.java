@@ -341,18 +341,16 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         if (signedInJudgeName == null) {
             throw new IllegalStateException("Unable to obtain signed in user name");
         }
-        names.add(StringUtils.getInitalsAndSurnameFromName(signedInJudgeName));
+        names.add(signedInJudgeName);
 
         List<JudicialUserBase> panelMembers = caseData.getAdjournment().getPanelMembers();
 
         names.addAll(panelMembers.stream()
             .filter(panelMember -> isNotBlank(panelMember.getPersonalCode()))
             .map(panelMember ->
-                judicialRefDataService.getJudicialUserTitleWithInitialsAndLastName(panelMember.getPersonalCode()))
+                judicialRefDataService.getJudicialUserFullName(panelMember.getPersonalCode()))
             .filter(Objects::nonNull)
             .collect(Collectors.toList()));
-
-        log.info("build Held before for {}", names);
 
         return StringUtils.getGramaticallyJoinedStrings(names);
     }
