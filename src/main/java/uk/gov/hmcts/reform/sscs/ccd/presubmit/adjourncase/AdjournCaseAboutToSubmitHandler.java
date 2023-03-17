@@ -118,7 +118,9 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         updateHearingChannel(sscsCaseData);
 
-        updateExcludedPanelMembers(sscsCaseData);
+        if (isAdjournmentEnabled) {
+            updateExcludedPanelMembers(sscsCaseData);
+        }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }

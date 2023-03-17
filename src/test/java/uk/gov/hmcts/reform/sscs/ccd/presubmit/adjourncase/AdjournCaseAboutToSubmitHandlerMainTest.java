@@ -143,6 +143,7 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
         + "to the excluded panel members list")
     @Test
     void givenPanelMembersExcluded_thenAddPanelMembersToExclusionList() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
         sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
             .excludedPanelMembers(new ArrayList<>(Arrays.asList(
                 new CollectionItem<>("", JudicialUserBase.builder().idamId("1").build()),
@@ -164,6 +165,7 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
         + "exclusions,  add them to the excluded panel members list")
     @Test
     void givenNoExistingPanelMembersExcluded_thenAddPanelMembersToExclusionList() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
         sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
         sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
         sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().idamId("3").build());
