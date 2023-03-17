@@ -52,6 +52,8 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     private final ListAssistHearingMessageHelper hearingMessageHelper;
     @Value("${feature.snl.enabled}")
     private boolean isScheduleListingEnabled;
+    @Value("${feature.typeahead.enabled}")
+    private boolean isTypeaheadEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -164,9 +166,14 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     private void clearTransientFields(SscsCaseData caseData) {
         caseData.setDocumentGeneration(DocumentGeneration.builder().build());
         caseData.setDocumentStaging(DocumentStaging.builder().build());
-        caseData.setReservedToJudgeInterloc(null);
         caseData.setTempNoteDetail(null);
         caseData.setShowRip1DocPage(null);
+
+        if (isTypeaheadEnabled) {
+            caseData.setReservedToJudgeInterloc(null);
+        } else {
+            caseData.setReservedToJudge(null);
+        }
 
         YesNo unprocessedPostponementRequest = caseData.getPostponementRequest().getUnprocessedPostponementRequest();
         caseData.setPostponementRequest(PostponementRequest.builder()

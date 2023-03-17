@@ -80,7 +80,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
 
         documentConfiguration.setDocuments(documents);
-        handler = new ProcessAudioVideoEvidenceAboutToSubmitHandler(footerService, userDetailsService);
+        handler = new ProcessAudioVideoEvidenceAboutToSubmitHandler(footerService, userDetailsService, true);
 
         sscsCaseData = SscsCaseData.builder()
             .documentGeneration(DocumentGeneration.builder()
