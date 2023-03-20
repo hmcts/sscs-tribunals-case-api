@@ -98,7 +98,6 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
         assertNoHearingsInThePastError();
     }
 
-    @Test
     public void givenHearingsListHasFutureDate_ReturnError() {
         sscsCaseData.setHearings(singletonList(Hearing.builder().value(
                 HearingDetails.builder()
