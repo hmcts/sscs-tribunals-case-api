@@ -365,7 +365,8 @@ sscs-evidence-share:
       SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
       TOPIC_NAME: "sscs-evidenceshare-topic-preview"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
-      AMQP_USERNAME: "SendAndListenSharedAccessKey"
+      AMQP_USERNAME: "preview_policy"
+      AMQP_PASSWORD: "LDSKtI6uxg5uggvLDx/4WcfZfP/RJkSrg+ASbMuROsM="
       ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
       ROBOTICS_EMAIL_TO: "fake"
       ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
@@ -379,9 +380,12 @@ sscs-ccd-callback-orchestrator:
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     readinessDelay: 90
     environment:
-      SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
+      SUBSCRIPTION_NAME: "sscs-evidenceshare-topic-preview"
       TOPIC_NAME: "sscs-evidenceshare-topic-preview"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
+      AMQP_USERNAME: "preview_policy"
+      AMQP_PASSWORD: "LDSKtI6uxg5uggvLDx/4WcfZfP/RJkSrg+ASbMuROsM="
+
 
 #Enable for SYA
 sscs-tribunals-frontend:
