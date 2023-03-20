@@ -173,21 +173,32 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
     private void setHearings(WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder, SscsCaseData caseData) {
         if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
-            Hearing finalHearing = caseData.getHearings().get(0);
-            if (finalHearing != null && finalHearing.getValue() != null) {
-                if (finalHearing.getValue().getHearingDate() != null) {
-                    writeFinalDecisionBuilder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
+            HearingDetails finalHearing = getFinalHearing(caseData);
+            if (finalHearing != null) {
+                if (finalHearing.getHearingDate() != null) {
+                    writeFinalDecisionBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
                 }
-                if (finalHearing.getValue().getVenue() != null) {
-                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getValue().getVenue(),
-                            finalHearing.getValue().getVenueId());
+                if (finalHearing.getVenue() != null) {
+                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getVenue(), finalHearing.getVenueId());
                     writeFinalDecisionBuilder.heldAt(venueName);
                 }
+                return;
             }
-        } else {
-            writeFinalDecisionBuilder.heldOn(LocalDate.now());
-            writeFinalDecisionBuilder.heldAt("In chambers");
         }
+        writeFinalDecisionBuilder.heldOn(LocalDate.now());
+        writeFinalDecisionBuilder.heldAt("In chambers");
+    }
+
+    private HearingDetails getFinalHearing(SscsCaseData caseData) {
+        for (Hearing hearing : caseData.getHearings()) {
+            if (hearing != null) {
+                HearingDetails hearingDetails = hearing.getValue();
+                if (hearingDetails != null && (hearingDetails.getHearingDate() != null || hearingDetails.getVenue() != null)) {
+                    return hearingDetails;
+                }
+            }
+        }
+        return null;
     }
 
     protected abstract void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData);
