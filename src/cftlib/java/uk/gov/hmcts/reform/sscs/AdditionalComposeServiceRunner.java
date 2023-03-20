@@ -23,14 +23,21 @@ public class AdditionalComposeServiceRunner {
         ControlPlane.waitForDB();
         ControlPlane.waitForAuthServer();
 
-        log.info("Starting additional services...");
+        startAdditionalServices(System.getenv("ADDITIONAL_COMPOSE_FILES"), "additional");
+        if (parseBoolean(System.getenv("ENABLE_WORK_ALLOCATION"))) {
+            startAdditionalServices(System.getenv("ADDITIONAL_COMPOSE_FILES_WA"), "work allocation");
+        }
+    }
 
-        String[] additionalFiles = Optional.ofNullable(System.getenv("ADDITIONAL_COMPOSE_FILES"))
-            .map(files -> files.split(","))
-            .orElse(new String[] {""});
+    private void startAdditionalServices(String serviceList, String name) throws IOException, InterruptedException {
+        log.info("Starting {} services...", name);
+
+        String[] additionalFiles = Optional.ofNullable(serviceList)
+                .map(files -> files.split(","))
+                .orElse(new String[] {""});
 
         if (additionalFiles[0].isBlank()) {
-            log.info("No additional services requested during startup");
+            log.info("No {} services requested during startup", name);
             return;
         }
 
@@ -38,17 +45,17 @@ public class AdditionalComposeServiceRunner {
             String path = BASE_COMPOSE_PATH + additionalService;
 
             ProcessBuilder processBuilder = new ProcessBuilder(buildComposeCommand(path))
-                .inheritIO();
+                    .inheritIO();
 
             Process process = processBuilder.start();
 
-            int code =  process.waitFor();
+            int code = process.waitFor();
 
             if (code != 0) {
-                log.error("****** Failed to start additional services in {} ******", additionalService);
+                log.error("****** Failed to start {} services in {} ******", name, additionalService);
                 log.info("Exit value: {}", code);
             } else {
-                log.info("Successfully started additional services in {}", additionalService);
+                log.info("Successfully started {} services in {}", name, additionalService);
             }
         }
     }
