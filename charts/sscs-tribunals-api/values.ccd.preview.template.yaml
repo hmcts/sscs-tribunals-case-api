@@ -311,13 +311,13 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S10538-22nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-10544-2nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
       CCD_ENVIRONMENT: 'PROD'
       CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
-      CCD_DEF_SSCS_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-sscs-ccd-orchestrator
+      CCD_DEF_SSCS_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-sscs-ccd-callback-orchestrator
       CCD_DEF_TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
       CCD_DEF_TYA_NOTIFICATIONS_API_URL: http://${SERVICE_NAME}-tya-notification
       CCD_DEF_BULK_SCAN_API_URL: http://${SERVICE_NAME}-bulk-scan-api
@@ -352,7 +352,7 @@ elastic:
   enabled: true
 
 sscs-evidence-share:
-  enabled: false
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/sscs/evidence-share:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
@@ -363,9 +363,10 @@ sscs-evidence-share:
       DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
       SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
-      TOPIC_NAME: "sscs-evidenceshare-topic-aat"
+      TOPIC_NAME: "sscs-evidenceshare-topic-preview"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
-      AMQP_USERNAME: "SendAndListenSharedAccessKey"
+      AMQP_USERNAME: "preview_policy"
+      AMQP_PASSWORD: "LDSKtI6uxg5uggvLDx/4WcfZfP/RJkSrg+ASbMuROsM="
       ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
       ROBOTICS_EMAIL_TO: "fake"
       ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
@@ -373,15 +374,17 @@ sscs-evidence-share:
       CASE_ACCESS_MANAGEMENT_FEATURE: true
 
 sscs-ccd-callback-orchestrator:
-  enabled: false
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/sscs/ccd-callback-orchestrator:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     readinessDelay: 90
     environment:
-      SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
+      SUBSCRIPTION_NAME: "sscs-evidenceshare-topic-preview"
       TOPIC_NAME: "sscs-evidenceshare-topic-aat"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
+      AMQP_PASSWORD: "LDSKtI6uxg5uggvLDx/4WcfZfP/RJkSrg+ASbMuROsM="
+      AMQP_USERNAME: "preview_policy"
 
 #Enable for SYA
 sscs-tribunals-frontend:
