@@ -6,9 +6,7 @@ import org.apache.commons.text.WordUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
@@ -57,6 +55,18 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
         }
         return WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getName()
                 .getFullNameNoTitle(), ' ', '.');
+    }
+
+    protected HearingDetails getLastValidHearing(SscsCaseData caseData) {
+        for (Hearing hearing : caseData.getHearings()) {
+            if (hearing != null) {
+                HearingDetails hearingDetails = hearing.getValue();
+                if (hearingDetails != null && (hearingDetails.getHearingDate() != null || hearingDetails.getVenue() != null)) {
+                    return hearingDetails;
+                }
+            }
+        }
+        return null;
     }
 
     protected String buildSignedInJudgeName(String userAuthorisation) {

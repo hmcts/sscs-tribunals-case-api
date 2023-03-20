@@ -173,7 +173,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
     private void setHearings(WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder, SscsCaseData caseData) {
         if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
-            HearingDetails finalHearing = getFinalHearing(caseData);
+            HearingDetails finalHearing = getLastValidHearing(caseData);
             if (finalHearing != null) {
                 if (finalHearing.getHearingDate() != null) {
                     writeFinalDecisionBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
@@ -187,18 +187,6 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         }
         writeFinalDecisionBuilder.heldOn(LocalDate.now());
         writeFinalDecisionBuilder.heldAt("In chambers");
-    }
-
-    private HearingDetails getFinalHearing(SscsCaseData caseData) {
-        for (Hearing hearing : caseData.getHearings()) {
-            if (hearing != null) {
-                HearingDetails hearingDetails = hearing.getValue();
-                if (hearingDetails != null && (hearingDetails.getHearingDate() != null || hearingDetails.getVenue() != null)) {
-                    return hearingDetails;
-                }
-            }
-        }
-        return null;
     }
 
     protected abstract void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData);
