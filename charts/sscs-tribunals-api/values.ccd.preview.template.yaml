@@ -375,7 +375,7 @@ sscs-evidence-share:
 sscs-ccd-callback-orchestrator:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/ccd-callback-orchestrator:pr-1032-437cf1b-20230321163138
+    image: hmctspublic.azurecr.io/sscs/ccd-callback-orchestrator:pr-1032
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     readinessDelay: 90
     environment:
