@@ -354,7 +354,7 @@ elastic:
 sscs-evidence-share:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/evidence-share:pr-1504
+    image: hmctspublic.azurecr.io/sscs/evidence-share:pr-1504-b3d42a5-20230321173409
     releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
     environment:
       SEND_LETTER_SERVICE_ENABLED: "true"
