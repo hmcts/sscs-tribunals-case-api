@@ -62,11 +62,16 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
         for (Hearing hearing : caseData.getHearings()) {
             if (hearing != null) {
                 HearingDetails hearingDetails = hearing.getValue();
-                if (hearingDetails != null && (!StringUtils.isEmpty(hearingDetails.getHearingDate()) || hearingDetails.getVenue() != null)) {
-                    return hearingDetails;
+                if (hearingDetails != null) {
+                    log.info("Hearing details  : hearing date {} , hearing venue {}", hearingDetails.getHearingDate() == null ? "null hearing date" : hearingDetails.getHearingDate(), hearingDetails.getVenue() == null ? "null hearing venue" : hearingDetails.getVenue().getName());
+                    if (!StringUtils.isEmpty(hearingDetails.getHearingDate()) || hearingDetails.getVenue() != null) {
+                        log.info("This hearing was chosen");
+                        return hearingDetails;
+                    }
                 }
             }
         }
+        log.info("No hearing was chosen");
         return null;
     }
 
