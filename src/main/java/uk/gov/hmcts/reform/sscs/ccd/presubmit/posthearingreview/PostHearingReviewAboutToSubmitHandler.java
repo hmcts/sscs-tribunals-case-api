@@ -37,8 +37,6 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
                                                           String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-
         String caseId = caseData.getCcdCaseId();
 
         PostHearingReviewType typeSelected = caseData.getPostHearing().getReviewType();
@@ -46,6 +44,6 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
 
         SscsUtil.clearDocumentTransientFields(caseData);
 
-        return response;
+        return new PreSubmitCallbackResponse<>(caseData);
     }
 }
