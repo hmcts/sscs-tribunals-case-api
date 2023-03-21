@@ -363,10 +363,9 @@ sscs-evidence-share:
       DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
       SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
-      TOPIC_NAME: "sscs-evidenceshare-topic-preview"
+      TOPIC_NAME: "sscs-evidenceshare-topic-aat"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
-      AMQP_USERNAME: "preview_policy"
-      AMQP_PASSWORD: "LDSKtI6uxg5uggvLDx/4WcfZfP/RJkSrg+ASbMuROsM="
+      AMQP_USERNAME: "SendAndListenSharedAccessKey"
       ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
       ROBOTICS_EMAIL_TO: "fake"
       ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
@@ -380,11 +379,10 @@ sscs-ccd-callback-orchestrator:
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     readinessDelay: 90
     environment:
-      SUBSCRIPTION_NAME: "sscs-evidenceshare-topic-preview"
+      SUBSCRIPTION_NAME: "sscs-evidenceshare-topic-aat"
       TOPIC_NAME: "sscs-evidenceshare-topic-aat"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
-      AMQP_PASSWORD: "LDSKtI6uxg5uggvLDx/4WcfZfP/RJkSrg+ASbMuROsM="
-      AMQP_USERNAME: "preview_policy"
+      AMQP_USERNAME: "SendAndListenSharedAccessKey"
 
 #Enable for SYA
 sscs-tribunals-frontend:
