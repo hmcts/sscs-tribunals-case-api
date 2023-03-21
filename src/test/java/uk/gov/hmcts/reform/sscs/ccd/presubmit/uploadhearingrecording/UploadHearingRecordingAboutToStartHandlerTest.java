@@ -102,7 +102,7 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
     public void givenHearingsListHasFutureDate_ReturnError() {
         sscsCaseData.setHearings(singletonList(Hearing.builder().value(
                 HearingDetails.builder()
-                        .hearingDate("2023-03-20")
+                        .hearingDate("2024-03-20")
                         .time("15:15").build()).build()));
         assertNoHearingsInThePastError();
     }
