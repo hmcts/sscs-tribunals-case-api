@@ -58,6 +58,7 @@ def secretsForPR = [
                 secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
                 secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
                 secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
+                secret('amqp-password', 'AMQP_PASSWORD'),
         ],
         's2s-${env}'      : [
                 secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
