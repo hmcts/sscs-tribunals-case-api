@@ -407,7 +407,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private void setReinstateCaseFieldsIfReinstatementRequest(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
         if (REINSTATEMENT_REQUEST.getValue().equals(sscsDocument.getValue().getDocumentType())) {
-            if (isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL.getCode())) {
+            if (isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode())
+                    || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL.getCode())
+                    || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode())
+                    || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
+                    || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())
+                    || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())) {
                 setReinstateCaseFields(sscsCaseData);
             }
         }
