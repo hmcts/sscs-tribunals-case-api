@@ -71,7 +71,6 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
                     && hearingDetails.getVenue() != null
                     && StringUtils.isNotBlank(hearingDetails.getVenue().getName())) {
                     return hearingDetails;
-
                 }
             }
         }
