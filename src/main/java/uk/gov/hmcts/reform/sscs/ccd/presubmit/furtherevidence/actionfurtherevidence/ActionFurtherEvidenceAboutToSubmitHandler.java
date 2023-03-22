@@ -200,8 +200,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
 
-        if (isFurtherEvidenceActionCode(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction(),
-            ISSUE_FURTHER_EVIDENCE.getCode())) {
+        if (isFurtherEvidenceActionCode(callback.getCaseDetails().getCaseData(), ISSUE_FURTHER_EVIDENCE.getCode())) {
 
             checkAddressesValidToIssueEvidenceToAllParties(sscsCaseData, preSubmitCallbackResponse);
 
@@ -284,14 +283,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return sscsCaseData.getAppeal().getBenefitType() != null
             && Benefit.CHILD_SUPPORT.getShortName().equalsIgnoreCase(sscsCaseData.getAppeal().getBenefitType().getCode())
             && YesNo.YES.equals(sscsCaseData.getIsConfidentialCase());
-    }
-
-    private boolean isFurtherEvidenceActionCode(DynamicList furtherEvidenceActionList, String code) {
-        if (furtherEvidenceActionList != null && furtherEvidenceActionList.getValue() != null
-            && isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
-            return furtherEvidenceActionList.getValue().getCode().equals(code);
-        }
-        return false;
     }
 
     public void checkAddressesValidToIssueEvidenceToAllParties(SscsCaseData sscsCaseData,
@@ -407,15 +398,25 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private void setReinstateCaseFieldsIfReinstatementRequest(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
         if (REINSTATEMENT_REQUEST.getValue().equals(sscsDocument.getValue().getDocumentType())) {
-            if (isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), ISSUE_FURTHER_EVIDENCE.getCode())
-                    || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL.getCode())
-                    || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode())
-                    || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
-                    || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())
-                    || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())) {
+            if (isFurtherEvidenceActionCode(sscsCaseData, ISSUE_FURTHER_EVIDENCE.getCode())
+                    || isFurtherEvidenceActionCode(sscsCaseData, OTHER_DOCUMENT_MANUAL.getCode())
+                    || isFurtherEvidenceActionCode(sscsCaseData, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode())
+                    || isFurtherEvidenceActionCode(sscsCaseData, INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
+                    || isFurtherEvidenceActionCode(sscsCaseData, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())
+                    || isFurtherEvidenceActionCode(sscsCaseData, SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())) {
                 setReinstateCaseFields(sscsCaseData);
             }
         }
+    }
+
+    private boolean isFurtherEvidenceActionCode(SscsCaseData sscsCaseData, String code) {
+        DynamicList furtherEvidenceActionList = sscsCaseData.getFurtherEvidenceAction();
+
+        if (furtherEvidenceActionList != null && furtherEvidenceActionList.getValue() != null
+                && isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
+            return furtherEvidenceActionList.getValue().getCode().equals(code);
+        }
+        return false;
     }
 
     private void setTranslationWorkOutstanding(SscsCaseData sscsCaseData) {
@@ -548,32 +549,24 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private boolean isBundleAdditionSelectedForActionType(SscsCaseData sscsCaseData, ScannedDocument scannedDocument) {
-        return isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), ISSUE_FURTHER_EVIDENCE.getCode())
-            || ((isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL.getCode())
-            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
-            SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())
-            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
-            SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())
-            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
-            INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
-            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
-            INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode()))
-            && (YES.equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle())
-            || NO.equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle())));
+        return isFurtherEvidenceActionCode(sscsCaseData, ISSUE_FURTHER_EVIDENCE.getCode())
+                || ((isFurtherEvidenceActionCode(sscsCaseData, OTHER_DOCUMENT_MANUAL.getCode())
+                || isFurtherEvidenceActionCode(sscsCaseData, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())
+                || isFurtherEvidenceActionCode(sscsCaseData, SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())
+                || isFurtherEvidenceActionCode(sscsCaseData, INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
+                || isFurtherEvidenceActionCode(sscsCaseData, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode()))
+                && (YES.equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle())
+                || NO.equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle())));
     }
 
     private boolean isCorrectActionTypeForBundleAddition(SscsCaseData sscsCaseData, ScannedDocument scannedDocument) {
-        return (isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), ISSUE_FURTHER_EVIDENCE.getCode())
-            || ((isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL.getCode())
-            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
-            SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())
-            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
-            SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())
-            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
-            INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
-            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
-            INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode()))
-            && YES.equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle())));
+        return (isFurtherEvidenceActionCode(sscsCaseData, ISSUE_FURTHER_EVIDENCE.getCode())
+                || ((isFurtherEvidenceActionCode(sscsCaseData, OTHER_DOCUMENT_MANUAL.getCode())
+                || isFurtherEvidenceActionCode(sscsCaseData, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())
+                || isFurtherEvidenceActionCode(sscsCaseData, SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())
+                || isFurtherEvidenceActionCode(sscsCaseData, INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
+                || isFurtherEvidenceActionCode(sscsCaseData, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode()))
+                && YES.equalsIgnoreCase(scannedDocument.getValue().getIncludeInBundle())));
     }
 
     private Boolean isCaseStateAdditionValid(State caseState) {
@@ -597,7 +590,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             return SET_ASIDE_APPLICATION;
         }
 
-        String originalSenderStripped  = originalSenderCode.replaceAll("\\d","");
+        String originalSenderStripped  = originalSenderCode.split("\\d")[0];
 
         final Optional<DocumentType> optionalDocumentType = stream(PartyItemList.values())
             .filter(f -> f.getCode().startsWith(originalSenderStripped))
