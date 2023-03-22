@@ -354,7 +354,7 @@ elastic:
 sscs-evidence-share:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/evidence-share:pr-1504-b3d42a5-20230321173409
+    image: hmctspublic.azurecr.io/sscs/evidence-share:pr-1504-a683580-20230322082556
     releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
     environment:
       SEND_LETTER_SERVICE_ENABLED: "true"
@@ -375,7 +375,7 @@ sscs-evidence-share:
 sscs-ccd-callback-orchestrator:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/ccd-callback-orchestrator:pr-1032
+    image: hmctspublic.azurecr.io/sscs/ccd-callback-orchestrator:pr-1032-5db6503-20230322110231
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     readinessDelay: 90
     environment:
