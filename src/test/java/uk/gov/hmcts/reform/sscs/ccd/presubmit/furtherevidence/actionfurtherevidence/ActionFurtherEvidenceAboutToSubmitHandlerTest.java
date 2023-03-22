@@ -962,8 +962,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE", "SEND_TO_INTERLOC_REVIEW_BY_TCW"})
-    public void givenWhenNotActionManuallyAndHasReinstatementRequestDocumentThenSetReinstateCaseFields(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem) {
+    @Parameters({"ISSUE_FURTHER_EVIDENCE", "OTHER_DOCUMENT_MANUAL", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE", "INFORMATION_RECEIVED_FOR_INTERLOC_TCW", "SEND_TO_INTERLOC_REVIEW_BY_JUDGE", "SEND_TO_INTERLOC_REVIEW_BY_TCW"})
+    public void givenAnyFurtherActionAndReinstatementRequestDocumentThenSetReinstateCaseFields(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem) {
         sscsCaseData.setPreviousState(null);
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
