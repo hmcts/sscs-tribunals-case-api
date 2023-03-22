@@ -7,7 +7,11 @@ import org.apache.commons.text.WordUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
@@ -62,16 +66,15 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
         for (Hearing hearing : caseData.getHearings()) {
             if (hearing != null) {
                 HearingDetails hearingDetails = hearing.getValue();
-                if (hearingDetails != null) {
-                    log.info("Hearing details  : hearing date {} , hearing venue {}", hearingDetails.getHearingDate() == null ? "null hearing date" : hearingDetails.getHearingDate(), hearingDetails.getVenue() == null ? "null hearing venue" : hearingDetails.getVenue().getName());
-                    if (StringUtils.isNotBlank(hearingDetails.getHearingDate()) && hearingDetails.getVenue() != null && StringUtils.isNotBlank(hearingDetails.getVenue().getName())) {
-                        log.info("This hearing was chosen");
-                        return hearingDetails;
-                    }
+                if (hearingDetails != null
+                    && StringUtils.isNotBlank(hearingDetails.getHearingDate())
+                    && hearingDetails.getVenue() != null
+                    && StringUtils.isNotBlank(hearingDetails.getVenue().getName())) {
+                    return hearingDetails;
+
                 }
             }
         }
-        log.info("No hearing was chosen");
         return null;
     }
 
