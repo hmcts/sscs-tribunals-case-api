@@ -17,9 +17,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceAboutToSubmitHandler.ACTIONS_THAT_REQUIRES_EVIDENCE_ISSUED_SET_TO_YES_AND_NOT_BULK_PRINTED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceAboutToSubmitHandler.FURTHER_EVIDENCE_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.APPELLANT;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.DWP;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.JOINT_PARTY;
@@ -964,9 +962,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenWhenNotActionManuallyAndHasReinstatementRequestDocumentThenSetReinstateCaseFields() {
+    @Parameters({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE", "SEND_TO_INTERLOC_REVIEW_BY_TCW"})
+    public void givenWhenNotActionManuallyAndHasReinstatementRequestDocumentThenSetReinstateCaseFields(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem) {
         sscsCaseData.setPreviousState(null);
-        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
                 ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.REINSTATEMENT_REQUEST.getValue())
                         .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
