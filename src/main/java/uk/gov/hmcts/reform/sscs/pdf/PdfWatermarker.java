@@ -4,7 +4,10 @@ import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.pdfbox.pdmodel.*;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.encryption.StandardProtectionPolicy;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.util.Matrix;
@@ -33,10 +36,14 @@ public class PdfWatermarker {
             p1a.makeCompliant(document);
 
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                StandardProtectionPolicy standardProtectionPolicy = new StandardProtectionPolicy(null,
+                        null, document.getCurrentAccessPermission());
+                standardProtectionPolicy.setEncryptionKeyLength(256);
+                document.protect(standardProtectionPolicy);
+                document.setAllSecurityToBeRemoved(true);
                 document.save(baos);
                 return baos.toByteArray();
             }
-
         }
     }
 
