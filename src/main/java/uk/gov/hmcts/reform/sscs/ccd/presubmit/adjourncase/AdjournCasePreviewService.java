@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +51,9 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     private final JudicialRefDataService judicialRefDataService;
     private static final String DOCUMENT_DATE_PATTERN = "dd/MM/yyyy";
     public static final String IN_CHAMBERS = "In chambers";
-
     private final SignLanguagesService signLanguagesService;
+    @Value("${feature.snl.adjournment.enabled}")
+    private boolean adjournmentFeature;
 
     @Autowired
     public AdjournCasePreviewService(GenerateFile generateFile,
@@ -343,14 +345,24 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         }
         names.add(signedInJudgeName);
 
-        List<JudicialUserBase> panelMembers = caseData.getAdjournment().getPanelMembers();
+        Adjournment adjournment = caseData.getAdjournment();
 
-        names.addAll(panelMembers.stream()
-            .filter(panelMember -> isNotBlank(panelMember.getPersonalCode()))
-            .map(panelMember ->
-                judicialRefDataService.getJudicialUserFullName(panelMember.getPersonalCode()))
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList()));
+        if (adjournmentFeature) {
+            List<JudicialUserBase> panelMembers = adjournment.getPanelMembers();
+
+            names.addAll(panelMembers.stream()
+                .filter(panelMember -> isNotBlank(panelMember.getPersonalCode()))
+                .map(panelMember ->
+                    judicialRefDataService.getJudicialUserFullName(panelMember.getPersonalCode()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList()));
+        } else {
+            List<String> panelMembers = Stream.of(adjournment.getDisabilityQualifiedPanelMemberName(),
+                adjournment.getMedicallyQualifiedPanelMemberName(), adjournment.getOtherPanelMemberName())
+                .filter(org.apache.commons.lang3.StringUtils::isNotBlank).collect(Collectors.toList());
+
+            names.addAll(panelMembers);
+        }
 
         return StringUtils.getGramaticallyJoinedStrings(names);
     }
