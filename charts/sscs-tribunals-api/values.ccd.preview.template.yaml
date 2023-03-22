@@ -362,7 +362,7 @@ sscs-evidence-share:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
-      SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
+      SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-preview"
       TOPIC_NAME: "sscs-evidenceshare-topic-preview"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
       AMQP_USERNAME: "preview_policy"
@@ -379,7 +379,7 @@ sscs-ccd-callback-orchestrator:
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     readinessDelay: 90
     environment:
-      SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
+      SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-preview"
       TOPIC_NAME: "sscs-evidenceshare-topic-preview"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
       AMQP_USERNAME: "preview_policy"
