@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adminactioncorrection;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
@@ -7,9 +8,13 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdminCorrectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
@@ -35,10 +40,43 @@ public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallb
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
+        handleAdminCorrection(sscsCaseData);
+
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
             new PreSubmitCallbackResponse<>(sscsCaseData);
 
         return preSubmitCallbackResponse;
+    }
+
+    private void handleAdminCorrection(SscsCaseData sscsCaseData) {
+        String ccdCaseId = sscsCaseData.getCcdCaseId();
+        log.info("Handling admin correction for case: {}", ccdCaseId);
+        AdminCorrectionType adminCorrectionType = sscsCaseData.getPostHearing().getCorrection().getAdminCorrectionType();
+        if (isNull(adminCorrectionType)) {
+            throw new IllegalStateException("adminCorrectionType unexpectedly null for case: " + ccdCaseId);
+        }
+
+        switch (adminCorrectionType) {
+            case BODY:
+                log.info("Handling body correction for case: {}", ccdCaseId);
+                handleSendCorrectionToJudge(sscsCaseData);
+                break;
+            case HEADER:
+                log.info("Handling header correction for case: {}", ccdCaseId);
+                setStatesForHeaderCorrection(sscsCaseData);
+                break;
+        }
+    }
+
+    private void setStatesForHeaderCorrection(SscsCaseData sscsCaseData) {
+        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.NONE);
+        sscsCaseData.setDwpState(DwpState.CORRECTED_DECISION_NOTICE_ISSUED);
+    }
+
+    private void handleSendCorrectionToJudge(SscsCaseData sscsCaseData) {
+        sscsCaseData.setState(State.POST_HEARING);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
     }
 
 
