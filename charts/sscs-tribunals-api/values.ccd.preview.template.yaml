@@ -214,6 +214,8 @@ ccd:
   logstash:
     image: hmctspublic.azurecr.io/imported/logstash/logstash
     imageTag: 8.5.1
+    imagePullPolicy: "IfNotPresent"
+    logstashJavaOpts: -Xmx1g -Xms512M
   ccd-admin-web:
     nodejs:
       image: hmctspublic.azurecr.io/ccd/admin-web:latest
@@ -311,7 +313,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:latest
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-11548-1nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
