@@ -411,8 +411,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private boolean isFurtherEvidenceActionCode(SscsCaseData sscsCaseData, String code) {
         DynamicList furtherEvidenceActionList = sscsCaseData.getFurtherEvidenceAction();
 
-        if (furtherEvidenceActionList != null && furtherEvidenceActionList.getValue() != null
-                && isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
+        if (furtherEvidenceActionList.getValue() != null && isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
             return furtherEvidenceActionList.getValue().getCode().equals(code);
         }
         return false;
