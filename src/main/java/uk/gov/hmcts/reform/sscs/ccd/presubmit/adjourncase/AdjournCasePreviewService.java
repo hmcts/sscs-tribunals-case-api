@@ -27,7 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
@@ -306,25 +306,30 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     protected String setHearings(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
         String venue = IN_CHAMBERS;
         if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
-            Hearing finalHearing = caseData.getHearings().get(0);
-            if (finalHearing != null && finalHearing.getValue() != null) {
-                if (finalHearing.getValue().getHearingDate() != null) {
-                    adjournCaseBuilder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
+            HearingDetails finalHearing = getLastValidHearing(caseData);
+            if (finalHearing != null) {
+                if (finalHearing.getHearingDate() != null) {
+                    adjournCaseBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
                 }
-                if (finalHearing.getValue().getVenue() != null) {
-                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getValue().getVenue(),
-                            finalHearing.getValue().getVenueId());
+                if (finalHearing.getVenue() != null) {
+                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getVenue(), finalHearing.getVenueId());
                     if (venueName != null) {
                         adjournCaseBuilder.heldAt(venueName);
                         venue = venueName;
                     }
                 }
+            } else {
+                setInChambers(adjournCaseBuilder);
             }
         } else {
-            adjournCaseBuilder.heldOn(LocalDate.now());
-            adjournCaseBuilder.heldAt(IN_CHAMBERS);
+            setInChambers(adjournCaseBuilder);
         }
         return venue;
+    }
+
+    private void setInChambers(AdjournCaseTemplateBodyBuilder adjournCaseBuilder) {
+        adjournCaseBuilder.heldOn(LocalDate.now());
+        adjournCaseBuilder.heldAt(IN_CHAMBERS);
     }
 
     @Override
