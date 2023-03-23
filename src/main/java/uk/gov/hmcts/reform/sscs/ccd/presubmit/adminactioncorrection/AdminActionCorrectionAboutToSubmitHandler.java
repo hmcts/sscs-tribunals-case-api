@@ -3,23 +3,25 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adminactioncorrection;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdminCorrectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    @Value("${feature.postHearings.enabled}")
+    private final boolean isPostHearingsEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -27,7 +29,8 @@ public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallb
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.ADMIN_ACTION_CORRECTION;
+            && callback.getEvent() == EventType.ADMIN_ACTION_CORRECTION
+            && isPostHearingsEnabled;
     }
 
     @Override
@@ -56,28 +59,13 @@ public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallb
             throw new IllegalStateException("adminCorrectionType unexpectedly null for case: " + ccdCaseId);
         }
 
-        switch (adminCorrectionType) {
-            case BODY:
-                log.info("Handling body correction for case: {}", ccdCaseId);
-                handleSendCorrectionToJudge(sscsCaseData);
-                break;
-            case HEADER:
-                log.info("Handling header correction for case: {}", ccdCaseId);
-                setStatesForHeaderCorrection(sscsCaseData);
-                break;
+        if (AdminCorrectionType.BODY.equals(adminCorrectionType)) {
+            log.info("Handling body correction for case: {}", ccdCaseId);
+            // do body things
+        } else if (AdminCorrectionType.HEADER.equals(adminCorrectionType)) {
+            log.info("Handling header correction for case: {}", ccdCaseId);
+            // do header things
         }
     }
-
-    private void setStatesForHeaderCorrection(SscsCaseData sscsCaseData) {
-        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
-        sscsCaseData.setInterlocReviewState(InterlocReviewState.NONE);
-        sscsCaseData.setDwpState(DwpState.CORRECTED_DECISION_NOTICE_ISSUED);
-    }
-
-    private void handleSendCorrectionToJudge(SscsCaseData sscsCaseData) {
-        sscsCaseData.setState(State.POST_HEARING);
-        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
-    }
-
 
 }
