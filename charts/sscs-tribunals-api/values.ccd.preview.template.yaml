@@ -211,9 +211,14 @@ ccd:
     nameOverride: ${SERVICE_NAME}-es
     clusterName: "es"
     replicas: 1
+
   logstash:
-    image:
-      tag: ccd-sscs-logstash-latest
+    image:logstash:
+    image: hmctspublic.azurecr.io/imported/logstash/logstash:8.5.1
+    imageTag: 8.5.1
+    imagePullPolicy: "IfNotPresent"
+    logstashJavaOpts: -Xmx1g -Xms512M
+
   ccd-admin-web:
     nodejs:
       image: hmctspublic.azurecr.io/ccd/admin-web:latest
