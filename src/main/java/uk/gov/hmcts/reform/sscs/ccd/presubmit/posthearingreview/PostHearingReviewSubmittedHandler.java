@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getCcdCallbackMap;
 
 import lombok.RequiredArgsConstructor;
@@ -77,35 +78,6 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
         }
 
         return new PreSubmitCallbackResponse<>(caseData);
-    }
-
-    @Nullable
-    private static CcdCallbackMap getCcdCallbackMap(PostHearing postHearing,
-                                                    PostHearingReviewType typeSelected) {
-        if (isNull(typeSelected)) {
-            return null;
-        }
-
-        switch (typeSelected) {
-            case SET_ASIDE:
-                SetAside setAside = postHearing.getSetAside();
-                CcdCallbackMap action = setAside.getAction();
-
-                if (isRefusedSor(setAside)) {
-                    action = SetAsideActions.REFUSE_SOR;
-                }
-                return action;
-            case CORRECTION:
-                return postHearing.getCorrection().getAction();
-            case STATEMENT_OF_REASONS:
-                return postHearing.getStatementOfReasons().getAction();
-            case PERMISSION_TO_APPEAL:
-                return postHearing.getPermissionToAppeal().getAction();
-            case LIBERTY_TO_APPLY:
-                return postHearing.getLibertyToApply().getAction();
-            default:
-                return null;
-        }
     }
 
     private static boolean isRefusedSor(SetAside setAside) {
