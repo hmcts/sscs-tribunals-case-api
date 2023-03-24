@@ -4,25 +4,11 @@
     <cve>CVE-2023-24998</cve>
     <cve>CVE-2022-40152</cve>
   </suppress>
-  <suppress until = "2023-03-15">
+  <suppress until="2023-04-01">
     <notes><![CDATA[
-   file name: jackson-core-2.14.1.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-core@.*$</packageUrl>
-    <cve>CVE-2022-45688</cve>
-  </suppress>
-  <suppress until = "2023-03-15">
-    <notes><![CDATA[
-   file name: json-20220924.jar
+   file name: json-20230227.jar
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/org\.json/json@.*$</packageUrl>
     <cve>CVE-2022-45688</cve>
-  </suppress>
-  <suppress until = "2023-03-15">
-    <notes><![CDATA[
-   file name: commons-fileupload-1.4.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/commons\-fileupload/commons\-fileupload@.*$</packageUrl>
-    <cve>CVE-2023-24998</cve>
   </suppress>
 </suppressions>

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
@@ -49,8 +51,9 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     private final JudicialRefDataService judicialRefDataService;
     private static final String DOCUMENT_DATE_PATTERN = "dd/MM/yyyy";
     public static final String IN_CHAMBERS = "In chambers";
-
     private final SignLanguagesService signLanguagesService;
+    @Value("${feature.snl.adjournment.enabled}")
+    private boolean adjournmentFeature;
 
     @Autowired
     public AdjournCasePreviewService(GenerateFile generateFile,
@@ -303,25 +306,30 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     protected String setHearings(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
         String venue = IN_CHAMBERS;
         if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
-            Hearing finalHearing = caseData.getHearings().get(0);
-            if (finalHearing != null && finalHearing.getValue() != null) {
-                if (finalHearing.getValue().getHearingDate() != null) {
-                    adjournCaseBuilder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
+            HearingDetails finalHearing = getLastValidHearing(caseData);
+            if (finalHearing != null) {
+                if (finalHearing.getHearingDate() != null) {
+                    adjournCaseBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
                 }
-                if (finalHearing.getValue().getVenue() != null) {
-                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getValue().getVenue(),
-                            finalHearing.getValue().getVenueId());
+                if (finalHearing.getVenue() != null) {
+                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getVenue(), finalHearing.getVenueId());
                     if (venueName != null) {
                         adjournCaseBuilder.heldAt(venueName);
                         venue = venueName;
                     }
                 }
+            } else {
+                setInChambers(adjournCaseBuilder);
             }
         } else {
-            adjournCaseBuilder.heldOn(LocalDate.now());
-            adjournCaseBuilder.heldAt(IN_CHAMBERS);
+            setInChambers(adjournCaseBuilder);
         }
         return venue;
+    }
+
+    private void setInChambers(AdjournCaseTemplateBodyBuilder adjournCaseBuilder) {
+        adjournCaseBuilder.heldOn(LocalDate.now());
+        adjournCaseBuilder.heldAt(IN_CHAMBERS);
     }
 
     @Override
@@ -340,15 +348,26 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         if (signedInJudgeName == null) {
             throw new IllegalStateException("Unable to obtain signed in user name");
         }
-        names.add(StringUtils.getInitalsAndSurnameFromName(signedInJudgeName));
+        names.add(signedInJudgeName);
 
-        List<JudicialUserBase> panelMembers = caseData.getAdjournment().getPanelMembers();
+        Adjournment adjournment = caseData.getAdjournment();
 
-        names.addAll(panelMembers.stream()
-            .map(panelMember ->
-                judicialRefDataService.getJudicialUserTitleWithInitialsAndLastName(panelMember.getPersonalCode()))
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList()));
+        if (adjournmentFeature) {
+            List<JudicialUserBase> panelMembers = adjournment.getPanelMembers();
+
+            names.addAll(panelMembers.stream()
+                .filter(panelMember -> isNotBlank(panelMember.getPersonalCode()))
+                .map(panelMember ->
+                    judicialRefDataService.getJudicialUserFullName(panelMember.getPersonalCode()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList()));
+        } else {
+            List<String> panelMembers = Stream.of(adjournment.getDisabilityQualifiedPanelMemberName(),
+                adjournment.getMedicallyQualifiedPanelMemberName(), adjournment.getOtherPanelMemberName())
+                .filter(org.apache.commons.lang3.StringUtils::isNotBlank).collect(Collectors.toList());
+
+            names.addAll(panelMembers);
+        }
 
         return StringUtils.getGramaticallyJoinedStrings(names);
     }
