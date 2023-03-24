@@ -407,19 +407,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private void setReinstateCaseFieldsIfReinstatementRequest(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
         if (REINSTATEMENT_REQUEST.getValue().equals(sscsDocument.getValue().getDocumentType())) {
-            setFurtherEvidenceAction(sscsCaseData);
-        }
-    }
-
-    private void setFurtherEvidenceAction(SscsCaseData sscsCaseData) {
-        DynamicList getFurtherEvidenceAction = sscsCaseData.getFurtherEvidenceAction();
-        if (isFurtherEvidenceActionCode(getFurtherEvidenceAction, ISSUE_FURTHER_EVIDENCE.getCode())
-                || isFurtherEvidenceActionCode(getFurtherEvidenceAction, OTHER_DOCUMENT_MANUAL.getCode())
-                || isFurtherEvidenceActionCode(getFurtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode())
-                || isFurtherEvidenceActionCode(getFurtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
-                || isFurtherEvidenceActionCode(getFurtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())
-                || isFurtherEvidenceActionCode(getFurtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())) {
-            setReinstateCaseFields(sscsCaseData);
+            if (isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), ISSUE_FURTHER_EVIDENCE.getCode())
+                    || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL.getCode())
+                    || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode())
+                    || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
+                    || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())
+                    || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())) {
+                setReinstateCaseFields(sscsCaseData);
+            }
         }
     }
 
