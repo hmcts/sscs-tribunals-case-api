@@ -43,10 +43,11 @@ public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallb
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        handleAdminCorrection(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
             new PreSubmitCallbackResponse<>(sscsCaseData);
+
+        handleAdminCorrection(sscsCaseData);
 
         return preSubmitCallbackResponse;
     }

@@ -43,17 +43,18 @@ public class AdminActionCorrectionMidEventHandler implements PreSubmitCallbackHa
         String caseId = sscsCaseData.getCcdCaseId();
         log.info("Admin Action Correction: handling callback with pageId {} for caseId {}", pageId, caseId);
 
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
+            new PreSubmitCallbackResponse<>(sscsCaseData);
+
         AdminCorrectionType adminCorrectionType = sscsCaseData.getPostHearing().getCorrection().getAdminCorrectionType();
+
+        log.info("adminCorrectionType is {}", adminCorrectionType);
 
         if (AdminCorrectionType.HEADER.equals(adminCorrectionType)) {
             // do header things
         } else if (AdminCorrectionType.BODY.equals(adminCorrectionType)) {
             // do body things
         }
-
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
-                new PreSubmitCallbackResponse<>(sscsCaseData);
-
 
         return preSubmitCallbackResponse;
     }
