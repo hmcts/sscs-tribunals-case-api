@@ -46,7 +46,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     }
 
     private boolean furtherEvidenceActionOptionValidation(DynamicList furtherEvidenceAction) {
-        return isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)
+        return isFurtherEvidenceActionOptionValid(furtherEvidenceAction, ADMIN_ACTION_CORRECTION)
+                || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)
                 || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_TCW)
                 || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, ISSUE_FURTHER_EVIDENCE)
                 || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_JUDGE)
@@ -76,6 +77,12 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     }
 
     private SscsCaseDetails updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
+        if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(),
+                ADMIN_ACTION_CORRECTION)) {
+            return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
+                AWAITING_ADMIN_ACTION, ADMIN_ACTION_CORRECTION,
+                EventType.CORRECTION_REQUEST, "Admin action correction");
+        }
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(),
                 INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
             caseData.setInterlocReferralDate(LocalDate.now());
