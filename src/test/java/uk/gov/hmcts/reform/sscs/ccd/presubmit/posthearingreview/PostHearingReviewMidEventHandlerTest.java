@@ -9,9 +9,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DECISION_ISSUED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REVIEW;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview.PostHearingReviewMidEventHandler.PAGE_ID_GENERATE_NOTICE;
@@ -31,17 +29,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
@@ -52,7 +40,7 @@ class PostHearingReviewMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private static final String URL = "http://dm-store/documents/123";
-    private static final String TEMPLATE_ID = "TB-SCS-GNO-ENG-00091.docx";
+    private static final String TEMPLATE_ID = "TB-SCS-GNO-ENG-grant-refuse-set-aside.docx";
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -77,6 +65,13 @@ class PostHearingReviewMidEventHandlerTest {
     void setUp() {
         handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, true);
 
+        PostHearing postHearing = PostHearing.builder()
+            .reviewType(PostHearingReviewType.SET_ASIDE)
+            .setAside(SetAside.builder()
+                .action(SetAsideActions.GRANT)
+                .build())
+            .build();
+
         caseData = SscsCaseData.builder()
             .documentGeneration(DocumentGeneration.builder()
                 .generateNotice(YES)
@@ -88,6 +83,7 @@ class PostHearingReviewMidEventHandlerTest {
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .hearingRoute(LIST_ASSIST)
                 .build())
+            .postHearing(postHearing)
             .build();
 
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
@@ -127,7 +123,7 @@ class PostHearingReviewMidEventHandlerTest {
 
         when(documentConfiguration.getDocuments()).thenReturn(new HashMap<>(Map.of(
             LanguagePreference.ENGLISH,  new HashMap<>(Map.of(
-                DECISION_ISSUED, TEMPLATE_ID)
+                SET_ASIDE_GRANTED, TEMPLATE_ID)
             ))
         ));
 
@@ -137,7 +133,7 @@ class PostHearingReviewMidEventHandlerTest {
         DocumentLink previewDocument = response.getData().getDocumentStaging().getPreviewDocument();
         assertThat(previewDocument).isNotNull();
 
-        String expectedFilename = String.format("Decision Notice issued on %s.pdf",
+        String expectedFilename = String.format("Set Aside Application granted on %s.pdf",
             LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         assertThat(previewDocument.getDocumentFilename()).isEqualTo(expectedFilename);
@@ -151,7 +147,7 @@ class PostHearingReviewMidEventHandlerTest {
         var value = capture.getValue();
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
-        assertThat(payload.getNoticeType()).isEqualTo("DECISION NOTICE");
+        assertThat(payload.getNoticeType()).isEqualTo("SET ASIDE APPLICATION");
         assertThat(payload.getAppellantFullName()).isEqualTo("Appellant Lastname");
         assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
     }

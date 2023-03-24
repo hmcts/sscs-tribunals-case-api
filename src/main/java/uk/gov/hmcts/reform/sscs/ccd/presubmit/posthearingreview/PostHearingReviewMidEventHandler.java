@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DECISION_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DECISION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getCcdCallbackMap;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getDocumentTypeFromReviewType;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getEventTypeFromDocumentReviewTypeAndAction;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdCallbackMap;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -52,9 +55,15 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
 
         if (PAGE_ID_GENERATE_NOTICE.equals(pageId) && isYes(caseData.getDocumentGeneration().getGenerateNotice())) {
             log.info("Review Post Hearing App: Generating notice for caseId {}", caseId);
+
+            CcdCallbackMap action = getCcdCallbackMap(caseData.getPostHearing(), typeSelected);
+            DocumentType documentType = getDocumentTypeFromReviewType(typeSelected);
+            EventType eventType = getEventTypeFromDocumentReviewTypeAndAction(typeSelected, action.getCcdDefinition());
+
             String templateId = documentConfiguration.getDocuments()
-                .get(caseData.getLanguagePreference()).get(DECISION_ISSUED);
-            response = issueDocument(callback, DECISION_NOTICE, templateId, generateFile, userAuthorisation);
+                .get(caseData.getLanguagePreference())
+                .get(eventType);
+            response = issueDocument(caseData, documentType, templateId, generateFile, userAuthorisation);
         }
 
         return response;

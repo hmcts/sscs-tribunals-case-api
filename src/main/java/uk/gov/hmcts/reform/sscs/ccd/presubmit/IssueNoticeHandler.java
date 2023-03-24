@@ -40,7 +40,7 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
         setGeneratedDateIfRequired(sscsCaseData, callback.getEvent());
 
         try {
-            return issueDocument(callback, documentType, templateId.apply(sscsCaseData.getLanguagePreference()), generateFile, userAuthorisation);
+            return issueDocument(sscsCaseData, documentType, templateId.apply(sscsCaseData.getLanguagePreference()), generateFile, userAuthorisation);
         } catch (IllegalStateException e) {
             log.error(e.getMessage() + ". Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
             preSubmitCallbackResponse.addError(e.getMessage());

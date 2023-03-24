@@ -1,6 +1,11 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -8,17 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @Slf4j
@@ -64,10 +61,65 @@ public class SscsUtil {
         }
     }
 
-    public static void addDocumentToBundle(FooterService footerService, SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
+    public static void addDocumentToBundle(FooterService footerService, SscsCaseData sscsCaseData, SscsDocument sscsDocument, String overrideFileName) {
         DocumentLink url = sscsDocument.getValue().getDocumentLink();
         DocumentType documentType = DocumentType.fromValue(sscsDocument.getValue().getDocumentType());
         String dateIssued = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, null, null);
+        footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, overrideFileName, null);
+    }
+
+    @Nullable
+    public static CcdCallbackMap getCcdCallbackMap(PostHearing postHearing, PostHearingReviewType reviewType) {
+        if (isNull(reviewType)) {
+            return null;
+        }
+        switch (reviewType) {
+            case SET_ASIDE:
+                CcdCallbackMap action = postHearing.getSetAside().getAction();
+                if (action == SetAsideActions.REFUSE
+                        && isYes(postHearing.getSetAside().getRequestStatementOfReasons())) {
+                    action = SetAsideActions.REFUSE_SOR;
+                }
+                return action;
+            case CORRECTION:
+                return postHearing.getCorrection().getAction();
+            case STATEMENT_OF_REASONS:
+                return postHearing.getStatementOfReasons().getAction();
+            case PERMISSION_TO_APPEAL:
+                return postHearing.getPermissionToAppeal().getAction();
+            case LIBERTY_TO_APPLY:
+                return postHearing.getLibertyToApply().getAction();
+            default:
+                return null;
+        }
+    }
+
+    @Nullable
+    public static DocumentType getDocumentTypeFromReviewType(PostHearingReviewType reviewType) {
+        if (isNull(reviewType)) {
+            return null;
+        }
+        // TODO: fill in other doc types for other post hearing routes, use switch if desired
+        if (SET_ASIDE.equals(reviewType)) {
+            return DocumentType.SET_ASIDE_APPLICATION;
+        }
+        return null;
+    }
+
+    @Nullable
+    public static EventType getEventTypeFromDocumentReviewTypeAndAction(PostHearingReviewType reviewType,
+                                                                           String actionName) {
+        if (isNull(reviewType) || isNull(actionName)) {
+            return null;
+        }
+        // TODO: fill in other event types for other post hearing routes, use switch if desired
+        if (SET_ASIDE.equals(reviewType)) {
+            if (GRANT.getValue().equals(actionName)) {
+                return EventType.SET_ASIDE_GRANTED;
+            } else if (REFUSE.getValue().equals(actionName)) {
+                return EventType.SET_ASIDE_REFUSED;
+            }
+        }
+        return null;
     }
 }
