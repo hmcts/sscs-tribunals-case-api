@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions.GRANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.CORRECTION;
 
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,9 +12,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
@@ -39,8 +46,26 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
 
         String caseId = caseData.getCcdCaseId();
 
-        PostHearingReviewType typeSelected = caseData.getPostHearing().getReviewType();
+        PostHearing postHearing = caseData.getPostHearing();
+
+        PostHearingReviewType typeSelected = postHearing.getReviewType();
         log.info("Review Post Hearing App: handling action {} for case {}", typeSelected,  caseId);
+
+        //Get preview doc and change name
+        if (CORRECTION.equals(typeSelected)) {
+            if (GRANT.equals(postHearing.getCorrection().getAction())) {
+                DocumentLink correctedDecision = caseData.getDocumentStaging().getPreviewDocument();
+
+                SscsDocumentDetails documentDetails = SscsDocumentDetails.builder()
+                    .dateApproved(LocalDate.now().toString())
+                    .documentFileName("Corrected decision notice")
+                    .documentLink(correctedDecision)
+                    .build();
+
+                //TODO: check what we need to do with this, does it need to be added here?
+                caseData.getSscsDocument().add(new SscsDocument(documentDetails));
+            }
+        }
 
         SscsUtil.clearDocumentTransientFields(caseData);
 
