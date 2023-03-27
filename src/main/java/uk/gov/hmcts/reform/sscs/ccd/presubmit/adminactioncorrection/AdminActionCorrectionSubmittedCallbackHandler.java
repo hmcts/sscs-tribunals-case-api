@@ -48,10 +48,10 @@ public class AdminActionCorrectionSubmittedCallbackHandler implements PreSubmitC
 
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
         PostHearing postHearing = caseData.getPostHearing();
-        AdminCorrectionType adminCorrectionType = postHearing.getCorrection().getAdminCorrectionType();
+        AdminCorrectionType adminCorrectionType = postHearing.getAdminCorrectionType();
         log.info("Admin Action Correction: handling adminActionCorrection {} for case {}", adminCorrectionType,  caseId);
 
-        CcdCallbackMap callbackMap = postHearing.getCorrection().getAdminCorrectionType();
+        CcdCallbackMap callbackMap = postHearing.getAdminCorrectionType();
 
         if (isNull(callbackMap)) {
             response.addError(String.format("Invalid Admin Correction Type Selected %s or correction "

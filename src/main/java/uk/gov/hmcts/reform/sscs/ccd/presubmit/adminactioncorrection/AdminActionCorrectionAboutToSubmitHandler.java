@@ -55,7 +55,7 @@ public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallb
     private void handleAdminCorrection(SscsCaseData sscsCaseData) {
         String ccdCaseId = sscsCaseData.getCcdCaseId();
         log.info("Handling admin correction for case: {}", ccdCaseId);
-        AdminCorrectionType adminCorrectionType = sscsCaseData.getPostHearing().getCorrection().getAdminCorrectionType();
+        AdminCorrectionType adminCorrectionType = sscsCaseData.getPostHearing().getAdminCorrectionType();
         if (isNull(adminCorrectionType)) {
             throw new IllegalStateException("adminCorrectionType unexpectedly null for case: " + ccdCaseId);
         }
