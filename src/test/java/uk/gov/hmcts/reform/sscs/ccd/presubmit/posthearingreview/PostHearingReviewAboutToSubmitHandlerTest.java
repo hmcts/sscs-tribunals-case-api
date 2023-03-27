@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REVIEW;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.CORRECTION;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
@@ -93,5 +95,18 @@ class PostHearingReviewAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void givenCorrectionHasBeenGranted_thenAddDocumentToCase() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        caseData.getPostHearing().setReviewType(CORRECTION);
+        caseData.getPostHearing().getCorrection().setAction(CorrectionActions.GRANT);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(caseData.getSscsDocument()).hasSize(1);
     }
 }

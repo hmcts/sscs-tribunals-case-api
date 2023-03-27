@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions.GRANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.CORRECTION;
 
 import java.time.LocalDate;
+import java.util.LinkedList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,20 +54,24 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
         PostHearingReviewType typeSelected = postHearing.getReviewType();
         log.info("Review Post Hearing App: handling action {} for case {}", typeSelected,  caseId);
 
-        //Get preview doc and change name
-        if (CORRECTION.equals(typeSelected)) {
-            if (GRANT.equals(postHearing.getCorrection().getAction())) {
-                DocumentLink correctedDecision = caseData.getDocumentStaging().getPreviewDocument();
+        if (CORRECTION.equals(typeSelected) && GRANT.equals(postHearing.getCorrection().getAction())) {
+            DocumentLink correctedDecision = caseData.getDocumentStaging().getPreviewDocument();
 
-                SscsDocumentDetails documentDetails = SscsDocumentDetails.builder()
-                    .dateApproved(LocalDate.now().toString())
-                    .documentFileName("Corrected decision notice")
-                    .documentLink(correctedDecision)
-                    .build();
+            SscsDocumentDetails documentDetails = SscsDocumentDetails.builder()
+                .dateApproved(LocalDate.now().toString())
+                .documentFileName("Corrected decision notice")
+                .documentLink(correctedDecision)
+                .build();
 
-                //TODO: check what we need to do with this, does it need to be added here?
-                caseData.getSscsDocument().add(new SscsDocument(documentDetails));
+            List<SscsDocument> documents = caseData.getSscsDocument();
+
+            if (isNull(documents)) {
+                documents = new LinkedList<>();
+                caseData.setSscsDocument(documents);
             }
+
+            documents.add(new SscsDocument(documentDetails));
+
         }
 
         SscsUtil.clearDocumentTransientFields(caseData);
