@@ -60,6 +60,7 @@ public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallb
             throw new IllegalStateException("adminCorrectionType unexpectedly null for case: " + ccdCaseId);
         }
 
+        log.info("This is adminCorrectionType for case {}: {}", ccdCaseId, adminCorrectionType);
         if (AdminCorrectionType.BODY.equals(adminCorrectionType)) {
             log.info("Handling body correction for case: {}", ccdCaseId);
             // do body things
