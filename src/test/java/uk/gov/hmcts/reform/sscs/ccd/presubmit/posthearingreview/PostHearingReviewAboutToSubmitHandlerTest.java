@@ -23,6 +23,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+
+import java.util.LinkedList;
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewAboutToSubmitHandlerTest {
@@ -108,5 +113,35 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(caseData.getSscsDocument()).hasSize(1);
+    }
+
+    @Test
+    void givenCorrectionHasBeenGrantedAndExistingDocumentOnCase_thenAddDocumentToCase() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        List<SscsDocument> documents = new LinkedList<>();
+        documents.add(SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
+        caseData.setSscsDocument(documents);
+
+        caseData.getPostHearing().setReviewType(CORRECTION);
+        caseData.getPostHearing().getCorrection().setAction(CorrectionActions.GRANT);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(caseData.getSscsDocument()).hasSize(2);
+    }
+
+    @Test
+    void givenCorrectionHasBeenRefused_thenDontAddDocumentToCase() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        caseData.getPostHearing().setReviewType(CORRECTION);
+        caseData.getPostHearing().getCorrection().setAction(CorrectionActions.REFUSE);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(caseData.getSscsDocument()).isNull();
     }
 }
