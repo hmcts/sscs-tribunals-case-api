@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
@@ -73,8 +72,6 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
             documents.add(new SscsDocument(documentDetails));
 
         }
-
-        SscsUtil.clearDocumentTransientFields(caseData);
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
