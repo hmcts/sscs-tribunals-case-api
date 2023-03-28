@@ -4,13 +4,13 @@ plugins {
     id 'org.sonarqube' version '3.5.0.2730'
     id 'jacoco'
     id 'org.springframework.boot' version '2.7.6'
-    id 'uk.gov.hmcts.java' version '0.12.33'
+    id 'uk.gov.hmcts.java' version '0.12.43'
     id 'com.gorylenko.gradle-git-properties' version '2.4.1'
     id 'com.github.ben-manes.versions' version '0.39.0'
     id "info.solidsoft.pitest" version '1.9.11'
-    id 'org.owasp.dependencycheck' version '8.1.2'
+    id 'org.owasp.dependencycheck' version '8.2.1'
     id 'au.com.dius.pact' version '4.3.15'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.579'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.632'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -260,7 +260,7 @@ dependencyManagement {
         }
 
         // CVE-2022-41881, CVE-2022-41915
-        dependencySet(group: 'io.netty', version: '4.1.89.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.90.Final') {
             entry 'netty-buffer'
             entry 'netty-common'
             entry 'netty-codec'
@@ -308,7 +308,7 @@ dependencies {
     implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.6'
 
-    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.1'
+    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
     implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.1'
 
@@ -328,8 +328,8 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.25.10'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.1'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.25.11'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.3'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.37.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.2'
@@ -346,7 +346,7 @@ dependencies {
     implementation group:'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.7.0'
 
-    implementation group: 'org.pitest', name: 'pitest', version:  '1.11.3'
+    implementation group: 'org.pitest', name: 'pitest', version:  '1.11.7'
     implementation group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.9.11'
     implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: '0.5'
 
