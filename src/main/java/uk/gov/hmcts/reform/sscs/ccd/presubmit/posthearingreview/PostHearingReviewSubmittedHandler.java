@@ -77,6 +77,8 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
                 idamService.getIdamTokens());
         }
 
+        caseData.setPostHearing(null);
+
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
