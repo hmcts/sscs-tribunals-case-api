@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 
 @RunWith(JUnitParamsRunner.class)
 public class DirectionIssuedAboutToStartHandlerTest {
@@ -268,5 +269,29 @@ public class DirectionIssuedAboutToStartHandlerTest {
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(2, listOptions.size());
         assertEquals(expected, response.getData().getDirectionTypeDl());
+    }
+
+    @Test
+    public void givenAValidCallbackType_thenClearTheConfidentialityFields() {
+        handler = new DirectionIssuedAboutToStartHandler();
+        sscsCaseData.setConfidentialityType(ConfidentialityType.CONFIDENTIAL.getCode());
+        sscsCaseData.setSendDirectionNoticeToFTA(YesNo.YES);
+        sscsCaseData.setSendDirectionNoticeToRepresentative(YesNo.YES);
+        sscsCaseData.setSendDirectionNoticeToOtherPartyRep(YesNo.YES);
+        sscsCaseData.setSendDirectionNoticeToOtherPartyAppointee(YesNo.YES);
+        sscsCaseData.setSendDirectionNoticeToOtherParty(YesNo.YES);
+        sscsCaseData.setSendDirectionNoticeToJointParty(YesNo.YES);
+        sscsCaseData.setSendDirectionNoticeToAppellantOrAppointee(YesNo.YES);
+
+        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertNull(sscsCaseData.getConfidentialityType());
+        assertNull(sscsCaseData.getSendDirectionNoticeToFTA());
+        assertNull(sscsCaseData.getSendDirectionNoticeToRepresentative());
+        assertNull(sscsCaseData.getSendDirectionNoticeToOtherPartyRep());
+        assertNull(sscsCaseData.getSendDirectionNoticeToOtherPartyAppointee());
+        assertNull(sscsCaseData.getSendDirectionNoticeToOtherParty());
+        assertNull(sscsCaseData.getSendDirectionNoticeToJointParty());
+        assertNull(sscsCaseData.getSendDirectionNoticeToAppellantOrAppointee());
     }
 }
