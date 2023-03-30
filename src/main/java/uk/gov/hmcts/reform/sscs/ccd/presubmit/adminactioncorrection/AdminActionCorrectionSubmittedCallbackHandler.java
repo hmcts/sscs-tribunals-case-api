@@ -54,9 +54,8 @@ public class AdminActionCorrectionSubmittedCallbackHandler implements PreSubmitC
         CcdCallbackMap callbackMap = postHearing.getCorrection().getAdminCorrectionType();
 
         if (isNull(callbackMap)) {
-            response.addError(String.format("Invalid Admin Correction Type Selected %s or correction "
-                    + "selected as callback is null",
-                adminCorrectionType));
+            response.addError("Invalid Admin Correction Type Selected or correction "
+                    + "selected as callback is null");
             return response;
         }
 
