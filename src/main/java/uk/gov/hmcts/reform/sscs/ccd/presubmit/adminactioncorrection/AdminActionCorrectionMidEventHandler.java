@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adminactioncorrection;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdminCorrectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
@@ -45,15 +47,24 @@ public class AdminActionCorrectionMidEventHandler implements PreSubmitCallbackHa
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
             new PreSubmitCallbackResponse<>(sscsCaseData);
-
         AdminCorrectionType adminCorrectionType = sscsCaseData.getPostHearing().getCorrection().getAdminCorrectionType();
 
-        log.info("adminCorrectionType is {}", adminCorrectionType);
+        if (isNull(adminCorrectionType)) {
+            log.error(String.format("adminCorrectionType unexpectedly null for case: %s", caseId));
+            preSubmitCallbackResponse.addError(String.format("adminCorrectionType unexpectedly null for case: %s", caseId));
+        } else if (AdminCorrectionType.HEADER.equals(adminCorrectionType)) {
+            // Only header correction requires further action
+            // Body correction is sent straight to review by judge
 
-        if (AdminCorrectionType.HEADER.equals(adminCorrectionType)) {
-            // do header things
-        } else if (AdminCorrectionType.BODY.equals(adminCorrectionType)) {
-            // do body things
+            log.info("Handling header correction for case: {}", caseId);
+            // identify if the final decision notice was generated or uploaded
+            // getWriteFinalDecisionGenerateNotice may not work due to being cleared during issueFinalDecisionNotice
+            String generateNotice = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice();
+            if (YesNo.YES.getValue().equals(generateNotice)) {
+                // IF generated: automatically regenerate final decision with the current details
+            } else {
+                // IF uploaded: go to upload screen and expect user to upload new document
+            }
         }
 
         return preSubmitCallbackResponse;

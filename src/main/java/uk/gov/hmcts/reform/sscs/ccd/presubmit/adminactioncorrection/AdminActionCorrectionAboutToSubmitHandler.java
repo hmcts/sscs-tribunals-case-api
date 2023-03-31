@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adminactioncorrection;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import lombok.RequiredArgsConstructor;
@@ -47,27 +46,17 @@ public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallb
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
             new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        handleAdminCorrection(sscsCaseData);
-
-        return preSubmitCallbackResponse;
-    }
-
-    private void handleAdminCorrection(SscsCaseData sscsCaseData) {
         String ccdCaseId = sscsCaseData.getCcdCaseId();
         log.info("Handling admin correction for case: {}", ccdCaseId);
         AdminCorrectionType adminCorrectionType = sscsCaseData.getPostHearing().getCorrection().getAdminCorrectionType();
-        if (isNull(adminCorrectionType)) {
-            throw new IllegalStateException("adminCorrectionType unexpectedly null for case: " + ccdCaseId);
+        if (AdminCorrectionType.HEADER.equals(adminCorrectionType)) {
+            // Only header correction requires further action
+            // Body correction is sent straight to review by judge
+            log.info("Handling header correction for case: {}", ccdCaseId);
+            // save the corrected document to case (whether generated or uploaded
         }
 
-        log.info("This is adminCorrectionType for case {}: {}", ccdCaseId, adminCorrectionType);
-        if (AdminCorrectionType.BODY.equals(adminCorrectionType)) {
-            log.info("Handling body correction for case: {}", ccdCaseId);
-            // do body things
-        } else if (AdminCorrectionType.HEADER.equals(adminCorrectionType)) {
-            log.info("Handling header correction for case: {}", ccdCaseId);
-            // do header things
-        }
+        return preSubmitCallbackResponse;
     }
 
 }
