@@ -348,6 +348,7 @@ ccd:
       - caseworker-sscs-panelmember
       - caseworker-sscs-bulkscan
       - caseworker-sscs-pcqextractor
+      - caseworker-sscs-hmrcresponsewriter
 elastic:
   enabled: true
 
