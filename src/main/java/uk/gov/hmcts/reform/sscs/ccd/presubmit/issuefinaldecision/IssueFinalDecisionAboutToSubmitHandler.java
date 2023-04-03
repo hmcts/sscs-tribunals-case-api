@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
@@ -49,6 +50,8 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     private boolean isScheduleListingEnabled;
     @Value("${feature.snl.adjournment.enabled}")
     private boolean isAdjournmentEnabled;
+    @Value("${feature.snl.postHearings.enabled}")
+    private boolean isPostHearingsEnabled;
 
     public IssueFinalDecisionAboutToSubmitHandler(FooterService footerService,
         DecisionNoticeService decisionNoticeService, Validator validator,
@@ -92,6 +95,13 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         }
 
         createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
+
+        if (isPostHearingsEnabled) {
+            String generateNotice = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice();
+            log.info("Saving finalDecisionNoticeGenerated for case {} as {}", sscsCaseData.getCcdCaseId(), generateNotice);
+            sscsCaseData.setFinalDecisionNoticeGenerated(YesNo.valueOf(generateNotice.toUpperCase()));
+        }
+
         clearTransientFields(preSubmitCallbackResponse);
 
         if (!(State.READY_TO_LIST.equals(sscsCaseData.getState())
