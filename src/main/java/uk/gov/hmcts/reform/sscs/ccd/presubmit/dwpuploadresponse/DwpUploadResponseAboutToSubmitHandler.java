@@ -5,7 +5,7 @@ import static java.util.Collections.sort;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.CONFIRM_PANEL_COMPOSITION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.CONFIRM_PANEL_COMPOSITION_AND_LISTING_DIRECTIONS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
@@ -126,7 +126,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private void setSscs2InterlocProperties(SscsCaseData sscsCaseData) {
         if (sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) && YesNo.isNoOrNull(sscsCaseData.getDwpFurtherInfo())) {
-            sscsCaseData.setInterlocReferralReason(CONFIRM_PANEL_COMPOSITION);
+            sscsCaseData.setInterlocReferralReason(CONFIRM_PANEL_COMPOSITION_AND_LISTING_DIRECTIONS);
         }
     }
 
