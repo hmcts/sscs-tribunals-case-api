@@ -24,7 +24,7 @@ services:
       IDAM_S2S_BASE_URI: http://host.docker.internal:4502
       #These are purely placeholder values. The key is simply 'some-key' Base64 encoded.
       STORAGEACCOUNT_PRIMARY_CONNECTION_STRING: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=c29tZS1rZXk=;BlobEndpoint=http://azure-storage-emulator-azurite:10000/devstoreaccount1
-      S2S_NAMES_WHITELIST: sscs,divorce,em_gw,em_ccd_orchestrator,ccd,document-management-store,ccd_gw,idam-api,fpl_case_service,em_stitching_api,sscs_bulkscan,ccd_data,dg_docassembly_api,xui_webapp,ccd_case_document_am_api
+      S2S_NAMES_WHITELIST: sscs,divorce,em_gw,em_ccd_orchestrator,ccd,document-management-store,ccd_gw,idam-api,fpl_case_service,em_stitching_api,sscs_bulkscan,ccd_data,dg_docassembly_api,xui_webapp,ccd_case_document_am_api,wa_task_management_api
       http_proxy:
       https_proxy:
       no_proxy:

@@ -35,6 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -411,6 +412,8 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueFinalDecisionEvent_shouldUpdateIssueFinalDecisionDateToToday() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+
         SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
         sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
         sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
