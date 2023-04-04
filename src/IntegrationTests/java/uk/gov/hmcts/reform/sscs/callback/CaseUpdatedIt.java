@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.client.RefDataApi;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -31,6 +32,9 @@ public class CaseUpdatedIt extends AbstractEventIt {
 
     @MockBean
     private IdamService idamService;
+
+    @MockBean
+    private CcdService ccdService;
 
     @MockBean
     private RefDataApi refDataApi;
