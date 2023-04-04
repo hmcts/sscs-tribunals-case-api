@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adminactioncorrection;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,10 +58,8 @@ public class AdminActionCorrectionMidEventHandler implements PreSubmitCallbackHa
             // Body correction is sent straight to review by judge
 
             log.info("Handling header correction for case: {}", caseId);
-            // identify if the final decision notice was generated or uploaded
-            // getWriteFinalDecisionGenerateNotice may not work due to being cleared during issueFinalDecisionNotice
-            String generateNotice = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice();
-            if (YesNo.YES.getValue().equals(generateNotice)) {
+            YesNo noticeGenerated = sscsCaseData.getFinalDecisionNoticeGenerated();
+            if (isYes(noticeGenerated)) {
                 // IF generated: automatically regenerate final decision with the current details
             } else {
                 // IF uploaded: go to upload screen and expect user to upload new document
