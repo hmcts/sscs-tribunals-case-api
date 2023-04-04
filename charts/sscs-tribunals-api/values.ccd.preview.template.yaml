@@ -212,10 +212,7 @@ ccd:
     clusterName: "es"
     replicas: 1
   logstash:
-    image:logstash:
     image: hmctspublic.azurecr.io/imported/logstash/logstash
-    imageTag: 8.5.1
-    imagePullPolicy: "IfNotPresent"
     logstashJavaOpts: -Xmx1g -Xms512M
   ccd-admin-web:
     nodejs:
