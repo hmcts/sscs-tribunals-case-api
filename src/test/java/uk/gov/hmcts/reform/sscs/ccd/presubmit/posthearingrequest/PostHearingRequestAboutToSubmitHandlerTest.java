@@ -163,7 +163,7 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).hasSize(1)
-            .containsOnly("There is no post hearing request document");
+            .containsOnly("There is no preview document");
         verifyNoInteractions(footerService);
     }
 
