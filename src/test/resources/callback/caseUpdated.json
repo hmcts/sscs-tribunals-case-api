@@ -24,7 +24,9 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "processingVenue": "Basildon CC",
+      "benefitCode" : "002",
+      "issueCode" : "DD",
+      "processingVenue": "myVenue",
       "dwpTimeExtension": [
       ],
       "hearings": [
