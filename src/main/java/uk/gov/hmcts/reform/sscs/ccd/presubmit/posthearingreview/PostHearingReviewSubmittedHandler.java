@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
@@ -76,6 +77,8 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
                 EventType.SOR_REQUEST.getCcdType(), "Send to hearing Judge for statement of reasons", "",
                 idamService.getIdamTokens());
         }
+
+        SscsUtil.clearPostHearingFields(caseData);
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
