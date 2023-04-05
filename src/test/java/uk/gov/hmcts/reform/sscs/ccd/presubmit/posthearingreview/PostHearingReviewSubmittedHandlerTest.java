@@ -3,10 +3,12 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REVIEW;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.CORRECTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.LIBERTY_TO_APPLY;
@@ -30,8 +32,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-
-import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewSubmittedHandlerTest {
@@ -115,6 +115,38 @@ class PostHearingReviewSubmittedHandlerTest {
         caseData.getPostHearing().getSetAside().setAction(value);
 
         verifyCcdCallbackCalledCorrectly(value);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = SetAsideActions.class, names = {"GRANT", "ISSUE_DIRECTIONS"})
+    void givenActionTypeSetAsideSelectedIsNotRefuse_shouldNotUpdateCaseWIthCcdService(SetAsideActions action) {
+        caseData.getPostHearing().setReviewType(SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setAction(action);
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        PostHearing returnedPostHearing = PostHearing.builder()
+            .reviewType(SET_ASIDE)
+            .setAside(SetAside.builder()
+                .action(action)
+                .build())
+            .build();
+        SscsCaseData returnedCase = SscsCaseData.builder()
+            .ccdCaseId("555")
+            .postHearing(returnedPostHearing)
+            .build();
+        when(ccdCallbackMapService.handleCcdCallbackMap(action, caseData))
+            .thenReturn(returnedCase);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        verify(ccdCallbackMapService, times(1))
+            .handleCcdCallbackMap(action, caseData);
+
+        verifyNoInteractions(ccdService);
     }
 
     @ParameterizedTest
