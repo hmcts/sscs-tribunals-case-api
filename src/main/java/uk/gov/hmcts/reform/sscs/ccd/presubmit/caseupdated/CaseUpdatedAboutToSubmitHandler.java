@@ -140,11 +140,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateBenefitIssueCode(SscsCaseData caseData,
                                           PreSubmitCallbackResponse<SscsCaseData> response) {
-        boolean secondDoctor = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
+        boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
         boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
 
         if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
-            secondDoctor, fqpmRequired))) {
+            isSecondDoctorPresent, fqpmRequired))) {
             response.addError("Incorrect benefit/issue code combination");
         }
     }
