@@ -146,7 +146,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             .roles(List.of(SUPER_USER.getValue()))
             .build());
 
-        when(categoryMapService.getSessionCategory(any(String.class), any(String.class), any(boolean.class), any(boolean.class))).thenReturn(new SessionCategoryMap(PIP_NEW_CLAIM, AT, true, true));
+        when(categoryMapService.getSessionCategory(any(String.class), any(String.class), any(boolean.class),
+            any(boolean.class))).thenReturn(new SessionCategoryMap(PIP_NEW_CLAIM, AT, true, true));
     }
 
     @Test
@@ -1222,5 +1223,18 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         if (error > 0) {
             assertTrue(response.getErrors().stream().anyMatch(e -> e.equals("Benefit type cannot be changed to the selected type")));
         }
+    }
+
+    @Test
+    public void givenInvalidIssueBenefitCode_thenThrowError() {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        when(categoryMapService.getSessionCategory("054", "DD", true, true))
+            .thenReturn(null);
+        sscsCaseData.setBenefitCode("054");
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
     }
 }
