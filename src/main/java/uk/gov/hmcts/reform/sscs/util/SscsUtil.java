@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -41,6 +42,11 @@ public class SscsUtil {
 
     public static boolean isValidCaseState(State state, List<State> allowedStates) {
         return allowedStates.contains(state);
+    }
+
+    public static void clearPostHearingFields(SscsCaseData caseData) {
+        caseData.setPostHearing(new PostHearing());
+        clearDocumentTransientFields(caseData);
     }
 
     public static void clearDocumentTransientFields(SscsCaseData caseData) {

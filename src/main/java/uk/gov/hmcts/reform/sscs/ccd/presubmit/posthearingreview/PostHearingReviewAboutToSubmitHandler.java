@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
@@ -41,8 +40,6 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
 
         PostHearingReviewType typeSelected = caseData.getPostHearing().getReviewType();
         log.info("Review Post Hearing App: handling action {} for case {}", typeSelected,  caseId);
-
-        SscsUtil.clearDocumentTransientFields(caseData);
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
