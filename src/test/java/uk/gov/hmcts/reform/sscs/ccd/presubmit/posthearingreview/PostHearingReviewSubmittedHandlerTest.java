@@ -130,7 +130,7 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @Test
-    void givenRefusedSetAsideSelected_shouldReturnCallCorrectCallback_andUpdateStates() {
+    void givenRefusedSetAsideSelected_shouldReturnCorrectCallback_andUpdateStates() {
         caseData.getPostHearing().setReviewType(SET_ASIDE);
         caseData.getPostHearing().getSetAside().setAction(REFUSE);
 
@@ -164,6 +164,16 @@ class PostHearingReviewSubmittedHandlerTest {
         caseData.getPostHearing().getSetAside().setRequestStatementOfReasons(YesNo.YES);
 
         verifyCcdCallbackCalledCorrectly(SetAsideActions.REFUSE_SOR);
+    }
+
+    @Test
+    void givenRefusedSetAsideSelected_andStatementOfReasonsNotRequested_shouldReturnCallCorrectCallback() {
+        caseData.getPostHearing().setReviewType(SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setAction(REFUSE);
+
+        caseData.getPostHearing().getSetAside().setRequestStatementOfReasons(YesNo.NO);
+
+        verifyCcdCallbackCalledCorrectly(SetAsideActions.REFUSE);
     }
 
     @ParameterizedTest
