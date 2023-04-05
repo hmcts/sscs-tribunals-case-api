@@ -250,6 +250,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (isSetAsideApplication(sscsCaseData)) {
             sscsCaseData.setState(State.POST_HEARING);
             sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
+            sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
+
             if (PartyItemList.DWP.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
                 sscsCaseData.setDwpState(DwpState.SET_ASIDE_REQUESTED);
             }
@@ -258,6 +260,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (isCorrectionApplication(sscsCaseData)) {
             sscsCaseData.setState(State.POST_HEARING);
             sscsCaseData.setDwpState(DwpState.CORRECTION_REQUESTED);
+            sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.CORRECTION);
 
             if (isSendToInterlocReviewByJudge(sscsCaseData)) {
                 sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);

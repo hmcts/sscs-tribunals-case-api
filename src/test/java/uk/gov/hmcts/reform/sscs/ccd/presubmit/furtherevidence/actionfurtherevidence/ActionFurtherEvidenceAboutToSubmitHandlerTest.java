@@ -231,12 +231,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-        "setAsideApplication, SET_ASIDE_REQUESTED", 
-        "correctionApplication, CORRECTION_REQUESTED"
+        "setAsideApplication, SET_ASIDE_REQUESTED, SET_ASIDE",
+        "correctionApplication, CORRECTION_REQUESTED, CORRECTION"
     })
     public void giveAValidPostHearingApplicationRequestFromAnFtaUser_thenDwpStateIsUpdatedAndDocumentIsExpectedType(
         String documentType,
-        DwpState dwpState
+        DwpState dwpState,
+        PostHearingRequestType requestType
     ) {
         DynamicListItem sendToInterlocListItem = new DynamicListItem(
                 FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
@@ -262,6 +263,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                 ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getDwpState(), is(dwpState));
+        assertThat(response.getData().getPostHearing().getRequestType(), is(requestType));
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
         assertThat(sscsDocumentDetail.getDocumentType(), is(documentType));
     }
@@ -291,6 +293,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getDwpState(), is(DwpState.CORRECTION_REQUESTED));
+        assertThat(response.getData().getPostHearing().getRequestType(), is(PostHearingRequestType.CORRECTION));
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
         assertThat(sscsDocumentDetail.getDocumentType(), is("correctionApplication"));
         assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.AWAITING_ADMIN_ACTION));
