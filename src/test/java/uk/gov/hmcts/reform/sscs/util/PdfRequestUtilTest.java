@@ -22,7 +22,8 @@ class PdfRequestUtilTest {
 
     @ParameterizedTest
     @CsvSource(value = {
-        "SET_ASIDE,SET_ASIDE_APPLICATION"
+        "SET_ASIDE,SET_ASIDE_APPLICATION",
+        "CORRECTION,CORRECTION_APPLICATION"
     })
     void getPostHearingDocumentType_returnsDocumentType(PostHearingRequestType postHearingRequestType, DocumentType documentType) {
         sscsCaseData.getPostHearing().setRequestType(postHearingRequestType);
@@ -32,7 +33,6 @@ class PdfRequestUtilTest {
     @ParameterizedTest
     @EnumSource(value = PostHearingRequestType.class,
         names = { // TODO remove as each type is implemented
-            "CORRECTION",
             "STATEMENT_OF_REASONS",
             "PERMISSION_TO_APPEAL",
             "LIBERTY_TO_APPLY"
