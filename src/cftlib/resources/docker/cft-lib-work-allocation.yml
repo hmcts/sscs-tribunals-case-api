@@ -1,0 +1,176 @@
+---
+version: '3.5'
+
+name: cft-lib-work-allocation
+
+services:
+  camunda-local-bpm:
+    image:  hmctsprivate.azurecr.io/camunda/bpm:latest
+    container_name: wa-camunda-bpm
+    environment:
+      CAMUNDA_DB_HOST: shared-database-pg12
+      CAMUNDA_DB_PORT: 5432
+      CAMUNDA_DB_USER_NAME: postgres
+      CAMUNDA_DB_PASSWORD: admin
+      "camunda.bpm.database.schema-update": true
+      CAMUNDA_API_AUTH_ENABLED: false
+      S2S_URL: http://host.docker.internal:4502/
+      camundaGroups.work-allocation.s2sServiceNames: wa_task_management_api,wa_workflow_api,wa_case_event_handler,wa_camunda_pipeline_upload,sscs
+      WA_AUTO_CONFIGURE_TASKS_ENABLED: true
+      TASK_MANAGEMENT_API_URL: ${TASK_MANAGEMENT_API_URL:-http://wa-task-management-api:8087}
+      TZ: Europe/London
+    ports:
+      - 8999:8999
+    networks:
+      - cftlib_default
+
+  ccd-message-publisher:
+    image: hmctspublic.azurecr.io/ccd/message-publisher:latest
+    container_name: wa-message-publisher
+    environment:
+      DATA_STORE_DB_HOST: shared-database-pg12
+      DATA_STORE_DB_URL: jdbc:postgresql://shared-database-pg12:5432/datastore
+      DATA_STORE_DB_PORT: 5432
+      DATA_STORE_DB_NAME: datastore
+      DATA_STORE_DB_OPTIONS: ?stringtype=unspecified&ssl=false
+      DATA_STORE_DB_USERNAME: postgres
+      DATA_STORE_DB_PASSWORD: admin
+      SERVICE_BUS_CONNECTION_STRING: ${AZURE_SERVICE_BUS_CONNECTION_STRING:-Endpoint=sb://ccd-servicebus-demo.servicebus.windows.net/;SharedAccessKeyName=SendAndRecieveCCDMessage;SharedAccessKey=REPLACEME}
+      CCD_CASE_EVENTS_DESTINATION: ${AZURE_SERVICE_BUS_TOPIC_NAME:-wa-case-event-handler-topic-sessions-ft}
+    ports:
+      - 4456:4456
+    networks:
+      - cftlib_default
+
+  wa-workflow-api:
+    image: "hmctspublic.azurecr.io/wa/workflow-api:latest"
+    container_name: wa-workflow-api
+    environment:
+      CAMUNDA_URL: http://wa-camunda-bpm:8999/engine-rest
+      S2S_URL: http://host.docker.internal:4502/
+      S2S_SECRET_WORKFLOW_API: "AAAAAAAAAAAAAAAA"
+      POSTGRES_HOST: shared-database-pg12
+      POSTGRES_PORT: 5432
+      POSTGRES_NAME: wa_workflow_api
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: admin
+      WA_S2S_AUTHORIZED_SERVICES: wa_workflow_api,wa_case_event_handler,camunda-bpm,xui_webapp
+      LAUNCH_DARKLY_SDK_KEY: "${LAUNCH_DARKLY_SDK_KEY}"
+    ports:
+      - 8099:8099
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - camunda-local-bpm
+    networks:
+      - cftlib_default
+
+  wa-task-management-api:
+      image: "hmctspublic.azurecr.io/wa/task-management-api:latest"
+      container_name: wa-task-management-api
+      environment:
+        CAMUNDA_URL: http://wa-camunda-bpm:8999/engine-rest
+        S2S_URL: http://host.docker.internal:4502/
+        IDAM_URL: http://rse-idam-simulator:5000
+        CCD_URL: http://host.docker.internal:4452
+        OPEN_ID_IDAM_URL: http://rse-idam-simulator:5000
+        ROLE_ASSIGNMENT_URL: http://host.docker.internal:4096
+        POSTGRES_HOST: shared-database-pg12
+        POSTGRES_PORT: 5432
+        POSTGRES_NAME: cft_task_db
+        ALLOWED_JURISDICTIONS: wa,ia,sscs,civil
+        ALLOWED_CASE_TYPES: asylum,wacasetype,sscs,civil,benefit
+        WA_S2S_AUTHORIZED_SERVICES: ccd,ccd_data,ccd_gw,ccd_ps,iac,wa_task_management_api,xui_webapp,wa_task_monitor,camunda_bpm,wa_workflow_api,wa_case_event_handler
+        LAUNCH_DARKLY_SDK_KEY: "${LAUNCH_DARKLY_SDK_KEY}"
+        WA_SYSTEM_USERNAME: "super-user@example.com"
+        WA_SYSTEM_PASSWORD: "${WA_SYSTEM_PASSWORD}"
+      ports:
+        - 8087:8087
+      extra_hosts:
+        - "host.docker.internal:host-gateway"
+      depends_on:
+        - camunda-local-bpm
+      networks:
+        - cftlib_default
+
+  case-event-handler:
+      image: "hmctspublic.azurecr.io/wa/case-event-handler:latest"
+      container_name: wa-case-event-handler
+      environment:
+        POSTGRES_HOST: shared-database-pg12
+        POSTGRES_USERNAME: postgres
+        POSTGRES_PASSWORD: admin
+        POSTGRES_CONNECTION_OPTIONS: "?stringtype=unspecified&gssEncMode=disable"
+        AZURE_SERVICE_BUS_CONNECTION_STRING: "${AZURE_SERVICE_BUS_CONNECTION_STRING}"
+        AZURE_SERVICE_BUS_TOPIC_NAME: "${AZURE_SERVICE_BUS_TOPIC_NAME}"
+        AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: "${AZURE_SERVICE_BUS_SUBSCRIPTION_NAME}"
+        AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME: "${AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME}"
+        APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=00000000-0000-0000-0000-000000000000"
+        ENVIRONMENT: "local"
+        S2S_URL: http://host.docker.internal:4502/
+        WA_WORKFLOW_API_URL: http://wa-workflow-api:8099
+        OPEN_ID_IDAM_URL: http://rse-idam-simulator:5000
+        IDAM_URL: http://rse-idam-simulator:5000
+        ROLE_ASSIGNMENT_URL: http://host.docker.internal:4096
+        CAMUNDA_URL: http://wa-camunda-bpm:8999/engine-rest
+        CCD_URL: http://host.docker.internal:4452
+        WA_TASK_MANAGEMENT_API_URL: http://wa-task-management-api:8087
+        AZURE_SERVICE_BUS_MESSAGE_AUTHOR: "${AZURE_SERVICE_BUS_MESSAGE_AUTHOR}"
+        AZURE_SERVICE_BUS_FEATURE_TOGGLE: "true"
+        AZURE_SERVICE_BUS_DLQ_FEATURE_TOGGLE: "true"
+        AZURE_SERVICE_BUS_CONCURRENT_SESSIONS: 2
+        MESSAGE_PROCESSING_POLL_INTERVAL_MILLISECONDS: 2000
+        MESSAGE_PROCESSING_THREAD_POOL_SIZE: 5
+        MESSAGE_READINESS_POLL_INTERVAL_MILLISECONDS: 500
+        MESSAGE_READINESS_THREAD_POOL_SIZE: 2
+        LAUNCH_DARKLY_SDK_KEY: "${LAUNCH_DARKLY_SDK_KEY}"
+      ports:
+        - 8088:8088
+      extra_hosts:
+        - "host.docker.internal:host-gateway"
+      depends_on:
+        - camunda-local-bpm
+        - wa-workflow-api
+      networks:
+        - cftlib_default
+
+  wa-task-monitor:
+    image: "hmctspublic.azurecr.io/wa/task-monitor:latest"
+    container_name: wa-task-monitor
+    environment:
+      S2S_URL: http://host.docker.internal:4502/
+      WA_WORKFLOW_API_URL: http://wa-workflow-api:8099
+      OPEN_ID_IDAM_URL: http://rse-idam-simulator:5000
+      IDAM_URL: http://rse-idam-simulator:5000
+      ROLE_ASSIGNMENT_URL: http://host.docker.internal:4096
+      CAMUNDA_URL: http://wa-camunda-bpm:8999/engine-rest
+      CCD_URL: http://host.docker.internal:4452
+      WA_TASK_MANAGEMENT_API_URL: http://wa-task-management-api:8087
+      CASE_EVENT_HANDLER_SERVICE_URL: http://wa-case-event-handler:8088
+      CCD_SEARCH_URL: http://host.docker.internal:9200
+      CONFIGURATION_CAMUNDA_MAX_RESULTS: 100
+      CONFIGURATION_TIME_LIMIT_FLAG: "true"
+      CONFIGURATION_TIME_LIMIT: 1440
+      INITIATION_CAMUNDA_MAX_RESULTS: 100
+      INITIATION_TIME_LIMIT_FLAG: "true"
+      INITIATION_TIME_LIMIT: 120
+      TERMINATION_CAMUNDA_MAX_RESULTS: 100
+      TERMINATION_TIME_LIMIT_FLAG: "true"
+      TERMINATION_TIME_LIMIT: 120
+      PENDING_TERMINATION_CAMUNDA_MAX_RESULTS: 1
+      WA_SYSTEM_USERNAME: "${WA_SYSTEM_USERNAME}"
+      WA_SYSTEM_PASSWORD: "${WA_SYSTEM_PASSWORD}"
+    ports:
+      - 8077:8077
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - camunda-local-bpm
+      - case-event-handler
+      - wa-task-management-api
+    networks:
+      - cftlib_default
+
+networks:
+  cftlib_default:
+    external: true

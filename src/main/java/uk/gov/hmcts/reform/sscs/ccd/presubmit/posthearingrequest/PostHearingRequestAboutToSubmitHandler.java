@@ -4,15 +4,19 @@ import static java.util.Objects.requireNonNull;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
@@ -21,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
+    private final FooterService footerService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -33,19 +38,34 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
-                                                          String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType,
+        Callback<SscsCaseData> callback,
+        String userAuthorisation
+    ) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-
         String caseId = caseData.getCcdCaseId();
+        PostHearingRequestType requestType = caseData.getPostHearing().getRequestType();
+        log.info("Post Hearing Request: handling action {} for case {}", requestType,  caseId);
 
-        PostHearingRequestType typeSelected = caseData.getPostHearing().getRequestType();
-        log.info("Post Hearing Request: handling action {} for case {}", typeSelected,  caseId);
+        final PreSubmitCallbackResponse<SscsCaseData> response = validatePostHearingRequest(caseData);
 
-        SscsUtil.clearDocumentTransientFields(caseData);
+        if (response.getErrors().isEmpty()) {
+            SscsUtil.addDocumentToDocumentTab(footerService, caseData, PdfRequestUtil.getPostHearingDocumentType(caseData));
+        }
 
+        return response;
+    }
+
+    @NotNull
+    private PreSubmitCallbackResponse<SscsCaseData> validatePostHearingRequest(SscsCaseData sscsCaseData) {
+        final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
+        DocumentLink previewDocument = sscsCaseData.getDocumentStaging().getPreviewDocument();
+        String postHearingRequestTypeDescription = sscsCaseData.getPostHearing().getRequestType().getDescriptionEn();
+        if (previewDocument == null
+            || !previewDocument.getDocumentFilename().contains(postHearingRequestTypeDescription)
+        ) {
+            response.addError("There is no post hearing request document");
+        }
         return response;
     }
 }

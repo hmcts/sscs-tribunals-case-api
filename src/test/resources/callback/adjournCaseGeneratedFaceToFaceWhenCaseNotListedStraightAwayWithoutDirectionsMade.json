@@ -753,14 +753,14 @@
     "case_data": {
       "adjournCaseAdditionalDirections": null,
       "adjournCaseCanCaseBeListedRightAway": "Yes",
-      "adjournCaseDisabilityQualifiedPanelMemberName": null,
+      "adjournCasePanelMember1": null,
       "adjournCaseGenerateNotice": "Yes",
       "adjournCaseInterpreterRequired": "No",
-      "adjournCaseMedicallyQualifiedPanelMemberName": null,
+      "adjournCasePanelMember2": null,
       "adjournCaseNextHearingDateType": "dateToBeFixed",
       "adjournCaseNextHearingListingDurationType": "standardTimeSlot",
       "adjournCaseNextHearingVenue": "sameVenue",
-      "adjournCaseOtherPanelMemberName": null,
+      "adjournCasePanelMember3": null,
       "adjournCasePanelMembersExcluded": "Yes",
       "adjournCaseReasons": [
         {
