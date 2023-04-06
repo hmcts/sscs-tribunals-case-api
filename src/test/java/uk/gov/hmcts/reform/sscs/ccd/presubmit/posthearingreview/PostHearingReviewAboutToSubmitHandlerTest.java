@@ -80,7 +80,6 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
     @Test
     void shouldReturnWithoutError() {
-
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 

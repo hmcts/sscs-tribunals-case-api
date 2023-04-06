@@ -35,6 +35,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -126,6 +127,7 @@ class AdjournCasePreviewServiceTest {
     void setUp() throws IOException {
         service = new AdjournCasePreviewService(generateFile, userDetailsService, venueDataLoader, TEMPLATE_ID,
             signLanguagesService, judicialRefDataService);
+        ReflectionTestUtils.setField(service, "adjournmentFeature", true);
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -544,8 +546,9 @@ class AdjournCasePreviewServiceTest {
 
     @ParameterizedTest
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayAnErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenCorrectlySetHeldAtAsInChambers(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
 
@@ -553,14 +556,17 @@ class AdjournCasePreviewServiceTest {
 
         sscsCaseData.setHearings(Arrays.asList(null, hearing1));
 
-        checkDocumentIsNotCreatedAndReturnsError("Unable to determine hearing date or venue");
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
+
+        assertThat(body.getHeldAt()).isEqualTo(IN_CHAMBERS);
     }
 
     @ParameterizedTest
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenCorrectlySetHeldAtAsInChambers(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
-
+        when(generateFile.assemble(any())).thenReturn(URL);
         adjournment.setTypeOfNextHearing(nextHearingType);
 
         Hearing hearing1 = createHearingWithDateAndVenueName(null, "venue 1 name");
@@ -570,7 +576,10 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        checkDocumentIsNotCreatedAndReturnsError("Unable to determine hearing date or venue");
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
+
+        assertThat(body.getHeldAt()).isEqualTo(IN_CHAMBERS);
     }
 
     @ParameterizedTest
@@ -642,9 +651,30 @@ class AdjournCasePreviewServiceTest {
 
     @ParameterizedTest
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    void givenCaseHasInvalidHearing_thenCorrectlySetTheHeldOnUsingTheSecondHearingInList(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
+        when(generateFile.assemble(any())).thenReturn(URL);
+
+        adjournment.setTypeOfNextHearing(nextHearingType);
+
+        Hearing hearing = createHearingWithDateAndVenueName("2019-01-02", "Venue Name");
+
+        List<Hearing> hearings = Arrays.asList(null, hearing);
+        sscsCaseData.setHearings(hearings);
+
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
+
+        assertThat(body.getHeldOn()).hasToString("2019-01-02");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenCorrectlySetTheHeldOnUsingTheSecondHearingInList(AdjournCaseTypeOfHearing nextHearingType) {
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
+        when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
 
@@ -655,22 +685,10 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        checkDocumentIsNotCreatedAndReturnsError("Unable to determine hearing date");
-    }
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-    @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayTwoErrorsAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
-        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
-
-        adjournment.setTypeOfNextHearing(nextHearingType);
-
-        Hearing hearing1 = createHearingWithDateAndVenueName(HEARING_DATE, "Venue Name");
-
-        List<Hearing> hearings = Arrays.asList(null, hearing1);
-        sscsCaseData.setHearings(hearings);
-
-        checkDocumentIsNotCreatedAndReturnsError("Unable to determine hearing date or venue");
+        assertThat(body.getHeldOn()).hasToString(HEARING_DATE);
     }
 
     @ParameterizedTest
@@ -774,6 +792,28 @@ class AdjournCasePreviewServiceTest {
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         checkOralHearingTimeslot(nextHearingTypeText, nextHearingType, "1 session");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithThreePanelMembers_thenCorrectlySetTheHeldBeforeWithoutFlag(AdjournCaseTypeOfHearing nextHearingType) {
+        ReflectionTestUtils.setField(service, "adjournmentFeature", false);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
+        when(generateFile.assemble(any())).thenReturn(URL);
+
+        adjournment.setTypeOfNextHearing(nextHearingType);
+        adjournment.setDisabilityQualifiedPanelMemberName(PANEL_MEMBER_1_NAME);
+        adjournment.setMedicallyQualifiedPanelMemberName(PANEL_MEMBER_2_NAME);
+        adjournment.setOtherPanelMemberName(OTHER_PANEL_MEMBER_NAME);
+
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
+
+        assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + ", "
+            + PANEL_MEMBER_1_NAME + ", "
+            + PANEL_MEMBER_2_NAME + " and "
+            + OTHER_PANEL_MEMBER_NAME);
     }
 
     @ParameterizedTest
