@@ -73,15 +73,6 @@ class PostHearingRequestAboutToSubmitHandlerTest {
                 .dwpIssuingOffice("3")
                 .build())
             .build();
-        DocumentStaging documentStaging = DocumentStaging.builder()
-            .previewDocument(previewDocument)
-            .build();
-        MrnDetails mrnDetails = MrnDetails.builder()
-            .dwpIssuingOffice("3")
-            .build();
-        Appeal appeal = Appeal.builder()
-            .mrnDetails(mrnDetails)
-            .build();
         caseData = SscsCaseData.builder()
             .appeal(appeal)
             .state(State.DORMANT_APPEAL_STATE)
