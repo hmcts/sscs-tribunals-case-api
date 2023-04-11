@@ -25,9 +25,4 @@
     <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-websocket@.*$</packageUrl>
     <cve>CVE-2023-28708</cve>
   </suppress>
-  <suppress until = "2023-04-14">
-    <notes><![CDATA[ file name: commons-fileupload-1.4.jar ]]></notes>
-    <packageUrl regex="true">^pkg:maven/commons\-fileupload/commons\-fileupload@.*$</packageUrl>
-    <cve>CVE-2023-24998</cve>
-  </suppress>
 </suppressions>
