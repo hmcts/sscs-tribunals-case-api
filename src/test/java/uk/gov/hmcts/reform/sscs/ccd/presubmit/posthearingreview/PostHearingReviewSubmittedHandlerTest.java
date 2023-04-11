@@ -15,6 +15,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.PERMISSI
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.STATEMENT_OF_REASONS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions.REFUSE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions.REFUSE_SOR;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,22 +27,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdCallbackMap;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LibertyToApplyActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PermissionToAppealActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -136,8 +123,15 @@ class PostHearingReviewSubmittedHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
+        PostHearing postHearing = PostHearing.builder()
+            .reviewType(SET_ASIDE)
+            .setAside(SetAside.builder()
+                .action(REFUSE)
+                .build())
+            .build();
         SscsCaseData returnedCase = SscsCaseData.builder()
             .state(State.DORMANT_APPEAL_STATE)
+            .postHearing(postHearing)
             .interlocReviewState(InterlocReviewState.NONE)
             .ccdCaseId("555")
             .build();
@@ -154,6 +148,13 @@ class PostHearingReviewSubmittedHandlerTest {
 
         assertThat(response.getData().getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
         assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.NONE);
+
+        verify(ccdService).updateCase(returnedCase,
+            Long.valueOf(returnedCase.getCcdCaseId()),
+            EventType.DORMANT.getCcdType(),
+            "Send to dormant",
+            "",
+            idamService.getIdamTokens());
     }
 
     @Test
@@ -161,9 +162,43 @@ class PostHearingReviewSubmittedHandlerTest {
         caseData.getPostHearing().setReviewType(SET_ASIDE);
         caseData.getPostHearing().getSetAside().setAction(REFUSE);
 
-        caseData.getPostHearing().getSetAside().setRequestStatementOfReasons(YesNo.YES);
+        caseData.getPostHearing().getSetAside().setRequestStatementOfReasons(YES);
 
-        verifyCcdCallbackCalledCorrectly(SetAsideActions.REFUSE_SOR);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        PostHearing postHearing = PostHearing.builder()
+            .reviewType(SET_ASIDE)
+            .setAside(SetAside.builder()
+                .action(REFUSE)
+                .requestStatementOfReasons(YES)
+                .build())
+            .build();
+        SscsCaseData returnedCase = SscsCaseData.builder()
+            .state(State.DORMANT_APPEAL_STATE)
+            .postHearing(postHearing)
+            .interlocReviewState(InterlocReviewState.NONE)
+            .ccdCaseId("555")
+            .build();
+
+        when(ccdCallbackMapService.handleCcdCallbackMap(REFUSE_SOR, caseData))
+            .thenReturn(returnedCase);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        verify(ccdCallbackMapService, times(1))
+            .handleCcdCallbackMap(REFUSE_SOR, caseData);
+
+        verify(ccdService).updateCase(returnedCase,
+            Long.valueOf(returnedCase.getCcdCaseId()),
+            EventType.SOR_REQUEST.getCcdType(),
+            "Send to hearing Judge for statement of reasons",
+            "",
+            idamService.getIdamTokens());
     }
 
     @ParameterizedTest
