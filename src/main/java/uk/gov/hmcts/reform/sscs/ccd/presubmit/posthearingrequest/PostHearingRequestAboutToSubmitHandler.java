@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.UPLOAD;
 
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -59,13 +61,31 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
     @NotNull
     private PreSubmitCallbackResponse<SscsCaseData> validatePostHearingRequest(SscsCaseData sscsCaseData) {
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-        DocumentLink previewDocument = sscsCaseData.getDocumentStaging().getPreviewDocument();
         String postHearingRequestTypeDescription = sscsCaseData.getPostHearing().getRequestType().getDescriptionEn();
+        renameDocumentIfUpload(sscsCaseData, postHearingRequestTypeDescription);
+        DocumentLink previewDocument = sscsCaseData.getDocumentStaging().getPreviewDocument();
         if (previewDocument == null) {
             response.addError("There is no preview document");
         } else if (!previewDocument.getDocumentFilename().contains(postHearingRequestTypeDescription)) {
             response.addError("There is no post hearing request document");
         }
         return response;
+    }
+
+    private void renameDocumentIfUpload(SscsCaseData caseData, String requestTypeDescription) {
+        if (Objects.equals(UPLOAD, caseData.getPostHearing().getRequestFormat())) {
+            DocumentLink previewDocument = caseData.getDocumentStaging().getPreviewDocument();
+            String filename = String.format("%s Application from FTA.pdf", requestTypeDescription);
+
+            log.info("Renaming uploaded Preview Document from '{}' to '{}'", previewDocument.getDocumentFilename(), filename);
+
+            DocumentLink renamedPreviewDoc = DocumentLink.builder()
+                .documentUrl(previewDocument.getDocumentUrl())
+                .documentBinaryUrl(previewDocument.getDocumentBinaryUrl())
+                .documentFilename(filename)
+                .documentHash(previewDocument.getDocumentHash())
+                .build();
+            caseData.getDocumentStaging().setPreviewDocument(renamedPreviewDoc);
+        }
     }
 }
