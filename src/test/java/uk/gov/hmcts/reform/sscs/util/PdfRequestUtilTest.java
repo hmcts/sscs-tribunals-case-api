@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,6 +44,35 @@ class PdfRequestUtilTest {
         assertThatThrownBy(() -> PdfRequestUtil.getPostHearingDocumentType(sscsCaseData))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Unexpected request type: " + postHearingRequestType);
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = PostHearingRequestType.class,
+        names = {
+            "SET_ASIDE",
+            "CORRECTION"
+        }
+    )
+    void setRequestDetailsForPostHearingType_doesNotThrowExceptionForImplementedTypes(PostHearingRequestType postHearingRequestType) {
+        sscsCaseData.getPostHearing().setRequestType(postHearingRequestType);
+        assertDoesNotThrow(() -> PdfRequestUtil.setRequestDetailsForPostHearingType(sscsCaseData));
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = PostHearingRequestType.class,
+        names = {
+            "SET_ASIDE",
+            "CORRECTION"
+        },
+        mode = EXCLUDE
+    )
+    void setRequestDetailsForPostHearingType_throwsExceptionForNotImplementedTypes(PostHearingRequestType postHearingRequestType) {
+        sscsCaseData.getPostHearing().setRequestType(postHearingRequestType);
+        assertThatThrownBy(() -> PdfRequestUtil.setRequestDetailsForPostHearingType(sscsCaseData))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageStartingWith("handlePostHearing has unexpected postHearingRequestType: ");
     }
 
 }

@@ -83,7 +83,7 @@ public class PdfRequestUtil {
                 sscsCaseData.getPostponementRequest().setPostponementPreviewDocument(previewDocument);
                 break;
             default:
-                throw new IllegalArgumentException("Unsupported event type for processRequestPdfAndSetPreviewDocument: " + pdfType);
+                // handled in first switch
         }
 
         return response;
@@ -128,7 +128,7 @@ public class PdfRequestUtil {
     }
 
 
-    private static void setRequestDetailsForPostHearingType(SscsCaseData sscsCaseData) {
+    protected static void setRequestDetailsForPostHearingType(SscsCaseData sscsCaseData) {
         PostHearingRequestType postHearingRequestType = sscsCaseData.getPostHearing().getRequestType();
         switch (postHearingRequestType) {
             case SET_ASIDE:
@@ -138,11 +138,8 @@ public class PdfRequestUtil {
                 requestDetails = sscsCaseData.getDocumentGeneration().getBodyContentCorrection();
                 break;
             case STATEMENT_OF_REASONS:
-                break;
             case PERMISSION_TO_APPEAL:
-                break;
             case LIBERTY_TO_APPLY:
-                break;
             default:
                 throw new IllegalArgumentException("handlePostHearing has unexpected postHearingRequestType: " + postHearingRequestType);
         }
