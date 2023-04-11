@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
@@ -80,6 +81,8 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
     private String getPostHearingFileName(PostHearing postHearing) {
         if (SetAsideActions.REFUSE.equals(postHearing.getSetAside().getAction())) {
             return "Set aside refused decision notice";
+        } else if (CorrectionActions.REFUSE.equals(postHearing.getCorrection().getAction())) {
+            return "Correction refused decision notice";
         }
 
         throw new RuntimeException("Can't get preview document name");
