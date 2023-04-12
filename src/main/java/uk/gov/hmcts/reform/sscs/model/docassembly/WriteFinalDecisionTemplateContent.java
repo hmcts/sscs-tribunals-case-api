@@ -134,11 +134,11 @@ public abstract class WriteFinalDecisionTemplateContent {
         }
     }
 
-    public List<String> getHearingTypeSentences(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfficerAttended, String otherPartyNamesAttended) {
+    public List<String> getHearingTypeSentences(String appellantName, String appointeeName, String bundlePage, String hearingType, boolean appellantAttended, boolean appointeeAttended, boolean presentingOfficerAttended, String otherPartyNamesAttended) {
         if (equalsIgnoreCase("paper", hearingType)) {
             return asList("No party has objected to the matter being decided without a hearing.", "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.");
         } else  {
-            return getFaceToFaceTelephoneVideoHearingTypeSentences(hearingType, appellantName, bundlePage, appellantAttended, presentingOfficerAttended, otherPartyNamesAttended);
+            return getFaceToFaceTelephoneVideoHearingTypeSentences(hearingType, appellantName, appointeeName, bundlePage, appellantAttended, appointeeAttended, presentingOfficerAttended, otherPartyNamesAttended);
         }
     }
 
@@ -190,9 +190,9 @@ public abstract class WriteFinalDecisionTemplateContent {
         return "The tribunal considered the appeal bundle to page " + bundlePage + ".";
     }
 
-    public List<String> getFaceToFaceTelephoneVideoHearingTypeSentences(String hearingType, String appellantName, String bundlePage,
-        boolean appellantAttended, boolean presentingOfficerAttended, String otherPartyNamesAttended) {
-        if (appellantAttended) {
+    public List<String> getFaceToFaceTelephoneVideoHearingTypeSentences(String hearingType, String appellantName, String appointeeName, String bundlePage,
+        boolean appellantAttended, boolean appointeeAttended, boolean presentingOfficerAttended, String otherPartyNamesAttended) {
+        if (appellantAttended && !appointeeAttended) {
             if (equalsIgnoreCase("faceToFace", hearingType)) {
                 return singletonList("This has been an oral (face to face) hearing. "
                     + getAppellantAndOtherPartyAttended(hearingType, appellantName, presentingOfficerAttended, bundlePage, otherPartyNamesAttended));
@@ -202,24 +202,37 @@ public abstract class WriteFinalDecisionTemplateContent {
                 return singletonList("This has been a remote hearing in the form of a " + hearingType + " hearing. "
                     + getAppellantAndOtherPartyAttended(hearingType, appellantName, presentingOfficerAttended, bundlePage, otherPartyNamesAttended));
             }
+        } else if (!appellantAttended && appointeeAttended) {
+            //TODO: check with Makeda wording of this case
+            if (equalsIgnoreCase("faceToFace", hearingType)) {
+                return asList("On behalf of " + appellantName + ", " + appointeeName + " did attend an oral hearing today. "
+                                + getPresentingOfficerAttendance(presentingOfficerAttended),
+                        getConsideredParagraph(bundlePage, appellantName));
+            } else if (equalsIgnoreCase("triage", hearingType)) {
+                return singletonList(getTriageConsideredParagraph(bundlePage));
+            } else {
+                return asList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + appointeeName + " did attend the hearing today. "
+                                + getPresentingOfficerAttendance(presentingOfficerAttended),
+                        getConsideredParagraph(bundlePage, appellantName));
+            }
         } else {
             if (equalsIgnoreCase("faceToFace", hearingType)) {
                 return asList(appellantName + " requested an oral hearing but did not attend today. "
-                        + getPresentingOfficerAttendance(presentingOfficerAttended),
-                    getConsideredParagraph(bundlePage, appellantName));
+                                + getPresentingOfficerAttendance(presentingOfficerAttended),
+                        getConsideredParagraph(bundlePage, appellantName));
             } else if (equalsIgnoreCase("triage", hearingType)) {
                 return singletonList(getTriageConsideredParagraph(bundlePage));
             } else {
                 return asList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend the hearing today. "
-                        + getPresentingOfficerAttendance(presentingOfficerAttended),
-                    getConsideredParagraph(bundlePage, appellantName));
+                                + getPresentingOfficerAttendance(presentingOfficerAttended),
+                        getConsideredParagraph(bundlePage, appellantName));
             }
         }
     }
 
     public void addHearingType(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
-        for (String hearingTypeSentence : getHearingTypeSentences(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getPageNumber(),
-            writeFinalDecisionTemplateBody.getHearingType(), writeFinalDecisionTemplateBody.isAttendedHearing(), writeFinalDecisionTemplateBody.isPresentingOfficerAttended(),
+        for (String hearingTypeSentence : getHearingTypeSentences(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getAppointeeName(), writeFinalDecisionTemplateBody.getPageNumber(),
+            writeFinalDecisionTemplateBody.getHearingType(), writeFinalDecisionTemplateBody.isAttendedHearing(), writeFinalDecisionTemplateBody.isAppointeeAttendedHearing(), writeFinalDecisionTemplateBody.isPresentingOfficerAttended(),
                 writeFinalDecisionTemplateBody.getOtherPartyNamesAttendedHearing())) {
             addComponent(new Paragraph(WriteFinalDecisionComponentId.HEARING_TYPE.name(), hearingTypeSentence));
         }
