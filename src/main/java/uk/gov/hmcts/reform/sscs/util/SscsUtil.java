@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
 import java.time.LocalDate;
@@ -56,17 +57,20 @@ public class SscsUtil {
 
     public static void addDocumentToDocumentTab(FooterService footerService, SscsCaseData caseData, DocumentType documentType) {
         DocumentLink url = caseData.getDocumentStaging().getPreviewDocument();
-        String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        SscsDocumentTranslationStatus documentTranslationStatus = null;
-        if (caseData.isLanguagePreferenceWelsh()) {
-            documentTranslationStatus = SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
-        }
-        footerService.createFooterAndAddDocToCase(url, caseData, documentType, now,
-            null, null, documentTranslationStatus);
-        if (documentTranslationStatus != null) {
-            caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
-            log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
-            caseData.setTranslationWorkOutstanding(YesNo.YES.getValue());
+
+        if (nonNull(url)) {
+            String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            SscsDocumentTranslationStatus documentTranslationStatus = null;
+            if (caseData.isLanguagePreferenceWelsh()) {
+                documentTranslationStatus = SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
+            }
+            footerService.createFooterAndAddDocToCase(url, caseData, documentType, now,
+                null, null, documentTranslationStatus);
+            if (documentTranslationStatus != null) {
+                caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
+                log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
+                caseData.setTranslationWorkOutstanding(YesNo.YES.getValue());
+            }
         }
     }
 
