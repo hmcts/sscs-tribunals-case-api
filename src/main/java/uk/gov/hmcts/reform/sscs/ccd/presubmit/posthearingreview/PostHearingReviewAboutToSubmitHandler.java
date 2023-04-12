@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -43,11 +42,11 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
 
         String caseId = caseData.getCcdCaseId();
 
-        PostHearingReviewType typeSelected = caseData.getPostHearing().getReviewType();
-        log.info("Review Post Hearing App: handling action {} for case {}", typeSelected,  caseId);
+        PostHearing postHearing = caseData.getPostHearing();
+        log.info("Review Post Hearing App: handling action {} for case {}", postHearing.getReviewType(),  caseId);
 
         SscsUtil.addDocumentToDocumentTab(footerService, caseData,
-            getPostHearingReviewDocumentType(caseData.getPostHearing()));
+            SscsUtil.getPostHearingReviewDocumentType(postHearing));
 
         return response;
     }
@@ -60,13 +59,5 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
             caseData.setDwpState(DwpState.SET_ASIDE_GRANTED);
             caseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION);
         }
-    }
-
-    private DocumentType getPostHearingReviewDocumentType(PostHearing postHearing) {
-        if (SetAsideActions.REFUSE.equals(postHearing.getSetAside().getAction())) {
-            return DocumentType.SET_ASIDE_REFUSED;
-        }
-
-        return DocumentType.DECISION_NOTICE;
     }
 }

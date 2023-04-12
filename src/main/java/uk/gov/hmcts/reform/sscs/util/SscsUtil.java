@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
@@ -79,5 +80,13 @@ public class SscsUtil {
         DocumentType documentType = DocumentType.fromValue(sscsDocument.getValue().getDocumentType());
         String dateIssued = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, null, null);
+    }
+
+    public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing) {
+        if (SetAsideActions.REFUSE.equals(postHearing.getSetAside().getAction())) {
+            return DocumentType.SET_ASIDE_REFUSED;
+        }
+
+        return DocumentType.DECISION_NOTICE;
     }
 }
