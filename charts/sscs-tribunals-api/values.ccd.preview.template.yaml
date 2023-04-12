@@ -317,7 +317,7 @@ ccd:
     environment:
       CCD_ENVIRONMENT: 'PROD'
       CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
-      CCD_DEF_SSCS_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-sscs-ccd-orchestrator
+      CCD_DEF_SSCS_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-sscs-ccd-callback-orchestrator
       CCD_DEF_TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
       CCD_DEF_TYA_NOTIFICATIONS_API_URL: http://${SERVICE_NAME}-tya-notification
       CCD_DEF_BULK_SCAN_API_URL: http://${SERVICE_NAME}-bulk-scan-api
@@ -363,9 +363,10 @@ sscs-evidence-share:
       DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
       SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
-      TOPIC_NAME: "sscs-evidenceshare-topic-aat"
+      TOPIC_NAME: "sscs-evidenceshare-topic-preview"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
-      AMQP_USERNAME: "SendAndListenSharedAccessKey"
+      AMQP_USERNAME: "preview_policy"
+      AMQP_PASSWORD: "LDSKtI6uxg5uggvLDx/4WcfZfP/RJkSrg+ASbMuROsM="
       ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
       ROBOTICS_EMAIL_TO: "fake"
       ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
@@ -379,9 +380,12 @@ sscs-ccd-callback-orchestrator:
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     readinessDelay: 90
     environment:
-      SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
-      TOPIC_NAME: "sscs-evidenceshare-topic-aat"
+      SUBSCRIPTION_NAME: "sscs-evidenceshare-topic-preview"
+      TOPIC_NAME: "sscs-evidenceshare-topic-preview"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
+      AMQP_USERNAME: "preview_policy"
+      AMQP_PASSWORD: "LDSKtI6uxg5uggvLDx/4WcfZfP/RJkSrg+ASbMuROsM="
+
 
 #Enable for SYA
 sscs-tribunals-frontend:
