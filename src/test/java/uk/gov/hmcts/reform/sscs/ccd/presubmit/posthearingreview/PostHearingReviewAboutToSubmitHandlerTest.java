@@ -4,8 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REVIEW;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
 import java.util.List;
@@ -17,13 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
@@ -115,5 +108,42 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         List<SscsDocument> documents = response.getData().getSscsDocument();
         assertThat(documents).hasSize(1);
         assertThat(documents.get(0).getValue().getDocumentType()).isEqualTo(DocumentType.SET_ASIDE_REFUSED.getValue());
+    }
+    
+    @Test
+    void givenHearingIsNull_thenCaseStatusNotChanged() {
+        caseData.setState(State.DORMANT_APPEAL_STATE);
+        handler.updateCaseStatus(caseData);
+        assertThat(caseData.getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
+    }
+
+    @Test
+    void givenSetAsideStateIsNull_thenCaseStatusNotChanged() {
+        caseData = SscsCaseData.builder()
+            .state(State.DORMANT_APPEAL_STATE)
+            .postHearing(PostHearing.builder()
+                .setAside(SetAside.builder()
+                    .action(null)
+                    .build())
+                .build())
+            .build();
+
+        handler.updateCaseStatus(caseData);
+        assertThat(caseData.getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
+    }
+
+    @Test
+    void givenSetAsideState_thenCaseStatusChanged() {
+        caseData = SscsCaseData.builder()
+            .state(State.DORMANT_APPEAL_STATE)
+            .postHearing(PostHearing.builder()
+                .setAside(SetAside.builder()
+                    .action(SetAsideActions.GRANT)
+                    .build())
+                .build())
+            .build();
+
+        handler.updateCaseStatus(caseData);
+        assertThat(caseData.getState()).isEqualTo(State.NOT_LISTABLE);
     }
 }
