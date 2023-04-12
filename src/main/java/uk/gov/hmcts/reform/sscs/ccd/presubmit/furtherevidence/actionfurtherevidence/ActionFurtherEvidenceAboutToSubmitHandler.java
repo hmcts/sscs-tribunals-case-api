@@ -60,11 +60,20 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     public static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
     private static final String COVERSHEET = "coversheet";
     protected static final List<String> ACTIONS_THAT_REQUIRES_EVIDENCE_ISSUED_SET_TO_YES_AND_NOT_BULK_PRINTED = List.of(
-            OTHER_DOCUMENT_MANUAL, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
-            SEND_TO_INTERLOC_REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_TCW).stream()
-        .map(FurtherEvidenceActionDynamicListItems::getCode)
-        .collect(Collectors.toUnmodifiableList());
-    private static final Set<State> ADDITION_VALID_STATES = Set.of(State.DORMANT_APPEAL_STATE, State.RESPONSE_RECEIVED, State.READY_TO_LIST, State.HEARING, State.NOT_LISTABLE, State.WITH_DWP);
+                    OTHER_DOCUMENT_MANUAL, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
+                    SEND_TO_INTERLOC_REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_TCW).stream()
+            .map(FurtherEvidenceActionDynamicListItems::getCode)
+            .collect(Collectors.toUnmodifiableList());
+    private static final Set<State> ADDITION_VALID_STATES = Set.of(State.DORMANT_APPEAL_STATE,
+            State.RESPONSE_RECEIVED,
+            State.READY_TO_LIST,
+            State.HEARING,
+            State.NOT_LISTABLE,
+            State.WITH_DWP,
+            State.POST_HEARING);
+
+    private static final Set<DocumentType> SENDER_VALID_STATES = Set.of(POSTPONEMENT_REQUEST,
+            SET_ASIDE_APPLICATION);
 
     private final FooterService footerService;
     private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
@@ -516,7 +525,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         DocumentLink url = scannedDocument.getValue().getUrl();
 
-        DocumentType documentType = getSubtype(sscsCaseData.getOriginalSender().getValue().getCode(), scannedDocument);
+        DocumentType documentType = getScannedDocumentType(sscsCaseData.getOriginalSender().getValue().getCode(), scannedDocument);
 
         String bundleAddition = null;
         String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
@@ -537,7 +546,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
 
         String requestingParty = null;
-        if (documentType.equals(POSTPONEMENT_REQUEST)) {
+
+        if (isOriginalSenderValidForBundleAddition(documentType)) {
             requestingParty = originalSenderCode;
         }
 
@@ -625,7 +635,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return ADDITION_VALID_STATES.contains(caseState);
     }
 
-    private DocumentType getSubtype(String originalSenderCode, ScannedDocument scannedDocument) {
+    private Boolean isOriginalSenderValidForBundleAddition(DocumentType documentType) {
+        return SENDER_VALID_STATES.contains(documentType);
+    }
+
+    private DocumentType getScannedDocumentType(String originalSenderCode, ScannedDocument scannedDocument) {
         String docType = scannedDocument.getValue().getType();
         if (ScannedDocumentType.REINSTATEMENT_REQUEST.getValue().equals(docType)) {
             return REINSTATEMENT_REQUEST;
