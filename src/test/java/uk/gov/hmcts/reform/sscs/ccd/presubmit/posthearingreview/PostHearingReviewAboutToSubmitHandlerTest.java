@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REVIEW;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
 import java.util.List;
@@ -16,15 +14,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewAboutToSubmitHandlerTest {
@@ -39,11 +34,20 @@ class PostHearingReviewAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private PdfStoreService pdfStoreService;
+
+    @Mock
+    private PdfWatermarker pdfWatermarker;
+
+    private FooterService footerService;
+
     private SscsCaseData caseData;
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewAboutToSubmitHandler(true);
+        footerService = new FooterService(pdfStoreService, pdfWatermarker);
+        handler = new PostHearingReviewAboutToSubmitHandler(footerService, true);
 
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -74,7 +78,7 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewAboutToSubmitHandler(false);
+        handler = new PostHearingReviewAboutToSubmitHandler(footerService, false);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
@@ -95,7 +99,7 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
-        caseData.getDocumentStaging().setPreviewDocument(DocumentLink.builder().build());
+        caseData.getDocumentStaging().setPreviewDocument(DocumentLink.builder().documentUrl("document url test").build());
         caseData.getPostHearing().getCorrection().setAction(CorrectionActions.REFUSE);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -105,7 +109,7 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
         List<SscsDocument> documents = response.getData().getSscsDocument();
         assertThat(documents).hasSize(1);
-        assertThat(documents.get(0).getValue().getDocumentFileName()).isEqualTo("Correction refused decision notice");
+        assertThat(documents.get(0).getValue().getDocumentType()).isEqualTo(DocumentType.CORRECTION.getValue());
     }
 
     @Test
@@ -113,23 +117,51 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
-        caseData.getDocumentStaging().setPreviewDocument(DocumentLink.builder().build());
+        caseData.getDocumentStaging().setPreviewDocument(DocumentLink.builder().documentUrl("document url test").build());
         caseData.getPostHearing().getSetAside().setAction(SetAsideActions.REFUSE);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getSscsDocument()).hasSize(1);
+        List<SscsDocument> documents = response.getData().getSscsDocument();
+        assertThat(documents).hasSize(1);
+        assertThat(documents.get(0).getValue().getDocumentType()).isEqualTo(DocumentType.SET_ASIDE_REFUSED.getValue());
+    }
+    
+    @Test
+    void givenHearingIsNull_thenCaseStatusNotChanged() {
+        caseData.setState(State.DORMANT_APPEAL_STATE);
+        handler.updateCaseStatus(caseData);
+        assertThat(caseData.getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
     }
 
     @Test
-    void givenPreviewDocumentHasBeenSetAndShouldBeNull_thenThrowError() {
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
+    void givenSetAsideStateIsNull_thenCaseStatusNotChanged() {
+        caseData = SscsCaseData.builder()
+            .state(State.DORMANT_APPEAL_STATE)
+            .postHearing(PostHearing.builder()
+                .setAside(SetAside.builder()
+                    .action(null)
+                    .build())
+                .build())
+            .build();
 
-        caseData.getDocumentStaging().setPreviewDocument(DocumentLink.builder().build());
+        handler.updateCaseStatus(caseData);
+        assertThat(caseData.getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
+    }
 
-        assertThrows(RuntimeException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
+    @Test
+    void givenSetAsideState_thenCaseStatusChanged() {
+        caseData = SscsCaseData.builder()
+            .state(State.DORMANT_APPEAL_STATE)
+            .postHearing(PostHearing.builder()
+                .setAside(SetAside.builder()
+                    .action(SetAsideActions.GRANT)
+                    .build())
+                .build())
+            .build();
+
+        handler.updateCaseStatus(caseData);
+        assertThat(caseData.getState()).isEqualTo(State.NOT_LISTABLE);
     }
 }
