@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
@@ -85,6 +86,8 @@ public class SscsUtil {
     public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing) {
         if (SetAsideActions.REFUSE.equals(postHearing.getSetAside().getAction())) {
             return DocumentType.SET_ASIDE_REFUSED;
+        } else if (CorrectionActions.REFUSE.equals(postHearing.getCorrection().getAction())) {
+            return DocumentType.CORRECTION_REFUSED;
         }
 
         return DocumentType.DECISION_NOTICE;
