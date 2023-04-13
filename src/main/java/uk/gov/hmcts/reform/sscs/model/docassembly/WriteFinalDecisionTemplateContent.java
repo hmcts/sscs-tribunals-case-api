@@ -203,17 +203,14 @@ public abstract class WriteFinalDecisionTemplateContent {
                     + getAppellantAndOtherPartyAttended(hearingType, appellantName, presentingOfficerAttended, bundlePage, otherPartyNamesAttended));
             }
         } else if (!appellantAttended && appointeeAttended) {
-            //TODO: check with Makeda wording of this case
             if (equalsIgnoreCase("faceToFace", hearingType)) {
-                return asList("On behalf of " + appellantName + ", " + appointeeName + " did attend an oral hearing today. "
-                                + getPresentingOfficerAttendance(presentingOfficerAttended),
-                        getConsideredParagraph(bundlePage, appellantName));
+                return asList(appointeeName + " did attend an oral (face to face) hearing today. "
+                                + getAppellantAndOtherPartyAttended(hearingType, appellantName, presentingOfficerAttended, bundlePage, otherPartyNamesAttended));
             } else if (equalsIgnoreCase("triage", hearingType)) {
                 return singletonList(getTriageConsideredParagraph(bundlePage));
             } else {
                 return asList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + appointeeName + " did attend the hearing today. "
-                                + getPresentingOfficerAttendance(presentingOfficerAttended),
-                        getConsideredParagraph(bundlePage, appellantName));
+                        + getAppellantAndOtherPartyAttended(hearingType, appellantName, presentingOfficerAttended, bundlePage, otherPartyNamesAttended));
             }
         } else {
             if (equalsIgnoreCase("faceToFace", hearingType)) {

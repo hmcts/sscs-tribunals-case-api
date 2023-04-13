@@ -108,7 +108,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(null);
         }
 
-        // TODO: get appointeeName
+        writeFinalDecisionBuilder.appointeeName(buildName(caseData, true));
 
         writeFinalDecisionBuilder.endDate(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate());
         writeFinalDecisionBuilder.startDate(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionStartDate());
@@ -131,9 +131,14 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         writeFinalDecisionBuilder.hearingType(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionTypeOfHearing());
 
-        //TODO: check appointeeAttendedHearing is correct
-        writeFinalDecisionBuilder.appointeeAttendedHearing("no".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion()));
-        writeFinalDecisionBuilder.attendedHearing("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion()));
+        if(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion().equalsIgnoreCase("no")) {
+            writeFinalDecisionBuilder.attendedHearing("no".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion()));
+            writeFinalDecisionBuilder.appointeeAttendedHearing("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion()));
+        } else {
+            writeFinalDecisionBuilder.attendedHearing("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion()));
+            writeFinalDecisionBuilder.appointeeAttendedHearing("no".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion()));
+        }
+
 
         writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
         if (isOtherPartyPresent(caseData) && CollectionUtils.isNotEmpty(caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions())) {
