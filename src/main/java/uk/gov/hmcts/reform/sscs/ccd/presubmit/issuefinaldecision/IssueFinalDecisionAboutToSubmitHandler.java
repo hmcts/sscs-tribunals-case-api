@@ -50,7 +50,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     private boolean isScheduleListingEnabled;
     @Value("${feature.snl.adjournment.enabled}")
     private boolean isAdjournmentEnabled;
-    @Value("${feature.snl.postHearings.enabled}")
+    @Value("${feature.postHearings.enabled}")
     private boolean isPostHearingsEnabled;
 
     public IssueFinalDecisionAboutToSubmitHandler(FooterService footerService,
