@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
@@ -50,7 +51,11 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
         PostHearingReviewType typeSelected = caseData.getPostHearing().getReviewType();
         log.info("Review Post Hearing App: handling action {} for case {}", typeSelected,  caseId);
 
-        if (PAGE_ID_GENERATE_NOTICE.equals(pageId) && isYes(caseData.getDocumentGeneration().getGenerateNotice())) {
+        caseData.getDocumentStaging().setPreviewDocument(null);
+
+        YesNo generateNotice = getGenerateNotice(caseData);
+
+        if (PAGE_ID_GENERATE_NOTICE.equals(pageId) && isYes(generateNotice)) {
             log.info("Review Post Hearing App: Generating notice for caseId {}", caseId);
             String templateId = documentConfiguration.getDocuments()
                 .get(caseData.getLanguagePreference()).get(DECISION_ISSUED);
@@ -58,5 +63,20 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
         }
 
         return response;
+    }
+
+    private YesNo getGenerateNotice(SscsCaseData caseData) {
+        PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
+        switch (postHearingReviewType) {
+            case SET_ASIDE:
+                return caseData.getDocumentGeneration().getGenerateNotice();
+            case CORRECTION:
+                return caseData.getDocumentGeneration().getCorrectionGenerateNotice();
+            case STATEMENT_OF_REASONS:
+            case PERMISSION_TO_APPEAL:
+            case LIBERTY_TO_APPLY:
+            default:
+                return null;
+        }
     }
 }

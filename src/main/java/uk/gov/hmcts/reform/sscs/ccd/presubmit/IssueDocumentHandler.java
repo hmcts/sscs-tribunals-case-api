@@ -55,8 +55,7 @@ public class IssueDocumentHandler {
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
                 .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
                 .respondents(getRespondents(caseData))
-                .noticeBody(Optional.ofNullable(caseData.getDocumentGeneration().getBodyContent())
-                        .orElse(caseData.getDocumentGeneration().getDirectionNoticeContent()))
+                .noticeBody(getNoticeBody(caseData))
                 .userName(caseData.getDocumentGeneration().getSignedBy())
                 .noticeType(documentTypeLabel.toUpperCase())
                 .userRole(caseData.getDocumentGeneration().getSignedRole())
@@ -208,6 +207,22 @@ public class IssueDocumentHandler {
             return Optional.of(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
         } else {
             return Optional.empty();
+        }
+    }
+
+    private String getNoticeBody(SscsCaseData caseData) {
+        PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
+        switch (postHearingReviewType) {
+            case SET_ASIDE:
+                return caseData.getDocumentGeneration().getBodyContent();
+            case CORRECTION:
+                return caseData.getDocumentGeneration().getCorrectionBodyContent();
+            case STATEMENT_OF_REASONS:
+            case PERMISSION_TO_APPEAL:
+            case LIBERTY_TO_APPLY:
+            default:
+                return Optional.ofNullable(caseData.getDocumentGeneration().getBodyContent())
+                    .orElse(caseData.getDocumentGeneration().getDirectionNoticeContent());
         }
     }
 }
