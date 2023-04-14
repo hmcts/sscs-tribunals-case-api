@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
@@ -28,7 +29,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 
 @ExtendWith(MockitoExtension.class)
@@ -91,12 +91,25 @@ class PostHearingRequestMidEventHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(
-        value = YesNo.class,
-        names = {"NO"})
-    @NullSource
-    void givenGenerateNoticeNotYes_doNothing(YesNo value) {
-        caseData.getDocumentGeneration().setGenerateNotice(value);
+    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE"})
+    void givenGenerateNoticeNo_doNothing(PostHearingRequestType requestType) {
+        caseData.getDocumentGeneration().setGenerateNotice(NO);
+        caseData.getPostHearing().setRequestType(requestType);
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE"})
+    void givenGenerateNoticeNull_doNothing(PostHearingRequestType requestType) {
+        caseData.getDocumentGeneration().setGenerateNotice(null);
+        caseData.getPostHearing().setRequestType(requestType);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
