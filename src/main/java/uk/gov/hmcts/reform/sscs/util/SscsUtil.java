@@ -97,15 +97,13 @@ public class SscsUtil {
             .build();
     }
 
-    public static void addDocumentToCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
-        List<SscsDocument> documents = new ArrayList<>();
-        documents.add(sscsDocument);
-
-        if (caseData.getSscsDocument() != null) {
-            documents.addAll(caseData.getSscsDocument());
-        }
-        caseData.setSscsDocument(documents);
+public static void addDocumentToCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
+    if (caseData.getSscsDocument() == null) {
+        caseData.setSscsDocument(new ArrayList<>());
     }
+    caseData.getSscsDocument().add(sscsDocument);
+}
+
 
 
     public static void addDocumentToBundle(FooterService footerService, SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
