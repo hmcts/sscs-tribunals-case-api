@@ -16,8 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CcdCallbackMap;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SetAside;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
@@ -90,10 +88,5 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
                     idamService.getIdamTokens());
             }
         }
-    }
-
-    private static boolean isRefusedSor(SetAside setAside) {
-        return setAside.getAction() == SetAsideActions.REFUSE
-            && isYes(setAside.getRequestStatementOfReasons());
     }
 }

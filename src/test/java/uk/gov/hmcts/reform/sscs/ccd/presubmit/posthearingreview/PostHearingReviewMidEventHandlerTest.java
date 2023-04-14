@@ -147,7 +147,7 @@ class PostHearingReviewMidEventHandlerTest {
         var value = capture.getValue();
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
-        assertThat(payload.getNoticeType()).isEqualTo("SET ASIDE APPLICATION");
+        assertThat(payload.getNoticeType()).isEqualTo("SET ASIDE DECISION NOTICE");
         assertThat(payload.getAppellantFullName()).isEqualTo("Appellant Lastname");
         assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
     }
