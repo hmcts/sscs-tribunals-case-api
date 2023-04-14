@@ -148,9 +148,14 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenTypeaheadEnabledFalse_thenReturnFalse() {
+    public void givenTypeaheadEnabledFalse_thenResetReserveToJudge() {
         ReflectionTestUtils.setField(handler, "isTypeaheadEnabled", false);
-        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
+        sscsCaseData.setReservedToJudge("judge name");
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getReservedToJudge()).isNull();
     }
 
     @Test
