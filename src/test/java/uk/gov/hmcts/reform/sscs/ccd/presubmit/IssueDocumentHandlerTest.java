@@ -104,34 +104,38 @@ public class IssueDocumentHandlerTest {
         assertEquals("Respondent: Mr Hugo Lloris", respondents.get(11).getName());
     }
 
-    @Test
-    public void testDocumentPayloadValues() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
+    private SscsCaseData buildCaseData() {
+        return SscsCaseData.builder()
             .documentGeneration(DocumentGeneration.builder()
                 .bodyContent("Hello World")
                 .signedBy("Barry Allen")
                 .signedRole("Judge")
                 .build())
-                .ccdCaseId("1")
-                .appeal(Appeal.builder()
-                    .appellant(Appellant.builder()
-                        .name(Name.builder()
-                            .title("Mr")
-                            .firstName("User")
-                            .lastName("Lloris")
-                            .build())
-                            .identity(Identity.builder()
-                                .nino("BB 22 55 66 B")
-                                .build())
-                            .build())
-                    .benefitType(BenefitType.builder()
-                        .code("PIP")
+            .ccdCaseId("1")
+            .appeal(Appeal.builder()
+                .appellant(Appellant.builder()
+                    .name(Name.builder()
+                        .title("Mr")
+                        .firstName("User")
+                        .lastName("Lloris")
                         .build())
-                    .signer("Signer")
-                    .hearingType("oral")
-                    .receivedVia("Online")
+                    .identity(Identity.builder()
+                        .nino("BB 22 55 66 B")
+                        .build())
                     .build())
-                .build();
+                .benefitType(BenefitType.builder()
+                    .code("PIP")
+                    .build())
+                .signer("Signer")
+                .hearingType("oral")
+                .receivedVia("Online")
+                .build())
+            .build();
+    }
+
+    @Test
+    public void testDocumentPayloadValues() {
+        SscsCaseData sscsCaseData = buildCaseData();
 
         String documentTypeLabel = "directions notice";
         LocalDate localDate = LocalDate.now();
@@ -195,4 +199,24 @@ public class IssueDocumentHandlerTest {
         assertEquals(expectedDefaultDocumentLabel, documentTypeLabel);
     }
 
+    @Test
+    public void givenPostHearingReviewIsCorrection_thenUseCorrectionBody() {
+        SscsCaseData sscsCaseData = buildCaseData();
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.CORRECTION);
+        String bodyContent = "correction body content";
+        sscsCaseData.getDocumentGeneration().setCorrectionBodyContent(bodyContent);
+
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, USER_AUTHORISATION);
+
+        assertEquals(payload.getNoticeBody(), bodyContent);
+    }
+
+    @Test
+    public void givenPostHearingReviewIsLibertyToApply_thenThrowException() {
+        SscsCaseData sscsCaseData = buildCaseData();
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
+
+        assertThrows(IllegalArgumentException.class, () ->
+            handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, USER_AUTHORISATION));
+    }
 }
