@@ -124,11 +124,7 @@ public static void addDocumentToCaseDataDocuments(SscsCaseData caseData, SscsDoc
     }
 
     private static SscsDocumentTranslationStatus getDocumentTranslationStatus(SscsCaseData caseData) {
-        if (caseData.isLanguagePreferenceWelsh()) {
-            return SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
-        }
-
-        return null;
+        return caseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
     }
 
     private static void updateTranslationStatus(SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
