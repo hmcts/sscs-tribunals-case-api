@@ -148,6 +148,12 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenTypeaheadEnabledFalse_thenReturnFalse() {
+        ReflectionTestUtils.setField(handler, "isTypeaheadEnabled", false);
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
+    }
+
+    @Test
     public void givenASendToJudge_thenSetReviewStateAndReferralReasonAndAddNote() {
         sscsCaseData.setPostponementRequest(PostponementRequest.builder()
                 .actionPostponementRequestSelected("sendToJudge")
