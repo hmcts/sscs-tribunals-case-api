@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 
@@ -211,12 +212,16 @@ public class IssueDocumentHandlerTest {
         assertEquals(payload.getNoticeBody(), bodyContent);
     }
 
-    @Test
-    public void givenPostHearingReviewIsLibertyToApply_thenThrowException() {
+    @EnumSource(
+        value = PostHearingReviewType.class,
+        names = {"LIBERTY_TO_APPLY", "STATEMENT_OF_REASONS", "PERMISSION_TO_APPEAL"})
+    public void givenPostHearingReviewIsLibertyToApply_thenThrowException(PostHearingReviewType postHearingReviewType) {
         SscsCaseData sscsCaseData = buildCaseData();
-        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
+        sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
 
-        assertThrows(IllegalArgumentException.class, () ->
-            handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, USER_AUTHORISATION));
+        assertThatThrownBy(() ->
+            handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, USER_AUTHORISATION))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("getting the notice body has an unexpected postHearingReviewType: " + postHearingReviewType.getDescriptionEn());
     }
 }
