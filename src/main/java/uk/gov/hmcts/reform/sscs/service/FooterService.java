@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
@@ -33,7 +32,7 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
 
         if (footerDetails != null) {
             SscsDocument sscsDocument = createFooterDocument(footerDetails.getUrl(), label, footerDetails.getBundleAddition(), footerDetails.getBundleFileName(), dateAdded, documentType, documentTranslationStatus);
-            addDocumentToCaseDataDocuments(caseData, sscsDocument);
+            SscsUtil.addDocumentToCaseDataDocuments(caseData, sscsDocument);
         } else {
             log.info("Could not find {} document for caseId {} so skipping generating footer", label, caseData.getCcdCaseId());
         }
@@ -51,15 +50,5 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
                 .documentTranslationStatus(documentTranslationStatus)
                 .build())
                 .build();
-    }
-
-    protected void addDocumentToCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
-        List<SscsDocument> documents = new ArrayList<>();
-        documents.add(sscsDocument);
-
-        if (caseData.getSscsDocument() != null) {
-            documents.addAll(caseData.getSscsDocument());
-        }
-        caseData.setSscsDocument(documents);
     }
 }

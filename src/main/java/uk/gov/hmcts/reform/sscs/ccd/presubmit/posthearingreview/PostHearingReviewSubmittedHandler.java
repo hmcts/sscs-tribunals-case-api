@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import lombok.RequiredArgsConstructor;
@@ -83,7 +84,7 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
         PostHearing postHearing = caseData.getPostHearing();
         if (postHearing.isRefused()) {
-            if (isYes(postHearing.getSetAside().getRequestStatementOfReasons())) {
+            if (SET_ASIDE.equals(postHearing.getReviewType()) && isYes(postHearing.getSetAside().getRequestStatementOfReasons())) {
                 ccdService.updateCase(caseData, caseId,
                     EventType.SOR_REQUEST.getCcdType(), "Send to hearing Judge for statement of reasons", "",
                     idamService.getIdamTokens());

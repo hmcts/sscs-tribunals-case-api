@@ -17,9 +17,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
-import uk.gov.hmcts.reform.sscs.service.FooterService;
-import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewAboutToSubmitHandlerTest {
@@ -34,20 +31,11 @@ class PostHearingReviewAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
-    @Mock
-    private PdfStoreService pdfStoreService;
-
-    @Mock
-    private PdfWatermarker pdfWatermarker;
-
-    private FooterService footerService;
-
     private SscsCaseData caseData;
 
     @BeforeEach
     void setUp() {
-        footerService = new FooterService(pdfStoreService, pdfWatermarker);
-        handler = new PostHearingReviewAboutToSubmitHandler(footerService, true);
+        handler = new PostHearingReviewAboutToSubmitHandler(true);
 
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -78,7 +66,7 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewAboutToSubmitHandler(footerService, false);
+        handler = new PostHearingReviewAboutToSubmitHandler(false);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }

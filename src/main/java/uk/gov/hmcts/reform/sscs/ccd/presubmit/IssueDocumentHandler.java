@@ -212,17 +212,21 @@ public class IssueDocumentHandler {
 
     private String getNoticeBody(SscsCaseData caseData) {
         PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
-        switch (postHearingReviewType) {
-            case SET_ASIDE:
-                return caseData.getDocumentGeneration().getBodyContent();
-            case CORRECTION:
-                return caseData.getDocumentGeneration().getCorrectionBodyContent();
-            case STATEMENT_OF_REASONS:
-            case PERMISSION_TO_APPEAL:
-            case LIBERTY_TO_APPLY:
-            default:
-                return Optional.ofNullable(caseData.getDocumentGeneration().getBodyContent())
-                    .orElse(caseData.getDocumentGeneration().getDirectionNoticeContent());
+
+        if (nonNull(postHearingReviewType)) {
+            switch (postHearingReviewType) {
+                case SET_ASIDE:
+                    return caseData.getDocumentGeneration().getBodyContent();
+                case CORRECTION:
+                    return caseData.getDocumentGeneration().getCorrectionBodyContent();
+                case STATEMENT_OF_REASONS:
+                case PERMISSION_TO_APPEAL:
+                case LIBERTY_TO_APPLY:
+                default:
+            }
         }
+
+        return Optional.ofNullable(caseData.getDocumentGeneration().getBodyContent())
+            .orElse(caseData.getDocumentGeneration().getDirectionNoticeContent());
     }
 }

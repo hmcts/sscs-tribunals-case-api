@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -57,24 +58,55 @@ public class SscsUtil {
         caseData.setDocumentStaging(DocumentStaging.builder().build());
     }
 
-    public static void addDocumentToDocumentTab(FooterService footerService, SscsCaseData caseData, DocumentType documentType) {
+    public static void addDocumentToDocumentTabAndBundle(FooterService footerService,
+                                                         SscsCaseData caseData, DocumentType documentType) {
         DocumentLink url = caseData.getDocumentStaging().getPreviewDocument();
 
         if (nonNull(url)) {
             String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-            SscsDocumentTranslationStatus documentTranslationStatus = null;
-            if (caseData.isLanguagePreferenceWelsh()) {
-                documentTranslationStatus = SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
-            }
+            SscsDocumentTranslationStatus documentTranslationStatus = getDocumentTranslationStatus(caseData);
+
             footerService.createFooterAndAddDocToCase(url, caseData, documentType, now,
                 null, null, documentTranslationStatus);
-            if (documentTranslationStatus != null) {
-                caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
-                log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
-                caseData.setTranslationWorkOutstanding(YesNo.YES.getValue());
-            }
+
+            updateTranslationStatus(caseData, documentTranslationStatus);
         }
     }
+
+    public static void addDocumentToDocumentTab(SscsCaseData caseData) {
+        SscsDocumentTranslationStatus documentTranslationStatus = getDocumentTranslationStatus(caseData);
+
+        SscsDocument sscsDocument = createDocument(caseData, documentTranslationStatus);
+        updateTranslationStatus(caseData, documentTranslationStatus);
+
+        addDocumentToCaseDataDocuments(caseData, sscsDocument);
+    }
+
+    public static SscsDocument createDocument(SscsCaseData caseData,
+                                              SscsDocumentTranslationStatus documentTranslationStatus) {
+        DocumentType documentType = getPostHearingReviewDocumentType(caseData.getPostHearing());
+        String date = LocalDate.now().toString();
+
+        return SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentFileName(documentType.getLabel() + " issued on " + date + ".pdf")
+                .documentLink(caseData.getDocumentStaging().getPreviewDocument())
+                .dateApproved(date)
+                .documentType(documentType.getValue())
+                .documentTranslationStatus(documentTranslationStatus)
+                .build())
+            .build();
+    }
+
+    public static void addDocumentToCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
+        List<SscsDocument> documents = new ArrayList<>();
+        documents.add(sscsDocument);
+
+        if (caseData.getSscsDocument() != null) {
+            documents.addAll(caseData.getSscsDocument());
+        }
+        caseData.setSscsDocument(documents);
+    }
+
 
     public static void addDocumentToBundle(FooterService footerService, SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
         DocumentLink url = sscsDocument.getValue().getDocumentLink();
@@ -91,5 +123,21 @@ public class SscsUtil {
         }
 
         return DocumentType.DECISION_NOTICE;
+    }
+
+    private static SscsDocumentTranslationStatus getDocumentTranslationStatus(SscsCaseData caseData) {
+        if (caseData.isLanguagePreferenceWelsh()) {
+            return SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
+        }
+
+        return null;
+    }
+
+    private static void updateTranslationStatus(SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
+        if (documentTranslationStatus != null) {
+            caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
+            log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
+            caseData.setTranslationWorkOutstanding(YesNo.YES.getValue());
+        }
     }
 }

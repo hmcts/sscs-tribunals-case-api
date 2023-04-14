@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DECISION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
@@ -67,16 +68,20 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
 
     private YesNo getGenerateNotice(SscsCaseData caseData) {
         PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
-        switch (postHearingReviewType) {
-            case SET_ASIDE:
-                return caseData.getDocumentGeneration().getGenerateNotice();
-            case CORRECTION:
-                return caseData.getDocumentGeneration().getCorrectionGenerateNotice();
-            case STATEMENT_OF_REASONS:
-            case PERMISSION_TO_APPEAL:
-            case LIBERTY_TO_APPLY:
-            default:
-                return null;
+        if (nonNull(postHearingReviewType)) {
+            switch (postHearingReviewType) {
+                case SET_ASIDE:
+                    return caseData.getDocumentGeneration().getGenerateNotice();
+                case CORRECTION:
+                    return caseData.getDocumentGeneration().getCorrectionGenerateNotice();
+                case STATEMENT_OF_REASONS:
+                case PERMISSION_TO_APPEAL:
+                case LIBERTY_TO_APPLY:
+                default:
+                    return null;
+            }
         }
+
+        return caseData.getDocumentGeneration().getGenerateNotice();
     }
 }
