@@ -96,11 +96,11 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
 
         List<SscsDocument> documents = response.getData().getSscsDocument();
-assertThat(documents)
-    .hasSize(1)
-    .element(0)
-    .extracting(doc -> doc.getValue().getDocumentType())
-    .isEqualTo(DocumentType.CORRECTION_REFUSED.getValue());
+        assertThat(documents)
+            .hasSize(1)
+            .element(0)
+            .extracting(doc -> doc.getValue().getDocumentType())
+            .isEqualTo(DocumentType.CORRECTION_REFUSED.getValue());
     }
 
     @Test

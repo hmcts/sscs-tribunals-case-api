@@ -97,12 +97,15 @@ public class SscsUtil {
             .build();
     }
 
-public static void addDocumentToCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
-    if (caseData.getSscsDocument() == null) {
-        caseData.setSscsDocument(new ArrayList<>());
+    public static void addDocumentToCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
+        List<SscsDocument> documents = new ArrayList<>();
+        documents.add(sscsDocument);
+
+        if (caseData.getSscsDocument() != null) {
+            documents.addAll(caseData.getSscsDocument());
+        }
+        caseData.setSscsDocument(documents);
     }
-    caseData.getSscsDocument().add(sscsDocument);
-}
 
 
 
