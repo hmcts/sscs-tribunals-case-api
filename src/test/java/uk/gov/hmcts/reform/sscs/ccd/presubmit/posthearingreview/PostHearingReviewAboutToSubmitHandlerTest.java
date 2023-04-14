@@ -18,11 +18,12 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
-import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.service.FooterService;
-
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewAboutToSubmitHandlerTest {
@@ -133,5 +134,42 @@ class PostHearingReviewAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void givenHearingIsNull_thenCaseStatusNotChanged() {
+        caseData.setState(State.DORMANT_APPEAL_STATE);
+        handler.updateCaseStatus(caseData);
+        assertThat(caseData.getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
+    }
+
+    @Test
+    void givenSetAsideStateIsNull_thenCaseStatusNotChanged() {
+        caseData = SscsCaseData.builder()
+            .state(State.DORMANT_APPEAL_STATE)
+            .postHearing(PostHearing.builder()
+                .setAside(SetAside.builder()
+                    .action(null)
+                    .build())
+                .build())
+            .build();
+
+        handler.updateCaseStatus(caseData);
+        assertThat(caseData.getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
+    }
+
+    @Test
+    void givenSetAsideState_thenCaseStatusChanged() {
+        caseData = SscsCaseData.builder()
+            .state(State.DORMANT_APPEAL_STATE)
+            .postHearing(PostHearing.builder()
+                .setAside(SetAside.builder()
+                    .action(SetAsideActions.GRANT)
+                    .build())
+                .build())
+            .build();
+
+        handler.updateCaseStatus(caseData);
+        assertThat(caseData.getState()).isEqualTo(State.NOT_LISTABLE);
     }
 }

@@ -71,13 +71,25 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
 
         caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
 
-        if (isRefusedSor(postHearing.getSetAside())) {
-            ccdService.updateCase(caseData, caseId,
-                EventType.SOR_REQUEST.getCcdType(), "Send to hearing Judge for statement of reasons", "",
-                idamService.getIdamTokens());
-        }
+        handlePostHearingRefused(caseData);
 
         return new PreSubmitCallbackResponse<>(caseData);
+    }
+
+    private void handlePostHearingRefused(SscsCaseData caseData) {
+        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        PostHearing postHearing = caseData.getPostHearing();
+        if (postHearing.isRefused()) {
+            if (isYes(postHearing.getSetAside().getRequestStatementOfReasons())) {
+                ccdService.updateCase(caseData, caseId,
+                    EventType.SOR_REQUEST.getCcdType(), "Send to hearing Judge for statement of reasons", "",
+                    idamService.getIdamTokens());
+            } else {
+                ccdService.updateCase(caseData, caseId,
+                    EventType.DORMANT.getCcdType(), "Send to dormant", "",
+                    idamService.getIdamTokens());
+            }
+        }
     }
 
     private static boolean isRefusedSor(SetAside setAside) {

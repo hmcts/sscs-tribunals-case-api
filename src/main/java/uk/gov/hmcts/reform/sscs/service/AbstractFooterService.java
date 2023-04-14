@@ -39,7 +39,10 @@ public abstract class AbstractFooterService<D extends AbstractDocument> {
 
             String bundleAddition = getNextBundleAddition(documents);
 
-            String bundleFileName = overrideFileName != null ? overrideFileName : buildBundleAdditionFileName(bundleAddition, label + " issued on " + dateIssued);
+            String verb = DocumentType.SET_ASIDE_APPLICATION.equals(documentType) ? " received on " : " issued on ";
+
+            String rightText = label + verb + dateIssued;
+            String bundleFileName = overrideFileName != null ? overrideFileName : buildBundleAdditionFileName(bundleAddition, rightText);
 
             url = addFooter(url, label, bundleAddition);
 

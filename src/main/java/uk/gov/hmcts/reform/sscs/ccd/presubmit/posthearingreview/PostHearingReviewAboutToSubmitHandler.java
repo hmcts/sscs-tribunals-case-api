@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getCcdCallbackMap;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getDocumentTypeFromReviewType;
@@ -16,8 +17,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
@@ -49,6 +51,9 @@ public class PostHearingReviewAboutToSubmitHandler extends IssueDocumentHandler 
                                                           String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
+        updateCaseStatus(caseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
         String caseId = caseData.getCcdCaseId();
         PostHearing postHearing = caseData.getPostHearing();
         PostHearingReviewType reviewType = postHearing.getReviewType();
@@ -59,7 +64,17 @@ public class PostHearingReviewAboutToSubmitHandler extends IssueDocumentHandler 
 
         SscsUtil.clearDocumentTransientFields(caseData);
 
-        return new PreSubmitCallbackResponse<>(caseData);
+        return response;
+    }
+
+    protected void updateCaseStatus(SscsCaseData caseData) {
+        PostHearing postHearing = caseData.getPostHearing();
+        if (nonNull(postHearing) && nonNull(postHearing.getSetAside().getAction())
+                && postHearing.getSetAside().getAction().equals(SetAsideActions.GRANT)) {
+            caseData.setState(State.NOT_LISTABLE);
+            caseData.setDwpState(DwpState.SET_ASIDE_GRANTED);
+            caseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION);
+        }
     }
 
     private void handlePostHearingReview(SscsCaseData caseData,
