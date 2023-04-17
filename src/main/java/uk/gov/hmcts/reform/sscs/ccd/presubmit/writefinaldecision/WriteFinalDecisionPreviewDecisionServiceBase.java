@@ -131,7 +131,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         writeFinalDecisionBuilder.hearingType(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionTypeOfHearing());
 
-        if(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion().equalsIgnoreCase("no")) {
+        if (caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion().equalsIgnoreCase("no")) {
             writeFinalDecisionBuilder.attendedHearing("no".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion()));
             writeFinalDecisionBuilder.appointeeAttendedHearing("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion()));
         } else {
@@ -177,6 +177,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
     }
 
     protected boolean isSetAside(SscsCaseData sscsCaseData, Outcome outcome) {
+
         return Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome);
     }
 
