@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASID
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.STATEMENT_OF_REASONS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions.REFUSE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions.REFUSE_SOR;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -195,11 +196,11 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @Test
-    void givenRefusedSetAsideSelected_andStatementOfReasonsRequested_shouldReturnCallCorrectCallback_andUpdateCase() {
+    void givenRefusedSetAsideSelected_andStatementOfReasonsRequested_shouldReturnCallCorrectCallback() {
         caseData.getPostHearing().setReviewType(SET_ASIDE);
         caseData.getPostHearing().getSetAside().setAction(REFUSE);
 
-        caseData.getPostHearing().getSetAside().setRequestStatementOfReasons(YesNo.YES);
+        caseData.getPostHearing().getSetAside().setRequestStatementOfReasons(YES);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
@@ -208,15 +209,16 @@ class PostHearingReviewSubmittedHandlerTest {
             .reviewType(SET_ASIDE)
             .setAside(SetAside.builder()
                 .action(REFUSE)
-                .requestStatementOfReasons(YesNo.YES)
+                .requestStatementOfReasons(YES)
                 .build())
             .build();
         SscsCaseData returnedCase = SscsCaseData.builder()
-            .ccdCaseId("555")
             .state(State.POST_HEARING)
-            .interlocReviewState(InterlocReviewState.NONE)
             .postHearing(returnedPostHearing)
+            .interlocReviewState(InterlocReviewState.NONE)
+            .ccdCaseId("555")
             .build();
+
         when(ccdCallbackMapService.handleCcdCallbackMap(REFUSE_SOR, caseData))
             .thenReturn(returnedCase);
 
@@ -226,15 +228,14 @@ class PostHearingReviewSubmittedHandlerTest {
         assertThat(response.getErrors()).isEmpty();
 
         verify(ccdCallbackMapService, times(1))
-            .handleCcdCallbackMap(SetAsideActions.REFUSE_SOR, caseData);
+            .handleCcdCallbackMap(REFUSE_SOR, caseData);
 
-        verify(ccdService, times(1))
-            .updateCase(returnedCase,
-                Long.valueOf(returnedCase.getCcdCaseId()),
-                EventType.SOR_REQUEST.getCcdType(),
-                "Send to hearing Judge for statement of reasons",
-                "",
-                idamService.getIdamTokens());
+        verify(ccdService, times(1)).updateCase(returnedCase,
+            Long.valueOf(returnedCase.getCcdCaseId()),
+            EventType.SOR_REQUEST.getCcdType(),
+            "Send to hearing Judge for statement of reasons",
+            "",
+            idamService.getIdamTokens());
 
         assertThat(response.getData().getState()).isEqualTo(State.POST_HEARING);
         assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.NONE);
