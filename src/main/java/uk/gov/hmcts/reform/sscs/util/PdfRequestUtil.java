@@ -9,10 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.PdfRequestTemplateBody;
@@ -86,7 +83,7 @@ public class PdfRequestUtil {
                 sscsCaseData.getPostponementRequest().setPostponementPreviewDocument(previewDocument);
                 break;
             default:
-                throw new IllegalArgumentException("Unsupported event type for processRequestPdfAndSetPreviewDocument: " + pdfType);
+                // handled in first switch
         }
 
         return response;
@@ -115,16 +112,37 @@ public class PdfRequestUtil {
         if (issueFinalDecisionDate == null) {
             throw new IllegalArgumentException("issueFinalDecisionDate unexpectedly null for caseId: " + sscsCaseData.getCcdCaseId());
         }
-        String postHearingRequestType = sscsCaseData.getPostHearing().getRequestType().getDescriptionEn();
+
+        setRequestDetailsForPostHearingType(sscsCaseData);
+
+        String requestTypeDescriptionEn = sscsCaseData.getPostHearing().getRequestType().getDescriptionEn();
         additionalRequestDetails.append("Date of decision issued: ")
             .append(issueFinalDecisionDate.format(DATE_TIME_FORMATTER))
             .append("\n")
             .append("Reason for ")
-            .append(postHearingRequestType)
+            .append(requestTypeDescriptionEn)
             .append(" application: ")
             .append(requestDetails)
             .append("\n");
-        title = String.format("%s Application from %s", postHearingRequestType, "FTA");
+        title = String.format("%s Application from %s", requestTypeDescriptionEn, "FTA");
+    }
+
+
+    protected static void setRequestDetailsForPostHearingType(SscsCaseData sscsCaseData) {
+        PostHearingRequestType postHearingRequestType = sscsCaseData.getPostHearing().getRequestType();
+        switch (postHearingRequestType) {
+            case SET_ASIDE:
+                requestDetails = sscsCaseData.getDocumentGeneration().getBodyContent();
+                break;
+            case CORRECTION:
+                requestDetails = sscsCaseData.getDocumentGeneration().getBodyContentCorrection();
+                break;
+            case STATEMENT_OF_REASONS:
+            case PERMISSION_TO_APPEAL:
+            case LIBERTY_TO_APPLY:
+            default:
+                throw new IllegalArgumentException("handlePostHearing has unexpected postHearingRequestType: " + postHearingRequestType);
+        }
     }
 
     private static DocumentLink getPreviewDocument(
@@ -159,6 +177,9 @@ public class PdfRequestUtil {
         switch (postHearing.getRequestType()) {
             case SET_ASIDE:
                 documentType = DocumentType.SET_ASIDE_APPLICATION;
+                break;
+            case CORRECTION:
+                documentType = DocumentType.CORRECTION_APPLICATION;
                 break;
             default:
                 throw new IllegalArgumentException("Unexpected request type: " + postHearing.getRequestType());
