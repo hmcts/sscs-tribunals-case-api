@@ -46,7 +46,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     }
 
     private boolean furtherEvidenceActionOptionValidation(DynamicList furtherEvidenceAction) {
-        return isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)
+        return isFurtherEvidenceActionOptionValid(furtherEvidenceAction, ADMIN_ACTION_CORRECTION)
+                || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)
                 || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_TCW)
                 || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, ISSUE_FURTHER_EVIDENCE)
                 || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_JUDGE)
@@ -76,28 +77,31 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     }
 
     private SscsCaseDetails updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
-        if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(),
-                INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
+        DynamicList furtherEvidenceAction = caseData.getFurtherEvidenceAction();
+        if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, ADMIN_ACTION_CORRECTION)) {
+            return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
+                AWAITING_ADMIN_ACTION, ADMIN_ACTION_CORRECTION,
+                EventType.CORRECTION_REQUEST, "Admin action correction");
+        }
+        if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
             caseData.setInterlocReferralDate(LocalDate.now());
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
                     REVIEW_BY_JUDGE, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
                     EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
         }
-        if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(),
-                INFORMATION_RECEIVED_FOR_INTERLOC_TCW)) {
+        if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_TCW)) {
             caseData.setInterlocReferralDate(LocalDate.now());
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
                     REVIEW_BY_TCW, INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
                     EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
         }
-        if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(),
-                SEND_TO_INTERLOC_REVIEW_BY_JUDGE)) {
+        if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_JUDGE)) {
             setSelectWhoReviewsCaseField(caseData, REVIEW_BY_JUDGE);
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
                     REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
                     EventType.VALID_SEND_TO_INTERLOC, TCW_REVIEW_SEND_TO_JUDGE);
         }
-        if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_TCW)) {
+        if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_TCW)) {
             setSelectWhoReviewsCaseField(caseData, REVIEW_BY_TCW);
             if (isPostponementRequest(caseData)) {
                 caseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
@@ -106,12 +110,12 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                     REVIEW_BY_TCW, SEND_TO_INTERLOC_REVIEW_BY_TCW, EventType.VALID_SEND_TO_INTERLOC,
                     TCW_REVIEW_SEND_TO_JUDGE);
         }
-        if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL)
+        if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, OTHER_DOCUMENT_MANUAL)
                 && isValidUrgentDocument(caseData)) {
             return setMakeCaseUrgentTriggerEvent(caseData, callback.getCaseDetails().getId(),
                     OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Send a case to urgent hearing");
         }
-        if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL)) {
+        if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, OTHER_DOCUMENT_MANUAL)) {
             return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                     EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Actioned manually",
                     "Actioned manually", idamService.getIdamTokens());
