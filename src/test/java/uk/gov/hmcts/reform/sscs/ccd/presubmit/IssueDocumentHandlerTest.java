@@ -212,9 +212,21 @@ public class IssueDocumentHandlerTest {
         assertEquals(payload.getNoticeBody(), bodyContent);
     }
 
+    @Test
+    public void givenPostHearingReviewIsSor_thenUseCorrectionBody() {
+        SscsCaseData sscsCaseData = buildCaseData();
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.STATEMENT_OF_REASONS);
+        String bodyContent = "sor body content";
+        sscsCaseData.getDocumentGeneration().setStatementOfReasonsBodyContent(bodyContent);
+
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, USER_AUTHORISATION);
+
+        assertEquals(payload.getNoticeBody(), bodyContent);
+    }
+
     @EnumSource(
         value = PostHearingReviewType.class,
-        names = {"LIBERTY_TO_APPLY", "STATEMENT_OF_REASONS", "PERMISSION_TO_APPEAL"})
+        names = {"LIBERTY_TO_APPLY", "PERMISSION_TO_APPEAL"})
     public void givenPostHearingReviewIsLibertyToApply_thenThrowException(PostHearingReviewType postHearingReviewType) {
         SscsCaseData sscsCaseData = buildCaseData();
         sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);

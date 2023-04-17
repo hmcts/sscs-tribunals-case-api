@@ -220,6 +220,7 @@ public class IssueDocumentHandler {
                 case CORRECTION:
                     return caseData.getDocumentGeneration().getCorrectionBodyContent();
                 case STATEMENT_OF_REASONS:
+                    return caseData.getDocumentGeneration().getStatementOfReasonsBodyContent();
                 case PERMISSION_TO_APPEAL:
                 case LIBERTY_TO_APPLY:
                 default:

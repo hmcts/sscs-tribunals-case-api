@@ -54,9 +54,7 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
 
         caseData.getDocumentStaging().setPreviewDocument(null);
 
-        YesNo generateNotice = getGenerateNotice(caseData);
-
-        if (PAGE_ID_GENERATE_NOTICE.equals(pageId) && isYes(generateNotice)) {
+        if (PAGE_ID_GENERATE_NOTICE.equals(pageId) && isYes(getGenerateNotice(caseData))) {
             log.info("Review Post Hearing App: Generating notice for caseId {}", caseId);
             String templateId = documentConfiguration.getDocuments()
                 .get(caseData.getLanguagePreference()).get(DECISION_ISSUED);
@@ -75,6 +73,7 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
                 case CORRECTION:
                     return caseData.getDocumentGeneration().getCorrectionGenerateNotice();
                 case STATEMENT_OF_REASONS:
+                    return caseData.getDocumentGeneration().getStatementOfReasonsGenerateNotice();
                 case PERMISSION_TO_APPEAL:
                 case LIBERTY_TO_APPLY:
                 default:
