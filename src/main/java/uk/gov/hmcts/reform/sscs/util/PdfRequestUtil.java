@@ -135,7 +135,7 @@ public class PdfRequestUtil {
                 requestDetails = sscsCaseData.getDocumentGeneration().getBodyContent();
                 break;
             case CORRECTION:
-                requestDetails = sscsCaseData.getDocumentGeneration().getBodyContentCorrection();
+                requestDetails = sscsCaseData.getDocumentGeneration().getCorrectionBodyContent();
                 break;
             case STATEMENT_OF_REASONS:
             case PERMISSION_TO_APPEAL:
