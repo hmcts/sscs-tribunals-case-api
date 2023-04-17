@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @Component
 @Slf4j
@@ -28,6 +29,7 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
     public static final String PAGE_ID_GENERATE_NOTICE = "generateNotice";
     private final DocumentConfiguration documentConfiguration;
     private final GenerateFile generateFile;
+    private final UserDetailsService userDetailsService;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
@@ -60,6 +62,10 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
             log.info("Review Post Hearing App: Generating notice for caseId {}", caseId);
             String templateId = documentConfiguration.getDocuments()
                 .get(caseData.getLanguagePreference()).get(DECISION_ISSUED);
+
+            caseData.getDocumentGeneration().setSignedBy(userDetailsService.buildLoggedInUserName(userAuthorisation));
+            caseData.getDocumentGeneration().setSignedRole(userDetailsService.getUserRole(userAuthorisation));
+
             response = issueDocument(callback, DECISION_NOTICE, templateId, generateFile, userAuthorisation);
         }
 

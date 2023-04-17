@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewMidEventHandlerTest {
@@ -70,12 +71,15 @@ class PostHearingReviewMidEventHandlerTest {
     @Mock
     private DocumentConfiguration documentConfiguration;
 
+    @Mock
+    private UserDetailsService userDetailsService;
+
     private PostHearingReviewMidEventHandler handler;
 
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, true);
+        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, userDetailsService, true);
 
         caseData = SscsCaseData.builder()
             .documentGeneration(DocumentGeneration.builder()
@@ -112,7 +116,7 @@ class PostHearingReviewMidEventHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, false);
+        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, userDetailsService, false);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
