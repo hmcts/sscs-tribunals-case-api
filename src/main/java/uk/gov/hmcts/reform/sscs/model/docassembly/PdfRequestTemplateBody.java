@@ -9,12 +9,10 @@ import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
 @Builder(toBuilder = true)
 @Value
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PostponeRequestTemplateBody implements FormPayload {
+public class PdfRequestTemplateBody implements FormPayload {
     @JsonProperty("title")
     String title;
 
     @JsonProperty("text")
     String text;
-
-
 }
