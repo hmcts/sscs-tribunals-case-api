@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
@@ -18,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
@@ -36,7 +39,7 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
     @Mock
     private SscsCaseData sscsCaseData;
     @Mock
-    DynamicListLanguageUtil dynamicListLanguageUtil;
+    DynamicListLanguageUtil utils;
     @InjectMocks
     private UpdateListingRequirementsAboutToStartHandler handler;
 
@@ -63,23 +66,50 @@ public class UpdateListingRequirementsAboutToStartHandlerTest {
     }
 
     @Test
-    public void handleUpdateListingRequirementsSandL() {
+    public void handleNonInitiatedUpdateListingRequirementsSandL() {
         ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", true);
 
         sscsCaseData = CaseDataUtils.buildCaseData();
+
+        DynamicListItem item = new DynamicListItem("abcd", "Abcd Abcd");
+        DynamicList list = new DynamicList(item, List.of(item));
+
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(utils.generateInterpreterLanguageFields(any())).willReturn(list);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        HearingInterpreter interpreter = response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
+
+        assertEquals(0, response.getErrors().size());
+        assertNotNull(interpreter);
+        assertNotNull(interpreter.getInterpreterLanguage());
+        assertEquals(1, interpreter.getInterpreterLanguage().getListItems().size());
+    }
+
+    @Test
+    public void handleInitiatedUpdateListingRequirementsSandL() {
+        ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", true);
+
+        sscsCaseData = CaseDataUtils.buildCaseData();
+        DynamicList interpreterLanguage = new DynamicList(null, List.of());
         OverrideFields overrideFields = OverrideFields.builder()
             .appellantInterpreter(HearingInterpreter.builder()
-                .interpreterLanguage(new DynamicList(null, List.of()))
+                .interpreterLanguage(interpreterLanguage)
                 .build())
             .build();
         sscsCaseData.getSchedulingAndListingFields().setOverrideFields(overrideFields);
 
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(utils.generateInterpreterLanguageFields(any())).willReturn(interpreterLanguage);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        HearingInterpreter interpreter = response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter();
+
         assertEquals(0, response.getErrors().size());
+        assertNotNull(interpreter);
+        assertNotNull(interpreter.getInterpreterLanguage());
+        assertEquals(0, interpreter.getInterpreterLanguage().getListItems().size());
     }
-
-
-
 }

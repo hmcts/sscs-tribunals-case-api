@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -80,6 +81,9 @@ class AdjournCaseAboutToStartHandlerTest {
                 .disabilityQualifiedPanelMemberName("")
                 .medicallyQualifiedPanelMemberName("")
                 .otherPanelMemberName("")
+                .panelMember1(JudicialUserBase.builder().build())
+                .panelMember2(JudicialUserBase.builder().build())
+                .panelMember3(JudicialUserBase.builder().build())
                 .nextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD)
                 .nextHearingListingDuration(1)
                 .nextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS)

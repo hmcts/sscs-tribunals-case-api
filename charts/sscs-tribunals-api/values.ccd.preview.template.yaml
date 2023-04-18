@@ -311,13 +311,13 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S10538-22nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-11342-1nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
       CCD_ENVIRONMENT: 'PROD'
       CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
-      CCD_DEF_SSCS_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-sscs-ccd-orchestrator
+      CCD_DEF_SSCS_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-sscs-ccd-callback-orchestrator
       CCD_DEF_TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
       CCD_DEF_TYA_NOTIFICATIONS_API_URL: http://${SERVICE_NAME}-tya-notification
       CCD_DEF_BULK_SCAN_API_URL: http://${SERVICE_NAME}-bulk-scan-api
@@ -348,16 +348,8 @@ ccd:
       - caseworker-sscs-panelmember
       - caseworker-sscs-bulkscan
       - caseworker-sscs-pcqextractor
-
 elastic:
   enabled: true
-  elasticsearch:
-    nameOverride: ${SERVICE_NAME}-es
-    clusterName: "es"
-    replicas: 1
-  logstash:
-    image:
-    tag: ccd-cmc-logstash-latest
 
 sscs-evidence-share:
   enabled: false
@@ -371,9 +363,10 @@ sscs-evidence-share:
       DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
       SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
-      TOPIC_NAME: "sscs-evidenceshare-topic-aat"
+      TOPIC_NAME: "sscs-evidenceshare-topic-preview"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
-      AMQP_USERNAME: "SendAndListenSharedAccessKey"
+      AMQP_USERNAME: "preview_policy"
+      AMQP_PASSWORD: "REPLACEME
       ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
       ROBOTICS_EMAIL_TO: "fake"
       ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
@@ -387,9 +380,12 @@ sscs-ccd-callback-orchestrator:
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     readinessDelay: 90
     environment:
-      SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
-      TOPIC_NAME: "sscs-evidenceshare-topic-aat"
+      SUBSCRIPTION_NAME: "sscs-evidenceshare-topic-preview"
+      TOPIC_NAME: "sscs-evidenceshare-topic-preview"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
+      AMQP_USERNAME: "preview_policy"
+      AMQP_PASSWORD: "LREPLACEME"
+
 
 #Enable for SYA
 sscs-tribunals-frontend:
@@ -450,7 +446,7 @@ sscs-hearings-api:
       IDAM_API_URL: "https://idam-api.aat.platform.hmcts.net"
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
       COMMON_REF_API_URL: "http://rd-commondata-api-aat.service.core-compute-aat.internal"
-      JUDICIAL_REF_API_URL: "http://judicial-ref-api-aat.service.core-compute-aat.internal"
+      JUDICIAL_REF_API_URL: "http://rd-judicial-api-aat.service.core-compute-aat.internal"
       EXUI_API_URL: "https://${SERVICE_NAME}-xui"
       HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
       #Messaging
