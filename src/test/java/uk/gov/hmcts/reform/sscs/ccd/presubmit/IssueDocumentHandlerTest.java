@@ -152,34 +152,6 @@ public class IssueDocumentHandlerTest {
         assertEquals("Barry Allen", payload.getIdamSurname());
     }
 
-    @Test
-    public void givenSetAsideStateIsNull_thenReturnDraftDecisionNotice() {
-        String expectedDefaultDocumentLabel = "Draft Decision Notice";
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .ccdCaseId("1")
-            .postHearing(PostHearing.builder()
-                .setAside(SetAside.builder()
-                    .action(null)
-                    .build())
-               .build())
-            .build();
-
-        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel, false);
-        assertEquals(expectedDefaultDocumentLabel, documentTypeLabel);
-    }
-
-    @Test
-    public void givenHearingIsNull_thenReturnDraftDecisionNotice() {
-        String expectedDefaultDocumentLabel = "Draft Decision Notice";
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .ccdCaseId("1")
-            .build();
-
-        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel, false);
-        assertEquals(expectedDefaultDocumentLabel, documentTypeLabel);
-    }
-
-
     @ParameterizedTest
     @EnumSource(value = SetAsideActions.class, names = {"GRANT", "REFUSE"})
     void givenSetAsideState_andPostHearingsIsEnabled_thenReturnSetAsideDecisionNotice(SetAsideActions setAsideActions) {
@@ -217,6 +189,33 @@ public class IssueDocumentHandlerTest {
         String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, originalLabel, isPostHearingsEnabled);
 
         assertThat(documentTypeLabel).isEqualTo(originalLabel);
+    }
+
+    @Test
+    public void givenSetAsideStateIsNull_thenReturnDraftDecisionNotice() {
+        String expectedDefaultDocumentLabel = "Draft Decision Notice";
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("1")
+            .postHearing(PostHearing.builder()
+                .setAside(SetAside.builder()
+                    .action(null)
+                    .build())
+               .build())
+            .build();
+
+        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel, false);
+        assertEquals(expectedDefaultDocumentLabel, documentTypeLabel);
+    }
+
+    @Test
+    public void givenHearingIsNull_thenReturnDraftDecisionNotice() {
+        String expectedDefaultDocumentLabel = "Draft Decision Notice";
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("1")
+            .build();
+
+        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel, false);
+        assertEquals(expectedDefaultDocumentLabel, documentTypeLabel);
     }
 
 }

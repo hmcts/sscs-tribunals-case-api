@@ -21,7 +21,6 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -31,7 +30,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingRequestMidEventHandlerTest {

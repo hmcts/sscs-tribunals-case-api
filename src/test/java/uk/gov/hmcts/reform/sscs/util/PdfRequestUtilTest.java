@@ -10,7 +10,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 class PdfRequestUtilTest {
 
