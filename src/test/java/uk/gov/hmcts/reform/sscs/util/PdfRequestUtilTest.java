@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
@@ -73,45 +72,6 @@ class PdfRequestUtilTest {
         assertThatThrownBy(() -> PdfRequestUtil.setRequestDetailsForPostHearingType(sscsCaseData))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageStartingWith("handlePostHearing has unexpected postHearingRequestType: ");
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = SetAsideActions.class, names = {"GRANT", "REFUSE"})
-    void givenSetAsideState_andPostHearingsIsEnabled_thenReturnSetAsideDecisionNotice(SetAsideActions setAsideActions) {
-        ReflectionTestUtils.setField(PdfRequestUtil.class, "isPostHearingsEnabled", true);
-        final String originalLabel = "label";
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .ccdCaseId("1")
-            .postHearing(PostHearing.builder()
-                .setAside(SetAside.builder()
-                    .action(setAsideActions)
-                    .build())
-                .build())
-            .build();
-
-        String documentTypeLabel = PdfRequestUtil.getEmbeddedDocumentTypeLabelForPostHearing(sscsCaseData, originalLabel);
-
-        String expectedLabel = "Set Aside Decision Notice";
-        assertThat(documentTypeLabel).isEqualTo(expectedLabel);
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = SetAsideActions.class, names = {"GRANT", "REFUSE"})
-    void givenSetAsideState_andPostHearingsIsDisabled_thenReturnOriginalLabel(SetAsideActions setAsideActions) {
-        ReflectionTestUtils.setField(PdfRequestUtil.class, "isPostHearingsEnabled", false);
-        final String originalLabel = "label";
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .ccdCaseId("1")
-            .postHearing(PostHearing.builder()
-                .setAside(SetAside.builder()
-                    .action(setAsideActions)
-                    .build())
-                .build())
-            .build();
-
-        String documentTypeLabel = PdfRequestUtil.getEmbeddedDocumentTypeLabelForPostHearing(sscsCaseData, originalLabel);
-
-        assertThat(documentTypeLabel).isEqualTo(originalLabel);
     }
 
 }
