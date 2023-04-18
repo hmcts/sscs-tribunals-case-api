@@ -79,7 +79,7 @@ class PdfRequestUtilTest {
     @EnumSource(value = SetAsideActions.class, names = {"GRANT", "REFUSE"})
     void givenSetAsideState_andPostHearingsIsEnabled_thenReturnSetAsideDecisionNotice(SetAsideActions setAsideActions) {
         ReflectionTestUtils.setField(PdfRequestUtil.class, "isPostHearingsEnabled", true);
-        final String ORIGINAL_LABEL = "label";
+        final String originalLabel = "label";
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("1")
             .postHearing(PostHearing.builder()
@@ -89,7 +89,7 @@ class PdfRequestUtilTest {
                 .build())
             .build();
 
-        String documentTypeLabel = PdfRequestUtil.getEmbeddedDocumentTypeLabelForPostHearing(sscsCaseData, ORIGINAL_LABEL);
+        String documentTypeLabel = PdfRequestUtil.getEmbeddedDocumentTypeLabelForPostHearing(sscsCaseData, originalLabel);
 
         String expectedLabel = "Set Aside Decision Notice";
         assertThat(documentTypeLabel).isEqualTo(expectedLabel);
@@ -99,7 +99,7 @@ class PdfRequestUtilTest {
     @EnumSource(value = SetAsideActions.class, names = {"GRANT", "REFUSE"})
     void givenSetAsideState_andPostHearingsIsDisabled_thenReturnOriginalLabel(SetAsideActions setAsideActions) {
         ReflectionTestUtils.setField(PdfRequestUtil.class, "isPostHearingsEnabled", false);
-        final String ORIGINAL_LABEL = "label";
+        final String originalLabel = "label";
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("1")
             .postHearing(PostHearing.builder()
@@ -109,9 +109,9 @@ class PdfRequestUtilTest {
                 .build())
             .build();
 
-        String documentTypeLabel = PdfRequestUtil.getEmbeddedDocumentTypeLabelForPostHearing(sscsCaseData, ORIGINAL_LABEL);
+        String documentTypeLabel = PdfRequestUtil.getEmbeddedDocumentTypeLabelForPostHearing(sscsCaseData, originalLabel);
 
-        assertThat(documentTypeLabel).isEqualTo(ORIGINAL_LABEL);
+        assertThat(documentTypeLabel).isEqualTo(originalLabel);
     }
 
 }

@@ -21,6 +21,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -30,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingRequestMidEventHandlerTest {
@@ -123,6 +125,8 @@ class PostHearingRequestMidEventHandlerTest {
     @ParameterizedTest
     @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE"}) // TODO add all other types as their feature code is implemented
     void givenGenerateNoticeYes_generateNotice(PostHearingRequestType postHearingRequestType) {
+        ReflectionTestUtils.setField(PdfRequestUtil.class, "isPostHearingsEnabled", true);
+
         String dmUrl = "http://dm-store/documents/123";
         when(generateFile.assemble(any())).thenReturn(dmUrl);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -166,6 +170,7 @@ class PostHearingRequestMidEventHandlerTest {
 
     @Test
     void givenIssueFinalDecisionDateIsNull_throwsException() {
+        ReflectionTestUtils.setField(PdfRequestUtil.class, "isPostHearingsEnabled", true);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
