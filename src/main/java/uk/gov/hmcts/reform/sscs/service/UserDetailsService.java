@@ -32,7 +32,14 @@ public class UserDetailsService {
 
     public String getUserRole(String userAuthorisation) {
         List<String> users = getUserInfo(userAuthorisation).getRoles();
-        return UserRole.getUserRoleByValue(users.get(users.size() - 1)).getLabel();
+
+        for (UserRole userRole : UserRole.values()) {
+            if (users.contains(userRole.getValue())) {
+                return userRole.getLabel();
+            }
+        }
+
+        return null;
     }
 
     public UserInfo getUserInfo(String userAuthorisation) {

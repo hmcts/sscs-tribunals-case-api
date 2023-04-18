@@ -6,6 +6,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.CORRECTION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -88,6 +90,7 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         caseData.getDocumentStaging().setPreviewDocument(DocumentLink.builder().documentUrl("document url test").build());
+        caseData.getPostHearing().setReviewType(CORRECTION);
         caseData.getPostHearing().getCorrection().setAction(CorrectionActions.REFUSE);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -109,6 +112,7 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         caseData.getDocumentStaging().setPreviewDocument(DocumentLink.builder().documentUrl("document url test").build());
+        caseData.getPostHearing().setReviewType(SET_ASIDE);
         caseData.getPostHearing().getSetAside().setAction(SetAsideActions.REFUSE);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
