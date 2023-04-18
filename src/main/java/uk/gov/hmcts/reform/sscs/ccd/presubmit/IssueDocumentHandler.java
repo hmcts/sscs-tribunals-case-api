@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Respondent;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
+import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 
 
 @Slf4j
@@ -165,13 +166,8 @@ public class IssueDocumentHandler {
 
         String embeddedDocumentTypeLabel = (FINAL_DECISION_NOTICE.equals(documentType) ? "Decision Notice" : documentTypeLabel);
 
-        PostHearing postHearing = caseData.getPostHearing();
-        if (nonNull(postHearing) && nonNull(postHearing.getSetAside().getAction())) {
-            CcdCallbackMap action = postHearing.getSetAside().getAction();
-            boolean isGrantOrRefuseSetAsideAction = action.toString().equals(SetAsideActions.GRANT.getCcdDefinition())
-                || action.toString().equals(SetAsideActions.REFUSE.getCcdDefinition());
-            embeddedDocumentTypeLabel =  isGrantOrRefuseSetAsideAction ? "Set Aside Decision Notice" : embeddedDocumentTypeLabel;
-        }
+        embeddedDocumentTypeLabel = PdfRequestUtil.getEmbeddedDocumentTypeLabelForPostHearing(caseData, embeddedDocumentTypeLabel);
+
         return embeddedDocumentTypeLabel;
     }
 

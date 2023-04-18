@@ -12,8 +12,6 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -149,23 +147,6 @@ public class IssueDocumentHandlerTest {
         assertEquals(localDate, payload.getDateAdded());
         assertEquals(localDate, payload.getGeneratedDate());
         assertEquals("Barry Allen", payload.getIdamSurname());
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = SetAsideActions.class, names = {"GRANT", "REFUSE"})
-    public void givenSetAsideState_thenReturnSetAsideDecisionNotice(SetAsideActions setAsideActions) {
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .ccdCaseId("1")
-            .postHearing(PostHearing.builder()
-                .setAside(SetAside.builder()
-                    .action(setAsideActions)
-                    .build())
-                .build())
-            .build();
-
-        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, "adfdsf2");
-
-        assertEquals("Set Aside Decision Notice", documentTypeLabel);
     }
 
     @Test

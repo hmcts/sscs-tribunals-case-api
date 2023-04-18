@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -15,15 +18,15 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.PdfRequestTemplateBody;
 
 @Slf4j
+@RequiredArgsConstructor
 public class PdfRequestUtil {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static String requestDetails;
     private static String title;
     private static StringBuilder additionalRequestDetails;
 
-    private PdfRequestUtil() {
-        //
-    }
+    @Value("${feature.postHearings.enabled}")
+    private static boolean isPostHearingsEnabled;
 
     @AllArgsConstructor
     public enum PdfType {
@@ -53,10 +56,12 @@ public class PdfRequestUtil {
         StringBuilder pdfUrlBuilder = new StringBuilder();
         switch (pdfType) {
             case POST_HEARING:
-                String postHearingDocumentTypeLabel = getPostHearingDocumentType(sscsCaseData).getLabel();
-                pdfUrlBuilder.append(postHearingDocumentTypeLabel)
-                    .append(" from FTA");
-                handlePostHearing(sscsCaseData);
+                if (isPostHearingsEnabled) {
+                    String postHearingDocumentTypeLabel = getPostHearingDocumentType(sscsCaseData).getLabel();
+                    pdfUrlBuilder.append(postHearingDocumentTypeLabel)
+                        .append(" from FTA");
+                    handlePostHearing(sscsCaseData);
+                }
                 break;
             case POSTPONEMENT:
                 pdfUrlBuilder.append("Postponement Request");
@@ -185,6 +190,17 @@ public class PdfRequestUtil {
                 throw new IllegalArgumentException("Unexpected request type: " + postHearing.getRequestType());
         }
         return documentType;
+    }
+
+    public static String getEmbeddedDocumentTypeLabelForPostHearing(SscsCaseData caseData, String embeddedDocumentTypeLabel) {
+        PostHearing postHearing = caseData.getPostHearing();
+        if (isPostHearingsEnabled && nonNull(postHearing.getSetAside().getAction())) {
+            CcdCallbackMap action = postHearing.getSetAside().getAction();
+            boolean isGrantOrRefuseSetAsideAction = action.toString().equals(SetAsideActions.GRANT.getCcdDefinition())
+                    || action.toString().equals(SetAsideActions.REFUSE.getCcdDefinition());
+            embeddedDocumentTypeLabel =  isGrantOrRefuseSetAsideAction ? "Set Aside Decision Notice" : embeddedDocumentTypeLabel;
+        }
+        return embeddedDocumentTypeLabel;
     }
 
 }
