@@ -125,8 +125,6 @@ class PostHearingRequestMidEventHandlerTest {
     @ParameterizedTest
     @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE"}) // TODO add all other types as their feature code is implemented
     void givenGenerateNoticeYes_generateNotice(PostHearingRequestType postHearingRequestType) {
-        ReflectionTestUtils.setField(PdfRequestUtil.class, "isPostHearingsEnabled", true);
-
         String dmUrl = "http://dm-store/documents/123";
         when(generateFile.assemble(any())).thenReturn(dmUrl);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -170,7 +168,6 @@ class PostHearingRequestMidEventHandlerTest {
 
     @Test
     void givenIssueFinalDecisionDateIsNull_throwsException() {
-        ReflectionTestUtils.setField(PdfRequestUtil.class, "isPostHearingsEnabled", true);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
