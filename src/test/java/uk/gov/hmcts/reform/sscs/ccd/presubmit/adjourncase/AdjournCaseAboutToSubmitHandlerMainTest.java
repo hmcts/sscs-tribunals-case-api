@@ -91,7 +91,7 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
         assertThat(sscsCaseData.getAdjournment().getGeneratedDate()).isEqualTo(LocalDate.parse("2023-01-01"));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        LocalDate date= response.getData().getAdjournment().getGeneratedDate();
+        LocalDate date = response.getData().getAdjournment().getGeneratedDate();
         assertThat(date).isEqualTo(LocalDate.now());
     }
 
