@@ -75,11 +75,11 @@ public class SscsUtil {
         }
     }
 
-    public static void addDocumentToDocumentTab(SscsCaseData caseData) {
+    public static void addDocumentToDocumentTab(SscsCaseData caseData, boolean isPostHearingsEnabled) {
         if (nonNull(caseData.getDocumentStaging().getPreviewDocument())) {
             SscsDocumentTranslationStatus documentTranslationStatus = getDocumentTranslationStatus(caseData);
 
-            SscsDocument sscsDocument = createDocument(caseData, documentTranslationStatus);
+            SscsDocument sscsDocument = createDocument(caseData, documentTranslationStatus, isPostHearingsEnabled);
             updateTranslationStatus(caseData, documentTranslationStatus);
 
             addDocumentToCaseDataDocuments(caseData, sscsDocument);
@@ -87,8 +87,9 @@ public class SscsUtil {
     }
 
     public static SscsDocument createDocument(SscsCaseData caseData,
-                                              SscsDocumentTranslationStatus documentTranslationStatus) {
-        DocumentType documentType = getPostHearingReviewDocumentType(caseData.getPostHearing());
+                                              SscsDocumentTranslationStatus documentTranslationStatus,
+                                              boolean isPostHearingsEnabled) {
+        DocumentType documentType = getPostHearingReviewDocumentType(caseData.getPostHearing(), isPostHearingsEnabled);
         String date = LocalDate.now().toString();
 
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
@@ -120,9 +121,9 @@ public class SscsUtil {
         footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, null, null);
     }
 
-    public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing) {
+    public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {
         PostHearingReviewType postHearingReviewType = postHearing.getReviewType();
-        if (nonNull(postHearingReviewType)) {
+        if (isPostHearingsEnabled && nonNull(postHearingReviewType)) {
             switch (postHearingReviewType) {
                 case SET_ASIDE:
                     if (SetAsideActions.REFUSE.equals(postHearing.getSetAside().getAction())) {

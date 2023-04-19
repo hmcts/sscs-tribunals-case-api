@@ -141,7 +141,7 @@ public class IssueDocumentHandlerTest {
 
         String documentTypeLabel = "directions notice";
         LocalDate localDate = LocalDate.now();
-        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, documentTypeLabel, localDate, localDate, false, USER_AUTHORISATION);
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, documentTypeLabel, localDate, localDate, false, false, USER_AUTHORISATION);
         assertEquals("User Lloris", payload.getAppellantFullName());
         assertNull(payload.getAppointeeFullName());
         assertEquals("1", payload.getCaseId());
@@ -230,7 +230,7 @@ public class IssueDocumentHandlerTest {
         String bodyContent = "correction body content";
         sscsCaseData.getDocumentGeneration().setCorrectionBodyContent(bodyContent);
 
-        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, USER_AUTHORISATION);
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, USER_AUTHORISATION);
 
         assertEquals(payload.getNoticeBody(), bodyContent);
     }
@@ -255,7 +255,7 @@ public class IssueDocumentHandlerTest {
         sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
 
         assertThatThrownBy(() ->
-            handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, USER_AUTHORISATION))
+            handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, USER_AUTHORISATION))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("getting the notice body has an unexpected postHearingReviewType: " + postHearingReviewType.getDescriptionEn());
     }
