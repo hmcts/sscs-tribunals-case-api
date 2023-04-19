@@ -66,7 +66,7 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
             caseData.getDocumentGeneration().setSignedBy(userDetailsService.buildLoggedInUserName(userAuthorisation));
             caseData.getDocumentGeneration().setSignedRole(userDetailsService.getUserRole(userAuthorisation));
 
-            response = issueDocument(callback, DECISION_NOTICE, templateId, generateFile, userAuthorisation);
+            response = issueDocument(callback, DECISION_NOTICE, templateId, generateFile, userAuthorisation, isPostHearingsEnabled);
         }
 
         return response;

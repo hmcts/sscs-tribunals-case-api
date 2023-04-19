@@ -73,18 +73,19 @@ public class SscsUtil {
         }
     }
 
-    public static void addDocumentToDocumentTab(SscsCaseData caseData) {
+    public static void addDocumentToDocumentTab(SscsCaseData caseData, boolean isPostHearingsEnabled) {
         SscsDocumentTranslationStatus documentTranslationStatus = getDocumentTranslationStatus(caseData);
 
-        SscsDocument sscsDocument = createDocument(caseData, documentTranslationStatus);
+        SscsDocument sscsDocument = createDocument(caseData, documentTranslationStatus, isPostHearingsEnabled);
         updateTranslationStatus(caseData, documentTranslationStatus);
 
         addDocumentToCaseDataDocuments(caseData, sscsDocument);
     }
 
     public static SscsDocument createDocument(SscsCaseData caseData,
-                                              SscsDocumentTranslationStatus documentTranslationStatus) {
-        DocumentType documentType = getPostHearingReviewDocumentType(caseData.getPostHearing());
+                                              SscsDocumentTranslationStatus documentTranslationStatus,
+                                              boolean isPostHearingsEnabled) {
+        DocumentType documentType = getPostHearingReviewDocumentType(caseData.getPostHearing(), isPostHearingsEnabled);
         String date = LocalDate.now().toString();
 
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
@@ -116,11 +117,13 @@ public class SscsUtil {
         footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, null, null);
     }
 
-    public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing) {
-        if (SetAsideActions.REFUSE.equals(postHearing.getSetAside().getAction())) {
-            return DocumentType.SET_ASIDE_REFUSED;
-        } else if (CorrectionActions.REFUSE.equals(postHearing.getCorrection().getAction())) {
-            return DocumentType.CORRECTION_REFUSED;
+    public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {
+        if (isPostHearingsEnabled) {
+            if (SetAsideActions.REFUSE.equals(postHearing.getSetAside().getAction())) {
+                return DocumentType.SET_ASIDE_REFUSED;
+            } else if (CorrectionActions.REFUSE.equals(postHearing.getCorrection().getAction())) {
+                return DocumentType.CORRECTION_REFUSED;
+            }
         }
 
         return DocumentType.DECISION_NOTICE;
