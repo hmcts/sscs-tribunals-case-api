@@ -31,10 +31,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -50,8 +51,9 @@ import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil;
 
-@Component
 @Slf4j
+@RequiredArgsConstructor
+@Service
 public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private static final Enum<EventType> EVENT_TYPE = EventType.ACTION_FURTHER_EVIDENCE;
     public static final String YES = YesNo.YES.getValue();
@@ -80,16 +82,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private final UserDetailsService userDetailsService;
     private final AddedDocumentsUtil addedDocumentsUtil;
 
-    @Autowired
-    public ActionFurtherEvidenceAboutToSubmitHandler(FooterService footerService,
-                                                     BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder,
-                                                     UserDetailsService userDetailsService,
-                                                     AddedDocumentsUtil addedDocumentsUtil) {
-        this.footerService = footerService;
-        this.bundleAdditionFilenameBuilder = bundleAdditionFilenameBuilder;
-        this.userDetailsService = userDetailsService;
-        this.addedDocumentsUtil = addedDocumentsUtil;
-    }
+    @Value("${feature.postHearings.enabled}")
+    private final boolean isPostHearingsEnabled;
 
     public static void checkWarningsAndErrors(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, String caseId,
                                               boolean ignoreWarnings,
@@ -256,7 +250,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
         }
 
-        if (isSetAsideApplication(sscsCaseData)) {
+        if (isSetAsideApplication(sscsCaseData) && isPostHearingsEnabled) {
             sscsCaseData.setState(State.POST_HEARING);
             sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
             sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
@@ -266,7 +260,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
         }
 
-        if (isCorrectionApplication(sscsCaseData)) {
+        if (isCorrectionApplication(sscsCaseData) && isPostHearingsEnabled) {
             sscsCaseData.setState(State.POST_HEARING);
             sscsCaseData.setDwpState(DwpState.CORRECTION_REQUESTED);
             sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.CORRECTION);
@@ -660,7 +654,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             return CORRECTION_APPLICATION;
         }
 
-        String originalSenderStripped  = originalSenderCode.replaceAll("\\d","");
+        String originalSenderStripped  = originalSenderCode.split("\\d")[0];
 
         final Optional<DocumentType> optionalDocumentType = stream(PartyItemList.values())
             .filter(f -> f.getCode().startsWith(originalSenderStripped))
