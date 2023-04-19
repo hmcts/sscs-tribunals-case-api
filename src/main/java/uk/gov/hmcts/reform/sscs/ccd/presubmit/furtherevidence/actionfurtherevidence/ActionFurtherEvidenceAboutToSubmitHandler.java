@@ -654,7 +654,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             return CORRECTION_APPLICATION;
         }
 
-        String originalSenderStripped  = originalSenderCode.replaceAll("\\d","");
+        String originalSenderStripped  = originalSenderCode.split("\\d")[0];
 
         final Optional<DocumentType> optionalDocumentType = stream(PartyItemList.values())
             .filter(f -> f.getCode().startsWith(originalSenderStripped))
