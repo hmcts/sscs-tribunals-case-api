@@ -242,7 +242,7 @@ public class IssueDocumentHandlerTest {
         String bodyContent = "sor body content";
         sscsCaseData.getDocumentGeneration().setStatementOfReasonsBodyContent(bodyContent);
 
-        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, USER_AUTHORISATION);
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, USER_AUTHORISATION);
 
         assertEquals(payload.getNoticeBody(), bodyContent);
     }
