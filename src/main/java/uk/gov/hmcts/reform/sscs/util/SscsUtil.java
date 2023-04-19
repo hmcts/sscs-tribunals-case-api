@@ -49,7 +49,7 @@ public class SscsUtil {
     }
 
     public static void clearPostHearingFields(SscsCaseData caseData) {
-        caseData.setPostHearing(new PostHearing());
+        caseData.setPostHearing(null);
         clearDocumentTransientFields(caseData);
     }
 
