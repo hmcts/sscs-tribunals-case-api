@@ -250,7 +250,7 @@ public class IssueDocumentHandlerTest {
     @EnumSource(
         value = PostHearingReviewType.class,
         names = {"LIBERTY_TO_APPLY", "PERMISSION_TO_APPEAL"})
-    public void givenPostHearingReviewIsLibertyToApply_thenThrowException(PostHearingReviewType postHearingReviewType) {
+    public void givenPostHearingReviewIsNotImplemented_thenThrowException(PostHearingReviewType postHearingReviewType) {
         SscsCaseData sscsCaseData = buildCaseData();
         sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
 

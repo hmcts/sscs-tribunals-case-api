@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -120,8 +121,9 @@ public class SscsUtil {
     }
 
     public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing) {
-        if (nonNull(postHearing.getReviewType())) {
-            switch (postHearing.getReviewType()) {
+        PostHearingReviewType postHearingReviewType = postHearing.getReviewType();
+        if (nonNull(postHearingReviewType)) {
+            switch (postHearingReviewType) {
                 case SET_ASIDE:
                     if (SetAsideActions.REFUSE.equals(postHearing.getSetAside().getAction())) {
                         return DocumentType.SET_ASIDE_REFUSED;
@@ -141,7 +143,8 @@ public class SscsUtil {
                 case LIBERTY_TO_APPLY:
                 case PERMISSION_TO_APPEAL:
                 default:
-                    break;
+                    throw new IllegalArgumentException("getting the document type has an unexpected postHearingReviewType: "
+                        + postHearingReviewType.getDescriptionEn());
             }
         }
 
