@@ -348,16 +348,8 @@ ccd:
       - caseworker-sscs-panelmember
       - caseworker-sscs-bulkscan
       - caseworker-sscs-pcqextractor
-
 elastic:
   enabled: true
-  elasticsearch:
-    nameOverride: ${SERVICE_NAME}-es
-    clusterName: "es"
-    replicas: 1
-  logstash:
-    image:
-    tag: ccd-cmc-logstash-latest
 
 sscs-evidence-share:
   enabled: false
