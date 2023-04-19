@@ -17,7 +17,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.cglib.core.Local;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
@@ -87,16 +86,15 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
 
     @DisplayName("When a previous write adjournment notice in place and you call the event the second time the generated date needs to be updated so its reflected in the issue adjournment event")
     @Test
-    void givenPreviousWritenAdjournCaseTriggerAnotherThenCheckIssueAdjournmentHasMostRecentDate(){
-
+    void givenPreviousWritenAdjournCaseTriggerAnotherThenCheckIssueAdjournmentHasMostRecentDate() {
         sscsCaseData.getAdjournment().setGeneratedDate(LocalDate.parse("2023-01-01"));
         assertThat(sscsCaseData.getAdjournment().getGeneratedDate()).isEqualTo(LocalDate.parse("2023-01-01"));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         LocalDate date= response.getData().getAdjournment().getGeneratedDate();
         assertThat(date).isEqualTo(LocalDate.now());
-
     }
+
     @DisplayName("When adjournment is disabled and case is LA, then should not send any messages")
     @Test
     void givenFeatureFlagDisabled_thenNoMessageIsSent() {
