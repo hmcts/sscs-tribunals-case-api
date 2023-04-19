@@ -50,7 +50,7 @@ public class SscsUtil {
     }
 
     public static void clearPostHearingFields(SscsCaseData caseData) {
-        caseData.setPostHearing(PostHearing.builder().build());
+        caseData.setPostHearing(null);
         clearDocumentTransientFields(caseData);
     }
 
