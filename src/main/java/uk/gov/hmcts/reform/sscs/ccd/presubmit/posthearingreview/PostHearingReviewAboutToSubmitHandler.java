@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 import lombok.RequiredArgsConstructor;
@@ -35,26 +34,13 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
                                                           String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        updateCaseStatus(caseData);
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        String caseId = caseData.getCcdCaseId();
-
         PostHearing postHearing = caseData.getPostHearing();
-        log.info("Review Post Hearing App: handling action {} for case {}", postHearing.getReviewType(),  caseId);
+        log.info("Review Post Hearing App: handling action {} for case {}", postHearing.getReviewType(),  caseData.getCcdCaseId());
 
         SscsUtil.addDocumentToDocumentTab(caseData);
 
         return response;
-    }
-
-    protected void updateCaseStatus(SscsCaseData caseData) {
-        PostHearing postHearing = caseData.getPostHearing();
-        if (nonNull(postHearing) && nonNull(postHearing.getSetAside().getAction())
-                && postHearing.getSetAside().getAction().equals(SetAsideActions.GRANT)) {
-            caseData.setState(State.NOT_LISTABLE);
-            caseData.setDwpState(DwpState.SET_ASIDE_GRANTED);
-            caseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION);
-        }
     }
 }
