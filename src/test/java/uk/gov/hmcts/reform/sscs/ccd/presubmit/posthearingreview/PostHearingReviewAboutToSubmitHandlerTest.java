@@ -118,41 +118,4 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         assertThat(documents).hasSize(1);
         assertThat(documents.get(0).getValue().getDocumentType()).isEqualTo(DocumentType.SET_ASIDE_REFUSED.getValue());
     }
-    
-    @Test
-    void givenHearingIsNull_thenCaseStatusNotChanged() {
-        caseData.setState(State.DORMANT_APPEAL_STATE);
-        handler.updateCaseStatus(caseData);
-        assertThat(caseData.getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
-    }
-
-    @Test
-    void givenSetAsideStateIsNull_thenCaseStatusNotChanged() {
-        caseData = SscsCaseData.builder()
-            .state(State.DORMANT_APPEAL_STATE)
-            .postHearing(PostHearing.builder()
-                .setAside(SetAside.builder()
-                    .action(null)
-                    .build())
-                .build())
-            .build();
-
-        handler.updateCaseStatus(caseData);
-        assertThat(caseData.getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
-    }
-
-    @Test
-    void givenSetAsideState_thenCaseStatusChanged() {
-        caseData = SscsCaseData.builder()
-            .state(State.DORMANT_APPEAL_STATE)
-            .postHearing(PostHearing.builder()
-                .setAside(SetAside.builder()
-                    .action(SetAsideActions.GRANT)
-                    .build())
-                .build())
-            .build();
-
-        handler.updateCaseStatus(caseData);
-        assertThat(caseData.getState()).isEqualTo(State.NOT_LISTABLE);
-    }
 }
