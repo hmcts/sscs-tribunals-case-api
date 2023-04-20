@@ -9,16 +9,17 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdminCorrectionType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
+import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private final DecisionNoticeService decisionNoticeService;
+    private final PreviewDocumentService previewDocumentService;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
@@ -42,18 +43,21 @@ public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallb
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
             new PreSubmitCallbackResponse<>(sscsCaseData);
 
         String ccdCaseId = sscsCaseData.getCcdCaseId();
+
         log.info("Handling admin correction for case: {}", ccdCaseId);
         AdminCorrectionType adminCorrectionType = sscsCaseData.getPostHearing().getCorrection().getAdminCorrectionType();
+
         if (AdminCorrectionType.HEADER.equals(adminCorrectionType)) {
-            // Only header correction requires further action
-            // Body correction is sent straight to review by judge
             log.info("Handling header correction for case: {}", ccdCaseId);
-            // save the corrected document to case (whether generated or uploaded
+            decisionNoticeService.handleFinalDecisionNotice(sscsCaseData, preSubmitCallbackResponse, previewDocumentService);
+
+        } else if (AdminCorrectionType.BODY.equals(adminCorrectionType)) {
+            log.info("Sending body correction to judge for case: {}", ccdCaseId);
+
         }
 
         return preSubmitCallbackResponse;

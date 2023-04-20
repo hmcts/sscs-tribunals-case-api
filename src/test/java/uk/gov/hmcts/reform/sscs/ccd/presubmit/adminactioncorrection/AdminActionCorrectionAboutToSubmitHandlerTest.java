@@ -16,12 +16,16 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
+import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 
 @ExtendWith(MockitoExtension.class)
 class AdminActionCorrectionAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private AdminActionCorrectionAboutToSubmitHandler handler;
+    private DecisionNoticeService decisionNoticeService;
+    private PreviewDocumentService previewDocumentService;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -33,7 +37,7 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new AdminActionCorrectionAboutToSubmitHandler(true);
+        handler = new AdminActionCorrectionAboutToSubmitHandler(decisionNoticeService,  previewDocumentService, true);
 
         caseData = SscsCaseData.builder()
             .ccdCaseId("1234")
@@ -59,7 +63,7 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new AdminActionCorrectionAboutToSubmitHandler(false);
+        handler = new AdminActionCorrectionAboutToSubmitHandler(decisionNoticeService,  previewDocumentService, false);
         when(callback.getEvent()).thenReturn(ADMIN_ACTION_CORRECTION);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }

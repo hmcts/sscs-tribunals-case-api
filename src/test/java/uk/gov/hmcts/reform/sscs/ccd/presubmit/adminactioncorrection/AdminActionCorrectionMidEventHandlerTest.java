@@ -1,28 +1,40 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adminactioncorrection;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_ACTION_CORRECTION;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdminCorrectionType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
+import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 
 @ExtendWith(MockitoExtension.class)
 class AdminActionCorrectionMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
+
+    private static final String URL = "http://dm-store/documents/123";
+    private static final String TEMPLATE_ID = "TB-SCS-GNO-ENG-00091.docx";
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -33,15 +45,34 @@ class AdminActionCorrectionMidEventHandlerTest {
     private SscsCaseData caseData;
 
     private AdminActionCorrectionMidEventHandler handler;
+    @Mock
+    private DocumentConfiguration documentConfiguration;
+    @Mock
+    private GenerateFile generateFile;
+    private ArgumentCaptor<GenerateFileParams> capture;
+
 
 
     @BeforeEach
     void setUp() {
-        handler = new AdminActionCorrectionMidEventHandler(true);
+        handler = new AdminActionCorrectionMidEventHandler(documentConfiguration, generateFile, true);
 
         caseData = SscsCaseData.builder()
             .ccdCaseId("1234")
+            .documentGeneration(DocumentGeneration.builder()
+                .generateNotice(YES)
+                .build())
+            .appeal(Appeal.builder().appellant(Appellant.builder()
+                .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
+                .identity(Identity.builder().build()).build()).build())
+            .directionDueDate(LocalDate.now().plusDays(1).toString())
+            .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                .hearingRoute(LIST_ASSIST)
+                .build())
             .build();
+
+        capture = ArgumentCaptor.forClass(GenerateFileParams.class);
+
     }
 
     @Test
@@ -63,7 +94,7 @@ class AdminActionCorrectionMidEventHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new AdminActionCorrectionMidEventHandler(false);
+        handler = new AdminActionCorrectionMidEventHandler(documentConfiguration, generateFile, false);
         when(callback.getEvent()).thenReturn(ADMIN_ACTION_CORRECTION);
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
@@ -86,29 +117,58 @@ class AdminActionCorrectionMidEventHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(ADMIN_ACTION_CORRECTION);
         when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(generateFile.assemble(any())).thenReturn(URL);
+        when(documentConfiguration.getDocuments()).thenReturn(new HashMap<>(Map.of(
+            LanguagePreference.ENGLISH,  new HashMap<>(Map.of(
+                DECISION_ISSUED, TEMPLATE_ID)
+            ))
+        ));
 
         caseData.getPostHearing().getCorrection().setAdminCorrectionType(AdminCorrectionType.HEADER);
-        // TODO set finalDecisionNoticeGenerated to YES
+        caseData.setFinalDecisionNoticeGenerated(YesNo.YES);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        // TODO expect document generation to be called with current details
+        // TODO expect document regeneration
+        DocumentLink previewDocument = response.getData().getDocumentStaging().getPreviewDocument();
+        assertThat(previewDocument).isNotNull();
+
+        String expectedFilename = String.format("Decision Notice issued on %s.pdf",
+            LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+
+        assertThat(previewDocument.getDocumentFilename()).isEqualTo(expectedFilename);
+        assertThat(previewDocument.getDocumentBinaryUrl()).isEqualTo(URL + "/binary");
+        assertThat(previewDocument.getDocumentUrl()).isEqualTo(URL);
+
+        verify(generateFile, times(1)).assemble(any());
+
+        verify(generateFile, atLeastOnce()).assemble(capture.capture());
+
+        var value = capture.getValue();
+        NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
+        assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
+        assertThat(payload.getNoticeType()).isEqualTo("DECISION NOTICE");
+        assertThat(payload.getAppellantFullName()).isEqualTo("Appellant Lastname");
+        assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
     }
 
     @Test
-    void givenHeaderCorrection_andFinalDecisionWasUploaded_expectCorrectedDocumentToBeUploaded() {
+    void givenHeaderCorrection_andFinalDecisionWasUploaded_doNotGenerateNotice() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(ADMIN_ACTION_CORRECTION);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         caseData.getPostHearing().getCorrection().setAdminCorrectionType(AdminCorrectionType.HEADER);
-        // TODO set finalDecisionNoticeGenerated to NO
+        caseData.setFinalDecisionNoticeGenerated(YesNo.NO);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        // TODO expect document upload
+        DocumentLink previewDocument = response.getData().getDocumentStaging().getPreviewDocument();
+        assertThat(previewDocument).isNull();
+
+        verifyNoInteractions(generateFile);
     }
 
     @Test
