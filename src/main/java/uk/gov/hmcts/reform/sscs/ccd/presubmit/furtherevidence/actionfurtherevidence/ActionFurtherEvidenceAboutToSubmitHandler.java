@@ -456,10 +456,20 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private void setReinstateCaseFieldsIfReinstatementRequest(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
         if (REINSTATEMENT_REQUEST.getValue().equals(sscsDocument.getValue().getDocumentType())) {
-            if (isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL.getCode())) {
+            if (checkIfPossibleToReinstateCaseFields(sscsCaseData.getFurtherEvidenceAction())) {
                 setReinstateCaseFields(sscsCaseData);
             }
         }
+    }
+
+    private boolean checkIfPossibleToReinstateCaseFields(DynamicList furtherEvidenceAction) {
+        return isFurtherEvidenceActionCode(furtherEvidenceAction, ISSUE_FURTHER_EVIDENCE.getCode())
+                || isFurtherEvidenceActionCode(furtherEvidenceAction, OTHER_DOCUMENT_MANUAL.getCode())
+                || isFurtherEvidenceActionCode(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode())
+                || isFurtherEvidenceActionCode(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
+                || isFurtherEvidenceActionCode(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())
+                || isFurtherEvidenceActionCode(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode());
+
     }
 
     private void setTranslationWorkOutstanding(SscsCaseData sscsCaseData) {
