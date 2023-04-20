@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.LocalDate;
@@ -53,7 +54,7 @@ public class PdfRequestUtil {
         StringBuilder pdfUrlBuilder = new StringBuilder();
         switch (pdfType) {
             case POST_HEARING:
-                String postHearingDocumentTypeLabel = getPostHearingDocumentType(sscsCaseData).getLabel();
+                String postHearingDocumentTypeLabel = getPostHearingDocumentType(sscsCaseData.getPostHearing().getRequestType()).getLabel();
                 pdfUrlBuilder.append(postHearingDocumentTypeLabel)
                     .append(" from FTA");
                 handlePostHearing(sscsCaseData);
@@ -170,21 +171,21 @@ public class PdfRequestUtil {
             .build();
     }
 
-    public static DocumentType getPostHearingDocumentType(SscsCaseData sscsCaseData) {
-        PostHearing postHearing = sscsCaseData.getPostHearing();
-        DocumentType documentType;
-
-        switch (postHearing.getRequestType()) {
-            case SET_ASIDE:
-                documentType = DocumentType.SET_ASIDE_APPLICATION;
-                break;
-            case CORRECTION:
-                documentType = DocumentType.CORRECTION_APPLICATION;
-                break;
-            default:
-                throw new IllegalArgumentException("Unexpected request type: " + postHearing.getRequestType());
+    public static DocumentType getPostHearingDocumentType(PostHearingRequestType postHearingRequestType) {
+        if (nonNull(postHearingRequestType)) {
+            switch (postHearingRequestType) {
+                case SET_ASIDE:
+                    return DocumentType.SET_ASIDE_APPLICATION;
+                case CORRECTION:
+                    return DocumentType.CORRECTION_APPLICATION;
+                case STATEMENT_OF_REASONS:
+                    return DocumentType.STATEMENT_OF_REASONS_APPLICATION;
+                default:
+                    break;
+            }
         }
-        return documentType;
+
+        throw new IllegalArgumentException("Unexpected request type: " + postHearingRequestType);
     }
 
 }
