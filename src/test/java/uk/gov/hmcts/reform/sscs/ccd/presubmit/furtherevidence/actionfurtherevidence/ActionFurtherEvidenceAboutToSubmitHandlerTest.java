@@ -14,9 +14,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.DORMANT_APPEAL_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceAboutToSubmitHandler.ACTIONS_THAT_REQUIRES_EVIDENCE_ISSUED_SET_TO_YES_AND_NOT_BULK_PRINTED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceAboutToSubmitHandler.FURTHER_EVIDENCE_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ADMIN_ACTION_CORRECTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
@@ -65,6 +67,7 @@ import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 @RunWith(JUnitParamsRunner.class)
 public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
+    public static final DocumentLink DOC_LINK = DocumentLink.builder().documentUrl("test.com").build();
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String NO = "No";
     private static final String YES = "Yes";
@@ -94,7 +97,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
-            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
+            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
         when(callback.isIgnoreWarnings()).thenReturn(true);
@@ -199,8 +202,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"setAsideApplication"})
+    @Parameters({"setAsideApplication", "correctionApplication"})
     public void givenAValidPostHearingApplicationRequest_thenInterlocReviewStateAndCaseStateUpdated(String documentType) {
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true);
+
         DynamicListItem sendToInterlocListItem = new DynamicListItem(
                 FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
                 FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
@@ -209,11 +214,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
 
-        DocumentLink docLink = DocumentLink.builder().documentUrl("test.com").build();
         ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
                 .type(documentType)
-                .fileName("Test.pdg")
-                .url(docLink)
+                .fileName("Test.pdf")
+                .url(DOC_LINK)
                 .build();
         ScannedDocument scannedDocument = ScannedDocument.builder()
                 .value(scannedDocDetails)
@@ -228,8 +232,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"setAsideApplication"})
-    public void giveAValidPostHearingApplicationRequestFromAnFtaUser_thenDwpStateIsUpdatedToSetAsideRequested(String documentType) {
+    @Parameters({
+        "setAsideApplication, SET_ASIDE_REQUESTED, SET_ASIDE",
+        "correctionApplication, CORRECTION_REQUESTED, CORRECTION"
+    })
+    public void giveAValidPostHearingApplicationRequestFromAnFtaUser_thenDwpStateIsUpdatedAndDocumentIsExpectedType(
+        String documentType,
+        DwpState dwpState,
+        PostHearingRequestType requestType
+    ) {
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true);
+
         DynamicListItem sendToInterlocListItem = new DynamicListItem(
                 FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
                 FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
@@ -238,11 +251,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
 
-        DocumentLink docLink = DocumentLink.builder().documentUrl("test.com").build();
         ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
                 .type(documentType)
-                .fileName("Test.pdg")
-                .url(docLink)
+                .fileName("Test.pdf")
+                .url(DOC_LINK)
                 .build();
         ScannedDocument scannedDocument = ScannedDocument.builder()
                 .value(scannedDocDetails)
@@ -254,12 +266,50 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
                 ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getDwpState(), is(DwpState.SET_ASIDE_REQUESTED));
+        assertThat(response.getData().getDwpState(), is(dwpState));
+        assertThat(response.getData().getPostHearing().getRequestType(), is(requestType));
+        SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
+        assertThat(sscsDocumentDetail.getDocumentType(), is(documentType));
+    }
+
+    @Test
+    public void giveAValidCorrectionApplicationWithAdminCorrectionActionSelected_thenDwpStateIsUpdated() {
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true);
+
+        DynamicListItem sendToInterlocListItem = new DynamicListItem(
+            FurtherEvidenceActionDynamicListItems.ADMIN_ACTION_CORRECTION.getCode(),
+            FurtherEvidenceActionDynamicListItems.ADMIN_ACTION_CORRECTION.getLabel());
+
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
+
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+            .type("correctionApplication")
+            .fileName("Test.pdf")
+            .url(DOC_LINK)
+            .build();
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+            .value(scannedDocDetails)
+            .build();
+
+        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
+            ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getDwpState(), is(DwpState.CORRECTION_REQUESTED));
+        assertThat(response.getData().getPostHearing().getRequestType(), is(PostHearingRequestType.CORRECTION));
+        SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
+        assertThat(sscsDocumentDetail.getDocumentType(), is("correctionApplication"));
+        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.AWAITING_ADMIN_ACTION));
     }
 
     @Test
     @Parameters({"setAsideApplication"})
     public void givenAValidPostHearingRequestWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError(String documentType) {
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true);
+
         DynamicListItem issueEvidenceAction = new DynamicListItem(
                 FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getCode(),
                 FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getLabel());
@@ -268,11 +318,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         sscsCaseData.getFurtherEvidenceAction().setValue(issueEvidenceAction);
 
-        DocumentLink docLink = DocumentLink.builder().documentUrl("test.com").build();
         ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
                 .type(documentType)
-                .fileName("Test.pdg")
-                .url(docLink)
+                .fileName("Test.pdf")
+                .url(DOC_LINK)
                 .build();
         ScannedDocument scannedDocument = ScannedDocument.builder()
                 .value(scannedDocDetails)
@@ -285,8 +334,40 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors(), hasSize(1));
         assertThat(response.getErrors(), hasItem(
-                String.format("Further evidence action must be set to '%s'",
+                String.format("'Further Evidence Action' must be set to '%s'",
                         SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel())));
+    }
+
+    @Test
+    public void givenAValidCorrectionApplicationWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError() {
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true);
+
+        DynamicListItem issueEvidenceAction = new DynamicListItem(
+            FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getCode(),
+            FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getLabel());
+
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.getFurtherEvidenceAction().setValue(issueEvidenceAction);
+
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+            .type("correctionApplication")
+            .fileName("Test.pdf")
+            .url(DOC_LINK)
+            .build();
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+            .value(scannedDocDetails)
+            .build();
+
+        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
+            ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors(), hasSize(1));
+        assertThat(response.getErrors(), hasItem(
+            String.format("'Further Evidence Action' must be set to '%s' or '%s'",
+                SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel(), ADMIN_ACTION_CORRECTION.getLabel())));
     }
 
     @Test
@@ -297,6 +378,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "setAsideApplication,HMCTS"
     })
     public void givenAValidPostHearingRequestFromParty_thenOriginalSenderSetOnSscsDocument(String documentType, PartyItemList sender) {
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true);
+
         DynamicListItem sendToInterlocListItem = new DynamicListItem(
                 FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
                 FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
@@ -333,6 +416,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "setAsideApplication,HMCTS"
     })
     public void givenValidAPostHearingRequestFromParty_thenAddFooterTextToDocument(String documentType, PartyItemList sender) {
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true);
+
         DynamicListItem sendToInterlocListItem = new DynamicListItem(
                 FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
                 FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
@@ -370,6 +455,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "setAsideApplication,REPRESENTATIVE"
     })
     public void givenValidAPostHearingRequestFromPartyWhenIncludeInBundle_thenAddDocumentToBundle(String documentType, PartyItemList sender) {
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true);
+
         when(footerService.getNextBundleAddition(any())).thenReturn("A");
         when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
 
@@ -845,7 +932,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-            ScannedDocumentDetails.builder().fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build())
+            ScannedDocumentDetails.builder().fileName("Testing.jpg").url(DOC_LINK)
                 .editedUrl(DocumentLink.builder().documentUrl("test").build()).build()).build();
 
         docs.add(scannedDocument);
@@ -867,7 +954,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-            ScannedDocumentDetails.builder().fileName("Testing.jpg").url(DocumentLink.builder().documentUrl("test.com").build())
+            ScannedDocumentDetails.builder().fileName("Testing.jpg").url(DOC_LINK)
                 .editedUrl(DocumentLink.builder().documentUrl("test").build()).build()).build();
 
         docs.add(scannedDocument);
@@ -887,7 +974,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-            ScannedDocumentDetails.builder().fileName(filename).url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName(filename).url(DOC_LINK).build()).build();
 
         docs.add(scannedDocument);
 
@@ -906,7 +993,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Parameters({"null", "DORMANT_APPEAL_STATE", "VOID_STATE"})
     public void shouldReviewByJudgeAndUpdatePreviousStateWhenActionManuallyAndHasReinstatementRequestDocument(@Nullable State previousState) {
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false);
 
         List<ScannedDocument> docs = new ArrayList<>();
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
@@ -914,7 +1001,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.REINSTATEMENT_REQUEST.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -929,7 +1016,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Parameters({"VALID_APPEAL", "READY_TO_LIST"})
     public void shouldReviewByJudgeButNotUpdatePreviousStateWhenActionManuallyAndHasReinstatementRequestDocument(@Nullable State previousState) {
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false);
 
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
@@ -937,7 +1024,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.REINSTATEMENT_REQUEST.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -954,7 +1041,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         State previousState = State.VALID_APPEAL;
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false);
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
         sscsCaseData.setPreviousState(previousState);
@@ -962,7 +1049,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.REINSTATEMENT_REQUEST.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -979,7 +1066,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Parameters({"VALID_APPEAL", "READY_TO_LIST"})
     public void shouldReviewByJudgeButNotUpdatePreviousStateWhenActionManuallyAndHasUrgentHearingRequestDocument(@Nullable State previousState) {
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false);
 
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
@@ -987,7 +1074,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(NO).build()).build();
+                .url(DOC_LINK).includeInBundle(NO).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1001,7 +1088,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Parameters({"READY_TO_LIST,1", "RESPONSE_RECEIVED,1", "DORMANT_APPEAL_STATE,1", "HEARING,1", "WITH_DWP,1", "VALID_APPEAL,0", "NOT_LISTABLE,1"})
     public void shouldSetBundleAdditionBasedOnPreviousState(@Nullable State state, int occurrs) {
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false);
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.code, ISSUE_FURTHER_EVIDENCE.label));
         when(caseDetails.getState()).thenReturn(state);
@@ -1009,7 +1096,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
 
         docs.add(scannedDocument);
@@ -1028,7 +1115,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,Yes,1", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,No,0"})
     public void shouldSetBundleAdditionBasedOnFurtherEvidenceActionType(FurtherEvidenceActionDynamicListItems actionType, String includeInBundle, int occurs) {
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true);
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(actionType.code, actionType.label));
 
@@ -1039,7 +1126,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             .builder()
             .value(
                 ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
-                    .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(includeInBundle).build()).build();
+                    .url(DOC_LINK).includeInBundle(includeInBundle).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
 
         docs.add(scannedDocument);
@@ -1048,6 +1135,37 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(occurs, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
+        assertEquals(0, response.getWarnings().size());
+    }
+
+    @Test
+    @Parameters({"ADMIN_ACTION_CORRECTION","SEND_TO_INTERLOC_REVIEW_BY_JUDGE"})
+    public void shouldSetBundleAdditionForCorrectionApplication(FurtherEvidenceActionDynamicListItems actionType) {
+
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false);
+
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(actionType.code, actionType.label));
+
+        when(caseDetails.getState()).thenReturn(DORMANT_APPEAL_STATE);
+        when(footerService.getNextBundleAddition(any())).thenReturn("A");
+
+        ScannedDocumentDetails scannedDocumentDetails = ScannedDocumentDetails.builder()
+            .fileName("filename.pdf")
+            .type(ScannedDocumentType.CORRECTION_APPLICATION.getValue())
+            .url(DOC_LINK)
+            .includeInBundle("Yes")
+            .build();
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+            .value(scannedDocumentDetails)
+            .build();
+        List<ScannedDocument> docs = new ArrayList<>();
+
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
         assertEquals(0, response.getWarnings().size());
     }
 
@@ -1079,8 +1197,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setPreviousState(null);
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.REINSTATEMENT_REQUEST.getValue())
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.REINSTATEMENT_REQUEST.getValue())
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1102,7 +1220,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1135,7 +1253,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1157,7 +1275,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(NO).build()).build();
+                .url(DOC_LINK).includeInBundle(NO).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1177,7 +1295,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(NO).build()).build();
+                .url(DOC_LINK).includeInBundle(NO).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1198,7 +1316,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1217,7 +1335,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1234,7 +1352,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1252,7 +1370,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build())
+                .url(DOC_LINK)
                 .originalSenderOtherPartyId("1")
                 .originalSenderOtherPartyName("Other Party")
                 .build()).build();
@@ -1275,7 +1393,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1295,7 +1413,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1314,7 +1432,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1335,7 +1453,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1363,7 +1481,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
                 .originalSenderOtherPartyId("otherPartyUnknown")
                 .originalSenderOtherPartyName("unknown name")
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1389,7 +1507,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
                 .originalSenderOtherPartyId(null)
                 .originalSenderOtherPartyName(null)
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1414,7 +1532,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
                 .originalSenderOtherPartyId("10")
                 .originalSenderOtherPartyName("John Smith")
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1435,7 +1553,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
                 .originalSenderOtherPartyId("10")
                 .originalSenderOtherPartyName("John Smith")
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1452,7 +1570,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1471,7 +1589,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CHERISHED.getValue())
                 .includeInBundle(YES)
-                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1496,7 +1614,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     })
     public void shouldAddDocumentToBundleBasedOnFurtherEvidenceActionType(FurtherEvidenceActionDynamicListItems actionType, String includeInBundle, int occurs) {
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false);
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(actionType.code, actionType.label));
 
@@ -1507,7 +1625,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             .builder()
             .value(
                 ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                    .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(includeInBundle).build()).build();
+                    .url(DOC_LINK).includeInBundle(includeInBundle).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1527,7 +1645,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             .builder()
             .value(
                 ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                    .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                    .url(DOC_LINK).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -1559,7 +1677,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,Yes,0", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,No,0", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,null,1"})
     public void shouldSetBundleAdditionWarningBasedOnFurtherEvidenceActionType(FurtherEvidenceActionDynamicListItems actionType, String includeInBundle, int warnings) {
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false));
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false);
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(actionType.code, actionType.label));
 
         when(callback.isIgnoreWarnings()).thenReturn(false);
@@ -1569,7 +1687,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             .builder()
             .value(
                 ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.OTHER.getValue())
-                    .url(DocumentLink.builder().documentUrl("test.com").build()).includeInBundle(includeInBundle).build()).build();
+                    .url(DOC_LINK).includeInBundle(includeInBundle).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
 
         docs.add(scannedDocument);
@@ -1644,7 +1762,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Test
     public void givenACaseWithScannedDocuments_shouldGenerateAMapOfSscsDocuments() throws JsonProcessingException {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
-            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true));
+            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true), false);
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
                 .fileName("new_test.pdf")
@@ -1673,7 +1791,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     public void givenACaseWithScannedDocumentsSubmittedMultipleTimes_shouldGenerateAMapOfSscsDocumentsWithTheMostRecentDocuments()
         throws JsonProcessingException {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
-            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true));
+            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true), false);
         ScannedDocument reinstatementRequestScannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
                 .fileName("new_test.pdf")
@@ -1716,7 +1834,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Test
     public void givenACaseWithNoScannedDocument_shouldClearAddedDocuments() {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
-            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true));
+            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true), false);
 
         sscsCaseData.setScannedDocuments(null);
         sscsCaseData.setWorkAllocationFields(WorkAllocationFields.builder()
@@ -1734,7 +1852,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Test
     public void givenACaseWithScannedDocumentCoversheet_shouldGenerateAnEmptyMapOfSscsDocuments() {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
-            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true));
+            bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true), false);
         List<ScannedDocument> scannedDocuments = new ArrayList<>();
         scannedDocuments.add(ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()

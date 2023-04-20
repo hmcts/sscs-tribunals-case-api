@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 
@@ -153,7 +154,8 @@ public class IssueDocumentHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = SetAsideActions.class, names = {"GRANT", "REFUSE"})
-    public void givenSetAsideState_thenReturnSetAsideDecisionNotice(SetAsideActions setAsideActions) {
+    void givenSetAsideState_andPostHearingsIsEnabled_thenReturnSetAsideDecisionNotice(SetAsideActions setAsideActions) {
+        final String originalLabel = "label";
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("1")
             .postHearing(PostHearing.builder()
@@ -163,9 +165,30 @@ public class IssueDocumentHandlerTest {
                 .build())
             .build();
 
-        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, "adfdsf2");
+        boolean isPostHearingsEnabled = true;
+        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, originalLabel, isPostHearingsEnabled);
 
-        assertEquals("Set Aside Decision Notice", documentTypeLabel);
+        String expectedLabel = "Set Aside Decision Notice";
+        assertThat(documentTypeLabel).isEqualTo(expectedLabel);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = SetAsideActions.class, names = {"GRANT", "REFUSE"})
+    void givenSetAsideState_andPostHearingsIsDisabled_thenReturnOriginalLabel(SetAsideActions setAsideActions) {
+        final String originalLabel = "label";
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("1")
+            .postHearing(PostHearing.builder()
+                .setAside(SetAside.builder()
+                    .action(setAsideActions)
+                    .build())
+                .build())
+            .build();
+
+        boolean isPostHearingsEnabled = false;
+        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, originalLabel, isPostHearingsEnabled);
+
+        assertThat(documentTypeLabel).isEqualTo(originalLabel);
     }
 
     @Test
@@ -180,7 +203,7 @@ public class IssueDocumentHandlerTest {
                .build())
             .build();
 
-        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel);
+        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel, false);
         assertEquals(expectedDefaultDocumentLabel, documentTypeLabel);
     }
 
@@ -191,7 +214,7 @@ public class IssueDocumentHandlerTest {
             .ccdCaseId("1")
             .build();
 
-        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel);
+        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel, false);
         assertEquals(expectedDefaultDocumentLabel, documentTypeLabel);
     }
 
