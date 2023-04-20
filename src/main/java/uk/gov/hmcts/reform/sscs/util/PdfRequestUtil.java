@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -18,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.PdfRequestTemplateBody;
 @Slf4j
 public class PdfRequestUtil {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    public static final String POST_HEARING_REQUEST_FILE_SUFFIX = " Application from FTA.pdf";
     private static String requestDetails;
     private static String title;
     private static StringBuilder additionalRequestDetails;
@@ -45,8 +48,8 @@ public class PdfRequestUtil {
         SscsCaseData sscsCaseData,
         PreSubmitCallbackResponse<SscsCaseData> response,
         GenerateFile generateFile,
-        String templateId
-    ) {
+        String templateId,
+        boolean isPostHearingsEnabled) {
         log.debug("Executing processRequestPdfAndSetPreviewDocument for caseId: {}", sscsCaseData.getCcdCaseId());
 
         additionalRequestDetails = new StringBuilder();
@@ -57,7 +60,7 @@ public class PdfRequestUtil {
                 String postHearingDocumentTypeLabel = getPostHearingDocumentType(sscsCaseData.getPostHearing().getRequestType()).getLabel();
                 pdfUrlBuilder.append(postHearingDocumentTypeLabel)
                     .append(" from FTA");
-                handlePostHearing(sscsCaseData);
+                handlePostHearing(sscsCaseData, isPostHearingsEnabled);
                 break;
             case POSTPONEMENT:
                 pdfUrlBuilder.append("Postponement Request");
@@ -107,14 +110,14 @@ public class PdfRequestUtil {
         title = "Postponement Request from FTA";
     }
 
-    private static void handlePostHearing(SscsCaseData sscsCaseData) {
-        requestDetails = sscsCaseData.getDocumentGeneration().getBodyContent();
+    private static void handlePostHearing(SscsCaseData sscsCaseData, boolean isPostHearingsEnabled) {
+        requestDetails = getNoticeBody(sscsCaseData, isPostHearingsEnabled);
         LocalDate issueFinalDecisionDate = sscsCaseData.getIssueFinalDecisionDate();
-        if (issueFinalDecisionDate == null) {
+        if (isNull(issueFinalDecisionDate)) {
             throw new IllegalArgumentException("issueFinalDecisionDate unexpectedly null for caseId: " + sscsCaseData.getCcdCaseId());
         }
 
-        setRequestDetailsForPostHearingType(sscsCaseData);
+        requestDetails = getRequestDetailsForPostHearingType(sscsCaseData);
 
         String requestTypeDescriptionEn = sscsCaseData.getPostHearing().getRequestType().getDescriptionEn();
         additionalRequestDetails.append("Date of decision issued: ")
@@ -129,21 +132,25 @@ public class PdfRequestUtil {
     }
 
 
-    protected static void setRequestDetailsForPostHearingType(SscsCaseData sscsCaseData) {
+    protected static String getRequestDetailsForPostHearingType(SscsCaseData sscsCaseData) {
         PostHearingRequestType postHearingRequestType = sscsCaseData.getPostHearing().getRequestType();
-        switch (postHearingRequestType) {
-            case SET_ASIDE:
-                requestDetails = sscsCaseData.getDocumentGeneration().getBodyContent();
-                break;
-            case CORRECTION:
-                requestDetails = sscsCaseData.getDocumentGeneration().getCorrectionBodyContent();
-                break;
-            case STATEMENT_OF_REASONS:
-            case PERMISSION_TO_APPEAL:
-            case LIBERTY_TO_APPLY:
-            default:
-                throw new IllegalArgumentException("handlePostHearing has unexpected postHearingRequestType: " + postHearingRequestType);
+
+        if (nonNull(postHearingRequestType)) {
+            switch (postHearingRequestType) {
+                case SET_ASIDE:
+                    return sscsCaseData.getDocumentGeneration().getBodyContent();
+                case CORRECTION:
+                    return sscsCaseData.getDocumentGeneration().getCorrectionBodyContent();
+                case STATEMENT_OF_REASONS:
+                    return sscsCaseData.getDocumentGeneration().getStatementOfReasonsBodyContent();
+                case PERMISSION_TO_APPEAL:
+                case LIBERTY_TO_APPLY:
+                default:
+                    break;
+            }
         }
+
+        throw new IllegalArgumentException("handlePostHearing has unexpected postHearingRequestType: " + postHearingRequestType);
     }
 
     private static DocumentLink getPreviewDocument(
@@ -188,4 +195,28 @@ public class PdfRequestUtil {
         throw new IllegalArgumentException("Unexpected request type: " + postHearingRequestType);
     }
 
+    public static String getNoticeBody(SscsCaseData caseData, boolean isPostHearingsEnabled) {
+        if (isPostHearingsEnabled) {
+            PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
+
+            if (nonNull(postHearingReviewType)) {
+                switch (postHearingReviewType) {
+                    case SET_ASIDE:
+                        return caseData.getDocumentGeneration().getBodyContent();
+                    case CORRECTION:
+                        return caseData.getDocumentGeneration().getCorrectionBodyContent();
+                    case STATEMENT_OF_REASONS:
+                        return caseData.getDocumentGeneration().getStatementOfReasonsBodyContent();
+                    case PERMISSION_TO_APPEAL:
+                    case LIBERTY_TO_APPLY:
+                    default:
+                        throw new IllegalArgumentException("getting the notice body has an unexpected postHearingReviewType: "
+                            + postHearingReviewType.getDescriptionEn());
+                }
+            }
+        }
+
+        return Optional.ofNullable(caseData.getDocumentGeneration().getBodyContent())
+            .orElse(caseData.getDocumentGeneration().getDirectionNoticeContent());
+    }
 }

@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Respondent;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
+import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 
 
 @Slf4j
@@ -59,7 +60,7 @@ public class IssueDocumentHandler {
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
                 .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
                 .respondents(getRespondents(caseData))
-                .noticeBody(getNoticeBody(caseData, isPostHearingsEnabled))
+                .noticeBody(PdfRequestUtil.getNoticeBody(caseData, isPostHearingsEnabled))
                 .userName(caseData.getDocumentGeneration().getSignedBy())
                 .noticeType(documentTypeLabel.toUpperCase())
                 .userRole(caseData.getDocumentGeneration().getSignedRole())
@@ -219,30 +220,5 @@ public class IssueDocumentHandler {
         } else {
             return Optional.empty();
         }
-    }
-
-    private String getNoticeBody(SscsCaseData caseData, boolean isPostHearingsEnabled) {
-        if (isPostHearingsEnabled) {
-            PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
-
-            if (nonNull(postHearingReviewType)) {
-                switch (postHearingReviewType) {
-                    case SET_ASIDE:
-                        return caseData.getDocumentGeneration().getBodyContent();
-                    case CORRECTION:
-                        return caseData.getDocumentGeneration().getCorrectionBodyContent();
-                    case STATEMENT_OF_REASONS:
-                        return caseData.getDocumentGeneration().getStatementOfReasonsBodyContent();
-                    case PERMISSION_TO_APPEAL:
-                    case LIBERTY_TO_APPLY:
-                    default:
-                        throw new IllegalArgumentException("getting the notice body has an unexpected postHearingReviewType: "
-                            + postHearingReviewType.getDescriptionEn());
-                }
-            }
-        }
-
-        return Optional.ofNullable(caseData.getDocumentGeneration().getBodyContent())
-            .orElse(caseData.getDocumentGeneration().getDirectionNoticeContent());
     }
 }

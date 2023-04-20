@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.Objects.nonNull;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -13,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
+import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
@@ -31,7 +34,7 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
         FooterDetails footerDetails = addFooterToExistingToContentAndCreateNewUrl(url, caseData.getSscsDocument(), documentType, overrideFileName, dateIssued);
 
         if (footerDetails != null) {
-            SscsDocument sscsDocument = createFooterDocument(footerDetails.getUrl(), label, footerDetails.getBundleAddition(), footerDetails.getBundleFileName(), dateAdded, documentType, documentTranslationStatus);
+            SscsDocument sscsDocument = createFooterDocument(footerDetails.getUrl(), footerDetails.getBundleAddition(), footerDetails.getBundleFileName(), dateAdded, documentType, documentTranslationStatus);
             SscsUtil.addDocumentToCaseDataDocuments(caseData, sscsDocument);
         } else {
             log.info("Could not find {} document for caseId {} so skipping generating footer", label, caseData.getCcdCaseId());
@@ -39,7 +42,7 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
     }
 
 
-    protected SscsDocument createFooterDocument(DocumentLink url, String leftText, String bundleAddition, String documentFileName,
+    protected SscsDocument createFooterDocument(DocumentLink url, String bundleAddition, String documentFileName,
                                                 LocalDate dateAdded, DocumentType documentType, SscsDocumentTranslationStatus documentTranslationStatus) {
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName(documentFileName)
@@ -48,7 +51,18 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
                 .documentDateAdded(Optional.ofNullable(dateAdded).orElse(LocalDate.now()).format(DateTimeFormatter.ISO_DATE))
                 .documentType(documentType.getValue())
                 .documentTranslationStatus(documentTranslationStatus)
+                .originalPartySender(getOriginalPartySender(url))
                 .build())
                 .build();
+    }
+
+    private String getOriginalPartySender(DocumentLink url) {
+        if (nonNull(url)) {
+            String documentFileName = url.getDocumentFilename();
+
+            return nonNull(documentFileName) && documentFileName.endsWith(PdfRequestUtil.POST_HEARING_REQUEST_FILE_SUFFIX) ? "FTA" : null;
+        }
+
+        return null;
     }
 }

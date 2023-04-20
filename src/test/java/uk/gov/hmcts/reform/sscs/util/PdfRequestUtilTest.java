@@ -56,7 +56,7 @@ class PdfRequestUtilTest {
     )
     void setRequestDetailsForPostHearingType_doesNotThrowExceptionForImplementedTypes(PostHearingRequestType postHearingRequestType) {
         sscsCaseData.getPostHearing().setRequestType(postHearingRequestType);
-        assertDoesNotThrow(() -> PdfRequestUtil.setRequestDetailsForPostHearingType(sscsCaseData));
+        assertDoesNotThrow(() -> PdfRequestUtil.getRequestDetailsForPostHearingType(sscsCaseData));
     }
 
     @ParameterizedTest
@@ -64,13 +64,14 @@ class PdfRequestUtilTest {
         value = PostHearingRequestType.class,
         names = {
             "SET_ASIDE",
-            "CORRECTION"
+            "CORRECTION",
+            "STATEMENT_OF_REASONS"
         },
         mode = EXCLUDE
     )
     void setRequestDetailsForPostHearingType_throwsExceptionForNotImplementedTypes(PostHearingRequestType postHearingRequestType) {
         sscsCaseData.getPostHearing().setRequestType(postHearingRequestType);
-        assertThatThrownBy(() -> PdfRequestUtil.setRequestDetailsForPostHearingType(sscsCaseData))
+        assertThatThrownBy(() -> PdfRequestUtil.getRequestDetailsForPostHearingType(sscsCaseData))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageStartingWith("handlePostHearing has unexpected postHearingRequestType: ");
     }
