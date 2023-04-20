@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
@@ -75,33 +74,6 @@ public class SscsUtil {
         }
     }
 
-    public static void addDocumentToDocumentTab(SscsCaseData caseData, boolean isPostHearingsEnabled) {
-        if (nonNull(caseData.getDocumentStaging().getPreviewDocument())) {
-            SscsDocumentTranslationStatus documentTranslationStatus = getDocumentTranslationStatus(caseData);
-
-            SscsDocument sscsDocument = createDocument(caseData, documentTranslationStatus, isPostHearingsEnabled);
-            updateTranslationStatus(caseData, documentTranslationStatus);
-
-            addDocumentToCaseDataDocuments(caseData, sscsDocument);
-        }
-    }
-
-    public static SscsDocument createDocument(SscsCaseData caseData,
-                                              SscsDocumentTranslationStatus documentTranslationStatus,
-                                              boolean isPostHearingsEnabled) {
-        DocumentType documentType = getPostHearingReviewDocumentType(caseData.getPostHearing(), isPostHearingsEnabled);
-        String date = LocalDate.now().toString();
-
-        return SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentFileName(documentType.getLabel() + " issued on " + date + ".pdf")
-                .documentLink(caseData.getDocumentStaging().getPreviewDocument())
-                .dateApproved(date)
-                .documentType(documentType.getValue())
-                .documentTranslationStatus(documentTranslationStatus)
-                .build())
-            .build();
-    }
-
     public static void addDocumentToCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(sscsDocument);
@@ -111,8 +83,6 @@ public class SscsUtil {
         }
         caseData.setSscsDocument(documents);
     }
-
-
 
     public static void addDocumentToBundle(FooterService footerService, SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
         DocumentLink url = sscsDocument.getValue().getDocumentLink();
@@ -144,12 +114,13 @@ public class SscsUtil {
                 case LIBERTY_TO_APPLY:
                 case PERMISSION_TO_APPEAL:
                 default:
-                    throw new IllegalArgumentException("getting the document type has an unexpected postHearingReviewType: "
-                        + postHearingReviewType.getDescriptionEn());
+                    break;
             }
+        } else {
+            return DocumentType.DECISION_NOTICE;
         }
 
-        return DocumentType.DECISION_NOTICE;
+        throw new IllegalArgumentException("getting the document type has an unexpected postHearingReviewType and action");
     }
 
     private static SscsDocumentTranslationStatus getDocumentTranslationStatus(SscsCaseData caseData) {
