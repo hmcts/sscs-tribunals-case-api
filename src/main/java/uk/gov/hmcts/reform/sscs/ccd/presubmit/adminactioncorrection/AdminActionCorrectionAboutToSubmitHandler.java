@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
@@ -53,7 +54,7 @@ public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallb
 
         if (AdminCorrectionType.HEADER.equals(adminCorrectionType)) {
             log.info("Handling header correction for case: {}", ccdCaseId);
-            decisionNoticeService.handleFinalDecisionNotice(sscsCaseData, preSubmitCallbackResponse, previewDocumentService);
+            SscsUtil.handleFinalDecisionNotice(sscsCaseData, preSubmitCallbackResponse, previewDocumentService, decisionNoticeService);
 
         } else if (AdminCorrectionType.BODY.equals(adminCorrectionType)) {
             log.info("Sending body correction to judge for case: {}", ccdCaseId);

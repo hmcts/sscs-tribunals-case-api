@@ -130,7 +130,7 @@ class AdminActionCorrectionMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        // TODO expect document regeneration
+
         DocumentLink previewDocument = response.getData().getDocumentStaging().getPreviewDocument();
         assertThat(previewDocument).isNotNull();
 
