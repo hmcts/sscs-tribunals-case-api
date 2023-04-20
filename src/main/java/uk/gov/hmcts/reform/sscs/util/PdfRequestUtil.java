@@ -146,11 +146,11 @@ public class PdfRequestUtil {
                 case PERMISSION_TO_APPEAL:
                 case LIBERTY_TO_APPLY:
                 default:
-                    break;
+                    throw new IllegalArgumentException("handlePostHearing has unexpected postHearingRequestType: " + postHearingRequestType);
             }
         }
 
-        throw new IllegalArgumentException("handlePostHearing has unexpected postHearingRequestType: " + postHearingRequestType);
+        return null;
     }
 
     private static DocumentLink getPreviewDocument(
@@ -188,11 +188,11 @@ public class PdfRequestUtil {
                 case STATEMENT_OF_REASONS:
                     return DocumentType.STATEMENT_OF_REASONS_APPLICATION;
                 default:
-                    break;
+                    throw new IllegalArgumentException("Unexpected request type: " + postHearingRequestType);
             }
         }
 
-        throw new IllegalArgumentException("Unexpected request type: " + postHearingRequestType);
+        return null;
     }
 
     public static String getNoticeBody(SscsCaseData caseData, boolean isPostHearingsEnabled) {
