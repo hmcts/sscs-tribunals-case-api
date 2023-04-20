@@ -657,7 +657,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         String originalSenderStripped  = originalSenderCode.split("\\d")[0];
 
         final Optional<DocumentType> optionalDocumentType = stream(PartyItemList.values())
-            .filter(f -> f.getCode().startsWith(originalSenderStripped))
+            .filter(f -> originalSenderStripped.startsWith(f.getCode()))
             .findFirst()
             .map(PartyItemList::getDocumentType);
 
