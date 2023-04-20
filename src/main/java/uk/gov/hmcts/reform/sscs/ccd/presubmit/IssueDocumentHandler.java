@@ -110,7 +110,7 @@ public class IssueDocumentHandler {
                 || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
     }
 
-    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(SscsCaseData caseData, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
+    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(SscsCaseData caseData, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation, boolean isPostHearingsEnabled) {
 
         if ((ADJOURNMENT_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType))
             && caseData.getAdjournment().getGenerateNotice() == null) {
@@ -123,7 +123,7 @@ public class IssueDocumentHandler {
 
         String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
 
-        String embeddedDocumentTypeLabel = getDocumentTypeLabel(caseData, documentType, documentTypeLabel);
+        String embeddedDocumentTypeLabel = getDocumentTypeLabel(caseData, documentType, documentTypeLabel, isPostHearingsEnabled);
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
@@ -169,17 +169,24 @@ public class IssueDocumentHandler {
         return response;
     }
 
-    protected String getDocumentTypeLabel(SscsCaseData caseData, DocumentType documentType, String documentTypeLabel) {
+    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(SscsCaseData caseData, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
+        return issueDocument(caseData, documentType, templateId, generateFile, userAuthorisation, false);
+    }
+
+    protected String getDocumentTypeLabel(SscsCaseData caseData, DocumentType documentType, String documentTypeLabel, boolean isPostHearingsEnabled) {
 
         String embeddedDocumentTypeLabel = (FINAL_DECISION_NOTICE.equals(documentType) ? "Decision Notice" : documentTypeLabel);
 
-        PostHearing postHearing = caseData.getPostHearing();
-        if (nonNull(postHearing) && nonNull(postHearing.getSetAside().getAction())) {
-            CcdCallbackMap action = postHearing.getSetAside().getAction();
-            boolean isGrantOrRefuseSetAsideAction = action.toString().equals(SetAsideActions.GRANT.getCcdDefinition())
-                || action.toString().equals(SetAsideActions.REFUSE.getCcdDefinition());
-            embeddedDocumentTypeLabel =  isGrantOrRefuseSetAsideAction ? "Set Aside Decision Notice" : embeddedDocumentTypeLabel;
+        if (isPostHearingsEnabled) {
+            PostHearing postHearing = caseData.getPostHearing();
+            if (nonNull(postHearing.getSetAside().getAction())) {
+                CcdCallbackMap action = postHearing.getSetAside().getAction();
+                boolean isGrantOrRefuseSetAsideAction = action.toString().equals(SetAsideActions.GRANT.getCcdDefinition())
+                        || action.toString().equals(SetAsideActions.REFUSE.getCcdDefinition());
+                embeddedDocumentTypeLabel =  isGrantOrRefuseSetAsideAction ? "Set Aside Decision Notice" : embeddedDocumentTypeLabel;
+            }
         }
+
         return embeddedDocumentTypeLabel;
     }
 
