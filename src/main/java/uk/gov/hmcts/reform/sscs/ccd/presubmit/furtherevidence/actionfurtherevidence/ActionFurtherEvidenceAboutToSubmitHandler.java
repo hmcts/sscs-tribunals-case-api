@@ -529,7 +529,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         DocumentLink url = scannedDocument.getValue().getUrl();
 
-        DocumentType documentType = getScannedDocumentType(sscsCaseData.getOriginalSender().getValue().getCode(), scannedDocument);
+        DocumentType documentType = getScannedDocumentType(sscsCaseData.getCcdCaseId(), sscsCaseData.getOriginalSender().getValue().getCode(), scannedDocument);
 
         String bundleAddition = null;
         String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
@@ -643,7 +643,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return SENDER_VALID_STATES.contains(documentType);
     }
 
-    private DocumentType getScannedDocumentType(String originalSenderCode, ScannedDocument scannedDocument) {
+    private DocumentType getScannedDocumentType(String caseId, String originalSenderCode, ScannedDocument scannedDocument) {
         String docType = scannedDocument.getValue().getType();
         if (ScannedDocumentType.REINSTATEMENT_REQUEST.getValue().equals(docType)) {
             return REINSTATEMENT_REQUEST;
@@ -670,6 +670,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             .filter(f -> f.getCode().startsWith(originalSenderStripped))
             .findFirst()
             .map(PartyItemList::getDocumentType);
+
+        log.info("Action further evidence Original Sender, originalSenderCode: {}, originalSenderStripped: {}, optionalDocumentType: {} for caseId: {}",
+                originalSenderCode, originalSenderStripped, optionalDocumentType.isPresent(), caseId);
+
         if (optionalDocumentType.isPresent()) {
             return optionalDocumentType.get();
         }
