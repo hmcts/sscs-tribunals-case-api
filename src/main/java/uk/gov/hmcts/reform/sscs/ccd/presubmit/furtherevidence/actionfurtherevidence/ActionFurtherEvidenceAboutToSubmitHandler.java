@@ -456,10 +456,20 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private void setReinstateCaseFieldsIfReinstatementRequest(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
         if (REINSTATEMENT_REQUEST.getValue().equals(sscsDocument.getValue().getDocumentType())) {
-            if (isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL.getCode())) {
+            if (checkIfPossibleToReinstateCaseFields(sscsCaseData.getFurtherEvidenceAction())) {
                 setReinstateCaseFields(sscsCaseData);
             }
         }
+    }
+
+    private boolean checkIfPossibleToReinstateCaseFields(DynamicList furtherEvidenceAction) {
+        return isFurtherEvidenceActionCode(furtherEvidenceAction, ISSUE_FURTHER_EVIDENCE.getCode())
+                || isFurtherEvidenceActionCode(furtherEvidenceAction, OTHER_DOCUMENT_MANUAL.getCode())
+                || isFurtherEvidenceActionCode(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode())
+                || isFurtherEvidenceActionCode(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
+                || isFurtherEvidenceActionCode(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode())
+                || isFurtherEvidenceActionCode(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode());
+
     }
 
     private void setTranslationWorkOutstanding(SscsCaseData sscsCaseData) {
@@ -519,7 +529,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         DocumentLink url = scannedDocument.getValue().getUrl();
 
-        DocumentType documentType = getScannedDocumentType(sscsCaseData.getOriginalSender().getValue().getCode(), scannedDocument);
+        DocumentType documentType = getScannedDocumentType(sscsCaseData.getCcdCaseId(), sscsCaseData.getOriginalSender().getValue().getCode(), scannedDocument);
 
         String bundleAddition = null;
         String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
@@ -633,7 +643,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return SENDER_VALID_STATES.contains(documentType);
     }
 
-    private DocumentType getScannedDocumentType(String originalSenderCode, ScannedDocument scannedDocument) {
+    private DocumentType getScannedDocumentType(String caseId, String originalSenderCode, ScannedDocument scannedDocument) {
         String docType = scannedDocument.getValue().getType();
         if (ScannedDocumentType.REINSTATEMENT_REQUEST.getValue().equals(docType)) {
             return REINSTATEMENT_REQUEST;
@@ -660,6 +670,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             .filter(f -> f.getCode().startsWith(originalSenderStripped))
             .findFirst()
             .map(PartyItemList::getDocumentType);
+
+        log.info("Action further evidence Original Sender, originalSenderCode: {}, originalSenderStripped: {}, optionalDocumentType: {} for caseId: {}",
+                originalSenderCode, originalSenderStripped, optionalDocumentType.isPresent(), caseId);
+
         if (optionalDocumentType.isPresent()) {
             return optionalDocumentType.get();
         }
