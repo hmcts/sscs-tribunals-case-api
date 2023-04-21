@@ -145,17 +145,13 @@ public class IssueDocumentHandler {
 
         final String generatedFileUrl = generateFile.assemble(params);
 
-        if (DocumentType.SET_ASIDE_APPLICATION.equals(documentType)) {
+        if (isPostHearingsEnabled) {
             PostHearing postHearing = caseData.getPostHearing();
-            SetAsideActions action = postHearing.getSetAside().getAction();
-            if (GRANT.getValue().equals(action.getCcdDefinition())) {
-                documentTypeLabel = documentTypeLabel + " granted";
-            } else if (REFUSE.getValue().equals(action.getCcdDefinition())) {
-                documentTypeLabel = documentTypeLabel + " refused";
-            }
+            documentTypeLabel = setDocumentTypeLabelForPostHearing(postHearing, documentType, documentTypeLabel);
         } else {
             documentTypeLabel = documentTypeLabel + ((DRAFT_DECISION_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType)) ? " generated" : " issued");
         }
+
         final String filename = String.format("%s on %s.pdf", documentTypeLabel, dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         DocumentLink previewFile = DocumentLink.builder()
@@ -188,6 +184,25 @@ public class IssueDocumentHandler {
         }
 
         return embeddedDocumentTypeLabel;
+    }
+
+    protected String setDocumentTypeLabelForPostHearing(PostHearing postHearing, DocumentType documentType, String documentTypeLabel) {
+        String actionType = "";
+        switch (documentType) {
+            case SET_ASIDE_APPLICATION:
+                actionType = postHearing.getSetAside().getAction().getCcdDefinition();
+            case CORRECTION_APPLICATION:
+                actionType = postHearing.getCorrection().getAction().getCcdDefinition();
+            default:
+                // do nothing
+        }
+        if (GRANT.getValue().equals(actionType)) {
+            return documentTypeLabel + " granted";
+        } else if (REFUSE.getValue().equals(actionType)) {
+            return documentTypeLabel + " refused";
+        } else {
+            return documentTypeLabel;
+        }
     }
 
     /**

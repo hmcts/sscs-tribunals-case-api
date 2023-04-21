@@ -218,4 +218,26 @@ public class IssueDocumentHandlerTest {
         assertEquals(expectedDefaultDocumentLabel, documentTypeLabel);
     }
 
+    @ParameterizedTest
+    @EnumSource(value = DocumentType.class, names = {"SET_ASIDE_APPLICATION", "CORRECTION_APPLICATION"})
+    public void givenPostHearingReviewGranted_thenReturnAppropriateDocumentLabel(DocumentType documentType) {
+
+        String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
+        String expectedLabel = documentType.getLabel() + " granted";
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("1")
+            .postHearing(PostHearing.builder()
+                .setAside(SetAside.builder()
+                    .action(SetAsideActions.GRANT)
+                    .build())
+                .correction(Correction.builder()
+                    .action(CorrectionActions.GRANT)
+                    .build())
+                .build())
+            .build();
+
+        String updatedLabel = new IssueDocumentHandler().setDocumentTypeLabelForPostHearing(sscsCaseData.getPostHearing(), documentType, documentTypeLabel);
+        assertEquals(expectedLabel, updatedLabel);
+    }
+
 }

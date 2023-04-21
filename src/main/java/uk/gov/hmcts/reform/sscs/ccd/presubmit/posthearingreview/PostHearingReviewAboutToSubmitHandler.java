@@ -60,8 +60,6 @@ public class PostHearingReviewAboutToSubmitHandler extends IssueDocumentHandler 
 
         handlePostHearingReview(caseData, action, reviewType, userAuthorisation);
 
-        SscsUtil.clearDocumentTransientFields(caseData);
-
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
