@@ -44,9 +44,6 @@ public class AdminActionCorrectionMidEventHandler extends IssueDocumentHandler i
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
         String userAuthorisation) {
-        if (!canHandle(callbackType, callback)) {
-            throw new IllegalStateException("Cannot handle callback");
-        }
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         String pageId = callback.getPageId();

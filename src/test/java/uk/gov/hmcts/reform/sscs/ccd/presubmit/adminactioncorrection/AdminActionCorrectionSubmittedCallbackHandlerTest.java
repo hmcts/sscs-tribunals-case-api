@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 
 @ExtendWith(MockitoExtension.class)
-class AdminActionCorrectionSubmittedHandlerTest {
+class AdminActionCorrectionSubmittedCallbackHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     public static final long CASE_ID = 1234L;
@@ -85,7 +85,6 @@ class AdminActionCorrectionSubmittedHandlerTest {
     void givenAdminCorrectionTypes_shouldReturnCallCorrectCallback(AdminCorrectionType value) {
         caseData.getPostHearing().getCorrection().setAdminCorrectionType(value);
 
-        when(callback.getEvent()).thenReturn(ADMIN_ACTION_CORRECTION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         when(caseDetails.getCaseData()).thenReturn(caseData);
@@ -108,7 +107,6 @@ class AdminActionCorrectionSubmittedHandlerTest {
         caseData.getPostHearing().getCorrection().setAdminCorrectionType(null);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(ADMIN_ACTION_CORRECTION);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response =

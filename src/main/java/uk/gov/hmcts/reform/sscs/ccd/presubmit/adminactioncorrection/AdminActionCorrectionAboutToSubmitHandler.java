@@ -37,9 +37,6 @@ public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallb
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
         String userAuthorisation) {
-        if (!canHandle(callbackType, callback)) {
-            throw new IllegalStateException("Cannot handle callback");
-        }
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();

@@ -102,7 +102,6 @@ class AdminActionCorrectionMidEventHandlerTest {
     @Test
     void givenBodyCorrection_doNothing() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(ADMIN_ACTION_CORRECTION);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         caseData.getPostHearing().getCorrection().setAdminCorrectionType(AdminCorrectionType.BODY);
@@ -115,7 +114,6 @@ class AdminActionCorrectionMidEventHandlerTest {
     @Test
     void givenHeaderCorrection_andFinalDecisionWasGenerated_regenerateCorrectedDocument() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(ADMIN_ACTION_CORRECTION);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(generateFile.assemble(any())).thenReturn(URL);
         when(documentConfiguration.getDocuments()).thenReturn(new HashMap<>(Map.of(
@@ -156,7 +154,6 @@ class AdminActionCorrectionMidEventHandlerTest {
     @Test
     void givenHeaderCorrection_andFinalDecisionWasUploaded_doNotGenerateNotice() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(ADMIN_ACTION_CORRECTION);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         caseData.getPostHearing().getCorrection().setAdminCorrectionType(AdminCorrectionType.HEADER);
@@ -174,7 +171,6 @@ class AdminActionCorrectionMidEventHandlerTest {
     @Test
     void givenOtherPageId_doNothing() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(ADMIN_ACTION_CORRECTION);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         caseData.getPostHearing().getCorrection().setAdminCorrectionType(AdminCorrectionType.HEADER);
@@ -191,7 +187,6 @@ class AdminActionCorrectionMidEventHandlerTest {
     @EnumSource(AdminCorrectionType.class)
     void whenAdminCorrectionTypeExists_shouldReturnWithoutError(AdminCorrectionType adminCorrectionType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(ADMIN_ACTION_CORRECTION);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         caseData.getPostHearing().getCorrection().setAdminCorrectionType(adminCorrectionType);
 
@@ -204,7 +199,6 @@ class AdminActionCorrectionMidEventHandlerTest {
     @Test
     void whenAdminCorrectionTypeIsNull_shouldReturnError() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(ADMIN_ACTION_CORRECTION);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         caseData.getPostHearing().getCorrection().setAdminCorrectionType(null);
 

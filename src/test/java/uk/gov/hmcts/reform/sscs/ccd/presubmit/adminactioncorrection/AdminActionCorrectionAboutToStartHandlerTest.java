@@ -73,7 +73,6 @@ class AdminActionCorrectionAboutToStartHandlerTest {
     void givenLaCase_shouldReturnWithoutError() {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(ADMIN_ACTION_CORRECTION);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -89,7 +88,6 @@ class AdminActionCorrectionAboutToStartHandlerTest {
             .build());
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(ADMIN_ACTION_CORRECTION);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
