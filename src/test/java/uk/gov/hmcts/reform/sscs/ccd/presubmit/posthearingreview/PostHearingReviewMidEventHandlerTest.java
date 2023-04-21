@@ -133,7 +133,7 @@ class PostHearingReviewMidEventHandlerTest {
         DocumentLink previewDocument = response.getData().getDocumentStaging().getPreviewDocument();
         assertThat(previewDocument).isNotNull();
 
-        String expectedFilename = String.format("Set Aside Application granted on %s.pdf",
+        String expectedFilename = String.format("Set Aside Application issued on %s.pdf",
             LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         assertThat(previewDocument.getDocumentFilename()).isEqualTo(expectedFilename);
@@ -147,7 +147,7 @@ class PostHearingReviewMidEventHandlerTest {
         var value = capture.getValue();
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
-        assertThat(payload.getNoticeType()).isEqualTo("SET ASIDE DECISION NOTICE");
+        assertThat(payload.getNoticeType()).isEqualTo("SET ASIDE APPLICATION");
         assertThat(payload.getAppellantFullName()).isEqualTo("Appellant Lastname");
         assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
     }

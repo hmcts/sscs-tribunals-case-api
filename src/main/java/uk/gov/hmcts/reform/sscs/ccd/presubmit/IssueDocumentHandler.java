@@ -191,8 +191,10 @@ public class IssueDocumentHandler {
         switch (documentType) {
             case SET_ASIDE_APPLICATION:
                 actionType = postHearing.getSetAside().getAction().getCcdDefinition();
+                break;
             case CORRECTION_APPLICATION:
                 actionType = postHearing.getCorrection().getAction().getCcdDefinition();
+                break;
             default:
                 // do nothing
         }

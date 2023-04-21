@@ -127,17 +127,20 @@ public class SscsUtil {
                 } else if (isRefuse) {
                     return EventType.SET_ASIDE_REFUSED;
                 }
+                break;
             case CORRECTION:
                 if (isGrant) {
                     return EventType.CORRECTION_GRANTED;
                 } else if (isRefuse) {
                     return EventType.CORRECTION_REFUSED;
                 }
+                break;
             case STATEMENT_OF_REASONS:
             case PERMISSION_TO_APPEAL:
             case LIBERTY_TO_APPLY:
             default:
-                return null;
+                // do nothing
         }
+        return null;
     }
 }
