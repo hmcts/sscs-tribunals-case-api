@@ -99,27 +99,45 @@ public class SscsUtil {
         if (isNull(reviewType)) {
             return null;
         }
-        // TODO: fill in other doc types for other post hearing routes, use switch if desired
-        if (SET_ASIDE.equals(reviewType)) {
-            return DocumentType.SET_ASIDE_APPLICATION;
+        switch (reviewType) {
+            case SET_ASIDE:
+                return DocumentType.SET_ASIDE_APPLICATION;
+            case CORRECTION:
+                return DocumentType.CORRECTION_APPLICATION;
+            case STATEMENT_OF_REASONS:
+            case PERMISSION_TO_APPEAL:
+            case LIBERTY_TO_APPLY:
+            default:
+                return null;
         }
-        return null;
     }
 
     @Nullable
-    public static EventType getEventTypeFromDocumentReviewTypeAndAction(PostHearingReviewType reviewType,
-                                                                           String actionName) {
+    public static EventType getEventTypeFromDocumentReviewTypeAndAction(PostHearingReviewType reviewType, String actionName) {
         if (isNull(reviewType) || isNull(actionName)) {
             return null;
         }
-        // TODO: fill in other event types for other post hearing routes, use switch if desired
-        if (SET_ASIDE.equals(reviewType)) {
-            if (GRANT.getValue().equals(actionName)) {
-                return EventType.SET_ASIDE_GRANTED;
-            } else if (REFUSE.getValue().equals(actionName)) {
-                return EventType.SET_ASIDE_REFUSED;
-            }
+        boolean isGrant = GRANT.getValue().equals(actionName);
+        boolean isRefuse = REFUSE.getValue().equals(actionName);
+
+        switch (reviewType) {
+            case SET_ASIDE:
+                if (isGrant) {
+                    return EventType.SET_ASIDE_GRANTED;
+                } else if (isRefuse) {
+                    return EventType.SET_ASIDE_REFUSED;
+                }
+            case CORRECTION:
+                if (isGrant) {
+                    return EventType.CORRECTION_GRANTED;
+                } else if (isRefuse) {
+                    return EventType.CORRECTION_REFUSED;
+                }
+            case STATEMENT_OF_REASONS:
+            case PERMISSION_TO_APPEAL:
+            case LIBERTY_TO_APPLY:
+            default:
+                return null;
         }
-        return null;
     }
 }
