@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;

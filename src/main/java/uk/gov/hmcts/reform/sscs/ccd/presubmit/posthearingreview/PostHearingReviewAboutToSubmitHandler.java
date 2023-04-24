@@ -100,6 +100,6 @@ public class PostHearingReviewAboutToSubmitHandler extends IssueDocumentHandler 
         String templateId = documentConfiguration.getDocuments()
             .get(caseData.getLanguagePreference())
             .get(eventType);
-        issueDocument(caseData, documentType, templateId, generateFile, userAuthorisation);
+        issueDocument(caseData, documentType, templateId, generateFile, userAuthorisation, isPostHearingsEnabled);
     }
 }
