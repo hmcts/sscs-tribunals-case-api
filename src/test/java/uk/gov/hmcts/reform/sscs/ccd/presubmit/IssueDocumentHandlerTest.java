@@ -222,8 +222,6 @@ public class IssueDocumentHandlerTest {
     @EnumSource(value = DocumentType.class, names = {"SET_ASIDE_APPLICATION", "CORRECTION_APPLICATION"})
     public void givenPostHearingReviewGrantedOrRefused_thenReturnAppropriateDocumentLabel(DocumentType documentType) {
         String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
-        String expectedLabelGrant = documentType.getLabel() + " granted";
-        String expectedLabelRefuse = documentType.getLabel() + " refused";
 
         SscsCaseData caseDataGrant = SscsCaseData.builder()
             .ccdCaseId("1")
@@ -253,6 +251,9 @@ public class IssueDocumentHandlerTest {
 
         caseDataRefuse.getPostHearing().setSetAside(setAsideRefuse);
         caseDataRefuse.getPostHearing().setCorrection(correctionRefuse);
+
+        String expectedLabelGrant = documentType.getLabel() + " granted";
+        String expectedLabelRefuse = documentType.getLabel() + " refused";
 
         String updatedLabelRefuse = new IssueDocumentHandler()
             .setDocumentTypeLabelForPostHearing(caseDataRefuse.getPostHearing(), documentType, documentTypeLabel);
