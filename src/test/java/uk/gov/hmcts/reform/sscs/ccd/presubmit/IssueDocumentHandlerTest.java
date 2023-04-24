@@ -220,24 +220,44 @@ public class IssueDocumentHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = DocumentType.class, names = {"SET_ASIDE_APPLICATION", "CORRECTION_APPLICATION"})
-    public void givenPostHearingReviewGranted_thenReturnAppropriateDocumentLabel(DocumentType documentType) {
-
+    public void givenPostHearingReviewGrantedOrRefused_thenReturnAppropriateDocumentLabel(DocumentType documentType) {
         String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
-        String expectedLabel = documentType.getLabel() + " granted";
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
+        String expectedLabelGrant = documentType.getLabel() + " granted";
+        String expectedLabelRefuse = documentType.getLabel() + " refused";
+
+        SscsCaseData caseDataGrant = SscsCaseData.builder()
             .ccdCaseId("1")
-            .postHearing(PostHearing.builder()
-                .setAside(SetAside.builder()
-                    .action(SetAsideActions.GRANT)
-                    .build())
-                .correction(Correction.builder()
-                    .action(CorrectionActions.GRANT)
-                    .build())
-                .build())
+            .build();
+        SetAside setAsideGrant = SetAside.builder()
+            .action(SetAsideActions.GRANT)
+            .build();
+        Correction correctionGrant = Correction.builder()
+            .action(CorrectionActions.GRANT)
             .build();
 
-        String updatedLabel = new IssueDocumentHandler().setDocumentTypeLabelForPostHearing(sscsCaseData.getPostHearing(), documentType, documentTypeLabel);
-        assertEquals(expectedLabel, updatedLabel);
-    }
+        caseDataGrant.getPostHearing().setSetAside(setAsideGrant);
+        caseDataGrant.getPostHearing().setCorrection(correctionGrant);
 
+        String updatedLabelGrant = new IssueDocumentHandler()
+            .setDocumentTypeLabelForPostHearing(caseDataGrant.getPostHearing(), documentType, documentTypeLabel);
+
+        SscsCaseData caseDataRefuse = SscsCaseData.builder()
+            .ccdCaseId("2")
+            .build();
+        SetAside setAsideRefuse = SetAside.builder()
+            .action(SetAsideActions.REFUSE)
+            .build();
+        Correction correctionRefuse = Correction.builder()
+            .action(CorrectionActions.REFUSE)
+            .build();
+
+        caseDataRefuse.getPostHearing().setSetAside(setAsideRefuse);
+        caseDataRefuse.getPostHearing().setCorrection(correctionRefuse);
+
+        String updatedLabelRefuse = new IssueDocumentHandler()
+            .setDocumentTypeLabelForPostHearing(caseDataRefuse.getPostHearing(), documentType, documentTypeLabel);
+
+        assertEquals(expectedLabelGrant, updatedLabelGrant);
+        assertEquals(expectedLabelRefuse, updatedLabelRefuse);
+    }
 }
