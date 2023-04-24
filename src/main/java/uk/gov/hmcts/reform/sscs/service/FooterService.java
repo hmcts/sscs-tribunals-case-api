@@ -33,7 +33,7 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
         log.info(label + " adding footer appendix document link: {} and caseId {}", url, caseData.getCcdCaseId());
         FooterDetails footerDetails = addFooterToExistingToContentAndCreateNewUrl(url, caseData.getSscsDocument(), documentType, overrideFileName, dateIssued);
 
-        if (footerDetails != null) {
+        if (nonNull(footerDetails)) {
             SscsDocument sscsDocument = createFooterDocument(footerDetails.getUrl(), footerDetails.getBundleAddition(), footerDetails.getBundleFileName(), dateAdded, documentType, documentTranslationStatus);
             SscsUtil.addDocumentToCaseDataDocuments(caseData, sscsDocument);
         } else {
