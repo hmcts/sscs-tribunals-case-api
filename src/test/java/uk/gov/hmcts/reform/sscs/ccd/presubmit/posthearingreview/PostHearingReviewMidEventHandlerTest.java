@@ -118,8 +118,7 @@ class PostHearingReviewMidEventHandlerTest {
         value = PostHearingReviewType.class,
         names = {
             "SET_ASIDE",
-            "CORRECTION",
-            "STATEMENT_OF_REASONS"
+            "CORRECTION"
         })
     void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentField(PostHearingReviewType postHearingReviewType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);

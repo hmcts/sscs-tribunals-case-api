@@ -235,7 +235,7 @@ public class IssueDocumentHandler {
                     case PERMISSION_TO_APPEAL:
                     case LIBERTY_TO_APPLY:
                     default:
-                        throw new IllegalArgumentException("getting the notice body has an unexpected postHearingReviewType: "
+                        throw new IllegalArgumentException("getNoticeBody has unexpected postHearingReviewType: "
                             + postHearingReviewType.getDescriptionEn());
                 }
             }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DECISION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
@@ -15,12 +14,12 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 
 @Component
 @Slf4j
@@ -56,9 +55,7 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
 
         caseData.getDocumentStaging().setPreviewDocument(null);
 
-        YesNo generateNotice = getGenerateNotice(caseData);
-
-        if (PAGE_ID_GENERATE_NOTICE.equals(pageId) && isYes(generateNotice)) {
+        if (PAGE_ID_GENERATE_NOTICE.equals(pageId) && isYes(PdfRequestUtil.getGenerateNotice(caseData, isPostHearingsEnabled))) {
             log.info("Review Post Hearing App: Generating notice for caseId {}", caseId);
             String templateId = documentConfiguration.getDocuments()
                 .get(caseData.getLanguagePreference()).get(DECISION_ISSUED);
@@ -72,22 +69,4 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
         return response;
     }
 
-    private YesNo getGenerateNotice(SscsCaseData caseData) {
-        PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
-        if (nonNull(postHearingReviewType)) {
-            switch (postHearingReviewType) {
-                case SET_ASIDE:
-                    return caseData.getDocumentGeneration().getGenerateNotice();
-                case CORRECTION:
-                    return caseData.getDocumentGeneration().getCorrectionGenerateNotice();
-                case STATEMENT_OF_REASONS:
-                case PERMISSION_TO_APPEAL:
-                case LIBERTY_TO_APPLY:
-                default:
-                    return null;
-            }
-        }
-
-        return caseData.getDocumentGeneration().getGenerateNotice();
-    }
 }

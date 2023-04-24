@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.Objects.nonNull;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -30,8 +32,8 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
         log.info(label + " adding footer appendix document link: {} and caseId {}", url, caseData.getCcdCaseId());
         FooterDetails footerDetails = addFooterToExistingToContentAndCreateNewUrl(url, caseData.getSscsDocument(), documentType, overrideFileName, dateIssued);
 
-        if (footerDetails != null) {
-            SscsDocument sscsDocument = createFooterDocument(footerDetails.getUrl(), label, footerDetails.getBundleAddition(), footerDetails.getBundleFileName(), dateAdded, documentType, documentTranslationStatus);
+        if (nonNull(footerDetails)) {
+            SscsDocument sscsDocument = createFooterDocument(footerDetails.getUrl(), footerDetails.getBundleAddition(), footerDetails.getBundleFileName(), dateAdded, documentType, documentTranslationStatus);
             SscsUtil.addDocumentToCaseDataDocuments(caseData, sscsDocument);
         } else {
             log.info("Could not find {} document for caseId {} so skipping generating footer", label, caseData.getCcdCaseId());
@@ -39,7 +41,7 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
     }
 
 
-    protected SscsDocument createFooterDocument(DocumentLink url, String leftText, String bundleAddition, String documentFileName,
+    protected SscsDocument createFooterDocument(DocumentLink url, String bundleAddition, String documentFileName,
                                                 LocalDate dateAdded, DocumentType documentType, SscsDocumentTranslationStatus documentTranslationStatus) {
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName(documentFileName)
