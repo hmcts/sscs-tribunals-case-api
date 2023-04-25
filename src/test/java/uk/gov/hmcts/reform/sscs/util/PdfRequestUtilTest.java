@@ -28,17 +28,17 @@ class PdfRequestUtilTest {
     @ParameterizedTest
     @CsvSource(value = {
         "SET_ASIDE,SET_ASIDE_APPLICATION",
-        "CORRECTION,CORRECTION_APPLICATION"
+        "CORRECTION,CORRECTION_APPLICATION",
+        "STATEMENT_OF_REASONS,STATEMENT_OF_REASONS_APPLICATION",
     })
     void getPostHearingDocumentType_returnsDocumentType(PostHearingRequestType postHearingRequestType, DocumentType documentType) {
         sscsCaseData.getPostHearing().setRequestType(postHearingRequestType);
-        assertThat(PdfRequestUtil.getPostHearingDocumentType(sscsCaseData.getPostHearing().getRequestType())).isEqualTo(documentType);
+        assertThat(PdfRequestUtil.getPostHearingDocumentType(postHearingRequestType)).isEqualTo(documentType);
     }
 
     @ParameterizedTest
     @EnumSource(value = PostHearingRequestType.class,
         names = { // TODO remove as each type is implemented
-            "STATEMENT_OF_REASONS",
             "PERMISSION_TO_APPEAL",
             "LIBERTY_TO_APPLY"
         })

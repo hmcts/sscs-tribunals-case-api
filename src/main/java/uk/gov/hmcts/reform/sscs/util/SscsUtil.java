@@ -16,13 +16,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -73,31 +74,6 @@ public class SscsUtil {
         }
     }
 
-    public static void addDocumentToDocumentTab(SscsCaseData caseData, boolean isPostHearingsEnabled) {
-        SscsDocumentTranslationStatus documentTranslationStatus = getDocumentTranslationStatus(caseData);
-
-        SscsDocument sscsDocument = createDocument(caseData, documentTranslationStatus, isPostHearingsEnabled);
-        updateTranslationStatus(caseData, documentTranslationStatus);
-
-        addDocumentToCaseDataDocuments(caseData, sscsDocument);
-    }
-
-    public static SscsDocument createDocument(SscsCaseData caseData,
-                                              SscsDocumentTranslationStatus documentTranslationStatus,
-                                              boolean isPostHearingsEnabled) {
-        DocumentType documentType = getPostHearingReviewDocumentType(caseData.getPostHearing(), isPostHearingsEnabled);
-        String date = LocalDate.now().toString();
-
-        return SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentFileName(documentType.getLabel() + " issued on " + date + ".pdf")
-                .documentLink(caseData.getDocumentStaging().getPreviewDocument())
-                .dateApproved(date)
-                .documentType(documentType.getValue())
-                .documentTranslationStatus(documentTranslationStatus)
-                .build())
-            .build();
-    }
-
     public static void addDocumentToCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(sscsDocument);
@@ -108,8 +84,6 @@ public class SscsUtil {
         caseData.setSscsDocument(documents);
     }
 
-
-
     public static void addDocumentToBundle(FooterService footerService, SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
         DocumentLink url = sscsDocument.getValue().getDocumentLink();
         DocumentType documentType = DocumentType.fromValue(sscsDocument.getValue().getDocumentType());
@@ -118,15 +92,35 @@ public class SscsUtil {
     }
 
     public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {
-        if (isPostHearingsEnabled) {
-            if (SetAsideActions.REFUSE.equals(postHearing.getSetAside().getAction())) {
-                return DocumentType.SET_ASIDE_REFUSED;
-            } else if (CorrectionActions.REFUSE.equals(postHearing.getCorrection().getAction())) {
-                return DocumentType.CORRECTION_REFUSED;
+        PostHearingReviewType postHearingReviewType = postHearing.getReviewType();
+        if (isPostHearingsEnabled && nonNull(postHearingReviewType)) {
+            switch (postHearingReviewType) {
+                case SET_ASIDE:
+                    if (SetAsideActions.REFUSE.equals(postHearing.getSetAside().getAction())) {
+                        return DocumentType.SET_ASIDE_REFUSED;
+                    }
+                    break;
+                case CORRECTION:
+                    if (CorrectionActions.REFUSE.equals(postHearing.getCorrection().getAction())) {
+                        return DocumentType.CORRECTION_REFUSED;
+                    }
+                    break;
+                case STATEMENT_OF_REASONS:
+                    if (StatementOfReasonsActions.REFUSE.equals(postHearing.getStatementOfReasons().getAction())) {
+                        return DocumentType.STATEMENT_OF_REASONS_REFUSED;
+                    }
+
+                    return DocumentType.STATEMENT_OF_REASONS_GRANTED;
+                case LIBERTY_TO_APPLY:
+                case PERMISSION_TO_APPEAL:
+                default:
+                    break;
             }
+        } else {
+            return DocumentType.DECISION_NOTICE;
         }
 
-        return DocumentType.DECISION_NOTICE;
+        throw new IllegalArgumentException("getPostHearingReviewDocumentType has an unexpected postHearingReviewType and action");
     }
 
     private static SscsDocumentTranslationStatus getDocumentTranslationStatus(SscsCaseData caseData) {

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.PdfRequestTemplateBody;
 @Slf4j
 public class PdfRequestUtil {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    public static final String POST_HEARING_REQUEST_FILE_SUFFIX = " Application from FTA.pdf";
     private static String requestDetails;
     private static String title;
     private static StringBuilder additionalRequestDetails;
@@ -116,7 +118,7 @@ public class PdfRequestUtil {
     private static void handlePostHearing(SscsCaseData sscsCaseData) {
         requestDetails = getRequestDetailsForPostHearingType(sscsCaseData);
         LocalDate issueFinalDecisionDate = sscsCaseData.getIssueFinalDecisionDate();
-        if (issueFinalDecisionDate == null) {
+        if (isNull(issueFinalDecisionDate)) {
             throw new IllegalArgumentException("issueFinalDecisionDate unexpectedly null for caseId: " + sscsCaseData.getCcdCaseId());
         }
 
@@ -165,6 +167,7 @@ public class PdfRequestUtil {
             case CORRECTION:
                 return DocumentType.CORRECTION_APPLICATION;
             case STATEMENT_OF_REASONS:
+                return DocumentType.STATEMENT_OF_REASONS_APPLICATION;
             case PERMISSION_TO_APPEAL:
             case LIBERTY_TO_APPLY:
             default:

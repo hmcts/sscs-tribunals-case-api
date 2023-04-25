@@ -7,16 +7,15 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewAboutToSubmitHandlerTest {
@@ -31,11 +30,14 @@ class PostHearingReviewAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private FooterService footerService;
+
     private SscsCaseData caseData;
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewAboutToSubmitHandler(true);
+        handler = new PostHearingReviewAboutToSubmitHandler(footerService, true);
 
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -66,7 +68,7 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewAboutToSubmitHandler(false);
+        handler = new PostHearingReviewAboutToSubmitHandler(footerService,false);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
@@ -80,42 +82,5 @@ class PostHearingReviewAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void givenPreviewDocumentHasBeenSetAndCorrectionsRefused_thenAddToDocumentsTab() {
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-
-        caseData.getDocumentStaging().setPreviewDocument(DocumentLink.builder().documentUrl("document url test").build());
-        caseData.getPostHearing().getCorrection().setAction(CorrectionActions.REFUSE);
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-
-        List<SscsDocument> documents = response.getData().getSscsDocument();
-        assertThat(documents)
-            .hasSize(1)
-            .element(0)
-            .extracting(doc -> doc.getValue().getDocumentType())
-            .isEqualTo(DocumentType.CORRECTION_REFUSED.getValue());
-    }
-
-    @Test
-    void givenPreviewDocumentHasBeenSetAndSetAsideRefused_thenAddToDocumentsTab() {
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-
-        caseData.getDocumentStaging().setPreviewDocument(DocumentLink.builder().documentUrl("document url test").build());
-        caseData.getPostHearing().getSetAside().setAction(SetAsideActions.REFUSE);
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        List<SscsDocument> documents = response.getData().getSscsDocument();
-        assertThat(documents).hasSize(1);
-        assertThat(documents.get(0).getValue().getDocumentType()).isEqualTo(DocumentType.SET_ASIDE_REFUSED.getValue());
     }
 }

@@ -4,7 +4,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 
 import java.time.LocalDate;
@@ -245,11 +244,22 @@ class IssueDocumentHandlerTest {
         assertThat(payload.getNoticeBody()).isEqualTo(bodyContent);
     }
 
+    @Test
+    void givenPostHearingReviewIsSor_thenUseSorBody() {
+        SscsCaseData sscsCaseData = buildCaseData();
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.STATEMENT_OF_REASONS);
+        String bodyContent = "sor body content";
+        sscsCaseData.getDocumentGeneration().setStatementOfReasonsBodyContent(bodyContent);
+
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, USER_AUTHORISATION);
+
+        assertThat(payload.getNoticeBody()).isEqualTo(bodyContent);
+    }
+
     @ParameterizedTest
     @EnumSource(
         value = PostHearingReviewType.class,
-        names = {"SET_ASIDE", "CORRECTION"},
-        mode = EXCLUDE)
+        names = {"LIBERTY_TO_APPLY", "PERMISSION_TO_APPEAL"})
     void givenPostHearingReviewIsNotImplemented_thenThrowException(PostHearingReviewType postHearingReviewType) {
         SscsCaseData sscsCaseData = buildCaseData();
         sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);

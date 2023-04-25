@@ -32,6 +32,7 @@ public class UserDetailsService {
 
     public String getUserRole(String userAuthorisation) {
         List<String> users = getUserInfo(userAuthorisation).getRoles();
+
         for (UserRole userRole : UserRole.values()) {
             if (users.contains(userRole.getValue())) {
                 return userRole.getLabel();

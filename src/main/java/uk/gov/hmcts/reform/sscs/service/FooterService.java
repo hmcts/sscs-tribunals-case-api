@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
+import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
@@ -50,7 +51,18 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
                 .documentDateAdded(Optional.ofNullable(dateAdded).orElse(LocalDate.now()).format(DateTimeFormatter.ISO_DATE))
                 .documentType(documentType.getValue())
                 .documentTranslationStatus(documentTranslationStatus)
+                .originalPartySender(getOriginalPartySender(url))
                 .build())
                 .build();
+    }
+
+    private String getOriginalPartySender(DocumentLink url) {
+        if (nonNull(url)) {
+            String documentFileName = url.getDocumentFilename();
+
+            return nonNull(documentFileName) && documentFileName.endsWith(PdfRequestUtil.POST_HEARING_REQUEST_FILE_SUFFIX) ? "FTA" : null;
+        }
+
+        return null;
     }
 }

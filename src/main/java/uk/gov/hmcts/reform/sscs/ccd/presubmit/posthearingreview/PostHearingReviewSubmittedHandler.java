@@ -73,18 +73,17 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
 
         caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
 
-        handlePostHearingRefused(caseData);
+        handleSetAsideRefusedSor(caseData);
 
         SscsUtil.clearPostHearingFields(caseData);
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
-    private void handlePostHearingRefused(SscsCaseData caseData) {
+    private void handleSetAsideRefusedSor(SscsCaseData caseData) {
         PostHearing postHearing = caseData.getPostHearing();
 
-        if (SET_ASIDE.equals(postHearing.getReviewType())
-            && isYes(postHearing.getSetAside().getRequestStatementOfReasons())) {
+        if (SET_ASIDE.equals(postHearing.getReviewType()) && isSetAsideRefusedSor(postHearing.getSetAside())) {
             ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
                 EventType.SOR_REQUEST.getCcdType(), "Send to hearing Judge for statement of reasons", "",
                 idamService.getIdamTokens());
@@ -101,8 +100,8 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
         switch (typeSelected) {
             case SET_ASIDE:
                 SetAside setAside = postHearing.getSetAside();
-                if (SetAsideActions.REFUSE.equals(setAside.getAction())
-                    && isYes(setAside.getRequestStatementOfReasons())) {
+
+                if (isSetAsideRefusedSor(setAside)) {
                     return SetAsideActions.REFUSE_SOR;
                 } else {
                     return setAside.getAction();
@@ -120,4 +119,7 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
         }
     }
 
+    private static boolean isSetAsideRefusedSor(SetAside setAside) {
+        return SetAsideActions.REFUSE.equals(setAside.getAction()) && isYes(setAside.getRequestStatementOfReasons());
+    }
 }
