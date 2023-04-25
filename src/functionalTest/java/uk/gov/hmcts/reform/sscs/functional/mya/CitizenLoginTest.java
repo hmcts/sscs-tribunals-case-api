@@ -4,13 +4,11 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
-import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-@Slf4j
 public class CitizenLoginTest extends BaseFunctionTest {
 
     CreatedCcdCase ccdCase;
@@ -41,9 +39,6 @@ public class CitizenLoginTest extends BaseFunctionTest {
         Thread.sleep(3000L);
 
         onlineHearingForTya = sscsMyaBackendRequests.getOnlineHearingForCitizen("", userEmail);
-
-        log.info("onlineHearingForTya {}", onlineHearingForTya);
-
         assertThat(onlineHearingForTya.length(), is(1));
         assertThat(onlineHearingForTya.getJSONObject(0).get("case_id"), is(expectedCaseId));
     }
@@ -68,7 +63,6 @@ public class CitizenLoginTest extends BaseFunctionTest {
 
 
         onlineHearingForTya = sscsMyaBackendRequests.getOnlineHearingForCitizen("", userEmail);
-        log.info("checkJointDoesNotHaveCaseAssignCaseAndCheckUserHasCase {}", onlineHearingForTya);
         assertThat(onlineHearingForTya.length(), is(1));
         assertThat(onlineHearingForTya.getJSONObject(0).get("case_id"), is(expectedCaseId));
     }
