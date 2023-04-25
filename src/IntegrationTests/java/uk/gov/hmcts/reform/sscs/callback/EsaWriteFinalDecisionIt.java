@@ -1401,9 +1401,9 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
             + "\n"
             + "Something else.\n"
             + "\n"
-            + "An Test requested an oral hearing but did not attend today. A Presenting Officer attended on behalf of the Respondent.\n"
-            + "\n"
-            + "Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify An Test of the hearing and that it is in the interests of justice to proceed today. \n"
+                + "An Test requested an oral hearing but did not attend today. A Presenting Officer attended on behalf of the Respondent.\n"
+                + "\n"
+                + "Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify An Test of the hearing and that it is in the interests of justice to proceed today. \n"
                 + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
         EsaTemplateContent esaTemplateContent = (EsaTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_10, esaTemplateContent.getScenario());
