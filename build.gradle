@@ -533,7 +533,7 @@ bootWithCCD {
 
     //---Extra ccd loging----
     //Uncomment for ccd callback logging
-    environment 'LOG_CALLBACK_DETAILS', '*'
+    //environment 'LOG_CALLBACK_DETAILS', '*'
 
     //---Additional compose services---
     //Place any extra compose files you'd like to be started automatically here. These should be
