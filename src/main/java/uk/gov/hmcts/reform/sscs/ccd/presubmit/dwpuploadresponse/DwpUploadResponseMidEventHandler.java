@@ -65,7 +65,8 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
 
     private void forceToAddOtherPartyOnSscs2Case(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (isSscs2Case(sscsCaseData.getAppeal().getBenefitType().getCode())
-                && sscsCaseData.getOtherParties() != null && sscsCaseData.getOtherParties().size() == 0) {
+                && sscsCaseData.getOtherParties() != null 
+                && sscsCaseData.getOtherParties().size() == 0) {
             preSubmitCallbackResponse.addError("Please provide other party details");
         }
     }
