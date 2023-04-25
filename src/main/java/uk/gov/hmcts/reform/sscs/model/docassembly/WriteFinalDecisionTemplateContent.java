@@ -182,8 +182,8 @@ public abstract class WriteFinalDecisionTemplateContent {
         return "";
     }
 
-    protected String getConsideredParagraph(String bundlePage, String appellantName) {
-        return "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify " + appellantName + " of the hearing and that it is in the interests of justice to proceed today. ";
+    protected String getConsideredParagraph(String bundlePage, String appointeName) {
+        return "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify " + appointeName + " of the hearing and that it is in the interests of justice to proceed today. ";
     }
 
     protected String getTriageConsideredParagraph(String bundlePage) {

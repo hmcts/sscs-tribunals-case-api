@@ -63,11 +63,11 @@ public abstract class UcOldTemplateContent extends UcTemplateContent {
         }
     }
 
-    public String getHearingTypeSentence(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfifficerAttened) {
-        return getFaceToFaceTelephoneVideoHearingTypeSentence(hearingType, appellantName, bundlePage, appellantAttended, presentingOfifficerAttened);
+    public String getHearingTypeSentence(String appellantName, String appointeeName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfifficerAttened) {
+        return getFaceToFaceTelephoneVideoHearingTypeSentence(hearingType, appellantName, appointeeName, bundlePage, appellantAttended, presentingOfifficerAttened);
     }
 
-    public String getFaceToFaceTelephoneVideoHearingTypeSentence(String hearingType, String appellantName, String bundlePage,
+    public String getFaceToFaceTelephoneVideoHearingTypeSentence(String hearingType, String appellantName, String appointeeName, String bundlePage,
         boolean appellantAttended, boolean presentingOfifficerAttened) {
         if (appellantAttended) {
             if (StringUtils.equalsIgnoreCase("faceToFace", hearingType)) {
@@ -78,10 +78,10 @@ public abstract class UcOldTemplateContent extends UcTemplateContent {
                     + getAppellantAndOtherPartyAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage, null);
             }
         } else {
-            return "This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend the hearing today. "
+            return "This has been a remote hearing in the form of a " + hearingType + " hearing. " + appointeeName + " did not attend the hearing today. "
                 + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.\n"
                 + "\n"
-                + getConsideredParagraph(bundlePage, appellantName);
+                + getConsideredParagraph(bundlePage, appointeeName);
 
         }
     }
