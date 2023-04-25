@@ -212,8 +212,11 @@ ccd:
     clusterName: "es"
     replicas: 1
   logstash:
-    image:
-      tag: ccd-sscs-logstash-latest
+    image:logstash:
+      image: hmctspublic.azurecr.io/imported/logstash/logstash
+      imageTag: 8.5.1
+      imagePullPolicy: "IfNotPresent"
+      logstashJavaOpts: -Xmx1g -Xms512M
   ccd-admin-web:
     nodejs:
       image: hmctspublic.azurecr.io/ccd/admin-web:latest
@@ -311,7 +314,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-11172-1nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-10934-3
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -330,7 +333,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S10538-22
+      CCD_DEF_VERSION: S-10934-3
     secrets: []
     userRoles:
       - citizen

@@ -33,6 +33,8 @@ public class WriteFinalDecisionTemplateBody {
     private boolean isIndefinite;
     @JsonProperty("appellant_name")
     private String appellantName;
+    @JsonProperty("appointee_name")
+    private String appointeeName;
     @JsonProperty("start_date")
     private String startDate;
     @JsonProperty("end_date")
