@@ -130,6 +130,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionTypeOfHearing("telephone");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPageSectionReference("A1");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppellantAttendedQuestion("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppointeeAttendedQuestion("Yes");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build()));
@@ -143,6 +144,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionTypeOfHearing("telephone");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPageSectionReference("A1");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppellantAttendedQuestion("Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppointeeAttendedQuestion("Yes");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build()));
