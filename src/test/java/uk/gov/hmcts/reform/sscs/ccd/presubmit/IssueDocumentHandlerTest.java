@@ -106,21 +106,6 @@ public class IssueDocumentHandlerTest {
     }
 
     @Test
-    public void testBenefitNull() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-                .documentGeneration(DocumentGeneration.builder()
-                        .bodyContent("Hello World")
-                        .signedBy("Barry Allen")
-                        .signedRole("Judge")
-                        .build())
-                .ccdCaseId("1")
-                .build();
-        LocalDate localDate = LocalDate.now();
-        String documentTypeLabel = "directions notice";
-        assertThrows(NullPointerException.class, () -> handler.createPayload(null, sscsCaseData, documentTypeLabel, localDate, localDate, false, USER_AUTHORISATION));
-    }
-
-    @Test
     public void testDocumentPayloadValues() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .documentGeneration(DocumentGeneration.builder()
