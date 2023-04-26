@@ -47,7 +47,7 @@ public class IssueDocumentHandler {
         caseData.getAdjournment().setPreviewDocument(null);
     }
 
-    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response, SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation) {
+    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response, SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation) throws IllegalStateException {
         NoticeIssuedTemplateBody formPayload = NoticeIssuedTemplateBody.builder()
                 .appellantFullName(buildFullName(caseData))
                 .appointeeFullName(buildAppointeeName(caseData).orElse(null))

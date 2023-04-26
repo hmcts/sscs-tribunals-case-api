@@ -63,7 +63,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
     @Override
     protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response, SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
-        String userAuthorisation) {
+        String userAuthorisation) throws IllegalStateException {
 
         String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(caseData);
 
