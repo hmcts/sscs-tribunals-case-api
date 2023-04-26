@@ -27,6 +27,7 @@ public class IssueDocumentHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private IssueDocumentHandler handler;
+    private IssueNoticeHandler noticeHandler;
 
     @Before
     public void setUp() {
@@ -103,6 +104,37 @@ public class IssueDocumentHandlerTest {
         assertEquals("Respondent: Secretary of State for Work and Pensions", respondents.get(0).getName());
         assertEquals("Second Respondent: Mr Hugo Lloris", respondents.get(1).getName());
         assertEquals("Respondent: Mr Hugo Lloris", respondents.get(11).getName());
+    }
+
+    @Test
+    public void testBenefitNull() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+                .documentGeneration(DocumentGeneration.builder()
+                        .bodyContent("Hello World")
+                        .signedBy("Barry Allen")
+                        .signedRole("Judge")
+                        .build())
+                .ccdCaseId("1")
+                .appeal(Appeal.builder()
+                        .appellant(Appellant.builder()
+                                .name(Name.builder()
+                                        .title("Mr")
+                                        .firstName("User")
+                                        .lastName("Lloris")
+                                        .build())
+                                .identity(Identity.builder()
+                                        .nino("BB 22 55 66 B")
+                                        .build())
+                                .build())
+                        .signer("Signer")
+                        .hearingType("oral")
+                        .receivedVia("Online")
+                        .build())
+                .build();
+        LocalDate localDate = LocalDate.now();
+        String documentTypeLabel = "directions notice";
+
+        assertThrows(NullPointerException.class, () -> noticeHandler.createPayload(null, sscsCaseData, documentTypeLabel, localDate, localDate, false, USER_AUTHORISATION));
     }
 
     @Test
