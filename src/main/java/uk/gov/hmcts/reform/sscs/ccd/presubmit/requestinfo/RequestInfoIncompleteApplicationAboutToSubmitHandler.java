@@ -46,7 +46,7 @@ public class RequestInfoIncompleteApplicationAboutToSubmitHandler implements Pre
             || State.INCOMPLETE_APPLICATION.equals(caseDetails.getState())
             || State.INTERLOCUTORY_REVIEW_STATE.equals(caseDetails.getState())) {
 
-            log.info(String.format("Setting state to incompleteApplicationInformationReqsted for caseId %s", sscsCaseData.getCcdCaseId()));
+            log.info(String.format("Setting state to incompleteApplicationInformationRequested for caseId %s", sscsCaseData.getCcdCaseId()));
             sscsCaseData.setState(State.INCOMPLETE_APPLICATION_INFORMATION_REQUESTED);
         }
 
