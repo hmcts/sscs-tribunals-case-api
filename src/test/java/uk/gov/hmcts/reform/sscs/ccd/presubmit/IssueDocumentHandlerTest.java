@@ -27,7 +27,6 @@ public class IssueDocumentHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private IssueDocumentHandler handler;
-    private IssueNoticeHandler noticeHandler;
 
     @Before
     public void setUp() {
@@ -115,26 +114,10 @@ public class IssueDocumentHandlerTest {
                         .signedRole("Judge")
                         .build())
                 .ccdCaseId("1")
-                .appeal(Appeal.builder()
-                        .appellant(Appellant.builder()
-                                .name(Name.builder()
-                                        .title("Mr")
-                                        .firstName("User")
-                                        .lastName("Lloris")
-                                        .build())
-                                .identity(Identity.builder()
-                                        .nino("BB 22 55 66 B")
-                                        .build())
-                                .build())
-                        .signer("Signer")
-                        .hearingType("oral")
-                        .receivedVia("Online")
-                        .build())
                 .build();
         LocalDate localDate = LocalDate.now();
         String documentTypeLabel = "directions notice";
-
-        assertThrows(NullPointerException.class, () -> noticeHandler.createPayload(null, sscsCaseData, documentTypeLabel, localDate, localDate, false, USER_AUTHORISATION));
+        assertThrows(NullPointerException.class, () -> handler.createPayload(null, sscsCaseData, documentTypeLabel, localDate, localDate, false, USER_AUTHORISATION));
     }
 
     @Test
