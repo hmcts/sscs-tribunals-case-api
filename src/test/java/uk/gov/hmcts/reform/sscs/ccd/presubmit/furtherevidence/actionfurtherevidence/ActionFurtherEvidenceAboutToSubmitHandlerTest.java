@@ -199,7 +199,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"setAsideApplication", "correctionApplication", "sorApplication"})
+    @Parameters({"setAsideApplication", "correctionApplication", "statementOfReasonsApplication"})
     public void givenAValidPostHearingApplicationRequest_thenInterlocReviewStateAndCaseStateUpdated(String documentType) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true);
 

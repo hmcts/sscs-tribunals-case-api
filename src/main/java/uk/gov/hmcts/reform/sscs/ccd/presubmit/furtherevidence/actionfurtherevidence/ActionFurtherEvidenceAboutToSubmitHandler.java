@@ -641,6 +641,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
             ADMIN_ACTION_CORRECTION.getCode())
             || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
+            ADMIN_ACTION_SOR.getCode())
+            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
             INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
             || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
             INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode()))
@@ -657,6 +659,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())
             || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
             ADMIN_ACTION_CORRECTION.getCode())
+            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
+            ADMIN_ACTION_SOR.getCode())
             || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
             INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
             || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
