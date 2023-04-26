@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevid
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 
@@ -52,6 +52,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                 || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, ISSUE_FURTHER_EVIDENCE)
                 || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_JUDGE)
                 || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_TCW)
+                || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, ADMIN_ACTION_SOR)
                 || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, OTHER_DOCUMENT_MANUAL);
     }
 
@@ -82,6 +83,11 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
                 AWAITING_ADMIN_ACTION, ADMIN_ACTION_CORRECTION,
                 EventType.CORRECTION_REQUEST, "Admin action correction");
+        }
+        if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, ADMIN_ACTION_SOR)) {
+            return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
+                AWAITING_ADMIN_ACTION, ADMIN_ACTION_SOR,
+                EventType.SOR_REQUEST, "Admin action SOR");
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
             caseData.setInterlocReferralDate(LocalDate.now());
