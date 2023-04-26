@@ -95,9 +95,9 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs did not attend the hearing today. First Tier Agency representative did not attend."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. Joe Bloggs requested an oral hearing but did not attend today. First Tier Agency representative did not attend."));
             assertThat(pdfTextWithoutNewLines, containsString("10. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
-            assertThat(pdfTextWithoutNewLines, containsString("11. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs. Tribunal Judge: Account Date: 26/04/2023 Issued to the parties on: "));
+            assertThat(pdfTextWithoutNewLines, containsString("11. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal recommends that the Department does not reassess Joe Bloggs within 3 months from today's date. Tribunal Judge: Account Date: 26/04/2023 Issued to the parties on: "));
             assertThat(pdfTextWithoutNewLines, not(containsString("12.")));
         }
     }
