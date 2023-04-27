@@ -137,7 +137,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         "sendToInterlocReviewByJudge, REVIEW_BY_JUDGE, validSendToInterloc",
         "sendToInterlocReviewByTcw, REVIEW_BY_TCW, validSendToInterloc",
         "adminActionCorrection, AWAITING_ADMIN_ACTION, correctionRequest",
-        "adminActionSor, AWAITING_ADMIN_ACTION, sorRequest"
+        "adminActionSor, AWAITING_ADMIN_ACTION, sORRequest"
     })
     public void givenFurtherEvidenceActionSelectedOption_shouldTriggerEventAndUpdateCaseCorrectly(
             String furtherEvidenceActionSelectedOption, InterlocReviewState interlocReviewState, String eventType) {
