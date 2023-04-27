@@ -144,20 +144,22 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType)
             && !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode)
         ) {
+            String furtherEvidenceActionMustBeSetTo = "'Further Evidence Action' must be set to '%s'";
             preSubmitCallbackResponse.addError(String
-                .format("'Further Evidence Action' must be set to '%s'",
+                .format(furtherEvidenceActionMustBeSetTo,
                     SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel()));
         }
 
+        final String furtherEvidenceActionMustBeSetToEither = "'Further Evidence Action' must be set to '%s' or '%s'";
         if (isCorrectionApplicationWithWrongActionCode(actionCode, scannedDocumentType)) {
             preSubmitCallbackResponse.addError(String
-                .format("'Further Evidence Action' must be set to '%s' or '%s'",
+                .format(furtherEvidenceActionMustBeSetToEither,
                     SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel(), ADMIN_ACTION_CORRECTION.getLabel()));
         }
 
         if (isSorApplicationWithWrongActionCode(actionCode, scannedDocumentType)) {
             preSubmitCallbackResponse.addError(String
-                .format("'Further Evidence Action' must be set to '%s' or '%s'",
+                .format(furtherEvidenceActionMustBeSetToEither,
                     SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel(), ADMIN_ACTION_SOR.getLabel()));
         }
 
@@ -695,6 +697,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
         if (ScannedDocumentType.CORRECTION_APPLICATION.getValue().equals(docType)) {
             return CORRECTION_APPLICATION;
+        }
+        if (ScannedDocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue().equals(docType)) {
+            return STATEMENT_OF_REASONS_APPLICATION;
         }
 
         final Optional<DocumentType> optionalDocumentType = stream(PartyItemList.values())

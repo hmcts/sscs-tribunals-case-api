@@ -282,8 +282,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
 
+        String expectedDocumentType = ScannedDocumentType.CORRECTION_APPLICATION.getValue();
         ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
-            .type(ScannedDocumentType.CORRECTION_APPLICATION.getValue())
+            .type(expectedDocumentType)
             .fileName("Test.pdf")
             .url(DOC_LINK)
             .build();
@@ -299,7 +300,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState(), is(DwpState.CORRECTION_REQUESTED));
         assertThat(response.getData().getPostHearing().getRequestType(), is(PostHearingRequestType.CORRECTION));
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
-        assertThat(sscsDocumentDetail.getDocumentType(), is("correctionApplication"));
+        assertThat(sscsDocumentDetail.getDocumentType(), is(expectedDocumentType));
         assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.AWAITING_ADMIN_ACTION));
     }
 
@@ -339,7 +340,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"setAsideApplication"})
-    public void givenAValidPostHearingRequestWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError(String documentType) {
+    public void givenAValidPostHearingApplicationWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError(String documentType) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true);
 
         DynamicListItem issueEvidenceAction = new DynamicListItem(
@@ -371,7 +372,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAValidCorrectionApplicationWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError() {
+    @Parameters({
+        "correctionApplication,Admin action correction",
+        "statementOfReasonsApplication,Admin action SOR"
+    })
+    public void givenAValidPostHearingApplicationWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError(String documentType, String actionLabel) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true);
 
         DynamicListItem issueEvidenceAction = new DynamicListItem(
@@ -383,7 +388,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.getFurtherEvidenceAction().setValue(issueEvidenceAction);
 
         ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
-            .type(ScannedDocumentType.CORRECTION_APPLICATION.getValue())
+            .type(documentType)
             .fileName("Test.pdf")
             .url(DOC_LINK)
             .build();
@@ -399,39 +404,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertThat(response.getErrors(), hasSize(1));
         assertThat(response.getErrors(), hasItem(
             String.format("'Further Evidence Action' must be set to '%s' or '%s'",
-                SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel(), ADMIN_ACTION_CORRECTION.getLabel())));
-    }
-
-    @Test
-    public void givenAValidSorApplicationWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError() {
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true);
-
-        DynamicListItem issueEvidenceAction = new DynamicListItem(
-            FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getCode(),
-            FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE.getLabel());
-
-        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
-        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
-        sscsCaseData.getFurtherEvidenceAction().setValue(issueEvidenceAction);
-
-        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
-            .type(ScannedDocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue())
-            .fileName("Test.pdf")
-            .url(DOC_LINK)
-            .build();
-        ScannedDocument scannedDocument = ScannedDocument.builder()
-            .value(scannedDocDetails)
-            .build();
-
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
-
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
-            ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors(), hasSize(1));
-        assertThat(response.getErrors(), hasItem(
-            String.format("'Further Evidence Action' must be set to '%s' or '%s'",
-                SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel(), ADMIN_ACTION_SOR.getLabel())));
+                SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel(), actionLabel)));
     }
 
     @Test
