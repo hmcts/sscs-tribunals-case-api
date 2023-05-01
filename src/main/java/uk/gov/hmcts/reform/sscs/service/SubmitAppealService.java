@@ -398,9 +398,13 @@ public class SubmitAppealService {
 
         SaveCaseResult result;
 
+        log.info("saveDraftCaseInCcd {}", forceCreate);
+
         if (Boolean.TRUE.equals(forceCreate)) {
+            log.info("saveDraftCaseInCcd createDraft");
             result = citizenCcdService.createDraft(caseData, idamTokens);
         } else {
+            log.info("saveDraftCaseInCcd saveCase");
             result = citizenCcdService.saveCase(caseData, idamTokens);
         }
 
