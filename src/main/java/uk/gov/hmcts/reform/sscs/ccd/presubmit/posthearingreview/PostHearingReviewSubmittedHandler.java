@@ -16,16 +16,23 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CcdCallbackMap;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SetAside;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final CcdCallbackMapService ccdCallbackMapService;
+
+    private final CcdService ccdService;
+
+    private final IdamService idamService;
 
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
@@ -64,7 +71,25 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
 
         caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
 
+        handlePostHearingRefused(caseData);
+
         return new PreSubmitCallbackResponse<>(caseData);
+    }
+
+    private void handlePostHearingRefused(SscsCaseData caseData) {
+        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        PostHearing postHearing = caseData.getPostHearing();
+        if (postHearing.isRefused()) {
+            if (isYes(postHearing.getSetAside().getRequestStatementOfReasons())) {
+                ccdService.updateCase(caseData, caseId,
+                    EventType.SOR_REQUEST.getCcdType(), "Send to hearing Judge for statement of reasons", "",
+                    idamService.getIdamTokens());
+            } else {
+                ccdService.updateCase(caseData, caseId,
+                    EventType.DORMANT.getCcdType(), "Send to dormant", "",
+                    idamService.getIdamTokens());
+            }
+        }
     }
 
     @Nullable
@@ -73,14 +98,15 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
         if (isNull(typeSelected)) {
             return null;
         }
+
         switch (typeSelected) {
             case SET_ASIDE:
-                CcdCallbackMap action = postHearing.getSetAside().getAction();
-                if (action == SetAsideActions.REFUSE
-                    && isYes(postHearing.getSetAside().getRequestStatementOfReasons())) {
-                    action = SetAsideActions.REFUSE_SOR;
+                SetAside setAside = postHearing.getSetAside();
+                if (postHearing.isRefused() && isYes(setAside.getRequestStatementOfReasons())) {
+                    return SetAsideActions.REFUSE_SOR;
+                } else {
+                    return setAside.getAction();
                 }
-                return action;
             case CORRECTION:
                 return postHearing.getCorrection().getAction();
             case STATEMENT_OF_REASONS:
@@ -93,4 +119,5 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
                 return null;
         }
     }
+
 }

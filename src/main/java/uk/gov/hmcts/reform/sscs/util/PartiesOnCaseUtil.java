@@ -59,7 +59,7 @@ public class PartiesOnCaseUtil {
         return listOptions;
     }
 
-    private static void addOtherPartiesToListOptions(SscsCaseData sscsCaseData, List<DynamicListItem> listOptions) {
+    public static void addOtherPartiesToListOptions(SscsCaseData sscsCaseData, List<DynamicListItem> listOptions) {
         for (int i = 0; i < sscsCaseData.getOtherParties().size(); i++) {
             OtherParty otherParty = sscsCaseData.getOtherParties().get(i).getValue();
             addOtherPartyOrOtherPartyAppointeeToListOptions(listOptions, i, otherParty);
