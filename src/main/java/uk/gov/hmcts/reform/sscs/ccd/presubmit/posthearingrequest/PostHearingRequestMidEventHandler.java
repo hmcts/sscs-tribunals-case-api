@@ -57,8 +57,8 @@ public class PostHearingRequestMidEventHandler implements PreSubmitCallbackHandl
 
         if (PAGE_ID_GENERATE_DOCUMENT.equals(pageId) && GENERATE.equals(caseData.getPostHearing().getRequestFormat())) {
             log.info("Post Hearing Request: Generating notice for caseId {}", caseId);
-            PdfRequestUtil.processRequestPdfAndSetPreviewDocument(PdfRequestUtil.PdfType.POST_HEARING, userAuthorisation, caseData, response,
-                generateFile, templateId);
+            PdfRequestUtil.processRequestPdfAndSetPreviewDocument(PdfRequestUtil.PdfType.POST_HEARING,
+                userAuthorisation, caseData, response, generateFile, templateId, isPostHearingsEnabled);
         }
 
         return response;
