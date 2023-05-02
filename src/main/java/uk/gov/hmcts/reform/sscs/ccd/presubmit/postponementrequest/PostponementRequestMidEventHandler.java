@@ -40,6 +40,6 @@ public class PostponementRequestMidEventHandler implements PreSubmitCallbackHand
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         return PdfRequestUtil.processRequestPdfAndSetPreviewDocument(PdfRequestUtil.PdfType.POSTPONEMENT, userAuthorisation, sscsCaseData, response,
-            generateFile, templateId);
+            generateFile, templateId, false);
     }
 }
