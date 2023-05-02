@@ -37,7 +37,6 @@ public class AdminActionCorrectionAboutToStartHandler implements PreSubmitCallba
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         String caseId = sscsCaseData.getCcdCaseId();
@@ -46,7 +45,6 @@ public class AdminActionCorrectionAboutToStartHandler implements PreSubmitCallba
             response.addError("Cannot process Admin Action Correction on non Scheduling & Listing Case");
             return response;
         }
-
         SscsUtil.clearDocumentTransientFields(sscsCaseData);
 
         return response;

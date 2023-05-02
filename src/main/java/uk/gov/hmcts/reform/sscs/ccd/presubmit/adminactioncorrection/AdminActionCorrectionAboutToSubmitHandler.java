@@ -52,10 +52,8 @@ public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallb
         if (AdminCorrectionType.HEADER.equals(adminCorrectionType)) {
             log.info("Handling header correction for case: {}", ccdCaseId);
             SscsUtil.handleFinalDecisionNotice(sscsCaseData, preSubmitCallbackResponse, previewDocumentService, decisionNoticeService);
-
         } else if (AdminCorrectionType.BODY.equals(adminCorrectionType)) {
             log.info("Sending body correction to judge for case: {}", ccdCaseId);
-
         }
 
         return preSubmitCallbackResponse;

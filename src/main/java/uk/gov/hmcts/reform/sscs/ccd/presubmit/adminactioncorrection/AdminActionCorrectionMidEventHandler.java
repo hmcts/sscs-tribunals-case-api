@@ -57,7 +57,6 @@ public class AdminActionCorrectionMidEventHandler extends IssueDocumentHandler i
         if (isNull(adminCorrectionType)) {
             log.error(String.format("adminCorrectionType unexpectedly null for case: %s", caseId));
             preSubmitCallbackResponse.addError(String.format("adminCorrectionType unexpectedly null for case: %s", caseId));
-
         } else if (AdminCorrectionType.HEADER.equals(adminCorrectionType)) {
             log.info("Handling header correction for case: {}", caseId);
             YesNo noticeGenerated = sscsCaseData.getFinalDecisionNoticeGenerated();
@@ -70,6 +69,7 @@ public class AdminActionCorrectionMidEventHandler extends IssueDocumentHandler i
                 preSubmitCallbackResponse = issueDocument(callback, DECISION_NOTICE, templateId, generateFile, userAuthorisation);
             } else {
                 // IF uploaded: go to upload screen and expect user to upload new document
+                // TODO determine if code is required here or if ccd definitions fulfil the required functionality
             }
         }
 

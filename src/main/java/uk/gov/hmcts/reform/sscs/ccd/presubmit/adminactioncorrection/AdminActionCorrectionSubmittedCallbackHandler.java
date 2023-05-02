@@ -41,7 +41,6 @@ public class AdminActionCorrectionSubmittedCallbackHandler implements PreSubmitC
         String userAuthorisation) {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
@@ -50,7 +49,6 @@ public class AdminActionCorrectionSubmittedCallbackHandler implements PreSubmitC
         log.info("Admin Action Correction: handling adminActionCorrection {} for case {}", adminCorrectionType,  caseId);
 
         CcdCallbackMap callbackMap = postHearing.getCorrection().getAdminCorrectionType();
-
         if (isNull(callbackMap)) {
             response.addError("Invalid Admin Correction Type Selected or correction "
                 + "selected as callback is null");
@@ -58,7 +56,6 @@ public class AdminActionCorrectionSubmittedCallbackHandler implements PreSubmitC
         }
 
         caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
-
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }
