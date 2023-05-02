@@ -138,7 +138,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
 
         assertEquals(4, result.getData().getOriginalSender().getListItems().size());
-        assertEquals(8, result.getData().getFurtherEvidenceAction().getListItems().size());
+        assertEquals(7, result.getData().getFurtherEvidenceAction().getListItems().size());
         assertEquals(ISSUE_FURTHER_EVIDENCE.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
         assertEquals(OTHER_DOCUMENT_MANUAL.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
         assertEquals(INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(2).getCode());
@@ -146,7 +146,6 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
         assertEquals(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(4).getCode());
         assertEquals(SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(5).getCode());
         assertEquals(ADMIN_ACTION_CORRECTION.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(6).getCode());
-        assertEquals(ADMIN_ACTION_SOR.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(7).getCode());
     }
 
     @Test

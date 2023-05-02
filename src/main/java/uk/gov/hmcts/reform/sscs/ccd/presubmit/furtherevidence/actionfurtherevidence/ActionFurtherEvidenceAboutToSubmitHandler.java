@@ -141,26 +141,24 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         String scannedDocumentType = scannedDocument.getValue().getType();
 
-        if (ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType)
-            && !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode)
+        String furtherEvidenceActionMustBeSetTo = "'Further Evidence Action' must be set to '%s'";
+        if (isSetAsideApplicationWitWrongActionCode(actionCode, scannedDocumentType)
         ) {
-            String furtherEvidenceActionMustBeSetTo = "'Further Evidence Action' must be set to '%s'";
             preSubmitCallbackResponse.addError(String
                 .format(furtherEvidenceActionMustBeSetTo,
                     SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel()));
         }
 
-        final String furtherEvidenceActionMustBeSetToEither = "'Further Evidence Action' must be set to '%s' or '%s'";
         if (isCorrectionApplicationWithWrongActionCode(actionCode, scannedDocumentType)) {
             preSubmitCallbackResponse.addError(String
-                .format(furtherEvidenceActionMustBeSetToEither,
+                .format("'Further Evidence Action' must be set to '%s' or '%s'",
                     SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel(), ADMIN_ACTION_CORRECTION.getLabel()));
         }
 
         if (isSorApplicationWithWrongActionCode(actionCode, scannedDocumentType)) {
             preSubmitCallbackResponse.addError(String
-                .format(furtherEvidenceActionMustBeSetToEither,
-                    SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel(), ADMIN_ACTION_SOR.getLabel()));
+                .format(furtherEvidenceActionMustBeSetTo,
+                    SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel()));
         }
 
         if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals(scannedDocumentType)
@@ -182,6 +180,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
     }
 
+    private static boolean isSetAsideApplicationWitWrongActionCode(String actionCode, String scannedDocumentType) {
+        boolean isDocTypeSetAsideApplication = ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType);
+        boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
+        return isDocTypeSetAsideApplication && isNotInterlocReviewByJudge;
+    }
+
     private static boolean isCorrectionApplicationWithWrongActionCode(String actionCode, String scannedDocumentType) {
         boolean isDocTypeCorrectionApplication = ScannedDocumentType.CORRECTION_APPLICATION.getValue().equals(scannedDocumentType);
         boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
@@ -194,10 +198,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private static boolean isSorApplicationWithWrongActionCode(String actionCode, String scannedDocumentType) {
         boolean isDocTypeSorApplication = ScannedDocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue().equals(scannedDocumentType);
         boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
-        boolean isNotAdminActionSor = !ADMIN_ACTION_SOR.getCode().equals(actionCode);
-        return isDocTypeSorApplication
-            && isNotInterlocReviewByJudge
-            && isNotAdminActionSor;
+        return isDocTypeSorApplication && isNotInterlocReviewByJudge;
     }
 
     @Override
@@ -291,8 +292,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
             if (isSendToInterlocReviewByJudge(sscsCaseData)) {
                 sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
-            } else if (isAdminActionSor(sscsCaseData)) {
-                sscsCaseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
             }
         }
 
@@ -304,10 +303,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private boolean isAdminActionCorrection(SscsCaseData sscsCaseData) {
         return isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), ADMIN_ACTION_CORRECTION.getCode());
-    }
-
-    private boolean isAdminActionSor(SscsCaseData sscsCaseData) {
-        return isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), ADMIN_ACTION_SOR.getCode());
     }
 
     private boolean isSendToInterlocReviewByJudge(SscsCaseData sscsCaseData) {
@@ -643,8 +638,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
             ADMIN_ACTION_CORRECTION.getCode())
             || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
-            ADMIN_ACTION_SOR.getCode())
-            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
             INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
             || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
             INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode()))
@@ -661,8 +654,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())
             || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
             ADMIN_ACTION_CORRECTION.getCode())
-            || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
-            ADMIN_ACTION_SOR.getCode())
             || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),
             INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode())
             || isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(),

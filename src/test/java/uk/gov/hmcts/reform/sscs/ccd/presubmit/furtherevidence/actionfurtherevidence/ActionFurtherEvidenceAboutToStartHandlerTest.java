@@ -80,9 +80,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
         assertEquals("adminActionCorrection", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "adminActionCorrection"));
 
-        assertEquals("adminActionSor", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "adminActionSor"));
-
-        assertEquals(8, response.getData().getFurtherEvidenceAction().getListItems().size());
+        assertEquals(7, response.getData().getFurtherEvidenceAction().getListItems().size());
     }
 
     private String getItemCodeInList(DynamicList dynamicList, String item) {

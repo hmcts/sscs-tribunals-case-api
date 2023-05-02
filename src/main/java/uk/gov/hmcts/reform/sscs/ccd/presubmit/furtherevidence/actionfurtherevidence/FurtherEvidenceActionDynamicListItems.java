@@ -5,7 +5,6 @@ import lombok.Getter;
 @Getter
 public enum FurtherEvidenceActionDynamicListItems {
     ADMIN_ACTION_CORRECTION("adminActionCorrection", "Admin action correction"),
-    ADMIN_ACTION_SOR("adminActionSor", "Admin action SOR"),
     INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE("informationReceivedForInterlocJudge", "Information received for Interloc - send to Judge"),
     INFORMATION_RECEIVED_FOR_INTERLOC_TCW("informationReceivedForInterlocTcw", "Information received for Interloc - send to TCW"),
     ISSUE_FURTHER_EVIDENCE("issueFurtherEvidence", "Issue further evidence to all parties"),

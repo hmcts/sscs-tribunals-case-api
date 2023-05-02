@@ -249,7 +249,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         + "and post hearing request type and document type are identified as expected.")
     @Parameters({
         "ADMIN_ACTION_CORRECTION, correctionApplication, CORRECTION_REQUESTED, CORRECTION, AWAITING_ADMIN_ACTION",
-        "ADMIN_ACTION_SOR, statementOfReasonsApplication, STATEMENT_OF_REASONS_REQUESTED, STATEMENT_OF_REASONS, AWAITING_ADMIN_ACTION"
     })
     public void givenAValidPostHearingApplicationRequest_andAdminActionIsSelected_thenStatesAreUpdatedAndTypesAreSet(
         FurtherEvidenceActionDynamicListItems adminAction,
@@ -292,7 +291,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"setAsideApplication"})
+    @Parameters({
+        "setAsideApplication",
+        "statementOfReasonsApplication"
+    })
     public void givenAValidPostHearingApplicationWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError(String documentType) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true);
 
@@ -327,7 +329,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Test
     @Parameters({
         "correctionApplication,Admin action correction",
-        "statementOfReasonsApplication,Admin action SOR"
     })
     public void givenAValidPostHearingApplicationWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError(String documentType, String actionLabel) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true);
@@ -1149,7 +1150,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"ADMIN_ACTION_CORRECTION","SEND_TO_INTERLOC_REVIEW_BY_JUDGE", "ADMIN_ACTION_SOR"})
+    @Parameters({"ADMIN_ACTION_CORRECTION","SEND_TO_INTERLOC_REVIEW_BY_JUDGE"})
     public void shouldSetBundleAdditionForCorrectionApplication(FurtherEvidenceActionDynamicListItems actionType) {
 
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false);
