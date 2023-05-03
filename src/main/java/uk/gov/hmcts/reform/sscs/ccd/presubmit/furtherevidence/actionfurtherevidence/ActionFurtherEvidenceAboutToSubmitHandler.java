@@ -9,8 +9,6 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
@@ -263,36 +261,20 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
 
         if (isSetAsideApplication(sscsCaseData) && isPostHearingsEnabled) {
-            sscsCaseData.setState(State.POST_HEARING);
-            sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
             sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
-
             if (PartyItemList.DWP.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
                 sscsCaseData.setDwpState(DwpState.SET_ASIDE_REQUESTED);
             }
         }
 
         if (isCorrectionApplication(sscsCaseData) && isPostHearingsEnabled) {
-            sscsCaseData.setState(State.POST_HEARING);
-            sscsCaseData.setDwpState(DwpState.CORRECTION_REQUESTED);
             sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.CORRECTION);
-
-            if (isSendToInterlocReviewByJudge(sscsCaseData)) {
-                sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
-            } else if (isAdminActionCorrection(sscsCaseData)) {
-                sscsCaseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
-                // TODO 10581 navigate user to Admin correction screen
-            }
+            sscsCaseData.setDwpState(DwpState.CORRECTION_REQUESTED);
         }
 
         if (isSorApplication(sscsCaseData) && isPostHearingsEnabled) {
-            sscsCaseData.setState(State.POST_HEARING);
-            sscsCaseData.setDwpState(DwpState.STATEMENT_OF_REASONS_REQUESTED);
             sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.STATEMENT_OF_REASONS);
-
-            if (isSendToInterlocReviewByJudge(sscsCaseData)) {
-                sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
-            }
+            sscsCaseData.setDwpState(DwpState.STATEMENT_OF_REASONS_REQUESTED);
         }
 
         buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState(), callback.isIgnoreWarnings(),

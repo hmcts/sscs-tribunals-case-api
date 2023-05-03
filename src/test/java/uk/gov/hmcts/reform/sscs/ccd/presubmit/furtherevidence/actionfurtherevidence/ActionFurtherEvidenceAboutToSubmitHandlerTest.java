@@ -205,7 +205,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "correctionApplication, CORRECTION_REQUESTED, CORRECTION",
         "statementOfReasonsApplication, STATEMENT_OF_REASONS_REQUESTED, STATEMENT_OF_REASONS"
     })
-    public void givenAValidPostHearingApplicationRequest_andReviewByJudgeIsSelected_thenStatesAreUpdatedAndTypesAreSet(
+    public void givenAValidPostHearingApplicationRequest_andReviewByJudgeIsSelected_thenDwpStateIsUpdatedAndTypesAreSet(
         String documentType,
         DwpState dwpState,
         PostHearingRequestType requestType
@@ -239,8 +239,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertThat(response.getData().getPostHearing().getRequestType(), is(requestType));
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
         assertThat(sscsDocumentDetail.getDocumentType(), is(documentType));
-        assertThat(response.getData().getState(), is(State.POST_HEARING));
-        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_JUDGE));
     }
 
     @Test
@@ -248,14 +246,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         + "then DWP state and Interloc Review state are updated, "
         + "and post hearing request type and document type are identified as expected.")
     @Parameters({
-        "ADMIN_ACTION_CORRECTION, correctionApplication, CORRECTION_REQUESTED, CORRECTION, AWAITING_ADMIN_ACTION",
+        "ADMIN_ACTION_CORRECTION, correctionApplication, CORRECTION_REQUESTED, CORRECTION",
     })
-    public void givenAValidPostHearingApplicationRequest_andAdminActionIsSelected_thenStatesAreUpdatedAndTypesAreSet(
+    public void givenAValidPostHearingApplicationRequest_andAdminActionIsSelected_thenDwpStateIsUpdatedAndTypesAreSet(
         FurtherEvidenceActionDynamicListItems adminAction,
         String documentType,
         DwpState dwpState,
-        PostHearingRequestType requestType,
-        InterlocReviewState interlocReviewState
+        PostHearingRequestType requestType
     ) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true);
 
@@ -286,8 +283,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertThat(response.getData().getPostHearing().getRequestType(), is(requestType));
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
         assertThat(sscsDocumentDetail.getDocumentType(), is(documentType));
-        assertThat(response.getData().getState(), is(State.POST_HEARING));
-        assertThat(response.getData().getInterlocReviewState(), is(interlocReviewState));
     }
 
     @Test
