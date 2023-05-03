@@ -17,11 +17,14 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -89,7 +92,7 @@ public class SscsUtil {
         exclusions.setArePanelMembersExcluded(YES);
     }
     
-    public static void addDocumentToDocumentTab(FooterService footerService, SscsCaseData caseData, DocumentType documentType) {
+    public static void addDocumentToDocumentTabAndBundle(FooterService footerService, SscsCaseData caseData, DocumentType documentType) {
         DocumentLink url = caseData.getDocumentStaging().getPreviewDocument();
 
         if (nonNull(url)) {
