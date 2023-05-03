@@ -9,6 +9,7 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -61,9 +63,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     public static final String POSTPONEMENT_DETAILS_IS_MANDATORY = "Postponement Details is mandatory for postponement requests.";
     public static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
     private static final String COVERSHEET = "coversheet";
-    protected static final List<String> ACTIONS_THAT_REQUIRES_EVIDENCE_ISSUED_SET_TO_YES_AND_NOT_BULK_PRINTED = List.of(
+    protected static final List<String> ACTIONS_THAT_REQUIRES_EVIDENCE_ISSUED_SET_TO_YES_AND_NOT_BULK_PRINTED = Stream.of(
                     OTHER_DOCUMENT_MANUAL, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
-                    SEND_TO_INTERLOC_REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_TCW).stream()
+                    SEND_TO_INTERLOC_REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_TCW)
             .map(FurtherEvidenceActionDynamicListItems::getCode)
             .collect(Collectors.toUnmodifiableList());
     private static final Set<State> ADDITION_VALID_STATES = Set.of(State.DORMANT_APPEAL_STATE,
@@ -220,6 +222,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
 
+        if (isGapsCase(sscsCaseData) && isPostHearingRequest(sscsCaseData)) {
+            preSubmitCallbackResponse.addError("Cannot upload post hearing requests on GAPS cases");
+
+            return preSubmitCallbackResponse;
+        }
+
         if (isFurtherEvidenceActionCode(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction(),
             ISSUE_FURTHER_EVIDENCE.getCode())) {
 
@@ -293,6 +301,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 && documentType.getValue().equals(doc.getValue().getType()));
     }
 
+    private boolean isPostHearingRequest(SscsCaseData sscsCaseData) {
+        return isPostHearingsEnabled
+            && (isSetAsideApplication(sscsCaseData)
+            || isCorrectionApplication(sscsCaseData)
+            || isStatementOfReasonsApplication(sscsCaseData));
+    }
+
+    private boolean isGapsCase(SscsCaseData sscsCaseData) {
+        return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
+    }
+
     private boolean isPostponementRequest(SscsCaseData sscsCaseData) {
         return isDocumentType(POSTPONEMENT_REQUEST, sscsCaseData);
     }
@@ -303,6 +322,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private boolean isCorrectionApplication(SscsCaseData sscsCaseData) {
         return isDocumentType(CORRECTION_APPLICATION, sscsCaseData);
+    }
+
+    private boolean isStatementOfReasonsApplication(SscsCaseData sscsCaseData) {
+        return isDocumentType(STATEMENT_OF_REASONS_APPLICATION, sscsCaseData);
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {

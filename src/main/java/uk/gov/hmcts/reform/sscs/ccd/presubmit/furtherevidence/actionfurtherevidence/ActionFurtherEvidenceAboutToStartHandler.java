@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCaseWithDwpAndHmcts;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -47,14 +49,15 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
     }
 
     private void setFurtherEvidenceActionDropdown(SscsCaseData sscsCaseData) {
-        List<DynamicListItem> listOptions = getFurtherActionEvidenceItems(List.of(values()));
+        List<DynamicListItem> listOptions = getFurtherActionEvidenceItems(sscsCaseData);
 
         sscsCaseData.setFurtherEvidenceAction(new DynamicList(listOptions.get(0), listOptions));
     }
 
-    private List<DynamicListItem> getFurtherActionEvidenceItems(List<FurtherEvidenceActionDynamicListItems> items) {
-        return items.stream()
-            .filter(item -> !item.equals(ADMIN_ACTION_CORRECTION) || isPostHearingsEnabled)
+    private List<DynamicListItem> getFurtherActionEvidenceItems(SscsCaseData sscsCaseData) {
+        return Stream.of(values())
+            .filter(item -> !item.equals(ADMIN_ACTION_CORRECTION)
+                || (!GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute()) && isPostHearingsEnabled))
             .map(item -> new DynamicListItem(item.getCode(), item.getLabel()))
             .collect(Collectors.toList());
     }
