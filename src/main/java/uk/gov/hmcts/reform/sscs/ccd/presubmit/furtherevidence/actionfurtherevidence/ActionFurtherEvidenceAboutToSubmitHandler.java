@@ -150,8 +150,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         String scannedDocumentType = scannedDocument.getValue().getType();
 
         if (ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType)
-            && !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode)
-        ) {
+            && !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode)) {
             preSubmitCallbackResponse.addError(String
                 .format("'Further Evidence Action' must be set to '%s'",
                     SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel()));
@@ -176,9 +175,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             && scannedDocument != null && scannedDocument.getValue() != null
             && scannedDocument.getValue().getOriginalSenderOtherPartyId() != null) {
             if (!sscsCaseData.getOriginalSender().getValue().getCode().equalsIgnoreCase(OTHER_PARTY.getCode() + scannedDocument.getValue().getOriginalSenderOtherPartyId())) {
-                preSubmitCallbackResponse
-                    .addError("The PDF evidence does not match the Original Sender selected");
+                preSubmitCallbackResponse.addError("The PDF evidence does not match the Original Sender selected");
             }
+        }
+
+        if (isGapsCase(sscsCaseData) && isPostHearingRequest(sscsCaseData)) {
+            preSubmitCallbackResponse.addError("Cannot upload post hearing requests on GAPS cases");
         }
     }
 
@@ -221,12 +223,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
 
         addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
-
-        if (isGapsCase(sscsCaseData) && isPostHearingRequest(sscsCaseData)) {
-            preSubmitCallbackResponse.addError("Cannot upload post hearing requests on GAPS cases");
-
-            return preSubmitCallbackResponse;
-        }
 
         if (isFurtherEvidenceActionCode(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction(),
             ISSUE_FURTHER_EVIDENCE.getCode())) {
@@ -295,20 +291,19 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode());
     }
 
-    private boolean isDocumentType(DocumentType documentType, SscsCaseData sscsCaseData) {
+    private static boolean isDocumentType(DocumentType documentType, SscsCaseData sscsCaseData) {
         return emptyIfNull(sscsCaseData.getScannedDocuments()).stream()
             .anyMatch(doc -> doc.getValue() != null && isNotBlank(doc.getValue().getType())
                 && documentType.getValue().equals(doc.getValue().getType()));
     }
 
-    private boolean isPostHearingRequest(SscsCaseData sscsCaseData) {
-        return isPostHearingsEnabled
-            && (isSetAsideApplication(sscsCaseData)
+    private static boolean isPostHearingRequest(SscsCaseData sscsCaseData) {
+        return isSetAsideApplication(sscsCaseData)
             || isCorrectionApplication(sscsCaseData)
-            || isStatementOfReasonsApplication(sscsCaseData));
+            || isStatementOfReasonsApplication(sscsCaseData);
     }
 
-    private boolean isGapsCase(SscsCaseData sscsCaseData) {
+    private static boolean isGapsCase(SscsCaseData sscsCaseData) {
         return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
     }
 
@@ -316,15 +311,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return isDocumentType(POSTPONEMENT_REQUEST, sscsCaseData);
     }
 
-    private boolean isSetAsideApplication(SscsCaseData sscsCaseData) {
+    private static boolean isSetAsideApplication(SscsCaseData sscsCaseData) {
         return isDocumentType(SET_ASIDE_APPLICATION, sscsCaseData);
     }
 
-    private boolean isCorrectionApplication(SscsCaseData sscsCaseData) {
+    private static boolean isCorrectionApplication(SscsCaseData sscsCaseData) {
         return isDocumentType(CORRECTION_APPLICATION, sscsCaseData);
     }
 
-    private boolean isStatementOfReasonsApplication(SscsCaseData sscsCaseData) {
+    private static boolean isStatementOfReasonsApplication(SscsCaseData sscsCaseData) {
         return isDocumentType(STATEMENT_OF_REASONS_APPLICATION, sscsCaseData);
     }
 
