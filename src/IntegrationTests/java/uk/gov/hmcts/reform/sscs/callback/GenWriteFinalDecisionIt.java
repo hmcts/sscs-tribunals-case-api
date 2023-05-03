@@ -233,26 +233,26 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @SuppressWarnings("unused")
     private Object[] hearingTypeCombinations() {
         return new Object[] {
-            new Object[] {"video", false, false},
-            new Object[] {"video", false, true},
-            new Object[] {"video", false, false},
-            new Object[] {"video", false, true},
+            new Object[] {"video", true, false},
+            new Object[] {"video", true, true},
+            new Object[] {"video", true, false},
+            new Object[] {"video", true, true},
             new Object[] {"paper", false, false},
             new Object[] {"paper", false, true},
             new Object[] {"paper", true, false},
             new Object[] {"paper", true, true},
-            new Object[] {"telephone", false, false},
-            new Object[] {"telephone", false, true},
-            new Object[] {"telephone", false, false},
-            new Object[] {"telephone", false, true},
+            new Object[] {"telephone", true, false},
+            new Object[] {"telephone", true, true},
+            new Object[] {"telephone", true, false},
+            new Object[] {"telephone", true, true},
             new Object[] {"triage", false, false},
             new Object[] {"triage", false, true},
             new Object[] {"triage", true, false},
             new Object[] {"triage", true, true},
-            new Object[] {"faceToFace", false, false},
-            new Object[] {"faceToFace", false, true},
-            new Object[] {"faceToFace", false, false},
-            new Object[] {"faceToFace", false, true},
+            new Object[] {"faceToFace", true, false},
+            new Object[] {"faceToFace", true, true},
+            new Object[] {"faceToFace", true, false},
+            new Object[] {"faceToFace", true, true},
         };
     }
 
@@ -334,8 +334,8 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 5, "Reasons for decision 2");
         assertIsParagraphWithText(components, 6, "Anything else.");
         assertIsParagraphWithText(components, 7,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.");
-        Assert.assertEquals(8, components.size());
+                "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+        Assert.assertEquals(7, components.size());
     }
 
     @Test
@@ -377,8 +377,8 @@ public class GenWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 5, "Reasons for decision 2");
         assertIsParagraphWithText(components, 6, "Anything else.");
         assertIsParagraphWithText(components, 7,
-                "This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.");
-        Assert.assertEquals(8, components.size());
+                "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+        Assert.assertEquals(7, components.size());
     }
 
     @Test
