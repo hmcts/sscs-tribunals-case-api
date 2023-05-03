@@ -52,7 +52,8 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
         final PreSubmitCallbackResponse<SscsCaseData> response = validatePostHearingRequest(caseData);
 
         if (response.getErrors().isEmpty()) {
-            SscsUtil.addDocumentToDocumentTab(footerService, caseData, PdfRequestUtil.getPostHearingDocumentType(caseData));
+            SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData,
+                PdfRequestUtil.getPostHearingDocumentType(caseData.getPostHearing().getRequestType()));
         }
 
         return response;
@@ -75,7 +76,7 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
     private void renameDocumentIfUpload(SscsCaseData caseData, String requestTypeDescription) {
         if (Objects.equals(UPLOAD, caseData.getPostHearing().getRequestFormat())) {
             DocumentLink previewDocument = caseData.getDocumentStaging().getPreviewDocument();
-            String filename = String.format("%s Application from FTA.pdf", requestTypeDescription);
+            String filename = String.format("%s%s", requestTypeDescription, PdfRequestUtil.POST_HEARING_REQUEST_FILE_SUFFIX);
 
             log.info("Renaming uploaded Preview Document from '{}' to '{}'", previewDocument.getDocumentFilename(), filename);
 

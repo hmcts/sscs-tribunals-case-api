@@ -1,19 +1,25 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import java.util.Collections;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.sscs.idam.UserRole;
 
-@RunWith(SpringRunner.class)
-public class UserDetailsServiceTest {
+@ExtendWith(MockitoExtension.class)
+class UserDetailsServiceTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     @Mock
@@ -21,32 +27,64 @@ public class UserDetailsServiceTest {
 
     private UserDetailsService userDetailsService;
 
-    @Before
-    public void setUp() {
-        openMocks(this);
+    @BeforeEach
+    void setUp() {
         userDetailsService = new UserDetailsService(idamClient);
     }
 
     @Test
-    public void givenUserAuthorisation_thenReturnUserFullName() {
+    void givenUserAuthorisation_thenReturnUserFullName() {
         when(idamClient.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
                 .forename("John").surname("Lewis").build());
 
-        assertEquals("John Lewis", userDetailsService.buildLoggedInUserName(USER_AUTHORISATION));
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void givenUserNotFound_thenThrowAnException() {
-        when(idamClient.getUserInfo(USER_AUTHORISATION)).thenReturn(null);
-        userDetailsService.buildLoggedInUserName(USER_AUTHORISATION);
+        assertThat(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).isEqualTo("John Lewis");
     }
 
     @Test
-    public void givenUserAuthorisation_thenReturnUserSurname() {
+    void givenUserNotFound_thenThrowAnException() {
+        assertThatThrownBy(() -> userDetailsService.buildLoggedInUserName(USER_AUTHORISATION))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageStartingWith("Unable to obtain signed in user details");
+    }
+
+    @Test
+    void givenUserAuthorisation_thenReturnUserSurname() {
         when(idamClient.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
                 .forename("John").surname("Lewis").build());
 
-        assertEquals("Lewis", userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION));
+        assertThat(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).isEqualTo("Lewis");
+    }
+
+    @Test
+    void givenUserAuthorisation_thenReturnUserInfo() {
+        UserInfo userInfo = UserInfo.builder().givenName("A").familyName("B").build();
+        when(idamClient.getUserInfo(USER_AUTHORISATION)).thenReturn(userInfo);
+
+        assertThat(userDetailsService.getUserInfo(USER_AUTHORISATION)).isEqualTo(userInfo);
+    }
+
+    @Test
+    void givenUserInfoIsNull_thenThrowAnException() {
+        assertThatThrownBy(() -> userDetailsService.getUserInfo(USER_AUTHORISATION))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageStartingWith("Unable to obtain signed in user info");
+    }
+
+    @ParameterizedTest
+    @EnumSource(UserRole.class)
+    void givenUserAuthorisation_thenReturnUserRole(UserRole userRole) {
+        UserInfo userInfo = UserInfo.builder().roles(List.of(userRole.getValue())).build();
+        when(idamClient.getUserInfo(USER_AUTHORISATION)).thenReturn(userInfo);
+
+        assertThat(userDetailsService.getUserRole(USER_AUTHORISATION)).isEqualTo(userRole.getLabel());
+    }
+
+    @Test
+    void givenUserAuthorisation_andRoleIsNull_thenReturnNull() {
+        UserInfo userInfo = UserInfo.builder().roles(Collections.emptyList()).build();
+        when(idamClient.getUserInfo(USER_AUTHORISATION)).thenReturn(userInfo);
+
+        assertThat(userDetailsService.getUserRole(USER_AUTHORISATION)).isNull();
     }
 
 
