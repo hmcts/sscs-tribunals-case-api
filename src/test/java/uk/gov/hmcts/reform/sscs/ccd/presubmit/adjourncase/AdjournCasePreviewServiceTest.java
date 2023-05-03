@@ -1638,6 +1638,7 @@ class AdjournCasePreviewServiceTest {
             LocalDate.now(),
             LocalDate.now(),
             false,
+            false,
             USER_AUTHORISATION);
 
         String faceToFaceValue = HearingType.FACE_TO_FACE.getKey();
