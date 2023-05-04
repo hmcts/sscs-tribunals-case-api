@@ -221,6 +221,15 @@ ccd:
         value: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*,grantofrepresentation_cases,caveat_cases,legacy_cases,standingsearch_cases,willlodgement_cases
 
   logstash:
+    extraEnvs:
+      - name: ES_HOSTS
+        value: http://${SERVICE_NAME}-es-master:9200
+      - name: ES_DATA_NODES_URL
+        value: http://${SERVICE_NAME}-es-master:9200
+      - name: ELASTIC_SEARCH_DATA_NODES_HOSTS
+        value: http://${SERVICE_NAME}-es-master:9200
+      - name: ES_URL
+        value: http://${SERVICE_NAME}-es-master:9200
     elasticsearch:
       host: ${SERVICE_NAME}-es-master
       port: 9200
