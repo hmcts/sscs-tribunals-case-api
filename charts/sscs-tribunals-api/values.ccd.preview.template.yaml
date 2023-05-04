@@ -221,6 +221,14 @@ ccd:
         value: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*,grantofrepresentation_cases,caveat_cases,legacy_cases,standingsearch_cases,willlodgement_cases
 
   logstash:
+    image: hmctspublic.azurecr.io/imported/logstash/logstash
+    imageTag: 8.5.1
+    imagePullPolicy: "IfNotPresent"
+    logstashJavaOpts: -Xmx1g -Xms512M
+    logstashConfig:
+      logstash.yml: |
+        http.host: 0.0.0.0
+        xpack.monitoring.elasticsearch.hosts: ["http://${SERVICE_NAME}-es-master:9200"]
     extraEnvs:
       - name: ES_HOSTS
         value: http://${SERVICE_NAME}-es-master:9200
