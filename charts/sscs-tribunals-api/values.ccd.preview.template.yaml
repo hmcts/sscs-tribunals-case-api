@@ -220,6 +220,11 @@ ccd:
       - name: action.auto_create_index
         value: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*,grantofrepresentation_cases,caveat_cases,legacy_cases,standingsearch_cases,willlodgement_cases
 
+  logstash:
+    elasticsearch:
+      host: ${SERVICE_NAME}-es-master
+      port: 9200
+
   ccd-admin-web:
     nodejs:
       image: hmctspublic.azurecr.io/ccd/admin-web:latest
