@@ -222,10 +222,6 @@ ccd:
 
   logstash:
     logstashJavaOpts: -Xmx1g -Xms512M
-    logstashConfig:
-      logstash.yml: |
-        http.host: 0.0.0.0
-        xpack.monitoring.elasticsearch.hosts: ["http://${SERVICE_NAME}-es-master:9200"]
     extraEnvs:
       - name: ES_HOSTS
         value: http://${SERVICE_NAME}-es-master:9200
