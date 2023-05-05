@@ -112,6 +112,15 @@ class PdfRequestUtilTest {
     }
 
     @Test
+    void getNoticeBody_throwsExceptionWhenLibertyToApplyAndIsPostHearingsBEnabledIsFalse() {
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
+        assertThatThrownBy(() -> PdfRequestUtil.getNoticeBody(sscsCaseData, true, false))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageStartingWith("isPostHearingsBEnabled is false - Liberty to Apply is not available");
+    }
+
+
+    @Test
     void getGenerateNoticeReturnsExpected_withPostHearingReviewTypeSetAside() {
         sscsCaseData.getDocumentGeneration().setGenerateNotice(YES);
         sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.SET_ASIDE);
@@ -146,6 +155,14 @@ class PdfRequestUtilTest {
         assertThatThrownBy(() -> PdfRequestUtil.getGenerateNotice(sscsCaseData, true, true))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageStartingWith("getGenerateNotice has unexpected PostHearingReviewType: ");
+    }
+
+    @Test
+    void getGenerateNoticeThrowsError_whenLibertyToApplyAndIsPostHearingsBEnabledFalse() {
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
+        assertThatThrownBy(() -> PdfRequestUtil.getGenerateNotice(sscsCaseData, true, false))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("isPostHearingsBEnabled is false - Liberty to Apply is not available");
     }
 
     @Test

@@ -190,7 +190,7 @@ public class PdfRequestUtil {
                     if (isPostHearingsBEnabled) {
                         return caseData.getDocumentGeneration().getLibertyToApplyBodyContent();
                     }
-                    break;
+                    throw new IllegalArgumentException("isPostHearingsBEnabled is false - Liberty to Apply is not available");
                 case PERMISSION_TO_APPEAL:
                 default:
                     throw new IllegalArgumentException("getNoticeBody has unexpected postHearingReviewType: "
@@ -234,7 +234,7 @@ public class PdfRequestUtil {
                     if (isPostHearingsBEnabled) {
                         return caseData.getDocumentGeneration().getLibertyToApplyGenerateNotice();
                     }
-                    break;
+                    throw new IllegalArgumentException("isPostHearingsBEnabled is false - Liberty to Apply is not available");
                 case PERMISSION_TO_APPEAL:
                 default:
                     throw new IllegalArgumentException("getGenerateNotice has unexpected PostHearingReviewType: " + postHearingReviewType);
