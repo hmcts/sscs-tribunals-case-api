@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
@@ -146,8 +146,8 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
         ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
         sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
             .excludedPanelMembers(new ArrayList<>(Arrays.asList(
-                new CollectionItem<>("", JudicialUserBase.builder().idamId("1").build()),
-                new CollectionItem<>("", JudicialUserBase.builder().idamId("2").build())))).build());
+                new CcdValue<>(JudicialUserBase.builder().idamId("1").build()),
+                new CcdValue<>(JudicialUserBase.builder().idamId("2").build())))).build());
 
         sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
         sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
