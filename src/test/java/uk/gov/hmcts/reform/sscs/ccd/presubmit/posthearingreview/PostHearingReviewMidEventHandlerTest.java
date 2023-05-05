@@ -69,7 +69,7 @@ class PostHearingReviewMidEventHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, userDetailsService, true);
+        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, userDetailsService, true, true);
 
         caseData = SscsCaseData.builder()
             .documentGeneration(DocumentGeneration.builder()
@@ -108,7 +108,7 @@ class PostHearingReviewMidEventHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, userDetailsService, false);
+        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, userDetailsService, false, false);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
@@ -119,7 +119,8 @@ class PostHearingReviewMidEventHandlerTest {
         names = {
             "SET_ASIDE",
             "CORRECTION",
-            "STATEMENT_OF_REASONS"
+            "STATEMENT_OF_REASONS",
+            "LIBERTY_TO_APPLY"
         })
     void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentField(PostHearingReviewType postHearingReviewType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);

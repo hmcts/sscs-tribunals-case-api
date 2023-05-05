@@ -138,7 +138,7 @@ class IssueDocumentHandlerTest {
 
         String documentTypeLabel = "directions notice";
         LocalDate localDate = LocalDate.now();
-        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, documentTypeLabel, localDate, localDate, false, false, USER_AUTHORISATION);
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, documentTypeLabel, localDate, localDate, false, false, false, USER_AUTHORISATION);
         assertThat(payload.getAppellantFullName()).isEqualTo("User Lloris");
         assertThat(payload.getAppointeeFullName()).isNull();
         assertThat(payload.getCaseId()).isEqualTo("1");
@@ -227,7 +227,7 @@ class IssueDocumentHandlerTest {
         String bodyContent = "set aside body content";
         sscsCaseData.getDocumentGeneration().setBodyContent(bodyContent);
 
-        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, USER_AUTHORISATION);
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, false, USER_AUTHORISATION);
 
         assertThat(payload.getNoticeBody()).isEqualTo(bodyContent);
     }
@@ -239,7 +239,7 @@ class IssueDocumentHandlerTest {
         String bodyContent = "correction body content";
         sscsCaseData.getDocumentGeneration().setCorrectionBodyContent(bodyContent);
 
-        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, USER_AUTHORISATION);
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, false, USER_AUTHORISATION);
 
         assertThat(payload.getNoticeBody()).isEqualTo(bodyContent);
     }
@@ -251,7 +251,19 @@ class IssueDocumentHandlerTest {
         String bodyContent = "sor body content";
         sscsCaseData.getDocumentGeneration().setStatementOfReasonsBodyContent(bodyContent);
 
-        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, USER_AUTHORISATION);
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, false, USER_AUTHORISATION);
+
+        assertThat(payload.getNoticeBody()).isEqualTo(bodyContent);
+    }
+
+    @Test
+    void givenPostHearingReviewIsLta_thenUseLtaBody() {
+        SscsCaseData sscsCaseData = buildCaseData();
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
+        String bodyContent = "sor body content";
+        sscsCaseData.getDocumentGeneration().setLibertyToApplyBodyContent(bodyContent);
+
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, true, USER_AUTHORISATION);
 
         assertThat(payload.getNoticeBody()).isEqualTo(bodyContent);
     }
@@ -265,7 +277,7 @@ class IssueDocumentHandlerTest {
         sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
 
         assertThatThrownBy(() ->
-            handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, USER_AUTHORISATION))
+            handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, true, USER_AUTHORISATION))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("getNoticeBody has unexpected postHearingReviewType: " + postHearingReviewType.getDescriptionEn());
     }
