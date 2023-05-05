@@ -221,7 +221,7 @@ ccd:
 
   logstash:
     image: hmctspublic.azurecr.io/ccd/logstash
-    imageTag: "latest"
+    imageTag: "ccd-sscs-logstash-latest"
     elasticsearch:
       host: ${SERVICE_NAME}-es-master
       port: 9200
