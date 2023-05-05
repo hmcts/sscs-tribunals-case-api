@@ -34,7 +34,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new ActionFurtherEvidenceAboutToStartHandler();
+        handler = new ActionFurtherEvidenceAboutToStartHandler(true);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
 
