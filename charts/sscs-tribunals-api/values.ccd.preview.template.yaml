@@ -56,7 +56,7 @@ em-ccdorc:
       EM_STITCHING_API_URL: http://em-stitching-aat.service.core-compute-aat.internal
       DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
       CCD_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
-      CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
+      CALLBACK_DOMAIN: https://em-ccdorc-${SERVICE_FQDN}
 
 ccd-case-document-am-api:
   enabled: true
