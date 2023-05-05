@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -70,7 +70,7 @@ public class SscsUtil {
 
     public static void excludePanelMembers(PanelMemberExclusions exclusions, List<JudicialUserBase> panelMembers) {
         if (nonNull(panelMembers)) {
-            List<CollectionItem<JudicialUserBase>> panelMemberExclusions = exclusions.getExcludedPanelMembers();
+            List<CcdValue<JudicialUserBase>> panelMemberExclusions = exclusions.getExcludedPanelMembers();
 
             log.info("Excluding {} panel members with Personal Codes {}", panelMembers.size(),
                 panelMembers.stream().map(JudicialUserBase::getPersonalCode).collect(Collectors.toList()));
@@ -82,7 +82,7 @@ public class SscsUtil {
             panelMemberExclusions.addAll(panelMembers.stream()
                 .filter(Objects::nonNull)
                 .distinct()
-                .map(panelMember -> new CollectionItem<>(panelMember.getIdamId(), panelMember))
+                .map(CcdValue::new)
                 .filter(not(panelMemberExclusions::contains))
                 .collect(Collectors.toList()));
 
