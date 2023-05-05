@@ -49,7 +49,7 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
     }
 
     private void setFurtherEvidenceActionDropdown(SscsCaseData sscsCaseData) {
-        List<DynamicListItem> listOptions = getFurtherActionEvidenceItems(sscsCaseData);
+        List<DynamicListItem> listOptions = getFurtherActionEvidenceItems(List.of(values()));
 
         sscsCaseData.setFurtherEvidenceAction(new DynamicList(listOptions.get(0), listOptions));
     }
