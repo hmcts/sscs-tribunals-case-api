@@ -45,7 +45,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new ActionFurtherEvidenceMidEventHandler(footerService);
+        handler = new ActionFurtherEvidenceMidEventHandler(footerService, true);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
         when(footerService.isReadablePdf(any())).thenReturn(PdfState.OK);
@@ -483,6 +483,33 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
         assertEquals(1, response.getErrors().size());
         Iterator<String> iterator = response.getErrors().iterator();
         assertEquals("You cannot select 'Other party hearing preferences' as a Document Type as an Other party not selected from Original Sender list", iterator.next());
+    }
+
+    @Test
+    @Parameters({"setAsideApplication", "correctionApplication","statementOfReasonsApplication"})
+    public void givenAGapsCaseAndPostponementRequest_thenAddAnErrorToResponse(String doctype) {
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
+        DynamicListItem issueEvidenceAction = new DynamicListItem(
+            FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+            FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
+
+        sscsCaseData.getFurtherEvidenceAction().setValue(issueEvidenceAction);
+
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+            .type(doctype)
+            .fileName("Test.pdf")
+            .url(DocumentLink.builder().documentUrl("test.com").build())
+            .build();
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+            .value(scannedDocDetails)
+            .build();
+
+        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("Cannot upload post hearing requests on GAPS cases", response.getErrors().iterator().next());
     }
 
     @Test(expected = IllegalStateException.class)
