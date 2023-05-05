@@ -76,6 +76,7 @@ class PostHearingReviewMidEventHandlerTest {
                 .generateNotice(YES)
                 .correctionGenerateNotice(YES)
                 .statementOfReasonsGenerateNotice(YES)
+                .libertyToApplyGenerateNotice(YES)
                 .build())
             .appeal(Appeal.builder().appellant(Appellant.builder()
                     .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())

@@ -271,7 +271,7 @@ class IssueDocumentHandlerTest {
     @ParameterizedTest
     @EnumSource(
         value = PostHearingReviewType.class,
-        names = {"LIBERTY_TO_APPLY", "PERMISSION_TO_APPEAL"})
+        names = {"PERMISSION_TO_APPEAL"})
     void givenPostHearingReviewIsNotImplemented_thenThrowException(PostHearingReviewType postHearingReviewType) {
         SscsCaseData sscsCaseData = buildCaseData();
         sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
