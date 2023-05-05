@@ -312,9 +312,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         }
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
-
-            State beforeState = callback.getCaseDetailsBefore().map(e -> e.getState()).orElse(null);
-            clearTransientFields(caseData, beforeState);
+            clearTransientFields(caseData);
 
             if (shouldSetDwpState(caseData)) {
                 caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED);

@@ -190,4 +190,23 @@ class PostHearingRequestMidEventHandlerTest {
         assertThat(response.getErrors()).isEmpty();
     }
 
+    @Test
+    void givenPostHearingsEnabledFalse_addsErrorToResponse() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
+
+        caseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
+
+        handler = new PostHearingRequestMidEventHandler(false, generateFile, templateId);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors())
+            .isNotEmpty()
+            .hasSize(1)
+            .containsOnly("Post hearings is not currently enabled");
+    }
+
 }

@@ -150,7 +150,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     }
 
     private void addDirectionNotice(SscsCaseData caseData) {
-        SscsUtil.addDocumentToDocumentTab(footerService, caseData, POSTPONEMENT_REQUEST_DIRECTION_NOTICE);
+        SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData, POSTPONEMENT_REQUEST_DIRECTION_NOTICE);
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {

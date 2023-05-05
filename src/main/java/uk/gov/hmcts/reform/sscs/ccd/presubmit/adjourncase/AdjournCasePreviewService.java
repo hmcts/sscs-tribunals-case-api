@@ -69,15 +69,11 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     }
 
     @Override
-    protected NoticeIssuedTemplateBody createPayload(
-        PreSubmitCallbackResponse<SscsCaseData> response,
-        SscsCaseData caseData,
-        String documentTypeLabel,
-        LocalDate dateAdded,
-        LocalDate generatedDate,
-        boolean isScottish,
-        String userAuthorisation
-    ) {
+    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response,
+                                                     SscsCaseData caseData, String documentTypeLabel,
+                                                     LocalDate dateAdded, LocalDate generatedDate,
+                                                     boolean isScottish, boolean isPostHearingsEnabled,
+                                                     String userAuthorisation) {
         Adjournment adjournment = caseData.getAdjournment();
         NoticeIssuedTemplateBody formPayload = super.createPayload(
             response,
@@ -86,6 +82,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             dateAdded,
             adjournment.getGeneratedDate(),
             isScottish,
+            isPostHearingsEnabled,
             userAuthorisation);
         AdjournCaseTemplateBodyBuilder adjournCaseBuilder = AdjournCaseTemplateBody.builder();
 
@@ -129,7 +126,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         if (nextHearingType.isOralHearingType()) {
             handleOralHearing(adjournment, adjournCaseBuilder);
         }
-        adjournCaseBuilder.nextHearingType(nextHearingType.getValue());
+        adjournCaseBuilder.nextHearingType(nextHearingType.getKey());
 
         adjournCaseBuilder.panelMembersExcluded(String.valueOf(adjournment.getPanelMembersExcluded()));
 
