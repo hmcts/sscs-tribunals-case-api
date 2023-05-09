@@ -135,9 +135,9 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         writeFinalDecisionBuilder.hearingType(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionTypeOfHearing());
 
         if (caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion() != null && caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion().equalsIgnoreCase("no")) {
-            writeFinalDecisionBuilder.attendedHearing("no".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion()));
+            writeFinalDecisionBuilder.appointeeHearing("no".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion()));
         } else {
-            writeFinalDecisionBuilder.attendedHearing("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion()));
+            writeFinalDecisionBuilder.appointeeHearing("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion()));
         }
 
         if (caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion() != null && caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion().equalsIgnoreCase("no")) {
