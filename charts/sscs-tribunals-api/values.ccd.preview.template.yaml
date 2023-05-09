@@ -535,7 +535,7 @@ elastic:
   enabled: true
 
 sscs-evidence-share:
-  enabled: false
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/sscs/evidence-share:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
@@ -546,15 +546,20 @@ sscs-evidence-share:
       DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
       SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
-      TOPIC_NAME: "sscs-evidenceshare-topic-preview"
+      TOPIC_NAME: "sscs-orchestrator"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
-      AMQP_USERNAME: "preview_policy"
-      AMQP_PASSWORD: "LDSKtI6uxg5uggvLDx/4WcfZfP/RJkSrg+ASbMuROsM="
       ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
       ROBOTICS_EMAIL_TO: "fake"
       ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
       ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
       CASE_ACCESS_MANAGEMENT_FEATURE: true
+    secrets:
+      AMQP_USERNAME:
+        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-sscs-orchestrator
+        key: namespaceName
+      AMQP_PASSWORD:
+        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-sscs-orchestrator
+        key: primaryKey
 
 sscs-ccd-callback-orchestrator:
   enabled: true
@@ -563,11 +568,16 @@ sscs-ccd-callback-orchestrator:
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     readinessDelay: 90
     environment:
-      SUBSCRIPTION_NAME: "sscs-evidenceshare-topic-preview"
-      TOPIC_NAME: "sscs-evidenceshare-topic-preview"
+      SUBSCRIPTION_NAME: "hmc-to-sscs-subscription"
+      TOPIC_NAME: "sscs-orchestrator"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
-      AMQP_USERNAME: "preview_policy"
-      AMQP_PASSWORD: "LDSKtI6uxg5uggvLDx/4WcfZfP/RJkSrg+ASbMuROsM="
+    secrets:
+      AMQP_USERNAME:
+        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-sscs-orchestrator
+        key: namespaceName
+      AMQP_PASSWORD:
+        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-sscs-orchestrator
+        key: primaryKey
 
 
 #Enable for SYA
@@ -695,7 +705,7 @@ hmc-cft-hearing-service:
 
 #Enable for queues/topics
 servicebus:
-  enabled: false
+  enabled: true
   teamName: sscs
   resourceGroup: sscs-aks
   serviceplan: standard
@@ -709,3 +719,4 @@ servicebus:
       - name: hmc-from-hmi
       - name: hmc-to-hmi
       - name: tribunals-to-hearing-api
+      - name: sscs-orchestrator
