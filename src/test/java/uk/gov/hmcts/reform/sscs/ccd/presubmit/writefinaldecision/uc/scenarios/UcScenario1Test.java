@@ -55,7 +55,7 @@ public class UcScenario1Test {
             + "\n"
             + "Something else\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
         assertEquals(9, content.getComponents().size());
@@ -103,7 +103,7 @@ public class UcScenario1Test {
             + "\n"
             + "My second reasons\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
         assertEquals(8, content.getComponents().size());
@@ -146,7 +146,7 @@ public class UcScenario1Test {
             + "\n"
             + "Something else\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
         assertEquals(8, content.getComponents().size());
