@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.ADJOURNMENT_NOTICE_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
@@ -10,6 +12,8 @@ import java.util.Objects;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,24 +26,23 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.adjourncase.AdjournCaseService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
+@AllArgsConstructor
 public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final FooterService footerService;
     private final Validator validator;
 
+    private final ListAssistHearingMessageHelper hearingMessageHelper;
+
     @Value("${feature.snl.adjournment.enabled}")
     private boolean isAdjournmentEnabled; // TODO SSCS-10951
-
-    @Autowired
-    public IssueAdjournmentNoticeAboutToSubmitHandler(FooterService footerService, Validator validator) {
-        this.footerService = footerService;
-        this.validator = validator;
-    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -74,6 +77,16 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             } else {
                 preSubmitCallbackResponse.addError("There is no Draft Adjournment Notice on the case so adjournment cannot be issued");
             }
+        }
+
+        Adjournment adjournment = sscsCaseData.getAdjournment();
+
+        if (SscsUtil.isSAndLCase(sscsCaseData)
+            && isAdjournmentEnabled // TODO SSCS-10951
+            && (isYes(adjournment.getCanCaseBeListedRightAway())
+            || isNoOrNull(adjournment.getAreDirectionsBeingMadeToParties()))) {
+            adjournment.setAdjournmentInProgress(YES);
+            hearingMessageHelper.sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
         }
 
         return preSubmitCallbackResponse;

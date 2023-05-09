@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -52,6 +53,9 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
     @Mock
     protected FooterService footerService;
 
+    @Mock
+    ListAssistHearingMessageHelper listAssistHearingMessageHelper;
+
     protected SscsCaseData sscsCaseData;
 
     protected static Validator validator = Validation
@@ -63,7 +67,8 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
 
     @BeforeEach
     protected void setUp() {
-        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, validator);
+        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, validator,
+            listAssistHearingMessageHelper, true);
 
         List<SscsDocument> documentList = new ArrayList<>();
 

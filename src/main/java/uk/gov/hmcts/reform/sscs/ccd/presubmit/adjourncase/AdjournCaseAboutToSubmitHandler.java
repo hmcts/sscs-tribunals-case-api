@@ -44,8 +44,6 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
 
-    private final ListAssistHearingMessageHelper hearingMessageHelper;
-
     @Value("${feature.snl.adjournment.enabled}")
     private boolean isAdjournmentEnabled; // TODO SSCS-10951
 
@@ -72,15 +70,6 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             sscsCaseData,
             DRAFT_ADJOURNMENT_NOTICE,
             adjournment.getPreviewDocument());
-
-        if (SscsUtil.isSAndLCase(sscsCaseData)
-            && isAdjournmentEnabled // TODO SSCS-10951
-            && (isYes(adjournment.getCanCaseBeListedRightAway())
-            || isNoOrNull(adjournment.getAreDirectionsBeingMadeToParties()))
-        ) {
-            adjournment.setAdjournmentInProgress(YES);
-            hearingMessageHelper.sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
-        }
 
         if (adjournment.getInterpreterRequired() != null) {
             HearingOptions hearingOptions = HearingOptions.builder().build();
