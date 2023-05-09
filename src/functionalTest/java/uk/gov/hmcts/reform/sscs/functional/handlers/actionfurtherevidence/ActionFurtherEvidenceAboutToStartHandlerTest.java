@@ -53,7 +53,9 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest extends BaseHandler {
             .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "informationReceivedForInterlocTcw")))
             .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "sendToInterlocReviewByJudge")))
             .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "sendToInterlocReviewByTcw")))
-            .assertThat().body("data.furtherEvidenceAction.list_items", hasSize(6));
+            .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "sendToInterlocReviewByTcw")))
+            .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "adminActionCorrection")))
+            .assertThat().body("data.furtherEvidenceAction.list_items", hasSize(7));
 
     }
 }
