@@ -12,10 +12,8 @@ import java.util.Objects;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -79,16 +77,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             }
         }
 
-        Adjournment adjournment = sscsCaseData.getAdjournment();
-
-        if (SscsUtil.isSAndLCase(sscsCaseData)
-            && isAdjournmentEnabled // TODO SSCS-10951
-            && (isYes(adjournment.getCanCaseBeListedRightAway())
-            || isNoOrNull(adjournment.getAreDirectionsBeingMadeToParties()))) {
-            adjournment.setAdjournmentInProgress(YES);
-            hearingMessageHelper.sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
-        }
-
         return preSubmitCallbackResponse;
     }
 
@@ -105,12 +93,22 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             }
         } else {
             log.info("Case is a Welsh case so Adjournment Notice requires translation for case id : {}", sscsCaseData.getCcdCaseId());
-            clearBasicTransientFields(sscsCaseData);
             sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
             log.info("Set the InterlocReviewState to {},  for case id : {}", sscsCaseData.getInterlocReviewState(), sscsCaseData.getCcdCaseId());
             sscsCaseData.setTranslationWorkOutstanding("Yes");
         }
 
+        Adjournment adjournment = sscsCaseData.getAdjournment();
+
+        if (SscsUtil.isSAndLCase(sscsCaseData)
+            && isAdjournmentEnabled // TODO SSCS-10951
+            && (isYes(adjournment.getCanCaseBeListedRightAway())
+            || isNoOrNull(adjournment.getAreDirectionsBeingMadeToParties()))) {
+            adjournment.setAdjournmentInProgress(YES);
+            hearingMessageHelper.sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
+        }
+
+        clearBasicTransientFields(sscsCaseData);
         AdjournCaseService.clearTransientFields(sscsCaseData, isAdjournmentEnabled);
 
         preSubmitCallbackResponse.getData().getSscsDocument()
