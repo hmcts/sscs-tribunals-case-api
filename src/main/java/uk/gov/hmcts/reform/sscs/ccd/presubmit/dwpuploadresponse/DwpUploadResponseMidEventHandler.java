@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isSscs2Case;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +45,7 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
 
 
         validatePostponementRequests(caseDetails, sscsCaseData, preSubmitCallbackResponse);
-
+        forceToAddOtherPartyOnSscs2Case(sscsCaseData, preSubmitCallbackResponse);
 
         return preSubmitCallbackResponse;
     }
@@ -59,6 +60,14 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
                     preSubmitCallbackResponse.addError(APPENDIX_12_DOC_NOT_FOR_SSCS5_CONFIDENTIALITY);
                 }
             }
+        }
+    }
+
+    private void forceToAddOtherPartyOnSscs2Case(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (isSscs2Case(sscsCaseData.getAppeal().getBenefitType().getCode())
+                && sscsCaseData.getOtherParties() != null 
+                && sscsCaseData.getOtherParties().size() == 0) {
+            preSubmitCallbackResponse.addError("Please provide other party details");
         }
     }
 }
