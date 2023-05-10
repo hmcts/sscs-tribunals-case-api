@@ -250,4 +250,11 @@ public class OtherPartyDataUtil {
         otherParty.setShowRole(NO);
         otherParty.setRole(null);
     }
+
+    public static boolean isSscs2Case(String benefitTypeCode) {
+        return Optional.ofNullable(benefitTypeCode)
+            .filter(b -> Benefit.findBenefitByShortName(b)
+            .filter(benefit -> benefit.getSscsType().equals(SscsType.SSCS2)).isPresent())
+            .isPresent();
+    }
 }
