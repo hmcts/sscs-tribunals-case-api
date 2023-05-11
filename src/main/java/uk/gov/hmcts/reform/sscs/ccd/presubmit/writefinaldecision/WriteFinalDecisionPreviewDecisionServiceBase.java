@@ -134,16 +134,16 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         writeFinalDecisionBuilder.hearingType(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionTypeOfHearing());
 
-        if (caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion() != null && caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion().equalsIgnoreCase("no")) {
-            writeFinalDecisionBuilder.appointeeHearing("no".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion()));
-        } else {
-            writeFinalDecisionBuilder.appointeeHearing("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion()));
+        if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equalsIgnoreCase("Yes")) {
+            writeFinalDecisionBuilder.appointeeOnCase(true);
         }
 
-        if (caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion() != null && caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion().equalsIgnoreCase("no")) {
-            writeFinalDecisionBuilder.attendedHearing("no".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion()));
-        } else {
-            writeFinalDecisionBuilder.attendedHearing("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion()));
+        if (caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion() != null && caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion().equalsIgnoreCase("yes")) {
+            writeFinalDecisionBuilder.appointeeHearing(true);
+        }
+
+        if (caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion() != null && caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion().equalsIgnoreCase("yes")) {
+            writeFinalDecisionBuilder.attendedHearing(true);
         }
 
         writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
