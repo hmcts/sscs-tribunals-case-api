@@ -52,7 +52,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, false);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, false, false);
     }
 
 
@@ -150,7 +150,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         Callback<SscsCaseData> callback = buildCallback(furtherEvidenceActionSelectedOption, ACTION_FURTHER_EVIDENCE);
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, false);
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals(interlocReviewState, captor.getValue().getInterlocReviewState());
@@ -170,6 +170,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         "SET_ASIDE, setAsideRequest",
         "CORRECTION, correctionRequest",
         "STATEMENT_OF_REASONS, sORRequest",
+        "LIBERTY_TO_APPLY, libertyToApplyRequest"
     })
     public void givenPostHearingAndFurtherEvidenceActionIsReviewByJudge_shouldTriggerEventAndUpdateCaseCorrectly(
         PostHearingRequestType requestType, String eventType) {
@@ -185,7 +186,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, true);
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, captor.getValue().getInterlocReviewState());
@@ -197,7 +198,6 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @Test
     @Parameters({
-        "LIBERTY_TO_APPLY, libertyToApplyRequest",
         "PERMISSION_TO_APPEAL, permissionToAppealRequest"
     })
     public void givenPostHearingNotImplementedAndFurtherEvidenceActionIsReviewByJudge_shouldThrowException(
@@ -214,9 +214,32 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, true);
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
         assertEquals(String.format("Post hearing request type is not implemented or recognised: %s", requestType), exception.getMessage());
+    }
+
+    @Test
+    @Parameters({
+        "LIBERTY_TO_APPLY, libertyToApplyRequest"
+    })
+    public void givenPostHearingsBNotEnabledAndFurtherEvidenceActionIsReviewByJudge_shouldThrowException(
+        PostHearingRequestType requestType, String eventType) {
+
+        Callback<SscsCaseData> callback = buildCallback("sendToInterlocReviewByJudge", ACTION_FURTHER_EVIDENCE);
+        callback.getCaseDetails().getCaseData().getPostHearing().setRequestType(requestType);
+
+        given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
+
+        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
+
+        given(ccdService.updateCase(captor.capture(), anyLong(), eq(eventType), anyString(), anyString(),
+            any(IdamTokens.class)))
+            .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, false);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
+        assertEquals("Post hearings B is not enabled)", exception.getMessage());
     }
 
     @Test
