@@ -14,8 +14,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.service.adjourncase.AdjournCaseService;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
@@ -59,7 +59,7 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
         if (preSubmitCallbackResponse.getData().getSscsDocument() != null && preSubmitCallbackResponse.getData().getSscsDocument().stream()
             .noneMatch(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()))) {
 
-            AdjournCaseService.clearTransientFields(preSubmitCallbackResponse.getData(), isAdjournmentEnabled);
+            SscsUtil.clearAdjournmentTransientFields(preSubmitCallbackResponse.getData(), isAdjournmentEnabled);
         }
     }
 }

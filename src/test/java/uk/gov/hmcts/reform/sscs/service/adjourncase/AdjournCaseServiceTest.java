@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 public class AdjournCaseServiceTest {
 
@@ -63,7 +64,7 @@ public class AdjournCaseServiceTest {
     @DisplayName("When adjournment feature flag is enabled, all fields are cleared except adjournmentInProgress which is NO")
     @Test
     public void willRemoveTransientAdjournCaseData_andSetAdjournmentInProgressToNoWhenFeatureFlagIsEnabled() {
-        AdjournCaseService.clearTransientFields(sscsCaseData, true);
+        SscsUtil.clearAdjournmentTransientFields(sscsCaseData, true);
         assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrPropertiesExcept("adjournmentInProgress");
         assertThat(sscsCaseData.getAdjournment().getAdjournmentInProgress()).isEqualTo(NO);
     }
@@ -71,7 +72,7 @@ public class AdjournCaseServiceTest {
     @DisplayName("When adjournment feature flag is disabled, all fields are cleared")
     @Test
     public void willRemoveTransientAdjournCaseData() {
-        AdjournCaseService.clearTransientFields(sscsCaseData, false);
+        SscsUtil.clearAdjournmentTransientFields(sscsCaseData, false);
         assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
     }
 }
