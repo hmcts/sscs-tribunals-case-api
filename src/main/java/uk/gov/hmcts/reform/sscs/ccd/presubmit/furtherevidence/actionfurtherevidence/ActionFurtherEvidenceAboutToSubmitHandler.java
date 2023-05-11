@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
 import static java.util.Arrays.stream;
-import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
@@ -175,11 +174,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private static boolean isPostHearingApplicationWithWrongActionCode(String actionCode, String scannedDocumentType) {
-        boolean isDocTypeRequiresReviewByJudge = !isNull(scannedDocumentType)
-            && Set.of(ScannedDocumentType.SET_ASIDE_APPLICATION.getValue(),
-                ScannedDocumentType.LIBERTY_TO_APPLY_APPLICATION.getValue(),
-                ScannedDocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue())
-            .contains(scannedDocumentType);
+        boolean isDocTypeRequiresReviewByJudge =
+            ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType)
+            || ScannedDocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue().equals(scannedDocumentType)
+            || ScannedDocumentType.LIBERTY_TO_APPLY_APPLICATION.getValue().equals(scannedDocumentType);
         boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
         return isDocTypeRequiresReviewByJudge && isNotInterlocReviewByJudge;
     }

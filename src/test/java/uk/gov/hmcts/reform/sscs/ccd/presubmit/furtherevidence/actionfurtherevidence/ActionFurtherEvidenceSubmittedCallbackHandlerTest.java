@@ -238,8 +238,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
         handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, false);
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
-        assertEquals("Post hearings B is not enabled)", exception.getMessage());
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
+        assertEquals("Post hearings B is not enabled", exception.getMessage());
     }
 
     @Test
