@@ -1,11 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.eq;
@@ -200,13 +196,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    @DisplayName("Given a valid post hearing application request, "
+        + "and review by judge is selected, "
+        + "and original sender is DWP, "
+        + "then DWP State is updated and types are set")
     @Parameters({
         "setAsideApplication, SET_ASIDE_REQUESTED, SET_ASIDE",
         "correctionApplication, CORRECTION_REQUESTED, CORRECTION",
         "statementOfReasonsApplication, STATEMENT_OF_REASONS_REQUESTED, STATEMENT_OF_REASONS",
         "libertyToApplyApplication, LIBERTY_TO_APPLY_REQUESTED, LIBERTY_TO_APPLY"
     })
-    public void givenAValidPostHearingApplicationRequest_andReviewByJudgeIsSelected_thenDwpStateIsUpdatedAndTypesAreSet(
+    public void givenAValidPostHearingApplicationRequest_andReviewByJudgeIsSelected_andOriginalSenderIsDwp_thenDwpStateIsUpdatedAndTypesAreSet(
         String documentType,
         DwpState dwpState,
         PostHearingRequestType requestType
@@ -237,6 +237,52 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                 ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getDwpState(), is(dwpState));
+        assertThat(response.getData().getPostHearing().getRequestType(), is(requestType));
+        SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
+        assertThat(sscsDocumentDetail.getDocumentType(), is(documentType));
+    }
+
+    @Test
+    @DisplayName("Given a valid post hearing application request, "
+        + "and review by judge is selected, "
+        + "and original sender is NOT DWP, "
+        + "then DWP State is NOT updated and types are set")
+    @Parameters({
+        "setAsideApplication, SET_ASIDE",
+        "correctionApplication, CORRECTION",
+        "statementOfReasonsApplication, STATEMENT_OF_REASONS",
+        "libertyToApplyApplication, LIBERTY_TO_APPLY"
+    })
+    public void givenAValidPostHearingApplicationRequest_andReviewByJudgeIsSelected_andOriginalSenderIsNotDwp_thenDwpStateIsNotUpdatedAndTypesAreSet(
+        String documentType,
+        PostHearingRequestType requestType
+    ) {
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true, true);
+
+        DynamicListItem sendToInterlocListItem = new DynamicListItem(
+            FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+            FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
+
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
+
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+            .type(documentType)
+            .fileName("Test.pdf")
+            .url(DOC_LINK)
+            .build();
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+            .value(scannedDocDetails)
+            .build();
+
+        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
+            ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getDwpState(), is(nullValue()));
         assertThat(response.getData().getPostHearing().getRequestType(), is(requestType));
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
         assertThat(sscsDocumentDetail.getDocumentType(), is(documentType));
