@@ -19,6 +19,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @ExtendWith(MockitoExtension.class)
 public class IssueAdjournmentNoticeSubmittedHandlerTest {
@@ -26,6 +28,12 @@ public class IssueAdjournmentNoticeSubmittedHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private IssueAdjournmentNoticeSubmittedHandler handler;
+
+    @Mock
+    private CcdService ccdService;
+
+    @Mock
+    private IdamService idamService;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -37,7 +45,7 @@ public class IssueAdjournmentNoticeSubmittedHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new IssueAdjournmentNoticeSubmittedHandler(true);
+        handler = new IssueAdjournmentNoticeSubmittedHandler(true, ccdService, idamService);
 
         caseData = SscsCaseData.builder().ccdCaseId("ccdId")
             .appeal(Appeal.builder().build())
@@ -91,7 +99,7 @@ public class IssueAdjournmentNoticeSubmittedHandlerTest {
 
     @Test
     void givenAdjournmentEnabledFalse_thenReturnFalse() {
-        handler = new IssueAdjournmentNoticeSubmittedHandler(false);
+        handler = new IssueAdjournmentNoticeSubmittedHandler(false, ccdService, idamService);
         when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
         assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }
