@@ -19,7 +19,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +26,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
