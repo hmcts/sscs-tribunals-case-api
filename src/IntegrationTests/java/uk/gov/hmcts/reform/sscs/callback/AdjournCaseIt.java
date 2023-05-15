@@ -219,7 +219,7 @@ public class AdjournCaseIt extends AbstractEventIt {
             parentPayload,
             payload,
             FIRST_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED,
-            "telephone",
+            "telephone hearing",
             A_STANDARD_TIME_SLOT,
             "telephone"
         );
@@ -240,7 +240,7 @@ public class AdjournCaseIt extends AbstractEventIt {
             parentPayload,
             payload,
             "It will be first in the session on a date to be fixed",
-            "video",
+            "video hearing",
             A_STANDARD_TIME_SLOT,
             "video"
         );
@@ -261,7 +261,7 @@ public class AdjournCaseIt extends AbstractEventIt {
             parentPayload,
             payload,
             FIRST_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED,
-            "paper",
+            "decision on the papers",
             null,
             "paper"
         );
@@ -338,7 +338,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         String nextHearingDate,
         String interpreterDescription
     ) {
-        checkPayloadDetails(parentPayload, payload, nextHearingDate, "faceToFace",
+        checkPayloadDetails(parentPayload, payload, nextHearingDate, "face to face hearing",
             A_STANDARD_TIME_SLOT, "faceToFace", interpreterDescription);
         assertThat(payload.isNextHearingAtVenue()).isTrue();
         assertThat(payload.getNextHearingVenue()).isEqualTo(CHESTER_MAGISTRATE_S_COURT);
