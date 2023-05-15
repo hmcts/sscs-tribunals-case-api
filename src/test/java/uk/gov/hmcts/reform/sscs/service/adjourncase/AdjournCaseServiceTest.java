@@ -66,7 +66,7 @@ public class AdjournCaseServiceTest {
     public void willRemoveTransientAdjournCaseData_andSetAdjournmentInProgressToNoWhenFeatureFlagIsEnabled() {
         SscsUtil.clearAdjournmentTransientFields(sscsCaseData, true);
         assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrPropertiesExcept("adjournmentInProgress");
-        assertThat(sscsCaseData.getAdjournment().getAdjournmentInProgress()).isEqualTo(NO);
+        assertThat(sscsCaseData.getAdjournment().getAdjournmentInProgress()).isEqualTo(null);
     }
 
     @DisplayName("When adjournment feature flag is disabled, all fields are cleared")

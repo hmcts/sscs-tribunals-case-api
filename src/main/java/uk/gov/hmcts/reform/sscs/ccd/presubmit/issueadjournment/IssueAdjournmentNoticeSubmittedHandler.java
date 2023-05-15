@@ -37,6 +37,7 @@ public class IssueAdjournmentNoticeSubmittedHandler implements PreSubmitCallback
         }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.getAdjournment().setAdjournmentInProgress(YesNo.NO);
 
         ccdService.updateCase(
             caseData,

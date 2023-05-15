@@ -114,7 +114,7 @@ public class IssueAdjournmentNoticeSubmittedHandlerTest {
         Adjournment adjournment = response.getData().getAdjournment();
 
         assertThat(adjournment).hasAllNullFieldsOrPropertiesExcept("adjournmentInProgress");
-        assertThat(adjournment.getAdjournmentInProgress()).isEqualTo(NO);
+        assertThat(adjournment.getAdjournmentInProgress()).isEqualTo(null);
     }
 
 }
