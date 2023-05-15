@@ -126,7 +126,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         if (nextHearingType.isOralHearingType()) {
             handleOralHearing(adjournment, adjournCaseBuilder);
         }
-        adjournCaseBuilder.nextHearingType(nextHearingType.getKey());
+        adjournCaseBuilder.nextHearingType(nextHearingType.getValue());
 
         adjournCaseBuilder.panelMembersExcluded(String.valueOf(adjournment.getPanelMembersExcluded()));
 
