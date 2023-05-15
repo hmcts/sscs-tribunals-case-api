@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.ADJOURNMENT_NOTICE_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -107,6 +108,10 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             hearingMessageHelper.sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
         }
 
+        if (isAdjournmentEnabled) {
+            updateExcludedPanelMembers(sscsCaseData);
+        }
+
         clearBasicTransientFields(sscsCaseData);
 
         preSubmitCallbackResponse.getData().getSscsDocument()
@@ -141,6 +146,21 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.ADJOURNMENT_NOTICE, now,
                 null, null, documentTranslationStatus);
+    }
+
+    private static void updateExcludedPanelMembers(SscsCaseData caseData) {
+        Adjournment adjournment = caseData.getAdjournment();
+        AdjournCasePanelMembersExcluded panelMembersExcluded = adjournment.getPanelMembersExcluded();
+        if (nonNull(panelMembersExcluded)) {
+            PanelMemberExclusions panelMemberExclusions = caseData.getSchedulingAndListingFields()
+                .getPanelMemberExclusions();
+
+            if (panelMembersExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
+                SscsUtil.excludePanelMembers(panelMemberExclusions, adjournment.getPanelMembers());
+            } else if (panelMembersExcluded.equals(AdjournCasePanelMembersExcluded.RESERVED)) {
+                panelMemberExclusions.setArePanelMembersReserved(YES);
+            }
+        }
     }
 
 }
