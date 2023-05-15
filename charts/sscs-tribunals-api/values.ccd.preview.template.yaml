@@ -578,6 +578,12 @@ sscs-ccd-callback-orchestrator:
       AMQP_PASSWORD:
         secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-sscs-orchestrator
         key: primaryKey
+      SB_ACCESS_KEY:
+        secretRef: sscs-sb-preview
+        key: primaryKey
+      SB_CONNECTION_STRING:
+        secretRef: sscs-sb-preview
+        key: connectionString
 
 
 #Enable for SYA
@@ -706,9 +712,8 @@ hmc-cft-hearing-service:
 #Enable for queues/topics
 servicebus:
   enabled: true
-  teamName: sscs
-  resourceGroup: sscs-aks
-  serviceplan: standard
+  resourceGroup: sscs-aso-preview-rg
+  sbNamespace: sscs
   #Each topic/queue matches up to one used in the config above
   setup:
     topics:
