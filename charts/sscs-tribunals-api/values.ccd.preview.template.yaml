@@ -379,7 +379,7 @@ ccd:
       03_output.conf: |
         output {
             elasticsearch {
-                hosts => ["${ES_HOSTS}"]
+                hosts => ["${SERVICE_NAME}-es"]
                 sniffing => false
                 index => "%{[index_id]}"
                 document_type => "_doc"
