@@ -222,8 +222,8 @@ ccd:
         memory: "512Mi"
 
   logstash:
-    image: "hmctspublic.azurecr.io/imported/logstash/logstash"
-    imageTag: "7.16.1"
+    image: hmctspublic.azurecr.io/ccd/logstash
+    imageTag: "latest"
     logstashJavaOpts: -Xmx1g -Xms512M
     persistence:
       enabled: false
