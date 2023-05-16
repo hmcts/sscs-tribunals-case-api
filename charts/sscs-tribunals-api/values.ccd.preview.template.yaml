@@ -223,7 +223,7 @@ ccd:
 
   logstash:
     image: hmctspublic.azurecr.io/imported/logstash/logstash
-    imageTag: 7.16.1
+    imageTag: 8.5.1
     elasticsearch:
       host: ${SERVICE_NAME}-es-master
       port: 9200
