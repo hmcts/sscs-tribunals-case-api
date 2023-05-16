@@ -257,9 +257,9 @@ ccd:
       01_input.conf: |
         input  {
           jdbc {
-            jdbc_connection_string => "${DATA_STORE_URL}"
-            jdbc_user => "${DATA_STORE_USER}"
-            jdbc_password => "${DATA_STORE_PASS}"
+            jdbc_connection_string => "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified"
+            jdbc_user => "hmcts"
+            jdbc_password => "hmcts"
             jdbc_validate_connection => true
             jdbc_validation_timeout => "1"
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
