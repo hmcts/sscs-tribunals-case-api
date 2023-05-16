@@ -227,7 +227,7 @@ ccd:
       - name: DATA_STORE_USER
         value: hmcts
       - name: ES_HOSTS
-        value: "${SERVICE_NAME}-es"
+        value: "${SERVICE_NAME}-es-master"
     extraInitContainers: |
       - name: download-postgres-jdbc
         image: hmctspublic.azurecr.io/curl:7.70.0
@@ -379,7 +379,7 @@ ccd:
       03_output.conf: |
         output {
             elasticsearch {
-                hosts => ["${SERVICE_NAME}-es"]
+                hosts => ["${SERVICE_NAME}-es-master"]
                 sniffing => false
                 index => "%{[index_id]}"
                 document_type => "_doc"
