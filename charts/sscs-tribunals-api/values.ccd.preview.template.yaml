@@ -222,32 +222,33 @@ ccd:
         memory: "512Mi"
 
   logstash:
-    image: hmctspublic.azurecr.io/imported/logstash/logstash
-    imageTag: 7.16.1
-    elasticsearch:
-      host: ${SERVICE_NAME}-es-master
-      port: 9200
+    image: "hmctspublic.azurecr.io/imported/logstash/logstash"
+    imageTag: "7.16.1"
+    logstashJavaOpts: -Xmx1g -Xms512M
+    persistence:
+      enabled: false
     extraEnvs:
-      - name: DATA_STORE_URL
-        value: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified
-      - name: DATA_STORE_USER
-        value: hmcts
       - name: DATA_STORE_PASS
-        value: hmcts
-      - name: DB_URL
-        value: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified
-      - name: DB_USER
-        value: hmcts
-      - name: DB_PWD
-        value: hmcts
+        value: "{{ tpl .Values.global.postgresUsername $}}"
+      - name: DATA_STORE_URL
+        value: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified"
+      - name: DATA_STORE_USER
+        value: "{{ tpl .Values.global.postgresUsername $}}"
       - name: ES_HOSTS
-        value: http://${SERVICE_NAME}-es-master:9200
-      - name: ES_DATA_NODES_URL
-        value: http://${SERVICE_NAME}-es-master:9200
-      - name: ELASTIC_SEARCH_DATA_NODES_HOSTS
-        value: http://${SERVICE_NAME}-es-master:9200
-      - name: ES_URL
-        value: http://${SERVICE_NAME}-es-master:9200
+        value: "{{ .Release.Name }}-es"
+    extraInitContainers: |
+        - name: download-postgres-jdbc
+          image: hmctspublic.azurecr.io/curl:7.70.0
+          command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.3.3.jar', '-o', '/logstash-lib/postgresql.jar']
+          volumeMounts:
+          - name: logstash-lib
+            mountPath: /logstash-lib
+    extraVolumes: |
+      - name: logstash-lib
+        emptyDir: {}
+    extraVolumeMounts: |
+      - name: logstash-lib
+        mountPath: /usr/share/logstash/ccd
     logstashConfig:
       logstash.yml: |
         http.host: 0.0.0.0
@@ -269,13 +270,11 @@ ccd:
             jdbc_user => "${DATA_STORE_USER}"
             jdbc_password => "${DATA_STORE_PASS}"
             jdbc_validate_connection => true
+            jdbc_validation_timeout => "1"
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
             jdbc_driver_class => "org.postgresql.Driver"
             jdbc_default_timezone => "UTC"
-            parameters => {
-                        "jurisdiction" => "SSCS"
-                          }
-            statement => "UPDATE case_data SET marked_by_logstash = true WHERE marked_by_logstash = false AND jurisdiction = :jurisdiction RETURNING id, created_date, last_modified, jurisdiction, case_type_id, state, last_state_modified_date, data::TEXT as json_data, data_classification::TEXT as json_data_classification, reference, security_classification, supplementary_data::TEXT as json_supplementary_data"
+            statement => "UPDATE case_data SET marked_by_logstash = true WHERE marked_by_logstash = false RETURNING id, created_date, last_modified, jurisdiction, case_type_id, state, last_state_modified_date, data::TEXT as json_data, data_classification::TEXT as json_data_classification, reference, security_classification, supplementary_data::TEXT as json_supplementary_data"
             clean_run => false
             schedule => "* * * * * *"
           }
@@ -397,13 +396,6 @@ ccd:
                 timeout => 60
             }
         }
-    resources:
-      requests:
-        cpu: "500m"
-        memory: "1024Mi"
-      limits:
-        cpu: "2500m"
-        memory: "1024Mi"
 
   ccd-admin-web:
     nodejs:
