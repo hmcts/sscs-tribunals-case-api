@@ -188,7 +188,7 @@ public abstract class WriteFinalDecisionTemplateContent {
     }
 
     private static String getPresentingOfficerAttendance(boolean presentingOfficerAttended) {
-        return presentingOfficerAttended ? "A Presenting Officer attended on behalf of the Respondent." : "First Tier Agency representative did not attend.";
+        return presentingOfficerAttended ? "First Tier Agency representative attended on behalf of the Respondent." : "First Tier Agency representative did not attend.";
     }
 
     protected String getOtherPartyNamesAttendedString(String otherPartyNamesAttended) {
