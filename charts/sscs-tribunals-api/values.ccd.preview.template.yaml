@@ -227,31 +227,12 @@ ccd:
         value: "{{ tpl .Values.global.postgresUsername $}}"
       - name: ES_HOSTS
         value: "{{ .Release.Name }}-es"
-    extraInitContainers: |
-        - name: download-postgres-jdbc
-          image: hmctspublic.azurecr.io/curl:7.70.0
-          command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.3.3.jar', '-o', '/logstash-lib/postgresql.jar']
-          volumeMounts:
-          - name: logstash-lib
-            mountPath: /logstash-lib
-    extraVolumes: |
-      - name: logstash-lib
-        emptyDir: {}
-    extraVolumeMounts: |
-      - name: logstash-lib
-        mountPath: /usr/share/logstash/ccd
     logstashConfig:
       logstash.yml: |
         http.host: 0.0.0.0
         xpack.monitoring.enabled: false
         queue.type: persisted
         dead_letter_queue.enable: true
-      configTpl:
-        xpack.monitoring.enabled: "false"
-        db.url: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified
-        db.user: hmcts
-        db.pwd: hmcts
-        es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
       pipelines.yml: |
         - pipeline.id: main
           path.config: "/usr/share/logstash/pipeline/{01_input,02_filter,03_output}.conf"
