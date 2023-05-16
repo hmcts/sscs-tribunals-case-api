@@ -32,7 +32,8 @@ public class PdfRequestUtil {
     @AllArgsConstructor
     public enum PdfType {
         POSTPONEMENT("Postponement Request"),
-        POST_HEARING("Post Hearing Application");
+        POST_HEARING("Post Hearing Application"),
+        STATEMENT_OF_REASONS("Statement of Reasons");
 
         final String name;
 
@@ -70,6 +71,10 @@ public class PdfRequestUtil {
                 pdfUrlBuilder.append("Postponement Request");
                 handlePostponement(sscsCaseData);
                 break;
+            case STATEMENT_OF_REASONS:
+                pdfUrlBuilder.append("Statement of Reasons");
+                handleWriteSor(sscsCaseData);
+                break;
             default:
                 throw new IllegalArgumentException("Unsupported pdf type for processRequestPdfAndSetPreviewDocument: " + pdfType);
         }
@@ -85,6 +90,7 @@ public class PdfRequestUtil {
 
         switch (pdfType) {
             case POST_HEARING:
+            case STATEMENT_OF_REASONS:
                 sscsCaseData.getDocumentStaging().setPreviewDocument(previewDocument);
                 break;
             case POSTPONEMENT:
@@ -131,6 +137,12 @@ public class PdfRequestUtil {
             .append(requestDetails)
             .append("\n");
         title = String.format("%s Application from %s", requestTypeDescriptionEn, "FTA");
+    }
+
+    private static void handleWriteSor(SscsCaseData sscsCaseData) {
+        requestDetails = sscsCaseData.getDocumentGeneration().getWriteStatementOfReasonsBodyContent();
+        additionalRequestDetails.append(requestDetails);
+        title = "Statement of Reasons";
     }
 
 
