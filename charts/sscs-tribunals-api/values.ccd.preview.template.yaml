@@ -547,7 +547,7 @@ sscs-evidence-share:
       CASE_ACCESS_MANAGEMENT_FEATURE: true
 
 sscs-ccd-callback-orchestrator:
-  enabled: false
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/sscs/ccd-callback-orchestrator:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
@@ -558,6 +558,19 @@ sscs-ccd-callback-orchestrator:
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
       AMQP_USERNAME: "preview_policy"
       AMQP_PASSWORD: "LDSKtI6uxg5uggvLDx/4WcfZfP/RJkSrg+ASbMuROsM="
+    secrets:
+      AMQP_USERNAME:
+        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-sscs-orchestrator
+        key: namespaceName
+      AMQP_PASSWORD:
+        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-sscs-orchestrator
+        key: primaryKey
+      SB_ACCESS_KEY:
+        secretRef: sscs-sb-preview
+        key: primaryKey
+      SB_CONNECTION_STRING:
+        secretRef: sscs-sb-preview
+        key: connectionString
 
 
 #Enable for SYA
@@ -685,10 +698,9 @@ hmc-cft-hearing-service:
 
 #Enable for queues/topics
 servicebus:
-  enabled: false
-  teamName: sscs
-  resourceGroup: sscs-aks
-  serviceplan: standard
+  enabled: true
+  resourceGroup: sscs-aso-preview-rg
+  sbNamespace: sscs
   #Each topic/queue matches up to one used in the config above
   setup:
     topics:
@@ -699,3 +711,4 @@ servicebus:
       - name: hmc-from-hmi
       - name: hmc-to-hmi
       - name: tribunals-to-hearing-api
+      - name: sscs-orchestrator
