@@ -697,12 +697,7 @@ servicebus:
   #Each topic/queue matches up to one used in the config above
   setup:
     topics:
-      - name: hmc-to-cft
-        subscriptionNeeded: no
       - name: sscs-evidenceshare-topic-preview
         subscriptionNeeded: yes
     queues:
-      - name: hmc-from-hmi
-      - name: hmc-to-hmi
-      - name: tribunals-to-hearing-api
-      - name: sscs-orchestrator-queue
+      - name: sscs-orchestrator-queue-preview
