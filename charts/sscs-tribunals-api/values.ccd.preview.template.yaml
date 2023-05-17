@@ -691,13 +691,12 @@ hmc-cft-hearing-service:
 
 #Enable for queues/topics
 servicebus:
-  enabled: true
+  enabled: false
   resourceGroup: sscs-aso-preview-rg
   sbNamespace: sscs
   #Each topic/queue matches up to one used in the config above
   setup:
     topics:
       - name: sscs-evidenceshare-topic-preview
-        subscriptionNeeded: yes
     queues:
       - name: sscs-orchestrator-queue-preview
