@@ -3,11 +3,9 @@ package uk.gov.hmcts.reform.sscs.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -32,8 +30,8 @@ public class AddedDocumentsUtil {
                                                List<String> documentsAddedThisEvent,
                                                Enum<EventType> eventType) {
         if (workAllocationFeature) {
+            updateScannedDocumentTypes(sscsCaseData, documentsAddedThisEvent);
             Map<String, Integer> documentsAddedThisEventCounts = new HashMap<>();
-            Set<String> scannedDocumentTypes = new HashSet<>();
             for (String type : documentsAddedThisEvent) {
                 if (documentsAddedThisEventCounts.containsKey(type)) {
                     Integer count = documentsAddedThisEventCounts.get(type);
@@ -41,14 +39,6 @@ public class AddedDocumentsUtil {
                 } else {
                     documentsAddedThisEventCounts.put(type, 1);
                 }
-                scannedDocumentTypes.add(type);
-            }
-
-            if (!scannedDocumentTypes.isEmpty()) {
-                sscsCaseData.setScannedDocumentTypes(new ArrayList<String>(scannedDocumentTypes));
-                logMessage(sscsCaseData, eventType);
-            } else {
-                sscsCaseData.setScannedDocumentTypes(null);
             }
 
             if (!documentsAddedThisEvent.isEmpty()) {
@@ -64,6 +54,10 @@ public class AddedDocumentsUtil {
                 sscsCaseData.getWorkAllocationFields().setAddedDocuments(null);
             }
         }
+    }
+
+    public void updateScannedDocumentTypes(SscsCaseData sscsCaseData, List<String> documentsAddedThisEvent) {
+        sscsCaseData.getWorkAllocationFields().setScannedDocumentTypes(documentsAddedThisEvent.stream().distinct().collect(Collectors.toList()));
     }
 
     private void logMessage(SscsCaseData sscsCaseData, Enum<EventType> eventType) {

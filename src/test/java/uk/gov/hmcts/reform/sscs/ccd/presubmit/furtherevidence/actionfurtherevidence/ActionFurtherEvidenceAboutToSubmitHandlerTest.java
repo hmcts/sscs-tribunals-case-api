@@ -1874,4 +1874,29 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             .as("Only a coversheet has been attached - this should be ignored.")
             .isNull();
     }
+
+    @Test
+    @Parameters({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE, CONFIDENTIALITY_REQUEST"})
+    public void givenScannedDocumentsAreUploaded_thenUpdateCaseWithListOfScannedDocumentTypes(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem, ScannedDocumentType documentType) {
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
+        sscsCaseData.getJointParty().setHasJointParty(YesNo.YES);
+
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf")
+                        .type(documentType.getValue())
+
+                        .url(DOC_LINK).build()).build());
+        sscsCaseData.setScannedDocuments(docs);
+
+        ActionFurtherEvidenceAboutToSubmitHandler handler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
+                bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true), false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size());
+
+        assertEquals(Arrays.asList(documentType.getValue()), sscsCaseData.getWorkAllocationFields().getScannedDocumentTypes());
+    }
 }
