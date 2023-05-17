@@ -66,7 +66,7 @@ public class WriteFinalDecisionTemplateBody {
     @JsonProperty("attended_hearing")
     private boolean attendedHearing;
     @JsonProperty("appointee_attended")
-    private boolean appointeeHearing;
+    private boolean appointeeAttended;
     @JsonProperty("appointee_on_case")
     private boolean appointeeOnCase;
     @JsonProperty("other_party_names_attended_hearing")

@@ -139,7 +139,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         }
 
         if (caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion() != null && caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion().equalsIgnoreCase("yes")) {
-            writeFinalDecisionBuilder.appointeeHearing(true);
+            writeFinalDecisionBuilder.appointeeAttended(true);
         }
 
         if (caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion() != null && caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion().equalsIgnoreCase("yes")) {
