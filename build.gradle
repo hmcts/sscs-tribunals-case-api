@@ -1,16 +1,16 @@
 plugins {
     id 'application'
     id 'pmd'
-    id 'org.sonarqube' version '3.5.0.2730'
+    id 'org.sonarqube' version '4.0.0.2929'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.7.10'
+    id 'org.springframework.boot' version '2.7.11'
     id 'uk.gov.hmcts.java' version '0.12.43'
     id 'com.gorylenko.gradle-git-properties' version '2.4.1'
-    id 'com.github.ben-manes.versions' version '0.39.0'
+    id 'com.github.ben-manes.versions' version '0.46.0'
     id "info.solidsoft.pitest" version '1.9.11'
     id 'org.owasp.dependencycheck' version '8.2.1'
     id 'au.com.dius.pact' version '4.3.15'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.632'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.674'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -129,7 +129,7 @@ task fortifyScan(type: JavaExec)  {
 }
 
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.10"
 }
 
 jacocoTestReport {
@@ -260,7 +260,7 @@ dependencyManagement {
         }
 
         // CVE-2022-41881, CVE-2022-41915
-        dependencySet(group: 'io.netty', version: '4.1.90.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.92.Final') {
             entry 'netty-buffer'
             entry 'netty-common'
             entry 'netty-codec'
@@ -283,7 +283,7 @@ dependencyManagement {
         }
 
         imports {
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.6"
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.7"
         }
     }
 }
@@ -297,27 +297,27 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-activemq'
 
-    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.8.2'
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.2'
-    implementation group: 'org.springframework.security', name: 'spring-security-config', version: '5.8.2'
-    implementation group: 'org.springframework.security', name: 'spring-security-web', version: '5.8.2'
+    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.8.3'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.3'
+    implementation group: 'org.springframework.security', name: 'spring-security-config', version: '5.8.3'
+    implementation group: 'org.springframework.security', name: 'spring-security-web', version: '5.8.3'
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.4'
 
     implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
-    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.6'
+    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.10'
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
-    implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.1'
+    implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.2'
 
     implementation group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.8'
 
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.14'
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.7.0'
 
-    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '11.10'
-    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.10.0'
+    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '12.3'
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.11.0'
 
     implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '2.1.5'
     implementation group: 'com.github.hmcts', name: 'properties-volume-spring-boot-starter', version: '0.1.1'
@@ -328,13 +328,13 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.25.18'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.3'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.25.25'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.4'
 
-    implementation group: 'com.azure', name: 'azure-core', version: '1.37.0'
-    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.2'
+    implementation group: 'com.azure', name: 'azure-core', version: '1.39.0'
+    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.4'
 
-    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.5.3'
+    implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.5.6'
 
     implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.4'
 
@@ -344,9 +344,9 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.2'
 
     implementation group:'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-    implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.7.0'
+    implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.8.0'
 
-    implementation group: 'org.pitest', name: 'pitest', version:  '1.11.7'
+    implementation group: 'org.pitest', name: 'pitest', version:  '1.13.1'
     implementation group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.9.11'
     implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: '0.5'
 
@@ -361,8 +361,8 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
-    implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.27'
-    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.27'
+    implementation group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.28'
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.28'
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.7.0'
     implementation group: 'org.apache.tika', name: 'tika-parsers', version: '2.7.0'
 
@@ -370,7 +370,7 @@ dependencies {
 
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.7.1'
 
-    implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.78"
+    implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.81"
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
 
@@ -385,18 +385,18 @@ dependencies {
 
     testImplementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version:  '4.5.14'
 
-    testImplementation group: 'com.azure', name: 'azure-core', version: '1.37.0'
-    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.2'
+    testImplementation group: 'com.azure', name: 'azure-core', version: '1.39.0'
+    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.4'
 
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.8.1'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.36.0'
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.8.1'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.36.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.37.0'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.37.0'
 
     testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
     // https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy-dep
-    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.14.0'
+    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.14.4'
 
 
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
@@ -407,11 +407,11 @@ dependencies {
     functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
 
-    testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.9.1')
+    testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.9.3')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
     testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine'
 
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.23.1'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.0'
 
@@ -555,7 +555,7 @@ bootWithCCD {
     environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
     environment 'S2S_URL', 'http://localhost:4502'
     environment 'DOC_ASSEMBLY_URL', 'http://localhost:4631'
-    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'emstitch,ccd_data,camunda,cft_task_db,evidence,wa_case_event_messages_db,wa_workflow_api'
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'emstitch,ccd_data,camunda,cft_task_db,sscsjobscheduler,evidence,wa_case_event_messages_db,wa_workflow_api'
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs,wa_task_management_api,wa_task_monitor,camunda_bpm,wa_workflow_api,wa_case_event_handler,em_stitching_api'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service,em_ccd_orchestrator,em_stitching_api,wa_task_management_api,wa_task_monitor,camunda_bpm,wa_workflow_api,wa_case_event_handler'
