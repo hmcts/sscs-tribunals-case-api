@@ -219,10 +219,6 @@ ccd:
     logstashJavaOpts: -Xmx1g -Xms512M
     persistence:
       enabled: false
-    secrets:
-      SB_CONNECTION_STRING:
-        secretRef: sscs-sb-preview
-        key: connectionString
     extraEnvs:
       - name: DATA_STORE_PASS
         value: hmcts
