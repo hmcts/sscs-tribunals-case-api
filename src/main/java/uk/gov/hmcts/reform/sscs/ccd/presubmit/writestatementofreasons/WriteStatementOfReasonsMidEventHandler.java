@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writestatementofreasons;
 
-import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.GENERATE;
+import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +36,9 @@ public class WriteStatementOfReasonsMidEventHandler implements PreSubmitCallback
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        requireNonNull(callback, "callback must not be null");
+        requireNonNull(callbackType, "callbackType must not be null");
+
         return callbackType.equals(CallbackType.MID_EVENT)
             && callback.getEvent() == EventType.WRITE_STATEMENT_OF_REASONS
             && isPostHearingsEnabled;
@@ -51,9 +55,9 @@ public class WriteStatementOfReasonsMidEventHandler implements PreSubmitCallback
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        if (PAGE_ID_GENERATE_DOCUMENT.equals(pageId) && GENERATE.equals(caseData.getPostHearing().getRequestFormat())) {
+        if (PAGE_ID_GENERATE_DOCUMENT.equals(pageId) && isYes(caseData.getDocumentGeneration().getGenerateNotice())) {
             log.info("Write Statement of Reasons: Generating notice for caseId {}", caseId);
-            PdfRequestUtil.processRequestPdfAndSetPreviewDocument(PdfRequestUtil.PdfType.POST_HEARING,
+            PdfRequestUtil.processRequestPdfAndSetPreviewDocument(PdfRequestUtil.PdfType.STATEMENT_OF_REASONS,
                 userAuthorisation, caseData, response, generateFile, templateId, isPostHearingsEnabled);
         }
 

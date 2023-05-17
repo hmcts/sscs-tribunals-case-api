@@ -32,10 +32,10 @@ public class WriteStatementOfReasonsAboutToSubmitHandler implements PreSubmitCal
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        requireNonNull(callbackType, "callbacktype must not be null");
+        requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.POST_HEARING_REQUEST
+            && callback.getEvent() == EventType.WRITE_STATEMENT_OF_REASONS
             && isPostHearingsEnabled;
     }
 

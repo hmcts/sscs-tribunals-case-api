@@ -24,7 +24,7 @@ public class WriteStatementOfReasonsAboutToStartHandler implements PreSubmitCall
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        requireNonNull(callbackType, "callbacktype must not be null");
+        requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
             && callback.getEvent() == EventType.WRITE_STATEMENT_OF_REASONS

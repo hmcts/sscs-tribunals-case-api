@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.PdfRequestTemplateBody;
 public class PdfRequestUtil {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     public static final String POST_HEARING_REQUEST_FILE_SUFFIX = " Application from FTA.pdf";
+    public static final String POST_HEARINGS_IS_NOT_CURRENTLY_ENABLED = "Post hearings is not currently enabled";
     private static String requestDetails;
     private static String title;
     private static StringBuilder additionalRequestDetails;
@@ -59,7 +60,7 @@ public class PdfRequestUtil {
         switch (pdfType) {
             case POST_HEARING:
                 if (!isPostHearingsEnabled) {
-                    response.addError("Post hearings is not currently enabled");
+                    response.addError(POST_HEARINGS_IS_NOT_CURRENTLY_ENABLED);
                     return response;
                 }
                 String postHearingDocumentTypeLabel = getPostHearingDocumentType(sscsCaseData.getPostHearing().getRequestType()).getLabel();
@@ -72,6 +73,10 @@ public class PdfRequestUtil {
                 handlePostponement(sscsCaseData);
                 break;
             case STATEMENT_OF_REASONS:
+                if (!isPostHearingsEnabled) {
+                    response.addError(POST_HEARINGS_IS_NOT_CURRENTLY_ENABLED);
+                    return response;
+                }
                 pdfUrlBuilder.append("Statement of Reasons");
                 handleWriteSor(sscsCaseData);
                 break;

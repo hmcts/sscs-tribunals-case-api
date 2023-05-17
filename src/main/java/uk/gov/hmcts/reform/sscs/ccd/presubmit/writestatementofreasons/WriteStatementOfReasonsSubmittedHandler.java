@@ -26,7 +26,7 @@ public class WriteStatementOfReasonsSubmittedHandler implements PreSubmitCallbac
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        requireNonNull(callbackType, "callbacktype must not be null");
+        requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent() == EventType.WRITE_STATEMENT_OF_REASONS
@@ -37,8 +37,6 @@ public class WriteStatementOfReasonsSubmittedHandler implements PreSubmitCallbac
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
 
