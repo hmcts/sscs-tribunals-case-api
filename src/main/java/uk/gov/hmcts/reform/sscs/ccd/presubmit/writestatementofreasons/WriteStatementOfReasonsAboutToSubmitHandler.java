@@ -1,24 +1,19 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writestatementofreasons;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.UPLOAD;
 
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
-import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
@@ -57,34 +52,4 @@ public class WriteStatementOfReasonsAboutToSubmitHandler implements PreSubmitCal
         return response;
     }
 
-    @NotNull
-    private PreSubmitCallbackResponse<SscsCaseData> validatePostHearingRequest(SscsCaseData sscsCaseData) {
-        final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-        String postHearingRequestTypeDescription = sscsCaseData.getPostHearing().getRequestType().getDescriptionEn();
-        renameDocumentIfUpload(sscsCaseData, postHearingRequestTypeDescription);
-        DocumentLink previewDocument = sscsCaseData.getDocumentStaging().getPreviewDocument();
-        if (previewDocument == null) {
-            response.addError("There is no preview document");
-        } else if (!previewDocument.getDocumentFilename().contains(postHearingRequestTypeDescription)) {
-            response.addError("There is no post hearing request document");
-        }
-        return response;
-    }
-
-    private void renameDocumentIfUpload(SscsCaseData caseData, String requestTypeDescription) {
-        if (Objects.equals(UPLOAD, caseData.getPostHearing().getRequestFormat())) {
-            DocumentLink previewDocument = caseData.getDocumentStaging().getPreviewDocument();
-            String filename = String.format("%s%s", requestTypeDescription, PdfRequestUtil.POST_HEARING_REQUEST_FILE_SUFFIX);
-
-            log.info("Renaming uploaded Preview Document from '{}' to '{}'", previewDocument.getDocumentFilename(), filename);
-
-            DocumentLink renamedPreviewDoc = DocumentLink.builder()
-                .documentUrl(previewDocument.getDocumentUrl())
-                .documentBinaryUrl(previewDocument.getDocumentBinaryUrl())
-                .documentFilename(filename)
-                .documentHash(previewDocument.getDocumentHash())
-                .build();
-            caseData.getDocumentStaging().setPreviewDocument(renamedPreviewDoc);
-        }
-    }
 }
