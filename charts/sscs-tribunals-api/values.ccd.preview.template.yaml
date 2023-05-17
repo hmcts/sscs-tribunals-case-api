@@ -537,14 +537,17 @@ sscs-evidence-share:
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
       SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
       TOPIC_NAME: "sscs-evidenceshare-topic-preview"
-      AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
-      AMQP_USERNAME: "preview_policy"
-      AMQP_PASSWORD: "LDSKtI6uxg5uggvLDx/4WcfZfP/RJkSrg+ASbMuROsM="
+      AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
+      AMQP_USERNAME: "RootManageSharedAccessKey"
       ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
       ROBOTICS_EMAIL_TO: "fake"
       ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
       ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
       CASE_ACCESS_MANAGEMENT_FEATURE: true
+    secrets:
+      AMQP_PASSWORD:
+        secretRef: sscs-sb-preview
+        key: primaryKey
 
 sscs-ccd-callback-orchestrator:
   enabled: true
@@ -553,24 +556,14 @@ sscs-ccd-callback-orchestrator:
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     readinessDelay: 90
     environment:
-      SUBSCRIPTION_NAME: "sscs-evidenceshare-topic-preview"
+      SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-preview"
       TOPIC_NAME: "sscs-evidenceshare-topic-preview"
-      AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
-      AMQP_USERNAME: "preview_policy"
-      AMQP_PASSWORD: "LDSKtI6uxg5uggvLDx/4WcfZfP/RJkSrg+ASbMuROsM="
+      AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
+      AMQP_USERNAME: "RootManageSharedAccessKey"
     secrets:
-      AMQP_USERNAME:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-sscs-orchestrator
-        key: namespaceName
       AMQP_PASSWORD:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-sscs-orchestrator
-        key: primaryKey
-      SB_ACCESS_KEY:
         secretRef: sscs-sb-preview
         key: primaryKey
-      SB_CONNECTION_STRING:
-        secretRef: sscs-sb-preview
-        key: connectionString
 
 
 #Enable for SYA
@@ -705,10 +698,9 @@ servicebus:
   setup:
     topics:
       - name: hmc-to-cft
-    subscriptions:
-      - name: hmc-to-sscs-subscription
+      - name: sscs-evidenceshare-topic-preview
     queues:
       - name: hmc-from-hmi
       - name: hmc-to-hmi
       - name: tribunals-to-hearing-api
-      - name: sscs-orchestrator
+      - name: sscs-orchestrator-queue
