@@ -697,7 +697,7 @@ servicebus:
   #Each topic/queue matches up to one used in the config above
   setup:
     topics:
-      - name: orchestrator-preview
+      - name: o
         subscriptionNeeded: yes
     queues:
       - name: sscs-orchestrator-queue-preview
