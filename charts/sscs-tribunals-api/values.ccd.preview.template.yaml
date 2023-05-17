@@ -698,6 +698,7 @@ servicebus:
   setup:
     topics:
       - name: hmc-to-cft
+        subscriptionNeeded: no
       - name: sscs-evidenceshare-topic-preview
         subscriptionNeeded: yes
     queues:
