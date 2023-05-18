@@ -536,7 +536,7 @@ sscs-evidence-share:
       DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
       SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-o"
-      TOPIC_NAME: "${SERVICE_NAME}--servicebus-o"
+      TOPIC_NAME: "${SERVICE_NAME}-servicebus-o"
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       AMQP_USERNAME: "RootManageSharedAccessKey"
       ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
