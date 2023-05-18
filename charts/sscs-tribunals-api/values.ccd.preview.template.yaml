@@ -484,7 +484,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-11172-1nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:6.0.19nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -503,7 +503,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S10538-22
+      CCD_DEF_VERSION: 6.0.19nonProd
     secrets: []
     userRoles:
       - citizen
@@ -535,8 +535,8 @@ sscs-evidence-share:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
-      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-o"
-      TOPIC_NAME: "${SERVICE_NAME}-servicebus-o"
+      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+      TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       AMQP_USERNAME: "RootManageSharedAccessKey"
       ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
@@ -556,8 +556,8 @@ sscs-ccd-callback-orchestrator:
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     readinessDelay: 90
     environment:
-      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-o"
-      TOPIC_NAME: "${SERVICE_NAME}-servicebus-o"
+      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+      TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       AMQP_USERNAME: "RootManageSharedAccessKey"
     secrets:
@@ -697,7 +697,7 @@ servicebus:
   #Each topic/queue matches up to one used in the config above
   setup:
     topics:
-      - name: o
+      - name: main-topic
         subscriptionNeeded: yes
     queues:
       - name: sscs-orchestrator-queue-preview
