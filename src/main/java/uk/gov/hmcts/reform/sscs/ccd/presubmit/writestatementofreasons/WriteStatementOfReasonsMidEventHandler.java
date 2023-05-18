@@ -55,7 +55,7 @@ public class WriteStatementOfReasonsMidEventHandler implements PreSubmitCallback
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        if (PAGE_ID_GENERATE_DOCUMENT.equals(pageId) && isYes(caseData.getDocumentGeneration().getGenerateNotice())) {
+        if (PAGE_ID_GENERATE_DOCUMENT.equals(pageId) && isYes(caseData.getDocumentGeneration().getWriteStatementOfReasonsGenerateNotice())) {
             log.info("Write Statement of Reasons: Generating notice for caseId {}", caseId);
             PdfRequestUtil.processRequestPdfAndSetPreviewDocument(PdfRequestUtil.PdfType.STATEMENT_OF_REASONS,
                 userAuthorisation, caseData, response, generateFile, templateId, isPostHearingsEnabled);

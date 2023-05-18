@@ -7,13 +7,13 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SOR_WRITE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,7 +56,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
         caseData = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .documentGeneration(DocumentGeneration.builder()
-                .generateNotice(YES)
+                .writeStatementOfReasonsGenerateNotice(YES)
                 .build())
             .build();
     }
@@ -84,22 +85,11 @@ class WriteStatementOfReasonsMidEventHandlerTest {
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
 
-    @Test
-    void givenGenerateNoticeNo_doNothing() {
-        caseData.getDocumentGeneration().setGenerateNotice(NO);
-
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void givenGenerateNoticeNull_doNothing() {
-        caseData.getDocumentGeneration().setGenerateNotice(null);
+    @ParameterizedTest
+    @EnumSource(value = YesNo.class, names = "NO")
+    @NullSource
+    void givenGenerateNoticeIsNoOrNull_doNothing(YesNo value) {
+        caseData.getDocumentGeneration().setWriteStatementOfReasonsGenerateNotice(value);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
