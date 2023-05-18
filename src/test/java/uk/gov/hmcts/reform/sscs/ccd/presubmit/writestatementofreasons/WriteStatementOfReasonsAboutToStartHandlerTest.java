@@ -5,7 +5,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.WRITE_STATEMENT_OF_REASONS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SOR_WRITE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
@@ -47,7 +47,7 @@ class WriteStatementOfReasonsAboutToStartHandlerTest {
 
     @Test
     void givenAValidAboutToSubmitEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(WRITE_STATEMENT_OF_REASONS);
+        when(callback.getEvent()).thenReturn(SOR_WRITE);
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isTrue();
     }
 
@@ -65,7 +65,7 @@ class WriteStatementOfReasonsAboutToStartHandlerTest {
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
         handler = new WriteStatementOfReasonsAboutToStartHandler(false);
-        when(callback.getEvent()).thenReturn(WRITE_STATEMENT_OF_REASONS);
+        when(callback.getEvent()).thenReturn(SOR_WRITE);
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 

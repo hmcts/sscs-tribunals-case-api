@@ -30,7 +30,7 @@ public class WriteStatementOfReasonsAboutToSubmitHandler implements PreSubmitCal
         requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.WRITE_STATEMENT_OF_REASONS
+            && callback.getEvent() == EventType.SOR_WRITE
             && isPostHearingsEnabled;
     }
 

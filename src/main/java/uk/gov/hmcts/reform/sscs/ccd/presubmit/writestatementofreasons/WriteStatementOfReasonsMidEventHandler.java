@@ -40,7 +40,7 @@ public class WriteStatementOfReasonsMidEventHandler implements PreSubmitCallback
         requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.MID_EVENT)
-            && callback.getEvent() == EventType.WRITE_STATEMENT_OF_REASONS
+            && callback.getEvent() == EventType.SOR_WRITE
             && isPostHearingsEnabled;
     }
 

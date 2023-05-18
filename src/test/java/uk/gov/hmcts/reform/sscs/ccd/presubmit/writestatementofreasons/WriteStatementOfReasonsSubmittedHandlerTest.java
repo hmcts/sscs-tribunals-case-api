@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.WRITE_STATEMENT_OF_REASONS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SOR_WRITE;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,7 +51,7 @@ class WriteStatementOfReasonsSubmittedHandlerTest {
 
     @Test
     void givenAValidSubmittedEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(WRITE_STATEMENT_OF_REASONS);
+        when(callback.getEvent()).thenReturn(SOR_WRITE);
         assertThat(handler.canHandle(SUBMITTED, callback)).isTrue();
     }
 
@@ -69,7 +69,7 @@ class WriteStatementOfReasonsSubmittedHandlerTest {
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
         handler = new WriteStatementOfReasonsSubmittedHandler(ccdCallbackMapService, false);
-        when(callback.getEvent()).thenReturn(WRITE_STATEMENT_OF_REASONS);
+        when(callback.getEvent()).thenReturn(SOR_WRITE);
         assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }
 

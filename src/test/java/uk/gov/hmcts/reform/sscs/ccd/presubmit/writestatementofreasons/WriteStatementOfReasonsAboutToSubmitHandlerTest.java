@@ -9,7 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.STATEMENT_OF_REASONS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.WRITE_STATEMENT_OF_REASONS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SOR_WRITE;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -84,7 +84,7 @@ class WriteStatementOfReasonsAboutToSubmitHandlerTest {
 
     @Test
     void givenAValidAboutToSubmitEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(WRITE_STATEMENT_OF_REASONS);
+        when(callback.getEvent()).thenReturn(SOR_WRITE);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
@@ -102,7 +102,7 @@ class WriteStatementOfReasonsAboutToSubmitHandlerTest {
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
         handler = new WriteStatementOfReasonsAboutToSubmitHandler(false, footerService);
-        when(callback.getEvent()).thenReturn(WRITE_STATEMENT_OF_REASONS);
+        when(callback.getEvent()).thenReturn(SOR_WRITE);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
