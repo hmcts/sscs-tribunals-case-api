@@ -62,8 +62,11 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
     }
 
     @Override
-    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response, SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
-        String userAuthorisation) {
+    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response,
+                                                     SscsCaseData caseData, String documentTypeLabel,
+                                                     LocalDate dateAdded, LocalDate generatedDate,
+                                                     boolean isScottish, boolean isPostHearingsEnabled,
+                                                     String userAuthorisation) {
 
         String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(caseData);
 
@@ -74,7 +77,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         decisionNoticeOutcomeService.performPreOutcomeIntegrityAdjustments(caseData);
 
         NoticeIssuedTemplateBody formPayload = super
-            .createPayload(response, caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, userAuthorisation);
+            .createPayload(response, caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, isPostHearingsEnabled, userAuthorisation);
         WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
 
         final NoticeIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
@@ -173,21 +176,20 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
     private void setHearings(WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder, SscsCaseData caseData) {
         if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
-            Hearing finalHearing = caseData.getHearings().get(0);
-            if (finalHearing != null && finalHearing.getValue() != null) {
-                if (finalHearing.getValue().getHearingDate() != null) {
-                    writeFinalDecisionBuilder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
+            HearingDetails finalHearing = getLastValidHearing(caseData);
+            if (finalHearing != null) {
+                if (finalHearing.getHearingDate() != null) {
+                    writeFinalDecisionBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
                 }
-                if (finalHearing.getValue().getVenue() != null) {
-                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getValue().getVenue(),
-                            finalHearing.getValue().getVenueId());
+                if (finalHearing.getVenue() != null) {
+                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getVenue(), finalHearing.getVenueId());
                     writeFinalDecisionBuilder.heldAt(venueName);
                 }
+                return;
             }
-        } else {
-            writeFinalDecisionBuilder.heldOn(LocalDate.now());
-            writeFinalDecisionBuilder.heldAt("In chambers");
         }
+        writeFinalDecisionBuilder.heldOn(LocalDate.now());
+        writeFinalDecisionBuilder.heldAt("In chambers");
     }
 
     protected abstract void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData);

@@ -35,6 +35,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -62,10 +64,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
-import uk.gov.hmcts.reform.sscs.service.LanguageService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
+import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
@@ -76,12 +80,18 @@ class AdjournCasePreviewServiceTest {
     private static final String APPELLANT_FULL_NAME = "Appellant Lastname";
     private static final String GAP_VENUE_NAME = "Gap venue name";
     private static final String HEARING_DATE = "2019-01-01";
-    private static final String JUDGE_FULL_NAME = "Judge Full Name";
     private static final String REASONS = "My reasons for decision";
     private static final String TEMPLATE_ID = "nuts.docx";
     private static final String URL = "http://dm-store/documents/123";
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final LocalDate LOCAL_DATE = LocalDate.parse("2018-10-10");
+    private static final String JUDGE_FULL_NAME = "Judge F Name";
+    private static final String PANEL_MEMBER_1_PERSONAL_CODE = "12";
+    private static final String PANEL_MEMBER_1_NAME = "Mr P M 1";
+    private static final String PANEL_MEMBER_2_PERSONAL_CODE = "123";
+    private static final String PANEL_MEMBER_2_NAME = "Ms P M 2";
+    private static final String OTHER_PANEL_MEMBER_PERSONAL_CODE = "1234";
+    private static final String OTHER_PANEL_MEMBER_NAME = "Mr O P M";
 
     private AdjournCasePreviewService service;
 
@@ -106,12 +116,19 @@ class AdjournCasePreviewServiceTest {
     @Mock
     private VenueDataLoader venueDataLoader;
 
+    @Mock
+    private JudicialRefDataService judicialRefDataService;
+
     Map<String, VenueDetails> venueDetailsMap;
+
+    @Mock
+    private SignLanguagesService signLanguagesService;
 
     @BeforeEach
     void setUp() throws IOException {
-        service = new AdjournCasePreviewService(generateFile, userDetailsService,
-            venueDataLoader, new LanguageService(), TEMPLATE_ID);
+        service = new AdjournCasePreviewService(generateFile, userDetailsService, venueDataLoader, TEMPLATE_ID,
+            signLanguagesService, judicialRefDataService);
+        ReflectionTestUtils.setField(service, "adjournmentFeature", true);
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -145,9 +162,9 @@ class AdjournCasePreviewServiceTest {
                 .value(HearingDetails.builder()
                     .hearingDate(HEARING_DATE)
                     .venue(Venue.builder()
-                        .name("Venue Name")
+                        .name("Liverpool")
                         .build())
-                    .venueId("someVenueId").build())
+                    .venueId("68").build())
                 .build()))
             .build();
         
@@ -353,7 +370,7 @@ class AdjournCasePreviewServiceTest {
 
         adjournment.setTypeOfNextHearing(nextHearingType);
         adjournment.setInterpreterRequired(YES);
-        adjournment.setInterpreterLanguage("french");
+        adjournment.setInterpreterLanguage(new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response =
             service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
@@ -392,7 +409,7 @@ class AdjournCasePreviewServiceTest {
 
         adjournment.setTypeOfNextHearing(nextHearingType);
         adjournment.setInterpreterRequired(NO);
-        adjournment.setInterpreterLanguage("french");
+        adjournment.setInterpreterLanguage(new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response =
             service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
@@ -418,7 +435,7 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setInterpreterLanguage("french");
+        adjournment.setInterpreterLanguage(new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response =
             service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
@@ -530,25 +547,27 @@ class AdjournCasePreviewServiceTest {
 
     @ParameterizedTest
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayAnErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenCorrectlySetHeldAtAsInChambers(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
 
         Hearing hearing1 = createHearingWithDateAndVenueName(null, "venue 1 name");
 
-        Hearing hearing2 = null;
+        sscsCaseData.setHearings(Arrays.asList(null, hearing1));
 
-        sscsCaseData.setHearings(Arrays.asList(hearing2, hearing1));
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-        checkDocumentIsNotCreatedAndReturnsError("Unable to determine hearing date or venue");
+        assertThat(body.getHeldAt()).isEqualTo(IN_CHAMBERS);
     }
 
     @ParameterizedTest
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenCorrectlySetHeldAtAsInChambers(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
-
+        when(generateFile.assemble(any())).thenReturn(URL);
         adjournment.setTypeOfNextHearing(nextHearingType);
 
         Hearing hearing1 = createHearingWithDateAndVenueName(null, "venue 1 name");
@@ -558,7 +577,10 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        checkDocumentIsNotCreatedAndReturnsError("Unable to determine hearing date or venue");
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
+
+        assertThat(body.getHeldAt()).isEqualTo(IN_CHAMBERS);
     }
 
     @ParameterizedTest
@@ -630,9 +652,30 @@ class AdjournCasePreviewServiceTest {
 
     @ParameterizedTest
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
+    void givenCaseHasInvalidHearing_thenCorrectlySetTheHeldOnUsingTheSecondHearingInList(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
+        when(generateFile.assemble(any())).thenReturn(URL);
+
+        adjournment.setTypeOfNextHearing(nextHearingType);
+
+        Hearing hearing = createHearingWithDateAndVenueName("2019-01-02", "Venue Name");
+
+        List<Hearing> hearings = Arrays.asList(null, hearing);
+        sscsCaseData.setHearings(hearings);
+
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
+
+        assertThat(body.getHeldOn()).hasToString("2019-01-02");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenCorrectlySetTheHeldOnUsingTheSecondHearingInList(AdjournCaseTypeOfHearing nextHearingType) {
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
+        when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
 
@@ -643,24 +686,10 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        checkDocumentIsNotCreatedAndReturnsError("Unable to determine hearing date");
-    }
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-    @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayTwoErrorsAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
-        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
-
-        adjournment.setTypeOfNextHearing(nextHearingType);
-
-        Hearing hearing1 = createHearingWithDateAndVenueName(HEARING_DATE, "Venue Name");
-
-        Hearing hearing2 = null;
-
-        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
-        sscsCaseData.setHearings(hearings);
-
-        checkDocumentIsNotCreatedAndReturnsError("Unable to determine hearing date or venue");
+        assertThat(body.getHeldOn()).hasToString(HEARING_DATE);
     }
 
     @ParameterizedTest
@@ -768,20 +797,52 @@ class AdjournCasePreviewServiceTest {
 
     @ParameterizedTest
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
+    void givenCaseWithThreePanelMembers_thenCorrectlySetTheHeldBeforeWithoutFlag(AdjournCaseTypeOfHearing nextHearingType) {
+        ReflectionTestUtils.setField(service, "adjournmentFeature", false);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
+        when(generateFile.assemble(any())).thenReturn(URL);
+
+        adjournment.setTypeOfNextHearing(nextHearingType);
+        adjournment.setDisabilityQualifiedPanelMemberName(PANEL_MEMBER_1_NAME);
+        adjournment.setMedicallyQualifiedPanelMemberName(PANEL_MEMBER_2_NAME);
+        adjournment.setOtherPanelMemberName(OTHER_PANEL_MEMBER_NAME);
+
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
+        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
+
+        assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + ", "
+            + PANEL_MEMBER_1_NAME + ", "
+            + PANEL_MEMBER_2_NAME + " and "
+            + OTHER_PANEL_MEMBER_NAME);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithThreePanelMembers_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
-        adjournment.setMedicallyQualifiedPanelMemberName("Ms Panel Member 2");
-        adjournment.setOtherPanelMemberName("Other Panel Member");
+        adjournment.setPanelMember1(JudicialUserBase.builder().personalCode(PANEL_MEMBER_1_PERSONAL_CODE).build());
+        adjournment.setPanelMember2(JudicialUserBase.builder().personalCode(PANEL_MEMBER_2_PERSONAL_CODE).build());
+        adjournment.setPanelMember3(JudicialUserBase.builder().personalCode(OTHER_PANEL_MEMBER_PERSONAL_CODE).build());
+
+        when(judicialRefDataService.getJudicialUserFullName(PANEL_MEMBER_1_PERSONAL_CODE))
+            .thenReturn(PANEL_MEMBER_1_NAME);
+        when(judicialRefDataService.getJudicialUserFullName(PANEL_MEMBER_2_PERSONAL_CODE))
+            .thenReturn(PANEL_MEMBER_2_NAME);
+        when(judicialRefDataService.getJudicialUserFullName(OTHER_PANEL_MEMBER_PERSONAL_CODE))
+            .thenReturn(OTHER_PANEL_MEMBER_NAME);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-        assertThat(body.getHeldBefore()).isEqualTo("Judge Full Name, Mr Panel Member 1, Ms Panel Member 2 and Other Panel Member");
+        assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + ", "
+            + PANEL_MEMBER_1_NAME + ", "
+            + PANEL_MEMBER_2_NAME + " and "
+            + OTHER_PANEL_MEMBER_NAME);
     }
 
     @ParameterizedTest
@@ -792,13 +853,20 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
-        adjournment.setMedicallyQualifiedPanelMemberName("Ms Panel Member 2");
+        adjournment.setPanelMember1(JudicialUserBase.builder().personalCode(PANEL_MEMBER_1_PERSONAL_CODE).build());
+        adjournment.setPanelMember2(JudicialUserBase.builder().personalCode(PANEL_MEMBER_2_PERSONAL_CODE).build());
+
+        when(judicialRefDataService.getJudicialUserFullName(PANEL_MEMBER_1_PERSONAL_CODE))
+            .thenReturn(PANEL_MEMBER_1_NAME);
+        when(judicialRefDataService.getJudicialUserFullName(PANEL_MEMBER_2_PERSONAL_CODE))
+            .thenReturn(PANEL_MEMBER_2_NAME);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-        assertThat(body.getHeldBefore()).isEqualTo("Judge Full Name, Mr Panel Member 1 and Ms Panel Member 2");
+        assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + ", "
+            + PANEL_MEMBER_1_NAME + " and "
+            + PANEL_MEMBER_2_NAME);
     }
 
     @ParameterizedTest
@@ -809,12 +877,15 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
+        adjournment.setPanelMember1(JudicialUserBase.builder().personalCode(PANEL_MEMBER_1_PERSONAL_CODE).build());
+
+        when(judicialRefDataService.getJudicialUserFullName(PANEL_MEMBER_1_PERSONAL_CODE))
+            .thenReturn(PANEL_MEMBER_1_NAME);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-        assertThat(body.getHeldBefore()).isEqualTo("Judge Full Name and Mr Panel Member 1");
+        assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + " and " + PANEL_MEMBER_1_NAME);
     }
 
     @ParameterizedTest
@@ -840,8 +911,8 @@ class AdjournCasePreviewServiceTest {
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setMedicallyQualifiedPanelMemberName("");
-        adjournment.setDisabilityQualifiedPanelMemberName("");
+        adjournment.setPanelMember1(null);
+        adjournment.setPanelMember2(null);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
@@ -1544,4 +1615,38 @@ class AdjournCasePreviewServiceTest {
         assertThat(payload.getGeneratedDate()).hasToString(LocalDate.now().toString());
     }
 
+    @Test
+    void givenPayloadWithOralCaseAdjournHearingType_thenPayloadContainsExpectedValuesForAdjournment() {
+        final String venueName = "Liverpool";
+
+        final PreSubmitCallbackResponse<SscsCaseData> response =
+            service.preview(callback,
+                DocumentType.DRAFT_ADJOURNMENT_NOTICE,
+                USER_AUTHORISATION,
+                false);
+
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+            .forename("Joe").surname("Linton").build().getFullName());
+
+        Venue venue = Venue.builder().name(venueName).build();
+
+        when(venueDataLoader.getGapVenueName(venue, "68")).thenReturn(venueName);
+
+        NoticeIssuedTemplateBody payload = service.createPayload(response,
+            sscsCaseData,
+            "documentTypeLabel",
+            LocalDate.now(),
+            LocalDate.now(),
+            false,
+            false,
+            USER_AUTHORISATION);
+
+        String faceToFaceValue = HearingType.FACE_TO_FACE.getKey();
+        AdjournCaseTemplateBody templateBody = payload.getAdjournCaseTemplateBody();
+
+        assertThat(venueName.equals(templateBody.getHeldAt()));
+        assertThat(venueName.equals(templateBody.getNextHearingVenue()));
+        assertThat(faceToFaceValue.equals(templateBody.getHearingType()));
+        assertThat(faceToFaceValue.equals(templateBody.getNextHearingType()));
+    }
 }

@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
@@ -84,7 +85,8 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             if (sscsCaseData.getAppeal().getHearingOptions() != null) {
                 hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
             }
-            hearingOptions.setLanguages(adjournment.getInterpreterLanguage());
+            DynamicList interpreterLanguage = adjournment.getInterpreterLanguage();
+            hearingOptions.setLanguages(nonNull(interpreterLanguage.getValue()) ? interpreterLanguage.getValue().getLabel() : "");
             hearingOptions.setLanguageInterpreter(adjournment.getInterpreterRequired().getValue());
 
             sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
@@ -124,7 +126,6 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             if (latestHearing != null && latestHearing.getValue() != null) {
                 final HearingChannel hearingChannel = getNextHearingChannel(sscsCaseData);
                 latestHearing.getValue().setHearingChannel(hearingChannel);
-
                 if (hearingChannel.getValueTribunals().equalsIgnoreCase(PAPER.getValueTribunals())) {
                     sscsCaseData.getAppeal().setHearingType(PAPER.getValueTribunals());
                 } else {

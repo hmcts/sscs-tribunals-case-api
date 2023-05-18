@@ -18,8 +18,6 @@ variable "infrastructure_env" {
 
 variable "subscription" {}
 
-variable "ilbIp" {}
-
 
 variable "tenant_id" {}
 
