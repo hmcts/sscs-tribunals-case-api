@@ -565,6 +565,8 @@ sscs-tya-notif:
       JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
       JOB_SCHEDULER_DB_HOST: ${SERVICE_NAME}-postgresql
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+      JOB_SCHEDULER_DB_USER: hmcts
+      JOB_SCHEDULER_DB_PASSWORD: hmcts
       HOURS_START_TIME: 0
       HOURS_END_TIME: 23
       RUN_DB_MIGRATION_ON_STARTUP: true
@@ -572,10 +574,6 @@ sscs-tya-notif:
     keyVaults:
       sscs:
         secrets:
-          - name: preview-ccd-db-username
-            alias: JOB_SCHEDULER_DB_USER
-          - name: preview-ccd-db-password
-            alias: JOB_SCHEDULER_DB_PASSWORD
           - idam-api
           - idam-oauth-user
           - idam-redirect
