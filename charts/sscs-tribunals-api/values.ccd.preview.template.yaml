@@ -565,7 +565,7 @@ sscs-tya-notif:
       JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
       JOB_SCHEDULER_DB_HOST: ${SERVICE_NAME}-postgresql
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
-      JOB_SCHEDULER_DB_USER: hmcts
+      JOB_SCHEDULER_DB_USERNAME: hmcts
       JOB_SCHEDULER_DB_PASSWORD: hmcts
       HOURS_START_TIME: 0
       HOURS_END_TIME: 23
