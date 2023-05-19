@@ -573,7 +573,7 @@ sscs-tya-notif:
       sscs:
         secrets:
           - name: preview-ccd-db-username
-            alias: ROLE_ASSIGNMEJOB_SCHEDULER_DB_USERNAMENT_DB_USERNAME
+            alias: JOB_SCHEDULER_DB_USER
           - name: preview-ccd-db-password
             alias: JOB_SCHEDULER_DB_PASSWORD
           - idam-api
