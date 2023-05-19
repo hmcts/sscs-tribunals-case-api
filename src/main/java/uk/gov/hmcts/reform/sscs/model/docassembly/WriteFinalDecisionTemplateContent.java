@@ -188,7 +188,7 @@ public abstract class WriteFinalDecisionTemplateContent {
                 + " attended and the Tribunal considered the appeal bundle to page " + bundlePage + ". "
                 + getPresentingOfficerAttendance(presentingOfficerAttended);
 
-        if (equalsIgnoreCase("faceToFace", hearingType)) {
+        if (equalsIgnoreCase(FACETOFACE, hearingType)) {
             if (appellantAttended) {
                 return getAttended(appellantName, false) + faceToFaceHearing;
             } else if (appointeeAttended) {
