@@ -19,6 +19,8 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecis
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class WriteFinalDecisionTemplateContent {
 
+    public static final String FACETOFACE = "faceToFace";
+    public static final String TRIAGE = "triage";
     protected static DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @JsonProperty("template_content")
@@ -178,69 +180,34 @@ public abstract class WriteFinalDecisionTemplateContent {
                                                        String hearingType, String appellantName,
                                                        String appointeeName, boolean presentingOfficerAttended,
                                                        String bundlePage, String otherPartyNamesAttended) {
-        String faceToFaceHearing = " attended the hearing today and the Tribunal considered the appeal bundle to page ";
-        String nonFaceToFaceHearing = " attended and the Tribunal considered the appeal bundle to page ";
+        String faceToFaceHearing = getOtherPartyNamesAttendedString(otherPartyNamesAttended)
+                + " attended the hearing today and the Tribunal considered the appeal bundle to page "
+                + bundlePage
+                + ". " + getPresentingOfficerAttendance(presentingOfficerAttended);
+        String nonFaceToFaceHearing = getOtherPartyNamesAttendedString(otherPartyNamesAttended)
+                + " attended and the Tribunal considered the appeal bundle to page " + bundlePage + ". "
+                + getPresentingOfficerAttendance(presentingOfficerAttended);
 
         if (equalsIgnoreCase("faceToFace", hearingType)) {
             if (appellantAttended) {
-                return getFaceToFaceAttended(
-                        appellantName,
-                        appointeeAttended)
-                        + getOtherPartyNamesAttendedString(otherPartyNamesAttended)
-                        + faceToFaceHearing
-                        + bundlePage
-                        + ". "
-                        + getPresentingOfficerAttendance(presentingOfficerAttended);
+                return getAttended(appellantName, false) + faceToFaceHearing;
             } else if (appointeeAttended) {
-                return getFaceToFaceAttended(appointeeName, true)
-                        + getOtherPartyNamesAttendedString(otherPartyNamesAttended)
-                        + faceToFaceHearing
-                        + bundlePage
-                        + ". "
-                        + getPresentingOfficerAttendance(presentingOfficerAttended);
+                return getAttended(appointeeName, true) + faceToFaceHearing;
             } else {
-                return appellantName
-                        + getOtherPartyNamesAttendedString(otherPartyNamesAttended)
-                        + faceToFaceHearing
-                        + bundlePage
-                        + ". "
-                        + getPresentingOfficerAttendance(presentingOfficerAttended);
+                return appellantName + faceToFaceHearing;
             }
         } else {
             if (appellantAttended) {
-                return getNonFaceToFaceAttended(appellantName, appointeeAttended)
-                        + getOtherPartyNamesAttendedString(otherPartyNamesAttended)
-                        + nonFaceToFaceHearing
-                        + bundlePage
-                        + ". "
-                        + getPresentingOfficerAttendance(presentingOfficerAttended);
+                return getAttended(appellantName, false) + nonFaceToFaceHearing;
             } else if (appointeeAttended) {
-                return getNonFaceToFaceAttended(appointeeName, true)
-                        + getOtherPartyNamesAttendedString(otherPartyNamesAttended)
-                        + nonFaceToFaceHearing
-                        + bundlePage
-                        + ". "
-                        + getPresentingOfficerAttendance(presentingOfficerAttended);
+                return getAttended(appointeeName, true) + nonFaceToFaceHearing;
             } else {
-                return appellantName
-                        + getOtherPartyNamesAttendedString(otherPartyNamesAttended)
-                        + nonFaceToFaceHearing
-                        + bundlePage
-                        + ". "
-                        + getPresentingOfficerAttendance(presentingOfficerAttended);
+                return appellantName + nonFaceToFaceHearing;
             }
         }
     }
 
-    protected String getFaceToFaceAttended(String attendedName, boolean appointeeAttended) {
-        if (appointeeAttended) {
-            return attendedName + " the appointee";
-        } else {
-            return attendedName + " the appellant";
-        }
-    }
-
-    protected String getNonFaceToFaceAttended(String attendedName, boolean appointeeAttended) {
+    protected String getAttended(String attendedName, boolean appointeeAttended) {
         if (appointeeAttended) {
             return attendedName + " the appointee";
         } else {
@@ -272,136 +239,171 @@ public abstract class WriteFinalDecisionTemplateContent {
                                                                         boolean appellantAttended, boolean appointeeAttended,
                                                                         boolean isAppointeeOnCase, boolean presentingOfficerAttended,
                                                                         String otherPartyNamesAttended) {
+
+        if (isAppointeeOnCase && appointeeAttended) {
+            return getSentenceAppointeeOnCaseAppointeeAttended(hearingType, appellantAttended, appellantName, appointeeName,
+            presentingOfficerAttended, bundlePage, otherPartyNamesAttended);
+        }
+
         if (isAppointeeOnCase) {
-            if (appointeeAttended) {
-                if (equalsIgnoreCase("faceToFace", hearingType)) {
-                    return singletonList(
-                            getFaceToFaceTypeSentences(
-                                    true,
-                                    true,
-                                    appellantAttended,
-                                    appellantName,
-                                    appointeeName)
+            return getSentenceAppointeeOnCaseAppointeeNotAttended(hearingType, appellantAttended, appellantName, appointeeName,
+            presentingOfficerAttended, bundlePage);
+        }
+
+        if (appellantAttended) {
+            return getSentenceAppointeeNotOnCaseAppellantAttended(hearingType,
+                    appellantName, appointeeName, presentingOfficerAttended, bundlePage, otherPartyNamesAttended);
+        }
+
+        return getSentenceAppointeeNotOnCaseAppellantNotAttended(hearingType, appointeeAttended, appellantName,
+                    appointeeName, presentingOfficerAttended, bundlePage);
+    }
+
+    protected List<String> getSentenceAppointeeOnCaseAppointeeAttended(String hearingType, boolean appellantAttended,
+                                                                       String appellantName, String appointeeName,
+                                                                       boolean presentingOfficerAttended,
+                                                                       String bundlePage,
+                                                                       String otherPartyNamesAttended) {
+        if (equalsIgnoreCase(FACETOFACE, hearingType)) {
+            return singletonList(
+                    getFaceToFaceTypeSentences(
+                            true,
+                            true,
+                            appellantAttended,
+                            appellantName,
+                            appointeeName)
                             + getAppellantAndOtherPartyAttended(
-                                    false,
-                                    true,
-                                    hearingType,
-                                    appellantName,
-                                    appointeeName,
-                                    presentingOfficerAttended,
-                                    bundlePage, otherPartyNamesAttended));
-                } else if (equalsIgnoreCase("triage", hearingType)) {
-                    return singletonList(getTriageConsideredParagraph(bundlePage));
-                } else {
-                    return singletonList(
-                            getNonFaceToFaceTypeSentences(
-                                    true,
-                                    true,
-                                    appellantAttended,
-                                    hearingType,
-                                    appellantName,
-                                    appointeeName)
-                            + getAppellantAndOtherPartyAttended(
-                                    false,
-                                    true,
-                                    hearingType,
-                                    appellantName,
-                                    appointeeName,
-                                    presentingOfficerAttended,
-                                    bundlePage,
-                                    otherPartyNamesAttended));
-                }
-            } else {
-                if (equalsIgnoreCase("faceToFace", hearingType)) {
-                    return asList(
-                            getFaceToFaceTypeSentences(
-                                    true,
-                                    false,
-                                    appellantAttended,
-                                    appellantName,
-                                    appointeeName)
-                            + getPresentingOfficerAttendance(presentingOfficerAttended),
-                            getConsideredParagraph(bundlePage, appointeeName));
-                } else if (equalsIgnoreCase("triage", hearingType)) {
-                    return singletonList(getTriageConsideredParagraph(bundlePage));
-                } else {
-                    return asList(
-                            getNonFaceToFaceTypeSentences(
-                                    true,
-                                    false,
-                                    appellantAttended,
-                                    hearingType,
-                                    appellantName,
-                                    appointeeName)
-                            + getPresentingOfficerAttendance(presentingOfficerAttended),
-                            getConsideredParagraph(bundlePage, appointeeName));
-                }
-            }
+                            false,
+                            true,
+                            hearingType,
+                            appellantName,
+                            appointeeName,
+                            presentingOfficerAttended,
+                            bundlePage, otherPartyNamesAttended));
+        } else if (equalsIgnoreCase(TRIAGE, hearingType)) {
+            return singletonList(getTriageConsideredParagraph(bundlePage));
         } else {
-            if (appellantAttended) {
-                if (equalsIgnoreCase("faceToFace", hearingType)) {
-                    return singletonList(
-                            getFaceToFaceTypeSentences(
-                                    false,
-                                    appointeeAttended,
-                                    true,
-                                    appellantName,
-                                    appointeeName)
-                            + getAppellantAndOtherPartyAttended(true,
-                                    false,
-                                    hearingType,
-                                    appellantName,
-                                    appointeeName,
-                                    presentingOfficerAttended,
-                                    bundlePage,
-                                    otherPartyNamesAttended));
-                } else if (equalsIgnoreCase("triage", hearingType)) {
-                    return singletonList(getTriageConsideredParagraph(bundlePage));
-                } else {
-                    return singletonList(
-                            getNonFaceToFaceTypeSentences(
-                                    false,
-                                    appointeeAttended,
-                                    true,
-                                    hearingType,
-                                    appellantName,
-                                    appointeeName)
+            return singletonList(
+                    getNonFaceToFaceTypeSentences(
+                            true,
+                            true,
+                            appellantAttended,
+                            hearingType,
+                            appellantName,
+                            appointeeName)
                             + getAppellantAndOtherPartyAttended(
-                                    true,
-                                    false,
-                                    hearingType,
-                                    appellantName,
-                                    appointeeName,
-                                    presentingOfficerAttended,
-                                    bundlePage,
-                                    otherPartyNamesAttended));
-                }
-            } else {
-                if (equalsIgnoreCase("faceToFace", hearingType)) {
-                    return asList(
-                            getFaceToFaceTypeSentences(
-                                    false,
-                                    appointeeAttended,
-                                    false,
-                                    appellantName,
-                                    appointeeName)
+                            false,
+                            true,
+                            hearingType,
+                            appellantName,
+                            appointeeName,
+                            presentingOfficerAttended,
+                            bundlePage,
+                            otherPartyNamesAttended));
+        }
+    }
+
+    protected List<String> getSentenceAppointeeOnCaseAppointeeNotAttended(String hearingType, boolean appellantAttended,
+                                                                          String appellantName, String appointeeName,
+                                                                          boolean presentingOfficerAttended,
+                                                                          String bundlePage) {
+        if (equalsIgnoreCase(FACETOFACE, hearingType)) {
+            return asList(
+                    getFaceToFaceTypeSentences(
+                            true,
+                            false,
+                            appellantAttended,
+                            appellantName,
+                            appointeeName)
                             + getPresentingOfficerAttendance(presentingOfficerAttended),
-                            getConsideredParagraph(bundlePage, appellantName));
-                } else if (equalsIgnoreCase("triage", hearingType)) {
-                    return singletonList(getTriageConsideredParagraph(bundlePage));
-                } else {
-                    return asList(
-                            getNonFaceToFaceTypeSentences(
-                                    false,
-                                    appointeeAttended,
-                                    false,
-                                    hearingType,
-                                    appellantName,
-                                    appointeeName)
+                    getConsideredParagraph(bundlePage, appointeeName));
+        } else if (equalsIgnoreCase(TRIAGE, hearingType)) {
+            return singletonList(getTriageConsideredParagraph(bundlePage));
+        } else {
+            return asList(
+                    getNonFaceToFaceTypeSentences(
+                            true,
+                            false,
+                            appellantAttended,
+                            hearingType,
+                            appellantName,
+                            appointeeName)
                             + getPresentingOfficerAttendance(presentingOfficerAttended),
-                            getConsideredParagraph(bundlePage, appellantName));
-                }
-            }
+                    getConsideredParagraph(bundlePage, appointeeName));
+        }
+    }
+
+    protected List<String> getSentenceAppointeeNotOnCaseAppellantAttended(String hearingType,
+                                                                          String appellantName, String appointeeName,
+                                                                          boolean presentingOfficerAttended,
+                                                                          String bundlePage,
+                                                                          String otherPartyNamesAttended) {
+        if (equalsIgnoreCase(FACETOFACE, hearingType)) {
+            return singletonList(
+                    getFaceToFaceTypeSentences(
+                            false,
+                            false,
+                            true,
+                            appellantName,
+                            appointeeName)
+                            + getAppellantAndOtherPartyAttended(
+                            true,
+                            false,
+                            hearingType,
+                            appellantName,
+                            appointeeName,
+                            presentingOfficerAttended,
+                            bundlePage, otherPartyNamesAttended));
+        } else if (equalsIgnoreCase(TRIAGE, hearingType)) {
+            return singletonList(getTriageConsideredParagraph(bundlePage));
+        } else {
+            return singletonList(
+                    getNonFaceToFaceTypeSentences(
+                            false,
+                            false,
+                            true,
+                            hearingType,
+                            appellantName,
+                            appointeeName)
+                    + getAppellantAndOtherPartyAttended(
+                            true,
+                            false,
+                            hearingType,
+                            appellantName,
+                            appointeeName,
+                            presentingOfficerAttended,
+                            bundlePage,
+                            otherPartyNamesAttended));
+        }
+    }
+
+    protected List<String> getSentenceAppointeeNotOnCaseAppellantNotAttended(String hearingType, boolean appointeeAttended,
+                                                                          String appellantName, String appointeeName,
+                                                                          boolean presentingOfficerAttended,
+                                                                          String bundlePage) {
+        if (equalsIgnoreCase(FACETOFACE, hearingType)) {
+            return asList(
+                    getFaceToFaceTypeSentences(
+                            false,
+                            appointeeAttended,
+                            false,
+                            appellantName,
+                            appointeeName)
+                            + getPresentingOfficerAttendance(presentingOfficerAttended),
+                    getConsideredParagraph(bundlePage, appellantName));
+        } else if (equalsIgnoreCase(TRIAGE, hearingType)) {
+            return singletonList(getTriageConsideredParagraph(bundlePage));
+        } else {
+            return asList(
+                    getNonFaceToFaceTypeSentences(
+                            false,
+                            appointeeAttended,
+                            false,
+                            hearingType,
+                            appellantName,
+                            appointeeName)
+                            + getPresentingOfficerAttendance(presentingOfficerAttended),
+                    getConsideredParagraph(bundlePage, appellantName));
         }
     }
 
@@ -427,42 +429,26 @@ public abstract class WriteFinalDecisionTemplateContent {
                         + " the appellant "
                         + notAttended;
             }
-
         }
     }
 
     protected String getNonFaceToFaceTypeSentences(boolean isAppointeeOnCase, boolean appointeeAttended,
                                                    boolean appellantAttended, String hearingType,
                                                    String appellantName, String appointeeName) {
-        String remoteHearing = "This has been a remote hearing in the form of a ";
-        String hearing = " hearing. ";
+        String remoteHearing = "This has been a remote hearing in the form of a " + hearingType + " hearing. ";
         String notAttended = "did not attend the hearing today. ";
 
         if (isAppointeeOnCase) {
             if (appointeeAttended) {
-                return remoteHearing
-                       + hearingType
-                       + hearing;
+                return remoteHearing;
             } else {
-                return remoteHearing
-                        + hearingType
-                        + hearing
-                        + appointeeName
-                        + " the appointee "
-                        + notAttended;
+                return remoteHearing + appointeeName + " the appointee " + notAttended;
             }
         } else {
             if (appellantAttended) {
-                return remoteHearing
-                        + hearingType
-                        + hearing;
+                return remoteHearing;
             } else {
-                return remoteHearing
-                        + hearingType
-                        + hearing
-                        + appellantName
-                        + " the appellant "
-                        + notAttended;
+                return remoteHearing + appellantName + " the appellant " + notAttended;
             }
         }
     }
