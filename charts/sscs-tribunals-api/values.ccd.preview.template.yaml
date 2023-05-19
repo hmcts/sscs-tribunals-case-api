@@ -147,6 +147,7 @@ ccd:
         CREATE DATABASE "annotation" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
         CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
         CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "sscsjobscheduler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
 
   global:
     ccdApiGatewayIngress: ${SERVICE_NAME}-ccd-api-gw
@@ -550,6 +551,48 @@ sscs-evidence-share:
         secretRef: sscs-sb-preview
         key: primaryKey
 
+sscs-tya-notif:
+  enabled: true
+  java:
+    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
+    releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
+    readinessDelay: 45
+  keyVaults:
+    sscs:
+      secrets:
+        - idam-api
+        - idam-oauth-user
+        - idam-redirect
+        - idam-sscs-systemupdate-user
+        - idam-sscs-systemupdate-password
+        - sscs-email-mac-secret-text
+        - idam-sscs-oauth2-client-secret
+        - sscs-s2s-secret
+        - s2s-micro
+        - evidence-share-topic-shared-access-key
+        - docmosis-api-key
+        - notification-key
+        - notification-test-key
+  environment:
+    SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+    TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+    AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
+    AMQP_USERNAME: "RootManageSharedAccessKey"
+    JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
+    JOB_SCHEDULER_DB_HOST: ${SERVICE_NAME}-postgresql
+    JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+    HOURS_START_TIME: 0
+    HOURS_END_TIME: 23
+    RUN_DB_MIGRATION_ON_STARTUP: true
+    TEST_RECIPIENTS_POSTCODE: "*"
+  keyVaults:
+    sscs:
+      secrets:
+        - name: preview-ccd-db-username
+          alias: ROLE_ASSIGNMEJOB_SCHEDULER_DB_USERNAMENT_DB_USERNAME
+        - name: preview-ccd-db-password
+          alias: JOB_SCHEDULER_DB_PASSWORD
+
 sscs-ccd-callback-orchestrator:
   enabled: true
   java:
@@ -691,6 +734,7 @@ hmc-cft-hearing-service:
             alias: CFT_HEARING_SERVICE_DB_PASSWORD
 
 #Enable for queues/topics
+#If you need a subscription for a topic, topic name should be not longer than 10 characters
 servicebus:
   enabled: true
   resourceGroup: sscs-aso-preview-rg
