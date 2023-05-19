@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -39,6 +41,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
 class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandlerTestBase {
 
@@ -47,6 +50,9 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
 
     @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
+
+    @Mock
+    private DynamicListLanguageUtil utils;
 
     @BeforeEach
     void setUpMocks() {
@@ -82,13 +88,17 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
         callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterLanguage(new DynamicList(SPANISH));
         callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder()
             .languageInterpreter(NO.getValue())
-            .languages("French")
+            .languages(new DynamicList("French"))
             .build());
+
+        DynamicListItem item = new DynamicListItem(SPA, SPANISH);
+        DynamicList list = new DynamicList(item, List.of(item));
+        given(utils.generateInterpreterLanguageFields(any())).willReturn(list);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(YES.getValue());
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(SPANISH);
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages().getValue().getLabel()).isEqualTo(SPANISH);
     }
 
     @DisplayName("Given an adjournment event with language interpreter required and interpreter language set, "
@@ -98,10 +108,14 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
         callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterRequired(YES);
         callback.getCaseDetails().getCaseData().getAdjournment().setInterpreterLanguage(new DynamicList(SPANISH));
 
+        DynamicListItem item = new DynamicListItem(SPANISH, SPANISH);
+        DynamicList list = new DynamicList(item, List.of(item));
+        given(utils.generateInterpreterLanguageFields(any())).willReturn(list);
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(YES.getValue());
-        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(SPANISH);
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages().getValue().getLabel()).isEqualTo(SPANISH);
     }
 
     @DisplayName("When adjournment is disabled and case is LA, then should not send any messages")

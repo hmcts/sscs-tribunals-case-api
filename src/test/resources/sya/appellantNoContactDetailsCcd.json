@@ -1,19 +1,19 @@
 {
-  "caseCreated" : "${json-unit.ignore}",
-  "benefitCode" : "002",
-  "issueCode" : "DD",
-  "caseCode" : "002DD",
+  "caseCreated": "${json-unit.ignore}",
+  "benefitCode": "002",
+  "issueCode": "DD",
+  "caseCode": "002DD",
   "region": "CARDIFF",
   "regionalProcessingCenter": {
-    "name" : "CARDIFF",
-    "address1" : "HM Courts & Tribunals Service",
-    "address2" : "Social Security & Child Support Appeals",
-    "address3" : "Eastgate House",
-    "address4" : "Newport Road",
-    "city" : "CARDIFF",
-    "postcode" : "CF24 0AB",
-    "phoneNumber" : "0300 123 1142",
-    "faxNumber" : "0870 739 4438",
+    "name": "CARDIFF",
+    "address1": "HM Courts & Tribunals Service",
+    "address2": "Social Security & Child Support Appeals",
+    "address3": "Eastgate House",
+    "address4": "Newport Road",
+    "city": "CARDIFF",
+    "postcode": "CF24 0AB",
+    "phoneNumber": "0300 123 1142",
+    "faxNumber": "0870 739 4438",
     "email": "Cardiff_SYA_Respon@justice.gov.uk",
     "hearingRoute": null,
     "epimsId": null
@@ -57,7 +57,18 @@
       "wantsToAttend": "Yes",
       "wantsSupport": "Yes",
       "languageInterpreter": "Yes",
-      "languages": "Telugu",
+      "languages": {
+        "value": {
+          "code": "tel",
+          "label": "Telugu"
+        },
+        "list_items": [
+          {
+            "code": "tel",
+            "label": "Telugu"
+          }
+        ]
+      },
       "signLanguageType": "Sign language",
       "arrangements": [
         "signLanguageInterpreter",
@@ -142,18 +153,18 @@
     "supporterSubscription": null,
     "appointeeSubscription": null,
     "representativeSubscription": {
-      "wantSmsNotifications":"Yes",
-      "tya":null,
-      "email":"harry.potter@wizards.com",
-      "mobile":"+447411999999",
-      "subscribeEmail":"Yes",
-      "subscribeSms":"Yes",
-      "reason":null,
+      "wantSmsNotifications": "Yes",
+      "tya": null,
+      "email": "harry.potter@wizards.com",
+      "mobile": "+447411999999",
+      "subscribeEmail": "Yes",
+      "subscribeSms": "Yes",
+      "reason": null,
       "lastLoggedIntoMya": null
     },
     "jointPartySubscription": null
   },
-  "evidencePresent" : "No",
-  "sscsDocument":[],
+  "evidencePresent": "No",
+  "sscsDocument": [],
   "dwpRegionalCentre": "Newcastle"
 }

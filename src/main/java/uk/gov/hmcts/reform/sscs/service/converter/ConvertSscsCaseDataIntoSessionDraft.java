@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service.converter;
 
+import static java.util.Objects.nonNull;
+
 import com.google.common.base.Preconditions;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -200,10 +202,12 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
             return null;
         }
 
+        boolean hearingsPresent = nonNull(appeal.getHearingOptions().getLanguages()) && nonNull(appeal.getHearingOptions().getLanguages().getValue());
+
         SessionHearingArrangement languageInterpreter = getArrangement(
             appeal.getHearingOptions().getLanguageInterpreter(),
             "yes",
-            appeal.getHearingOptions().getLanguages());
+            hearingsPresent ? appeal.getHearingOptions().getLanguages().getValue().getLabel() : "");
 
         SessionHearingArrangement signLanguage = getArrangement(
             appeal.getHearingOptions().getSignLanguageType(),

@@ -63,7 +63,18 @@
       "wantsToAttend": "Yes",
       "wantsSupport": "Yes",
       "languageInterpreter": "Yes",
-      "languages": "Telugu",
+      "languages": {
+        "value": {
+          "code": "tel",
+          "label": "Telugu"
+        },
+        "list_items": [
+          {
+            "code": "tel",
+            "label": "Telugu"
+          }
+        ]
+      },
       "signLanguageType": "Sign language",
       "arrangements": [
         "signLanguageInterpreter",

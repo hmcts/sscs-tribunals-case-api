@@ -38,7 +38,9 @@ import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
+import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
 @Service
 @Slf4j
@@ -58,6 +60,8 @@ public class SubmitAppealService {
     private final RefDataService refDataService;
     private final VenueService venueService;
     private final boolean caseAccessManagementFeature;
+    private DynamicListLanguageUtil dynamicListLanguageUtil;
+    private VerbalLanguagesService verbalLanguagesService;
 
     @SuppressWarnings("squid:S107")
     SubmitAppealService(CcdService ccdService,
@@ -68,6 +72,8 @@ public class SubmitAppealService {
                         AirLookupService airLookupService,
                         RefDataService refDataService,
                         VenueService venueService,
+                        DynamicListLanguageUtil dynamicListLanguageUtil,
+                        VerbalLanguagesService verbalLanguagesService,
                         @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
@@ -76,6 +82,8 @@ public class SubmitAppealService {
         this.convertAIntoBService = convertAIntoBService;
         this.airLookupService = airLookupService;
         this.refDataService = refDataService;
+        this.dynamicListLanguageUtil = dynamicListLanguageUtil;
+        this.verbalLanguagesService = verbalLanguagesService;
         this.caseAccessManagementFeature = caseAccessManagementFeature;
         this.venueService = venueService;
     }
@@ -107,7 +115,7 @@ public class SubmitAppealService {
         }
 
         try {
-            return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal, caseAccessManagementFeature), idamTokens, forceCreate));
+            return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal, caseAccessManagementFeature, dynamicListLanguageUtil, verbalLanguagesService), idamTokens, forceCreate));
         } catch (FeignException e) {
             if (e.status() == HttpStatus.SC_CONFLICT) {
                 logError(appeal, idamTokens);
@@ -128,7 +136,7 @@ public class SubmitAppealService {
         }
 
         try {
-            SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, caseAccessManagementFeature);
+            SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, caseAccessManagementFeature, dynamicListLanguageUtil, verbalLanguagesService);
 
             CaseDetails caseDetails = citizenCcdService.updateCase(sscsCaseData, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
                     "Update draft in CCD", idamTokens, appeal.getCcdCaseId());
@@ -168,7 +176,7 @@ public class SubmitAppealService {
             throw new ApplicationErrorException(new Exception(USER_HAS_A_INVALID_ROLE_MESSAGE));
         }
 
-        SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, caseAccessManagementFeature);
+        SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, caseAccessManagementFeature, dynamicListLanguageUtil, verbalLanguagesService);
         citizenCcdService.archiveDraft(sscsCaseData, idamTokens, ccdCaseId);
 
         return Optional.of(SaveCaseResult.builder()
@@ -249,8 +257,8 @@ public class SubmitAppealService {
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
 
         SscsCaseData sscsCaseData = rpc == null
-            ? convertSyaToCcdCaseData(appeal, caseAccessManagementFeature)
-            : convertSyaToCcdCaseData(appeal, rpc.getName(), rpc, caseAccessManagementFeature);
+            ? convertSyaToCcdCaseData(appeal, caseAccessManagementFeature, dynamicListLanguageUtil, verbalLanguagesService)
+            : convertSyaToCcdCaseData(appeal, rpc.getName(), rpc, caseAccessManagementFeature, dynamicListLanguageUtil, verbalLanguagesService);
 
         sscsCaseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
         String processingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());

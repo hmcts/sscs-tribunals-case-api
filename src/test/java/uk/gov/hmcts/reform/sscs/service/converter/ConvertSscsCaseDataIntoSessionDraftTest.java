@@ -1253,7 +1253,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .scheduleHearing("Yes")
                         .wantsSupport("Yes")
                         .languageInterpreter("Yes")
-                        .languages("Spanish")
+                        .languages(new DynamicList("Spanish"))
                         .signLanguageType("British Sign Language (BSL)")
                         .other("Help with stairs")
                         .arrangements(

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Collections.emptyList;
+import static java.util.Objects.nonNull;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 
@@ -70,6 +71,7 @@ public class OnlineHearingService {
         AppealDetails appealDetails = convertAppealDetails(sscsCaseDetails);
         Name name = appellant.getName();
         String nameString = name.getFirstName() + " " + name.getLastName();
+        boolean hearingsPresent = nonNull(hearingOptions.getLanguages()) && nonNull(hearingOptions.getLanguages().getValue());
 
         List<String> arrangements = (hearingOptions.getArrangements() != null)
                 ? hearingOptions.getArrangements() : emptyList();
@@ -79,7 +81,7 @@ public class OnlineHearingService {
                 sscsCaseDetails.getId(),
                 new HearingArrangements(
                         "yes".equalsIgnoreCase(hearingOptions.getLanguageInterpreter()),
-                        hearingOptions.getLanguages(),
+                        hearingsPresent ? hearingOptions.getLanguages().getValue().getLabel() : "",
                         arrangements.contains("signLanguageInterpreter"),
                         hearingOptions.getSignLanguageType(),
                         arrangements.contains("hearingLoop"),

@@ -25,6 +25,8 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
+import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
@@ -38,6 +40,12 @@ public class CreateAndUpdateCaseInCcdTest {
     @Autowired
     private IdamService idamService;
 
+    @Autowired
+    private DynamicListLanguageUtil dynamicListLanguageUtil;
+
+    @Autowired
+    private VerbalLanguagesService verbalLanguagesService;
+
     private IdamTokens idamTokens;
 
     @Before
@@ -50,7 +58,7 @@ public class CreateAndUpdateCaseInCcdTest {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
 
-        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, rpc.getName(), rpc, false);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, rpc.getName(), rpc, false, dynamicListLanguageUtil, verbalLanguagesService);
         caseData.setCreatedInGapsFrom("readyToList");
 
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, CREATE_TEST_CASE.getCcdType(),
@@ -62,7 +70,7 @@ public class CreateAndUpdateCaseInCcdTest {
     public void givenASyaCaseWithoutAMatchingRpcShouldBeSavedIntoCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
 
-        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, false);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, false, dynamicListLanguageUtil, verbalLanguagesService);
         caseData.setCreatedInGapsFrom("readyToList");
 
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, CREATE_TEST_CASE.getCcdType(), "Test case created from functional test", "Test case created from givenASyaCaseWithoutAMatchingRpcShouldBeSavedIntoCcd", idamTokens);
@@ -73,7 +81,7 @@ public class CreateAndUpdateCaseInCcdTest {
     public void givenACaseWithDetails_thenCorrectlyUpdateAndDeserializeFromCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
 
-        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, false);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, false, dynamicListLanguageUtil, verbalLanguagesService);
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, CREATE_TEST_CASE.getCcdType(), "Test case created from functional test", "Test case created from givenACaseWithDetails_thenCorrectlyUpdateAndDeserializeFromCcd", idamTokens);
         assertNotNull(caseDetails);
 

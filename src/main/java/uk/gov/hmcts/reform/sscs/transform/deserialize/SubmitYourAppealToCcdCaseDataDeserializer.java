@@ -18,7 +18,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 import uk.gov.hmcts.reform.sscs.exception.BenefitMappingException;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
+import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Slf4j
@@ -33,16 +36,18 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper,
                                                        String region,
                                                        RegionalProcessingCenter rpc,
-                                                       boolean caseAccessManagementEnabled) {
-        return convertSyaToCcdCaseData(syaCaseWrapper, caseAccessManagementEnabled)
+                                                       boolean caseAccessManagementEnabled,
+                                                       DynamicListLanguageUtil dynamicListLanguageUtil,
+                                                       VerbalLanguagesService verbalLanguagesService) {
+        return convertSyaToCcdCaseData(syaCaseWrapper, caseAccessManagementEnabled, dynamicListLanguageUtil, verbalLanguagesService)
             .toBuilder()
             .region(region)
             .regionalProcessingCenter(rpc)
             .build();
     }
 
-    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled) {
-        Appeal appeal = getAppeal(syaCaseWrapper);
+    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled, DynamicListLanguageUtil dynamicListLanguageUtil, VerbalLanguagesService verbalLanguagesService) {
+        Appeal appeal = getAppeal(syaCaseWrapper, dynamicListLanguageUtil, verbalLanguagesService);
 
         boolean isDraft = isDraft(syaCaseWrapper);
 
@@ -161,7 +166,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         return populateSubscriptions(syaCaseWrapper);
     }
 
-    private static Appeal getAppeal(SyaCaseWrapper syaCaseWrapper) {
+    private static Appeal getAppeal(SyaCaseWrapper syaCaseWrapper, DynamicListLanguageUtil dynamicListLanguageUtil, VerbalLanguagesService verbalLanguagesService) {
 
         MrnDetails mrnDetails = getMrnDetails(syaCaseWrapper);
 
@@ -172,7 +177,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .description(syaCaseWrapper.getBenefitType().getDescription())
                 .build();
 
-        HearingOptions hearingOptions = getHearingOptions(syaCaseWrapper.getSyaHearingOptions());
+        HearingOptions hearingOptions = getHearingOptions(syaCaseWrapper.getSyaHearingOptions(), dynamicListLanguageUtil, verbalLanguagesService);
 
         AppealReasons appealReasons = getReasonsForAppealing(syaCaseWrapper.getReasonsForAppealing());
 
@@ -444,7 +449,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         return builder.build();
     }
 
-    private static HearingOptions getHearingOptions(SyaHearingOptions syaHearingOptions) {
+    private static HearingOptions getHearingOptions(SyaHearingOptions syaHearingOptions, DynamicListLanguageUtil dynamicListLanguageUtil, VerbalLanguagesService verbalLanguagesService) {
         if (syaHearingOptions == null) {
             return null;
         }
@@ -476,13 +481,20 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             }
 
             if (syaHearingOptions.getScheduleHearing() == null) {
+                DynamicList languageDynamicList = null;
+                if (languageInterpreter != null && languageInterpreter.equals(YES)) {
+                    Language language = verbalLanguagesService.getVerbalLanguage(syaHearingOptions.getInterpreterLanguageType());
+                    DynamicListItem dynamicListItem = dynamicListLanguageUtil.getLanguageDynamicListItem(language);
+                    languageDynamicList = new DynamicList(dynamicListItem, null);
+                    languageDynamicList = dynamicListLanguageUtil.generateInterpreterLanguageFields(languageDynamicList);
+                }
+
                 return HearingOptions.builder()
                         .wantsToAttend(YES)
                         .wantsSupport(wantsSupport)
                         .arrangements(arrangements)
                         .languageInterpreter(languageInterpreter)
-                        .languages(languageInterpreter != null && languageInterpreter.equals(YES)
-                                ? syaHearingOptions.getInterpreterLanguageType() : null)
+                        .languages(languageDynamicList)
                         .scheduleHearing(null)
                         .signLanguageType(syaHearingOptions.getSignLanguageType())
                         .other(syaHearingOptions.getAnythingElse())
@@ -495,11 +507,16 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 excludedDates = getExcludedDates(syaHearingOptions.getDatesCantAttend());
             }
 
+            Language language = verbalLanguagesService.getVerbalLanguage(syaHearingOptions.getInterpreterLanguageType());
+            DynamicListItem dynamicListItem = dynamicListLanguageUtil.getLanguageDynamicListItem(language);
+            DynamicList languageDynamicList = new DynamicList(dynamicListItem, null);
+            languageDynamicList = dynamicListLanguageUtil.generateInterpreterLanguageFields(languageDynamicList);
+
             return HearingOptions.builder()
                     .wantsToAttend(YES)
                     .wantsSupport(wantsSupport)
                     .languageInterpreter(languageInterpreter)
-                    .languages(syaHearingOptions.getInterpreterLanguageType())
+                    .languages(languageDynamicList)
                     .signLanguageType(syaHearingOptions.getSignLanguageType())
                     .scheduleHearing(scheduleHearing)
                     .arrangements(arrangements)

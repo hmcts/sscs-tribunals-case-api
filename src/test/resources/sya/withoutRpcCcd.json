@@ -1,8 +1,8 @@
 {
-  "caseCreated" : "${json-unit.ignore}",
-  "benefitCode" : "002",
-  "issueCode" : "DD",
-  "caseCode" : "002DD",
+  "caseCreated": "${json-unit.ignore}",
+  "benefitCode": "002",
+  "issueCode": "DD",
+  "caseCode": "002DD",
   "appeal": {
     "mrnDetails": {
       "dwpIssuingOffice": "DWP PIP (1)",
@@ -48,7 +48,18 @@
       "wantsToAttend": "Yes",
       "wantsSupport": "Yes",
       "languageInterpreter": "Yes",
-      "languages": "Telugu",
+      "languages": {
+        "value": {
+          "code": "tel",
+          "label": "Telugu"
+        },
+        "list_items": [
+          {
+            "code": "tel",
+            "label": "Telugu"
+          }
+        ]
+      },
       "signLanguageType": "Sign language",
       "arrangements": [
         "signLanguageInterpreter",
@@ -142,20 +153,20 @@
     "supporterSubscription": null,
     "appointeeSubscription": null,
     "representativeSubscription": {
-      "wantSmsNotifications":"Yes",
-      "tya":null,
-      "email":"harry.potter@wizards.com",
-      "mobile":"+447411999999",
-      "subscribeEmail":"Yes",
-      "subscribeSms":"Yes",
-      "reason":null,
+      "wantSmsNotifications": "Yes",
+      "tya": null,
+      "email": "harry.potter@wizards.com",
+      "mobile": "+447411999999",
+      "subscribeEmail": "Yes",
+      "subscribeSms": "Yes",
+      "reason": null,
       "lastLoggedIntoMya": null
     },
     "jointPartySubscription": null
   },
-  "evidencePresent" : "No",
-  "sscsDocument":[],
+  "evidencePresent": "No",
+  "sscsDocument": [],
   "dwpRegionalCentre": "Newcastle",
   "pcqId": "12345678",
-  "languagePreferenceWelsh" : "No"
+  "languagePreferenceWelsh": "No"
 }

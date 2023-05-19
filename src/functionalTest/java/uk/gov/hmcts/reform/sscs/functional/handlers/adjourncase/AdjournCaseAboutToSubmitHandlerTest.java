@@ -82,7 +82,7 @@ public class AdjournCaseAboutToSubmitHandlerTest extends BaseHandler {
             .containsOnly("Testing reason");
         assertThat(adjournment.getPreviewDocument().getDocumentUrl()).isNotNull();
         assertThat(adjournment.getAdjournmentInProgress()).isEqualTo(YES);
-        assertThat(result.getAppeal().getHearingOptions().getLanguages()).isEqualTo("spanish");
+        assertThat(result.getAppeal().getHearingOptions().getLanguages().getValue().getLabel()).isEqualTo("spanish");
         assertThat(result.getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo("Yes");
     }
 }

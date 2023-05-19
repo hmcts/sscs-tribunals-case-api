@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 abstract class AdjournCaseAboutToSubmitHandlerTestBase {
 
     protected static final String USER_AUTHORISATION = "Bearer token";
+    protected static final String SPA = "spa";
     protected static final String SPANISH = "Spanish";
     protected static final String OLD_DRAFT_DOC = "oldDraft.doc";
 

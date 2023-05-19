@@ -80,7 +80,9 @@ import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
+import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
 @RunWith(JUnitParamsRunner.class)
 public class SubmitAppealServiceTest {
@@ -117,6 +119,12 @@ public class SubmitAppealServiceTest {
 
     @Mock
     private EmailHelper emailHelper;
+
+    @Mock
+    private DynamicListLanguageUtil dynamicListLanguageUtil;
+
+    @Mock
+    private VerbalLanguagesService verbalLanguagesService;
 
     private SubmitAppealService submitAppealService;
 
@@ -185,6 +193,8 @@ public class SubmitAppealServiceTest {
             airLookupService,
             refDataService,
             venueService,
+            dynamicListLanguageUtil,
+            verbalLanguagesService,
             true);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))

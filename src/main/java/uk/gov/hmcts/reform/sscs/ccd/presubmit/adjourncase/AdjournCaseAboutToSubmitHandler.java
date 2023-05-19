@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
@@ -43,6 +44,8 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
     private final RegionalProcessingCenterService regionalProcessingCenterService;
 
     private final ListAssistHearingMessageHelper hearingMessageHelper;
+
+    private final DynamicListLanguageUtil utils;
 
     @Value("${feature.snl.adjournment.enabled}")
     private boolean isAdjournmentEnabled; // TODO SSCS-10951
@@ -85,8 +88,8 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             if (sscsCaseData.getAppeal().getHearingOptions() != null) {
                 hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
             }
-            DynamicList interpreterLanguage = adjournment.getInterpreterLanguage();
-            hearingOptions.setLanguages(nonNull(interpreterLanguage.getValue()) ? interpreterLanguage.getValue().getLabel() : "");
+            DynamicList interpreterLanguages = utils.generateInterpreterLanguageFields(adjournment.getInterpreterLanguage());
+            hearingOptions.setLanguages(interpreterLanguages);
             hearingOptions.setLanguageInterpreter(adjournment.getInterpreterRequired().getValue());
 
             sscsCaseData.getAppeal().setHearingOptions(hearingOptions);

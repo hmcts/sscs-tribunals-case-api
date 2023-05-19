@@ -55,7 +55,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.client.RefDataApi;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
+import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
+import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_it.properties")
@@ -93,6 +95,12 @@ public class SyaEndpointsIt extends AbstractEventIt {
 
     @MockBean
     private RefDataApi refDataApi;
+
+    @MockBean
+    private DynamicListLanguageUtil dynamicListLanguageUtil;
+
+    @MockBean
+    private VerbalLanguagesService verbalLanguagesService;
 
     @Captor
     private ArgumentCaptor<Map<String, Object>> captor;

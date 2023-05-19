@@ -193,7 +193,7 @@ public class OnlineHearingServiceTest {
                                         .build())
                                 .hearingOptions(HearingOptions.builder()
                                         .languageInterpreter("yes")
-                                        .languages("french")
+                                        .languages(new DynamicList("french"))
                                         .arrangements(asList("signLanguageInterpreter", "hearingLoop", "disabledAccess"))
                                         .signLanguageType("BSL")
                                         .other("other arrangements")

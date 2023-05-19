@@ -65,7 +65,13 @@
       "hearingOptions": {
         "wantsToAttend": "Yes",
         "languageInterpreter": "Yes",
-        "languages": "Spanish",
+        "languages": {
+          "value": {
+            "code": "Spanish",
+            "label":"Spanish"
+          },
+          "list_items": null
+        },
         "signLanguageType": "A sign language",
         "arrangements": [
           "hearingLoop",
