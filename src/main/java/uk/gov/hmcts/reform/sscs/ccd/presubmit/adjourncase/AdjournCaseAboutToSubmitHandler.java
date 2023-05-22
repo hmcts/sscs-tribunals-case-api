@@ -94,9 +94,7 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             }
         }
 
-        if (adjournment.getGeneratedDate() == null) {
-            adjournment.setGeneratedDate(LocalDate.now());
-        }
+        adjournment.setGeneratedDate(LocalDate.now());
 
         updateHearingChannel(sscsCaseData);
 

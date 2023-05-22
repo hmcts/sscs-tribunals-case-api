@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNME
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -80,4 +81,65 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(SPANISH);
     }
 
+    @DisplayName("When a previous write adjournment notice in place and you call the event the second time the generated date needs to be updated so its reflected in the issue adjournment event")
+    @Test
+    void givenPreviousWritenAdjournCaseTriggerAnotherThenCheckIssueAdjournmentHasMostRecentDate() {
+        sscsCaseData.getAdjournment().setGeneratedDate(LocalDate.parse("2023-01-01"));
+        assertThat(sscsCaseData.getAdjournment().getGeneratedDate()).isEqualTo(LocalDate.parse("2023-01-01"));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        LocalDate date = response.getData().getAdjournment().getGeneratedDate();
+        assertThat(date).isEqualTo(LocalDate.now());
+    }
+
+    @DisplayName("When adjournment is disabled and case is LA, then should not send any messages")
+    @Test
+    void givenFeatureFlagDisabled_thenNoMessageIsSent() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", false);
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verifyNoInteractions(hearingMessageHelper);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @DisplayName("When adjournment is enabled and case is LA and case cannot be listed right away "
+        + "and no directions are being made, then should send a new hearing request in hearings API")
+    @Test
+    void givenCaseCannotBeListedRightAwayAndNoDirectionsBeingMade_thenNewHearingRequestSent() {
+        PreSubmitCallbackResponse<SscsCaseData> response = cannotBeListedAndNoDirectionsGiven();
+
+        assertHearingCreatedAndAdjournmentInProgress(response);
+    }
+
+    @DisplayName("When adjournment is enabled and case is LA and case can be listed right away "
+        + "then should send a new hearing request in hearings API")
+    @Test
+    void givenCanBeListedRightAway_thenNewHearingRequestSent() {
+        PreSubmitCallbackResponse<SscsCaseData> response = canBeListed();
+
+        assertHearingCreatedAndAdjournmentInProgress(response);
+    }
+
+    private void assertHearingCreatedAndAdjournmentInProgress(PreSubmitCallbackResponse<SscsCaseData> response) {
+        verify(hearingMessageHelper, times(1))
+            .sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAdjournment().getAdjournmentInProgress()).isEqualTo(YES);
+    }
+
+    @DisplayName("When adjournment is enabled and case is LA and case cannot be listed right away "
+        + "and directions are being made, then should not send any messages")
+    @Test
+    void givenCaseCannotBeListedRightAwayAndDirectionsAreBeingMade_thenNoMessagesSent() {
+        PreSubmitCallbackResponse<SscsCaseData> response = cannotBeListedAndDirectionsGiven();
+
+        verifyNoInteractions(hearingMessageHelper);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
 }
