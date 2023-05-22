@@ -571,6 +571,10 @@ sscs-tya-notif:
       HOURS_END_TIME: 23
       RUN_DB_MIGRATION_ON_STARTUP: true
       TEST_RECIPIENTS_POSTCODE: "*"
+    secrets:
+      AMQP_PASSWORD:
+        secretRef: sscs-sb-preview
+        key: primaryKey
     keyVaults:
       sscs:
         secrets:
