@@ -554,7 +554,7 @@ sscs-evidence-share:
 sscs-tya-notif:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2372
+    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
@@ -592,7 +592,6 @@ sscs-tya-notif:
           - docmosis-api-key
           - notification-key
           - notification-test-key
-          - notification-test2-key
 
 sscs-ccd-callback-orchestrator:
   enabled: true
