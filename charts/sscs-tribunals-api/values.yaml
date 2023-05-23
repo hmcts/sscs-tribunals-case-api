@@ -73,6 +73,7 @@ java:
     HEARINGS_EVENT_QUEUE_NAME: tribunals-to-hearing-api-{{ .Values.global.environment }}
     CASE_ACCESS_MANAGEMENT_FEATURE: false
 
+
 idam-pr:
   enabled: false
 xui-webapp:
