@@ -86,10 +86,10 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             sscsCaseData.setDwpState(ADJOURNMENT_NOTICE_ISSUED);
-            if (isYes(sscsCaseData.getAdjournment().getAreDirectionsBeingMadeToParties())) {
-                sscsCaseData.setState(State.NOT_LISTABLE);
-            } else {
+            if (isYes(sscsCaseData.getAdjournment().getCanCaseBeListedRightAway())) {
                 sscsCaseData.setState(State.READY_TO_LIST);
+            } else {
+                sscsCaseData.setState(State.NOT_LISTABLE);
             }
         } else {
             log.info("Case is a Welsh case so Adjournment Notice requires translation for case id : {}", sscsCaseData.getCcdCaseId());
@@ -101,9 +101,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         Adjournment adjournment = sscsCaseData.getAdjournment();
 
         if (SscsUtil.isSAndLCase(sscsCaseData)
-            && isAdjournmentEnabled // TODO SSCS-10951
-            && (isYes(adjournment.getCanCaseBeListedRightAway())
-            || isNoOrNull(adjournment.getAreDirectionsBeingMadeToParties()))) {
+            && isAdjournmentEnabled
+            && (isYes(adjournment.getCanCaseBeListedRightAway()))) {
             adjournment.setAdjournmentInProgress(YES);
             hearingMessageHelper.sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
         }
