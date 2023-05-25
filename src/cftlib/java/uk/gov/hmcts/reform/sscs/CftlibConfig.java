@@ -69,6 +69,10 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker",
             "caseworker-sscs"
         );
+        lib.createIdamUser("regional-centre-admin@fake.hmcts.net",
+                "caseworker",
+                "caseworker-sscs"
+        );
         lib.createIdamUser("data.store.idam.system.user@gmail.com",
                 "ccd-import", "manage-user", "caseworker");
         lib.createIdamUser("wa-system-user@fake.hmcts.net",
