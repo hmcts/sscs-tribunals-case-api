@@ -91,11 +91,11 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
     }
 
     @Test
-    void givenAnIssueAdjournmentEventWithDirectionsToAllParties_thenSetStateToNotListable() {
+    void givenAnIssueAdjournmentEventWithCaseNotReadyToListRightAway_thenSetStateToNotListable() {
 
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().getAdjournment().setPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getAdjournment().setAreDirectionsBeingMadeToParties(YES);
+        callback.getCaseDetails().getCaseData().getAdjournment().setCanCaseBeListedRightAway(NO);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
