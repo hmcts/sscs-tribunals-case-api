@@ -147,6 +147,7 @@ ccd:
         CREATE DATABASE "annotation" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
         CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
         CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        CREATE DATABASE "sscsjobscheduler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
 
   global:
     ccdApiGatewayIngress: ${SERVICE_NAME}-ccd-api-gw
@@ -211,9 +212,182 @@ ccd:
     nameOverride: ${SERVICE_NAME}-es
     clusterName: "es"
     replicas: 1
+  
   logstash:
-    image:
-      tag: ccd-sscs-logstash-latest
+    image: hmctspublic.azurecr.io/imported/logstash/logstash
+    imageTag: "7.16.1"
+    imagePullPolicy: "IfNotPresent"
+    logstashJavaOpts: -Xmx1g -Xms512M
+    persistence:
+      enabled: false
+    extraEnvs:
+      - name: DATA_STORE_PASS
+        value: hmcts
+      - name: DATA_STORE_URL
+        value: "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified"
+      - name: DATA_STORE_USER
+        value: hmcts
+      - name: ES_HOSTS
+        value: "${SERVICE_NAME}-es-master"
+    extraInitContainers: |
+      - name: download-postgres-jdbc
+        image: hmctspublic.azurecr.io/curl:7.70.0
+        command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.3.3.jar', '-o', '/logstash-lib/postgresql.jar']
+        volumeMounts:
+        - name: logstash-lib
+          mountPath: /logstash-lib
+    extraVolumes: |
+      - name: logstash-lib
+        emptyDir: {}
+    extraVolumeMounts: |
+      - name: logstash-lib
+        mountPath: /usr/share/logstash/ccd
+    logstashConfig:
+      logstash.yml: |
+        http.host: 0.0.0.0
+        xpack.monitoring.enabled: false
+        queue.type: persisted
+        dead_letter_queue.enable: true
+      pipelines.yml: |
+        - pipeline.id: main
+          path.config: "/usr/share/logstash/pipeline/{01_input,02_filter,03_output}.conf"
+          pipeline.workers: 4
+          pipeline.batch.size: 500
+          queue.type: persisted
+    logstashPipeline:
+      01_input.conf: |
+        input  {
+          jdbc {
+            jdbc_connection_string => "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified"
+            jdbc_user => "hmcts"
+            jdbc_password => "hmcts"
+            jdbc_validate_connection => true
+            jdbc_validation_timeout => "1"
+            jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
+            jdbc_driver_class => "org.postgresql.Driver"
+            jdbc_default_timezone => "UTC"
+            statement => "UPDATE case_data SET marked_by_logstash = true WHERE marked_by_logstash = false RETURNING id, created_date, last_modified, jurisdiction, case_type_id, state, last_state_modified_date, data::TEXT as json_data, data_classification::TEXT as json_data_classification, reference, security_classification, supplementary_data::TEXT as json_supplementary_data"
+            clean_run => false
+            schedule => "* * * * * *"
+          }
+        }
+      02_filter.conf: |
+        filter{
+          json{
+              source => "json_data"
+              target => "data"
+              remove_field => ["json_data"]
+              }
+
+              json{
+                  source => "json_supplementary_data"
+                  target => "supplementary_data"
+                  remove_field => ["json_supplementary_data"]
+              }
+
+              json{
+                  source => "json_data_classification"
+                  target => "data_classification"
+                  remove_field => ["json_data_classification"]
+              }
+
+              if [data][SearchCriteria] {
+                  clone {
+                      clones => ["SearchCriteria"]
+                  }
+              }
+
+              if [type] == "SearchCriteria" {
+                  if [data][SearchCriteria] {
+                      mutate {
+                        rename => {"[data][SearchCriteria]" => "[data_new][SearchCriteria]" }
+                      }
+                  }
+                  if [data][caseManagementLocation] {
+                      mutate {
+                        rename => {"[data][caseManagementLocation]" => "[data_new][caseManagementLocation]" }
+                      }
+                  }
+                  if [data][CaseAccessCategory] {
+                    mutate {
+                        rename => {"[data][CaseAccessCategory]" => "[data_new][CaseAccessCategory]" }
+                    }
+                  }
+                  if [data][caseNameHmctsInternal] {
+                      mutate {
+                        rename => {"[data][caseNameHmctsInternal]" => "[data_new][caseNameHmctsInternal]" }
+                      }
+                  }
+                  if [data][caseManagementCategory] {
+                      mutate {
+                        rename => {"[data][caseManagementCategory]" => "[data_new][caseManagementCategory]" }
+                      }
+                  }
+                  if [supplementary_data][HMCTSServiceId] {
+                      mutate {
+                        rename => {"[supplementary_data][HMCTSServiceId]" => "[supplementary_data_new][HMCTSServiceId]" }
+                      }
+                  }
+                  if [data_classification][SearchCriteria] {
+                      mutate {
+                        rename => {"[data_classification][SearchCriteria]" => "[data_classification_new][SearchCriteria]" }
+                      }
+                  }
+                  if [data_classification][CaseAccessCategory] {
+                    mutate {
+                          rename => {"[data_classification][CaseAccessCategory]" => "[data_classification_new][CaseAccessCategory]" }
+                    }
+                  }
+                  if [data_classification][caseManagementLocation] {
+                    mutate {
+                        rename => {"[data_classification][caseManagementLocation]" => "[data_classification_new][caseManagementLocation]" }
+                    }
+                  }
+                  if [data_classification][caseNameHmctsInternal] {
+                      mutate {
+                        rename => {"[data_classification][caseNameHmctsInternal]" => "[data_classification_new][caseNameHmctsInternal]" }
+                      }
+                  }
+
+                  if [data_classification][caseManagementCategory] {
+                      mutate {
+                        rename => {"[data_classification][caseManagementCategory]" => "[data_classification_new][caseManagementCategory]" }
+                      }
+                  }
+                  mutate { remove_field =>[ "data" ,"supplementary_data", "data_classification", "last_state_modified_date", "type","last_modified", "created_date" ] }
+
+                  mutate {
+                          rename => { "[data_new]" => "data" }
+                          rename => { "[supplementary_data_new]"  => "supplementary_data" }
+                          rename => { "[data_classification_new]"  => "data_classification" }
+                  }
+
+                  mutate {
+                    add_field => { "index_id" => "global_search" }
+                  }
+                  mutate {
+                    lowercase => [ "index_id" ]
+                  }
+              } else {
+                  mutate {
+                      add_field => { "index_id" => "%{case_type_id}_cases" }
+                }
+              mutate {
+                lowercase => [ "index_id" ]
+              }
+              }
+        }
+      03_output.conf: |
+        output {
+            elasticsearch {
+                hosts => ["${SERVICE_NAME}-es-master"]
+                sniffing => false
+                index => "%{[index_id]}"
+                document_type => "_doc"
+                document_id => "%{id}"
+                timeout => 60
+            }
+        }
   ccd-admin-web:
     nodejs:
       image: hmctspublic.azurecr.io/ccd/admin-web:latest
@@ -311,7 +485,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-11172-1nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-11548-10
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -330,7 +504,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S10538-22
+      CCD_DEF_VERSION: S-11548-10
     secrets: []
     userRoles:
       - citizen
@@ -348,11 +522,12 @@ ccd:
       - caseworker-sscs-panelmember
       - caseworker-sscs-bulkscan
       - caseworker-sscs-pcqextractor
+      - caseworker-sscs-hmrcresponsewriter
 elastic:
   enabled: true
 
 sscs-evidence-share:
-  enabled: false
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/sscs/evidence-share:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
@@ -362,36 +537,84 @@ sscs-evidence-share:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
-      SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
-      TOPIC_NAME: "sscs-evidenceshare-topic-preview"
-      AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
-      AMQP_USERNAME: "preview_policy"
-      AMQP_PASSWORD: "LDSKtI6uxg5uggvLDx/4WcfZfP/RJkSrg+ASbMuROsM="
+      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+      TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+      AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
+      AMQP_USERNAME: "RootManageSharedAccessKey"
       ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
       ROBOTICS_EMAIL_TO: "fake"
       ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
       ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
       CASE_ACCESS_MANAGEMENT_FEATURE: true
+    secrets:
+      AMQP_PASSWORD:
+        secretRef: sscs-sb-preview
+        key: primaryKey
+
+sscs-tya-notif:
+  enabled: true
+  java:
+    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
+    releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
+    readinessDelay: 45
+    environment:
+      CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
+      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+      TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+      AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
+      AMQP_USERNAME: "RootManageSharedAccessKey"
+      JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
+      JOB_SCHEDULER_DB_HOST: ${SERVICE_NAME}-postgresql
+      JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+      JOB_SCHEDULER_DB_USERNAME: hmcts
+      JOB_SCHEDULER_DB_PASSWORD: hmcts
+      HOURS_START_TIME: 0
+      HOURS_END_TIME: 23
+      RUN_DB_MIGRATION_ON_STARTUP: true
+      TEST_RECIPIENTS_POSTCODE: "*"
+    secrets:
+      AMQP_PASSWORD:
+        secretRef: sscs-sb-preview
+        key: primaryKey
+    keyVaults:
+      sscs:
+        secrets:
+          - idam-api
+          - idam-oauth-user
+          - idam-redirect
+          - idam-sscs-systemupdate-user
+          - idam-sscs-systemupdate-password
+          - sscs-email-mac-secret-text
+          - idam-sscs-oauth2-client-secret
+          - sscs-s2s-secret
+          - s2s-micro
+          - evidence-share-topic-shared-access-key
+          - docmosis-api-key
+          - notification-key
+          - notification-test-key
 
 sscs-ccd-callback-orchestrator:
-  enabled: false
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/sscs/ccd-callback-orchestrator:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     readinessDelay: 90
     environment:
-      SUBSCRIPTION_NAME: "sscs-evidenceshare-topic-preview"
-      TOPIC_NAME: "sscs-evidenceshare-topic-preview"
-      AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
-      AMQP_USERNAME: "preview_policy"
-      AMQP_PASSWORD: "LDSKtI6uxg5uggvLDx/4WcfZfP/RJkSrg+ASbMuROsM="
+      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+      TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+      AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
+      AMQP_USERNAME: "RootManageSharedAccessKey"
+    secrets:
+      AMQP_PASSWORD:
+        secretRef: sscs-sb-preview
+        key: primaryKey
 
 
 #Enable for SYA
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:prod-32cbe82-20220825134712
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
@@ -511,18 +734,15 @@ hmc-cft-hearing-service:
             alias: CFT_HEARING_SERVICE_DB_PASSWORD
 
 #Enable for queues/topics
+#If you need a subscription for a topic, topic name should be not longer than 10 characters
 servicebus:
-  enabled: false
-  teamName: sscs
-  resourceGroup: sscs-aks
-  serviceplan: standard
+  enabled: true
+  resourceGroup: sscs-aso-preview-rg
+  sbNamespace: sscs
   #Each topic/queue matches up to one used in the config above
   setup:
     topics:
-      - name: hmc-to-cft
-    subscriptions:
-      - name: hmc-to-sscs-subscription
+      - name: main-topic
+        subscriptionNeeded: yes
     queues:
-      - name: hmc-from-hmi
-      - name: hmc-to-hmi
-      - name: tribunals-to-hearing-api
+      - name: sscs-orchestrator-queue-preview
