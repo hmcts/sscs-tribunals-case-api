@@ -1,13 +1,16 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -293,5 +296,29 @@ public class DirectionIssuedAboutToStartHandlerTest {
         assertNull(sscsCaseData.getSendDirectionNoticeToOtherParty());
         assertNull(sscsCaseData.getSendDirectionNoticeToJointParty());
         assertNull(sscsCaseData.getSendDirectionNoticeToAppellantOrAppointee());
+    }
+
+    @Test
+    public void givenAValidCallbackType_thenVerifyAllPartiesOnTheCase() {
+        handler = new DirectionIssuedAboutToStartHandler();
+
+        CcdValue<OtherParty> otherParty = CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder()
+                        .id("1")
+                        .name(Name.builder().firstName("Harry").lastName("Kane").build())
+                        .isAppointee(YES.getValue())
+                        .appointee(Appointee.builder().id("2").name(Name.builder().firstName("Henry").lastName("Smith").build()).build())
+                        .rep(Representative.builder().id("3").name(Name.builder().firstName("Wendy").lastName("Smith").build()).hasRepresentative(YES.getValue()).build())
+                        .build())
+                .build();
+
+        sscsCaseData.setOtherParties(Collections.singletonList(otherParty));
+        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals(sscsCaseData.getHasRepresentative(), YesNo.NO);
+        assertEquals(sscsCaseData.getHasOtherPartyRep(), YesNo.YES);
+        assertEquals(sscsCaseData.getHasOtherPartyAppointee(), YesNo.YES);
+        assertEquals(sscsCaseData.getHasOtherParties(), YesNo.YES);
+        assertEquals(sscsCaseData.getHasJointParty(), YesNo.NO);
     }
 }
