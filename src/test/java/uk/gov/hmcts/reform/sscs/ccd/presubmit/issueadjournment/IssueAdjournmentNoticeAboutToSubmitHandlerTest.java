@@ -179,7 +179,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
     void givenCaseCannotBeListedRightAwayAndNoDirectionsBeingMade_thenNewHearingRequestSent() {
         PreSubmitCallbackResponse<SscsCaseData> response = cannotBeListedAndNoDirectionsGiven();
 
-        assertHearingCreatedAndAdjournmentInProgress(response);
+        assertHearingCreatedAndAdjournmentInProgress(response, 0);
     }
 
     @DisplayName("When adjournment is enabled and case is LA and case can be listed right away "
@@ -188,11 +188,11 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
     void givenCanBeListedRightAway_thenNewHearingRequestSent() {
         PreSubmitCallbackResponse<SscsCaseData> response = canBeListed();
 
-        assertHearingCreatedAndAdjournmentInProgress(response);
+        assertHearingCreatedAndAdjournmentInProgress(response, 1);
     }
 
-    private void assertHearingCreatedAndAdjournmentInProgress(PreSubmitCallbackResponse<SscsCaseData> response) {
-        verify(hearingMessageHelper, times(1))
+    private void assertHearingCreatedAndAdjournmentInProgress(PreSubmitCallbackResponse<SscsCaseData> response, int invocations) {
+        verify(hearingMessageHelper, times(invocations))
             .sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
 
         assertThat(response.getErrors()).isEmpty();
