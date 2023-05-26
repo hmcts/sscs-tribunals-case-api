@@ -92,7 +92,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             sscsCaseData.setDwpState(FINAL_DECISION_ISSUED);
             sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         }
-        if (eligibleForHearingsCancel.test(callback) && anyHearingsScheduledInTheFuture(sscsCaseData)) {
+        if (eligibleForHearingsCancel.test(callback) && hasHearingScheduledInTheFuture(sscsCaseData)) {
             log.info("Issue Final Decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
             hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
@@ -105,7 +105,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         return preSubmitCallbackResponse;
     }
 
-    private boolean anyHearingsScheduledInTheFuture(SscsCaseData caseData) {
+    private boolean hasHearingScheduledInTheFuture(SscsCaseData caseData) {
         Optional<Hearing> futureHearing = Optional.ofNullable(caseData.getHearings()).orElse(Collections.emptyList()).stream().filter(hearing -> {
             HearingDetails hearingDetails = hearing.getValue();
             if (hearingDetails != null
