@@ -63,7 +63,7 @@ public class PipScenarioNotConsideredStandardRateTest {
             + "\n"
             + "Something else\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative did not attend.\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative did not attend.\n"
             + "\n";
 
         Assert.assertEquals(10, content.getComponents().size());
@@ -71,5 +71,5 @@ public class PipScenarioNotConsideredStandardRateTest {
         Assert.assertEquals(expectedContent, content.toString());
 
     }
-    
+
 }

@@ -369,24 +369,24 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @SuppressWarnings("unused")
     private Object[] hearingTypeCombinations() {
         return new Object[] {
-            new Object[] {"video", false, false},
-            new Object[] {"video", false, true},
+            new Object[] {"video", true, false},
+            new Object[] {"video", true, true},
             new Object[] {"video", true, false},
             new Object[] {"video", true, true},
             new Object[] {"paper", false, false},
             new Object[] {"paper", false, true},
             new Object[] {"paper", true, false},
             new Object[] {"paper", true, true},
-            new Object[] {"telephone", false, false},
-            new Object[] {"telephone", false, true},
+            new Object[] {"telephone", true, false},
+            new Object[] {"telephone", true, true},
             new Object[] {"telephone", true, false},
             new Object[] {"telephone", true, true},
             new Object[] {"triage", false, false},
             new Object[] {"triage", false, true},
             new Object[] {"triage", true, false},
             new Object[] {"triage", true, true},
-            new Object[] {"faceToFace", false, false},
-            new Object[] {"faceToFace", false, true},
+            new Object[] {"faceToFace", true, false},
+            new Object[] {"faceToFace", true, true},
             new Object[] {"faceToFace", true, false},
             new Object[] {"faceToFace", true, true},
         };
@@ -470,7 +470,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 5, "Reasons for decision 2");
         assertIsParagraphWithText(components, 6, "Anything else.");
         assertIsParagraphWithText(components, 7,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
         Assert.assertEquals(7, components.size());
     }
 
@@ -537,10 +537,10 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         if ("video".equals(hearingType)) {
             if (appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+                    "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
             } else if (appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend.");
+                    "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend.");
             } else if (!appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
                     "This has been a remote hearing in the form of a video hearing. Joe Bloggs did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.");
@@ -557,10 +557,10 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         } else if ("telephone".equals(hearingType)) {
             if (appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+                    "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
             } else if (appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend.");
+                    "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend.");
             } else if (!appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
                     "This has been a remote hearing in the form of a telephone hearing. Joe Bloggs did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.");
@@ -582,10 +582,10 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         } else if ("faceToFace".equals(hearingType)) {
             if (appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+                    "This has been an oral (face to face) hearing. Joe Bloggs the appellant attended the hearing today and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
             } else if (appellantAttended && !presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
-                    "This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend.");
+                    "This has been an oral (face to face) hearing. Joe Bloggs the appellant attended the hearing today and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend.");
             } else if (!appellantAttended && presentingOfficerAttended) {
                 assertIsParagraphWithText(components, 8,
                     "Joe Bloggs requested an oral hearing but did not attend today. A Presenting Officer attended on behalf of the Respondent.");
@@ -675,7 +675,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 6, "Reasons for decision 2");
         assertIsParagraphWithText(components, 7, "Anything else.");
         assertIsParagraphWithText(components, 8,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
         assertEquals(9, components.size());
     }
 
@@ -866,7 +866,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 6, "Reasons for decision 2");
         assertIsParagraphWithText(components, 7, "Anything else.");
         assertIsParagraphWithText(components, 8,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
         assertEquals(9, components.size());
     }
 
@@ -929,7 +929,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 6, "Reasons for decision 2");
         assertIsParagraphWithText(components, 7, "Anything else.");
         assertIsParagraphWithText(components, 8,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
         assertEquals(10, components.size());
     }
 
@@ -993,7 +993,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 7, "Reasons for decision 2");
         assertIsParagraphWithText(components, 8, "Anything else.");
         assertIsParagraphWithText(components, 9,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
         assertEquals(11, components.size());
     }
 
@@ -1063,7 +1063,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 7, "Reasons for decision 2");
         assertIsParagraphWithText(components, 8, "Anything else.");
         assertIsParagraphWithText(components, 9,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
         assertEquals(11, components.size());
     }
 
@@ -1133,7 +1133,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 7, "Reasons for decision 2");
         assertIsParagraphWithText(components, 8, "Anything else.");
         assertIsParagraphWithText(components, 9,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
         assertEquals(10, components.size());
     }
 
@@ -1206,7 +1206,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 7, "Reasons for decision 2");
         assertIsParagraphWithText(components, 8, "Anything else.");
         assertIsParagraphWithText(components, 9,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
         assertEquals(11, components.size());
     }
 
@@ -1281,7 +1281,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 8, "Reasons for decision 2");
         assertIsParagraphWithText(components, 9, "Anything else.");
         assertIsParagraphWithText(components, 10,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
         assertEquals(12, components.size());
     }
 
@@ -1355,7 +1355,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 8, "Reasons for decision 2");
         assertIsParagraphWithText(components, 9, "Anything else.");
         assertIsParagraphWithText(components, 10,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
         assertEquals(12, components.size());
     }
 
@@ -1424,7 +1424,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 7, "Reasons for decision 2");
         assertIsParagraphWithText(components, 8, "Anything else.");
         assertIsParagraphWithText(components, 9,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
         assertEquals(10, components.size());
     }
 
@@ -1495,7 +1495,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 7, "Reasons for decision 2");
         assertIsParagraphWithText(components, 8, "Anything else.");
         assertIsParagraphWithText(components, 9,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
         assertEquals(11, components.size());
     }
 
@@ -1570,7 +1570,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 8, "Reasons for decision 2");
         assertIsParagraphWithText(components, 9, "Anything else.");
         assertIsParagraphWithText(components, 10,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+                "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
         assertEquals(12, components.size());
     }
 
@@ -1644,7 +1644,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertIsParagraphWithText(components, 8, "Reasons for decision 2");
         assertIsParagraphWithText(components, 9, "Anything else.");
         assertIsParagraphWithText(components, 10,
-            "This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent.");
+            "This has been a remote hearing in the form of a video hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative attended on behalf of the Respondent.");
         assertEquals(12, components.size());
     }
 
