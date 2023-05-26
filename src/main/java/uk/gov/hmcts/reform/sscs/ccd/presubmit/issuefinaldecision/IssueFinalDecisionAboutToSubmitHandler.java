@@ -107,16 +107,14 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
     private boolean anyHearingsScheduledInTheFuture(SscsCaseData caseData) {
         Optional<Hearing> futureHearing = Optional.ofNullable(caseData.getHearings()).orElse(Collections.emptyList()).stream().filter(hearing -> {
-            if (hearing != null) {
-                HearingDetails hearingDetails = hearing.getValue();
-                if (hearingDetails != null
-                        && StringUtils.isNotBlank(hearingDetails.getHearingDate())
-                        && hearingDetails.getVenue() != null
-                        && StringUtils.isNotBlank(hearingDetails.getVenue().getName())) {
+            HearingDetails hearingDetails = hearing.getValue();
+            if (hearingDetails != null
+                    && StringUtils.isNotBlank(hearingDetails.getHearingDate())
+                    && hearingDetails.getVenue() != null
+                    && StringUtils.isNotBlank(hearingDetails.getVenue().getName())) {
 
-                    LocalDateTime hearingDttm = getLocalDateTime(hearingDetails.getHearingDate(), hearingDetails.getTime());
-                    return Optional.of(hearingDttm).filter(d -> d.isAfter(LocalDateTime.now())).isPresent();
-                }
+                LocalDateTime hearingDttm = getLocalDateTime(hearingDetails.getHearingDate(), hearingDetails.getTime());
+                return Optional.of(hearingDttm).filter(d -> d.isAfter(LocalDateTime.now())).isPresent();
             }
             return false;
         }).findFirst();

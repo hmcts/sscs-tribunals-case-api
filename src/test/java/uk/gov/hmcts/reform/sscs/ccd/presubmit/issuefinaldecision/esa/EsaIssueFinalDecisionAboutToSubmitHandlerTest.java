@@ -573,4 +573,35 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
         verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
     }
+
+    @Test
+    public void givenAnIssueFinalDecisionEventIfHearingsListIsEmpty_ThenDoNotSendHearingCancellationRequest() {
+        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
+                hearingMessageHelper, true);
+
+        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        callback.getCaseDetails().getCaseData().setHearings(List.of());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+        verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+    }
+
+    @Test
+    public void givenAnIssueFinalDecisionEventIfHearingsExistsWithoutHearingDetails_ThenDoNotSendHearingCancellationRequest() {
+        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
+                hearingMessageHelper, true);
+
+        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        Hearing hearing = Hearing.builder().build();
+
+        callback.getCaseDetails().getCaseData().setHearings(List.of(hearing));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+        verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+    }
 }
