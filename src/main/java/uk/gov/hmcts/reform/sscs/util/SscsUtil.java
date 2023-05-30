@@ -58,30 +58,49 @@ public class SscsUtil {
         caseData.setDocumentStaging(DocumentStaging.builder().build());
     }
 
-    public static void excludePanelMembers(PanelMemberExclusions exclusions, List<JudicialUserBase> panelMembers) {
-        if (nonNull(panelMembers)) {
-            List<CcdValue<JudicialUserBase>> panelMemberExclusions = exclusions.getExcludedPanelMembers();
+    public static void setAdjournmentPanelMembersExclusions(PanelMemberExclusions exclusions,
+                                           List<JudicialUserBase> adjournmentPanelMembers,
+                                           AdjournCasePanelMembersExcluded panelMemberExcluded) {
 
-            log.info("Excluding {} panel members with Personal Codes {}", panelMembers.size(),
-                panelMembers.stream().map(JudicialUserBase::getPersonalCode).collect(Collectors.toList()));
+        if (nonNull(adjournmentPanelMembers)) {
+            List<CcdValue<JudicialUserBase>> panelMembersList = getPanelMembersList(exclusions, panelMemberExcluded);
 
-            if (isNull(panelMemberExclusions)) {
-                panelMemberExclusions = new LinkedList<>();
+            log.info("Excluding {} panel members with Personal Codes {}", adjournmentPanelMembers.size(),
+                adjournmentPanelMembers.stream().map(JudicialUserBase::getPersonalCode).collect(Collectors.toList()));
+
+            if (isNull(panelMembersList)) {
+                panelMembersList = new LinkedList<>();
             }
 
-            panelMemberExclusions.addAll(panelMembers.stream()
+            panelMembersList.addAll(adjournmentPanelMembers.stream()
                 .filter(Objects::nonNull)
                 .distinct()
                 .map(CcdValue::new)
-                .filter(not(panelMemberExclusions::contains))
+                .filter(not(panelMembersList::contains))
                 .collect(Collectors.toList()));
-
-            exclusions.setExcludedPanelMembers(panelMemberExclusions);
+            
+            if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
+                exclusions.setExcludedPanelMembers(panelMembersList);
+                exclusions.setArePanelMembersExcluded(YES);
+            }
+            if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.RESERVED)) {
+                exclusions.setReservedPanelMembers(panelMembersList);
+                exclusions.setArePanelMembersReserved(YES);
+            }
         }
-
-        exclusions.setArePanelMembersExcluded(YES);
     }
-    
+
+    private static List<CcdValue<JudicialUserBase>> getPanelMembersList(PanelMemberExclusions exclusions,
+                                                                        AdjournCasePanelMembersExcluded panelMemberExcluded) {
+        if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
+            return exclusions.getExcludedPanelMembers();
+        }
+        if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.RESERVED)) {
+            return exclusions.getReservedPanelMembers();
+        }
+        return new LinkedList<>();
+    }
+
     public static void addDocumentToDocumentTabAndBundle(FooterService footerService, SscsCaseData caseData, DocumentType documentType) {
         DocumentLink url = caseData.getDocumentStaging().getPreviewDocument();
 

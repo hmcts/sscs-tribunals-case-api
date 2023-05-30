@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 
 import java.time.LocalDate;
@@ -20,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
@@ -92,10 +90,6 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         adjournment.setGeneratedDate(LocalDate.now());
 
-        if (isAdjournmentEnabled) {
-            updateExcludedPanelMembers(sscsCaseData);
-        }
-
         updateHearingChannel(sscsCaseData);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
@@ -123,21 +117,6 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
                 .filter(hearingChannel -> caseData.getAdjournment().getTypeOfNextHearing().getHearingChannel().getValueTribunals().equalsIgnoreCase(
                         hearingChannel.getValueTribunals()))
                 .findFirst().orElse(HearingChannel.PAPER);
-    }
-
-    private static void updateExcludedPanelMembers(SscsCaseData caseData) {
-        Adjournment adjournment = caseData.getAdjournment();
-        AdjournCasePanelMembersExcluded panelMembersExcluded = adjournment.getPanelMembersExcluded();
-        if (nonNull(panelMembersExcluded)) {
-            PanelMemberExclusions panelMemberExclusions = caseData.getSchedulingAndListingFields()
-                .getPanelMemberExclusions();
-
-            if (panelMembersExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
-                SscsUtil.excludePanelMembers(panelMemberExclusions, adjournment.getPanelMembers());
-            } else if (panelMembersExcluded.equals(AdjournCasePanelMembersExcluded.RESERVED)) {
-                panelMemberExclusions.setArePanelMembersReserved(YES);
-            }
-        }
     }
 
 }

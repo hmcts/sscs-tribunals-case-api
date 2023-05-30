@@ -107,7 +107,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         }
 
         if (isAdjournmentEnabled) {
-            updateExcludedPanelMembers(sscsCaseData);
+            updatePanelMembers(sscsCaseData);
         }
 
         clearBasicTransientFields(sscsCaseData);
@@ -146,18 +146,13 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
                 null, null, documentTranslationStatus);
     }
 
-    private static void updateExcludedPanelMembers(SscsCaseData caseData) {
+    private static void updatePanelMembers(SscsCaseData caseData) {
         Adjournment adjournment = caseData.getAdjournment();
-        AdjournCasePanelMembersExcluded panelMembersExcluded = adjournment.getPanelMembersExcluded();
-        if (nonNull(panelMembersExcluded)) {
-            PanelMemberExclusions panelMemberExclusions = caseData.getSchedulingAndListingFields()
-                .getPanelMemberExclusions();
+        AdjournCasePanelMembersExcluded panelMemberExcluded = adjournment.getPanelMembersExcluded();
 
-            if (panelMembersExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
-                SscsUtil.excludePanelMembers(panelMemberExclusions, adjournment.getPanelMembers());
-            } else if (panelMembersExcluded.equals(AdjournCasePanelMembersExcluded.RESERVED)) {
-                panelMemberExclusions.setArePanelMembersReserved(YES);
-            }
+        if (nonNull(panelMemberExcluded)) {
+            PanelMemberExclusions panelMemberExclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
+            SscsUtil.setAdjournmentPanelMembersExclusions(panelMemberExclusions, adjournment.getPanelMembers(), panelMemberExcluded);
         }
     }
 

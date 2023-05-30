@@ -13,14 +13,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 
@@ -56,8 +49,6 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        log.info("#17 {}", sscsCaseData.getSchedulingAndListingFields().getPanelMemberExclusions());
-
         ReserveTo callbackReserveTo = callbackResponse.getData().getSchedulingAndListingFields().getReserveTo();
         SchedulingAndListingFields caseDataSnlFields = sscsCaseData.getSchedulingAndListingFields();
 
@@ -68,6 +59,18 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             if (!isNoOrNull(callbackReservedDtj)) {
                 caseDataReserveTo.setReservedJudge(null);
             }
+        }
+
+        PanelMemberExclusions callbackPanelMemberExcl = callbackResponse
+            .getData()
+            .getSchedulingAndListingFields()
+            .getPanelMemberExclusions();
+
+        log.info("#17 CaseData Exclusions {}", caseDataSnlFields.getPanelMemberExclusions());
+        log.info("#18 Callback Exclusions {}", callbackPanelMemberExcl);
+
+        if (nonNull(callbackPanelMemberExcl)) {
+            caseDataSnlFields.setPanelMemberExclusions(callbackPanelMemberExcl);
         }
 
         State state = callback.getCaseDetails().getState();
