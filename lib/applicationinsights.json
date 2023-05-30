@@ -1,6 +1,0 @@
-{
-  "connectionString": "${file:/mnt/secrets/sscs/app-insights-connection-string}",
-  "role": {
-    "name": "TribunalsCaseApi"
-  }
-}
