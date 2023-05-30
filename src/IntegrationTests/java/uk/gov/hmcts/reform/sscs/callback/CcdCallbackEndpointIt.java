@@ -29,9 +29,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.hamcrest.core.StringEndsWith;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,9 +126,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
         }
     }
 
-    @Test
-    @Ignore("Requires a dedicated feature flag for post hearings enabled false just for this test. Will also need a second test for true which "
-        + "expects 7 elements in the menu")
+    @Test // TODO another test is required for post hearings flag TRUE (will give 7 list items) and manually set the flag false for this test
     public void actionFurtherEvidenceDropdownAboutToStartCallback() throws Exception {
         json = getJson("callback/actionFurtherEvidenceWithEmptyFurtherEvidenceActionFieldCallback.json");
 
