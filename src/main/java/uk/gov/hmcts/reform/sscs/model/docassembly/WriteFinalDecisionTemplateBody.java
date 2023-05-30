@@ -33,6 +33,8 @@ public class WriteFinalDecisionTemplateBody {
     private boolean isIndefinite;
     @JsonProperty("appellant_name")
     private String appellantName;
+    @JsonProperty("appointee_name")
+    private String appointeeName;
     @JsonProperty("start_date")
     private String startDate;
     @JsonProperty("end_date")
@@ -63,6 +65,10 @@ public class WriteFinalDecisionTemplateBody {
     private String pageNumber;
     @JsonProperty("attended_hearing")
     private boolean attendedHearing;
+    @JsonProperty("appointee_attended")
+    private boolean appointeeAttended;
+    @JsonProperty("appointee_on_case")
+    private boolean appointeeOnCase;
     @JsonProperty("other_party_names_attended_hearing")
     private String otherPartyNamesAttendedHearing;
     @JsonProperty("presenting_officer_attended")
