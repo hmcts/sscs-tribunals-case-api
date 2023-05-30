@@ -65,8 +65,6 @@ public class SscsUtil {
         if (nonNull(adjournmentPanelMembers)) {
             List<CcdValue<JudicialUserBase>> panelMembersList = getPanelMembersList(exclusions, panelMemberExcluded);
 
-            log.info("Excluding {} panel members with Personal Codes {}", adjournmentPanelMembers.size(),
-                adjournmentPanelMembers.stream().map(JudicialUserBase::getPersonalCode).collect(Collectors.toList()));
 
             if (isNull(panelMembersList)) {
                 panelMembersList = new LinkedList<>();
@@ -78,12 +76,18 @@ public class SscsUtil {
                 .map(CcdValue::new)
                 .filter(not(panelMembersList::contains))
                 .collect(Collectors.toList()));
-            
+
             if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
+                log.info("Excluding {} panel members with Personal Codes {}", adjournmentPanelMembers.size(),
+                    adjournmentPanelMembers.stream().map(JudicialUserBase::getPersonalCode).collect(Collectors.toList()));
+
                 exclusions.setExcludedPanelMembers(panelMembersList);
                 exclusions.setArePanelMembersExcluded(YES);
             }
             if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.RESERVED)) {
+                log.info("Reserving {} panel members with Personal Codes {}", adjournmentPanelMembers.size(),
+                    adjournmentPanelMembers.stream().map(JudicialUserBase::getPersonalCode).collect(Collectors.toList()));
+
                 exclusions.setReservedPanelMembers(panelMembersList);
                 exclusions.setArePanelMembersReserved(YES);
             }
