@@ -28,9 +28,9 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     @Mock
     private Callback<SscsCaseData> callback;
     @Mock
-    private PreviewDocumentService previewDocumentService;
-    @Mock
     private DecisionNoticeOutcomeService decisionNoticeOutcomeService;
+    @Mock
+    private PreviewDocumentService previewDocumentService;
 
     @Before
     public void setUp() {

@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
-
 import java.time.LocalDate;
 import java.util.*;
+
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -15,20 +14,15 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
+@AllArgsConstructor
 public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final DecisionNoticeService decisionNoticeService;
     private final PreviewDocumentService previewDocumentService;
-
-    @Autowired
-    public WriteFinalDecisionAboutToSubmitHandler(DecisionNoticeService decisionNoticeService,
-                                                  PreviewDocumentService previewDocumentService) {
-        this.decisionNoticeService = decisionNoticeService;
-        this.previewDocumentService = previewDocumentService;
-    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -44,7 +38,8 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
+        SscsCaseData sscsCaseData = caseDetails.getCaseData();
         State state = sscsCaseData.getState();
 
         // Due to a bug with CCD related to hidden fields, this field is not being set
@@ -64,7 +59,6 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         if (benefitType == null) {
             preSubmitCallbackResponse.addError("Unexpected error - benefit type is null");
         } else {
-
             DecisionNoticeOutcomeService outcomeService = decisionNoticeService.getOutcomeService(benefitType);
 
             outcomeService.validate(preSubmitCallbackResponse, sscsCaseData);
@@ -74,7 +68,9 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                 sscsCaseData.setPreviousState(state);
             }
 
-            previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_DECISION_NOTICE, sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+            previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData,
+                SscsUtil.getWriteFinalDecisionDocumentType(caseDetails),
+                sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         }
         return preSubmitCallbackResponse;
     }

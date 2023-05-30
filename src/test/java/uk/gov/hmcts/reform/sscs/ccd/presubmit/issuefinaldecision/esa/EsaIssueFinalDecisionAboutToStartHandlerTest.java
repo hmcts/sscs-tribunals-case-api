@@ -118,7 +118,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
             .ccdCaseId("ccdId")
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionGeneratedDate("2018-01-01")
-                .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
+                .writeFinalDecisionPreviewDocument(DocumentLink.builder().documentFilename("filename").build())
                 .build())
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("ESA").build())

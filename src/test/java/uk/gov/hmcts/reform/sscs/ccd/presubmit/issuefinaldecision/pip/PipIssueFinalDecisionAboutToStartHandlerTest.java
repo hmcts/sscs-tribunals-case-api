@@ -99,7 +99,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
             .ccdCaseId("ccdId")
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionGeneratedDate("2018-01-01")
-                .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
+                .writeFinalDecisionPreviewDocument(DocumentLink.builder().documentFilename("test").build())
                 .build())
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("PIP").build())

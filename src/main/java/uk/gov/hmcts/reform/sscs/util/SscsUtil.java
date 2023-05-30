@@ -10,10 +10,12 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
@@ -133,5 +135,28 @@ public class SscsUtil {
             log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
             caseData.setTranslationWorkOutstanding(YesNo.YES.getValue());
         }
+    }
+
+    public static boolean isReadyForPostHearings(CaseDetails<SscsCaseData> caseDetails) {
+        State currentState = caseDetails.getState();
+        return HearingRoute.LIST_ASSIST.equals(caseDetails.getCaseData().getSchedulingAndListingFields().getHearingRoute())
+            && (State.DORMANT_APPEAL_STATE.equals(currentState) || State.POST_HEARING.equals(currentState));
+    }
+
+    public static DocumentType getWriteFinalDecisionDocumentType(CaseDetails<SscsCaseData> caseDetails) {
+        if (SscsUtil.isReadyForPostHearings(caseDetails)) {
+            return DocumentType.DRAFT_CORRECTION_GRANTED;
+        }
+
+        return DocumentType.DRAFT_DECISION_NOTICE;
+    }
+
+    public static DocumentType getIssueFinalDecisionDocumentType(String documentFilename) {
+        if (documentFilename.contains(DocumentType.DRAFT_CORRECTION_GRANTED.getLabel())
+            || documentFilename.contains(DocumentType.CORRECTION_GRANTED.getLabel())) {
+            return DocumentType.CORRECTION_GRANTED;
+        }
+
+        return DocumentType.FINAL_DECISION_NOTICE;
     }
 }

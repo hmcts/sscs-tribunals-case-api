@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService2;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesStatus;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @RestController
 @Slf4j
@@ -84,8 +86,8 @@ public class CcdMideventCallbackController {
             callback.getCaseDetails().getId());
 
         authorisationService.authorise(serviceAuthHeader);
-
-        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
+        SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(sscsCaseData);
 
@@ -97,7 +99,8 @@ public class CcdMideventCallbackController {
 
         WriteFinalDecisionPreviewDecisionServiceBase writeFinalDecisionPreviewDecisionService = decisionNoticeService.getPreviewService(benefitType);
 
-        return ok(writeFinalDecisionPreviewDecisionService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, userAuthorisation, false));
+        return ok(writeFinalDecisionPreviewDecisionService.preview(callback,
+            SscsUtil.getWriteFinalDecisionDocumentType(caseDetails), userAuthorisation, false));
     }
 
     @PostMapping(path = "/ccdMidEventPreviewAdjournCase", produces = MediaType.APPLICATION_JSON_VALUE)

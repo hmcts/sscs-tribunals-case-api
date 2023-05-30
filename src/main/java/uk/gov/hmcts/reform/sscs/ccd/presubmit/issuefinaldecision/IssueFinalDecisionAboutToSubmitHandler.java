@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -109,6 +108,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         if (isAdjournmentEnabled) {
             sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());
         }
+
         return preSubmitCallbackResponse;
     }
 
@@ -162,8 +162,10 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
         final SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelsh() ? TRANSLATION_REQUIRED : null;
-        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.FINAL_DECISION_NOTICE, now,
-                null, null, documentTranslationStatus);
+        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData,
+            SscsUtil.getIssueFinalDecisionDocumentType(docLink.getDocumentFilename()),
+            now, null, null, documentTranslationStatus);
+
         if (documentTranslationStatus != null) {
             sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
             log.info("Set the InterlocReviewState to {},  for case id : {}", sscsCaseData.getInterlocReviewState(), sscsCaseData.getCcdCaseId());

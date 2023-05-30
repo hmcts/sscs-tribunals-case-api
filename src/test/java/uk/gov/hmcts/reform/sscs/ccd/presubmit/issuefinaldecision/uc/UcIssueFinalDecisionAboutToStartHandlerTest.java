@@ -61,7 +61,6 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private IssueFinalDecisionAboutToStartHandler handler;
     private static final String URL = "http://dm-store/documents/123";
-    private static final String TEMPLATE_ID = "nuts.docx";
     private static final String UC_TEMPLATE_ID = "esanuts.docx";
 
     @Mock
@@ -119,7 +118,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
             .ccdCaseId("ccdId")
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionGeneratedDate("2018-01-01")
-                .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
+                .writeFinalDecisionPreviewDocument(DocumentLink.builder().documentFilename("filename").build())
                 .build())
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("UC").build())
@@ -161,7 +160,6 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
 
     @Test
     public void givenAboutToStartRequest_willGeneratePreviewFile() {
-
         when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
 
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(sscsCaseData);
