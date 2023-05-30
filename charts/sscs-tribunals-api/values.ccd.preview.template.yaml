@@ -29,6 +29,9 @@ java:
     CASE_ACCESS_MANAGEMENT_FEATURE: true
     WORK_ALLOCATION_FEATURE: true
     SCHEDULE_LISTING_FEATURE: true
+    POST_HEARINGS_FEATURE: true
+    SCHEDULE_LISTING_FEATURE: true
+    ADJOURNMENT_FEATURE: true
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -484,7 +487,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-11548-10
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-11665nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -503,7 +506,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S-11548-10
+      CCD_DEF_VERSION: S-11665
     secrets: []
     userRoles:
       - citizen
@@ -553,7 +556,7 @@ sscs-evidence-share:
 sscs-tya-notif:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
+    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2319-662224d-20230530123914
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
@@ -571,6 +574,7 @@ sscs-tya-notif:
       HOURS_END_TIME: 23
       RUN_DB_MIGRATION_ON_STARTUP: true
       TEST_RECIPIENTS_POSTCODE: "*"
+      POST_HEARINGS_FEATURE: true
     secrets:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
