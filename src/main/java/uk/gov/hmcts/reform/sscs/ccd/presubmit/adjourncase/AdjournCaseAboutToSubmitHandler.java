@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
@@ -90,7 +91,10 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         adjournment.setGeneratedDate(LocalDate.now());
 
-        updateHearingChannel(sscsCaseData);
+        if (isAdjournmentEnabled) {
+            updatePanelMembers(sscsCaseData);
+            updateHearingChannel(sscsCaseData);
+        }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
@@ -117,6 +121,16 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
                 .filter(hearingChannel -> caseData.getAdjournment().getTypeOfNextHearing().getHearingChannel().getValueTribunals().equalsIgnoreCase(
                         hearingChannel.getValueTribunals()))
                 .findFirst().orElse(HearingChannel.PAPER);
+    }
+
+    private static void updatePanelMembers(SscsCaseData caseData) {
+        Adjournment adjournment = caseData.getAdjournment();
+        AdjournCasePanelMembersExcluded panelMemberExcluded = adjournment.getPanelMembersExcluded();
+
+        if (nonNull(panelMemberExcluded)) {
+            PanelMemberExclusions panelMemberExclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
+            SscsUtil.setAdjournmentPanelMembersExclusions(panelMemberExclusions, adjournment.getPanelMembers(), panelMemberExcluded);
+        }
     }
 
 }

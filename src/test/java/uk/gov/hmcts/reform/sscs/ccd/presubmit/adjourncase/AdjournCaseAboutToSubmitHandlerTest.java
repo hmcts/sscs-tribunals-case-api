@@ -17,22 +17,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
@@ -208,6 +196,47 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(callback.getCaseDetails().getCaseData().getLatestHearing().getValue().getHearingChannel()).isEqualTo(HearingChannel.PAPER);
+    }
+
+    @DisplayName("When we have written an adjournment notice and excluded some panel members, and there are already excluded panel members, "
+        + "add them to the existing excluded panel members list")
+    @Test
+    void givenPanelMembersExcluded_thenAddPanelMembersToExclusionList() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+        sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
+            .excludedPanelMembers(new ArrayList<>(Arrays.asList(
+                new CcdValue<>(JudicialUserBase.builder().idamId("1").build()),
+                new CcdValue<>(JudicialUserBase.builder().idamId("2").build())))).build());
+
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
+        sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
+        sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().idamId("3").build());
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getSchedulingAndListingFields()
+            .getPanelMemberExclusions().getExcludedPanelMembers()).hasSize(3);
+    }
+
+    @DisplayName("When we have written an adjournment notice and excluded some panel members, and there are no current "
+        + "exclusions, add them to the excluded panel members list")
+    @Test
+    void givenNoExistingPanelMembersExcluded_thenAddPanelMembersToExclusionList() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
+        sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
+        sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().idamId("3").build());
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getSchedulingAndListingFields()
+            .getPanelMemberExclusions().getExcludedPanelMembers()).hasSize(2);
+        assertThat(sscsCaseData.getSchedulingAndListingFields().getPanelMemberExclusions().getArePanelMembersExcluded())
+            .isEqualTo(YES);
     }
 
 }
