@@ -126,7 +126,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
         }
     }
 
-    @Test
+    @Test // TODO another test is required for post hearings flag TRUE (will give 7 list items) and manually set the flag false for this test
     public void actionFurtherEvidenceDropdownAboutToStartCallback() throws Exception {
         json = getJson("callback/actionFurtherEvidenceWithEmptyFurtherEvidenceActionFieldCallback.json");
 
