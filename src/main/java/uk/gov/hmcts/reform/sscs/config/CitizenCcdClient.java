@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.config;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
@@ -59,31 +57,25 @@ public class CitizenCcdClient {
     @Retryable
     public List<CaseDetails> searchForCitizen(IdamTokens idamTokens) {
         log.info("Searching cases for citizen");
-        Map<String, String> searchCriteria = new HashMap<>();
-        searchCriteria.put("state", State.DRAFT.getId());
-        searchCriteria.put("sortDirection", "desc");
-        return coreCaseDataApi.searchForCitizen(
-            idamTokens.getIdamOauth2Token(),
-            idamTokens.getServiceAuthorization(),
-            idamTokens.getUserId(),
-            ccdRequestDetails.getJurisdictionId(),
-            ccdRequestDetails.getCaseTypeId(),
-            searchCriteria
-        );
+        String searchCriteria ;
+        searchCriteria = buildQuery("state", State.DRAFT.getId());
+        return  coreCaseDataApi.searchCases(
+                idamTokens.getIdamOauth2Token(),
+                idamTokens.getServiceAuthorization(),
+                ccdRequestDetails.getCaseTypeId(),
+                searchCriteria).getCases();
 
     }
 
     public List<CaseDetails> searchForCitizenAllCases(IdamTokens idamTokens) {
-        Map<String, String> searchCriteria = new HashMap<>();
-        searchCriteria.put("sortDirection", "desc");
-        return coreCaseDataApi.searchForCitizen(
+        String searchCriteria = "\"query\" : {\n" +
+                "        \"match_all\" : {}\n" +
+                "    }";
+        return  coreCaseDataApi.searchCases(
                 idamTokens.getIdamOauth2Token(),
                 idamTokens.getServiceAuthorization(),
-                idamTokens.getUserId(),
-                ccdRequestDetails.getJurisdictionId(),
                 ccdRequestDetails.getCaseTypeId(),
-                searchCriteria
-        );
+                searchCriteria).getCases();
 
     }
 
@@ -134,6 +126,12 @@ public class CitizenCcdClient {
                 caseId.toString(),
                 userIdToRemove
         );
+    }
+
+    public String buildQuery(String searchValue, String searchField) {
+        return "{\"query\":{\"term\":{ \""
+                + searchField
+                + "\":\"" + searchValue + "\"}}}";
     }
 }
 
