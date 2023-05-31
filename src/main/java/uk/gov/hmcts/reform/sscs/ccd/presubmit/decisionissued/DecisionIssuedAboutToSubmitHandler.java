@@ -83,7 +83,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             State beforeState = callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null);
-            clearTransientFields(caseData,beforeState);
+            clearTransientFields(caseData);
             caseData.setDwpState(DwpState.STRUCK_OUT);
             caseData.setDirectionDueDate(null);
 
