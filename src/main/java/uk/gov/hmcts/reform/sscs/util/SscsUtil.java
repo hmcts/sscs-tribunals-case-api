@@ -137,22 +137,24 @@ public class SscsUtil {
         }
     }
 
-    public static boolean isReadyForPostHearings(CaseDetails<SscsCaseData> caseDetails) {
+    public static boolean isReadyForPostHearings(CaseDetails<SscsCaseData> caseDetails, boolean isPostHearingsEnabled) {
         State currentState = caseDetails.getState();
-        return HearingRoute.LIST_ASSIST.equals(caseDetails.getCaseData().getSchedulingAndListingFields().getHearingRoute())
+        return isPostHearingsEnabled
+            && HearingRoute.LIST_ASSIST.equals(caseDetails.getCaseData().getSchedulingAndListingFields().getHearingRoute())
             && (State.DORMANT_APPEAL_STATE.equals(currentState) || State.POST_HEARING.equals(currentState));
     }
 
-    public static DocumentType getWriteFinalDecisionDocumentType(CaseDetails<SscsCaseData> caseDetails) {
-        if (SscsUtil.isReadyForPostHearings(caseDetails)) {
+    public static DocumentType getWriteFinalDecisionDocumentType(CaseDetails<SscsCaseData> caseDetails, boolean isPostHearingsEnabled) {
+        if (SscsUtil.isReadyForPostHearings(caseDetails, isPostHearingsEnabled)) {
             return DocumentType.DRAFT_CORRECTION_GRANTED;
         }
 
         return DocumentType.DRAFT_DECISION_NOTICE;
     }
 
-    public static DocumentType getIssueFinalDecisionDocumentType(String documentFilename) {
-        if (documentFilename.contains(DocumentType.DRAFT_CORRECTION_GRANTED.getLabel())
+    public static DocumentType getIssueFinalDecisionDocumentType(String documentFilename, boolean isPostHearingsEnabled) {
+        if (isPostHearingsEnabled
+            && documentFilename.contains(DocumentType.DRAFT_CORRECTION_GRANTED.getLabel())
             || documentFilename.contains(DocumentType.CORRECTION_GRANTED.getLabel())) {
             return DocumentType.CORRECTION_GRANTED;
         }

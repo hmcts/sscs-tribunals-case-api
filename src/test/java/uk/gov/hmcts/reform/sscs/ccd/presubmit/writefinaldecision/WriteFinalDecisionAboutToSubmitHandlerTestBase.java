@@ -57,7 +57,7 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
         openMocks(this);
         decisionNoticeService = new DecisionNoticeService(Arrays.asList(decisionNoticeQuestionService), Arrays.asList(createOutcomeService(decisionNoticeQuestionService)), Arrays.asList());
         previewDocumentService = new PreviewDocumentService();
-        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeService, previewDocumentService);
+        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeService, previewDocumentService, false);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

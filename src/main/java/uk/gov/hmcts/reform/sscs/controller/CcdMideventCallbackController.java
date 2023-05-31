@@ -8,6 +8,7 @@ import com.opencsv.CSVReader;
 import java.io.InputStreamReader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,8 @@ public class CcdMideventCallbackController {
     private final AdjournCasePreviewService adjournCasePreviewService;
     private final AdjournCaseCcdService adjournCaseCcdService;
     private final RestoreCasesService2 restoreCasesService2;
+    @Value("${feature.postHearings.enabled}")
+    private boolean isPostHearingEnabled;
 
     @Autowired
     public CcdMideventCallbackController(AuthorisationService authorisationService, SscsCaseCallbackDeserializer deserializer,
@@ -100,7 +103,7 @@ public class CcdMideventCallbackController {
         WriteFinalDecisionPreviewDecisionServiceBase writeFinalDecisionPreviewDecisionService = decisionNoticeService.getPreviewService(benefitType);
 
         return ok(writeFinalDecisionPreviewDecisionService.preview(callback,
-            SscsUtil.getWriteFinalDecisionDocumentType(caseDetails), userAuthorisation, false));
+            SscsUtil.getWriteFinalDecisionDocumentType(caseDetails, isPostHearingEnabled), userAuthorisation, false));
     }
 
     @PostMapping(path = "/ccdMidEventPreviewAdjournCase", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import java.time.LocalDate;
 import java.util.*;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -23,6 +23,8 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
     private final DecisionNoticeService decisionNoticeService;
     private final PreviewDocumentService previewDocumentService;
+    @Value("${feature.postHearings.enabled}")
+    private boolean isPostHearingEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -69,7 +71,7 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             }
 
             previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData,
-                SscsUtil.getWriteFinalDecisionDocumentType(caseDetails),
+                SscsUtil.getWriteFinalDecisionDocumentType(caseDetails, isPostHearingEnabled),
                 sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         }
         return preSubmitCallbackResponse;

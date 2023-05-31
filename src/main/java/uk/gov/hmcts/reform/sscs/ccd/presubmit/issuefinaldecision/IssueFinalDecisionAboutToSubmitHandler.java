@@ -48,6 +48,8 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     private boolean isScheduleListingEnabled;
     @Value("${feature.snl.adjournment.enabled}")
     private boolean isAdjournmentEnabled;
+    @Value("${feature.postHearings.enabled}")
+    private boolean isPostHearingEnabled;
 
     public IssueFinalDecisionAboutToSubmitHandler(FooterService footerService,
         DecisionNoticeService decisionNoticeService, Validator validator,
@@ -163,7 +165,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         final SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelsh() ? TRANSLATION_REQUIRED : null;
         footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData,
-            SscsUtil.getIssueFinalDecisionDocumentType(docLink.getDocumentFilename()),
+            SscsUtil.getIssueFinalDecisionDocumentType(docLink.getDocumentFilename(), isPostHearingEnabled),
             now, null, null, documentTranslationStatus);
 
         if (documentTranslationStatus != null) {

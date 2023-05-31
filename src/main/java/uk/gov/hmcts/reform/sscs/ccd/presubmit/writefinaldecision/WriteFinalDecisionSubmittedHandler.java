@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import java.util.*;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -18,6 +18,8 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @AllArgsConstructor
 public class WriteFinalDecisionSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final CcdCallbackMapService ccdCallbackMapService;
+    @Value("${feature.postHearings.enabled}")
+    private boolean isPostHearingEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -37,7 +39,7 @@ public class WriteFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        if (SscsUtil.isReadyForPostHearings(caseDetails)) {
+        if (SscsUtil.isReadyForPostHearings(caseDetails, isPostHearingEnabled)) {
             sscsCaseData = ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, sscsCaseData);
 
             return new PreSubmitCallbackResponse<>(sscsCaseData);

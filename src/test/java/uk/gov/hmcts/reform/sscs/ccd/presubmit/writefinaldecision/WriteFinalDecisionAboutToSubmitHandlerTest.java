@@ -36,7 +36,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
 
-        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeService, previewDocumentService);
+        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeService, previewDocumentService, false);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());
