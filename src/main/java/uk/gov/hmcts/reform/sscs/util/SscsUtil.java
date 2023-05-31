@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
@@ -140,7 +139,6 @@ public class SscsUtil {
     public static boolean isReadyForPostHearings(CaseDetails<SscsCaseData> caseDetails, boolean isPostHearingsEnabled) {
         State currentState = caseDetails.getState();
         return isPostHearingsEnabled
-            && HearingRoute.LIST_ASSIST.equals(caseDetails.getCaseData().getSchedulingAndListingFields().getHearingRoute())
             && (State.DORMANT_APPEAL_STATE.equals(currentState) || State.POST_HEARING.equals(currentState));
     }
 
@@ -154,8 +152,8 @@ public class SscsUtil {
 
     public static DocumentType getIssueFinalDecisionDocumentType(String documentFilename, boolean isPostHearingsEnabled) {
         if (isPostHearingsEnabled
-            && documentFilename.contains(DocumentType.DRAFT_CORRECTION_GRANTED.getLabel())
-            || documentFilename.contains(DocumentType.CORRECTION_GRANTED.getLabel())) {
+            && (documentFilename.contains(DocumentType.DRAFT_CORRECTION_GRANTED.getLabel())
+            || documentFilename.contains(DocumentType.CORRECTION_GRANTED.getLabel()))) {
             return DocumentType.CORRECTION_GRANTED;
         }
 

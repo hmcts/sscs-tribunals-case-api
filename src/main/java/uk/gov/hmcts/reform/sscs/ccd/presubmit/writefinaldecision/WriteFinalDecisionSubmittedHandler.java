@@ -38,8 +38,8 @@ public class WriteFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
 
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
-
         if (SscsUtil.isReadyForPostHearings(caseDetails, isPostHearingEnabled)) {
+            System.out.println("hit");
             sscsCaseData = ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, sscsCaseData);
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
