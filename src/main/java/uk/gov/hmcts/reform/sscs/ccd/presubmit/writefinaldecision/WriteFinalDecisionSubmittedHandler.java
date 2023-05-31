@@ -41,8 +41,6 @@ public class WriteFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
 
         if (SscsUtil.isReadyForPostHearings(caseDetails, isPostHearingEnabled)) {
             sscsCaseData = ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, sscsCaseData);
-
-            return new PreSubmitCallbackResponse<>(sscsCaseData);
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
