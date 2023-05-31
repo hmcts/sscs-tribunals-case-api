@@ -235,8 +235,6 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of("caseworker-sscs-judge")).build());
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-
-
         assertThat(sscsCaseData.getDwpState()).isEqualTo(DwpState.IN_PROGRESS);
         assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
         assertThat(sscsCaseData.getState()).isEqualTo(State.READY_TO_LIST);
