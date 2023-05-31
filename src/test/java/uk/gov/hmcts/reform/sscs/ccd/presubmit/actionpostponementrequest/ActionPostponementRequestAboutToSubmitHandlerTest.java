@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -51,6 +50,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsHearingRecordingCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
@@ -74,6 +75,9 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     @Mock
     private UserDetailsService userDetailsService;
+
+    @Mock
+    private IdamService idamService;
 
     @Mock
     private FooterService footerService;
@@ -198,6 +202,44 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getDocumentGeneration().getDirectionNoticeContent()).isNull();
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
                 eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
+    }
+
+    @Test
+    public void givenARefuseOnTheDayPostponement_thatIsDoneByDwp_thenClearFtaStateAndClearInterlocStateAndSetStatusToBeHearing() {
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder()
+                .actionPostponementRequestSelected("refuseOnTheDay")
+                .build());
+
+        sscsCaseData.setDwpState(DwpState.IN_PROGRESS);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
+        sscsCaseData.setState(State.READY_TO_LIST);
+
+        when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of("caseworker-sscs-dwpresponsewriter")).build());
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getDwpState()).isNull();
+        assertThat(sscsCaseData.getInterlocReviewState()).isNull();
+        assertThat(sscsCaseData.getState()).isEqualTo(State.HEARING);
+    }
+
+    @Test
+    public void givenARefuseOnTheDayPostponement_thatIsNotDoneByDwp_thenLeaveFields() {
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder()
+                .actionPostponementRequestSelected("refuseOnTheDay")
+                .build());
+
+        sscsCaseData.setDwpState(DwpState.IN_PROGRESS);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
+        sscsCaseData.setState(State.READY_TO_LIST);
+
+        when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of("caseworker-sscs-judge")).build());
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+
+
+        assertThat(sscsCaseData.getDwpState()).isEqualTo(DwpState.IN_PROGRESS);
+        assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
+        assertThat(sscsCaseData.getState()).isEqualTo(State.READY_TO_LIST);
     }
 
     @Test
