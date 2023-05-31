@@ -105,14 +105,17 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         return preSubmitCallbackResponse;
     }
 
+    private boolean isValidHearing(HearingDetails hearingDetails) {
+        return hearingDetails != null
+            && StringUtils.isNotBlank(hearingDetails.getHearingDate())
+            && hearingDetails.getVenue() != null
+            && StringUtils.isNotBlank(hearingDetails.getVenue().getName());
+    }
+
     private boolean hasHearingScheduledInTheFuture(SscsCaseData caseData) {
         Optional<Hearing> futureHearing = Optional.ofNullable(caseData.getHearings()).orElse(Collections.emptyList()).stream().filter(hearing -> {
             HearingDetails hearingDetails = hearing.getValue();
-            if (hearingDetails != null
-                    && StringUtils.isNotBlank(hearingDetails.getHearingDate())
-                    && hearingDetails.getVenue() != null
-                    && StringUtils.isNotBlank(hearingDetails.getVenue().getName())) {
-
+            if (isValidHearing(hearingDetails)) {
                 LocalDateTime hearingDttm = getLocalDateTime(hearingDetails.getHearingDate(), hearingDetails.getTime());
                 return Optional.of(hearingDttm).filter(d -> d.isAfter(LocalDateTime.now())).isPresent();
             }
