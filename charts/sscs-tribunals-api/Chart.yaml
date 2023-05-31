@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.98
+version: 0.0.101
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -21,12 +21,16 @@ dependencies:
     version: 0.0.46
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-evidence-share.enabled
+  - name: sscs-tya-notif
+    version: 0.0.42
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: sscs-tya-notif.enabled
   - name: sscs-ccd-callback-orchestrator
     version: 0.0.28
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-ccd-callback-orchestrator.enabled
   - name: ccd
-    version: 8.0.26
+    version: 8.0.27
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd.enabled
     tags:
@@ -44,7 +48,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: em-ccdorc.enabled
   - name: ccd-case-document-am-api
-    version: 1.7.8
+    version: 1.7.9
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd-case-document-am-api.enabled
   - name: sscs-hearings-api
@@ -56,6 +60,6 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: hmc-cft-hearing-service.enabled
   - name: servicebus
-    version: 0.4.0
+    version: 1.0.2
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: servicebus.enabled

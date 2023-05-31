@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
+import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -132,5 +132,19 @@ public class DwpUploadResponseMidEventHandlerTest {
         assertThat(response.getErrors(), is(empty()));
     }
 
+    @Test
+    public void testMidEventHandlerOnSscs2_WhenNoOtherPartyIsEnteredThenThrowError() {
+        sscsCaseData = SscsCaseData.builder()
+                .benefitCode("022")
+                .issueCode("CC")
+                .dwpFurtherInfo("Yes")
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).build())
+                .otherParties(emptyList())
+                .build();
 
+        when(callback.getCaseDetails().getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+        assertEquals("Please provide other party details", response.getErrors().toArray()[0]);
+    }
 }

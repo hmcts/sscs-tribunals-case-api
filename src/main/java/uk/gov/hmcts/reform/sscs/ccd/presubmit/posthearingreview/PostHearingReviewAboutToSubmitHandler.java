@@ -9,16 +9,17 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private final FooterService footerService;
+
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
@@ -26,7 +27,6 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
-
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && callback.getEvent() == EventType.POST_HEARING_REVIEW
             && isPostHearingsEnabled;
@@ -39,12 +39,13 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        String caseId = caseData.getCcdCaseId();
+        PostHearing postHearing = caseData.getPostHearing();
+        log.info("Review Post Hearing App: handling action {} for case {}", postHearing.getReviewType(), caseData.getCcdCaseId());
 
-        PostHearingReviewType typeSelected = caseData.getPostHearing().getReviewType();
-        log.info("Review Post Hearing App: handling action {} for case {}", typeSelected,  caseId);
-
-        SscsUtil.clearDocumentTransientFields(caseData);
+        if (response.getErrors().isEmpty()) {
+            SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData,
+                SscsUtil.getPostHearingReviewDocumentType(postHearing, isPostHearingsEnabled));
+        }
 
         return response;
     }

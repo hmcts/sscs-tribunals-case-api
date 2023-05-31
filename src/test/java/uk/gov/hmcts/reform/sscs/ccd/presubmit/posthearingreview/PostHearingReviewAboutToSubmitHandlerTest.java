@@ -4,8 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REVIEW;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,17 +14,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewAboutToSubmitHandlerTest {
-
-    private static final String DOCUMENT_URL = "dm-store/documents/123";
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -37,11 +30,14 @@ class PostHearingReviewAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private FooterService footerService;
+
     private SscsCaseData caseData;
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewAboutToSubmitHandler(true);
+        handler = new PostHearingReviewAboutToSubmitHandler(footerService, true);
 
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -49,13 +45,6 @@ class PostHearingReviewAboutToSubmitHandlerTest {
             .ccdCaseId("1234")
             .documentGeneration(DocumentGeneration.builder()
                 .directionNoticeContent("Body Content")
-                .build())
-            .documentStaging(DocumentStaging.builder()
-                .previewDocument(DocumentLink.builder()
-                    .documentUrl(DOCUMENT_URL)
-                    .documentBinaryUrl(DOCUMENT_URL + "/binary")
-                    .documentFilename("decisionIssued.pdf")
-                    .build())
                 .build())
             .build();
     }
@@ -79,14 +68,13 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewAboutToSubmitHandler(false);
+        handler = new PostHearingReviewAboutToSubmitHandler(footerService,false);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @Test
     void shouldReturnWithoutError() {
-
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
