@@ -1,0 +1,53 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPattern": "/refdata/judicial/users/search",
+    "bodyPatterns" : [ {
+      "equalToJson" : "{ \"searchString\": \"${json-unit.any-string}\" }"
+    } ]
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "title": "string1",
+        "knownAs": "string",
+        "surname": "string",
+        "fullName": "string",
+        "emailId": "string",
+        "personalCode": "string",
+        "idamId": "string"
+      },
+      {
+        "title": "string2",
+        "knownAs": "string",
+        "surname": "string",
+        "fullName": "string",
+        "emailId": "string",
+        "personalCode": "string",
+        "idamId": "string"
+      },
+      {
+        "title": "string3",
+        "knownAs": "string",
+        "surname": "string",
+        "fullName": "string",
+        "emailId": "string",
+        "personalCode": "string",
+        "idamId": "string"
+      },
+      {
+        "title": "string4",
+        "knownAs": "string",
+        "surname": "string",
+        "fullName": "string",
+        "emailId": "string",
+        "personalCode": "string",
+        "idamId": "string"
+      }
+    ]
+  }
+}
