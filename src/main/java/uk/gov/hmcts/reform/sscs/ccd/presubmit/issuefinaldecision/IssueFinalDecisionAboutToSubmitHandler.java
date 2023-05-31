@@ -116,8 +116,8 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         Optional<Hearing> futureHearing = Optional.ofNullable(caseData.getHearings()).orElse(Collections.emptyList()).stream().filter(hearing -> {
             HearingDetails hearingDetails = hearing.getValue();
             if (isValidHearing(hearingDetails)) {
-                LocalDateTime hearingDttm = getLocalDateTime(hearingDetails.getHearingDate(), hearingDetails.getTime());
-                return Optional.of(hearingDttm).filter(d -> d.isAfter(LocalDateTime.now())).isPresent();
+                LocalDateTime hearingDateTime = getLocalDateTime(hearingDetails.getHearingDate(), hearingDetails.getTime());
+                return Optional.of(hearingDateTime).filter(d -> d.isAfter(LocalDateTime.now())).isPresent();
             }
             return false;
         }).findFirst();
