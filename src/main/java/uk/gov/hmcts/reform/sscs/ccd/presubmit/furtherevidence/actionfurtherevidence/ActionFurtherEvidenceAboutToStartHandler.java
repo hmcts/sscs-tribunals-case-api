@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCaseWithDwpAndHmcts;
 
@@ -16,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @AllArgsConstructor
@@ -56,7 +56,8 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
     private List<DynamicListItem> getFurtherActionEvidenceItems(SscsCaseData sscsCaseData) {
         return Stream.of(values())
             .filter(item -> !item.equals(ADMIN_ACTION_CORRECTION)
-                || (!GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute()) && isPostHearingsEnabled))
+                || (!SscsUtil.isGapsCase(sscsCaseData)
+                && isPostHearingsEnabled))
             .map(item -> new DynamicListItem(item.getCode(), item.getLabel()))
             .collect(Collectors.toList());
     }

@@ -34,7 +34,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new ActionFurtherEvidenceAboutToStartHandler(true);
+        handler = new ActionFurtherEvidenceAboutToStartHandler(false);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
 
@@ -58,7 +58,6 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
     @Test
     public void givenActionFurtherEvidenceAboutToStart_populateFurtherEvidenceDropdown() {
-
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -66,20 +65,32 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
         assertEquals("issueFurtherEvidence", getItemCodeInList(
                 response.getData().getFurtherEvidenceAction(), "issueFurtherEvidence"));
-
         assertEquals("otherDocumentManual", getItemCodeInList(
                 response.getData().getFurtherEvidenceAction(), "otherDocumentManual"));
-
         assertEquals("informationReceivedForInterlocJudge", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "informationReceivedForInterlocJudge"));
-
         assertEquals("informationReceivedForInterlocTcw", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "informationReceivedForInterlocTcw"));
-
         assertEquals("sendToInterlocReviewByJudge", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "sendToInterlocReviewByJudge"));
-
         assertEquals("sendToInterlocReviewByTcw", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "sendToInterlocReviewByTcw"));
+        assertEquals(6, response.getData().getFurtherEvidenceAction().getListItems().size());
+    }
 
+    @Test
+    public void givenActionFurtherEvidenceAboutToStartWithPostHearingsFlagEnabled_populateFurtherEvidenceDropdown() {
+        handler = new ActionFurtherEvidenceAboutToStartHandler(true);
+        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals("issueFurtherEvidence", getItemCodeInList(
+            response.getData().getFurtherEvidenceAction(), "issueFurtherEvidence"));
+        assertEquals("otherDocumentManual", getItemCodeInList(
+            response.getData().getFurtherEvidenceAction(), "otherDocumentManual"));
+        assertEquals("informationReceivedForInterlocJudge", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "informationReceivedForInterlocJudge"));
+        assertEquals("informationReceivedForInterlocTcw", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "informationReceivedForInterlocTcw"));
+        assertEquals("sendToInterlocReviewByJudge", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "sendToInterlocReviewByJudge"));
+        assertEquals("sendToInterlocReviewByTcw", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "sendToInterlocReviewByTcw"));
         assertEquals("adminActionCorrection", getItemCodeInList(response.getData().getFurtherEvidenceAction(), "adminActionCorrection"));
-
         assertEquals(7, response.getData().getFurtherEvidenceAction().getListItems().size());
     }
 

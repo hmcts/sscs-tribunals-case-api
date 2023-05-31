@@ -9,7 +9,6 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
@@ -52,6 +51,7 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -180,7 +180,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
         }
 
-        if (isPostHearingsEnabled && isGapsCase(sscsCaseData) && isPostHearingRequest(sscsCaseData)) {
+        if (isPostHearingsEnabled && SscsUtil.isGapsCase(sscsCaseData) && isPostHearingRequest(sscsCaseData)) {
             preSubmitCallbackResponse.addError("Cannot upload post hearing requests on GAPS cases");
         }
     }
@@ -302,10 +302,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return isSetAsideApplication(sscsCaseData)
             || isCorrectionApplication(sscsCaseData)
             || isStatementOfReasonsApplication(sscsCaseData);
-    }
-
-    private static boolean isGapsCase(SscsCaseData sscsCaseData) {
-        return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
     }
 
     private boolean isPostponementRequest(SscsCaseData sscsCaseData) {
