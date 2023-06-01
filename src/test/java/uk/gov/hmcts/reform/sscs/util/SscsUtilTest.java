@@ -129,7 +129,13 @@ class SscsUtilTest {
     }
 
     @Test
-    void givenPostHearingsFlagIsFalseAndStateIsPostHearings_shouldReturnDraftDecisionNotice() {
+    void givenPostHearingsFlagIsTrueAndStateIsHearing_shouldReturnDraftCorrectionGranted() {
+        when(caseDetails.getState()).thenReturn(State.HEARING);
+        assertThat(getWriteFinalDecisionDocumentType(caseDetails, true)).isEqualTo(DRAFT_DECISION_NOTICE);
+    }
+
+    @Test
+    void givenPostHearingsFlagIsFalseAndStateIsPostHearing_shouldReturnDraftDecisionNotice() {
         when(caseDetails.getState()).thenReturn(State.POST_HEARING);
         assertThat(getWriteFinalDecisionDocumentType(caseDetails, false)).isEqualTo(DRAFT_DECISION_NOTICE);
     }
