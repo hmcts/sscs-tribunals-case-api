@@ -83,11 +83,6 @@ public class UploadHearingRecordingAboutToStartHandler implements PreSubmitCallb
 
     @NotNull
     private String checkHearingTime(String hearingTime) {
-        if (hearingTime.length() > 5) {
-            return hearingTime.substring(0, 5) + ":00";
-        } else if (hearingTime.length() == 5) {
-            return hearingTime + ":00";
-        }
-        return hearingTime;
+        return hearingTime.length() > 5 ? hearingTime.substring(0, 5) + ":00" : (hearingTime.length() == 5 ? hearingTime + ":00" : hearingTime);
     }
 }
