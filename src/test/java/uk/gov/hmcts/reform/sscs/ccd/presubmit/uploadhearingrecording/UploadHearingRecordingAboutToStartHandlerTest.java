@@ -137,6 +137,51 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
         assertEquals("good value 09:00:00 06 Jun 2021", selectHearingDetails.get(0).getLabel());
     }
 
+    @Test
+    public void givenHearingsListHasPastDate_WithTimeFormat_ReturnList() {
+        List<Hearing> hearingList = new ArrayList<>();
+
+        HearingDetails hearingDetails1 = HearingDetails.builder()
+                .hearingId("1")
+                .venue(Venue.builder().name("venue name").build())
+                .hearingDate("2021-06-06")
+                .time("09:00").build();
+        HearingDetails hearingDetails2 = HearingDetails.builder()
+                .hearingId("2")
+                .venue(Venue.builder().name("venue name").build())
+                .hearingDate("2021-06-06")
+                .time("09:00:00").build();
+        HearingDetails hearingDetails3 = HearingDetails.builder()
+                .hearingId("3")
+                .venue(Venue.builder().name("venue name").build())
+                .hearingDate("2021-06-06")
+                .time("09:00:00.0").build();
+        HearingDetails hearingDetails4 = HearingDetails.builder()
+                .hearingId("4")
+                .venue(Venue.builder().name("venue name").build())
+                .hearingDate("2021-06-06")
+                .time("09:00:00.00").build();
+        HearingDetails hearingDetails5 = HearingDetails.builder()
+                .hearingId("5")
+                .venue(Venue.builder().name("venue name").build())
+                .hearingDate("2021-06-06")
+                .time("09:00:00.000").build();
+
+        hearingList.add(Hearing.builder().value(hearingDetails1).build());
+        hearingList.add(Hearing.builder().value(hearingDetails2).build());
+        hearingList.add(Hearing.builder().value(hearingDetails3).build());
+        hearingList.add(Hearing.builder().value(hearingDetails4).build());
+        hearingList.add(Hearing.builder().value(hearingDetails5).build());
+
+        sscsCaseData.setHearings(unmodifiableList(hearingList));
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+
+        List<DynamicListItem> selectHearingDetails = response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems();
+        assertEquals(hearingList.size(), selectHearingDetails.size());
+        selectHearingDetails.forEach(o -> assertEquals("venue name 09:00:00 06 Jun 2021", o.getLabel()));
+    }
+
     private void assertNoHearingsInThePastError() {
         final PreSubmitCallbackResponse<SscsCaseData>
                 response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
