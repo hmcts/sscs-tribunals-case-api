@@ -18,6 +18,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -100,8 +102,9 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
         assertThat(date).isEqualTo(LocalDate.now());
     }
 
+    @DisplayName("OverrideFields should persist correct epimsid for selected venue in adjournment")
     @Test
-    void test() {
+    void givenVenueReturnCorrectEpimsInOverrideFields() {
         String epimsId = "epimsId";
         String code = "venueCode";
         VenueDetails details = VenueDetails.builder()
@@ -128,4 +131,60 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
         assertThat(hearingEpimsIds).isNotNull().hasSize(1).allMatch(b -> b.getValue().getValue().equals(epimsId));
     }
 
+    @DisplayName("Duration in sessions should be correctly converted in minutes in override duration field")
+    @Test
+    void givenDurationAsSessionDurationShouldBeCorrectInOverrides() {
+        var adjournment = sscsCaseData.getAdjournment();
+        adjournment.setNextHearingListingDuration(5);
+        adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.NON_STANDARD);
+        adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS);
+        
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        var schedulingAndListingFields = response.getData().getSchedulingAndListingFields();
+        assertThat(schedulingAndListingFields).isNotNull();
+
+        var overrideFields = schedulingAndListingFields.getOverrideFields();
+        assertThat(overrideFields).isNotNull();
+        assertThat(overrideFields.getDuration()).isEqualTo(825);
+    }
+
+    @DisplayName("When duration in minutes and more than default value override fields should return it")
+    @Test
+    void giveDurationInMinutesShouldBeCorrectInOverrides() {
+        int duration = 40;
+        var adjournment = sscsCaseData.getAdjournment();
+        adjournment.setNextHearingListingDuration(duration);
+        adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.NON_STANDARD);
+        adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.MINUTES);
+        
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        var schedulingAndListingFields = response.getData().getSchedulingAndListingFields();
+        assertThat(schedulingAndListingFields).isNotNull();
+
+        var overrideFields = schedulingAndListingFields.getOverrideFields();
+        assertThat(overrideFields).isNotNull();
+        assertThat(overrideFields.getDuration()).isEqualTo(duration);
+    }
+
+    @DisplayName("When duration in minutes and less than default value override fields should return default value")
+    @Test
+    void giveDurationInMinutesLessThanDefaultOverridesShouldReturnDefaultValue() {
+        int duration = 5;
+        var adjournment = sscsCaseData.getAdjournment();
+        adjournment.setNextHearingListingDuration(duration);
+        adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.NON_STANDARD);
+        adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.MINUTES);
+        
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        var schedulingAndListingFields = response.getData().getSchedulingAndListingFields();
+        assertThat(schedulingAndListingFields).isNotNull();
+
+        var overrideFields = schedulingAndListingFields.getOverrideFields();
+        int expectedDefaultDuration = 30;
+        assertThat(overrideFields).isNotNull();
+        assertThat(overrideFields.getDuration()).isEqualTo(expectedDefaultDuration);
+    }
 }
