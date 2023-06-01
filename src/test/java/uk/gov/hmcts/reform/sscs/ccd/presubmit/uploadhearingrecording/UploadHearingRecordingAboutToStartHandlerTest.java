@@ -179,7 +179,7 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
 
         List<DynamicListItem> selectHearingDetails = response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems();
         assertEquals(hearingList.size(), selectHearingDetails.size());
-        selectHearingDetails.forEach(o -> assertEquals("venue name 09:00:00 06 Jun 2021", o.getLabel()));
+        assertTrue(selectHearingDetails.stream().allMatch(o -> "venue name 09:00:00 06 Jun 2021".equals(o.getLabel())));
     }
 
     private void assertNoHearingsInThePastError() {
