@@ -117,8 +117,14 @@ class SscsUtilTest {
     }
 
     @Test
-    void givenPostHearingsFlagIsTrueAndStateIsPostHearings_shouldReturnDraftCorrectionGranted() {
+    void givenPostHearingsFlagIsTrueAndStateIsPostHearing_shouldReturnDraftCorrectionGranted() {
         when(caseDetails.getState()).thenReturn(State.POST_HEARING);
+        assertThat(getWriteFinalDecisionDocumentType(caseDetails, true)).isEqualTo(DRAFT_CORRECTED_NOTICE);
+    }
+
+    @Test
+    void givenPostHearingsFlagIsTrueAndStateIsDormant_shouldReturnDraftCorrectionGranted() {
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
         assertThat(getWriteFinalDecisionDocumentType(caseDetails, true)).isEqualTo(DRAFT_CORRECTED_NOTICE);
     }
 
@@ -129,17 +135,22 @@ class SscsUtilTest {
     }
 
     @Test
+    void givenPostHearingsFlagIsTrueAndDraftCorrectionNoticeHasBeenGenerated_shouldReturnCorrectionGranted() {
+        assertThat(getIssueFinalDecisionDocumentType(DRAFT_CORRECTED_NOTICE.getLabel(), true)).isEqualTo(CORRECTION_GRANTED);
+    }
+
+    @Test
     void givenPostHearingsFlagIsTrueAndCorrectionNoticeHasBeenGenerated_shouldReturnCorrectionGranted() {
-        assertThat(getIssueFinalDecisionDocumentType("Correction granted decision notice", true)).isEqualTo(CORRECTION_GRANTED);
+        assertThat(getIssueFinalDecisionDocumentType(CORRECTION_GRANTED.getLabel(), true)).isEqualTo(CORRECTION_GRANTED);
     }
 
     @Test
     void givenPostHearingsFlagIsTrueAndDecisionNoticeHasBeenGenerated_shouldReturnFinalDecisionNotice() {
-        assertThat(getIssueFinalDecisionDocumentType("Draft Decision Notice", true)).isEqualTo(FINAL_DECISION_NOTICE);
+        assertThat(getIssueFinalDecisionDocumentType(FINAL_DECISION_NOTICE.getLabel(), true)).isEqualTo(FINAL_DECISION_NOTICE);
     }
 
     @Test
     void givenPostHearingsFlagIsFalseAndCorrectionNoticeHasBeenGenerated_shouldReturnFinalDecisionNotice() {
-        assertThat(getIssueFinalDecisionDocumentType("Correction granted decision notice", false)).isEqualTo(FINAL_DECISION_NOTICE);
+        assertThat(getIssueFinalDecisionDocumentType("Corrected Final Decision Notice", false)).isEqualTo(FINAL_DECISION_NOTICE);
     }
 }
