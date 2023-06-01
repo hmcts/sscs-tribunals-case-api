@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
 @ExtendWith(MockitoExtension.class)
 abstract class AdjournCaseAboutToSubmitHandlerTestBase {
@@ -33,6 +34,9 @@ abstract class AdjournCaseAboutToSubmitHandlerTestBase {
     @SuppressWarnings("unused")
     @Mock
     protected PreviewDocumentService previewDocumentService;
+
+    @Mock
+    protected VenueDataLoader venueDataLoader;
 
     protected SscsCaseData sscsCaseData;
 

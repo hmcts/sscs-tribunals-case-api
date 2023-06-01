@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
@@ -31,6 +35,8 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
     private final AirLookupService airLookupService;
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
+
+    private final VenueDataLoader venueDataLoader;
 
     @Value("${feature.snl.adjournment.enabled}")
     private boolean isAdjournmentEnabled; // TODO SSCS-10951
@@ -94,6 +100,7 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
         if (isAdjournmentEnabled) {
             updatePanelMembers(sscsCaseData);
             updateHearingChannel(sscsCaseData);
+            updateOverrideFields(sscsCaseData);
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
@@ -133,4 +140,78 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
         }
     }
 
+    private void updateOverrideFields(SscsCaseData caseData) {
+        OverrideFields fields = caseData.getSchedulingAndListingFields().getOverrideFields();
+        Adjournment adjournment = caseData.getAdjournment();
+
+        if (isNull(fields)) {
+            fields = OverrideFields.builder().build();
+            caseData.getSchedulingAndListingFields().setOverrideFields(fields);
+        }
+
+        if (nonNull(adjournment.getTypeOfHearing())) {
+            fields.setAppellantHearingChannel(adjournment.getTypeOfHearing().getHearingChannel());
+        }
+
+        var nextHearingVenueSelected = adjournment.getNextHearingVenueSelected();
+
+        if (nonNull(nextHearingVenueSelected)) {
+            var venueDetails = venueDataLoader.getVenueDetailsMap().get(nextHearingVenueSelected.getValue().getCode());
+
+            if (nonNull(venueDetails)) {
+                CcdValue<String> venueDetailsValue = new CcdValue<String>(venueDetails.getEpimsId());
+                CcdValue<CcdValue<String>> ccdValue = new CcdValue<>(venueDetailsValue);
+                fields.setHearingVenueEpimsIds(List.of(ccdValue));
+            }
+        }
+
+        Integer duration = caseData.getAdjournment().getNextHearingListingDuration();
+        if (duration != null && caseData.getAdjournment().getNextHearingListingDurationType() == AdjournCaseNextHearingDurationType.NON_STANDARD) {
+            fields.setDuration(handleNonStandardDuration(caseData, duration));
+        }
+
+        if (isYes(adjournment.getInterpreterRequired())) {
+            HearingInterpreter interpreter = HearingInterpreter.builder()
+                .interpreterLanguage(adjournment.getInterpreterLanguage())
+                .isInterpreterWanted(adjournment.getInterpreterRequired())
+                .build();
+            fields.setAppellantInterpreter(interpreter);
+        }
+
+        handleHearingWindow(caseData, fields);
+    }
+
+    public static final int DURATION_SESSIONS_MULTIPLIER = 165;
+    public static final int DURATION_DEFAULT = 30;
+    public static final int MIN_HEARING_DURATION = 30;
+    public static final int MIN_HEARING_SESSION_DURATION = 1;
+
+    private static Integer handleNonStandardDuration(SscsCaseData caseData, Integer duration) {
+        AdjournCaseNextHearingDurationUnits units = caseData.getAdjournment().getNextHearingListingDurationUnits();
+        if (units == AdjournCaseNextHearingDurationUnits.SESSIONS && duration >= MIN_HEARING_SESSION_DURATION) {
+            return duration * DURATION_SESSIONS_MULTIPLIER;
+        } else if (units == AdjournCaseNextHearingDurationUnits.MINUTES && duration >= MIN_HEARING_DURATION) {
+            return duration;
+        }
+        return DURATION_DEFAULT;
+    }
+
+    private void handleHearingWindow(SscsCaseData caseData, OverrideFields overrideFields) {
+        HearingWindow hearingWindow = overrideFields.getHearingWindow();
+        Adjournment adjournment = caseData.getAdjournment();
+
+        if (hearingWindow == null) {
+            hearingWindow = HearingWindow.builder().build();
+            overrideFields.setHearingWindow(hearingWindow);
+        }
+
+        if (AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER.equals(adjournment.getNextHearingDateType())) {
+            if (AdjournCaseNextHearingDateOrPeriod.PROVIDE_DATE.equals(adjournment.getNextHearingDateOrPeriod())) {
+                hearingWindow.setFirstDateTimeMustBe(adjournment.getNextHearingFirstAvailableDateAfterDate().plusDays(1).atStartOfDay());
+            } else if (AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD.equals(adjournment.getNextHearingDateOrPeriod())) {
+                long after = Long.valueOf(adjournment.getNextHearingFirstAvailableDateAfterPeriod().toString());
+                hearingWindow.setFirstDateTimeMustBe(LocalDate.now().plusDays(after).atStartOfDay());
+            }
+        }
+    }
 }

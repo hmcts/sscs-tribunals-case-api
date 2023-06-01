@@ -140,5 +140,4 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.ADJOURNMENT_NOTICE, now,
                 null, null, documentTranslationStatus);
     }
-
 }

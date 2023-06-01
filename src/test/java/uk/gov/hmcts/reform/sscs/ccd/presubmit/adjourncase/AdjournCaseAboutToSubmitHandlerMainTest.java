@@ -12,18 +12,26 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.model.VenueDetails;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHandlerTestBase {
+
+    @Mock
+    private RegionalProcessingCenterService regionalProcessingCenterService;
 
     @BeforeEach
     void setUpMocks() {
@@ -90,6 +98,34 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         LocalDate date = response.getData().getAdjournment().getGeneratedDate();
         assertThat(date).isEqualTo(LocalDate.now());
+    }
+
+    @Test
+    void test() {
+        String epimsId = "epimsId";
+        String code = "venueCode";
+        VenueDetails details = VenueDetails.builder()
+            .epimsId(epimsId)
+            .build();
+
+        var item = new DynamicListItem(code, code);
+        var list = new DynamicList(item, null);
+
+        sscsCaseData.getAdjournment().setNextHearingVenueSelected(list);
+
+        when(venueDataLoader.getVenueDetailsMap()).thenReturn(Map.of(code, details));
+        when(regionalProcessingCenterService.getByVenueId(code)).thenReturn(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        var schedulingAndListingFields = response.getData().getSchedulingAndListingFields();
+        assertThat(schedulingAndListingFields).isNotNull();
+
+        var overrideFields = schedulingAndListingFields.getOverrideFields();
+        assertThat(overrideFields).isNotNull();
+
+        var hearingEpimsIds = overrideFields.getHearingVenueEpimsIds();
+        assertThat(hearingEpimsIds).isNotNull().hasSize(1).allMatch(b -> b.getValue().getValue().equals(epimsId));
     }
 
 }
