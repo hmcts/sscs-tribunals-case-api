@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -70,8 +71,9 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                 sscsCaseData.setPreviousState(state);
             }
 
-            previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData,
-                SscsUtil.getWriteFinalDecisionDocumentType(caseDetails, isPostHearingEnabled),
+            DocumentType docType = SscsUtil.getWriteFinalDecisionDocumentType(caseDetails, isPostHearingEnabled);
+
+            previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, docType,
                 sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         }
         return preSubmitCallbackResponse;

@@ -101,9 +101,9 @@ public class CcdMideventCallbackController {
         }
 
         WriteFinalDecisionPreviewDecisionServiceBase writeFinalDecisionPreviewDecisionService = decisionNoticeService.getPreviewService(benefitType);
+        DocumentType docType = SscsUtil.getWriteFinalDecisionDocumentType(caseDetails, isPostHearingEnabled);
 
-        return ok(writeFinalDecisionPreviewDecisionService.preview(callback,
-            SscsUtil.getWriteFinalDecisionDocumentType(caseDetails, isPostHearingEnabled), userAuthorisation, false));
+        return ok(writeFinalDecisionPreviewDecisionService.preview(callback, docType, userAuthorisation, false));
     }
 
     @PostMapping(path = "/ccdMidEventPreviewAdjournCase", produces = MediaType.APPLICATION_JSON_VALUE)

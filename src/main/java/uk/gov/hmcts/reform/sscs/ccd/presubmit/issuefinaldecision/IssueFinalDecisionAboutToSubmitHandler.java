@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -160,13 +161,11 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             .documentBinaryUrl(docLink.getDocumentBinaryUrl())
             .build();
 
-
         String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        DocumentType docType = SscsUtil.getIssueFinalDecisionDocumentType(docLink.getDocumentFilename(), isPostHearingEnabled);
 
         final SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelsh() ? TRANSLATION_REQUIRED : null;
-        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData,
-            SscsUtil.getIssueFinalDecisionDocumentType(docLink.getDocumentFilename(), isPostHearingEnabled),
-            now, null, null, documentTranslationStatus);
+        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, docType, now, null, null, documentTranslationStatus);
 
         if (documentTranslationStatus != null) {
             sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
