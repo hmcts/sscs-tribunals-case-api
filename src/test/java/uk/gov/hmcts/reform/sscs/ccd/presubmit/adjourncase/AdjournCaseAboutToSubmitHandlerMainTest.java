@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +19,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -186,5 +190,38 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
         int expectedDefaultDuration = 30;
         assertThat(overrideFields).isNotNull();
         assertThat(overrideFields.getDuration()).isEqualTo(expectedDefaultDuration);
+    }
+
+    @Test
+    void testNextHearingDateType() {
+        var adjournment = sscsCaseData.getAdjournment();
+        var date = LocalDate.parse("2040-12-24");
+        adjournment.setNextHearingDateType(AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER);
+        adjournment.setNextHearingDateOrPeriod(AdjournCaseNextHearingDateOrPeriod.PROVIDE_DATE);
+        adjournment.setNextHearingFirstAvailableDateAfterDate(date);
+        
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        var schedulingAndListingFields = response.getData().getSchedulingAndListingFields();
+        assertThat(schedulingAndListingFields).isNotNull();
+        var overrideFields = schedulingAndListingFields.getOverrideFields();
+        var expectedDate = LocalDate.parse("2040-12-25").atStartOfDay();
+        assertThat(overrideFields.getHearingWindow().getFirstDateTimeMustBe()).isEqualTo(expectedDate);
+    }
+
+    @Test
+    void testPEriod() {
+        var adjournment = sscsCaseData.getAdjournment();
+        adjournment.setNextHearingDateType(AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER);
+        adjournment.setNextHearingDateOrPeriod(AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD);
+        adjournment.setNextHearingFirstAvailableDateAfterPeriod(AdjournCaseNextHearingPeriod.TWENTY_EIGHT_DAYS);
+        
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        var schedulingAndListingFields = response.getData().getSchedulingAndListingFields();
+        assertThat(schedulingAndListingFields).isNotNull();
+        var overrideFields = schedulingAndListingFields.getOverrideFields();
+        var expectedDate = LocalDate.now().plusDays(28).atStartOfDay();
+        assertThat(overrideFields.getHearingWindow().getFirstDateTimeMustBe()).isEqualTo(expectedDate);
     }
 }
