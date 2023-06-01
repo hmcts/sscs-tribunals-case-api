@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Component
 @Slf4j
 @AllArgsConstructor
-public class WriteFinalDecisionSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+class WriteFinalDecisionSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final CcdCallbackMapService ccdCallbackMapService;
     @Value("${feature.postHearings.enabled}")
     private boolean isPostHearingEnabled;
