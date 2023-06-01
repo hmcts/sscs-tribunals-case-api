@@ -144,7 +144,7 @@ public class SscsUtil {
 
     public static DocumentType getWriteFinalDecisionDocumentType(CaseDetails<SscsCaseData> caseDetails, boolean isPostHearingsEnabled) {
         if (SscsUtil.isReadyForPostHearings(caseDetails, isPostHearingsEnabled)) {
-            return DocumentType.DRAFT_CORRECTION_GRANTED;
+            return DocumentType.DRAFT_CORRECTED_NOTICE;
         }
 
         return DocumentType.DRAFT_DECISION_NOTICE;
@@ -152,7 +152,7 @@ public class SscsUtil {
 
     public static DocumentType getIssueFinalDecisionDocumentType(String documentFilename, boolean isPostHearingsEnabled) {
         if (isPostHearingsEnabled
-            && (documentFilename.contains(DocumentType.DRAFT_CORRECTION_GRANTED.getLabel())
+            && (documentFilename.contains(DocumentType.DRAFT_CORRECTED_NOTICE.getLabel())
             || documentFilename.contains(DocumentType.CORRECTION_GRANTED.getLabel()))) {
             return DocumentType.CORRECTION_GRANTED;
         }

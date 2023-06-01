@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_GRANTED;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTION_GRANTED;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getIssueFinalDecisionDocumentType;
@@ -119,7 +119,7 @@ class SscsUtilTest {
     @Test
     void givenPostHearingsFlagIsTrueAndStateIsPostHearings_shouldReturnDraftCorrectionGranted() {
         when(caseDetails.getState()).thenReturn(State.POST_HEARING);
-        assertThat(getWriteFinalDecisionDocumentType(caseDetails, true)).isEqualTo(DRAFT_CORRECTION_GRANTED);
+        assertThat(getWriteFinalDecisionDocumentType(caseDetails, true)).isEqualTo(DRAFT_CORRECTED_NOTICE);
     }
 
     @Test
