@@ -72,9 +72,9 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             }
 
             DocumentType docType = SscsUtil.getWriteFinalDecisionDocumentType(caseDetails, isPostHearingEnabled);
+            DocumentLink docLink = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument();
 
-            previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, docType,
-                sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+            previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, docType, docLink);
         }
         return preSubmitCallbackResponse;
     }
