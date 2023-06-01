@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SOR_WRITE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.DORMANT_APPEAL_STATE;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -75,7 +74,7 @@ class WriteStatementOfReasonsSubmittedHandlerTest {
     }
 
     @Test
-    void givenWriteStatementOfReasons_shouldReturnCallCorrectCallback_andStateIsDormant() {
+    void givenWriteStatementOfReasons_shouldReturnCallCorrectCallback() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         when(caseDetails.getCaseData()).thenReturn(caseData);
@@ -90,7 +89,6 @@ class WriteStatementOfReasonsSubmittedHandlerTest {
 
         verify(ccdCallbackMapService, times(1))
             .handleCcdCallbackMap(WriteStatementOfReasons.IN_TIME, caseData);
-        assertThat(caseData.getState()).isEqualTo(DORMANT_APPEAL_STATE);
     }
 
 }

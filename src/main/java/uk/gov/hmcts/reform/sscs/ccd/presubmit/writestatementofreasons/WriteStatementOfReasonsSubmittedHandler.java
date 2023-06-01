@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.WriteStatementOfReasons;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
@@ -43,7 +42,6 @@ public class WriteStatementOfReasonsSubmittedHandler implements PreSubmitCallbac
 
         log.info("Write Statement of Reasons: processing submitted handler for case {}", caseId);
 
-        caseData.setState(State.DORMANT_APPEAL_STATE);
         caseData = ccdCallbackMapService.handleCcdCallbackMap(WriteStatementOfReasons.IN_TIME, caseData);
 
         return new PreSubmitCallbackResponse<>(caseData);
