@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQ
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.updateDirectionDueDateByAnAmountOfDays;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.assignNewOtherPartyData;
@@ -116,6 +117,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 sscsCaseData.setDwpDueDate(null);
             }
         }
+        updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
 
         return preSubmitCallbackResponse;
     }
