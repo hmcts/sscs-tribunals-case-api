@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writestatementofreasons;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
@@ -17,6 +17,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -26,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 
 @ExtendWith(MockitoExtension.class)
 class WriteStatementOfReasonsMidEventHandlerTest {
@@ -46,12 +49,13 @@ class WriteStatementOfReasonsMidEventHandlerTest {
 
     private WriteStatementOfReasonsMidEventHandler handler;
 
-    private final String templateId = "templateId.docx";
+    private final String templateIdEnglish = "templateIdEnglish.docx";
+    private final String templateIdWelsh = "templateIdWelsh.docx";
 
 
     @BeforeEach
     void setUp() {
-        handler = new WriteStatementOfReasonsMidEventHandler(true, generateFile, templateId);
+        handler = new WriteStatementOfReasonsMidEventHandler(true, generateFile, templateIdEnglish, templateIdWelsh);
 
         caseData = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
@@ -80,7 +84,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new WriteStatementOfReasonsMidEventHandler(false, generateFile, templateId);
+        handler = new WriteStatementOfReasonsMidEventHandler(false, generateFile, templateIdEnglish, templateIdWelsh);
         when(callback.getEvent()).thenReturn(SOR_WRITE);
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
@@ -156,7 +160,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
 
-        handler = new WriteStatementOfReasonsMidEventHandler(false, generateFile, templateId);
+        handler = new WriteStatementOfReasonsMidEventHandler(false, generateFile, templateIdEnglish, templateIdWelsh);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 

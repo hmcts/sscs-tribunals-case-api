@@ -22,16 +22,19 @@ public class WriteStatementOfReasonsMidEventHandler implements PreSubmitCallback
 
     private final boolean isPostHearingsEnabled;
     private final GenerateFile generateFile;
-    private final String templateId;
+    private final String templateIdEnglish;
+    private final String templateIdWelsh;
 
     WriteStatementOfReasonsMidEventHandler(
         @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
         GenerateFile generateFile,
-        @Value("${doc_assembly.write_statementofreasons}") String templateId
+        @Value("${documents.english.WRITE_SOR}") String templateIdEnglish,
+        @Value("${documents.welsh.WRITE_SOR}") String templateIdWelsh
     ) {
         this.isPostHearingsEnabled = isPostHearingsEnabled;
         this.generateFile = generateFile;
-        this.templateId = templateId;
+        this.templateIdEnglish = templateIdEnglish;
+        this.templateIdWelsh = templateIdWelsh;
     }
 
     @Override
@@ -55,8 +58,18 @@ public class WriteStatementOfReasonsMidEventHandler implements PreSubmitCallback
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
+        String templateId;
+        String language;
+        if (caseData.isLanguagePreferenceWelsh()) {
+            templateId = templateIdWelsh;
+            language = "Welsh";
+        } else {
+            templateId = templateIdEnglish;
+            language = "English";
+        }
+
         if (PAGE_ID_GENERATE_DOCUMENT.equals(pageId) && isYes(caseData.getDocumentGeneration().getWriteStatementOfReasonsGenerateNotice())) {
-            log.info("Write Statement of Reasons: Generating notice for caseId {}", caseId);
+            log.info("Write Statement of Reasons: Generating {} notice for caseId {}", language, caseId);
             PdfRequestUtil.processRequestPdfAndSetPreviewDocument(PdfRequestUtil.PdfType.STATEMENT_OF_REASONS,
                 userAuthorisation, caseData, response, generateFile, templateId, isPostHearingsEnabled);
         }
