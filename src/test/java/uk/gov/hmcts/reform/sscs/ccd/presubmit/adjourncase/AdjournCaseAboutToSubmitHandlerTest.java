@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -262,6 +263,36 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(callback.getCaseDetails().getCaseData().getLatestHearing().getValue().getHearingChannel()).isEqualTo(HearingChannel.PAPER);
+    }
+
+    @DisplayName("When adjournment is enabled and case hearing type is face_to_face and Adjournment next hearing type is Paper "
+        + ", then case hearing type should updated the wants to attend to no.")
+    @Test
+    void givenAdjournmentNextHearingIsPaper_thenUpdateWantsToAttend() {
+        HearingDetails hearingDetails = new HearingDetails();
+        hearingDetails.setHearingChannel(HearingChannel.FACE_TO_FACE);
+        callback.getCaseDetails().getCaseData().setHearings(Arrays.asList(new Hearing(hearingDetails)));
+        callback.getCaseDetails().getCaseData().getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.PAPER);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(callback.getCaseDetails().getCaseData().getAppeal().getHearingOptions().getWantsToAttend()).isEqualTo(NO.getValue());
+        assertThat(callback.getCaseDetails().getCaseData().getAppeal().getHearingType()).isEqualTo(HearingType.PAPER.getValue());
+        assertThat(callback.getCaseDetails().getCaseData().getSchedulingAndListingFields().getOverrideFields().getAppellantHearingChannel()).isEqualTo(HearingChannel.PAPER);
+    }
+
+    @DisplayName("When adjournment is enabled and case hearing type is paper and Adjournment next hearing type is Face to Face "
+        + ", then case hearing type should updated the wants to attend to yes.")
+    @Test
+    void givenAdjournmentNextHearingIsFaceToFace_thenUpdateWantsToAttend() {
+        HearingDetails hearingDetails = new HearingDetails();
+        hearingDetails.setHearingChannel(HearingChannel.PAPER);
+        callback.getCaseDetails().getCaseData().setHearings(Arrays.asList(new Hearing(hearingDetails)));
+        callback.getCaseDetails().getCaseData().getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(callback.getCaseDetails().getCaseData().getAppeal().getHearingOptions().getWantsToAttend()).isEqualTo(YES.getValue());
+        assertThat(callback.getCaseDetails().getCaseData().getAppeal().getHearingType()).isEqualTo(HearingType.ORAL.getValue());
+        assertThat(callback.getCaseDetails().getCaseData().getSchedulingAndListingFields().getOverrideFields().getAppellantHearingChannel()).isEqualTo(HearingChannel.FACE_TO_FACE);
     }
 
 }
