@@ -15,7 +15,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
@@ -51,9 +53,10 @@ abstract class AdjournCaseAboutToSubmitHandlerTestBase {
         ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
-            .appeal(Appeal.builder().build())
+            .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build())
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .hearingRoute(HearingRoute.GAPS)
+                .overrideFields(OverrideFields.builder().build())
                 .build())
             .build();
     }
