@@ -65,12 +65,14 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
             && isBenefitTypeValidForOtherPartyValidation(sscsCaseData.getBenefitType())) {
             if (callback.isIgnoreWarnings()) {
                 validateOtherPartyForSscs5Case(sscsCaseData);
+                updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
             } else {
                 if (roleExistsForOtherParties(sscsCaseData.getOtherParties())) {
                     response.addWarning("You have entered a role for the Other Party which is not valid "
                         + "for an SSCS5 case. This role will be ignored when the event completes.");
                 } else {
                     validateOtherPartyForSscs5Case(sscsCaseData);
+                    updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
                 }
             }
             return response;
