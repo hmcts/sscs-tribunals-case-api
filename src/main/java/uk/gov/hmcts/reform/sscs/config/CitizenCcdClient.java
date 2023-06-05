@@ -57,7 +57,7 @@ public class CitizenCcdClient {
     @Retryable
     public List<CaseDetails> searchForCitizen(IdamTokens idamTokens) {
         log.info("Searching cases for citizen");
-        String searchCriteria ;
+        String searchCriteria;
         searchCriteria = buildQuery("state", State.DRAFT.getId());
         return  coreCaseDataApi.searchCases(
                 idamTokens.getIdamOauth2Token(),
@@ -68,9 +68,9 @@ public class CitizenCcdClient {
     }
 
     public List<CaseDetails> searchForCitizenAllCases(IdamTokens idamTokens) {
-        String searchCriteria = "\"query\" : {\n" +
-                "        \"match_all\" : {}\n" +
-                "    }";
+        String searchCriteria = "\"query\" : {\n"
+                + "        \"match_all\" : {}\n"
+                + "    }";
         return  coreCaseDataApi.searchCases(
                 idamTokens.getIdamOauth2Token(),
                 idamTokens.getServiceAuthorization(),
