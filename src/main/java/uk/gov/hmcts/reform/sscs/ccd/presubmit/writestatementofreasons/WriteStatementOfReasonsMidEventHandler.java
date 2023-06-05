@@ -28,8 +28,8 @@ public class WriteStatementOfReasonsMidEventHandler implements PreSubmitCallback
     WriteStatementOfReasonsMidEventHandler(
         @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
         GenerateFile generateFile,
-        @Value("${documents.english.WRITE_SOR}") String templateIdEnglish,
-        @Value("${documents.welsh.WRITE_SOR}") String templateIdWelsh
+        @Value("${documents.english.SOR_WRITE}") String templateIdEnglish,
+        @Value("${documents.welsh.SOR_WRITE}") String templateIdWelsh
     ) {
         this.isPostHearingsEnabled = isPostHearingsEnabled;
         this.generateFile = generateFile;
