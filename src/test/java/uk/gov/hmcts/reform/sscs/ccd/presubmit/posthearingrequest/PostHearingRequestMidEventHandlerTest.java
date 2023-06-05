@@ -91,7 +91,7 @@ class PostHearingRequestMidEventHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE"})
+    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE", "CORRECTION", "STATEMENT_OF_REASONS", "LIBERTY_TO_APPLY"})
     void givenGenerateNoticeNo_doNothing(PostHearingRequestType requestType) {
         caseData.getDocumentGeneration().setGenerateNotice(NO);
         caseData.getPostHearing().setRequestType(requestType);
@@ -106,7 +106,7 @@ class PostHearingRequestMidEventHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE"})
+    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE", "CORRECTION", "STATEMENT_OF_REASONS", "LIBERTY_TO_APPLY"})
     void givenGenerateNoticeNull_doNothing(PostHearingRequestType requestType) {
         caseData.getDocumentGeneration().setGenerateNotice(null);
         caseData.getPostHearing().setRequestType(requestType);
@@ -121,7 +121,7 @@ class PostHearingRequestMidEventHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE"}) // TODO add all other types as their feature code is implemented
+    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE", "CORRECTION", "STATEMENT_OF_REASONS", "LIBERTY_TO_APPLY"}) // TODO add all other types as their feature code is implemented
     void givenGenerateNoticeYes_generateNotice(PostHearingRequestType postHearingRequestType) {
         String dmUrl = "http://dm-store/documents/123";
         when(generateFile.assemble(any())).thenReturn(dmUrl);
@@ -131,7 +131,14 @@ class PostHearingRequestMidEventHandlerTest {
 
         caseData.getPostHearing().setRequestType(postHearingRequestType);
         caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
-        caseData.getDocumentGeneration().setBodyContent("Something");
+        caseData.getPostHearing().getCorrection().setRequestFormat(RequestFormat.GENERATE);
+        caseData.getPostHearing().getStatementOfReasons().setRequestFormat(RequestFormat.GENERATE);
+        caseData.getPostHearing().getLibertyToApply().setRequestFormat(RequestFormat.GENERATE);
+        String content = "Something";
+        caseData.getDocumentGeneration().setBodyContent(content);
+        caseData.getDocumentGeneration().setCorrectionBodyContent(content);
+        caseData.getDocumentGeneration().setStatementOfReasonsBodyContent(content);
+        caseData.getDocumentGeneration().setLibertyToApplyBodyContent(content);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 

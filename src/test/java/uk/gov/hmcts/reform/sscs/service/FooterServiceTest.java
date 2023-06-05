@@ -113,9 +113,12 @@ public class FooterServiceTest {
 
     @Test
     @Parameters({
-        "DIRECTION_NOTICE,issued",
-        "STATEMENT_OF_EVIDENCE,issued",
-        "SET_ASIDE_APPLICATION,received"
+        "DIRECTION_NOTICE, issued",
+        "STATEMENT_OF_EVIDENCE, issued",
+        "SET_ASIDE_APPLICATION, received",
+        "CORRECTION_APPLICATION, received",
+        "STATEMENT_OF_REASONS_APPLICATION, received",
+        "LIBERTY_TO_APPLY_APPLICATION, received"
     })
     public void givenADocument_thenAddAFooter(DocumentType documentType, String verb) throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
