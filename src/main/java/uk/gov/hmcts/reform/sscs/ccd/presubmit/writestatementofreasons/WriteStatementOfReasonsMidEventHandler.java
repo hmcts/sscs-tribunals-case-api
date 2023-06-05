@@ -9,16 +9,23 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
+import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+import uk.gov.hmcts.reform.sscs.model.docassembly.WriteStatementOfReasonsTemplateBody;
+
+import java.time.LocalDate;
 
 @Component
 @Slf4j
 public class WriteStatementOfReasonsMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     public static final String PAGE_ID_GENERATE_DOCUMENT = "generateDocument";
+    public static final String SSCS_URL = "www.gov.uk/appeal-benefit-decision";
+    public static final String HMCTS_PNG = "[userImage:hmcts.png]";
 
     private final boolean isPostHearingsEnabled;
     private final GenerateFile generateFile;
@@ -53,11 +60,21 @@ public class WriteStatementOfReasonsMidEventHandler implements PreSubmitCallback
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         String pageId = callback.getPageId();
-        String caseId = caseData.getCcdCaseId();
-        log.info("Write Statement of Reasons: handling callback with pageId {} for caseId {}", pageId, caseId);
+        log.info("Write Statement of Reasons: handling callback with pageId {} for caseId {}", pageId, caseData.getCcdCaseId());
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
+        if (PAGE_ID_GENERATE_DOCUMENT.equals(pageId) && isYes(caseData.getDocumentGeneration().getWriteStatementOfReasonsGenerateNotice())) {
+            processSorPdfAndSetPreviewDocument(userAuthorisation, caseData);
+        }
+
+        return response;
+    }
+
+    void processSorPdfAndSetPreviewDocument(
+        String userAuthorisation,
+        SscsCaseData caseData
+    ) {
         String templateId;
         String language;
         if (caseData.isLanguagePreferenceWelsh()) {
@@ -68,13 +85,50 @@ public class WriteStatementOfReasonsMidEventHandler implements PreSubmitCallback
             language = "English";
         }
 
-        if (PAGE_ID_GENERATE_DOCUMENT.equals(pageId) && isYes(caseData.getDocumentGeneration().getWriteStatementOfReasonsGenerateNotice())) {
-            log.info("Write Statement of Reasons: Generating {} notice for caseId {}", language, caseId);
-            PdfRequestUtil.processRequestPdfAndSetPreviewDocument(PdfRequestUtil.PdfType.STATEMENT_OF_REASONS,
-                userAuthorisation, caseData, response, generateFile, templateId, isPostHearingsEnabled);
-        }
+        log.info("Write Statement of Reasons: Generating {} notice for caseId {}", language, caseData.getCcdCaseId());
+        DocumentLink previewDocument = getPreviewDocument(userAuthorisation, generateFile, templateId, caseData);
+        caseData.getDocumentStaging().setPreviewDocument(previewDocument);
+    }
 
-        return response;
+    protected static DocumentLink getPreviewDocument(
+        String userAuthorisation,
+        GenerateFile generateFile,
+        String templateId,
+        SscsCaseData caseData
+    ) {
+        String requestDetails = caseData.getDocumentGeneration().getWriteStatementOfReasonsBodyContent(); // TODO where does this go?
+        Appellant appellant = caseData.getAppeal().getAppellant();
+        GenerateFileParams params = GenerateFileParams.builder()
+            .renditionOutputLocation(null)
+            .templateId(templateId)
+            .formPayload(WriteStatementOfReasonsTemplateBody.builder()
+                // Todo fill in
+                .name(appellant.getName().getFullNameNoTitle())
+                .sscsUrl(SSCS_URL)
+                .hmcts2(HMCTS_PNG)
+                .benefitNameAcronym(caseData.getBenefitCode()) // TODO what should this be
+                .benefitNameAcronymWelsh(caseData.getBenefitCode()) // TODO what should this be
+                .appealRef(caseData.getCcdCaseId()) //TODO what should this be
+                .phoneNumber(appellant.getContact().getPhone())
+                .hearingDate(LocalDate.parse(caseData.getLatestHearing().getValue().getHearingDate()))
+                .entityType("Appellant") // TODO determine this
+                .addressName("BLAh")//TODO what should this be
+                .addressLine1(appellant.getAddress().getLine1())
+                .addressLine2(appellant.getAddress().getLine2())
+                .town(appellant.getAddress().getTown())
+                .county(appellant.getAddress().getCounty())
+                .postcode(appellant.getAddress().getPostcode())
+                .generatedDate(LocalDate.now())
+                .build())
+            .userAuthentication(userAuthorisation)
+            .build();
+        final String generatedFileUrl = generateFile.assemble(params);
+
+        return DocumentLink.builder()
+            .documentFilename("Statement of Reasons.pdf")
+            .documentBinaryUrl(generatedFileUrl + "/binary")
+            .documentUrl(generatedFileUrl)
+            .build();
     }
 
 }
