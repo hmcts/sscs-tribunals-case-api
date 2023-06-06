@@ -107,6 +107,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
 
         checkSscs2AndSscs5Confidentiality(preSubmitCallbackResponse, sscsCaseData);
+        SscsHelper.updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
 
         if (isValidBenefitTypeForConfidentiality(sscsCaseData)
                 && sscsCaseData.getOtherParties() != null) {
@@ -117,8 +118,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 sscsCaseData.setDwpDueDate(null);
             }
         }
-        SscsHelper.updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
-
         return preSubmitCallbackResponse;
     }
 

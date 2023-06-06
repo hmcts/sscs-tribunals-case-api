@@ -60,6 +60,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
         updateHearingTypeForNonSscs1Case(sscsCaseData, response, hasSystemUserRole);
+        SscsHelper.updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
 
         if (sscsCaseData.getAppeal() != null && sscsCaseData.getAppeal().getBenefitType() != null
             && isBenefitTypeValidForOtherPartyValidation(sscsCaseData.getBenefitType())) {
@@ -79,7 +80,6 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         if (roleAbsentForOtherParties(sscsCaseData.getOtherParties())) {
             response.addError("Role is required for the selected case");
         }
-        SscsHelper.updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
         return response;
     }
 
