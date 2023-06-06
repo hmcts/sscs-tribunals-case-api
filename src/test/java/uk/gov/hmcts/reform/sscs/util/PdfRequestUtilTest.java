@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 class PdfRequestUtilTest {
 
+    public static final String EXPECTED_CONTENT = "Expected body content";
     SscsCaseData sscsCaseData;
 
     @BeforeEach
@@ -109,6 +110,25 @@ class PdfRequestUtilTest {
         assertThatThrownBy(() -> PdfRequestUtil.getNoticeBody(sscsCaseData, true))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageStartingWith("getNoticeBody has unexpected postHearingReviewType: ");
+    }
+
+    @Test
+    void getNoticeBody_returnsBodyContentWhenPostHearingReviewTypeIsNull() {
+        sscsCaseData.getDocumentGeneration().setBodyContent(EXPECTED_CONTENT);
+        sscsCaseData.getPostHearing().setReviewType(null);
+        assertThat(PdfRequestUtil.getNoticeBody(sscsCaseData, true)).isEqualTo(EXPECTED_CONTENT);
+    }
+
+    @Test
+    void getNoticeBody_returnsBodyContentWhenPostHearingsIsDisabled() {
+        sscsCaseData.getDocumentGeneration().setBodyContent(EXPECTED_CONTENT);
+        assertThat(PdfRequestUtil.getNoticeBody(sscsCaseData, false)).isEqualTo(EXPECTED_CONTENT);
+    }
+
+    @Test
+    void getNoticeBody_returnsDirectionNoticeContentWhenBodyContentIsNull() {
+        sscsCaseData.getDocumentGeneration().setDirectionNoticeContent(EXPECTED_CONTENT);
+        assertThat(PdfRequestUtil.getNoticeBody(sscsCaseData, false)).isEqualTo(EXPECTED_CONTENT);
     }
 
     @Test

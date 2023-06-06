@@ -1,40 +1,47 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writestatementofreasons;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SOR_WRITE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
+import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @ExtendWith(MockitoExtension.class)
 class WriteStatementOfReasonsMidEventHandlerTest {
+    public static final String URL = "http://dm-store/documents/123";
     private static final String USER_AUTHORISATION = "Bearer token";
     public static final String CASE_ID = "123123";
     public static final String GENERATE_DOCUMENT = "generateDocument";
+    public static final String TEMPLATE_ID = "template.docx";
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -42,27 +49,39 @@ class WriteStatementOfReasonsMidEventHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    private ArgumentCaptor<GenerateFileParams> capture;
+
     @Mock
     private GenerateFile generateFile;
+
+    @Mock
+    private DocumentConfiguration documentConfiguration;
+
+    @Mock
+    private UserDetailsService userDetailsService;
 
     private SscsCaseData caseData;
 
     private WriteStatementOfReasonsMidEventHandler handler;
 
-    private final String templateIdEnglish = "templateIdEnglish.docx";
-    private final String templateIdWelsh = "templateIdWelsh.docx";
-
-
     @BeforeEach
     void setUp() {
-        handler = new WriteStatementOfReasonsMidEventHandler(true, generateFile, templateIdEnglish, templateIdWelsh);
+        handler = new WriteStatementOfReasonsMidEventHandler(documentConfiguration, generateFile, userDetailsService, true);
 
         caseData = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
             .documentGeneration(DocumentGeneration.builder()
-                .writeStatementOfReasonsGenerateNotice(YES)
+                .generateNotice(YES)
+                .build())
+            .appeal(Appeal.builder().appellant(Appellant.builder()
+                .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
+                .identity(Identity.builder().build()).build()).build())
+            .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                .hearingRoute(LIST_ASSIST)
                 .build())
             .build();
+
+        capture = ArgumentCaptor.forClass(GenerateFileParams.class);
     }
 
     @Test
@@ -84,7 +103,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new WriteStatementOfReasonsMidEventHandler(false, generateFile, templateIdEnglish, templateIdWelsh);
+        handler = new WriteStatementOfReasonsMidEventHandler(documentConfiguration, generateFile, userDetailsService, false);
         when(callback.getEvent()).thenReturn(SOR_WRITE);
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
@@ -93,7 +112,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
     @EnumSource(value = YesNo.class, names = "NO")
     @NullSource
     void givenGenerateNoticeIsNoOrNull_doNothing(YesNo value) {
-        caseData.getDocumentGeneration().setWriteStatementOfReasonsGenerateNotice(value);
+        caseData.getDocumentGeneration().setGenerateNotice(value);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
@@ -106,41 +125,41 @@ class WriteStatementOfReasonsMidEventHandlerTest {
 
     @Test
     void givenGenerateNoticeYes_generateNotice() {
-        String dmUrl = "http://dm-store/documents/123";
-        when(generateFile.assemble(any())).thenReturn(dmUrl);
+        when(generateFile.assemble(any())).thenReturn(URL);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
+        when(documentConfiguration.getDocuments()).thenReturn(new HashMap<>(Map.of(
+            LanguagePreference.ENGLISH,  new HashMap<>(Map.of(
+                SOR_WRITE, TEMPLATE_ID)
+            ))
+        ));
 
-        caseData.getDocumentGeneration().setWriteStatementOfReasonsBodyContent("Something");
+        caseData.getDocumentGeneration().setBodyContent("Something");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        String expectedFileName = "Statement of Reasons.pdf";
-        DocumentLink documentLink = DocumentLink.builder()
-            .documentBinaryUrl(dmUrl + "/binary")
-            .documentUrl(dmUrl)
-            .documentFilename(expectedFileName)
-            .build();
-        assertThat(response.getData().getDocumentStaging().getPreviewDocument()).isEqualTo(documentLink);
-    }
+        DocumentLink previewDocument = response.getData().getDocumentStaging().getPreviewDocument();
+        assertThat(previewDocument).isNotNull();
 
-    @ParameterizedTest
-    @ValueSource(strings = {""})
-    @NullSource
-    void givenRequestDetailsIsBlank_returnResponseWithError(String emptyValue) {
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
+        String expectedFilename = String.format("Statement of Reasons issued on %s.pdf",
+            LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
-        caseData.getDocumentGeneration().setStatementOfReasonsBodyContent(emptyValue);
+        assertThat(previewDocument.getDocumentFilename()).isEqualTo(expectedFilename);
+        assertThat(previewDocument.getDocumentBinaryUrl()).isEqualTo(URL + "/binary");
+        assertThat(previewDocument.getDocumentUrl()).isEqualTo(URL);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        verify(generateFile, times(1)).assemble(any());
 
-        assertThat(response.getErrors())
-            .hasSize(1)
-            .containsOnly("Please enter request details to generate a statement of reasons document");
+        verify(generateFile, atLeastOnce()).assemble(capture.capture());
+
+        var value = capture.getValue();
+        NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
+        assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
+        assertThat(payload.getNoticeType()).isEqualTo("STATEMENT OF REASONS");
+        assertThat(payload.getAppellantFullName()).isEqualTo("Appellant Lastname");
+        assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
     }
 
     @Test
@@ -152,22 +171,6 @@ class WriteStatementOfReasonsMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void givenPostHearingsEnabledFalse_addsErrorToResponse() {
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
-
-        handler = new WriteStatementOfReasonsMidEventHandler(false, generateFile, templateIdEnglish, templateIdWelsh);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors())
-            .isNotEmpty()
-            .hasSize(1)
-            .containsOnly("Post hearings is not currently enabled");
     }
 
 }

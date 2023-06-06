@@ -177,19 +177,20 @@ public class PdfRequestUtil {
     public static String getNoticeBody(SscsCaseData caseData, boolean isPostHearingsEnabled) {
         if (isPostHearingsEnabled) {
             PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
-
-            switch (postHearingReviewType) {
-                case SET_ASIDE:
-                    return caseData.getDocumentGeneration().getBodyContent();
-                case CORRECTION:
-                    return caseData.getDocumentGeneration().getCorrectionBodyContent();
-                case STATEMENT_OF_REASONS:
-                    return caseData.getDocumentGeneration().getStatementOfReasonsBodyContent();
-                case PERMISSION_TO_APPEAL:
-                case LIBERTY_TO_APPLY:
-                default:
-                    throw new IllegalArgumentException("getNoticeBody has unexpected postHearingReviewType: "
-                        + postHearingReviewType.getDescriptionEn());
+            if (nonNull(postHearingReviewType)) {
+                switch (postHearingReviewType) {
+                    case SET_ASIDE:
+                        return caseData.getDocumentGeneration().getBodyContent();
+                    case CORRECTION:
+                        return caseData.getDocumentGeneration().getCorrectionBodyContent();
+                    case STATEMENT_OF_REASONS:
+                        return caseData.getDocumentGeneration().getStatementOfReasonsBodyContent();
+                    case PERMISSION_TO_APPEAL:
+                    case LIBERTY_TO_APPLY:
+                    default:
+                        throw new IllegalArgumentException("getNoticeBody has unexpected postHearingReviewType: "
+                            + postHearingReviewType.getDescriptionEn());
+                }
             }
         }
 
