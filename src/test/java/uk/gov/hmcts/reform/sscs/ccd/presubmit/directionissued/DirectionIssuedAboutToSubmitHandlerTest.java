@@ -246,7 +246,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setConfidentialityType(confidentialityType);
         caseData.setSendDirectionNoticeToFTA(isFtaChosen ? YES : NO);
-        caseData.setDirectionDueDate(String.valueOf(LocalDate.now()));
+        caseData.setDirectionDueDate(LocalDate.now().toString());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getDwpState(), is(newFtaState));

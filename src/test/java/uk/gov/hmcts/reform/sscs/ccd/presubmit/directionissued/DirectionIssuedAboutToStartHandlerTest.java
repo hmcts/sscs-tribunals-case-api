@@ -332,11 +332,11 @@ public class DirectionIssuedAboutToStartHandlerTest {
         sscsCaseData.setOtherParties(Collections.singletonList(otherParty));
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(sscsCaseData.getHasRepresentative(), YES);
-        assertEquals(sscsCaseData.getHasOtherPartyRep(), YES);
-        assertEquals(sscsCaseData.getHasOtherPartyAppointee(), YES);
-        assertEquals(sscsCaseData.getHasOtherParties(), YES);
-        assertEquals(sscsCaseData.getHasJointParty(), YES);
+        assertEquals(YES, sscsCaseData.getHasRepresentative());
+        assertEquals(YES, sscsCaseData.getHasOtherPartyRep());
+        assertEquals(YES, sscsCaseData.getHasOtherPartyAppointee());
+        assertEquals(YES, sscsCaseData.getHasOtherParties());
+        assertEquals(YES, sscsCaseData.getHasJointParty());
     }
 
     @Test
@@ -354,10 +354,10 @@ public class DirectionIssuedAboutToStartHandlerTest {
         sscsCaseData.setOtherParties(Collections.singletonList(otherParty));
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(sscsCaseData.getHasRepresentative(), NO);
-        assertEquals(sscsCaseData.getHasOtherPartyRep(), NO);
-        assertEquals(sscsCaseData.getHasOtherPartyAppointee(), NO);
-        assertEquals(sscsCaseData.getHasOtherParties(), YES);
-        assertEquals(sscsCaseData.getHasJointParty(), NO);
+        assertEquals(NO, sscsCaseData.getHasRepresentative());
+        assertEquals(NO, sscsCaseData.getHasOtherPartyRep());
+        assertEquals(NO, sscsCaseData.getHasOtherPartyAppointee());
+        assertEquals(YES, sscsCaseData.getHasOtherParties());
+        assertEquals(NO, sscsCaseData.getHasJointParty());
     }
 }
