@@ -15,6 +15,19 @@
           "jurisdiction": "SSCS"
         },
         "authorisations": []
+      },
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "TCW",
+        "grantType": "STANDARD",
+        "roleCategory": "LEGAL_OPERATIONS",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "Benefit",
+          "jurisdiction": "SSCS"
+        },
+        "authorisations": []
       }
     ],
     "overrideAll": true
