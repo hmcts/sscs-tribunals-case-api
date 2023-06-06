@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.ScannedDocumentType.REINSTATEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceAboutToSubmitHandlerTest.buildOriginalSenderItemListForGivenOption;
 
 import java.util.*;
@@ -486,7 +487,8 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    @Parameters({"setAsideApplication", "correctionApplication","statementOfReasonsApplication"})
+    @Parameters({"setAsideApplication", "correctionApplication","statementOfReasonsApplication",
+        "libertyToApplyApplication", "permissionToAppealApplication"})
     public void givenAGapsCaseAndPostponementRequest_thenAddAnErrorToResponse(String doctype) {
         handler = new ActionFurtherEvidenceMidEventHandler(footerService, true);
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
@@ -514,8 +516,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    @Parameters({"libertyToApplyApplication", "permissionToAppealApplication", "reinstatementRequest"})
-    public void givenAGapsCaseAndNotPostponementRequest_thenDontAddErrorToResponse(String doctype) {
+    public void givenAGapsCaseAndNotPostponementRequest_thenDontAddErrorToResponse() {
         handler = new ActionFurtherEvidenceMidEventHandler(footerService, true);
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
         DynamicListItem issueEvidenceAction = new DynamicListItem(
@@ -525,7 +526,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
         sscsCaseData.getFurtherEvidenceAction().setValue(issueEvidenceAction);
 
         ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
-            .type(doctype)
+            .type(REINSTATEMENT_REQUEST.getValue())
             .fileName("Test.pdf")
             .url(DocumentLink.builder().documentUrl("test.com").build())
             .build();

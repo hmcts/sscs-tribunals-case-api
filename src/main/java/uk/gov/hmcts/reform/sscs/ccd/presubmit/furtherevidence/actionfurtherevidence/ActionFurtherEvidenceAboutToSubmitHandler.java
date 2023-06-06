@@ -301,7 +301,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private static boolean isPostHearingRequest(SscsCaseData sscsCaseData) {
         return isSetAsideApplication(sscsCaseData)
             || isCorrectionApplication(sscsCaseData)
-            || isStatementOfReasonsApplication(sscsCaseData);
+            || isStatementOfReasonsApplication(sscsCaseData)
+            || isLibertyToApplyApplication(sscsCaseData)
+            || isPermissionToApplyApplication(sscsCaseData);
     }
 
     private boolean isPostponementRequest(SscsCaseData sscsCaseData) {
@@ -314,6 +316,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private static boolean isCorrectionApplication(SscsCaseData sscsCaseData) {
         return isDocumentType(CORRECTION_APPLICATION, sscsCaseData);
+    }
+
+    private static boolean isLibertyToApplyApplication(SscsCaseData sscsCaseData) {
+        return isDocumentType(LIBERTY_TO_APPLY_APPLICATION, sscsCaseData);
+    }
+
+    private static boolean isPermissionToApplyApplication(SscsCaseData sscsCaseData) {
+        return isDocumentType(PERMISSION_TO_APPEAL_APPLICATION, sscsCaseData);
     }
 
     private static boolean isStatementOfReasonsApplication(SscsCaseData sscsCaseData) {
