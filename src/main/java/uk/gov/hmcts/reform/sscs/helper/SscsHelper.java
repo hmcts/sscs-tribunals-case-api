@@ -42,11 +42,10 @@ public class SscsHelper {
     }
 
     public static void updateDirectionDueDateByAnAmountOfDays(SscsCaseData sscsCaseData) {
+        log.info("entering updateDirectionDueDateByAnAmountOfDays for caseId: {} ", sscsCaseData.getCcdCaseId());
         if (!OtherPartyDataUtil.isValidBenefitTypeForConfidentiality(sscsCaseData)) {
             return;
         }
-
-        log.info("entering updateDirectionDueDateByAnAmountOfDays for caseId: {} ", sscsCaseData.getCcdCaseId());
 
         if (isNull(sscsCaseData.getDirectionDueDate()) && hasNewOtherPartyEntryAdded(sscsCaseData)) {
             log.info("getDirectionDueDate is null and hasNewOtherPartyEntryAdded for caseId: {} ", sscsCaseData.getCcdCaseId());
