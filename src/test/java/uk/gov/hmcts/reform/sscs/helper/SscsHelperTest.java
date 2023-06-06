@@ -79,4 +79,13 @@ public class SscsHelperTest {
         updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
         assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo(NOW.plusDays(14).toString());
     }
+
+    @Test
+    public void givenResponseDueDateIsEmpty_WithNoOtherParty_ThenDoNotUpdateDueDate() {
+        sscsCaseData.setDirectionDueDate("");
+        sscsCaseData.setOtherParties(null);
+
+        updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
+        assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo("");
+    }
 }
