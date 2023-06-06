@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -20,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 
+@Slf4j
 public class SscsHelper {
 
     private static final List<State> PRE_VALID_STATES = new ArrayList<>(Arrays.asList(INCOMPLETE_APPLICATION, INCOMPLETE_APPLICATION_INFORMATION_REQUESTED, INTERLOCUTORY_REVIEW_STATE));
@@ -43,14 +46,22 @@ public class SscsHelper {
             return;
         }
 
+        log.info("entering updateDirectionDueDateByAnAmountOfDays for caseId: {} ", sscsCaseData.getCcdCaseId());
+
         if (isNull(sscsCaseData.getDirectionDueDate()) && hasNewOtherPartyEntryAdded(sscsCaseData)) {
+
+            log.info("getDirectionDueDate is null and hasNewOtherPartyEntryAdded for caseId: {} ", sscsCaseData.getCcdCaseId());
             sscsCaseData.setDirectionDueDate(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS));
         } else if (nonNull(sscsCaseData.getDirectionDueDate())) {
+            log.info("getDirectionDueDate is nonNull for caseId: {} ", sscsCaseData.getCcdCaseId());
             Optional<LocalDate> directionDueDate = DateTimeUtils.getLocalDate(sscsCaseData.getDirectionDueDate());
             if (directionDueDate.isEmpty()) {
                 return;
             }
+            log.info("directionDueDate is isEmpty for caseId: {} ", sscsCaseData.getCcdCaseId());
             long dueDateLength = ChronoUnit.DAYS.between(LocalDate.now(), directionDueDate.get());
+
+            log.info("dueDateLength value is for caseId: {} ", dueDateLength);
             if (dueDateLength <= 14) {
                 sscsCaseData.setDirectionDueDate(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS));
             }
