@@ -270,13 +270,13 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
     @ParameterizedTest
     @EnumSource(AdjournCaseTypeOfHearing.class)
     void givenAdjournmentNextHearing_thenUpdateWantsToAttend(AdjournCaseTypeOfHearing adjournCaseTypeOfHearing) {
-        HearingChannel hearingChannel = adjournCaseTypeOfHearing.getHearingChannel();
         HearingDetails hearingDetails = new HearingDetails();
         sscsCaseData.setHearings(List.of(new Hearing(hearingDetails)));
         sscsCaseData.getAdjournment().setTypeOfNextHearing(adjournCaseTypeOfHearing);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        HearingChannel hearingChannel = adjournCaseTypeOfHearing.getHearingChannel();
         if (HearingChannel.PAPER.equals(hearingChannel)) {
             assertThat(sscsCaseData.getAppeal().getHearingOptions().getWantsToAttend()).isEqualTo(NO.getValue());
             assertThat(sscsCaseData.getAppeal().getHearingType()).isEqualTo(HearingType.PAPER.getValue());
