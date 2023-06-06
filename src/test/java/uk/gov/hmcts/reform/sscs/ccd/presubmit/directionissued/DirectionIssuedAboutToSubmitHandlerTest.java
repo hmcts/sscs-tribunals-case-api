@@ -24,6 +24,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.NONE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.WELSH_TRANSLATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import com.google.common.collect.ImmutableSet;
 import java.time.LocalDate;
@@ -102,7 +104,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         sscsCaseData = SscsCaseData.builder()
             .documentGeneration(DocumentGeneration.builder()
-                .generateNotice(YesNo.YES)
+                .generateNotice(YES)
                 .signedBy("User")
                 .signedRole("Judge")
                 .build())
@@ -230,10 +232,10 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     private Object[] getDirectionNoticeConfidentialMembers() {
         return new Object[]{
             new Object[]{ConfidentialityType.GENERAL.getCode(), false, DIRECTION_ACTION_REQUIRED},
-            new Object[]{ConfidentialityType.CONFIDENTIAL.getCode(), true, DwpState.DIRECTION_ACTION_REQUIRED},
+            new Object[]{ConfidentialityType.CONFIDENTIAL.getCode(), true, DIRECTION_ACTION_REQUIRED},
             new Object[]{ConfidentialityType.CONFIDENTIAL.getCode(), false, null},
             new Object[]{ConfidentialityType.GENERAL.getCode(), false, DIRECTION_ACTION_REQUIRED},
-            new Object[]{ConfidentialityType.CONFIDENTIAL.getCode(), true, DwpState.DIRECTION_ACTION_REQUIRED},
+            new Object[]{ConfidentialityType.CONFIDENTIAL.getCode(), true, DIRECTION_ACTION_REQUIRED},
             new Object[]{ConfidentialityType.CONFIDENTIAL.getCode(), false, null},
         };
     }
@@ -243,7 +245,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     public void givenDirectionNoticeCheckFtaStateBasedOnConfidentiality(String confidentialityType, boolean isFtaChosen, DwpState newFtaState) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setConfidentialityType(confidentialityType);
-        caseData.setSendDirectionNoticeToFTA(isFtaChosen ? YesNo.YES : YesNo.NO);
+        caseData.setSendDirectionNoticeToFTA(isFtaChosen ? YES : NO);
         caseData.setDirectionDueDate(String.valueOf(LocalDate.now()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.sscs.helper;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse.DwpUploadResponseAboutToSubmitHandler.NEW_OTHER_PARTY_RESPONSE_DUE_DAYS;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isValidBenefitTypeForConfidentiality;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
+import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 
 public class SscsHelper {
 
@@ -37,14 +39,17 @@ public class SscsHelper {
     }
 
     public static void updateDirectionDueDateByAnAmountOfDays(SscsCaseData sscsCaseData) {
-        if (!isValidBenefitTypeForConfidentiality(sscsCaseData)) {
+        if (!OtherPartyDataUtil.isValidBenefitTypeForConfidentiality(sscsCaseData)) {
             return;
         }
 
-        if (sscsCaseData.getDirectionDueDate() == null && hasNewOtherPartyEntryAdded(sscsCaseData)) {
+        if (isNull(sscsCaseData.getDirectionDueDate()) && hasNewOtherPartyEntryAdded(sscsCaseData)) {
             sscsCaseData.setDirectionDueDate(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS));
-        } else if (sscsCaseData.getDirectionDueDate() != null) {
+        } else if (nonNull(sscsCaseData.getDirectionDueDate())) {
             Optional<LocalDate> directionDueDate = DateTimeUtils.getLocalDate(sscsCaseData.getDirectionDueDate());
+            if (directionDueDate.isEmpty()) {
+                return;
+            }
             long dueDateLength = ChronoUnit.DAYS.between(LocalDate.now(), directionDueDate.get());
             if (dueDateLength <= 14) {
                 sscsCaseData.setDirectionDueDate(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS));

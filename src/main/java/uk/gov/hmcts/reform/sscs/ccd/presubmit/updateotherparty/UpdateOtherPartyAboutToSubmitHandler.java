@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updateotherparty;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_DATA;
-import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.updateDirectionDueDateByAnAmountOfDays;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
 
@@ -17,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
@@ -79,7 +79,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         if (roleAbsentForOtherParties(sscsCaseData.getOtherParties())) {
             response.addError("Role is required for the selected case");
         }
-        updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
+        SscsHelper.updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
         return response;
     }
 
