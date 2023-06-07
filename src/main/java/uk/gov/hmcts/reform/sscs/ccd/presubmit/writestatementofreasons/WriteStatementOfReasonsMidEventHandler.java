@@ -56,7 +56,7 @@ public class WriteStatementOfReasonsMidEventHandler extends IssueDocumentHandler
             log.info("Write Statement of Reasons: Generating notice for caseId {}", caseId);
 
             String templateId = documentConfiguration.getDocuments()
-                .get(caseData.getLanguagePreference()).get(EventType.SOR_WRITE);
+                .get(caseData.getLanguagePreference()).get(EventType.DECISION_ISSUED);
 
             caseData.getDocumentGeneration().setSignedBy(userDetailsService.buildLoggedInUserName(userAuthorisation));
             caseData.getDocumentGeneration().setSignedRole(userDetailsService.getUserRole(userAuthorisation));

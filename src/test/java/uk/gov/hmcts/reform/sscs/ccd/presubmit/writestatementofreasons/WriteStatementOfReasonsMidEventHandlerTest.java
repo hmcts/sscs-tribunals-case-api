@@ -8,8 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SOR_WRITE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -131,7 +130,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
         when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
         when(documentConfiguration.getDocuments()).thenReturn(new HashMap<>(Map.of(
             LanguagePreference.ENGLISH,  new HashMap<>(Map.of(
-                SOR_WRITE, TEMPLATE_ID)
+                DECISION_ISSUED, TEMPLATE_ID)
             ))
         ));
 
