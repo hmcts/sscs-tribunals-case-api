@@ -48,7 +48,6 @@ import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
-import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
 @Component
 @Slf4j
@@ -113,7 +112,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             assignNewOtherPartyData(sscsCaseData.getOtherParties());
             updateOtherPartyUcb(sscsCaseData);
             if (sscsCaseData.getOtherParties().stream().anyMatch(o -> YesNo.isYes(o.getValue().getSendNewOtherPartyNotification()))) {
-                sscsCaseData.setDirectionDueDate(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS));
                 sscsCaseData.setDwpDueDate(null);
             }
         }
