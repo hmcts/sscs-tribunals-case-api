@@ -49,10 +49,9 @@ public class SscsHelper {
             log.info("getDirectionDueDate is isEmpty and hasNewOtherPartyEntryAdded for caseId: {}", sscsCaseData.getCcdCaseId());
             sscsCaseData.setDirectionDueDate(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS));
         } else if (!isEmpty(sscsCaseData.getDirectionDueDate())) {
-            log.info("getDirectionDueDate is no isEmpty for caseId: {}", sscsCaseData.getCcdCaseId());
             LocalDate directionDueDate = LocalDate.parse(sscsCaseData.getDirectionDueDate());
             long dueDateLength = ChronoUnit.DAYS.between(LocalDate.now(), directionDueDate);
-            log.info("dueDateLength value is for caseId: {}", dueDateLength);
+            log.info("getDirectionDueDate is no isEmpty and dueDateLength value is {} for caseId: {}", dueDateLength, sscsCaseData.getCcdCaseId());
             if (dueDateLength <= 14) {
                 sscsCaseData.setDirectionDueDate(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS));
             }
