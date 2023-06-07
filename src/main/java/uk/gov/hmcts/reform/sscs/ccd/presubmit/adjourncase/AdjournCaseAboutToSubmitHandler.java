@@ -149,8 +149,8 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             caseData.getSchedulingAndListingFields().setOverrideFields(fields);
         }
 
-        if (nonNull(adjournment.getTypeOfHearing())) {
-            fields.setAppellantHearingChannel(adjournment.getTypeOfHearing().getHearingChannel());
+        if (nonNull(adjournment.getTypeOfNextHearing())) {
+            fields.setAppellantHearingChannel(adjournment.getTypeOfNextHearing().getHearingChannel());
         }
 
         var nextHearingVenueSelected = adjournment.getNextHearingVenueSelected();

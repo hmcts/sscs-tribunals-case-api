@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingPeriod;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -32,6 +33,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHandlerTestBase {
@@ -207,6 +209,19 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
         var overrideFields = schedulingAndListingFields.getOverrideFields();
         var expectedDate = LocalDate.parse("2040-12-25").atStartOfDay();
         assertThat(overrideFields.getHearingWindow().getFirstDateTimeMustBe()).isEqualTo(expectedDate);
+    }
+
+    @Test
+    void hearingChannelShouldBeFromNextHearing() {
+        var adjournment = sscsCaseData.getAdjournment();
+        var hearingChannel = HearingChannel.TELEPHONE;
+        var typeOfHearing = AdjournCaseTypeOfHearing.TELEPHONE;
+        adjournment.setTypeOfNextHearing(typeOfHearing);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        var schedulingAndListingFields = response.getData().getSchedulingAndListingFields();
+        assertThat(schedulingAndListingFields).isNotNull();
+        assertThat(schedulingAndListingFields.getOverrideFields().getAppellantHearingChannel()).isEqualTo(hearingChannel);
     }
 
     @Test
