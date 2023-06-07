@@ -67,7 +67,7 @@ public class CitizenCcdClient {
 
     }
 
-    public List<CaseDetails> searchForCitizenAllCases(IdamTokens idamTokens) {
+    public List<CaseDetails> searchForCitizenAllCases(IdamTokens     idamTokens) {
         String searchCriteria = "\"query\" : {\n"
                 + "        \"match_all\" : {}\n"
                 + "    }";
@@ -130,8 +130,8 @@ public class CitizenCcdClient {
 
     public String buildQuery(String searchValue, String searchField) {
         return "{\"query\":{\"term\":{ \""
-                + searchField
-                + "\":\"" + searchValue + "\"}}}";
+                + searchValue
+                + "\":\"" + searchField + "\"}}}";
     }
 }
 
