@@ -96,8 +96,8 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
         clearTransientFields(preSubmitCallbackResponse);
 
-        if (!(State.READY_TO_LIST.equals(sscsCaseData.getState())
-            || State.WITH_DWP.equals(sscsCaseData.getState()))) {
+        if ((!(State.READY_TO_LIST.equals(sscsCaseData.getState())
+            || State.WITH_DWP.equals(sscsCaseData.getState()))) && !SscsUtil.isReadyForPostHearings(callback.getCaseDetails(), isPostHearingEnabled)) {
             sscsCaseData.setDwpState(FINAL_DECISION_ISSUED);
             sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         }
