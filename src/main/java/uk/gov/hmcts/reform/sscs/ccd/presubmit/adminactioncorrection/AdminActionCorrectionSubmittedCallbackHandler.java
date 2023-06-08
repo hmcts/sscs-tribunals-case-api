@@ -43,7 +43,7 @@ public class AdminActionCorrectionSubmittedCallbackHandler implements PreSubmitC
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        String caseId = caseData.getCcdCaseId();
         PostHearing postHearing = caseData.getPostHearing();
         AdminCorrectionType adminCorrectionType = postHearing.getCorrection().getAdminCorrectionType();
         log.info("Admin Action Correction: handling adminActionCorrection {} for case {}", adminCorrectionType,  caseId);
