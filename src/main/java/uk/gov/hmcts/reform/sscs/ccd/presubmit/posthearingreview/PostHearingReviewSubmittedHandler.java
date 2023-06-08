@@ -75,7 +75,7 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
 
         handleSetAsideRefusedSor(caseData);
 
-        SscsUtil.clearPostHearingFields(caseData);
+        SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
