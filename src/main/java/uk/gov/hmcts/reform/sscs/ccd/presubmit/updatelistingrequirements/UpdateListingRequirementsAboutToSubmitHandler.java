@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,14 +17,19 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
+import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    private final JudicialRefDataService judicialRefDataService;
     @Value("${feature.gaps-switchover.enabled}")
     private boolean gapsSwitchOverFeature;
+    @Value("${feature.postHearings.enabled}")
+    private final boolean isPostHearingsEnabled;
 
     private final ListAssistHearingMessageHelper listAssistHearingMessageHelper;
 
@@ -61,16 +67,10 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
 
-        PanelMemberExclusions callbackPanelMemberExcl = callbackResponse
-            .getData()
-            .getSchedulingAndListingFields()
-            .getPanelMemberExclusions();
-
-        log.info("#17 CaseData Exclusions {}", caseDataSnlFields.getPanelMemberExclusions());
-        log.info("#18 Callback Exclusions {}", callbackPanelMemberExcl);
-
-        if (nonNull(callbackPanelMemberExcl)) {
-            caseDataSnlFields.setPanelMemberExclusions(callbackPanelMemberExcl);
+        if (isPostHearingsEnabled) {
+            PanelMemberExclusions panelMemberExclusions = caseDataSnlFields.getPanelMemberExclusions();
+            updatePanelMemberValues(panelMemberExclusions.getExcludedPanelMembers());
+            updatePanelMemberValues(panelMemberExclusions.getReservedPanelMembers());
         }
 
         State state = callback.getCaseDetails().getState();
@@ -100,5 +100,17 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
         return callbackResponse;
+    }
+
+    private void updatePanelMemberValues(List<CcdValue<JudicialUserBase>> panelMembers) {
+        for (CcdValue<JudicialUserBase> panelMember : panelMembers) {
+            String idamId = panelMember.getId();
+            JudicialUserBase judicialUserBase = panelMember.getValue();
+
+            if (nonNull(idamId)) {
+                judicialUserBase.setIdamId(idamId);
+                judicialUserBase.setPersonalCode(judicialRefDataService.getPersonalCode(idamId));
+            }
+        }
     }
 }
