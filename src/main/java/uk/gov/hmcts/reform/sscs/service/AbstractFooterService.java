@@ -48,7 +48,8 @@ public abstract class AbstractFooterService<D extends AbstractDocument> {
             boolean isPostHearingApp = Set.of(SET_ASIDE_APPLICATION,
                     CORRECTION_APPLICATION,
                     STATEMENT_OF_REASONS_APPLICATION,
-                    LIBERTY_TO_APPLY_APPLICATION)
+                    LIBERTY_TO_APPLY_APPLICATION,
+                    PERMISSION_TO_APPEAL_APPLICATION)
                 .contains(documentType);
 
             String verb = isPostHearingApp ? " received on " : " issued on ";

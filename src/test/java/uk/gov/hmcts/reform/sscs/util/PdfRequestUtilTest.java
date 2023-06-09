@@ -7,6 +7,7 @@ import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -80,11 +81,11 @@ class PdfRequestUtilTest {
             .hasMessageStartingWith("getRequestDetailsForPostHearingType has unexpected postHearingRequestType: ");
     }
 
+    @Disabled("Re-enable when rest of post hearings B types are implemented into the enum")
     @ParameterizedTest
     @EnumSource(
         value = PostHearingReviewType.class,
-        names = { // TODO remove as each type is implemented
-            "PERMISSION_TO_APPEAL"
+        names = { // TODO add names of unimplemented post hearings B types
         },
         mode = EXCLUDE
     )
@@ -100,7 +101,8 @@ class PdfRequestUtilTest {
             "SET_ASIDE",
             "CORRECTION",
             "STATEMENT_OF_REASONS",
-            "LIBERTY_TO_APPLY"
+            "LIBERTY_TO_APPLY",
+            "PERMISSION_TO_APPEAL"
         },
         mode = EXCLUDE
     )

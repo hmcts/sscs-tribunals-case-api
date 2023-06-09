@@ -6,10 +6,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -260,7 +264,7 @@ class IssueDocumentHandlerTest {
     void givenPostHearingReviewIsLta_thenUseLtaBody() {
         SscsCaseData sscsCaseData = buildCaseData();
         sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
-        String bodyContent = "sor body content";
+        String bodyContent = "lta body content";
         sscsCaseData.getDocumentGeneration().setLibertyToApplyBodyContent(bodyContent);
 
         NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, true, USER_AUTHORISATION);
@@ -268,10 +272,25 @@ class IssueDocumentHandlerTest {
         assertThat(payload.getNoticeBody()).isEqualTo(bodyContent);
     }
 
+    @Test
+    void givenPostHearingReviewIsPta_thenUsePtaBody() {
+        SscsCaseData sscsCaseData = buildCaseData();
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
+        String bodyContent = "pta body content";
+        sscsCaseData.getDocumentGeneration().setPermissionToAppealBodyContent(bodyContent);
+
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, true, USER_AUTHORISATION);
+
+        assertThat(payload.getNoticeBody()).isEqualTo(bodyContent);
+    }
+
+    @Disabled("Re-enable when remaining post hearings B types are added to the enum")
     @ParameterizedTest
     @EnumSource(
         value = PostHearingReviewType.class,
-        names = {"PERMISSION_TO_APPEAL"})
+        names = { // TODO add post hearings B unimplemented types
+        }
+    )
     void givenPostHearingReviewIsNotImplemented_thenThrowException(PostHearingReviewType postHearingReviewType) {
         SscsCaseData sscsCaseData = buildCaseData();
         sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
@@ -280,5 +299,4 @@ class IssueDocumentHandlerTest {
             handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, true, USER_AUTHORISATION))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("getNoticeBody has unexpected postHearingReviewType: " + postHearingReviewType.getDescriptionEn());
-    }
 }
