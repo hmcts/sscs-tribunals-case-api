@@ -177,7 +177,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         boolean isDocTypeRequiresReviewByJudge =
             ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType)
             || ScannedDocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue().equals(scannedDocumentType)
-            || ScannedDocumentType.LIBERTY_TO_APPLY_APPLICATION.getValue().equals(scannedDocumentType);
+            || ScannedDocumentType.LIBERTY_TO_APPLY_APPLICATION.getValue().equals(scannedDocumentType)
+            || ScannedDocumentType.PERMISSION_TO_APPEAL.getValue().equals(scannedDocumentType);
         boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
         return isDocTypeRequiresReviewByJudge && isNotInterlocReviewByJudge;
     }
@@ -280,6 +281,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     sscsCaseData.setDwpState(DwpState.LIBERTY_TO_APPLY_REQUESTED);
                 }
             }
+
+            if (isPostHearingsBEnabled && isPtaApplication(sscsCaseData)) {
+                sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.PERMISSION_TO_APPEAL);
+                if (isOriginalSenderDwp(sscsCaseData)) {
+                    sscsCaseData.setDwpState(DwpState.PERMISSION_TO_APPEAL_REQUESTED);
+                }
+            }
         }
 
         buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState(), callback.isIgnoreWarnings(),
@@ -316,6 +324,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private boolean isLtaApplication(SscsCaseData sscsCaseData) {
         return isDocumentType(LIBERTY_TO_APPLY_APPLICATION, sscsCaseData);
+    }
+
+    private boolean isPtaApplication(SscsCaseData sscsCaseData) {
+        return isDocumentType(PERMISSION_TO_APPEAL, sscsCaseData);
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {
@@ -681,6 +693,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
         if (ScannedDocumentType.LIBERTY_TO_APPLY_APPLICATION.getValue().equals(docType)) {
             return LIBERTY_TO_APPLY_APPLICATION;
+        }
+        if (ScannedDocumentType.PERMISSION_TO_APPEAL.getValue().equals(docType)) {
+            return PERMISSION_TO_APPEAL_APPLICATION;
         }
 
         final Optional<DocumentType> optionalDocumentType = stream(PartyItemList.values())

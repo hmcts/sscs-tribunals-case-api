@@ -22,6 +22,7 @@ import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -170,7 +171,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         "SET_ASIDE, setAsideRequest",
         "CORRECTION, correctionRequest",
         "STATEMENT_OF_REASONS, sORRequest",
-        "LIBERTY_TO_APPLY, libertyToApplyRequest"
+        "LIBERTY_TO_APPLY, libertyToApplyRequest",
+        "PERMISSION_TO_APPEAL, permissionToAppealRequest"
     })
     public void givenPostHearingAndFurtherEvidenceActionIsReviewByJudge_shouldTriggerEventAndUpdateCaseCorrectly(
         PostHearingRequestType requestType, String eventType) {
@@ -196,9 +198,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                 anyString(), any(IdamTokens.class));
     }
 
+    @Disabled("Re-enable once new post hearings B types are added to the enum")
     @Test
-    @Parameters({
-        "PERMISSION_TO_APPEAL, permissionToAppealRequest"
+    @Parameters({ // TODO add unimplemented post hearings B types
     })
     public void givenPostHearingNotImplementedAndFurtherEvidenceActionIsReviewByJudge_shouldThrowException(
         PostHearingRequestType requestType, String eventType) {
@@ -221,7 +223,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @Test
     @Parameters({
-        "LIBERTY_TO_APPLY, libertyToApplyRequest"
+        "LIBERTY_TO_APPLY, libertyToApplyRequest",
+        "PERMISSION_TO_APPEAL, permissionToAppealRequest"
     })
     public void givenPostHearingsBNotEnabledAndFurtherEvidenceActionIsReviewByJudge_shouldThrowException(
         PostHearingRequestType requestType, String eventType) {

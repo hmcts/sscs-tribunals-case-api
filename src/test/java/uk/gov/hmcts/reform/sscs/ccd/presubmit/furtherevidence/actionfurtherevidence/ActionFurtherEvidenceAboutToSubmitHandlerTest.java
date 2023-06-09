@@ -204,7 +204,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "setAsideApplication, SET_ASIDE_REQUESTED, SET_ASIDE",
         "correctionApplication, CORRECTION_REQUESTED, CORRECTION",
         "statementOfReasonsApplication, STATEMENT_OF_REASONS_REQUESTED, STATEMENT_OF_REASONS",
-        "libertyToApplyApplication, LIBERTY_TO_APPLY_REQUESTED, LIBERTY_TO_APPLY"
+        "libertyToApplyApplication, LIBERTY_TO_APPLY_REQUESTED, LIBERTY_TO_APPLY",
+        "permissionToAppealApplication, PERMISSION_TO_APPEAL_REQUESTED, PERMISSION_TO_APPEAL"
     })
     public void givenAValidPostHearingApplicationRequest_andReviewByJudgeIsSelected_andOriginalSenderIsDwp_thenDwpStateIsUpdatedAndTypesAreSet(
         String documentType,
@@ -251,7 +252,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "setAsideApplication, SET_ASIDE",
         "correctionApplication, CORRECTION",
         "statementOfReasonsApplication, STATEMENT_OF_REASONS",
-        "libertyToApplyApplication, LIBERTY_TO_APPLY"
+        "libertyToApplyApplication, LIBERTY_TO_APPLY",
+        "permissionToAppealApplication, PERMISSION_TO_APPEAL"
     })
     public void givenAValidPostHearingApplicationRequest_andReviewByJudgeIsSelected_andOriginalSenderIsNotDwp_thenDwpStateIsNotUpdatedAndTypesAreSet(
         String documentType,
@@ -336,7 +338,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Parameters({
         "setAsideApplication",
         "statementOfReasonsApplication",
-        "libertyToApplyApplication"
+        "libertyToApplyApplication",
+        "permissionToAppealApplication"
     })
     public void givenAValidPostHearingApplicationWithInvalidFurtherEvidenceAction_thenThrowInvalidActionError(String documentType) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true, true);
@@ -421,7 +424,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "libertyToApplyApplication,APPELLANT",
         "libertyToApplyApplication,REPRESENTATIVE",
         "libertyToApplyApplication,DWP",
-        "libertyToApplyApplication,HMCTS"
+        "libertyToApplyApplication,HMCTS",
+        "permissionToAppealApplication,APPELLANT",
+        "permissionToAppealApplication,REPRESENTATIVE",
+        "permissionToAppealApplication,DWP",
+        "permissionToAppealApplication,HMCTS"
     })
     public void givenAValidPostHearingRequestFromParty_thenOriginalSenderSetOnSscsDocument(String documentType, PartyItemList sender) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true, true);
@@ -471,7 +478,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "libertyToApplyApplication,APPELLANT",
         "libertyToApplyApplication,REPRESENTATIVE",
         "libertyToApplyApplication,DWP",
-        "libertyToApplyApplication,HMCTS"
+        "libertyToApplyApplication,HMCTS",
+        "permissionToAppealApplication,APPELLANT",
+        "permissionToAppealApplication,REPRESENTATIVE",
+        "permissionToAppealApplication,DWP",
+        "permissionToAppealApplication,HMCTS"
     })
     public void givenValidAPostHearingRequestFromParty_thenAddFooterTextToDocument(String documentType, PartyItemList sender) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true, true);
@@ -517,6 +528,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         "statementOfReasonsApplication,REPRESENTATIVE",
         "libertyToApplyApplication,APPELLANT",
         "libertyToApplyApplication,REPRESENTATIVE",
+        "permissionToAppealApplication,APPELLANT",
+        "permissionToAppealApplication,REPRESENTATIVE"
     })
     public void givenValidAPostHearingRequestFromPartyWhenIncludeInBundle_thenAddDocumentToBundle(String documentType, PartyItemList sender) {
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true, true);

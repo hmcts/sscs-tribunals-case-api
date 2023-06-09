@@ -63,16 +63,12 @@ class PdfRequestUtilTest {
         assertDoesNotThrow(() -> PdfRequestUtil.getRequestDetailsForPostHearingType(sscsCaseData));
     }
 
+    @Disabled("Re-enable once new post hearings B types are added to the enum") // TODO
     @ParameterizedTest
     @EnumSource(
         value = PostHearingRequestType.class,
-        names = {
-            "SET_ASIDE",
-            "CORRECTION",
-            "STATEMENT_OF_REASONS",
-            "LIBERTY_TO_APPLY"
-        },
-        mode = EXCLUDE
+        names = { // TODO add unimplemented post hearings B types
+        }
     )
     void setRequestDetailsForPostHearingType_throwsExceptionForNotImplementedTypes(PostHearingRequestType postHearingRequestType) {
         sscsCaseData.getPostHearing().setRequestType(postHearingRequestType);
@@ -81,11 +77,11 @@ class PdfRequestUtilTest {
             .hasMessageStartingWith("getRequestDetailsForPostHearingType has unexpected postHearingRequestType: ");
     }
 
-    @Disabled("Re-enable when rest of post hearings B types are implemented into the enum")
+    @Disabled("Re-enable once new post hearings B types are added to the enum") // TODO
     @ParameterizedTest
     @EnumSource(
         value = PostHearingReviewType.class,
-        names = { // TODO add names of unimplemented post hearings B types
+        names = { // TODO add unimplemented post hearings B types
         },
         mode = EXCLUDE
     )
@@ -94,6 +90,7 @@ class PdfRequestUtilTest {
         assertDoesNotThrow(() -> PdfRequestUtil.getNoticeBody(sscsCaseData, true, true));
     }
 
+    @Disabled("Re-enable once new post hearings B types are added to the enum") // TODO
     @ParameterizedTest
     @EnumSource(
         value = PostHearingReviewType.class,
@@ -119,6 +116,14 @@ class PdfRequestUtilTest {
         assertThatThrownBy(() -> PdfRequestUtil.getNoticeBody(sscsCaseData, true, false))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageStartingWith("isPostHearingsBEnabled is false - Liberty to Apply is not available");
+    }
+
+    @Test
+    void getNoticeBody_throwsExceptionWhenPermissionToAppealAndIsPostHearingsBEnabledIsFalse() {
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
+        assertThatThrownBy(() -> PdfRequestUtil.getNoticeBody(sscsCaseData, true, false))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageStartingWith("isPostHearingsBEnabled is false - Permission to Appeal is not available");
     }
 
 
@@ -150,8 +155,16 @@ class PdfRequestUtilTest {
         assertThat(PdfRequestUtil.getGenerateNotice(sscsCaseData, true, true)).isEqualTo(YES);
     }
 
+    @Test
+    void getGenerateNoticeReturnsExpected_withPostHearingReviewTypePta() {
+        sscsCaseData.getDocumentGeneration().setPermissionToAppealGenerateNotice(YES);
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
+        assertThat(PdfRequestUtil.getGenerateNotice(sscsCaseData, true, true)).isEqualTo(YES);
+    }
+
+    @Disabled("Re-enable once new post hearings B types are added to the enum") // TODO
     @ParameterizedTest
-    @EnumSource(value = PostHearingReviewType.class, names = {"PERMISSION_TO_APPEAL"})
+    @EnumSource(value = PostHearingReviewType.class, names = {})
     void getGenerateNoticeThrowsError_whenUnimplementedPostHearingReviewType(PostHearingReviewType postHearingReviewType) {
         sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
         assertThatThrownBy(() -> PdfRequestUtil.getGenerateNotice(sscsCaseData, true, true))
@@ -165,6 +178,14 @@ class PdfRequestUtilTest {
         assertThatThrownBy(() -> PdfRequestUtil.getGenerateNotice(sscsCaseData, true, false))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("isPostHearingsBEnabled is false - Liberty to Apply is not available");
+    }
+
+    @Test
+    void getGenerateNoticeThrowsError_whenPermissionToAppealAndIsPostHearingsBEnabledFalse() {
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
+        assertThatThrownBy(() -> PdfRequestUtil.getGenerateNotice(sscsCaseData, true, false))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("isPostHearingsBEnabled is false - Permission to Appeal is not available");
     }
 
     @Test
