@@ -42,12 +42,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
+import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
-import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
 @Component
 @Slf4j
@@ -112,11 +112,10 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             assignNewOtherPartyData(sscsCaseData.getOtherParties());
             updateOtherPartyUcb(sscsCaseData);
             if (sscsCaseData.getOtherParties().stream().anyMatch(o -> YesNo.isYes(o.getValue().getSendNewOtherPartyNotification()))) {
-                sscsCaseData.setDirectionDueDate(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS));
                 sscsCaseData.setDwpDueDate(null);
             }
         }
-
+        SscsHelper.updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
         return preSubmitCallbackResponse;
     }
 
