@@ -9,17 +9,9 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ADMIN_ACTION_CORRECTION;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_TCW;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyName;
 
@@ -146,9 +138,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
 
         String scannedDocumentType = scannedDocument.getValue().getType();
-
-        if (ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType)
-            && !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode)
+        if (isPostHearingApplicationWithWrongActionCode(actionCode, scannedDocumentType)
         ) {
             preSubmitCallbackResponse.addError(String
                 .format("'Further Evidence Action' must be set to '%s'",
@@ -178,6 +168,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     .addError("The PDF evidence does not match the Original Sender selected");
             }
         }
+    }
+
+    private static boolean isPostHearingApplicationWithWrongActionCode(String actionCode, String scannedDocumentType) {
+        boolean isDocTypeRequiresReviewByJudge =
+            ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType)
+            || ScannedDocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue().equals(scannedDocumentType);
+        boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
+        return isDocTypeRequiresReviewByJudge && isNotInterlocReviewByJudge;
     }
 
     private static boolean isCorrectionApplicationWithWrongActionCode(String actionCode, String scannedDocumentType) {
@@ -251,26 +249,20 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
 
         if (isSetAsideApplication(sscsCaseData) && isPostHearingsEnabled) {
-            sscsCaseData.setState(State.POST_HEARING);
-            sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
             sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
-
             if (PartyItemList.DWP.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
                 sscsCaseData.setDwpState(DwpState.SET_ASIDE_REQUESTED);
             }
         }
 
         if (isCorrectionApplication(sscsCaseData) && isPostHearingsEnabled) {
-            sscsCaseData.setState(State.POST_HEARING);
-            sscsCaseData.setDwpState(DwpState.CORRECTION_REQUESTED);
             sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.CORRECTION);
+            sscsCaseData.setDwpState(DwpState.CORRECTION_REQUESTED);
+        }
 
-            if (isSendToInterlocReviewByJudge(sscsCaseData)) {
-                sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
-            } else if (isAdminActionCorrection(sscsCaseData)) {
-                sscsCaseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
-                // TODO 10581 navigate user to Admin correction screen
-            }
+        if (isSorApplication(sscsCaseData) && isPostHearingsEnabled) {
+            sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.STATEMENT_OF_REASONS);
+            sscsCaseData.setDwpState(DwpState.STATEMENT_OF_REASONS_REQUESTED);
         }
 
         buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState(), callback.isIgnoreWarnings(),
@@ -303,6 +295,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private boolean isCorrectionApplication(SscsCaseData sscsCaseData) {
         return isDocumentType(CORRECTION_APPLICATION, sscsCaseData);
+    }
+
+    private boolean isSorApplication(SscsCaseData sscsCaseData) {
+        return isDocumentType(STATEMENT_OF_REASONS_APPLICATION, sscsCaseData);
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {
@@ -662,6 +658,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
         if (ScannedDocumentType.CORRECTION_APPLICATION.getValue().equals(docType)) {
             return CORRECTION_APPLICATION;
+        }
+        if (ScannedDocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue().equals(docType)) {
+            return STATEMENT_OF_REASONS_APPLICATION;
         }
 
         final Optional<DocumentType> optionalDocumentType = stream(PartyItemList.values())
