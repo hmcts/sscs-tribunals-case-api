@@ -1,13 +1,17 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -19,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 
 @RunWith(JUnitParamsRunner.class)
 public class DirectionIssuedAboutToStartHandlerTest {
@@ -237,7 +242,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YES);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
@@ -257,7 +262,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.NO);
+        sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(NO);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
@@ -268,5 +273,91 @@ public class DirectionIssuedAboutToStartHandlerTest {
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(2, listOptions.size());
         assertEquals(expected, response.getData().getDirectionTypeDl());
+    }
+
+    @Test
+    public void givenAValidCallbackType_thenClearTheConfidentialityFields() {
+        handler = new DirectionIssuedAboutToStartHandler();
+        sscsCaseData.setConfidentialityType(ConfidentialityType.CONFIDENTIAL.getCode());
+        sscsCaseData.setSendDirectionNoticeToFTA(YES);
+        sscsCaseData.setSendDirectionNoticeToRepresentative(YES);
+        sscsCaseData.setSendDirectionNoticeToOtherPartyRep(YES);
+        sscsCaseData.setSendDirectionNoticeToOtherPartyAppointee(YES);
+        sscsCaseData.setSendDirectionNoticeToOtherParty(YES);
+        sscsCaseData.setSendDirectionNoticeToJointParty(YES);
+        sscsCaseData.setSendDirectionNoticeToAppellantOrAppointee(YES);
+
+        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertNull(sscsCaseData.getConfidentialityType());
+        assertNull(sscsCaseData.getSendDirectionNoticeToFTA());
+        assertNull(sscsCaseData.getSendDirectionNoticeToRepresentative());
+        assertNull(sscsCaseData.getSendDirectionNoticeToOtherPartyRep());
+        assertNull(sscsCaseData.getSendDirectionNoticeToOtherPartyAppointee());
+        assertNull(sscsCaseData.getSendDirectionNoticeToOtherParty());
+        assertNull(sscsCaseData.getSendDirectionNoticeToJointParty());
+        assertNull(sscsCaseData.getSendDirectionNoticeToAppellantOrAppointee());
+    }
+
+    @Test
+    public void givenAValidCallbackType_thenVerifyAllPartiesOnTheCase() {
+        handler = new DirectionIssuedAboutToStartHandler();
+
+        Appointee otherPartyAppointee = Appointee.builder()
+                .id("2")
+                .name(Name.builder().firstName("Henry").lastName("Smith").build())
+                .build();
+
+        Representative otherPartyRepresentative = Representative.builder()
+                .id("3")
+                .name(Name.builder().firstName("Wendy").lastName("Smith").build())
+                .hasRepresentative(YES.getValue())
+                .build();
+
+        JointParty jointParty = JointParty.builder().hasJointParty(YES).build();
+        Representative representative = Representative.builder().hasRepresentative("yes").build();
+        sscsCaseData.getAppeal().setRep(representative);
+        sscsCaseData.setJointParty(jointParty);
+
+        CcdValue<OtherParty> otherParty = CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder()
+                        .id("1")
+                        .name(Name.builder().firstName("Harry").lastName("Kane").build())
+                        .isAppointee(YES.getValue())
+                        .appointee(otherPartyAppointee)
+                        .rep(otherPartyRepresentative)
+                        .build())
+                .build();
+
+        sscsCaseData.setOtherParties(Collections.singletonList(otherParty));
+        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals(YES, sscsCaseData.getHasRepresentative());
+        assertEquals(YES, sscsCaseData.getHasOtherPartyRep());
+        assertEquals(YES, sscsCaseData.getHasOtherPartyAppointee());
+        assertEquals(YES, sscsCaseData.getHasOtherParties());
+        assertEquals(YES, sscsCaseData.getHasJointParty());
+    }
+
+    @Test
+    public void givenAValidCallbackType_NoAdditionalPartiesForOtherParty() {
+        handler = new DirectionIssuedAboutToStartHandler();
+
+        CcdValue<OtherParty> otherParty = CcdValue.<OtherParty>builder()
+                .value(OtherParty.builder()
+                        .id("1")
+                        .name(Name.builder().firstName("Harry").lastName("Kane").build())
+                        .isAppointee(YES.getValue())
+                        .build())
+                .build();
+
+        sscsCaseData.setOtherParties(Collections.singletonList(otherParty));
+        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals(NO, sscsCaseData.getHasRepresentative());
+        assertEquals(NO, sscsCaseData.getHasOtherPartyRep());
+        assertEquals(NO, sscsCaseData.getHasOtherPartyAppointee());
+        assertEquals(YES, sscsCaseData.getHasOtherParties());
+        assertEquals(NO, sscsCaseData.getHasJointParty());
     }
 }
