@@ -165,7 +165,7 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             var venueDetails = venueDataLoader.getVenueDetailsMap().get(nextHearingVenueSelected.getValue().getCode());
 
             if (nonNull(venueDetails)) {
-                CcdValue<String> venueDetailsValue = new CcdValue<String>(venueDetails.getEpimsId());
+                CcdValue<String> venueDetailsValue = new CcdValue<>(venueDetails.getEpimsId());
                 CcdValue<CcdValue<String>> ccdValue = new CcdValue<>(venueDetailsValue);
                 fields.setHearingVenueEpimsIds(List.of(ccdValue));
             }

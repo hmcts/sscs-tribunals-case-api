@@ -42,7 +42,7 @@ public class SscsUtil {
         return allowedStates.contains(state);
     }
 
-    public static void clearAdjournmentTransientFields(SscsCaseData caseData, boolean isAdjournmentEnabled) {
+    public static void clearAdjournmentTransientFields(SscsCaseData caseData) {
         log.info("Clearing transient adjournment case fields for caseId {}", caseData.getCcdCaseId());
 
         caseData.setAdjournment(Adjournment.builder().build());

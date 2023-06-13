@@ -261,8 +261,78 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
         List<CollectionItem<JudicialUserBase>> result = response.getData().getSchedulingAndListingFields().getPanelMemberExclusions().getExcludedPanelMembers();
         assertThat(result).hasSize(1);
-        System.out.println(result);
         assertThat(result.get(0)).isEqualTo(new CollectionItem<>(idamId, JudicialUserBase.builder().idamId(idamId).personalCode(personalCode).build()));
+    }
+
+    @Test
+    void givenPanelMembersAreReserved_updateTheirValues() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
+
+        String personalCode = "1";
+        String idamId = "2";
+        given(judicialRefDataService.getPersonalCode(idamId)).willReturn(personalCode);
+
+        sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
+            .arePanelMembersReserved(YES).reservedPanelMembers(List.of(new CollectionItem<>(idamId, null))).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        List<CollectionItem<JudicialUserBase>> result = response.getData().getSchedulingAndListingFields().getPanelMemberExclusions().getReservedPanelMembers();
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0)).isEqualTo(new CollectionItem<>(idamId, JudicialUserBase.builder().idamId(idamId).personalCode(personalCode).build()));
+    }
+
+    @Test
+    void givenPanelMembersAreExcludedButNoValuesInList_updateTheirValues() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
+
+        sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
+            .arePanelMembersExcluded(YES).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        List<CollectionItem<JudicialUserBase>> result = response.getData().getSchedulingAndListingFields().getPanelMemberExclusions().getExcludedPanelMembers();
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void givenPanelMembersAreExcludedButNoIdamId_dontUpdateTheirValues() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
+
+        List<CollectionItem<JudicialUserBase>> excludedPanelMembers = List.of(new CollectionItem<>("", null));
+
+        sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
+            .arePanelMembersExcluded(YES).excludedPanelMembers(excludedPanelMembers).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+            ABOUT_TO_SUBMIT,
+            callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        List<CollectionItem<JudicialUserBase>> result = response.getData().getSchedulingAndListingFields().getPanelMemberExclusions().getExcludedPanelMembers();
+        assertThat(result).hasSize(1);
+        assertThat(result).isEqualTo(excludedPanelMembers);
     }
 
 }

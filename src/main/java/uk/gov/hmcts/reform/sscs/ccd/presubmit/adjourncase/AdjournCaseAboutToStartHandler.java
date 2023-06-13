@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNME
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -25,9 +24,6 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
 
     private final DynamicListLanguageUtil utils;
 
-    @Value("${feature.snl.adjournment.enabled}")
-    private boolean isAdjournmentEnabled; // TODO SSCS-10951
-
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_START
@@ -46,7 +42,7 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        clearTransientFields(preSubmitCallbackResponse, isAdjournmentEnabled);
+        clearTransientFields(preSubmitCallbackResponse);
         sscsCaseData.getAdjournment().setAdjournmentInProgress(YesNo.YES);
 
         DynamicList languageList = utils.generateInterpreterLanguageFields(sscsCaseData.getAdjournment().getInterpreterLanguage());
@@ -55,12 +51,12 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
         return preSubmitCallbackResponse;
     }
 
-    private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, boolean isAdjournmentEnabled) {
+    private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
 
         if (preSubmitCallbackResponse.getData().getSscsDocument() != null && preSubmitCallbackResponse.getData().getSscsDocument().stream()
             .noneMatch(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()))) {
 
-            SscsUtil.clearAdjournmentTransientFields(preSubmitCallbackResponse.getData(), isAdjournmentEnabled);
+            SscsUtil.clearAdjournmentTransientFields(preSubmitCallbackResponse.getData());
         }
     }
 }
