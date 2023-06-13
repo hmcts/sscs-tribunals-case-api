@@ -100,6 +100,7 @@ public class SscsUtil {
         if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.RESERVED)) {
             return exclusions.getReservedPanelMembers();
         }
+
         return new LinkedList<>();
     }
 

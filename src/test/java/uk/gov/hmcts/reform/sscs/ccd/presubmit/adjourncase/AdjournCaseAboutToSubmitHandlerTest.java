@@ -291,8 +291,11 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
                 new CollectionItem<>("1", JudicialUserBase.builder().idamId("1").build()),
                 new CollectionItem<>("2", JudicialUserBase.builder().idamId("2").build())))).build());
 
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.NO);
         sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
         sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+        sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
+        sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().idamId("3").build());
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
