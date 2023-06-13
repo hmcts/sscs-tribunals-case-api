@@ -298,16 +298,13 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
 
-        sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
-            .arePanelMembersExcluded(YES).build());
-
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
             ABOUT_TO_SUBMIT,
             callback,
             USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        List<CollectionItem<JudicialUserBase>> result = response.getData().getSchedulingAndListingFields().getPanelMemberExclusions().getExcludedPanelMembers();
+        PanelMemberExclusions result = response.getData().getSchedulingAndListingFields().getPanelMemberExclusions();
         assertThat(result).isNull();
     }
 

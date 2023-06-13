@@ -70,9 +70,10 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         if (isAdjournmentEnabled) {
             PanelMemberExclusions panelMemberExclusions = caseDataSnlFields.getPanelMemberExclusions();
-            log.info("#21 panel member exclusions: {}", panelMemberExclusions);
 
             if (nonNull(panelMemberExclusions)) {
+                log.info("#21 panel member exclusions: {}", panelMemberExclusions);
+
                 updatePanelMemberValues(panelMemberExclusions.getExcludedPanelMembers());
                 updatePanelMemberValues(panelMemberExclusions.getReservedPanelMembers());
             }
