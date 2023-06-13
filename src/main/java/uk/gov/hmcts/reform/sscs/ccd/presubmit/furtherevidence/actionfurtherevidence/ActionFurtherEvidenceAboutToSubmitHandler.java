@@ -273,14 +273,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 }
             }
 
-            if (isSorApplication(sscsCaseData)) {
+            if (isStatementOfReasonsApplication(sscsCaseData)) {
                 sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.STATEMENT_OF_REASONS);
                 if (isOriginalSenderDwp(sscsCaseData)) {
                     sscsCaseData.setDwpState(DwpState.STATEMENT_OF_REASONS_REQUESTED);
                 }
             }
 
-            if (isPostHearingsBEnabled && isLtaApplication(sscsCaseData)) {
+            if (isPostHearingsBEnabled && isLibertyToApplyApplication(sscsCaseData)) {
                 sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.LIBERTY_TO_APPLY);
                 if (isOriginalSenderDwp(sscsCaseData)) {
                     sscsCaseData.setDwpState(DwpState.LIBERTY_TO_APPLY_REQUESTED);
