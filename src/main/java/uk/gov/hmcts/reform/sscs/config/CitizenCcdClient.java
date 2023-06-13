@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.config;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
@@ -59,11 +62,13 @@ public class CitizenCcdClient {
         log.info("Searching cases for citizen");
         String searchCriteria ;
         searchCriteria = buildQuery("state", State.DRAFT.getId());
-        return  coreCaseDataApi.searchCases(
+        Optional<List<CaseDetails>> cases = Optional.ofNullable(coreCaseDataApi.searchCases(
                 idamTokens.getIdamOauth2Token(),
                 idamTokens.getServiceAuthorization(),
                 ccdRequestDetails.getCaseTypeId(),
-                searchCriteria).getCases();
+                searchCriteria).getCases());
+
+        return cases.orElseGet(ArrayList::new);
 
     }
 
