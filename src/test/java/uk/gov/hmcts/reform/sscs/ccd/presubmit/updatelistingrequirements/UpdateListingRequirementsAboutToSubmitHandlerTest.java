@@ -319,7 +319,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
 
-        List<CollectionItem<JudicialUserBase>> excludedPanelMembers = List.of(new CollectionItem<>("", null));
+        List<CollectionItem<JudicialUserBase>> excludedPanelMembers = List.of(new CollectionItem<>("", JudicialUserBase.builder().build()), new CollectionItem<>("", JudicialUserBase.builder().build()));
 
         sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
             .arePanelMembersExcluded(YES).excludedPanelMembers(excludedPanelMembers).build());
@@ -331,8 +331,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors()).isEmpty();
         List<CollectionItem<JudicialUserBase>> result = response.getData().getSchedulingAndListingFields().getPanelMemberExclusions().getExcludedPanelMembers();
-        assertThat(result).hasSize(1);
-        assertThat(result).isEqualTo(excludedPanelMembers);
+        assertThat(result).hasSize(2).isEqualTo(excludedPanelMembers);
     }
 
 }

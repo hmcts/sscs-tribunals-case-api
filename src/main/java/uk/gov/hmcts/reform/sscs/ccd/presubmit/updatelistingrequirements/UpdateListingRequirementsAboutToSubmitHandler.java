@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static org.apache.logging.log4j.util.Strings.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
@@ -111,9 +112,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             for (CollectionItem<JudicialUserBase> panelMember : panelMembers) {
                 String idamId = panelMember.getId();
 
-                log.info("{}", idamId);
-
-                if (nonNull(idamId)) {
+                if (isNotEmpty(idamId)) {
                     JudicialUserBase judicialUserBase = JudicialUserBase.builder()
                         .idamId(idamId)
                         .personalCode(judicialRefDataService.getPersonalCode(idamId)).build();
