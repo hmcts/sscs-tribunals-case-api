@@ -213,10 +213,10 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         if (AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER.equals(adjournment.getNextHearingDateType())) {
             if (AdjournCaseNextHearingDateOrPeriod.PROVIDE_DATE.equals(adjournment.getNextHearingDateOrPeriod())) {
-                hearingWindow.setFirstDateTimeMustBe(adjournment.getNextHearingFirstAvailableDateAfterDate().plusDays(1).atStartOfDay());
+                hearingWindow.setDateRangeStart(adjournment.getNextHearingFirstAvailableDateAfterDate().plusDays(1));
             } else if (AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD.equals(adjournment.getNextHearingDateOrPeriod())) {
                 long after = Long.parseLong(adjournment.getNextHearingFirstAvailableDateAfterPeriod().toString());
-                hearingWindow.setFirstDateTimeMustBe(LocalDate.now().plusDays(after).atStartOfDay());
+                hearingWindow.setDateRangeStart(LocalDate.now().plusDays(after));
             }
         }
     }
