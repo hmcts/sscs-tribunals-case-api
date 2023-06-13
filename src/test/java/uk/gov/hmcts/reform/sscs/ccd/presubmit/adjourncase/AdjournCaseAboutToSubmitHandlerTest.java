@@ -239,4 +239,46 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
             .isEqualTo(YES);
     }
 
+    @DisplayName("When we have written an adjournment notice and reserved some panel members, and there are already reserved panel members, "
+        + "add them to the existing reserved panel members list")
+    @Test
+    void givenPanelMembersReserved_thenAddPanelMembersToReservedList() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+        sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
+            .reservedPanelMembers(new ArrayList<>(Arrays.asList(
+                new CollectionItem<>("1", JudicialUserBase.builder().idamId("1").build()),
+                new CollectionItem<>("2", JudicialUserBase.builder().idamId("2").build())))).build());
+
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.RESERVED);
+        sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
+        sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().idamId("3").build());
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getSchedulingAndListingFields()
+            .getPanelMemberExclusions().getReservedPanelMembers()).hasSize(3);
+    }
+
+    @DisplayName("When we have written an adjournment notice and not excluded some panel members, and there are already excluded panel members, "
+        + "keep the existing excluded panel members list the same")
+    @Test
+    void givenPanelMembersNotExcluded_thenKeepExclusionListTheSame() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+        sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
+            .excludedPanelMembers(new ArrayList<>(Arrays.asList(
+                new CollectionItem<>("1", JudicialUserBase.builder().idamId("1").build()),
+                new CollectionItem<>("2", JudicialUserBase.builder().idamId("2").build())))).build());
+
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getSchedulingAndListingFields()
+            .getPanelMemberExclusions().getExcludedPanelMembers()).hasSize(2);
+    }
+
 }
