@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 
 import java.util.List;
@@ -71,10 +69,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
         if (isAdjournmentEnabled) {
             PanelMemberExclusions panelMemberExclusions = caseDataSnlFields.getPanelMemberExclusions();
-
             log.info("#21 panel member exclusions: {}", panelMemberExclusions);
-
-            panelMemberExclusions.setArePanelMembersReserved(YES);
 
             if (nonNull(panelMemberExclusions)) {
                 updatePanelMemberValues(panelMemberExclusions.getExcludedPanelMembers());
@@ -112,18 +107,19 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
     }
 
     private void updatePanelMemberValues(List<CollectionItem<JudicialUserBase>> panelMembers) {
-        for (CollectionItem<JudicialUserBase> panelMember : panelMembers) {
-            String idamId = panelMember.getId();
+        if (nonNull(panelMembers)) {
+            for (CollectionItem<JudicialUserBase> panelMember : panelMembers) {
+                String idamId = panelMember.getId();
 
-            if (nonNull(idamId)) {
-                JudicialUserBase judicialUserBase = panelMember.getValue();
+                log.info("{}", idamId);
 
-                if (isNull(judicialUserBase)) {
-                    judicialUserBase = JudicialUserBase.builder().build();
+                if (nonNull(idamId)) {
+                    JudicialUserBase judicialUserBase = JudicialUserBase.builder()
+                        .idamId(idamId)
+                        .personalCode(judicialRefDataService.getPersonalCode(idamId)).build();
+
+                    panelMember.setValue(judicialUserBase);
                 }
-
-                judicialUserBase.setIdamId(idamId);
-                judicialUserBase.setPersonalCode(judicialRefDataService.getPersonalCode(idamId));
             }
         }
     }
