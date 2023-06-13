@@ -170,6 +170,7 @@ public class PdfRequestUtil {
             case LIBERTY_TO_APPLY:
                 return DocumentType.LIBERTY_TO_APPLY_APPLICATION;
             case PERMISSION_TO_APPEAL:
+                return DocumentType.PERMISSION_TO_APPEAL_APPLICATION;
             default:
                 throw new IllegalArgumentException("Unexpected request type: " + postHearingRequestType);
         }

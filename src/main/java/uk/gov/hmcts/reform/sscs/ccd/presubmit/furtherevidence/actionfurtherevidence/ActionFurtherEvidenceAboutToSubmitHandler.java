@@ -178,7 +178,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType)
             || ScannedDocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue().equals(scannedDocumentType)
             || ScannedDocumentType.LIBERTY_TO_APPLY_APPLICATION.getValue().equals(scannedDocumentType)
-            || ScannedDocumentType.PERMISSION_TO_APPEAL.getValue().equals(scannedDocumentType);
+            || ScannedDocumentType.PERMISSION_TO_APPEAL_APPLICATION.getValue().equals(scannedDocumentType);
         boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
         return isDocTypeRequiresReviewByJudge && isNotInterlocReviewByJudge;
     }
@@ -327,7 +327,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private boolean isPtaApplication(SscsCaseData sscsCaseData) {
-        return isDocumentType(PERMISSION_TO_APPEAL, sscsCaseData);
+        return isDocumentType(PERMISSION_TO_APPEAL_APPLICATION, sscsCaseData);
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {
@@ -694,7 +694,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (ScannedDocumentType.LIBERTY_TO_APPLY_APPLICATION.getValue().equals(docType)) {
             return LIBERTY_TO_APPLY_APPLICATION;
         }
-        if (ScannedDocumentType.PERMISSION_TO_APPEAL.getValue().equals(docType)) {
+        if (ScannedDocumentType.PERMISSION_TO_APPEAL_APPLICATION.getValue().equals(docType)) {
             return PERMISSION_TO_APPEAL_APPLICATION;
         }
 

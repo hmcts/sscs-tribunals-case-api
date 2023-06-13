@@ -7,8 +7,8 @@ import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -21,6 +21,14 @@ class PdfRequestUtilTest {
 
     SscsCaseData sscsCaseData;
 
+    static boolean postHearingRequestTypeHasMoreThan5Values() {
+        return PostHearingRequestType.values().length > 5;
+    }
+
+    static boolean postHearingReviewTypeHasMoreThan5Values() {
+        return PostHearingReviewType.values().length > 5;
+    }
+
     @BeforeEach
     void setUp() {
         sscsCaseData = new SscsCaseData();
@@ -32,17 +40,25 @@ class PdfRequestUtilTest {
         "CORRECTION,CORRECTION_APPLICATION",
         "STATEMENT_OF_REASONS,STATEMENT_OF_REASONS_APPLICATION",
         "LIBERTY_TO_APPLY,LIBERTY_TO_APPLY_APPLICATION",
+        "PERMISSION_TO_APPEAL,PERMISSION_TO_APPEAL_APPLICATION"
     })
     void getPostHearingDocumentType_returnsDocumentType(PostHearingRequestType postHearingRequestType, DocumentType documentType) {
         sscsCaseData.getPostHearing().setRequestType(postHearingRequestType);
         assertThat(PdfRequestUtil.getPostHearingDocumentType(postHearingRequestType)).isEqualTo(documentType);
     }
 
+    @EnabledIf("postHearingRequestTypeHasMoreThan5Values")
     @ParameterizedTest
-    @EnumSource(value = PostHearingRequestType.class,
-        names = { // TODO remove as each type is implemented
+    @EnumSource(
+        value = PostHearingRequestType.class,
+        names = {
+            "SET_ASIDE",
+            "CORRECTION",
+            "STATEMENT_OF_REASONS",
+            "LIBERTY_TO_APPLY",
             "PERMISSION_TO_APPEAL"
-        })
+        },
+        mode = EXCLUDE)
     void getPostHearingDocumentType_throwsExceptionWhenUnexpectedRequestType(PostHearingRequestType postHearingRequestType) {
         sscsCaseData.getPostHearing().setRequestType(postHearingRequestType);
         assertThatThrownBy(() -> PdfRequestUtil.getPostHearingDocumentType(postHearingRequestType))
@@ -54,7 +70,6 @@ class PdfRequestUtilTest {
     @EnumSource(
         value = PostHearingRequestType.class,
         names = { // TODO remove as each type is implemented
-            "PERMISSION_TO_APPEAL"
         },
         mode = EXCLUDE
     )
@@ -63,12 +78,18 @@ class PdfRequestUtilTest {
         assertDoesNotThrow(() -> PdfRequestUtil.getRequestDetailsForPostHearingType(sscsCaseData));
     }
 
-    @Disabled("Re-enable once new post hearings B types are added to the enum") // TODO
+    @EnabledIf("postHearingRequestTypeHasMoreThan5Values")
     @ParameterizedTest
     @EnumSource(
         value = PostHearingRequestType.class,
-        names = { // TODO add unimplemented post hearings B types
-        }
+        names = {
+            "SET_ASIDE",
+            "CORRECTION",
+            "STATEMENT_OF_REASONS",
+            "LIBERTY_TO_APPLY",
+            "PERMISSION_TO_APPEAL"
+        },
+        mode = EXCLUDE
     )
     void setRequestDetailsForPostHearingType_throwsExceptionForNotImplementedTypes(PostHearingRequestType postHearingRequestType) {
         sscsCaseData.getPostHearing().setRequestType(postHearingRequestType);
@@ -77,7 +98,7 @@ class PdfRequestUtilTest {
             .hasMessageStartingWith("getRequestDetailsForPostHearingType has unexpected postHearingRequestType: ");
     }
 
-    @Disabled("Re-enable once new post hearings B types are added to the enum") // TODO
+    @EnabledIf("postHearingRequestTypeHasMoreThan5Values")
     @ParameterizedTest
     @EnumSource(
         value = PostHearingReviewType.class,
@@ -90,7 +111,7 @@ class PdfRequestUtilTest {
         assertDoesNotThrow(() -> PdfRequestUtil.getNoticeBody(sscsCaseData, true, true));
     }
 
-    @Disabled("Re-enable once new post hearings B types are added to the enum") // TODO
+    @EnabledIf("postHearingRequestTypeHasMoreThan5Values") // TODO
     @ParameterizedTest
     @EnumSource(
         value = PostHearingReviewType.class,
@@ -124,6 +145,23 @@ class PdfRequestUtilTest {
         assertThatThrownBy(() -> PdfRequestUtil.getNoticeBody(sscsCaseData, true, false))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageStartingWith("isPostHearingsBEnabled is false - Permission to Appeal is not available");
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = PostHearingReviewType.class,
+        names = {
+            "SET_ASIDE",
+            "CORRECTION",
+            "STATEMENT_OF_REASONS",
+        },
+        mode = EXCLUDE
+    )
+    void getNoticeBody_throwsExceptionWhenPostHearingsBEnabledIsFalse(PostHearingReviewType postHearingReviewType) {
+        sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
+        assertThatThrownBy(() -> PdfRequestUtil.getNoticeBody(sscsCaseData, true, false))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageStartingWith(String.format("isPostHearingsBEnabled is false - %s is not available", postHearingReviewType.getDescriptionEn()));
     }
 
 
@@ -162,7 +200,7 @@ class PdfRequestUtilTest {
         assertThat(PdfRequestUtil.getGenerateNotice(sscsCaseData, true, true)).isEqualTo(YES);
     }
 
-    @Disabled("Re-enable once new post hearings B types are added to the enum") // TODO
+    @EnabledIf("postHearingReviewTypeHasMoreThan5Values")
     @ParameterizedTest
     @EnumSource(value = PostHearingReviewType.class, names = {})
     void getGenerateNoticeThrowsError_whenUnimplementedPostHearingReviewType(PostHearingReviewType postHearingReviewType) {
@@ -170,22 +208,6 @@ class PdfRequestUtilTest {
         assertThatThrownBy(() -> PdfRequestUtil.getGenerateNotice(sscsCaseData, true, true))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageStartingWith("getGenerateNotice has unexpected PostHearingReviewType: ");
-    }
-
-    @Test
-    void getGenerateNoticeThrowsError_whenLibertyToApplyAndIsPostHearingsBEnabledFalse() {
-        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
-        assertThatThrownBy(() -> PdfRequestUtil.getGenerateNotice(sscsCaseData, true, false))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("isPostHearingsBEnabled is false - Liberty to Apply is not available");
-    }
-
-    @Test
-    void getGenerateNoticeThrowsError_whenPermissionToAppealAndIsPostHearingsBEnabledFalse() {
-        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
-        assertThatThrownBy(() -> PdfRequestUtil.getGenerateNotice(sscsCaseData, true, false))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("isPostHearingsBEnabled is false - Permission to Appeal is not available");
     }
 
     @Test

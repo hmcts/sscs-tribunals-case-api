@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.LIBERTY_TO_APPLY_APPLICATION;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.PERMISSION_TO_APPEAL_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.SET_ASIDE_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.STATEMENT_OF_REASONS_APPLICATION;
 

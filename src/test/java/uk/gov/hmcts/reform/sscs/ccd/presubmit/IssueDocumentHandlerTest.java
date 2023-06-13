@@ -6,15 +6,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -284,14 +281,21 @@ class IssueDocumentHandlerTest {
         assertThat(payload.getNoticeBody()).isEqualTo(bodyContent);
     }
 
-    @Disabled("Re-enable when remaining post hearings B types are added to the enum")
+    @EnabledIf("postHearingReviewTypeHasMoreThan5Values")
     @ParameterizedTest
     @EnumSource(
         value = PostHearingReviewType.class,
-        names = { // TODO add post hearings B unimplemented types
-        }
+        names = {
+            "SET_ASIDE",
+            "CORRECTION",
+            "STATEMENT_OF_REASONS",
+            "LIBERTY_TO_APPLY",
+            "PERMISSION_TO_APPEAL"
+            // TODO add post hearings B types as they are implemented
+        },
+        mode = EnumSource.Mode.EXCLUDE
     )
-    void givenPostHearingReviewIsNotImplemented_thenThrowException(PostHearingReviewType postHearingReviewType) {
+    void givenPostHearingReviewTypeIsNotImplemented_thenThrowException(PostHearingReviewType postHearingReviewType) {
         SscsCaseData sscsCaseData = buildCaseData();
         sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
 
@@ -299,4 +303,9 @@ class IssueDocumentHandlerTest {
             handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, true, USER_AUTHORISATION))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("getNoticeBody has unexpected postHearingReviewType: " + postHearingReviewType.getDescriptionEn());
+    }
+
+    static boolean postHearingReviewTypeHasMoreThan5Values() {
+        return PostHearingReviewType.values().length > 5;
+    }
 }
