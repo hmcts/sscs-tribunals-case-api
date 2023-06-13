@@ -73,6 +73,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                                                      SscsCaseData caseData, String documentTypeLabel,
                                                      LocalDate dateAdded, LocalDate generatedDate,
                                                      boolean isScottish, boolean isPostHearingsEnabled,
+                                                     boolean isPostHearingsBEnabled,
                                                      String userAuthorisation) {
         Adjournment adjournment = caseData.getAdjournment();
         NoticeIssuedTemplateBody formPayload = super.createPayload(
@@ -83,6 +84,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             adjournment.getGeneratedDate(),
             isScottish,
             isPostHearingsEnabled,
+            isPostHearingsBEnabled,
             userAuthorisation);
         AdjournCaseTemplateBodyBuilder adjournCaseBuilder = AdjournCaseTemplateBody.builder();
 

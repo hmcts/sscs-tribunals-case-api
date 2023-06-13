@@ -66,7 +66,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
                                                      SscsCaseData caseData, String documentTypeLabel,
                                                      LocalDate dateAdded, LocalDate generatedDate,
                                                      boolean isScottish, boolean isPostHearingsEnabled,
-                                                     String userAuthorisation) {
+                                                     boolean isPostHearingsBEnabled, String userAuthorisation) {
 
         String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(caseData);
 
@@ -77,7 +77,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         decisionNoticeOutcomeService.performPreOutcomeIntegrityAdjustments(caseData);
 
         NoticeIssuedTemplateBody formPayload = super
-            .createPayload(response, caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, isPostHearingsEnabled, userAuthorisation);
+            .createPayload(response, caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, isPostHearingsEnabled, isPostHearingsBEnabled, userAuthorisation);
         WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
 
         final NoticeIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
