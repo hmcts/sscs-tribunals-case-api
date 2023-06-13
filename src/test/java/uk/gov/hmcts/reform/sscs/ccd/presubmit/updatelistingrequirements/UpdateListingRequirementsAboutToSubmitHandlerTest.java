@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
+import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 
 @ExtendWith(MockitoExtension.class)
 class UpdateListingRequirementsAboutToSubmitHandlerTest {
@@ -46,6 +47,8 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     private Callback<SscsCaseData> callback;
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
+    @Mock
+    private JudicialRefDataService judicialRefDataService;
     @Mock
     private ListAssistHearingMessageHelper listAssistHearingMessageHelper;
     @InjectMocks

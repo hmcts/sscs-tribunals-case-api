@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 
 import java.util.List;
@@ -28,8 +30,8 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
     private final JudicialRefDataService judicialRefDataService;
     @Value("${feature.gaps-switchover.enabled}")
     private boolean gapsSwitchOverFeature;
-    @Value("${feature.postHearings.enabled}")
-    private final boolean isPostHearingsEnabled;
+    @Value("${feature.snl.adjournment.enabled}")
+    private boolean isAdjournmentEnabled; // TODO SSCS-10951
 
     private final ListAssistHearingMessageHelper listAssistHearingMessageHelper;
 
@@ -67,10 +69,17 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
 
-        if (isPostHearingsEnabled) {
+        if (isAdjournmentEnabled) {
             PanelMemberExclusions panelMemberExclusions = caseDataSnlFields.getPanelMemberExclusions();
-            updatePanelMemberValues(panelMemberExclusions.getExcludedPanelMembers());
-            updatePanelMemberValues(panelMemberExclusions.getReservedPanelMembers());
+
+            log.info("#21 panel member exclusions: {}", panelMemberExclusions);
+
+            panelMemberExclusions.setArePanelMembersReserved(YES);
+
+            if (nonNull(panelMemberExclusions)) {
+                updatePanelMemberValues(panelMemberExclusions.getExcludedPanelMembers());
+                updatePanelMemberValues(panelMemberExclusions.getReservedPanelMembers());
+            }
         }
 
         State state = callback.getCaseDetails().getState();
@@ -102,12 +111,17 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
         return callbackResponse;
     }
 
-    private void updatePanelMemberValues(List<CcdValue<JudicialUserBase>> panelMembers) {
-        for (CcdValue<JudicialUserBase> panelMember : panelMembers) {
+    private void updatePanelMemberValues(List<CollectionItem<JudicialUserBase>> panelMembers) {
+        for (CollectionItem<JudicialUserBase> panelMember : panelMembers) {
             String idamId = panelMember.getId();
-            JudicialUserBase judicialUserBase = panelMember.getValue();
 
             if (nonNull(idamId)) {
+                JudicialUserBase judicialUserBase = panelMember.getValue();
+
+                if (isNull(judicialUserBase)) {
+                    judicialUserBase = JudicialUserBase.builder().build();
+                }
+
                 judicialUserBase.setIdamId(idamId);
                 judicialUserBase.setPersonalCode(judicialRefDataService.getPersonalCode(idamId));
             }

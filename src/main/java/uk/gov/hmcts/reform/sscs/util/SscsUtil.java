@@ -61,9 +61,8 @@ public class SscsUtil {
     public static void setAdjournmentPanelMembersExclusions(PanelMemberExclusions exclusions,
                                            List<JudicialUserBase> adjournmentPanelMembers,
                                            AdjournCasePanelMembersExcluded panelMemberExcluded) {
-
         if (nonNull(adjournmentPanelMembers)) {
-            List<CcdValue<JudicialUserBase>> panelMembersList = getPanelMembersList(exclusions, panelMemberExcluded);
+            List<CollectionItem<JudicialUserBase>> panelMembersList = getPanelMembersList(exclusions, panelMemberExcluded);
 
 
             if (isNull(panelMembersList)) {
@@ -73,7 +72,7 @@ public class SscsUtil {
             panelMembersList.addAll(adjournmentPanelMembers.stream()
                 .filter(Objects::nonNull)
                 .distinct()
-                .map(CcdValue::new)
+                .map(panelMember -> new CollectionItem<>(panelMember.getIdamId(), panelMember))
                 .filter(not(panelMembersList::contains))
                 .collect(Collectors.toList()));
 
@@ -83,8 +82,7 @@ public class SscsUtil {
 
                 exclusions.setExcludedPanelMembers(panelMembersList);
                 exclusions.setArePanelMembersExcluded(YES);
-            }
-            if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.RESERVED)) {
+            } else if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.RESERVED)) {
                 log.info("Reserving {} panel members with Personal Codes {}", adjournmentPanelMembers.size(),
                     adjournmentPanelMembers.stream().map(JudicialUserBase::getPersonalCode).collect(Collectors.toList()));
 
@@ -94,7 +92,7 @@ public class SscsUtil {
         }
     }
 
-    private static List<CcdValue<JudicialUserBase>> getPanelMembersList(PanelMemberExclusions exclusions,
+    private static List<CollectionItem<JudicialUserBase>> getPanelMembersList(PanelMemberExclusions exclusions,
                                                                         AdjournCasePanelMembersExcluded panelMemberExcluded) {
         if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
             return exclusions.getExcludedPanelMembers();

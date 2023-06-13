@@ -136,6 +136,12 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         if (nonNull(panelMemberExcluded)) {
             PanelMemberExclusions panelMemberExclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
+
+            if (isNull(panelMemberExclusions)) {
+                panelMemberExclusions = PanelMemberExclusions.builder().build();
+                caseData.getSchedulingAndListingFields().setPanelMemberExclusions(panelMemberExclusions);
+            }
+
             SscsUtil.setAdjournmentPanelMembersExclusions(panelMemberExclusions, adjournment.getPanelMembers(), panelMemberExcluded);
         }
     }

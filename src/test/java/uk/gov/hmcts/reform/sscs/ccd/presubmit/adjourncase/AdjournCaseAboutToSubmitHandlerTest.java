@@ -205,8 +205,8 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
         ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
         sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
             .excludedPanelMembers(new ArrayList<>(Arrays.asList(
-                new CcdValue<>(JudicialUserBase.builder().idamId("1").build()),
-                new CcdValue<>(JudicialUserBase.builder().idamId("2").build())))).build());
+                new CollectionItem<>("1", JudicialUserBase.builder().idamId("1").build()),
+                new CollectionItem<>("2", JudicialUserBase.builder().idamId("2").build())))).build());
 
         sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
         sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
@@ -226,8 +226,8 @@ class AdjournCaseAboutToSubmitHandlerTest extends AdjournCaseAboutToSubmitHandle
     void givenNoExistingPanelMembersExcluded_thenAddPanelMembersToExclusionList() {
         ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
         sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
-        sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
-        sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().idamId("3").build());
+        sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().personalCode("4").idamId("1").build());
+        sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().personalCode("5").idamId("3").build());
         sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
         sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
 
