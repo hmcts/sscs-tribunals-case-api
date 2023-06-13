@@ -206,8 +206,8 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
         var schedulingAndListingFields = response.getData().getSchedulingAndListingFields();
         assertThat(schedulingAndListingFields).isNotNull();
         var overrideFields = schedulingAndListingFields.getOverrideFields();
-        var expectedDate = LocalDate.parse("2040-12-25").atStartOfDay();
-        assertThat(overrideFields.getHearingWindow().getFirstDateTimeMustBe()).isEqualTo(expectedDate);
+        var expectedDate = LocalDate.parse("2040-12-25");
+        assertThat(overrideFields.getHearingWindow().getDateRangeStart()).isEqualTo(expectedDate);
     }
 
     @Test
@@ -235,7 +235,7 @@ class AdjournCaseAboutToSubmitHandlerMainTest extends AdjournCaseAboutToSubmitHa
         var schedulingAndListingFields = response.getData().getSchedulingAndListingFields();
         assertThat(schedulingAndListingFields).isNotNull();
         var overrideFields = schedulingAndListingFields.getOverrideFields();
-        var expectedDate = LocalDate.now().plusDays(28).atStartOfDay();
-        assertThat(overrideFields.getHearingWindow().getFirstDateTimeMustBe()).isEqualTo(expectedDate);
+        var expectedDate = LocalDate.now().plusDays(28);
+        assertThat(overrideFields.getHearingWindow().getDateRangeStart()).isEqualTo(expectedDate);
     }
 }
