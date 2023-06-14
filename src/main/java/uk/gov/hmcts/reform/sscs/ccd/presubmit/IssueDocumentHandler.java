@@ -52,6 +52,7 @@ public class IssueDocumentHandler {
                                                      SscsCaseData caseData, String documentTypeLabel,
                                                      LocalDate dateAdded, LocalDate generatedDate,
                                                      boolean isScottish, boolean isPostHearingsEnabled,
+                                                     boolean isPostHearingsBEnabled,
                                                      String userAuthorisation) {
         NoticeIssuedTemplateBody formPayload = NoticeIssuedTemplateBody.builder()
                 .appellantFullName(buildFullName(caseData))
@@ -60,7 +61,7 @@ public class IssueDocumentHandler {
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
                 .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
                 .respondents(getRespondents(caseData))
-                .noticeBody(PdfRequestUtil.getNoticeBody(caseData, isPostHearingsEnabled))
+                .noticeBody(PdfRequestUtil.getNoticeBody(caseData, isPostHearingsEnabled, isPostHearingsBEnabled))
                 .userName(caseData.getDocumentGeneration().getSignedBy())
                 .noticeType(documentTypeLabel.toUpperCase())
                 .userRole(caseData.getDocumentGeneration().getSignedRole())
@@ -114,10 +115,10 @@ public class IssueDocumentHandler {
     }
 
     protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
-        return issueDocument(callback, documentType, templateId, generateFile, userAuthorisation, false);
+        return issueDocument(callback, documentType, templateId, generateFile, userAuthorisation, false, false);
     }
 
-    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation, boolean isPostHearingsEnabled) {
+    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation, boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
@@ -137,7 +138,7 @@ public class IssueDocumentHandler {
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        FormPayload formPayload = createPayload(response, caseData, embeddedDocumentTypeLabel, dateAdded, LocalDate.now(), isScottish, isPostHearingsEnabled, userAuthorisation);
+        FormPayload formPayload = createPayload(response, caseData, embeddedDocumentTypeLabel, dateAdded, LocalDate.now(), isScottish, isPostHearingsEnabled, isPostHearingsBEnabled, userAuthorisation);
 
         if (!response.getErrors().isEmpty()) {
             return response;
