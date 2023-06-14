@@ -46,7 +46,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new ActionFurtherEvidenceMidEventHandler(footerService, false);
+        handler = new ActionFurtherEvidenceMidEventHandler(footerService, false, false);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
         when(footerService.isReadablePdf(any())).thenReturn(PdfState.OK);
@@ -490,7 +490,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     @Parameters({"setAsideApplication", "correctionApplication","statementOfReasonsApplication",
         "libertyToApplyApplication", "permissionToAppealApplication"})
     public void givenAGapsCaseAndPostponementRequest_thenAddAnErrorToResponse(String doctype) {
-        handler = new ActionFurtherEvidenceMidEventHandler(footerService, true);
+        handler = new ActionFurtherEvidenceMidEventHandler(footerService, true, true);
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
         DynamicListItem issueEvidenceAction = new DynamicListItem(
             FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
@@ -517,7 +517,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
     @Test
     public void givenAGapsCaseAndNotPostponementRequest_thenDontAddErrorToResponse() {
-        handler = new ActionFurtherEvidenceMidEventHandler(footerService, true);
+        handler = new ActionFurtherEvidenceMidEventHandler(footerService, true, true);
         sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
         DynamicListItem issueEvidenceAction = new DynamicListItem(
             FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),

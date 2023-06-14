@@ -85,7 +85,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     public static void checkWarningsAndErrors(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, String caseId,
                                               boolean ignoreWarnings,
                                               PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
-                                              boolean isPostHearingsEnabled) {
+                                              boolean isPostHearingsEnabled,
+                                              boolean isPostHearingsBEnabled) {
 
         if (scannedDocument.getValue().getUrl() == null) {
             preSubmitCallbackResponse.addError("No document URL so could not process");
@@ -174,7 +175,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
         }
 
-        if (isPostHearingsEnabled && SscsUtil.isGapsCase(sscsCaseData) && isPostHearingRequest(sscsCaseData)) {
+        if (isPostHearingsEnabled && SscsUtil.isGapsCase(sscsCaseData) && isPostHearingRequest(sscsCaseData, isPostHearingsBEnabled)) {
             preSubmitCallbackResponse.addError("Cannot upload post hearing requests on GAPS cases");
         }
     }
@@ -219,8 +220,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
-            new PreSubmitCallbackResponse<>(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (!callback.isIgnoreWarnings()) {
             checkForWarnings(preSubmitCallbackResponse);
@@ -288,8 +288,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
         }
 
-        buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState(), callback.isIgnoreWarnings(),
-            preSubmitCallbackResponse, isPostHearingsEnabled);
+        buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState(), callback.isIgnoreWarnings(), preSubmitCallbackResponse);
 
         return preSubmitCallbackResponse;
     }
@@ -304,12 +303,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 && documentType.getValue().equals(doc.getValue().getType()));
     }
 
-    private static boolean isPostHearingRequest(SscsCaseData sscsCaseData) {
+    private static boolean isPostHearingRequest(SscsCaseData sscsCaseData, boolean isPostHearingsBEnabled) {
         return isSetAsideApplication(sscsCaseData)
             || isCorrectionApplication(sscsCaseData)
             || isStatementOfReasonsApplication(sscsCaseData)
-            || isLibertyToApplyApplication(sscsCaseData)
-            || isPermissionToApplyApplication(sscsCaseData);
+            || (isPostHearingsBEnabled && (isLibertyToApplyApplication(sscsCaseData)
+            || isPermissionToApplyApplication(sscsCaseData)));
     }
 
     private boolean isPostponementRequest(SscsCaseData sscsCaseData) {
@@ -421,15 +420,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void buildSscsDocumentFromScan(SscsCaseData sscsCaseData, State caseState, Boolean ignoreWarnings,
-                                           PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
-                                           boolean isPostHearingsEnabled) {
+                                           PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         List<String> documentsAddedThisEvent = new ArrayList<>();
         if (sscsCaseData.getScannedDocuments() != null) {
             for (ScannedDocument scannedDocument : sscsCaseData.getScannedDocuments()) {
                 if (scannedDocument != null && scannedDocument.getValue() != null) {
 
                     checkWarningsAndErrors(sscsCaseData, scannedDocument, sscsCaseData.getCcdCaseId(), ignoreWarnings,
-                        preSubmitCallbackResponse, isPostHearingsEnabled);
+                        preSubmitCallbackResponse, isPostHearingsEnabled, isPostHearingsBEnabled);
 
                     setCofidentialCaseFields(sscsCaseData, preSubmitCallbackResponse, scannedDocument);
 
