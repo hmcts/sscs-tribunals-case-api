@@ -26,23 +26,11 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ExtensionNextEvent;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
+import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
@@ -222,7 +210,16 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         return caseData;
     }
 
+    private boolean hasFtaBeenChosenAsOneOfThePartyMembers(SscsCaseData caseData) {
+        String confidentialityType = caseData.getConfidentialityType();
 
+        if (isNull(confidentialityType)
+            || ConfidentialityType.GENERAL.getCode().equalsIgnoreCase(confidentialityType)) {
+            return true;
+        }
+
+        return YesNo.isYes(caseData.getSendDirectionNoticeToFTA());
+    }
 
     private SscsCaseData updateCaseAfterReinstatementRefused(SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
 
@@ -314,7 +311,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             clearTransientFields(caseData);
 
-            if (shouldSetDwpState(caseData)) {
+            if (shouldSetDwpState(caseData) && hasFtaBeenChosenAsOneOfThePartyMembers(caseData)) {
                 caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED);
             }
 

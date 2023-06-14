@@ -118,7 +118,9 @@ class PostHearingRequestAboutToSubmitHandlerTest {
     @ParameterizedTest
     @EnumSource(value = PostHearingRequestType.class, names = {
         "SET_ASIDE",
-        "CORRECTION"
+        "CORRECTION",
+        "STATEMENT_OF_REASONS",
+        "LIBERTY_TO_APPLY"
     })
     void shouldReturnWithoutError_whenPreviewDocFilenameContainsRequestTypeDescriptionEn(PostHearingRequestType requestType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -137,7 +139,9 @@ class PostHearingRequestAboutToSubmitHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "SET_ASIDE,Set Aside Application from FTA.pdf,SET_ASIDE_APPLICATION",
-        "CORRECTION,Correction Application from FTA.pdf,CORRECTION_APPLICATION"
+        "CORRECTION,Correction Application from FTA.pdf,CORRECTION_APPLICATION",
+        "STATEMENT_OF_REASONS,Statement of Reasons Application from FTA.pdf,STATEMENT_OF_REASONS_APPLICATION",
+        "LIBERTY_TO_APPLY,Liberty to Apply Application from FTA.pdf,LIBERTY_TO_APPLY_APPLICATION",
     })
     void givenAPostHearingRequest_footerServiceIsCalledToCreateDocAndAddToBundle(
         PostHearingRequestType requestType,
@@ -166,7 +170,9 @@ class PostHearingRequestAboutToSubmitHandlerTest {
     @EnumSource(value = PostHearingRequestType.class,
         names = {
             "SET_ASIDE",
-            "CORRECTION"
+            "CORRECTION",
+            "STATEMENT_OF_REASONS",
+            "LIBERTY_TO_APPLY"
         })
     void givenPreviewDocumentIsNotAPostHearingDoc_andRequestFormatIsNotUpload_doesNotGenerateADocument(PostHearingRequestType requestType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -188,7 +194,9 @@ class PostHearingRequestAboutToSubmitHandlerTest {
     @EnumSource(value = PostHearingRequestType.class,
         names = {
             "SET_ASIDE",
-            "CORRECTION"
+            "CORRECTION",
+            "STATEMENT_OF_REASONS",
+            "LIBERTY_TO_APPLY"
         })
     void givenPreviewDocumentIsNull_andRequestFormatIsNotUpload_doesNotGenerateADocument(PostHearingRequestType requestType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -205,13 +213,21 @@ class PostHearingRequestAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = PostHearingRequestType.class,
-        names = {"SET_ASIDE"})
+        names = {
+            "SET_ASIDE",
+            "CORRECTION",
+            "STATEMENT_OF_REASONS",
+            "LIBERTY_TO_APPLY"
+        })
     void givenUploadedDocument_previewDocumentIsRenamedToExpectedPostHearingFormat(PostHearingRequestType postHearingRequestType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         caseData.getPostHearing().setRequestType(postHearingRequestType);
         caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.UPLOAD);
+        caseData.getPostHearing().getCorrection().setRequestFormat(RequestFormat.UPLOAD);
+        caseData.getPostHearing().getStatementOfReasons().setRequestFormat(RequestFormat.UPLOAD);
+        caseData.getPostHearing().getLibertyToApply().setRequestFormat(RequestFormat.UPLOAD);
         String dmUrl = "http://dm-store/documents/123";
         DocumentLink uploadedDocument = DocumentLink.builder()
             .documentFilename("A random filename.pdf")
