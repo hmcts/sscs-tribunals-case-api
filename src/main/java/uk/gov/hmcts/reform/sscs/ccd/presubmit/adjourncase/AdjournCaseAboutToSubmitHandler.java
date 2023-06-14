@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 
 import java.time.LocalDate;
@@ -39,7 +39,7 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
     private final VenueDataLoader venueDataLoader;
 
     @Value("${feature.snl.adjournment.enabled}")
-    private boolean isAdjournmentEnabled; // TODO SSCS-10951
+    private boolean isAdjournmentEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -99,35 +99,52 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         if (isAdjournmentEnabled) {
             updatePanelMembers(sscsCaseData);
-            updateHearingChannel(sscsCaseData);
+            updateHearingChannelAndWantsToAttend(sscsCaseData);
             updateOverrideFields(sscsCaseData);
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    public static void updateHearingChannel(SscsCaseData sscsCaseData) {
+    public void updateHearingChannelAndWantsToAttend(SscsCaseData sscsCaseData) {
+        AdjournCaseTypeOfHearing nextHearingType = sscsCaseData.getAdjournment().getTypeOfNextHearing();
+        if (nonNull(nextHearingType)) {
+            Appeal appeal = sscsCaseData.getAppeal();
+            HearingChannel hearingChannel = getNextHearingChannel(sscsCaseData);
 
-        if (sscsCaseData.getAdjournment().getTypeOfNextHearing() != null) {
-            log.info(String.format("Update the hearing channel %s", sscsCaseData.getAdjournment().getTypeOfNextHearing()));
-            final Hearing latestHearing = sscsCaseData.getLatestHearing();
-            if (latestHearing != null && latestHearing.getValue() != null) {
-                final HearingChannel hearingChannel = getNextHearingChannel(sscsCaseData);
+            if (isAdjournmentEnabled) {
+                String wantsToAttend = YES.toString();
+                String hearingType = uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue();
+
+                if (PAPER.equals(nextHearingType.getHearingChannel())) {
+                    wantsToAttend = NO.toString();
+                    hearingType = HearingType.PAPER.getValue();
+                }
+
+                log.info("Updating hearing type to {} and wants to attend to {}", hearingType, wantsToAttend);
+                appeal.getHearingOptions().setWantsToAttend(wantsToAttend);
+                appeal.setHearingType(hearingType);
+                sscsCaseData.getSchedulingAndListingFields().getOverrideFields().setAppellantHearingChannel(hearingChannel);
+            }
+
+            Hearing latestHearing = sscsCaseData.getLatestHearing();
+            if (nonNull(latestHearing) && nonNull(latestHearing.getValue())) {
                 latestHearing.getValue().setHearingChannel(hearingChannel);
+
                 if (hearingChannel.getValueTribunals().equalsIgnoreCase(PAPER.getValueTribunals())) {
-                    sscsCaseData.getAppeal().setHearingType(PAPER.getValueTribunals());
+                    appeal.setHearingType(PAPER.getValueTribunals());
                 } else {
-                    sscsCaseData.getAppeal().setHearingType("oral");
+                    appeal.setHearingType(uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue());
                 }
             }
         }
     }
 
-    private static HearingChannel getNextHearingChannel(SscsCaseData caseData) {
+    private HearingChannel getNextHearingChannel(SscsCaseData caseData) {
         return Arrays.stream(HearingChannel.values())
-                .filter(hearingChannel -> caseData.getAdjournment().getTypeOfNextHearing().getHearingChannel().getValueTribunals().equalsIgnoreCase(
-                        hearingChannel.getValueTribunals()))
-                .findFirst().orElse(HearingChannel.PAPER);
+            .filter(hearingChannel -> caseData.getAdjournment().getTypeOfNextHearing().getHearingChannel().getValueTribunals().equalsIgnoreCase(
+            hearingChannel.getValueTribunals()))
+            .findFirst().orElse(HearingChannel.PAPER);
     }
 
     private static void updatePanelMembers(SscsCaseData caseData) {
