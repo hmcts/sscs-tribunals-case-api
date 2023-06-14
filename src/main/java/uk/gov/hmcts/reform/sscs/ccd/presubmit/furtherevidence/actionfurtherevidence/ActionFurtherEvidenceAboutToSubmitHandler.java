@@ -304,8 +304,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private static boolean isPostHearingRequest(SscsCaseData sscsCaseData, boolean isPostHearingsBEnabled) {
-        boolean isPostHearingsBRequest = (isPostHearingsBEnabled
-            && (isLibertyToApplyApplication(sscsCaseData) || isPermissionToAppealApplication(sscsCaseData)));
+        boolean isPostHearingsBRequest = isPostHearingsBEnabled
+            && (isLibertyToApplyApplication(sscsCaseData) || isPermissionToAppealApplication(sscsCaseData));
 
         return isSetAsideApplication(sscsCaseData)
             || isCorrectionApplication(sscsCaseData)
