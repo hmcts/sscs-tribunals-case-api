@@ -71,11 +71,16 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
             return response;
         }
 
-        caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
-
-        handleSetAsideRefusedSor(caseData);
+        boolean isSetAsideRefusedSor = SET_ASIDE.equals(postHearing.getReviewType())
+            && isSetAsideRefusedSor(postHearing.getSetAside());
 
         SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
+
+        caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
+
+        if (isSetAsideRefusedSor) {
+            handleSetAsideRefusedSor(caseData);
+        }
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
@@ -83,7 +88,9 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
     private void handleSetAsideRefusedSor(SscsCaseData caseData) {
         PostHearing postHearing = caseData.getPostHearing();
 
-        if (SET_ASIDE.equals(postHearing.getReviewType()) && isSetAsideRefusedSor(postHearing.getSetAside())) {
+        boolean isSetAsideRefusedSor = SET_ASIDE.equals(postHearing.getReviewType()) && isSetAsideRefusedSor(postHearing.getSetAside());
+        if (isSetAsideRefusedSor) {
+
             ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
                 EventType.SOR_REQUEST.getCcdType(), "Send to hearing Judge for statement of reasons", "",
                 idamService.getIdamTokens());

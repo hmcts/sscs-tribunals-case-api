@@ -45,8 +45,6 @@ public class WriteStatementOfReasonsAboutToStartHandler implements PreSubmitCall
             return response;
         }
 
-        SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
-
         return response;
     }
 }
