@@ -31,6 +31,8 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
     private final UserDetailsService userDetailsService;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
+    @Value("${feature.postHearingsB.enabled}")
+    private final boolean isPostHearingsBEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -55,7 +57,7 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
 
         caseData.getDocumentStaging().setPreviewDocument(null);
 
-        if (PAGE_ID_GENERATE_NOTICE.equals(pageId) && isYes(PdfRequestUtil.getGenerateNotice(caseData, isPostHearingsEnabled))) {
+        if (PAGE_ID_GENERATE_NOTICE.equals(pageId) && isYes(PdfRequestUtil.getGenerateNotice(caseData, isPostHearingsEnabled, isPostHearingsBEnabled))) {
             log.info("Review Post Hearing App: Generating notice for caseId {}", caseId);
             String templateId = documentConfiguration.getDocuments()
                 .get(caseData.getLanguagePreference()).get(DECISION_ISSUED);
@@ -63,7 +65,7 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
             caseData.getDocumentGeneration().setSignedBy(userDetailsService.buildLoggedInUserName(userAuthorisation));
             caseData.getDocumentGeneration().setSignedRole(userDetailsService.getUserRole(userAuthorisation));
 
-            response = issueDocument(callback, DECISION_NOTICE, templateId, generateFile, userAuthorisation, isPostHearingsEnabled);
+            response = issueDocument(callback, DECISION_NOTICE, templateId, generateFile, userAuthorisation, isPostHearingsEnabled, isPostHearingsBEnabled);
         }
 
         return response;
