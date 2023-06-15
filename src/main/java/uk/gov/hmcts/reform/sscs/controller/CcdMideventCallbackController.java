@@ -101,7 +101,7 @@ public class CcdMideventCallbackController {
         }
 
         WriteFinalDecisionPreviewDecisionServiceBase writeFinalDecisionPreviewDecisionService = decisionNoticeService.getPreviewService(benefitType);
-        DocumentType docType = SscsUtil.getWriteFinalDecisionDocumentType(caseDetails, isPostHearingEnabled);
+        DocumentType docType = SscsUtil.getWriteFinalDecisionDocumentType(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress(), isPostHearingEnabled);
 
         return ok(writeFinalDecisionPreviewDecisionService.preview(callback, docType, userAuthorisation, false));
     }

@@ -58,7 +58,7 @@ public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
 
             WriteFinalDecisionPreviewDecisionServiceBase previewDecisionService = decisionNoticeService.getPreviewService(benefitType);
             previewDecisionService.preview(callback,
-                SscsUtil.getIssueFinalDecisionDocumentType(previewDocument.getDocumentFilename(), isPostHearingEnabled),
+                SscsUtil.getIssueFinalDecisionDocumentType(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress(), isPostHearingEnabled),
                 userAuthorisation, true);
         } else {
             response.addError("No draft final decision notice found on case. Please use 'Write final decision' event before trying to issue.");

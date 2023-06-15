@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 class SscsUtilTest {
     public static final String UNEXPECTED_POST_HEARING_REVIEW_TYPE_AND_ACTION = "getting the document type has an unexpected postHearingReviewType and action";
@@ -119,7 +120,7 @@ class SscsUtilTest {
     @Test
     void givenPostHearingsFlagIsTrueAndStateIsPostHearing_shouldReturnDraftCorrectionGranted() {
         when(caseDetails.getState()).thenReturn(State.POST_HEARING);
-        assertThat(getWriteFinalDecisionDocumentType(caseDetails, true)).isEqualTo(DRAFT_CORRECTED_NOTICE);
+        assertThat(getWriteFinalDecisionDocumentType(YesNo.YES, true)).isEqualTo(DRAFT_CORRECTED_NOTICE);
     }
 
     @Test
@@ -137,12 +138,12 @@ class SscsUtilTest {
     @Test
     void givenPostHearingsFlagIsFalseAndStateIsPostHearing_shouldReturnDraftDecisionNotice() {
         when(caseDetails.getState()).thenReturn(State.POST_HEARING);
-        assertThat(getWriteFinalDecisionDocumentType(caseDetails, false)).isEqualTo(DRAFT_DECISION_NOTICE);
+        assertThat(getWriteFinalDecisionDocumentType(YesNo.YES, false)).isEqualTo(DRAFT_DECISION_NOTICE);
     }
 
     @Test
     void givenPostHearingsFlagIsTrueAndDraftCorrectionNoticeHasBeenGenerated_shouldReturnCorrectionGranted() {
-        assertThat(getIssueFinalDecisionDocumentType(DRAFT_CORRECTED_NOTICE.getLabel(), true)).isEqualTo(CORRECTION_GRANTED);
+        assertThat(getIssueFinalDecisionDocumentType(YesNo.YES, true)).isEqualTo(CORRECTION_GRANTED);
     }
 
     @Test
@@ -157,6 +158,6 @@ class SscsUtilTest {
 
     @Test
     void givenPostHearingsFlagIsFalseAndCorrectionNoticeHasBeenGenerated_shouldReturnFinalDecisionNotice() {
-        assertThat(getIssueFinalDecisionDocumentType("Corrected Final Decision Notice", false)).isEqualTo(FINAL_DECISION_NOTICE);
+        assertThat(getIssueFinalDecisionDocumentType(YesNo.YES, false)).isEqualTo(FINAL_DECISION_NOTICE);
     }
 }

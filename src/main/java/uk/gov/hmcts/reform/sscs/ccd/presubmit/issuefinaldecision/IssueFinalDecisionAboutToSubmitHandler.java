@@ -164,7 +164,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             .build();
 
         String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        DocumentType docType = SscsUtil.getIssueFinalDecisionDocumentType(docLink.getDocumentFilename(), isPostHearingEnabled);
+        DocumentType docType = SscsUtil.getIssueFinalDecisionDocumentType(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress(), isPostHearingEnabled);
 
         final SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelsh() ? TRANSLATION_REQUIRED : null;
         footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, docType, now, null, null, documentTranslationStatus);
