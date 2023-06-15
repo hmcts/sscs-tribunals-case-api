@@ -29,6 +29,8 @@ java:
     CASE_ACCESS_MANAGEMENT_FEATURE: true
     WORK_ALLOCATION_FEATURE: true
     SCHEDULE_LISTING_FEATURE: true
+    POST_HEARINGS_FEATURE: true
+    POST_HEARINGS_B_FEATURE: true
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -484,7 +486,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-10468-1nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-11548-10
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:

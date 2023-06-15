@@ -72,12 +72,12 @@ public class CitizenCcdClient {
         String searchCriteria = "\"query\" : {\n"
                 + "        \"match_all\" : {}\n"
                 + "    }";
-        return  coreCaseDataApi.searchCases(
+        SearchResult searchResult = coreCaseDataApi.searchCases(
                 idamTokens.getIdamOauth2Token(),
                 idamTokens.getServiceAuthorization(),
                 ccdRequestDetails.getCaseTypeId(),
-                searchCriteria).getCases();
-
+                searchCriteria);
+        return Optional.ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
     }
 
     CaseDetails submitEventForCitizen(IdamTokens idamTokens, String caseId, CaseDataContent caseDataContent) {
