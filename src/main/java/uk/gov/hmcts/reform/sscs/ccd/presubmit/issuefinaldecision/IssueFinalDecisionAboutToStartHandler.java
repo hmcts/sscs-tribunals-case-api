@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -56,10 +57,10 @@ public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
                 response.addError("Unexpected error - benefit type is null");
             }
 
+            DocumentType docType = SscsUtil.getIssueFinalDecisionDocumentType(sscsCaseData, isPostHearingEnabled);
+
             WriteFinalDecisionPreviewDecisionServiceBase previewDecisionService = decisionNoticeService.getPreviewService(benefitType);
-            previewDecisionService.preview(callback,
-                SscsUtil.getIssueFinalDecisionDocumentType(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress(), isPostHearingEnabled),
-                userAuthorisation, true);
+            previewDecisionService.preview(callback, docType, userAuthorisation, true);
         } else {
             response.addError("No draft final decision notice found on case. Please use 'Write final decision' event before trying to issue.");
         }

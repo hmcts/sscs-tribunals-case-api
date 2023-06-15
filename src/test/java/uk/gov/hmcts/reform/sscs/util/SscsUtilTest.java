@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
@@ -17,28 +16,32 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Correction;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 class SscsUtilTest {
     public static final String UNEXPECTED_POST_HEARING_REVIEW_TYPE_AND_ACTION = "getting the document type has an unexpected postHearingReviewType and action";
     private PostHearing postHearing;
-    @Mock
-    private CaseDetails<SscsCaseData> caseDetails;
+    private SscsCaseData caseData;
 
     @BeforeEach
     void setUp() {
         openMocks(this);
-        postHearing = new PostHearing();
+        postHearing = PostHearing.builder()
+            .correction(Correction.builder()
+                .correctionFinalDecisionInProgress(YesNo.NO)
+                .build())
+            .build();
+
+        caseData = new SscsCaseData();
+        caseData.setPostHearing(postHearing);
     }
 
     @Test
@@ -118,46 +121,36 @@ class SscsUtilTest {
     }
 
     @Test
-    void givenPostHearingsFlagIsTrueAndStateIsPostHearing_shouldReturnDraftCorrectionGranted() {
-        when(caseDetails.getState()).thenReturn(State.POST_HEARING);
-        assertThat(getWriteFinalDecisionDocumentType(YesNo.YES, true)).isEqualTo(DRAFT_CORRECTED_NOTICE);
+    void givenPostHearingsFlagIsTrueAndCorrectionNotInProgress_shouldReturnDraftDecisionNotice() {
+        assertThat(getWriteFinalDecisionDocumentType(caseData, true)).isEqualTo(DRAFT_DECISION_NOTICE);
     }
 
     @Test
-    void givenPostHearingsFlagIsTrueAndStateIsDormant_shouldReturnDraftCorrectionGranted() {
-        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
-        assertThat(getWriteFinalDecisionDocumentType(caseDetails, true)).isEqualTo(DRAFT_CORRECTED_NOTICE);
+    void givenPostHearingsFlagIsTrueAndCorrectionInProgress_shouldReturnDraftCorrectedDecisionNotice() {
+        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
+        assertThat(getWriteFinalDecisionDocumentType(caseData, true)).isEqualTo(DRAFT_CORRECTED_NOTICE);
     }
 
     @Test
-    void givenPostHearingsFlagIsTrueAndStateIsHearing_shouldReturnDraftCorrectionGranted() {
-        when(caseDetails.getState()).thenReturn(State.HEARING);
-        assertThat(getWriteFinalDecisionDocumentType(caseDetails, true)).isEqualTo(DRAFT_DECISION_NOTICE);
+    void givenPostHearingsFlagIsFalseAndCorrectionInProgress_shouldReturnDraftDecisionNotice() {
+        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
+        assertThat(getWriteFinalDecisionDocumentType(caseData, false)).isEqualTo(DRAFT_DECISION_NOTICE);
     }
 
     @Test
-    void givenPostHearingsFlagIsFalseAndStateIsPostHearing_shouldReturnDraftDecisionNotice() {
-        when(caseDetails.getState()).thenReturn(State.POST_HEARING);
-        assertThat(getWriteFinalDecisionDocumentType(YesNo.YES, false)).isEqualTo(DRAFT_DECISION_NOTICE);
+    void givenPostHearingsFlagIsTrueAndCorrectionInProgress_shouldReturnCorrectionGranted() {
+        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
+        assertThat(getIssueFinalDecisionDocumentType(caseData, true)).isEqualTo(CORRECTION_GRANTED);
     }
 
     @Test
-    void givenPostHearingsFlagIsTrueAndDraftCorrectionNoticeHasBeenGenerated_shouldReturnCorrectionGranted() {
-        assertThat(getIssueFinalDecisionDocumentType(YesNo.YES, true)).isEqualTo(CORRECTION_GRANTED);
+    void givenPostHearingsFlagIsTrueAndCorrectionNotInProgress_shouldReturnFinalDecisionNotice() {
+        assertThat(getIssueFinalDecisionDocumentType(caseData, true)).isEqualTo(FINAL_DECISION_NOTICE);
     }
 
     @Test
-    void givenPostHearingsFlagIsTrueAndCorrectionNoticeHasBeenGenerated_shouldReturnCorrectionGranted() {
-        assertThat(getIssueFinalDecisionDocumentType(CORRECTION_GRANTED.getLabel(), true)).isEqualTo(CORRECTION_GRANTED);
-    }
-
-    @Test
-    void givenPostHearingsFlagIsTrueAndDecisionNoticeHasBeenGenerated_shouldReturnFinalDecisionNotice() {
-        assertThat(getIssueFinalDecisionDocumentType(FINAL_DECISION_NOTICE.getLabel(), true)).isEqualTo(FINAL_DECISION_NOTICE);
-    }
-
-    @Test
-    void givenPostHearingsFlagIsFalseAndCorrectionNoticeHasBeenGenerated_shouldReturnFinalDecisionNotice() {
-        assertThat(getIssueFinalDecisionDocumentType(YesNo.YES, false)).isEqualTo(FINAL_DECISION_NOTICE);
+    void givenPostHearingsFlagIsFalseAndCorrectionInProgress_shouldReturnFinalDecisionNotice() {
+        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
+        assertThat(getIssueFinalDecisionDocumentType(caseData, false)).isEqualTo(FINAL_DECISION_NOTICE);
     }
 }

@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 
 public class IssueFinalDecisionSubmittedHandlerTest {
@@ -62,6 +63,7 @@ public class IssueFinalDecisionSubmittedHandlerTest {
 
     @Test
     void givenCaseReadyForPostHearings_thenGrantCorrection() {
+        sscsCaseData.getPostHearing().getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
         when(ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, sscsCaseData)).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 

@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -137,16 +136,19 @@ public class SscsUtil {
         }
     }
 
-    public static DocumentType getWriteFinalDecisionDocumentType(YesNo correctionFinalDecisionInProgress, boolean isPostHearingsEnabled) {
-        if (isPostHearingsEnabled && isYes(correctionFinalDecisionInProgress)) {
+    public static DocumentType getWriteFinalDecisionDocumentType(SscsCaseData caseData, boolean isPostHearingsEnabled) {
+        if (isPostHearingsEnabled
+            && isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
             return DocumentType.DRAFT_CORRECTED_NOTICE;
         }
 
         return DocumentType.DRAFT_DECISION_NOTICE;
     }
 
-    public static DocumentType getIssueFinalDecisionDocumentType(YesNo correctionFinalDecisionInProgress, boolean isPostHearingsEnabled) {
-        if (isPostHearingsEnabled && isYes(correctionFinalDecisionInProgress)) {
+    public static DocumentType getIssueFinalDecisionDocumentType(SscsCaseData caseData, boolean isPostHearingsEnabled) {
+        System.out.println(caseData.getPostHearing());
+        if (isPostHearingsEnabled
+            && isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
             return DocumentType.CORRECTION_GRANTED;
         }
 
