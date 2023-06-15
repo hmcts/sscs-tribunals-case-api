@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.config;
 
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.isNull;
