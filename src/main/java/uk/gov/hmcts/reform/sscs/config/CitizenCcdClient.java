@@ -10,10 +10,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessApi;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.ccd.client.model.UserId;
+import uk.gov.hmcts.reform.ccd.client.model.*;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -62,13 +59,12 @@ public class CitizenCcdClient {
         log.info("Searching cases for citizen");
         String searchCriteria;
         searchCriteria = buildQuery("state", State.DRAFT.getId());
-        Optional<List<CaseDetails>> cases = Optional.ofNullable(coreCaseDataApi.searchCases(
+        SearchResult searchResult = coreCaseDataApi.searchCases(
                 idamTokens.getIdamOauth2Token(),
                 idamTokens.getServiceAuthorization(),
                 ccdRequestDetails.getCaseTypeId(),
-                searchCriteria).getCases());
-
-        return cases.orElseGet(ArrayList::new);
+                searchCriteria);
+        return Optional.ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
 
     }
 

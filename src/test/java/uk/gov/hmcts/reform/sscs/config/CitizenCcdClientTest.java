@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.config;
 
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.isNull;
 import static org.mockito.Mockito.verify;
@@ -72,7 +73,7 @@ public class CitizenCcdClientTest {
         citizenCcdClient.searchForCitizen(idamTokens);
 
         verify(coreCaseDataApi)
-                .searchForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit"), anyMap());
+                .searchCases(eq("token"), eq("s2s"), eq("Benefit"), anyString());
 
     }
 }
