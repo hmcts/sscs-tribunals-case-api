@@ -65,7 +65,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new WriteStatementOfReasonsMidEventHandler(documentConfiguration, generateFile, userDetailsService, true);
+        handler = new WriteStatementOfReasonsMidEventHandler(documentConfiguration, generateFile, userDetailsService, true, true);
 
         caseData = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
@@ -102,7 +102,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new WriteStatementOfReasonsMidEventHandler(documentConfiguration, generateFile, userDetailsService, false);
+        handler = new WriteStatementOfReasonsMidEventHandler(documentConfiguration, generateFile, userDetailsService, false, false);
         when(callback.getEvent()).thenReturn(SOR_WRITE);
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }

@@ -30,6 +30,9 @@ public class WriteStatementOfReasonsMidEventHandler extends IssueDocumentHandler
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
+    @Value("${feature.postHearingsB.enabled}")
+    private final boolean isPostHearingsBEnabled;
+
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -60,7 +63,7 @@ public class WriteStatementOfReasonsMidEventHandler extends IssueDocumentHandler
 
             caseData.getDocumentGeneration().setSignedBy(userDetailsService.buildLoggedInUserName(userAuthorisation));
             caseData.getDocumentGeneration().setSignedRole(userDetailsService.getUserRole(userAuthorisation));
-            response = issueDocument(callback, STATEMENT_OF_REASONS, templateId, generateFile, userAuthorisation, isPostHearingsEnabled);
+            response = issueDocument(callback, STATEMENT_OF_REASONS, templateId, generateFile, userAuthorisation, isPostHearingsEnabled, isPostHearingsBEnabled);
         }
 
         return response;
