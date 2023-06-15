@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
 import java.util.*;
 import lombok.AllArgsConstructor;
@@ -13,10 +13,12 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+
 @Component
 @Slf4j
 @AllArgsConstructor
-class WriteFinalDecisionSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final CcdCallbackMapService ccdCallbackMapService;
     @Value("${feature.postHearings.enabled}")
     private boolean isPostHearingEnabled;
@@ -24,7 +26,7 @@ class WriteFinalDecisionSubmittedHandler implements PreSubmitCallbackHandler<Ssc
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.SUBMITTED
-            && callback.getEvent() == EventType.WRITE_FINAL_DECISION
+            && callback.getEvent() == EventType.ISSUE_FINAL_DECISION
             && Objects.nonNull(callback.getCaseDetails())
             && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
@@ -38,7 +40,9 @@ class WriteFinalDecisionSubmittedHandler implements PreSubmitCallbackHandler<Ssc
 
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
-        if (SscsUtil.isReadyForPostHearings(caseDetails, isPostHearingEnabled)) {
+        Correction correction = sscsCaseData.getPostHearing().getCorrection();
+        if (isPostHearingEnabled && isYes(correction.getCorrectionFinalDecisionInProgress())) {
+            correction.setCorrectionFinalDecisionInProgress(YesNo.NO);
             sscsCaseData = ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, sscsCaseData);
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);

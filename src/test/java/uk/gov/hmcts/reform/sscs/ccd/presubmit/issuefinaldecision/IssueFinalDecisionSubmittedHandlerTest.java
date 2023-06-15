@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 
-public class WriteFinalDecisionSubmittedHandlerTest {
+public class IssueFinalDecisionSubmittedHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private SscsCaseData sscsCaseData;
     @Mock
@@ -30,19 +30,19 @@ public class WriteFinalDecisionSubmittedHandlerTest {
     private Callback<SscsCaseData> callback;
     @Mock
     private CcdCallbackMapService ccdCallbackMapService;
-    private WriteFinalDecisionSubmittedHandler handler;
+    private IssueFinalDecisionSubmittedHandler handler;
 
     @BeforeEach
     public void setUp() {
         openMocks(this);
 
-        handler = new WriteFinalDecisionSubmittedHandler(ccdCallbackMapService, true);
+        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, true);
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
             .state(State.POST_HEARING).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(caseDetails.getState()).thenReturn(State.POST_HEARING);
-        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
+        when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
     }
 
@@ -55,7 +55,7 @@ public class WriteFinalDecisionSubmittedHandlerTest {
     }
 
     @Test
-    void givenANonWriteFinalDecisionCaseEvent_thenReturnFalse() {
+    void givenANonIssueFinalDecisionCaseEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
@@ -71,7 +71,7 @@ public class WriteFinalDecisionSubmittedHandlerTest {
 
     @Test
     void givenCaseReadyForPostHearingsAndFlagIsFalse_thenDontGrantCorrection() {
-        handler = new WriteFinalDecisionSubmittedHandler(ccdCallbackMapService, false);
+        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, false);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         verify(ccdCallbackMapService, times(0)).handleCcdCallbackMap(CorrectionActions.GRANT, sscsCaseData);

@@ -4,6 +4,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -97,7 +98,8 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         clearTransientFields(preSubmitCallbackResponse);
 
         if ((!(State.READY_TO_LIST.equals(sscsCaseData.getState())
-            || State.WITH_DWP.equals(sscsCaseData.getState()))) && !SscsUtil.isReadyForPostHearings(callback.getCaseDetails(), isPostHearingEnabled)) {
+            || State.WITH_DWP.equals(sscsCaseData.getState())))
+            && (isPostHearingEnabled && isNoOrNull(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress()))) {
             sscsCaseData.setDwpState(FINAL_DECISION_ISSUED);
             sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         }

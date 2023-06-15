@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -136,24 +137,16 @@ public class SscsUtil {
         }
     }
 
-    public static boolean isReadyForPostHearings(CaseDetails<SscsCaseData> caseDetails, boolean isPostHearingsEnabled) {
-        State currentState = caseDetails.getState();
-        return isPostHearingsEnabled
-            && (State.DORMANT_APPEAL_STATE.equals(currentState) || State.POST_HEARING.equals(currentState));
-    }
-
-    public static DocumentType getWriteFinalDecisionDocumentType(CaseDetails<SscsCaseData> caseDetails, boolean isPostHearingsEnabled) {
-        if (SscsUtil.isReadyForPostHearings(caseDetails, isPostHearingsEnabled)) {
+    public static DocumentType getWriteFinalDecisionDocumentType(YesNo correctionFinalDecisionInProgress, boolean isPostHearingsEnabled) {
+        if (isPostHearingsEnabled && isYes(correctionFinalDecisionInProgress)) {
             return DocumentType.DRAFT_CORRECTED_NOTICE;
         }
 
         return DocumentType.DRAFT_DECISION_NOTICE;
     }
 
-    public static DocumentType getIssueFinalDecisionDocumentType(String documentFilename, boolean isPostHearingsEnabled) {
-        if (isPostHearingsEnabled
-            && (documentFilename.contains(DocumentType.DRAFT_CORRECTED_NOTICE.getLabel())
-            || documentFilename.contains(DocumentType.CORRECTION_GRANTED.getLabel()))) {
+    public static DocumentType getIssueFinalDecisionDocumentType(YesNo correctionFinalDecisionInProgress, boolean isPostHearingsEnabled) {
+        if (isPostHearingsEnabled && isYes(correctionFinalDecisionInProgress)) {
             return DocumentType.CORRECTION_GRANTED;
         }
 
