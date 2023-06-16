@@ -120,7 +120,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             updateRpc(sscsCaseData);
             updatePanelMembers(sscsCaseData);
             updateOverrideFields(sscsCaseData);
-            updateHearingChannelAndWantsToAttend(sscsCaseData);
 
             if (SscsUtil.isSAndLCase(sscsCaseData)
                 && (isYes(adjournment.getCanCaseBeListedRightAway()))) {
@@ -235,9 +234,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             caseData.getSchedulingAndListingFields().setOverrideFields(fields);
         }
 
-        if (nonNull(adjournment.getTypeOfNextHearing())) {
-            fields.setAppellantHearingChannel(adjournment.getTypeOfNextHearing().getHearingChannel());
-        }
+        updateHearingChannelAndWantsToAttend(caseData);
 
         var nextHearingVenueSelected = adjournment.getNextHearingVenueSelected();
 
@@ -265,35 +262,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         }
 
         handleHearingWindow(caseData, fields);
-    }
-
-    private Integer handleNonStandardDuration(SscsCaseData caseData, Integer duration) {
-        AdjournCaseNextHearingDurationUnits units = caseData.getAdjournment().getNextHearingListingDurationUnits();
-        if (units == AdjournCaseNextHearingDurationUnits.SESSIONS && duration >= MIN_HEARING_SESSION_DURATION) {
-            return duration * DURATION_SESSIONS_MULTIPLIER;
-        } else if (units == AdjournCaseNextHearingDurationUnits.MINUTES && duration >= MIN_HEARING_DURATION) {
-            return duration;
-        }
-        return DURATION_DEFAULT;
-    }
-
-    private void handleHearingWindow(SscsCaseData caseData, OverrideFields overrideFields) {
-        HearingWindow hearingWindow = overrideFields.getHearingWindow();
-        Adjournment adjournment = caseData.getAdjournment();
-
-        if (hearingWindow == null) {
-            hearingWindow = HearingWindow.builder().build();
-            overrideFields.setHearingWindow(hearingWindow);
-        }
-
-        if (AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER.equals(adjournment.getNextHearingDateType())) {
-            if (AdjournCaseNextHearingDateOrPeriod.PROVIDE_DATE.equals(adjournment.getNextHearingDateOrPeriod())) {
-                hearingWindow.setDateRangeStart(adjournment.getNextHearingFirstAvailableDateAfterDate().plusDays(1));
-            } else if (AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD.equals(adjournment.getNextHearingDateOrPeriod())) {
-                long after = Long.parseLong(adjournment.getNextHearingFirstAvailableDateAfterPeriod().toString());
-                hearingWindow.setDateRangeStart(LocalDate.now().plusDays(after));
-            }
-        }
     }
 
     private void updateHearingChannelAndWantsToAttend(SscsCaseData sscsCaseData) {
@@ -327,6 +295,35 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
                 } else {
                     appeal.setHearingType(uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue());
                 }
+            }
+        }
+    }
+
+    private Integer handleNonStandardDuration(SscsCaseData caseData, Integer duration) {
+        AdjournCaseNextHearingDurationUnits units = caseData.getAdjournment().getNextHearingListingDurationUnits();
+        if (units == AdjournCaseNextHearingDurationUnits.SESSIONS && duration >= MIN_HEARING_SESSION_DURATION) {
+            return duration * DURATION_SESSIONS_MULTIPLIER;
+        } else if (units == AdjournCaseNextHearingDurationUnits.MINUTES && duration >= MIN_HEARING_DURATION) {
+            return duration;
+        }
+        return DURATION_DEFAULT;
+    }
+
+    private void handleHearingWindow(SscsCaseData caseData, OverrideFields overrideFields) {
+        HearingWindow hearingWindow = overrideFields.getHearingWindow();
+        Adjournment adjournment = caseData.getAdjournment();
+
+        if (hearingWindow == null) {
+            hearingWindow = HearingWindow.builder().build();
+            overrideFields.setHearingWindow(hearingWindow);
+        }
+
+        if (AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER.equals(adjournment.getNextHearingDateType())) {
+            if (AdjournCaseNextHearingDateOrPeriod.PROVIDE_DATE.equals(adjournment.getNextHearingDateOrPeriod())) {
+                hearingWindow.setDateRangeStart(adjournment.getNextHearingFirstAvailableDateAfterDate().plusDays(1));
+            } else if (AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD.equals(adjournment.getNextHearingDateOrPeriod())) {
+                long after = Long.parseLong(adjournment.getNextHearingFirstAvailableDateAfterPeriod().toString());
+                hearingWindow.setDateRangeStart(LocalDate.now().plusDays(after));
             }
         }
     }
