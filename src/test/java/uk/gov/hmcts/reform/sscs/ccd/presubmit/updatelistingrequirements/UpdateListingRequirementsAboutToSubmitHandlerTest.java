@@ -11,7 +11,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,12 +25,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -39,7 +36,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
-import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 
 @ExtendWith(MockitoExtension.class)
 class UpdateListingRequirementsAboutToSubmitHandlerTest {
@@ -50,8 +46,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     private Callback<SscsCaseData> callback;
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-    @Mock
-    private JudicialRefDataService judicialRefDataService;
     @Mock
     private ListAssistHearingMessageHelper listAssistHearingMessageHelper;
     @InjectMocks
@@ -237,98 +231,4 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         JudicialUserBase result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge();
         assertThat(result).isNull();
     }
-
-    @Test
-    void givenPanelMembersAreExcluded_updateTheirValues() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-
-        String personalCode = "1";
-        String idamId = "2";
-        given(judicialRefDataService.getPersonalCode(idamId)).willReturn(personalCode);
-
-        sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
-            .arePanelMembersExcluded(YES).excludedPanelMembers(List.of(new CollectionItem<>(idamId, null))).build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-        List<CollectionItem<JudicialUserBase>> result = response.getData().getSchedulingAndListingFields().getPanelMemberExclusions().getExcludedPanelMembers();
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(new CollectionItem<>(idamId, JudicialUserBase.builder().idamId(idamId).personalCode(personalCode).build()));
-    }
-
-    @Test
-    void givenPanelMembersAreReserved_updateTheirValues() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-
-        String personalCode = "1";
-        String idamId = "2";
-        given(judicialRefDataService.getPersonalCode(idamId)).willReturn(personalCode);
-
-        sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
-            .arePanelMembersReserved(YES).reservedPanelMembers(List.of(new CollectionItem<>(idamId, null))).build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-        List<CollectionItem<JudicialUserBase>> result = response.getData().getSchedulingAndListingFields().getPanelMemberExclusions().getReservedPanelMembers();
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0)).isEqualTo(new CollectionItem<>(idamId, JudicialUserBase.builder().idamId(idamId).personalCode(personalCode).build()));
-    }
-
-    @Test
-    void givenPanelMembersAreExcludedButNoValuesInList_updateTheirValues() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-        PanelMemberExclusions result = response.getData().getSchedulingAndListingFields().getPanelMemberExclusions();
-        assertThat(result).isNull();
-    }
-
-    @Test
-    void givenPanelMembersAreExcludedButNoIdamId_dontUpdateTheirValues() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-
-        List<CollectionItem<JudicialUserBase>> excludedPanelMembers = List.of(new CollectionItem<>("", JudicialUserBase.builder().build()), new CollectionItem<>("", JudicialUserBase.builder().build()));
-
-        sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
-            .arePanelMembersExcluded(YES).excludedPanelMembers(excludedPanelMembers).build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-            ABOUT_TO_SUBMIT,
-            callback,
-            USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-        List<CollectionItem<JudicialUserBase>> result = response.getData().getSchedulingAndListingFields().getPanelMemberExclusions().getExcludedPanelMembers();
-        assertThat(result).hasSize(2).isEqualTo(excludedPanelMembers);
-    }
-
 }

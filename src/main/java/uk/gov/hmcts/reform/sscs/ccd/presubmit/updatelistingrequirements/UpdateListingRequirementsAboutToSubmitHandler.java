@@ -2,12 +2,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatelistingrequirements;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static org.apache.logging.log4j.util.Strings.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,19 +16,13 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
-import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
-import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
-    private final JudicialRefDataService judicialRefDataService;
     @Value("${feature.gaps-switchover.enabled}")
     private boolean gapsSwitchOverFeature;
-    @Value("${feature.snl.adjournment.enabled}")
-    private boolean isAdjournmentEnabled; // TODO SSCS-10951
 
     private final ListAssistHearingMessageHelper listAssistHearingMessageHelper;
 
@@ -68,17 +60,6 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
 
-        if (isAdjournmentEnabled) {
-            PanelMemberExclusions panelMemberExclusions = caseDataSnlFields.getPanelMemberExclusions();
-
-            if (nonNull(panelMemberExclusions)) {
-                log.info("#21 panel member exclusions: {}", panelMemberExclusions);
-
-                updatePanelMemberValues(panelMemberExclusions.getExcludedPanelMembers());
-                updatePanelMemberValues(panelMemberExclusions.getReservedPanelMembers());
-            }
-        }
-
         State state = callback.getCaseDetails().getState();
         HearingRoute hearingRoute = caseDataSnlFields.getHearingRoute();
         if (gapsSwitchOverFeature
@@ -106,21 +87,5 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
         return callbackResponse;
-    }
-
-    private void updatePanelMemberValues(List<CollectionItem<JudicialUserBase>> panelMembers) {
-        if (nonNull(panelMembers)) {
-            for (CollectionItem<JudicialUserBase> panelMember : panelMembers) {
-                String idamId = panelMember.getId();
-
-                if (isNotEmpty(idamId)) {
-                    JudicialUserBase judicialUserBase = JudicialUserBase.builder()
-                        .idamId(idamId)
-                        .personalCode(judicialRefDataService.getPersonalCode(idamId)).build();
-
-                    panelMember.setValue(judicialUserBase);
-                }
-            }
-        }
     }
 }

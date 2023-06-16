@@ -16,20 +16,44 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PanelMemberExclusions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 
 class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
 
@@ -200,6 +224,299 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         verifyNoInteractions(hearingMessageHelper);
 
         assertThat(response.getErrors()).isEmpty();
+    }
+
+    @DisplayName("Given an adjournment event with language interpreter required and case has existing interpreter, "
+        + "then overwrite existing interpreter in hearing options")
+    @Test
+    void givenAdjournmentEventWithLanguageInterpreterRequiredAndCaseHasExistingInterpreter_overwriteExistingInterpreter() {
+        sscsCaseData.getAdjournment().setInterpreterRequired(YES);
+        sscsCaseData.getAdjournment().setInterpreterLanguage(new DynamicList(SPANISH));
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
+            .languageInterpreter(NO.getValue())
+            .languages("French")
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(YES.getValue());
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(SPANISH);
+    }
+
+    @DisplayName("Given an adjournment event with language interpreter required and interpreter language set, "
+        + "then do not display error")
+    @Test
+    void givenAdjournmentEventWithLanguageInterpreterRequiredAndLanguageSet_thenDoNotDisplayError() {
+        sscsCaseData.getAdjournment().setInterpreterRequired(YES);
+        sscsCaseData.getAdjournment().setInterpreterLanguage(new DynamicList(SPANISH));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo(YES.getValue());
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo(SPANISH);
+    }
+
+    @DisplayName("When we have changed the next hearing venue through an adjournment, show we change the region")
+    @Test
+    void givenAdjournCaseNextHearingVenueSelectedTrue_thenSetRegion() {
+        String venueId = "185";
+
+        RegionalProcessingCenter rpc = getRegionalProcessingCenter();
+        String postcode = rpc.getPostcode();
+        String processingVenue = "cardiff";
+
+        BenefitType benefitType = BenefitType.builder().code("PIP").build();
+
+        when(airLookupService.lookupAirVenueNameByPostCode(postcode, benefitType)).thenReturn(processingVenue);
+        when(regionalProcessingCenterService.getByVenueId(venueId)).thenReturn(rpc);
+
+        DynamicListItem venue = new DynamicListItem(venueId, null);
+        DynamicList adjournedNextVenue = new DynamicList(venue, null);
+
+        String originalRegion = "SUTTON";
+        String originalProcessingVenue = "Staines";
+
+        sscsCaseData.getAdjournment().setNextHearingVenueSelected(adjournedNextVenue);
+        sscsCaseData.setRegion(originalRegion);
+        sscsCaseData.setProcessingVenue(originalProcessingVenue);
+        sscsCaseData.setAppeal(Appeal.builder()
+            .appellant(Appellant.builder()
+                .address(Address.builder().postcode(postcode).build()).isAppointee(YES.getValue())
+                .build())
+            .benefitType(benefitType)
+            .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        assertThat(sscsCaseData.getRegion()).isEqualTo(rpc.getName());
+        assertThat(sscsCaseData.getRegion()).isNotEqualTo(originalRegion);
+
+        assertThat(sscsCaseData.getProcessingVenue()).isEqualTo(processingVenue);
+        assertThat(sscsCaseData.getProcessingVenue()).isNotEqualTo(originalProcessingVenue);
+    }
+
+    @DisplayName("When we have changed the next hearing venue through an adjournment, but the region is null,"
+        + " keep the original region and processing venue")
+    @Test
+    void givenRpcIsNull_thenDontSetRegion() {
+        String venueId = "01010101010101";
+
+        when(regionalProcessingCenterService.getByVenueId(venueId)).thenReturn(null);
+
+        DynamicListItem venue = new DynamicListItem(venueId, null);
+        DynamicList adjournedNextVenue = new DynamicList(venue, null);
+
+        String originalRegion = "SUTTON";
+        String originalProcessingVenue = "Staines";
+
+        sscsCaseData.getAdjournment().setNextHearingVenueSelected(adjournedNextVenue);
+        sscsCaseData.setRegion(originalRegion);
+        sscsCaseData.setProcessingVenue(originalProcessingVenue);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        assertThat(sscsCaseData.getRegion()).isEqualTo(originalRegion);
+        assertThat(sscsCaseData.getProcessingVenue()).isEqualTo(originalProcessingVenue);
+    }
+
+    @DisplayName("When adjournment is enabled and case hearing type is Paper and Adjournment next hearing type is not provided "
+        + ", then case hearing type should not be updated.")
+    @Test
+    void givenAdjournmentNextHearingNotProvided_thenNoChangeInHearingChannel() {
+        HearingDetails hearingDetails = new HearingDetails();
+        hearingDetails.setHearingChannel(HearingChannel.PAPER);
+        sscsCaseData.setHearings(List.of(new Hearing(hearingDetails)));
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(null);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(sscsCaseData.getLatestHearing().getValue().getHearingChannel()).isEqualTo(HearingChannel.PAPER);
+
+    }
+
+    @DisplayName("When adjournment is enabled and case hearing type is Paper and Adjournment next hearing type is Face To Face "
+        + ", then case hearing type should updated from paper to face to face.")
+    @Test
+    void givenAdjournmentNextHearingIsFaceToFace_thenUpdateHearingChannel() {
+        HearingDetails hearingDetails = new HearingDetails();
+        hearingDetails.setHearingChannel(HearingChannel.PAPER);
+        sscsCaseData.setHearings(List.of(new Hearing(hearingDetails)));
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(sscsCaseData.getLatestHearing().getValue().getHearingChannel()).isEqualTo(HearingChannel.FACE_TO_FACE);
+    }
+
+    @DisplayName("When adjournment is enabled and case hearing type is face_to_face and Adjournment next hearing type is Paper "
+        + ", then case hearing type should updated from face_to_face to Paper.")
+    @Test
+    void givenAdjournmentNextHearingIsPaper_thenUpdateHearingChannel() {
+        HearingDetails hearingDetails = new HearingDetails();
+        hearingDetails.setHearingChannel(HearingChannel.FACE_TO_FACE);
+        sscsCaseData.setHearings(List.of(new Hearing(hearingDetails)));
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.PAPER);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(sscsCaseData.getLatestHearing().getValue().getHearingChannel()).isEqualTo(HearingChannel.PAPER);
+    }
+
+    @DisplayName("When adjournment is enabled and theres a next hearing, then case hearing type should updated the wants to attend.")
+    @ParameterizedTest
+    @EnumSource(AdjournCaseTypeOfHearing.class)
+    void givenAdjournmentNextHearing_thenUpdateWantsToAttend(AdjournCaseTypeOfHearing adjournCaseTypeOfHearing) {
+        HearingDetails hearingDetails = new HearingDetails();
+        sscsCaseData.setHearings(List.of(new Hearing(hearingDetails)));
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(adjournCaseTypeOfHearing);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        HearingChannel hearingChannel = adjournCaseTypeOfHearing.getHearingChannel();
+        if (HearingChannel.PAPER.equals(hearingChannel)) {
+            assertThat(sscsCaseData.getAppeal().getHearingOptions().getWantsToAttend()).isEqualTo(NO.getValue());
+            assertThat(sscsCaseData.getAppeal().getHearingType()).isEqualTo(HearingType.PAPER.getValue());
+        } else {
+            assertThat(sscsCaseData.getAppeal().getHearingOptions().getWantsToAttend()).isEqualTo(YES.getValue());
+            assertThat(sscsCaseData.getAppeal().getHearingType()).isEqualTo(uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue());
+        }
+
+        assertThat(sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getAppellantHearingChannel()).isEqualTo(hearingChannel);
+    }
+
+    @DisplayName("When theres no latest hearing on the case, don't update the hearing type")
+    @Test
+    void givenNoLatestHearingOnCase_thenDontUpdateHearingType() {
+        HearingDetails hearingDetails = new HearingDetails();
+        hearingDetails.setHearingChannel(HearingChannel.PAPER);
+        sscsCaseData.setHearings(List.of(new Hearing(hearingDetails)));
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE);
+        sscsCaseData.setHearings(null);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(sscsCaseData.getAppeal().getHearingType()).isEqualTo(uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue());
+    }
+
+    @DisplayName("When theres a latest hearing on the case with no value, don't update the hearing type")
+    @Test
+    void givenLatestHearingOnCaseWithNoValue_thenDontUpdateHearingType() {
+        HearingDetails hearingDetails = new HearingDetails();
+        hearingDetails.setHearingChannel(HearingChannel.PAPER);
+        sscsCaseData.setHearings(List.of(new Hearing(hearingDetails)));
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.FACE_TO_FACE);
+        sscsCaseData.setHearings(List.of(Hearing.builder().build()));
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(sscsCaseData.getAppeal().getHearingType()).isEqualTo(uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue());
+    }
+
+
+    @DisplayName("When we have written an adjournment notice and excluded some panel members, and there are already excluded panel members, "
+        + "add them to the existing excluded panel members list")
+    @Test
+    void givenPanelMembersExcluded_thenAddPanelMembersToExclusionList() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+        sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
+            .excludedPanelMembers(new ArrayList<>(Arrays.asList(
+                new CollectionItem<>("1", JudicialUserBase.builder().idamId("1").build()),
+                new CollectionItem<>("2", JudicialUserBase.builder().idamId("2").build())))).build());
+
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
+        sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
+        sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().idamId("3").build());
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getSchedulingAndListingFields()
+            .getPanelMemberExclusions().getExcludedPanelMembers()).hasSize(3);
+    }
+
+    @DisplayName("When we have written an adjournment notice and excluded some panel members, and there are no current "
+        + "exclusions, add them to the excluded panel members list")
+    @Test
+    void givenNoExistingPanelMembersExcluded_thenAddPanelMembersToExclusionList() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
+        sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().personalCode("4").idamId("1").build());
+        sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().personalCode("5").idamId("3").build());
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getSchedulingAndListingFields()
+            .getPanelMemberExclusions().getExcludedPanelMembers()).hasSize(2);
+        assertThat(sscsCaseData.getSchedulingAndListingFields().getPanelMemberExclusions().getArePanelMembersExcluded())
+            .isEqualTo(YES);
+    }
+
+    @DisplayName("When we have written an adjournment notice and reserved some panel members, and there are already reserved panel members, "
+        + "add them to the existing reserved panel members list")
+    @Test
+    void givenPanelMembersReserved_thenAddPanelMembersToReservedList() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+        sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
+            .reservedPanelMembers(new ArrayList<>(Arrays.asList(
+                new CollectionItem<>("1", JudicialUserBase.builder().idamId("1").build()),
+                new CollectionItem<>("2", JudicialUserBase.builder().idamId("2").build())))).build());
+
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.RESERVED);
+        sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
+        sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().idamId("3").build());
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getSchedulingAndListingFields()
+            .getPanelMemberExclusions().getReservedPanelMembers()).hasSize(3);
+    }
+
+    @DisplayName("When we have written an adjournment notice and not excluded some panel members, and there are already excluded panel members, "
+        + "keep the existing excluded panel members list the same")
+    @Test
+    void givenPanelMembersNotExcluded_thenKeepExclusionListTheSame() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+        sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
+            .excludedPanelMembers(new ArrayList<>(Arrays.asList(
+                new CollectionItem<>("1", JudicialUserBase.builder().idamId("1").build()),
+                new CollectionItem<>("2", JudicialUserBase.builder().idamId("2").build())))).build());
+
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getSchedulingAndListingFields()
+            .getPanelMemberExclusions().getExcludedPanelMembers()).hasSize(2);
+    }
+
+    @DisplayName("When we have written an adjournment notice and not excluded some panel members, and there are already excluded panel members, "
+        + "keep the existing excluded panel members list the same")
+    @Test
+    void givenPanelMembersNotExcludedAndAdjournmentNotSelected_thenKeepExclusionListTheSame() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+        sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
+            .excludedPanelMembers(new ArrayList<>(Arrays.asList(
+                new CollectionItem<>("1", JudicialUserBase.builder().idamId("1").build()),
+                new CollectionItem<>("2", JudicialUserBase.builder().idamId("2").build())))).build());
+
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.NO);
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(NO);
+        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(NO);
+        sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
+        sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().idamId("3").build());
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getSchedulingAndListingFields()
+            .getPanelMemberExclusions().getExcludedPanelMembers()).hasSize(2);
     }
 
 }

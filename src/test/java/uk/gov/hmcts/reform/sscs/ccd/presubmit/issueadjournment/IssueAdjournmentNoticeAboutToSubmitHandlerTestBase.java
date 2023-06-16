@@ -39,12 +39,16 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
 @ExtendWith(MockitoExtension.class)
 abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
 
     protected static final String USER_AUTHORISATION = "Bearer token";
+    protected static final String SPANISH = "Spanish";
     protected IssueAdjournmentNoticeAboutToSubmitHandler handler;
 
     @Mock
@@ -59,6 +63,15 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
     @Mock
     protected ListAssistHearingMessageHelper hearingMessageHelper;
 
+    @Mock
+    protected VenueDataLoader venueDataLoader;
+
+    @Mock
+    protected AirLookupService airLookupService;
+
+    @Mock
+    protected RegionalProcessingCenterService regionalProcessingCenterService;
+
     protected SscsCaseData sscsCaseData;
 
     protected static Validator validator = Validation
@@ -70,7 +83,7 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
 
     @BeforeEach
     protected void setUp() {
-        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, validator, hearingMessageHelper, true);
+        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, validator, hearingMessageHelper, venueDataLoader, airLookupService, regionalProcessingCenterService, true);
 
         List<SscsDocument> documentList = new ArrayList<>();
 
