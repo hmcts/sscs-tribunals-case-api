@@ -43,7 +43,7 @@ public class CcdMideventCallbackController {
     private final AdjournCaseCcdService adjournCaseCcdService;
     private final RestoreCasesService2 restoreCasesService2;
     @Value("${feature.postHearings.enabled}")
-    private boolean isPostHearingEnabled;
+    private boolean isPostHearingsEnabled;
 
     @Autowired
     public CcdMideventCallbackController(AuthorisationService authorisationService, SscsCaseCallbackDeserializer deserializer,
@@ -85,11 +85,11 @@ public class CcdMideventCallbackController {
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
         @RequestBody String message) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
+        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         log.info("About to start ccdMidEventPreviewFinalDecision callback `{}` received for Case ID `{}`", callback.getEvent(),
-            callback.getCaseDetails().getId());
+            caseDetails.getId());
 
         authorisationService.authorise(serviceAuthHeader);
-        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(sscsCaseData);
@@ -100,8 +100,10 @@ public class CcdMideventCallbackController {
             return ok(preSubmitCallbackResponse);
         }
 
+        SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);
+
         WriteFinalDecisionPreviewDecisionServiceBase writeFinalDecisionPreviewDecisionService = decisionNoticeService.getPreviewService(benefitType);
-        DocumentType docType = SscsUtil.getWriteFinalDecisionDocumentType(sscsCaseData, isPostHearingEnabled);
+        DocumentType docType = SscsUtil.getWriteFinalDecisionDocumentType(sscsCaseData, isPostHearingsEnabled);
 
         return ok(writeFinalDecisionPreviewDecisionService.preview(callback, docType, userAuthorisation, false));
     }

@@ -25,7 +25,7 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     private final DecisionNoticeService decisionNoticeService;
     private final PreviewDocumentService previewDocumentService;
     @Value("${feature.postHearings.enabled}")
-    private boolean isPostHearingEnabled;
+    private boolean isPostHearingsEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -71,7 +71,9 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                 sscsCaseData.setPreviousState(state);
             }
 
-            DocumentType docType = SscsUtil.getWriteFinalDecisionDocumentType(sscsCaseData, isPostHearingEnabled);
+            SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);
+
+            DocumentType docType = SscsUtil.getWriteFinalDecisionDocumentType(sscsCaseData, isPostHearingsEnabled);
             DocumentLink docLink = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument();
 
             previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, docType, docLink);

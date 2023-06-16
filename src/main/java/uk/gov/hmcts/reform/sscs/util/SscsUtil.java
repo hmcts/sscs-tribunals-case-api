@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Correction;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -153,5 +155,18 @@ public class SscsUtil {
         }
 
         return DocumentType.FINAL_DECISION_NOTICE;
+    }
+
+    public static void setCorrectionInProgress(CaseDetails<SscsCaseData> caseDetails, boolean isPostHearingsEnabled) {
+        if (isPostHearingsEnabled) {
+            Correction correction = caseDetails.getCaseData().getPostHearing().getCorrection();
+
+            if ((State.POST_HEARING.equals(caseDetails.getState())
+                || State.DORMANT_APPEAL_STATE.equals(caseDetails.getState()))) {
+                correction.setCorrectionFinalDecisionInProgress(YesNo.YES);
+            } else {
+                correction.setCorrectionFinalDecisionInProgress(YesNo.NO);
+            }
+        }
     }
 }
