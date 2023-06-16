@@ -135,6 +135,36 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
                 .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
     }
 
+    private void calculateDueDate(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getAdjournment().getDirectionsDueDate() != null) {
+            sscsCaseData.setDirectionDueDate(sscsCaseData.getAdjournment().getDirectionsDueDate().toString());
+        } else if (sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset() != null) {
+            sscsCaseData.setDirectionDueDate(LocalDate.now()
+                .plusDays(sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset().getCcdDefinition())
+                .toString());
+        }
+    }
+
+    private void createAdjournmentNoticeFromPreviewDraft(
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
+        SscsDocumentTranslationStatus documentTranslationStatus) {
+
+        SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
+
+        DocumentLink docLink = sscsCaseData.getAdjournment().getPreviewDocument();
+
+        DocumentLink documentLink = DocumentLink.builder()
+            .documentUrl(docLink.getDocumentUrl())
+            .documentFilename(docLink.getDocumentFilename())
+            .documentBinaryUrl(docLink.getDocumentBinaryUrl())
+            .build();
+
+        String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+
+        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.ADJOURNMENT_NOTICE, now,
+                null, null, documentTranslationStatus);
+    }
+
     private void updateHearingOptions(SscsCaseData sscsCaseData) {
         Adjournment adjournment = sscsCaseData.getAdjournment();
 
@@ -173,70 +203,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         }
     }
 
-    private void calculateDueDate(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getAdjournment().getDirectionsDueDate() != null) {
-            sscsCaseData.setDirectionDueDate(sscsCaseData.getAdjournment().getDirectionsDueDate().toString());
-        } else if (sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset() != null) {
-            sscsCaseData.setDirectionDueDate(LocalDate.now()
-                .plusDays(sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset().getCcdDefinition())
-                .toString());
-        }
-    }
-
-    private void createAdjournmentNoticeFromPreviewDraft(
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
-        SscsDocumentTranslationStatus documentTranslationStatus) {
-
-        SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
-
-        DocumentLink docLink = sscsCaseData.getAdjournment().getPreviewDocument();
-
-        DocumentLink documentLink = DocumentLink.builder()
-            .documentUrl(docLink.getDocumentUrl())
-            .documentFilename(docLink.getDocumentFilename())
-            .documentBinaryUrl(docLink.getDocumentBinaryUrl())
-            .build();
-
-        String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-
-        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.ADJOURNMENT_NOTICE, now,
-                null, null, documentTranslationStatus);
-    }
-
-    public void updateHearingChannelAndWantsToAttend(SscsCaseData sscsCaseData) {
-        AdjournCaseTypeOfHearing nextHearingType = sscsCaseData.getAdjournment().getTypeOfNextHearing();
-        if (nonNull(nextHearingType)) {
-            Appeal appeal = sscsCaseData.getAppeal();
-            HearingChannel hearingChannel = getNextHearingChannel(sscsCaseData);
-
-            if (isAdjournmentEnabled) {
-                String wantsToAttend = YES.toString();
-                String hearingType = uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue();
-
-                if (PAPER.equals(nextHearingType.getHearingChannel())) {
-                    wantsToAttend = NO.toString();
-                    hearingType = uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.HearingType.PAPER.getValue();
-                }
-
-                log.info("Updating hearing type to {} and wants to attend to {}", hearingType, wantsToAttend);
-                appeal.getHearingOptions().setWantsToAttend(wantsToAttend);
-                appeal.setHearingType(hearingType);
-                sscsCaseData.getSchedulingAndListingFields().getOverrideFields().setAppellantHearingChannel(hearingChannel);
-            }
-
-            Hearing latestHearing = sscsCaseData.getLatestHearing();
-            if (nonNull(latestHearing) && nonNull(latestHearing.getValue())) {
-                latestHearing.getValue().setHearingChannel(hearingChannel);
-
-                if (hearingChannel.getValueTribunals().equalsIgnoreCase(PAPER.getValueTribunals())) {
-                    appeal.setHearingType(PAPER.getValueTribunals());
-                } else {
-                    appeal.setHearingType(uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue());
-                }
-            }
-        }
-    }
-
     private HearingChannel getNextHearingChannel(SscsCaseData caseData) {
         return Arrays.stream(HearingChannel.values())
             .filter(hearingChannel -> caseData.getAdjournment().getTypeOfNextHearing().getHearingChannel().getValueTribunals().equalsIgnoreCase(
@@ -244,7 +210,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             .findFirst().orElse(HearingChannel.PAPER);
     }
 
-    private static void updatePanelMembers(SscsCaseData caseData) {
+    private void updatePanelMembers(SscsCaseData caseData) {
         Adjournment adjournment = caseData.getAdjournment();
         AdjournCasePanelMembersExcluded panelMemberExcluded = adjournment.getPanelMembersExcluded();
 
@@ -301,7 +267,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         handleHearingWindow(caseData, fields);
     }
 
-    private static Integer handleNonStandardDuration(SscsCaseData caseData, Integer duration) {
+    private Integer handleNonStandardDuration(SscsCaseData caseData, Integer duration) {
         AdjournCaseNextHearingDurationUnits units = caseData.getAdjournment().getNextHearingListingDurationUnits();
         if (units == AdjournCaseNextHearingDurationUnits.SESSIONS && duration >= MIN_HEARING_SESSION_DURATION) {
             return duration * DURATION_SESSIONS_MULTIPLIER;
@@ -326,6 +292,41 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             } else if (AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD.equals(adjournment.getNextHearingDateOrPeriod())) {
                 long after = Long.parseLong(adjournment.getNextHearingFirstAvailableDateAfterPeriod().toString());
                 hearingWindow.setDateRangeStart(LocalDate.now().plusDays(after));
+            }
+        }
+    }
+
+    private void updateHearingChannelAndWantsToAttend(SscsCaseData sscsCaseData) {
+        AdjournCaseTypeOfHearing nextHearingType = sscsCaseData.getAdjournment().getTypeOfNextHearing();
+        if (nonNull(nextHearingType)) {
+            Appeal appeal = sscsCaseData.getAppeal();
+            HearingChannel hearingChannel = getNextHearingChannel(sscsCaseData);
+
+            if (isAdjournmentEnabled) {
+                String wantsToAttend = YES.toString();
+                String hearingType = uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue();
+
+                if (PAPER.equals(nextHearingType.getHearingChannel())) {
+                    wantsToAttend = NO.toString();
+                    hearingType = uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.HearingType.PAPER.getValue();
+                }
+
+                log.info("Updating hearing type to {} and wants to attend to {}", hearingType, wantsToAttend);
+                appeal.getHearingOptions().setWantsToAttend(wantsToAttend);
+                appeal.setHearingType(hearingType);
+                sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues().setAppellantHearingChannel(hearingChannel);
+                sscsCaseData.getSchedulingAndListingFields().getOverrideFields().setAppellantHearingChannel(hearingChannel);
+            }
+
+            Hearing latestHearing = sscsCaseData.getLatestHearing();
+            if (nonNull(latestHearing) && nonNull(latestHearing.getValue())) {
+                latestHearing.getValue().setHearingChannel(hearingChannel);
+
+                if (hearingChannel.getValueTribunals().equalsIgnoreCase(PAPER.getValueTribunals())) {
+                    appeal.setHearingType(PAPER.getValueTribunals());
+                } else {
+                    appeal.setHearingType(uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue());
+                }
             }
         }
     }

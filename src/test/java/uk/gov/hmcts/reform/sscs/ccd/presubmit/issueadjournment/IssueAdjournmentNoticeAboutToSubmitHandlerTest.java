@@ -62,10 +62,6 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        sscsCaseData.getAdjournment().setPreviewDocument(DocumentLink.builder()
-            .documentUrl("url")
-            .documentFilename("adjournedcasedoc.pdf").build());
     }
 
     @Test
