@@ -79,6 +79,18 @@ public class CftlibConfig implements CFTLibConfigurer {
              "caseworker-wa",
              "caseworker-wa-configuration"
         );
+        lib.createIdamUser("tribunal-member-1@fake.hmcts.net",
+                "caseworker",
+                "caseworker-sscs"
+        );
+        lib.createIdamUser("tribunal-member-2@fake.hmcts.net",
+                "caseworker",
+                "caseworker-sscs"
+        );
+        lib.createIdamUser("tribunal-member-3@fake.hmcts.net",
+                "caseworker",
+                "caseworker-sscs"
+        );
         lib.createRoles(
                 "caseworker-sscs-superuser",
                 "caseworker-sscs-clerk",
