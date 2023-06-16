@@ -188,6 +188,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     @Test
     public void givenAGrantedPostponement_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
+        sscsCaseData.getPostponementRequest().setListingOption("readyToList");
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -203,6 +204,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     @Test
     public void givenAGrantedPostponement_shouldSendCancellation() {
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
+        sscsCaseData.getPostponementRequest().setListingOption("readyToList");
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -210,6 +212,28 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         verify(hearingMessageHelper).sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
             CancellationReason.OTHER);
         verifyNoMoreInteractions(hearingMessageHelper);
+    }
+
+    @Test
+    public void givenAGrantedPostponement_shouldUpdateCaseStateToReadyToList() {
+        sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
+        sscsCaseData.getPostponementRequest().setListingOption("readyToList");
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getState()).isEqualTo(State.READY_TO_LIST);
+    }
+
+    @Test
+    public void givenAGrantedPostponement_shouldUpdateCaseStateToNotListable() {
+        sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
+        sscsCaseData.getPostponementRequest().setListingOption("notListable");
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getState()).isEqualTo(State.NOT_LISTABLE);
     }
 
     @Test

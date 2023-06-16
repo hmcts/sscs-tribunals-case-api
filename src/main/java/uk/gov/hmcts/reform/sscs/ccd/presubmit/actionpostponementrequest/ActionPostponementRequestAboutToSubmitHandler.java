@@ -17,20 +17,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Note;
-import uk.gov.hmcts.reform.sscs.ccd.domain.NoteDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.NotePad;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
@@ -119,6 +106,13 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         EventType postponementEventType = EventType.getEventTypeByCcdType(listingOption);
         log.info("Action postponement request: postponement listingOption {} mapped to Event {} for case {}",
             listingOption, postponementEventType, sscsCaseData.getCcdCaseId());
+
+
+        if (listingOption.equalsIgnoreCase("readytolist")) {
+            sscsCaseData.setState(State.READY_TO_LIST);
+        } else if (listingOption.equalsIgnoreCase("notlistable")) {
+            sscsCaseData.setState(State.NOT_LISTABLE);
+        }
 
         sscsCaseData.setPostponement(Postponement.builder()
             .unprocessedPostponement(YES)
