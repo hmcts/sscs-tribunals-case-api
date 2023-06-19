@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
@@ -286,7 +285,13 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
                 log.info("Updating hearing type to {} and wants to attend to {}", hearingType, wantsToAttend);
                 appeal.getHearingOptions().setWantsToAttend(wantsToAttend);
                 appeal.setHearingType(hearingType);
-                sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues().setAppellantHearingChannel(hearingChannel);
+
+                OverrideFields defaultListingValues = sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues();
+                if (isNull(defaultListingValues)) {
+                    defaultListingValues = new OverrideFields();
+                }
+
+                defaultListingValues.setAppellantHearingChannel(hearingChannel);
                 sscsCaseData.getSchedulingAndListingFields().getOverrideFields().setAppellantHearingChannel(hearingChannel);
             }
 
@@ -332,9 +337,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         if (FIRST_AVAILABLE_DATE.equals(hearingDateType)) {
             hearingWindow.setDateRangeStart(LocalDate.now().plusDays(FIRST_AVAILABLE_DATE_DAYS));
-        }
 
-        if (FIRST_AVAILABLE_DATE_AFTER.equals(hearingDateType)) {
             if (PROVIDE_DATE.equals(hearingDateOrPeriod)) {
                 hearingWindow.setDateRangeStart(adjournment.getNextHearingFirstAvailableDateAfterDate().plusDays(1));
             } else if (PROVIDE_PERIOD.equals(hearingDateOrPeriod)) {
