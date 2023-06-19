@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod.PROVIDE_DATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.NON_STANDARD;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.ADJOURNMENT_NOTICE_ISSUED;
@@ -329,7 +330,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         AdjournCaseNextHearingDateType hearingDateType = adjournment.getNextHearingDateType();
         AdjournCaseNextHearingDateOrPeriod hearingDateOrPeriod = adjournment.getNextHearingDateOrPeriod();
 
-        if (FIRST_AVAILABLE_DATE_AFTER.equals(hearingDateType)) {
+        if (FIRST_AVAILABLE_DATE.equals(hearingDateType)) {
             hearingWindow.setDateRangeStart(LocalDate.now().plusDays(FIRST_AVAILABLE_DATE_DAYS));
         }
 
