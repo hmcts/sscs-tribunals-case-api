@@ -50,6 +50,7 @@ em-ccdorc:
   java:
     image: hmctspublic.azurecr.io/em/ccdorc:latest
     releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
+    ingressHost: em-ccdorc-${SERVICE_FQDN}
     environment:
       IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
@@ -57,7 +58,8 @@ em-ccdorc:
       EM_STITCHING_API_URL: http://em-stitching-aat.service.core-compute-aat.internal
       DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
       CCD_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
-      CALLBACK_DOMAIN: ${SERVICE_NAME}-em-ccdorc
+      CALLBACK_HTTP_SCHEME: https
+      CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
 
 ccd-case-document-am-api:
   enabled: true
@@ -486,7 +488,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-10603-1
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:6.0.26
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
