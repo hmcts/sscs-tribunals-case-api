@@ -57,7 +57,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     private boolean isAdjournmentEnabled; // TODO SSCS-10951
 
     private static final int DURATION_SESSIONS_MULTIPLIER = 165;
-    private static final int DURATION_DEFAULT = 30;
+    private static final int DURATION_DEFAULT = 60;
     private static final int MIN_HEARING_DURATION = 30;
     private static final int MIN_HEARING_SESSION_DURATION = 1;
     private static final int FIRST_AVAILABLE_DATE_DAYS = 14;

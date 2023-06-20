@@ -147,7 +147,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
         assertThat(schedulingAndListingFields).isNotNull();
 
         var overrideFields = schedulingAndListingFields.getOverrideFields();
-        int expectedDefaultDuration = 30;
+        int expectedDefaultDuration = 60;
         assertThat(overrideFields).isNotNull();
         assertThat(overrideFields.getDuration()).isEqualTo(expectedDefaultDuration);
     }
