@@ -285,12 +285,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
                 appeal.getHearingOptions().setWantsToAttend(wantsToAttend);
                 appeal.setHearingType(hearingType);
 
-                OverrideFields defaultListingValues = sscsCaseData.getSchedulingAndListingFields().getDefaultListingValues();
-                if (isNull(defaultListingValues)) {
-                    defaultListingValues = new OverrideFields();
-                }
-
-                defaultListingValues.setAppellantHearingChannel(hearingChannel);
                 sscsCaseData.getSchedulingAndListingFields().getOverrideFields().setAppellantHearingChannel(hearingChannel);
             }
 
