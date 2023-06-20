@@ -51,7 +51,7 @@ public class SscsUtil {
 
     public static void clearPostHearingFields(SscsCaseData caseData, boolean isPostHearingsEnabled) {
         if (isPostHearingsEnabled) {
-            caseData.setPostHearing(null);
+            caseData.setPostHearing(PostHearing.builder().build());
         }
         clearDocumentTransientFields(caseData);
     }
