@@ -122,9 +122,9 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             listingOption, postponementEventType, sscsCaseData.getCcdCaseId());
 
 
-        if (listingOption.equalsIgnoreCase("readytolist")) {
+        if (listingOption.equals(State.READY_TO_LIST.toString())) {
             sscsCaseData.setState(State.READY_TO_LIST);
-        } else if (listingOption.equalsIgnoreCase("notlistable")) {
+        } else if (listingOption.equals(State.NOT_LISTABLE.toString())) {
             sscsCaseData.setState(State.NOT_LISTABLE);
         }
 
