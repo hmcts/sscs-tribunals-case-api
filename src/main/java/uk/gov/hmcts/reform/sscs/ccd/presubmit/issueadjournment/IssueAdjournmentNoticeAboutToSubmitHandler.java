@@ -260,7 +260,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         }
 
         Integer duration = handleHearingDuration(caseData);
-        caseData.getAdjournment().setNextHearingListingDuration(duration);
         fields.setDuration(duration);
 
         updateHearingChannelAndWantsToAttend(caseData);
