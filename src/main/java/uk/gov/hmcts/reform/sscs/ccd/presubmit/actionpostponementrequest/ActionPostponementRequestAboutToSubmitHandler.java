@@ -121,12 +121,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         log.info("Action postponement request: postponement listingOption {} mapped to Event {} for case {}",
             listingOption, postponementEventType, sscsCaseData.getCcdCaseId());
 
-
-        if (listingOption.equals(State.READY_TO_LIST.toString())) {
-            sscsCaseData.setState(State.READY_TO_LIST);
-        } else if (listingOption.equals(State.NOT_LISTABLE.toString())) {
-            sscsCaseData.setState(State.NOT_LISTABLE);
-        }
+        sscsCaseData.setState(State.getById(listingOption));
 
         sscsCaseData.setPostponement(Postponement.builder()
             .unprocessedPostponement(YES)
