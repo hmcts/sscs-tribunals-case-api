@@ -337,7 +337,7 @@ dependencies {
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'd191788'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.4'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: 'b05079a'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.39.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.4'
