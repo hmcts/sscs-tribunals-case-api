@@ -206,7 +206,7 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
 
     private void assertHearingCreatedAndAdjournmentInProgress(PreSubmitCallbackResponse<SscsCaseData> response, int invocations) {
         verify(hearingMessageHelper, times(invocations))
-            .sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
+            .sendListAssistCreateAdjournmentHearingMessage(sscsCaseData.getCcdCaseId());
 
         assertThat(response.getErrors()).isEmpty();
     }

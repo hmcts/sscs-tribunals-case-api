@@ -129,7 +129,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             if (SscsUtil.isSAndLCase(sscsCaseData)
                 && (isYes(adjournment.getCanCaseBeListedRightAway()))) {
                 adjournment.setAdjournmentInProgress(YES);
-                hearingMessageHelper.sendListAssistCreateHearingMessage(sscsCaseData.getCcdCaseId());
+                hearingMessageHelper.sendListAssistCreateAdjournmentHearingMessage(sscsCaseData.getCcdCaseId());
             }
         }
 
