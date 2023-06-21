@@ -158,7 +158,7 @@
     "roleAssignments": [
       {
         "roleType": "ORGANISATION",
-        "roleName": "appraiser-1",
+        "roleName": "appraiser-2",
         "grantType": "STANDARD",
         "roleCategory": "JUDICIAL",
         "classification": "PUBLIC",
