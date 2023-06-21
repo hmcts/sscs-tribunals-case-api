@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
-import java.util.stream.Stream;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
+import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -14,17 +17,23 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @Service
 @Slf4j
 public class WorkAllocationHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final boolean workAllocationFeature;
+
+    private IdamService idamService;
+
+    private CaseAssignmentApi caseAssignmentApi;
     
-    private SessionCategoryMapService sessionCategoryMapService;
-    
-    public WorkAllocationHandler(SessionCategoryMapService sessionCategoryMapService) {
-        this.sessionCategoryMapService = sessionCategoryMapService;
+    public WorkAllocationHandler(CaseAssignmentApi caseAssignmentApi, IdamService idamService, @Value("${feature.work-allocation.enabled}") boolean workAllocationFeature) {
+        this.caseAssignmentApi = caseAssignmentApi;
+        this.idamService = idamService;
+        this.workAllocationFeature = workAllocationFeature;
     }
     
     @Override
@@ -33,7 +42,8 @@ public class WorkAllocationHandler implements PreSubmitCallbackHandler<SscsCaseD
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.CREATE_BUNDLE;
+                && callback.getEvent() == EventType.CREATE_BUNDLE
+                && workAllocationFeature;
     }
 
     @Override
@@ -44,36 +54,27 @@ public class WorkAllocationHandler implements PreSubmitCallbackHandler<SscsCaseD
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-        
-        updateSessionCategory(sscsCaseData);
-        updatePanelCount(sscsCaseData);
+
+        sscsCaseData.getWorkAllocationFields().setAssignedCaseRoles(listAssignedCaseRoles(caseDetails.getId()));
         
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private void updatePanelCount(SscsCaseData caseData) {
-        boolean doctorSpecialistSecond = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
-        boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
-        SessionCategoryMap sessionCategory = sessionCategoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
-                        doctorSpecialistSecond, fqpmRequired);
+    private List<String> listAssignedCaseRoles(long caseId) {
+        IdamTokens tokens = idamService.getIdamTokens();
 
-        if (sessionCategory != null) {
-            caseData.getWorkAllocationFields().setSessionCategory(sessionCategory.getCategory().getSessionCategoryCode());
+        CaseAssignmentUserRolesResource response = caseAssignmentApi.getUserRoles(
+                tokens.getIdamOauth2Token(),
+                tokens.getServiceAuthorization(),
+                Arrays.asList(Long.toString(caseId)));
+
+        if (response != null && response.getCaseAssignmentUserRoles() != null) {
+            return response.getCaseAssignmentUserRoles().stream()
+                    .map(a -> a.getCaseRole())
+                    .distinct()
+                    .collect(Collectors.toList());
         }
-    }
 
-    private void updateSessionCategory(SscsCaseData caseData) {
-        if (caseData.getPanel() != null) {
-            long count = Stream.of(
-                            caseData.getPanel().getAssignedTo(),
-                            caseData.getPanel().getMedicalMember(),
-                            caseData.getPanel().getDisabilityQualifiedMember())
-                    .filter(m -> isNotBlank(m))
-                    .count();
-
-            if (count > 0) {
-                caseData.getWorkAllocationFields().setPanelCount((int) count);
-            }
-        }
+        return null;
     }
 }

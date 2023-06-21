@@ -26,7 +26,8 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker-sscs-systemupdate",
             "caseworker-sscs-judge",
             "caseworker-sscs-dwpresponsewriter",
-            "caseworker-sscs-registrar"
+            "caseworker-sscs-registrar",
+            "caseworker-caa"
         );
         lib.createIdamUser("local.test@example.com",
             "caseworker",
