@@ -51,7 +51,8 @@ public class CaseUpdatedAboutToStartHandlerTest {
 
     @Before
     public void setUp() {
-        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
+        Appeal appeal = Appeal.builder().build();
+        sscsCaseData = SscsCaseData.builder().appeal(appeal).build();
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
         given(callback.getEvent()).willReturn(EventType.CASE_UPDATED);
