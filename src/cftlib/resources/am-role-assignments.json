@@ -131,6 +131,46 @@
       }
     ],
     "overrideAll": true
+  },
+  {
+    "email": "appraiser-1@fake.hmcts.net",
+    "id": "e177cb01-e343-3641-a1ae-445587b9e653",
+    "roleAssignments": [
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "appraiser-1",
+        "grantType": "STANDARD",
+        "roleCategory": "JUDICIAL",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "Benefit",
+          "jurisdiction": "SSCS"
+        },
+        "authorisations": []
+      }
+    ],
+    "overrideAll": true
+  },
+  {
+    "email": "appraiser-2@fake.hmcts.net",
+    "id": "351b0950-581e-31c3-bf57-b07369cfdb6b",
+    "roleAssignments": [
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "appraiser-1",
+        "grantType": "STANDARD",
+        "roleCategory": "JUDICIAL",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "Benefit",
+          "jurisdiction": "SSCS"
+        },
+        "authorisations": []
+      }
+    ],
+    "overrideAll": true
   }
 ]
 
