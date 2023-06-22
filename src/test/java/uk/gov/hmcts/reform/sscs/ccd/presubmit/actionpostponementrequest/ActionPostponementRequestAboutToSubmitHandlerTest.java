@@ -92,6 +92,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     public void setUp() {
         openMocks(this);
         ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", true);
+        ReflectionTestUtils.setField(handler, "isTypeaheadEnabled", true);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_POSTPONEMENT_REQUEST);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -144,6 +145,17 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     public void givenSchedulingAndListingEnabledFalse_thenReturnFalse() {
         ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", false);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
+    }
+
+    @Test
+    public void givenTypeaheadEnabledFalse_thenResetReserveToJudge() {
+        ReflectionTestUtils.setField(handler, "isTypeaheadEnabled", false);
+        sscsCaseData.setReservedToJudge("judge name");
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getReservedToJudge()).isNull();
     }
 
     @Test
