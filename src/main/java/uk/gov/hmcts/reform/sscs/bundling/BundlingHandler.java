@@ -72,7 +72,6 @@ public class BundlingHandler {
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         moveDocsToDwpCollectionIfOldPattern(sscsCaseData);
-
         setDocumentFileNameIfNotSet(sscsCaseData);
 
         if (hasBundleAdditionsWithSameCharacter(sscsCaseData) && !callback.isIgnoreWarnings()) {
@@ -82,7 +81,6 @@ public class BundlingHandler {
         }
 
         moveExistingBundlesToHistoricalBundlesThenClearExistingBundles(sscsCaseData);
-
         createPdfsForAnyAudioVideoEvidence(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
@@ -165,9 +163,8 @@ public class BundlingHandler {
 
     private void setMultiBundleConfig(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
 
-        boolean hasEditedDwpResponseDocument = isHasEditedDwpResponseDocument(sscsCaseData);
-
-        boolean hasEditedDwpEvidenceBundleDocument = isHasEditedDwpEvidenceBundleDocument(sscsCaseData);
+        boolean hasEditedDwpResponseDocument = hasEditedDwpResponseDocument(sscsCaseData);
+        boolean hasEditedDwpEvidenceBundleDocument = hasEditedDwpEvidenceBundleDocument(sscsCaseData);
 
         if (!hasPheRequestOrConfidentialityUnderReview(sscsCaseData, response, hasEditedDwpResponseDocument, hasEditedDwpEvidenceBundleDocument)) {
 
@@ -176,8 +173,10 @@ public class BundlingHandler {
     }
 
     private boolean hasPheRequestOrConfidentialityUnderReview(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, boolean hasEditedDwpResponseDocument, boolean hasEditedDwpEvidenceBundleDocument) {
-        if (!sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT) && isPheStatusUnderReview(sscsCaseData)
-                && (hasEditedDwpResponseDocument || hasEditedDwpEvidenceBundleDocument)) {
+        boolean isChildSupport = sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT);
+        boolean isPheStatusUnderReview = isPheStatusUnderReview(sscsCaseData);
+        boolean hasEditedResponseOrEvidenceDoc = hasEditedDwpResponseDocument || hasEditedDwpEvidenceBundleDocument;
+        if (!isChildSupport && isPheStatusUnderReview && hasEditedResponseOrEvidenceDoc) {
             response.addError("There is a pending PHE request on this case");
         }
 
@@ -187,13 +186,13 @@ public class BundlingHandler {
         return !response.getErrors().isEmpty();
     }
 
-    private boolean isHasEditedDwpEvidenceBundleDocument(SscsCaseData sscsCaseData) {
+    private boolean hasEditedDwpEvidenceBundleDocument(SscsCaseData sscsCaseData) {
         return emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
                 .filter(dwpDocument -> DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue().equals(dwpDocument.getValue().getDocumentType()))
                 .anyMatch(dwpDocument -> nonNull(dwpDocument.getValue().getEditedDocumentLink()));
     }
 
-    private boolean isHasEditedDwpResponseDocument(SscsCaseData sscsCaseData) {
+    private boolean hasEditedDwpResponseDocument(SscsCaseData sscsCaseData) {
         return emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
                 .filter(dwpDocument -> DwpDocumentType.DWP_RESPONSE.getValue().equals(dwpDocument.getValue().getDocumentType()))
                 .anyMatch(dwpDocument -> nonNull(dwpDocument.getValue().getEditedDocumentLink()));
@@ -205,10 +204,10 @@ public class BundlingHandler {
     }
 
     private List<MultiBundleConfig> getMultiBundleConfigs(SscsCaseData sscsCaseData) {
-        boolean requiresMultiBundleForPhe = isPheReviewGranted(sscsCaseData) && (isHasEditedDwpResponseDocument(sscsCaseData) || isHasEditedDwpEvidenceBundleDocument(sscsCaseData));
+        boolean requiresMultiBundleForPhe = isPheReviewGranted(sscsCaseData) && (hasEditedDwpResponseDocument(sscsCaseData) || hasEditedDwpEvidenceBundleDocument(sscsCaseData));
         boolean requiresMultiBundleForConfidentiality = isConfidentialCase(sscsCaseData) && hasEditedSscsDocuments(sscsCaseData);
         boolean requiresMultiBundleForNonPhe = sscsCaseData.isBenefitType(Benefit.CHILD_SUPPORT)
-                && (hasEditedSscsDocuments(sscsCaseData) || isHasEditedDwpResponseDocument(sscsCaseData) || isHasEditedDwpEvidenceBundleDocument(sscsCaseData));
+                && (hasEditedSscsDocuments(sscsCaseData) || hasEditedDwpResponseDocument(sscsCaseData) || hasEditedDwpEvidenceBundleDocument(sscsCaseData));
 
         if (requiresMultiBundleForPhe || requiresMultiBundleForConfidentiality || requiresMultiBundleForNonPhe) {
             return getEditedAndUneditedConfigs(sscsCaseData);
@@ -221,17 +220,11 @@ public class BundlingHandler {
     }
 
     private List<MultiBundleConfig> getUneditedConfigs(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.isLanguagePreferenceWelsh()) {
-            return singletonList(getUnEditedConfigForWelsh());
-        }
-        return singletonList(getUnEditedConfigForEnglish());
+        return sscsCaseData.isLanguagePreferenceWelsh() ? singletonList(getUnEditedConfigForWelsh()) : singletonList(getUnEditedConfigForEnglish());
     }
 
     private List<MultiBundleConfig> getEditedAndUneditedConfigs(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.isLanguagePreferenceWelsh()) {
-            return getEditedAndUneditedConfigForWelsh();
-        }
-        return getEditedAndUndeditedConfigForEnglish();
+        return sscsCaseData.isLanguagePreferenceWelsh() ? getEditedAndUneditedConfigForWelsh() : getEditedAndUndeditedConfigForEnglish();
     }
 
     private List<MultiBundleConfig> getEditedAndUndeditedConfigForEnglish() {
