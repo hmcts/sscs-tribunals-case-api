@@ -24,10 +24,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 @RunWith(JUnitParamsRunner.class)
-public class RequestInfoIncompleteApplicationAboutToStartHandlerTest {
+public class RequestForInformationAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private RequestInfoIncompleteApplicationAboutToStartHandler handler;
+    private RequestForInformationAboutToStartHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -40,9 +40,9 @@ public class RequestInfoIncompleteApplicationAboutToStartHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new RequestInfoIncompleteApplicationAboutToStartHandler();
+        handler = new RequestForInformationAboutToStartHandler();
 
-        when(callback.getEvent()).thenReturn(EventType.REQUEST_INFO_INCOMPLETE);
+        when(callback.getEvent()).thenReturn(EventType.REQUEST_FOR_INFORMATION);
 
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("1234")
@@ -55,7 +55,7 @@ public class RequestInfoIncompleteApplicationAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenANonRequestInfoIncompleteEvent_thenReturnFalse() {
+    public void givenANonRequestForInformationEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
@@ -67,7 +67,7 @@ public class RequestInfoIncompleteApplicationAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenARequestInfoIncompleteApplicationRequestWithRep_thenPopulateDropdownWithPartiesOnCase() {
+    public void givenARequestForInformationRequestWithRep_thenPopulateDropdownWithPartiesOnCase() {
         sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -84,7 +84,7 @@ public class RequestInfoIncompleteApplicationAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenARequestInfoIncompleteApplicationRequestWithJointParty_thenPopulateDropdownWithPartiesOnCase() {
+    public void givenARequestForInformationRequestWithJointParty_thenPopulateDropdownWithPartiesOnCase() {
         sscsCaseData.getJointParty().setHasJointParty(YES);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -101,7 +101,7 @@ public class RequestInfoIncompleteApplicationAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenARequestInfoIncompleteApplicationRequestWithJointPartyAndRep_thenPopulateDropdownWithPartiesOnCase() {
+    public void givenARequestForInformationRequestWithJointPartyAndRep_thenPopulateDropdownWithPartiesOnCase() {
         sscsCaseData.getJointParty().setHasJointParty(YES);
         sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
 
