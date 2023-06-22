@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
 @Slf4j
-public class RequestInfoIncompleteApplicationAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class RequestForInformationAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -22,7 +22,7 @@ public class RequestInfoIncompleteApplicationAboutToStartHandler implements PreS
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
-                && callback.getEvent() == EventType.REQUEST_INFO_INCOMPLETE;
+                && callback.getEvent() == EventType.REQUEST_FOR_INFORMATION;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class RequestInfoIncompleteApplicationAboutToStartHandler implements PreS
 
         return callbackResponse;
     }
-    
+
     private void setPartiesToRequestInfoFrom(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = getPartiesOnCase(sscsCaseData);
 

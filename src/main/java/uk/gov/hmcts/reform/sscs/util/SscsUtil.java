@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
@@ -168,5 +169,8 @@ public class SscsUtil {
                 correction.setCorrectionFinalDecisionInProgress(YesNo.NO);
             }
         }
+      
+    public static boolean isGapsCase(SscsCaseData sscsCaseData) {
+        return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
     }
 }
