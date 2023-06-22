@@ -459,7 +459,7 @@ ccd:
         IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
         IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
-        ROLE_ASSIGNMENT_URL: "http://{{ .Release.Name }}-am-role-assignment-service"
+        ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
       keyVaults: [ ]
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
       autoscaling:
@@ -488,7 +488,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-10603-1
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-10973-2
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -507,7 +507,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S-10603-1
+      CCD_DEF_VERSION: S-10973-2
     secrets: []
     userRoles:
       - citizen
@@ -540,7 +540,7 @@ sscs-evidence-share:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
-      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-evidence"
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       AMQP_USERNAME: "RootManageSharedAccessKey"
@@ -557,7 +557,7 @@ sscs-evidence-share:
 sscs-tya-notif:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
+    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2382
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
@@ -712,7 +712,7 @@ hmc-cft-hearing-service:
       CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
       CFT_HEARING_SERVICE_DB_PORT: 5432
       HMC_ACCESS_CONTROL_ENABLED: false
-      ROLE_ASSIGNMENT_URL: "http://{{ .Release.Name }}-am-role-assignment-service"
+      ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
       SPRING_CONFIG_IMPORT : "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
     secrets:
       HMC_SERVICE_BUS_CONNECTION_STRING:
