@@ -17,4 +17,7 @@
   <suppress until="2023-09-01">
     <cve>CVE-2023-20863</cve>
   </suppress>
+  <suppress until="2023-09-01">
+    <cve>CVE-2023-34411</cve>
+  </suppress>
 </suppressions>
