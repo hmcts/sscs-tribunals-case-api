@@ -163,12 +163,13 @@ public class SscsUtil {
             Correction correction = caseDetails.getCaseData().getPostHearing().getCorrection();
 
             if ((State.POST_HEARING.equals(caseDetails.getState())
-                || State.DORMANT_APPEAL_STATE.equals(caseDetails.getState()))) {
+                    || State.DORMANT_APPEAL_STATE.equals(caseDetails.getState()))) {
                 correction.setCorrectionFinalDecisionInProgress(YesNo.YES);
             } else {
                 correction.setCorrectionFinalDecisionInProgress(YesNo.NO);
             }
         }
+    }
       
     public static boolean isGapsCase(SscsCaseData sscsCaseData) {
         return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
