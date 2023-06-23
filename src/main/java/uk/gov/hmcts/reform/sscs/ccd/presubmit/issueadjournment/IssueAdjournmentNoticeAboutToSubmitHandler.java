@@ -335,7 +335,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         if (FIRST_AVAILABLE_DATE_AFTER.equals(hearingDateType)) {
 
             if (PROVIDE_DATE.equals(hearingDateOrPeriod)) {
-                hearingWindow.setDateRangeStart(adjournment.getNextHearingFirstAvailableDateAfterDate().plusDays(1));
+                hearingWindow.setDateRangeStart(adjournment.getNextHearingFirstAvailableDateAfterDate());
             } else if (PROVIDE_PERIOD.equals(hearingDateOrPeriod)) {
                 long after = Long.parseLong(adjournment.getNextHearingFirstAvailableDateAfterPeriod().toString());
                 hearingWindow.setDateRangeStart(LocalDate.now().plusDays(after));

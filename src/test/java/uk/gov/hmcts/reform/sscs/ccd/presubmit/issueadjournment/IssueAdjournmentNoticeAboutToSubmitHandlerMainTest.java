@@ -165,7 +165,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
         var schedulingAndListingFields = response.getData().getSchedulingAndListingFields();
         assertThat(schedulingAndListingFields).isNotNull();
         var overrideFields = schedulingAndListingFields.getOverrideFields();
-        var expectedDate = LocalDate.parse("2040-12-25");
+        var expectedDate = LocalDate.parse("2040-12-24");
         assertThat(overrideFields.getHearingWindow().getDateRangeStart()).isEqualTo(expectedDate);
     }
 
