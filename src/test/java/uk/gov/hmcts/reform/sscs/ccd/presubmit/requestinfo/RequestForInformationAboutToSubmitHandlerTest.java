@@ -26,10 +26,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 @RunWith(JUnitParamsRunner.class)
-public class RequestInfoIncompleteApplicationAboutToSubmitHandlerTest {
+public class RequestForInformationAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private RequestInfoIncompleteApplicationAboutToSubmitHandler handler;
+    private RequestForInformationAboutToSubmitHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -42,9 +42,9 @@ public class RequestInfoIncompleteApplicationAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new RequestInfoIncompleteApplicationAboutToSubmitHandler();
+        handler = new RequestForInformationAboutToSubmitHandler();
 
-        when(callback.getEvent()).thenReturn(EventType.REQUEST_INFO_INCOMPLETE);
+        when(callback.getEvent()).thenReturn(EventType.REQUEST_FOR_INFORMATION);
 
         sscsCaseData = SscsCaseData.builder()
                 .ccdCaseId("1234")
@@ -57,7 +57,7 @@ public class RequestInfoIncompleteApplicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenANonRequestInfoIncompleteEvent_thenReturnFalse() {
+    public void givenANonRequestForInformationEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
