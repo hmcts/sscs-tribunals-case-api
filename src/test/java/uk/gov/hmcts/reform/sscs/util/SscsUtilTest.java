@@ -10,11 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 class SscsUtilTest {
     public static final String UNEXPECTED_POST_HEARING_REVIEW_TYPE_AND_ACTION = "getting the document type has an unexpected postHearingReviewType and action";
@@ -85,6 +81,20 @@ class SscsUtilTest {
     void givenActionTypeSor_shouldReturnSorDocument(StatementOfReasonsActions action, DocumentType expectedDocumentType) {
         postHearing.setReviewType(PostHearingReviewType.STATEMENT_OF_REASONS);
         postHearing.getStatementOfReasons().setAction(action);
+
+        DocumentType documentType = getPostHearingReviewDocumentType(postHearing, true);
+
+        assertThat(documentType).isEqualTo(expectedDocumentType);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "GRANT,LIBERTY_TO_APPLY_GRANTED",
+            "REFUSE,LIBERTY_TO_APPLY_REFUSED"
+    })
+    void givenActionTypeLta_shouldReturnLtaDocument(LibertyToApplyActions action, DocumentType expectedDocumentType) {
+        postHearing.setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
+        postHearing.getLibertyToApply().setAction(action);
 
         DocumentType documentType = getPostHearingReviewDocumentType(postHearing, true);
 
