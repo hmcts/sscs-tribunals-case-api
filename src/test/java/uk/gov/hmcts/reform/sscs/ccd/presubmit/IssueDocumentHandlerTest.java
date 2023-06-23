@@ -3,79 +3,77 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Respondent;
 
-@RunWith(JUnitParamsRunner.class)
-public class IssueDocumentHandlerTest {
+class IssueDocumentHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private IssueDocumentHandler handler;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         handler = new IssueDocumentHandler();
     }
 
-    @Test
-    @Parameters({"CHILD_SUPPORT", "TAX_CREDIT"})
-    public void givenAnSscs2OrSscs5BenefitType_thenHideNino(Benefit benefit) {
-        assertTrue(handler.isBenefitTypeValidToHideNino(Optional.ofNullable(benefit)));
+    @ParameterizedTest
+    @EnumSource(value = Benefit.class, names = {"CHILD_SUPPORT", "TAX_CREDIT"})
+    void givenAnSscs2OrSscs5BenefitType_thenHideNino(Benefit benefit) {
+        assertThat(handler.isBenefitTypeValidToHideNino(Optional.ofNullable(benefit))).isTrue();
     }
 
     @Test
-    public void givenAnSscs1BenefitType_thenDoNotHideNino() {
-        assertFalse(handler.isBenefitTypeValidToHideNino(Optional.ofNullable(PIP)));
+    void givenAnSscs1BenefitType_thenDoNotHideNino() {
+        assertThat(handler.isBenefitTypeValidToHideNino(Optional.of(PIP))).isFalse();
     }
 
-    @Parameters({"PIP", "ESA", "UC", "JSA", "DLA", "UC", "carersAllowance", "attendanceAllowance",
+    @ParameterizedTest
+    @ValueSource(strings = {"PIP", "ESA", "UC", "JSA", "DLA", "UC", "carersAllowance", "attendanceAllowance",
         "bereavementBenefit", "industrialInjuriesDisablement", "maternityAllowance", "socialFund",
         "incomeSupport", "bereavementSupportPaymentScheme", "industrialDeathBenefit", "pensionCredit", "retirementPension"})
-    public void givenAnSscs1BenefitType_thenAddDwpAsRespondent(String benefit) {
+    void givenAnSscs1BenefitType_thenAddDwpAsRespondent(String benefit) {
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefit).build()).build()).build();
         List<Respondent> respondents = handler.getRespondents(sscsCaseData);
-        assertEquals(1, respondents.size());
-        assertEquals("Respondent: Secretary of State for Work and Pensions", respondents.get(0).getName());
+        assertThat(respondents).hasSize(1);
+        assertThat(respondents.get(0).getName()).isEqualTo("Respondent: Secretary of State for Work and Pensions");
     }
 
     @Test
-    public void givenAnSscs2BenefitType_thenAddDwpAsRespondent() {
+    void givenAnSscs2BenefitType_thenAddDwpAsRespondent() {
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).build()).build();
 
         List<Respondent> respondents = handler.getRespondents(sscsCaseData);
-        assertEquals(1, respondents.size());
-        assertEquals("Respondent: Secretary of State for Work and Pensions", respondents.get(0).getName());
+        assertThat(respondents).hasSize(1);
+        assertThat(respondents.get(0).getName()).isEqualTo("Respondent: Secretary of State for Work and Pensions");
     }
 
-    @Test
-    @Parameters({"taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection", "childBenefit",
+    @ParameterizedTest
+    @ValueSource(strings = {"taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection", "childBenefit",
         "thirtyHoursFreeChildcare", "guaranteedMinimumPension", "nationalInsuranceCredits"})
-    public void givenAnSscs5BenefitType_thenAddHmrcAsRespondent(String benefit) {
+    void givenAnSscs5BenefitType_thenAddHmrcAsRespondent(String benefit) {
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefit).build()).build()).build();
 
         List<Respondent> respondents = handler.getRespondents(sscsCaseData);
-        assertEquals(1, respondents.size());
-        assertEquals("Respondent: HM Revenue & Customs", respondents.get(0).getName());
+        assertThat(respondents).hasSize(1);
+        assertThat(respondents.get(0).getName()).isEqualTo("Respondent: HM Revenue & Customs");
     }
 
     @Test
-    public void givenOtherParties_thenAddAsRespondent() {
+    void givenOtherParties_thenAddAsRespondent() {
         CcdValue<OtherParty> otherParty1 = CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder().id("1").name(Name.builder().title("Mr").firstName("Hugo").lastName("Lloris").build()).build()).build();
         SscsCaseData sscsCaseData = SscsCaseData.builder()
@@ -83,13 +81,13 @@ public class IssueDocumentHandlerTest {
                 .otherParties(singletonList(otherParty1)).build();
 
         List<Respondent> respondents = handler.getRespondents(sscsCaseData);
-        assertEquals(2, respondents.size());
-        assertEquals("Respondent: Secretary of State for Work and Pensions", respondents.get(0).getName());
-        assertEquals("Second Respondent: Mr Hugo Lloris", respondents.get(1).getName());
+        assertThat(respondents).hasSize(2);
+        assertThat(respondents.get(0).getName()).isEqualTo("Respondent: Secretary of State for Work and Pensions");
+        assertThat(respondents.get(1).getName()).isEqualTo("Second Respondent: Mr Hugo Lloris");
     }
 
     @Test
-    public void given10OtherParties_thenAddAsRespondentWithoutNumber() {
+    void given10OtherParties_thenAddAsRespondentWithoutNumber() {
         CcdValue<OtherParty> otherParty1 = CcdValue.<OtherParty>builder()
                 .value(OtherParty.builder().id("1").name(Name.builder().title("Mr").firstName("Hugo").lastName("Lloris").build()).build()).build();
         List<CcdValue<OtherParty>> otherParties = asList(otherParty1, otherParty1, otherParty1, otherParty1, otherParty1,
@@ -99,57 +97,61 @@ public class IssueDocumentHandlerTest {
                 .otherParties(otherParties).build();
 
         List<Respondent> respondents = handler.getRespondents(sscsCaseData);
-        assertEquals(12, respondents.size());
-        assertEquals("Respondent: Secretary of State for Work and Pensions", respondents.get(0).getName());
-        assertEquals("Second Respondent: Mr Hugo Lloris", respondents.get(1).getName());
-        assertEquals("Respondent: Mr Hugo Lloris", respondents.get(11).getName());
+        assertThat(respondents).hasSize(12);
+        assertThat(respondents.get(0).getName()).isEqualTo("Respondent: Secretary of State for Work and Pensions");
+        assertThat(respondents.get(1).getName()).isEqualTo("Second Respondent: Mr Hugo Lloris");
+        assertThat(respondents.get(11).getName()).isEqualTo("Respondent: Mr Hugo Lloris");
     }
 
-    @Test
-    public void testDocumentPayloadValues() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
+    private SscsCaseData buildCaseData() {
+        return SscsCaseData.builder()
             .documentGeneration(DocumentGeneration.builder()
                 .bodyContent("Hello World")
                 .signedBy("Barry Allen")
                 .signedRole("Judge")
                 .build())
-                .ccdCaseId("1")
-                .appeal(Appeal.builder()
-                    .appellant(Appellant.builder()
-                        .name(Name.builder()
-                            .title("Mr")
-                            .firstName("User")
-                            .lastName("Lloris")
-                            .build())
-                            .identity(Identity.builder()
-                                .nino("BB 22 55 66 B")
-                                .build())
-                            .build())
-                    .benefitType(BenefitType.builder()
-                        .code("PIP")
+            .ccdCaseId("1")
+            .appeal(Appeal.builder()
+                .appellant(Appellant.builder()
+                    .name(Name.builder()
+                        .title("Mr")
+                        .firstName("User")
+                        .lastName("Lloris")
                         .build())
-                    .signer("Signer")
-                    .hearingType("oral")
-                    .receivedVia("Online")
+                    .identity(Identity.builder()
+                        .nino("BB 22 55 66 B")
+                        .build())
                     .build())
-                .build();
+                .benefitType(BenefitType.builder()
+                    .code("PIP")
+                    .build())
+                .signer("Signer")
+                .hearingType("oral")
+                .receivedVia("Online")
+                .build())
+            .build();
+    }
+
+    @Test
+    void testDocumentPayloadValues() {
+        SscsCaseData sscsCaseData = buildCaseData();
 
         String documentTypeLabel = "directions notice";
         LocalDate localDate = LocalDate.now();
-        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, documentTypeLabel, localDate, localDate, false, USER_AUTHORISATION);
-        assertEquals("User Lloris", payload.getAppellantFullName());
-        assertNull(payload.getAppointeeFullName());
-        assertEquals("1", payload.getCaseId());
-        assertEquals("BB 22 55 66 B", payload.getNino());
-        assertFalse(payload.isShouldHideNino());
-        assertEquals(1, payload.getRespondents().size());
-        assertEquals("Hello World", payload.getNoticeBody());
-        assertEquals("Barry Allen", payload.getUserName());
-        assertEquals("DIRECTIONS NOTICE", payload.getNoticeType());
-        assertEquals("Judge", payload.getUserRole());
-        assertEquals(localDate, payload.getDateAdded());
-        assertEquals(localDate, payload.getGeneratedDate());
-        assertEquals("Barry Allen", payload.getIdamSurname());
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, documentTypeLabel, localDate, localDate, false, false, false, USER_AUTHORISATION);
+        assertThat(payload.getAppellantFullName()).isEqualTo("User Lloris");
+        assertThat(payload.getAppointeeFullName()).isNull();
+        assertThat(payload.getCaseId()).isEqualTo("1");
+        assertThat(payload.getNino()).isEqualTo("BB 22 55 66 B");
+        assertThat(payload.isShouldHideNino()).isFalse();
+        assertThat(payload.getRespondents()).hasSize(1);
+        assertThat(payload.getNoticeBody()).isEqualTo("Hello World");
+        assertThat(payload.getUserName()).isEqualTo("Barry Allen");
+        assertThat(payload.getNoticeType()).isEqualTo("DIRECTIONS NOTICE");
+        assertThat(payload.getUserRole()).isEqualTo("Judge");
+        assertThat(payload.getDateAdded()).isEqualTo(localDate);
+        assertThat(payload.getGeneratedDate()).isEqualTo(localDate);
+        assertThat(payload.getIdamSurname()).isEqualTo("Barry Allen");
     }
 
     @ParameterizedTest
@@ -192,7 +194,7 @@ public class IssueDocumentHandlerTest {
     }
 
     @Test
-    public void givenSetAsideStateIsNull_thenReturnDraftDecisionNotice() {
+    void givenSetAsideStateIsNull_thenReturnDraftDecisionNotice() {
         String expectedDefaultDocumentLabel = "Draft Decision Notice";
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("1")
@@ -204,85 +206,79 @@ public class IssueDocumentHandlerTest {
             .build();
 
         String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel, false);
-        assertEquals(expectedDefaultDocumentLabel, documentTypeLabel);
+        assertThat(documentTypeLabel).isEqualTo(expectedDefaultDocumentLabel);
     }
 
     @Test
-    public void givenHearingIsNull_thenReturnDraftDecisionNotice() {
+    void givenHearingIsNull_thenReturnDraftDecisionNotice() {
         String expectedDefaultDocumentLabel = "Draft Decision Notice";
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("1")
             .build();
 
         String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel, false);
-        assertEquals(expectedDefaultDocumentLabel, documentTypeLabel);
+        assertThat(documentTypeLabel).isEqualTo(expectedDefaultDocumentLabel);
+    }
+
+    @Test
+    void givenPostHearingReviewIsSetAside_thenUseBodyContent() {
+        SscsCaseData sscsCaseData = buildCaseData();
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.SET_ASIDE);
+        String bodyContent = "set aside body content";
+        sscsCaseData.getDocumentGeneration().setBodyContent(bodyContent);
+
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, false, USER_AUTHORISATION);
+
+        assertThat(payload.getNoticeBody()).isEqualTo(bodyContent);
+    }
+
+    @Test
+    void givenPostHearingReviewIsCorrection_thenUseCorrectionBody() {
+        SscsCaseData sscsCaseData = buildCaseData();
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.CORRECTION);
+        String bodyContent = "correction body content";
+        sscsCaseData.getDocumentGeneration().setCorrectionBodyContent(bodyContent);
+
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, false, USER_AUTHORISATION);
+
+        assertThat(payload.getNoticeBody()).isEqualTo(bodyContent);
+    }
+
+    @Test
+    void givenPostHearingReviewIsSor_thenUseSorBody() {
+        SscsCaseData sscsCaseData = buildCaseData();
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.STATEMENT_OF_REASONS);
+        String bodyContent = "sor body content";
+        sscsCaseData.getDocumentGeneration().setStatementOfReasonsBodyContent(bodyContent);
+
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, false, USER_AUTHORISATION);
+
+        assertThat(payload.getNoticeBody()).isEqualTo(bodyContent);
+    }
+
+    @Test
+    void givenPostHearingReviewIsLta_thenUseLtaBody() {
+        SscsCaseData sscsCaseData = buildCaseData();
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
+        String bodyContent = "sor body content";
+        sscsCaseData.getDocumentGeneration().setLibertyToApplyBodyContent(bodyContent);
+
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, true, USER_AUTHORISATION);
+
+        assertThat(payload.getNoticeBody()).isEqualTo(bodyContent);
     }
 
     @ParameterizedTest
-    @EnumSource(value = DocumentType.class, names = {"SET_ASIDE_APPLICATION", "CORRECTION_APPLICATION"})
-    public void givenPostHearingReviewGrantedOrRefused_thenReturnAppropriateDocumentLabel(DocumentType documentType) {
-        String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
+    @EnumSource(
+        value = PostHearingReviewType.class,
+        names = {"PERMISSION_TO_APPEAL"})
+    void givenPostHearingReviewIsNotImplemented_thenThrowException(PostHearingReviewType postHearingReviewType) {
+        SscsCaseData sscsCaseData = buildCaseData();
+        sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
 
-        SscsCaseData caseDataGrant = SscsCaseData.builder()
-            .ccdCaseId("1")
-            .build();
-        SetAside setAsideGrant = SetAside.builder()
-            .action(SetAsideActions.GRANT)
-            .build();
-        Correction correctionGrant = Correction.builder()
-            .action(CorrectionActions.GRANT)
-            .build();
-
-        caseDataGrant.getPostHearing().setSetAside(setAsideGrant);
-        caseDataGrant.getPostHearing().setCorrection(correctionGrant);
-
-        String updatedLabelGrant = new IssueDocumentHandler()
-            .setDocumentTypeLabelForPostHearing(caseDataGrant.getPostHearing(), documentType, documentTypeLabel);
-
-        SscsCaseData caseDataRefuse = SscsCaseData.builder()
-            .ccdCaseId("2")
-            .build();
-        SetAside setAsideRefuse = SetAside.builder()
-            .action(SetAsideActions.REFUSE)
-            .build();
-        Correction correctionRefuse = Correction.builder()
-            .action(CorrectionActions.REFUSE)
-            .build();
-
-        caseDataRefuse.getPostHearing().setSetAside(setAsideRefuse);
-        caseDataRefuse.getPostHearing().setCorrection(correctionRefuse);
-
-        String expectedLabelGrant = documentType.getLabel() + " granted";
-        String expectedLabelRefuse = documentType.getLabel() + " refused";
-
-        String updatedLabelRefuse = new IssueDocumentHandler()
-            .setDocumentTypeLabelForPostHearing(caseDataRefuse.getPostHearing(), documentType, documentTypeLabel);
-
-        assertEquals(expectedLabelGrant, updatedLabelGrant);
-        assertEquals(expectedLabelRefuse, updatedLabelRefuse);
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = DocumentType.class, names = {"SET_ASIDE_APPLICATION", "CORRECTION_APPLICATION"})
-    public void givenPostHearingReviewActionTypeIsNotGrantOrRefuse_thenReturnDefaultDocumentLabel(DocumentType documentType) {
-        String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
-
-        SscsCaseData caseDataGrant = SscsCaseData.builder()
-            .ccdCaseId("1")
-            .build();
-        SetAside setAsideGrant = SetAside.builder()
-            .action(SetAsideActions.ISSUE_DIRECTIONS)
-            .build();
-        Correction correctionGrant = Correction.builder()
-            .action(CorrectionActions.SEND_TO_JUDGE)
-            .build();
-
-        caseDataGrant.getPostHearing().setSetAside(setAsideGrant);
-        caseDataGrant.getPostHearing().setCorrection(correctionGrant);
-
-        String updatedLabel = new IssueDocumentHandler()
-            .setDocumentTypeLabelForPostHearing(caseDataGrant.getPostHearing(), documentType, documentTypeLabel);
-
-        assertEquals(documentTypeLabel, updatedLabel);
+        assertThatThrownBy(() ->
+            handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, true, USER_AUTHORISATION))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("getNoticeBody has unexpected postHearingReviewType: " + postHearingReviewType.getDescriptionEn());
     }
 }

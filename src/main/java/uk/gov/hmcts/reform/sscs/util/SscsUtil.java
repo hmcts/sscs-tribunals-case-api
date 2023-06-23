@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.sscs.util;
 
-import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -12,9 +10,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.Nullable;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @Slf4j
@@ -39,25 +50,39 @@ public class SscsUtil {
         return allowedStates.contains(state);
     }
 
+    public static void clearPostHearingFields(SscsCaseData caseData) {
+        caseData.setPostHearing(null);
+        clearDocumentTransientFields(caseData);
+    }
+
     public static void clearDocumentTransientFields(SscsCaseData caseData) {
         caseData.setDocumentGeneration(DocumentGeneration.builder().build());
         caseData.setDocumentStaging(DocumentStaging.builder().build());
     }
 
-    public static void addDocumentToDocumentTab(FooterService footerService, SscsCaseData caseData, DocumentType documentType) {
+    public static void addDocumentToDocumentTabAndBundle(FooterService footerService,
+                                                         SscsCaseData caseData, DocumentType documentType) {
         DocumentLink url = caseData.getDocumentStaging().getPreviewDocument();
-        String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        SscsDocumentTranslationStatus documentTranslationStatus = null;
-        if (caseData.isLanguagePreferenceWelsh()) {
-            documentTranslationStatus = SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
+
+        if (nonNull(url)) {
+            String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            SscsDocumentTranslationStatus documentTranslationStatus = getDocumentTranslationStatus(caseData);
+
+            footerService.createFooterAndAddDocToCase(url, caseData, documentType, now,
+                null, null, documentTranslationStatus);
+
+            updateTranslationStatus(caseData, documentTranslationStatus);
         }
-        footerService.createFooterAndAddDocToCase(url, caseData, documentType, now,
-            null, null, documentTranslationStatus);
-        if (documentTranslationStatus != null) {
-            caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
-            log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
-            caseData.setTranslationWorkOutstanding(YesNo.YES.getValue());
+    }
+
+    public static void addDocumentToCaseDataDocuments(SscsCaseData caseData, SscsDocument sscsDocument) {
+        List<SscsDocument> documents = new ArrayList<>();
+        documents.add(sscsDocument);
+
+        if (caseData.getSscsDocument() != null) {
+            documents.addAll(caseData.getSscsDocument());
         }
+        caseData.setSscsDocument(documents);
     }
 
     public static void addDocumentToBundle(FooterService footerService, SscsCaseData sscsCaseData, SscsDocument sscsDocument, String overrideFileName) {
@@ -67,79 +92,51 @@ public class SscsUtil {
         footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, overrideFileName, null);
     }
 
-    @Nullable
-    public static CcdCallbackMap getCcdCallbackMap(PostHearing postHearing, PostHearingReviewType reviewType) {
-        if (isNull(reviewType)) {
-            return null;
+    public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {
+        PostHearingReviewType postHearingReviewType = postHearing.getReviewType();
+        if (isPostHearingsEnabled && nonNull(postHearingReviewType)) {
+            switch (postHearingReviewType) {
+                case SET_ASIDE:
+                    if (SetAsideActions.REFUSE.equals(postHearing.getSetAside().getAction())) {
+                        return DocumentType.SET_ASIDE_REFUSED;
+                    }
+                    break;
+                case CORRECTION:
+                    if (CorrectionActions.REFUSE.equals(postHearing.getCorrection().getAction())) {
+                        return DocumentType.CORRECTION_REFUSED;
+                    }
+                    break;
+                case STATEMENT_OF_REASONS:
+                    if (StatementOfReasonsActions.REFUSE.equals(postHearing.getStatementOfReasons().getAction())) {
+                        return DocumentType.STATEMENT_OF_REASONS_REFUSED;
+                    }
+
+                    return DocumentType.STATEMENT_OF_REASONS_GRANTED;
+                case LIBERTY_TO_APPLY:
+                case PERMISSION_TO_APPEAL:
+                default:
+                    break;
+            }
+        } else {
+            return DocumentType.DECISION_NOTICE;
         }
-        switch (reviewType) {
-            case SET_ASIDE:
-                CcdCallbackMap action = postHearing.getSetAside().getAction();
-                if (action == SetAsideActions.REFUSE
-                        && isYes(postHearing.getSetAside().getRequestStatementOfReasons())) {
-                    action = SetAsideActions.REFUSE_SOR;
-                }
-                return action;
-            case CORRECTION:
-                return postHearing.getCorrection().getAction();
-            case STATEMENT_OF_REASONS:
-                return postHearing.getStatementOfReasons().getAction();
-            case PERMISSION_TO_APPEAL:
-                return postHearing.getPermissionToAppeal().getAction();
-            case LIBERTY_TO_APPLY:
-                return postHearing.getLibertyToApply().getAction();
-            default:
-                return null;
+
+        throw new IllegalArgumentException("getting the document type has an unexpected postHearingReviewType and action");
+    }
+
+    private static SscsDocumentTranslationStatus getDocumentTranslationStatus(SscsCaseData caseData) {
+        return caseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
+    }
+
+    private static void updateTranslationStatus(SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
+        if (documentTranslationStatus != null) {
+            caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
+            log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
+            caseData.setTranslationWorkOutstanding(YesNo.YES.getValue());
         }
     }
 
-    @Nullable
-    public static DocumentType getDocumentTypeFromReviewType(PostHearingReviewType reviewType) {
-        if (isNull(reviewType)) {
-            return null;
-        }
-        switch (reviewType) {
-            case SET_ASIDE:
-                return DocumentType.SET_ASIDE_APPLICATION;
-            case CORRECTION:
-                return DocumentType.CORRECTION_APPLICATION;
-            case STATEMENT_OF_REASONS:
-            case PERMISSION_TO_APPEAL:
-            case LIBERTY_TO_APPLY:
-            default:
-                return null;
-        }
-    }
-
-    @Nullable
-    public static EventType getEventTypeFromDocumentReviewTypeAndAction(PostHearingReviewType reviewType, String actionName) {
-        if (isNull(reviewType) || isNull(actionName)) {
-            return null;
-        }
-        boolean isGrant = GRANT.getValue().equals(actionName);
-        boolean isRefuse = REFUSE.getValue().equals(actionName);
-
-        switch (reviewType) {
-            case SET_ASIDE:
-                if (isGrant) {
-                    return EventType.SET_ASIDE_GRANTED;
-                } else if (isRefuse) {
-                    return EventType.SET_ASIDE_REFUSED;
-                }
-                break;
-            case CORRECTION:
-                if (isGrant) {
-                    return EventType.CORRECTION_GRANTED;
-                } else if (isRefuse) {
-                    return EventType.CORRECTION_REFUSED;
-                }
-                break;
-            case STATEMENT_OF_REASONS:
-            case PERMISSION_TO_APPEAL:
-            case LIBERTY_TO_APPLY:
-            default:
-                // do nothing
-        }
-        return null;
+    public static boolean isGapsCase(SscsCaseData sscsCaseData) {
+        return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
     }
 }

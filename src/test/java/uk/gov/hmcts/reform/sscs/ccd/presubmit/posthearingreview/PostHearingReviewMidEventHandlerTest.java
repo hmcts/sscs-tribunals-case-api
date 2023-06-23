@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewMidEventHandlerTest {
@@ -58,12 +59,15 @@ class PostHearingReviewMidEventHandlerTest {
     @Mock
     private DocumentConfiguration documentConfiguration;
 
+    @Mock
+    private UserDetailsService userDetailsService;
+
     private PostHearingReviewMidEventHandler handler;
 
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, true);
+        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, userDetailsService, true, true);
 
         PostHearing postHearing = PostHearing.builder()
             .reviewType(PostHearingReviewType.SET_ASIDE)
@@ -75,6 +79,9 @@ class PostHearingReviewMidEventHandlerTest {
         caseData = SscsCaseData.builder()
             .documentGeneration(DocumentGeneration.builder()
                 .generateNotice(YES)
+                .correctionGenerateNotice(YES)
+                .statementOfReasonsGenerateNotice(YES)
+                .libertyToApplyGenerateNotice(YES)
                 .build())
             .appeal(Appeal.builder().appellant(Appellant.builder()
                     .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
@@ -108,13 +115,21 @@ class PostHearingReviewMidEventHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, false);
+        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, userDetailsService, false, false);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
 
-    @Test
-    void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentField() {
+    @ParameterizedTest
+    @EnumSource(
+        value = PostHearingReviewType.class,
+        names = {
+            "SET_ASIDE",
+            "CORRECTION",
+            "STATEMENT_OF_REASONS",
+            "LIBERTY_TO_APPLY"
+        })
+    void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentField(PostHearingReviewType postHearingReviewType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
@@ -126,6 +141,8 @@ class PostHearingReviewMidEventHandlerTest {
                 SET_ASIDE_GRANTED, TEMPLATE_ID)
             ))
         ));
+
+        caseData.getPostHearing().setReviewType(postHearingReviewType);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
