@@ -102,6 +102,7 @@ public class SscsUtil {
                     if (LibertyToApplyActions.REFUSE.equals(postHearing.getLibertyToApply().getAction())) {
                         return DocumentType.LIBERTY_TO_APPLY_REFUSED;
                     }
+
                     return DocumentType.LIBERTY_TO_APPLY_GRANTED;
                 case PERMISSION_TO_APPEAL:
                 default:
