@@ -89,8 +89,8 @@ class SscsUtilTest {
 
     @ParameterizedTest
     @CsvSource(value = {
-            "GRANT,LIBERTY_TO_APPLY_GRANTED",
-            "REFUSE,LIBERTY_TO_APPLY_REFUSED"
+        "GRANT,LIBERTY_TO_APPLY_GRANTED",
+        "REFUSE,LIBERTY_TO_APPLY_REFUSED"
     })
     void givenActionTypeLta_shouldReturnLtaDocument(LibertyToApplyActions action, DocumentType expectedDocumentType) {
         postHearing.setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
