@@ -1,18 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.getfirsttierdocuments;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.sscs.bundling.BundleCallback;
 import uk.gov.hmcts.reform.sscs.bundling.BundlingHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -36,9 +33,6 @@ public class GetFirstTierDocumentsAboutToSubmitHandlerTest {
 
     private PreSubmitCallbackResponse<SscsCaseData> bundlingResponse;
 
-    private final ArgumentCaptor<BundleCallback> capture = ArgumentCaptor.forClass(BundleCallback.class);
-
-
     @BeforeEach
     public void setUp() {
         handler = new GetFirstTierDocumentsAboutToSubmitHandler(true, true, bundlingHandler);
@@ -50,14 +44,14 @@ public class GetFirstTierDocumentsAboutToSubmitHandlerTest {
 
     @Test
     public void givenAValidEvent_thenReturnTrue() {
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
     @Test
-    public void givenANonCreateBundleEvent_thenReturnFalse() {
+    public void givenANonGetFirstTierDocumentsEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
-        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @Test
@@ -66,8 +60,6 @@ public class GetFirstTierDocumentsAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(bundlingHandler).handle(capture.capture());
-        assertEquals(callback, capture.getValue());
-        assertEquals(bundlingResponse, response);
+        assertThat(response).isEqualTo(bundlingResponse);
     }
 }

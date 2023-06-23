@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.getfirsttierdocuments;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
@@ -39,14 +39,14 @@ public class GetFirstTierDocumentsAboutToStartEventHandlerTest {
 
     @Test
     public void givenAValidEvent_thenReturnTrue() {
-        assertTrue(handler.canHandle(ABOUT_TO_START, callback));
+        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isTrue();
     }
 
     @Test
     public void givenANonGetFirstTierDocumentsEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
-        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
+        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 
     @Test
@@ -59,7 +59,7 @@ public class GetFirstTierDocumentsAboutToStartEventHandlerTest {
         String error = response.getWarnings().stream()
                 .findFirst()
                 .orElse("");
-        assertEquals("There is no hearing recording uploaded on this case, please email the RPC to upload before completing this event", error);
+        assertThat(error).isEqualTo("There is no hearing recording uploaded on this case, please email the RPC to upload before completing this event");
     }
 
     @Test
@@ -73,8 +73,8 @@ public class GetFirstTierDocumentsAboutToStartEventHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(0, response.getErrors().size());
-        assertEquals(0, response.getWarnings().size());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
     }
 
 

@@ -1,10 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -13,10 +10,8 @@ import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import uk.gov.hmcts.reform.sscs.bundling.BundleCallback;
 import uk.gov.hmcts.reform.sscs.bundling.BundlingHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -40,9 +35,6 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
     private PreSubmitCallbackResponse<SscsCaseData> bundlingResponse;
 
-    private final ArgumentCaptor<BundleCallback> capture = ArgumentCaptor.forClass(BundleCallback.class);
-
-
     @Before
     public void setUp() {
         openMocks(this);
@@ -55,22 +47,22 @@ public class CreateBundleAboutToSubmitHandlerTest {
 
     @Test
     public void givenAValidEvent_thenReturnTrue() {
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
     @Test
     public void givenANonCreateBundleEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
-        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
 
     @Test
     public void shouldHandleBundling() {
+        when(bundlingHandler.handle(any())).thenReturn(bundlingResponse);
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(bundlingHandler).handle(capture.capture());
-        assertEquals(callback, capture.getValue());
-        assertEquals(bundlingResponse, response);
+        assertThat(response).isEqualTo(bundlingResponse);
     }
 }

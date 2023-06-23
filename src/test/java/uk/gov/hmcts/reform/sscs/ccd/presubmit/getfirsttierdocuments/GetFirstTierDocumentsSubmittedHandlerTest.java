@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.getfirsttierdocuments;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,15 +49,15 @@ public class GetFirstTierDocumentsSubmittedHandlerTest {
     @Test
     public void givenAValidEvent_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.GET_FIRST_TIER_DOCUMENTS);
-        assertTrue(handler.canHandle(SUBMITTED, callback));
+        assertThat(handler.canHandle(SUBMITTED, callback)).isTrue();
     }
 
     @Test
-    public void givenANonCreateBundleEvent_thenReturnFalse() {
+    public void givenANonGetFirstTierDocumentsEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.GET_FIRST_TIER_DOCUMENTS);
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
-        assertFalse(handler.canHandle(SUBMITTED, callback));
+        assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }
 
     @Test
@@ -69,8 +69,8 @@ public class GetFirstTierDocumentsSubmittedHandlerTest {
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         verify(ccdCallbackMapService).handleCcdCallbackMap(capture.capture(), eq(sscsCaseData));
-        assertEquals(EventType.BUNDLE_CREATED_FOR_UPPER_TRIBUNAL, capture.getValue().getCallbackEvent());
-        assertEquals("Bundle created for UT", capture.getValue().getCallbackSummary());
-        assertEquals("Bundle created for UT", capture.getValue().getCallbackDescription());
+        assertThat(capture.getValue().getCallbackEvent()).isEqualTo(EventType.BUNDLE_CREATED_FOR_UPPER_TRIBUNAL);
+        assertThat(capture.getValue().getCallbackSummary()).isEqualTo("Bundle created for UT");
+        assertThat(capture.getValue().getCallbackDescription()).isEqualTo("Bundle created for UT");
     }
 }
