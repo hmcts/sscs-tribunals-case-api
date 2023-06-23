@@ -1,20 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.getfirsttierdocuments;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-
-import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdCallbackMap;
@@ -22,7 +13,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 
-@RunWith(JUnitParamsRunner.class)
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
+
+@ExtendWith(MockitoExtension.class)
 public class GetFirstTierDocumentsSubmittedHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -43,26 +40,21 @@ public class GetFirstTierDocumentsSubmittedHandlerTest {
     private final ArgumentCaptor<CcdCallbackMap> capture = ArgumentCaptor.forClass(CcdCallbackMap.class);
 
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        openMocks(this);
-        handler = new GetFirstTierDocumentsSubmittedHandler(ccdCallbackMapService, true);
-
+        handler = new GetFirstTierDocumentsSubmittedHandler(true, true, ccdCallbackMapService);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("1").build();
-
-        when(callback.getEvent()).thenReturn(EventType.GET_FIRST_TIER_DOCUMENTS);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(ccdCallbackMapService.handleCcdCallbackMap(capture.capture(), eq(sscsCaseData))).thenReturn(sscsCaseData);
     }
 
     @Test
     public void givenAValidEvent_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.GET_FIRST_TIER_DOCUMENTS);
         assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
     public void givenANonCreateBundleEvent_thenReturnFalse() {
+        when(callback.getEvent()).thenReturn(EventType.GET_FIRST_TIER_DOCUMENTS);
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
         assertFalse(handler.canHandle(SUBMITTED, callback));
@@ -70,7 +62,9 @@ public class GetFirstTierDocumentsSubmittedHandlerTest {
 
     @Test
     public void shouldUpdateEvent() {
-        when(callback.getEvent()).thenReturn(EventType.GET_FIRST_TIER_DOCUMENTS);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(ccdCallbackMapService.handleCcdCallbackMap(capture.capture(), eq(sscsCaseData))).thenReturn(sscsCaseData);
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 

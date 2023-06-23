@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.getfirsttierdocuments;
 
-import static java.util.Objects.requireNonNull;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +13,15 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
+import static java.util.Objects.requireNonNull;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class GetFirstTierDocumentsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    @Value("${feature.postHearings.enabled}")
+    private final boolean isPostHearingsEnabled;
 
     @Value("${feature.postHearingsB.enabled}")
     private final boolean isPostHearingsBEnabled;
@@ -33,6 +36,7 @@ public class GetFirstTierDocumentsAboutToSubmitHandler implements PreSubmitCallb
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
                 && callback.getEvent() == EventType.GET_FIRST_TIER_DOCUMENTS
+                && isPostHearingsEnabled
                 && isPostHearingsBEnabled;
     }
 
