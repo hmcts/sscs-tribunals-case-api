@@ -92,7 +92,7 @@ class SscsUtilTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PostHearingReviewType.class, names = {"PERMISSION_TO_APPEAL", "LIBERTY_TO_APPLY"})
+    @EnumSource(value = PostHearingReviewType.class, names = {"PERMISSION_TO_APPEAL"})
     void givenActionTypeNotSupported_throwError(PostHearingReviewType postHearingReviewType) {
         postHearing.setReviewType(postHearingReviewType);
 
