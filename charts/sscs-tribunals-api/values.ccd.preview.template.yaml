@@ -554,8 +554,17 @@ sscs-evidence-share:
         secretRef: sscs-sb-preview
         key: primaryKey
 
+# tya disabled by default due of requirements of additional topic subscriptions which is not possible currently configure and should be done manually
+# if your PR requires tya-notif change enabled to true
+# deploy to preview as usual
+# and when go to azure portal and search for sscs-sb-preview
+# click topics and select your PR topic
+# click subscriptions and click add subscription button (+ subscription)
+# into name field add name: sscs-tribunals-api-pr-##YOUR PR NUMBER ##-servicebus-tya (example: sscs-tribunals-api-pr-3290-servicebus-tya)
+# click create
+# azure steps should be repeated every time PR is undeployed from preview
 sscs-tya-notif:
-  enabled: true
+  enabled: false
   java:
     image: hmctspublic.azurecr.io/sscs/tya-notif:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
@@ -563,7 +572,7 @@ sscs-tya-notif:
     environment:
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
       SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
-      TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+      TOPIC_NAME: "${SERVICE_NAME}-servicebus-tya"
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       AMQP_USERNAME: "RootManageSharedAccessKey"
       JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
