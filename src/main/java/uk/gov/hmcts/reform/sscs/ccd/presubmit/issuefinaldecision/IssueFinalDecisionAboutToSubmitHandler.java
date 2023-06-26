@@ -2,11 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -19,24 +16,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.util.FinalDecisionUtil;
+import uk.gov.hmcts.reform.sscs.util.FinalDecisionUtil.FinalDecisionType;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
@@ -94,7 +88,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             return preSubmitCallbackResponse;
         }
 
-        createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
+        FinalDecisionUtil.createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse, FinalDecisionType.INITIAL, footerService);
 
         if (isPostHearingsEnabled) {
             String generateNotice = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice();
@@ -137,7 +131,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
     private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
 
-        String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(sscsCaseData);
+        String benefitType = FinalDecisionUtil.getBenefitType(sscsCaseData);
 
         if (benefitType == null) {
             throw new IllegalStateException("Unable to determine benefit type");
@@ -154,31 +148,6 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             preSubmitCallbackResponse.addError("Outcome cannot be empty. Please check case data. If problem continues please contact support");
         }
 
-    }
-
-    private void createFinalDecisionNoticeFromPreviewDraft(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-
-        SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
-
-        DocumentLink docLink = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument();
-
-        DocumentLink documentLink = DocumentLink.builder()
-            .documentUrl(docLink.getDocumentUrl())
-            .documentFilename(docLink.getDocumentFilename())
-            .documentBinaryUrl(docLink.getDocumentBinaryUrl())
-            .build();
-
-
-        String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-
-        final SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelsh() ? TRANSLATION_REQUIRED : null;
-        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.FINAL_DECISION_NOTICE, now,
-                null, null, documentTranslationStatus);
-        if (documentTranslationStatus != null) {
-            sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
-            log.info("Set the InterlocReviewState to {},  for case id : {}", sscsCaseData.getInterlocReviewState(), sscsCaseData.getCcdCaseId());
-            sscsCaseData.setTranslationWorkOutstanding(YES.getValue());
-        }
     }
 
     private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {

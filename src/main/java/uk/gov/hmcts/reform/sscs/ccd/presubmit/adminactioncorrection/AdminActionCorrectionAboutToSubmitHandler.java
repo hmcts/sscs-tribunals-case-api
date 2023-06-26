@@ -15,8 +15,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
+import uk.gov.hmcts.reform.sscs.util.FinalDecisionUtil;
+import uk.gov.hmcts.reform.sscs.util.FinalDecisionUtil.FinalDecisionType;
 
 @Component
 @Slf4j
@@ -24,6 +26,8 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final DecisionNoticeService decisionNoticeService;
     private final PreviewDocumentService previewDocumentService;
+
+    private final FooterService footerService;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
@@ -54,7 +58,8 @@ public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallb
 
         if (AdminCorrectionType.HEADER.equals(adminCorrectionType)) {
             log.info("Handling header correction for case: {}", ccdCaseId);
-            SscsUtil.writeFinalDecisionNotice(sscsCaseData, preSubmitCallbackResponse, previewDocumentService, decisionNoticeService);
+            FinalDecisionUtil.writePreviewFinalDecisionNotice(sscsCaseData, preSubmitCallbackResponse, previewDocumentService, decisionNoticeService);
+            FinalDecisionUtil.createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse, FinalDecisionType.CORRECTED, footerService);
         }
 
         return preSubmitCallbackResponse;

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
@@ -12,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -28,11 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
-import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 
 @Slf4j
 public class SscsUtil {
@@ -96,21 +90,6 @@ public class SscsUtil {
         DocumentType documentType = DocumentType.fromValue(sscsDocument.getValue().getDocumentType());
         String dateIssued = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, null, null);
-    }
-
-    public static void writeFinalDecisionNotice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, PreviewDocumentService previewDocumentService, DecisionNoticeService decisionNoticeService) {
-        State state = sscsCaseData.getState();
-        String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(sscsCaseData);
-        if (benefitType == null) {
-            preSubmitCallbackResponse.addError("Unexpected error - benefit type is null");
-        } else {
-            DecisionNoticeOutcomeService outcomeService =  decisionNoticeService.getOutcomeService(benefitType);
-            outcomeService.validate(preSubmitCallbackResponse, sscsCaseData);
-            if (!(State.READY_TO_LIST.equals(state) || State.WITH_DWP.equals(state))) {
-                sscsCaseData.setPreviousState(state);
-            }
-            previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_DECISION_NOTICE, sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
-        }
     }
 
     public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {

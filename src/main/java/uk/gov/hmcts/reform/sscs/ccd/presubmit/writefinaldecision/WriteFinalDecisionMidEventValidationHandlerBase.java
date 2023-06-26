@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
+import uk.gov.hmcts.reform.sscs.util.FinalDecisionUtil;
 
 @Slf4j
 public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -46,7 +47,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
 
     private String getBenefitTypeFromCallback(Callback<SscsCaseData> callback) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        return WriteFinalDecisionBenefitTypeHelper.getBenefitType(caseData);
+        return FinalDecisionUtil.getBenefitType(caseData);
     }
 
     @Override

@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
+import uk.gov.hmcts.reform.sscs.util.FinalDecisionUtil;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Slf4j
@@ -68,7 +69,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
                                                      boolean isScottish, boolean isPostHearingsEnabled,
                                                      boolean isPostHearingsBEnabled, String userAuthorisation) {
 
-        String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(caseData);
+        String benefitType = FinalDecisionUtil.getBenefitType(caseData);
 
         if (benefitType == null) {
             throw new IllegalStateException("Unable to determine benefit type");

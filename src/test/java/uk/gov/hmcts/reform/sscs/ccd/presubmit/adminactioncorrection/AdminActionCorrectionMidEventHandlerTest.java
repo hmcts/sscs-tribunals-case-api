@@ -132,7 +132,7 @@ class AdminActionCorrectionMidEventHandlerTest {
         DocumentLink previewDocument = response.getData().getDocumentStaging().getPreviewDocument();
         assertThat(previewDocument).isNotNull();
 
-        String expectedFilename = String.format("Decision Notice issued on %s.pdf",
+        String expectedFilename = String.format("Corrected decision notice issued on %s.pdf",
             LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         assertThat(previewDocument.getDocumentFilename()).isEqualTo(expectedFilename);
@@ -146,7 +146,7 @@ class AdminActionCorrectionMidEventHandlerTest {
         var value = capture.getValue();
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
-        assertThat(payload.getNoticeType()).isEqualTo("DECISION NOTICE");
+        assertThat(payload.getNoticeType()).isEqualTo("CORRECTED DECISION NOTICE");
         assertThat(payload.getAppellantFullName()).isEqualTo("Appellant Lastname");
         assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
     }

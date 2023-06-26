@@ -22,12 +22,12 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService2;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesStatus;
+import uk.gov.hmcts.reform.sscs.util.FinalDecisionUtil;
 
 @RestController
 @Slf4j
@@ -87,7 +87,7 @@ public class CcdMideventCallbackController {
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(sscsCaseData);
+        String benefitType = FinalDecisionUtil.getBenefitType(sscsCaseData);
 
         if (benefitType == null) {
             PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);

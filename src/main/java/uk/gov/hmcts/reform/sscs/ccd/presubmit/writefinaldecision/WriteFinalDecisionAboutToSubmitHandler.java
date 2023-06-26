@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
+import uk.gov.hmcts.reform.sscs.util.FinalDecisionUtil;
 
 @Component
 @Slf4j
@@ -56,7 +56,7 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        SscsUtil.writeFinalDecisionNotice(sscsCaseData, preSubmitCallbackResponse, previewDocumentService, decisionNoticeService);
+        FinalDecisionUtil.writePreviewFinalDecisionNotice(sscsCaseData, preSubmitCallbackResponse, previewDocumentService, decisionNoticeService);
 
         return preSubmitCallbackResponse;
     }
