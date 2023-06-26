@@ -260,19 +260,19 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
         }
 
-        if (isSetAsideApplication(sscsCaseData) && isPostHearingsEnabled) {
+        if (isPostHearingsEnabled && isSetAsideApplication(sscsCaseData)) {
             sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
             if (PartyItemList.DWP.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
                 sscsCaseData.setDwpState(DwpState.SET_ASIDE_REQUESTED);
             }
         }
 
-        if (isCorrectionApplication(sscsCaseData) && isPostHearingsEnabled) {
+        if (isPostHearingsEnabled && isCorrectionApplication(sscsCaseData)) {
             sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.CORRECTION);
             sscsCaseData.setDwpState(DwpState.CORRECTION_REQUESTED);
         }
 
-        if (isSorApplication(sscsCaseData) && isPostHearingsEnabled) {
+        if (isPostHearingsEnabled && isSorApplication(sscsCaseData)) {
             sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.STATEMENT_OF_REASONS);
             sscsCaseData.setDwpState(DwpState.STATEMENT_OF_REASONS_REQUESTED);
         }
@@ -281,14 +281,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             preSubmitCallbackResponse);
 
         return preSubmitCallbackResponse;
-    }
-
-    private boolean isAdminActionCorrection(SscsCaseData sscsCaseData) {
-        return isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), ADMIN_ACTION_CORRECTION.getCode());
-    }
-
-    private boolean isSendToInterlocReviewByJudge(SscsCaseData sscsCaseData) {
-        return isFurtherEvidenceActionCode(sscsCaseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode());
     }
 
     private boolean isDocumentType(DocumentType documentType, SscsCaseData sscsCaseData) {

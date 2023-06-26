@@ -97,7 +97,7 @@ public class SscsUtil {
         footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, null, null);
     }
 
-    public static void handleFinalDecisionNotice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, PreviewDocumentService previewDocumentService, DecisionNoticeService decisionNoticeService) {
+    public static void writeFinalDecisionNotice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, PreviewDocumentService previewDocumentService, DecisionNoticeService decisionNoticeService) {
         State state = sscsCaseData.getState();
         String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(sscsCaseData);
         if (benefitType == null) {

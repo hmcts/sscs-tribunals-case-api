@@ -45,7 +45,6 @@ public class AdminActionCorrectionAboutToStartHandler implements PreSubmitCallba
             response.addError("Cannot process Admin Action Correction on non Scheduling & Listing Case");
             return response;
         }
-        SscsUtil.clearDocumentTransientFields(sscsCaseData);
 
         return response;
     }

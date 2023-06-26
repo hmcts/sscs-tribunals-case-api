@@ -56,7 +56,7 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        SscsUtil.handleFinalDecisionNotice(sscsCaseData, preSubmitCallbackResponse, previewDocumentService, decisionNoticeService);
+        SscsUtil.writeFinalDecisionNotice(sscsCaseData, preSubmitCallbackResponse, previewDocumentService, decisionNoticeService);
 
         return preSubmitCallbackResponse;
     }

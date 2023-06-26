@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdminCorrectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
@@ -57,20 +56,12 @@ public class AdminActionCorrectionMidEventHandler extends IssueDocumentHandler i
         if (isNull(adminCorrectionType)) {
             log.error(String.format("adminCorrectionType unexpectedly null for case: %s", caseId));
             preSubmitCallbackResponse.addError(String.format("adminCorrectionType unexpectedly null for case: %s", caseId));
-        } else if (AdminCorrectionType.HEADER.equals(adminCorrectionType)) {
-            log.info("Handling header correction for case: {}", caseId);
-            YesNo noticeGenerated = sscsCaseData.getFinalDecisionNoticeGenerated();
-
-            if (isYes(noticeGenerated)) {
-                // IF generated: automatically regenerate final decision with the current details
-                log.info("Admin Action Correction: Regenerating final decision for caseId {}", caseId);
-                String templateId = documentConfiguration.getDocuments()
-                    .get(sscsCaseData.getLanguagePreference()).get(DECISION_ISSUED);
-                preSubmitCallbackResponse = issueDocument(callback, DECISION_NOTICE, templateId, generateFile, userAuthorisation);
-            } else {
-                // IF uploaded: go to upload screen and expect user to upload new document
-                // TODO determine if code is required here or if ccd definitions fulfil the required functionality
-            }
+        } else if (AdminCorrectionType.HEADER.equals(adminCorrectionType)
+            && isYes(sscsCaseData.getFinalDecisionNoticeGenerated())) {
+            log.info("Admin Action Correction: Regenerating final decision for caseId {}", caseId);
+            String templateId = documentConfiguration.getDocuments()
+                .get(sscsCaseData.getLanguagePreference()).get(DECISION_ISSUED);
+            preSubmitCallbackResponse = issueDocument(callback, DECISION_NOTICE, templateId, generateFile, userAuthorisation);
         }
 
         return preSubmitCallbackResponse;

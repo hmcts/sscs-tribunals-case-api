@@ -149,4 +149,19 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
             caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertThat(response.getData().getPreviousState()).isEqualTo(State.VOID_STATE);
     }
+
+
+    @Test
+    void givenHeaderCorrectionAndBenefitTypeNull_returnsError() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        caseData.getAppeal().setBenefitType(null);
+        caseData.getPostHearing().getCorrection().setAdminCorrectionType(AdminCorrectionType.HEADER);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors())
+            .containsOnly("Unexpected error - benefit type is null");
+    }
 }

@@ -9,7 +9,10 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdminCorrectionType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
@@ -51,9 +54,7 @@ public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallb
 
         if (AdminCorrectionType.HEADER.equals(adminCorrectionType)) {
             log.info("Handling header correction for case: {}", ccdCaseId);
-            SscsUtil.handleFinalDecisionNotice(sscsCaseData, preSubmitCallbackResponse, previewDocumentService, decisionNoticeService);
-        } else if (AdminCorrectionType.BODY.equals(adminCorrectionType)) {
-            log.info("Sending body correction to judge for case: {}", ccdCaseId);
+            SscsUtil.writeFinalDecisionNotice(sscsCaseData, preSubmitCallbackResponse, previewDocumentService, decisionNoticeService);
         }
 
         return preSubmitCallbackResponse;
