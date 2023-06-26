@@ -35,6 +35,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
+    @Value("${feature.postHearingsB.enabled}")
+    private final boolean isPostHearingsBEnabled;
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -144,8 +147,14 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                 return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
                     REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
                     EventType.SOR_REQUEST, "Statement of reasons request");
-            case PERMISSION_TO_APPEAL:
             case LIBERTY_TO_APPLY:
+                if (isPostHearingsBEnabled) {
+                    return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
+                        REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
+                        EventType.LIBERTY_TO_APPLY_REQUEST, "Liberty to apply request");
+                }
+                throw new IllegalStateException("Post hearings B is not enabled");
+            case PERMISSION_TO_APPEAL:
             default:
                 throw new IllegalArgumentException("Post hearing request type is not implemented or recognised: " + postHearingRequestType);
         }
