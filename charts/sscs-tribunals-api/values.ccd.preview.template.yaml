@@ -50,6 +50,7 @@ em-ccdorc:
   java:
     image: hmctspublic.azurecr.io/em/ccdorc:latest
     releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
+    ingressHost: em-ccdorc-${SERVICE_FQDN}
     environment:
       IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
@@ -57,7 +58,8 @@ em-ccdorc:
       EM_STITCHING_API_URL: http://em-stitching-aat.service.core-compute-aat.internal
       DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
       CCD_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
-      CALLBACK_DOMAIN: ${SERVICE_NAME}-em-ccdorc
+      CALLBACK_HTTP_SCHEME: https
+      CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
 
 ccd-case-document-am-api:
   enabled: true
@@ -457,7 +459,7 @@ ccd:
         IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
         IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
-        ROLE_ASSIGNMENT_URL: "http://{{ .Release.Name }}-am-role-assignment-service"
+        ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
       keyVaults: [ ]
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
       autoscaling:
@@ -538,7 +540,7 @@ sscs-evidence-share:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
-      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-evidence"
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       AMQP_USERNAME: "RootManageSharedAccessKey"
@@ -552,8 +554,17 @@ sscs-evidence-share:
         secretRef: sscs-sb-preview
         key: primaryKey
 
+# tya disabled by default due of requirements of additional topic subscriptions which is not possible currently configure and should be done manually
+# if your PR requires tya-notif change enabled to true
+# deploy to preview as usual
+# and when go to azure portal and search for sscs-sb-preview
+# click topics and select your PR topic
+# click subscriptions and click add subscription button (+ subscription)
+# into name field add name: sscs-tribunals-api-pr-##YOUR PR NUMBER ##-servicebus-tya (example: sscs-tribunals-api-pr-3290-servicebus-tya)
+# click create
+# azure steps should be repeated every time PR is undeployed from preview
 sscs-tya-notif:
-  enabled: true
+  enabled: false
   java:
     image: hmctspublic.azurecr.io/sscs/tya-notif:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
@@ -561,7 +572,7 @@ sscs-tya-notif:
     environment:
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
       SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
-      TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+      TOPIC_NAME: "${SERVICE_NAME}-servicebus-tya"
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       AMQP_USERNAME: "RootManageSharedAccessKey"
       JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
@@ -710,7 +721,7 @@ hmc-cft-hearing-service:
       CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
       CFT_HEARING_SERVICE_DB_PORT: 5432
       HMC_ACCESS_CONTROL_ENABLED: false
-      ROLE_ASSIGNMENT_URL: "http://{{ .Release.Name }}-am-role-assignment-service"
+      ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
       SPRING_CONFIG_IMPORT : "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
     secrets:
       HMC_SERVICE_BUS_CONNECTION_STRING:
