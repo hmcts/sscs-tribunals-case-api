@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,6 +46,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final RefDataService refDataService;
     private final VenueService venueService;
     private final boolean caseAccessManagementFeature;
+    private LocalDateTime hearingStartDate;
+    private LocalDateTime hearingEndDate;
+
+
 
     @SuppressWarnings("squid:S107")
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
@@ -143,13 +148,37 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void validateHearingOptions(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        System.out.println("***********************In validateHearingOptions***********************");
+
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+        validateHearingDate(sscsCaseData, response);
         if (hearingOptions != null
             && sscsCaseData.getAppeal().getHearingType() != null
             && HearingType.ORAL.getValue().equals(sscsCaseData.getAppeal().getHearingType())
             && Boolean.FALSE.equals(hearingOptions.isWantsToAttendHearing())) {
             response.addWarning("There is a mismatch between the hearing type and the wants to attend field, "
                 + "all hearing options will be cleared please check if this is correct");
+        }
+    }
+
+    private void validateHearingDate(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        System.out.println("***********************In validateHearingDate***********************");
+
+        //TODO: add loop to iterate through all hearings on case
+        if (sscsCaseData.getLatestHearing() != null) {
+            System.out.println("***********************In getLatestHearing***********************");
+            hearingStartDate = response.getData().getLatestHearing().getValue().getStart();
+            hearingEndDate = response.getData().getLatestHearing().getValue().getEnd();
+
+            System.out.println("hearingStartDate: " + hearingStartDate + "\nhearingEndDate: " + hearingEndDate);
+
+            if (hearingStartDate == null) {
+                response.addWarning("Add a start date for unavailable dates");
+            } else if (hearingEndDate == null) {
+                response.addWarning("Add an end date for unavailable dates");
+            } else if (hearingStartDate.isAfter(hearingEndDate)) {
+                response.addWarning("Start date must be before end date for unavailable dates");
+            }
         }
     }
 
