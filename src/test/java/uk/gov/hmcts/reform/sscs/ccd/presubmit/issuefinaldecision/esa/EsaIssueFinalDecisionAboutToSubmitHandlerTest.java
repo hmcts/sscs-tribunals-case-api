@@ -484,10 +484,9 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
-<<<<<<< HEAD
     public void givenAnIssueFinalDecisionEventIfHearingsIsNull_ThenDoNotSendHearingCancellationRequest() {
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
+                hearingMessageHelper, ccdCallbackMapService, true);
 
         DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
@@ -505,7 +504,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     @Test
     public void givenAnIssueFinalDecisionEventIfHearingsIsInThePastOnly_ThenDoNotSendHearingCancellationRequest() {
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
+                hearingMessageHelper, ccdCallbackMapService, true);
 
         DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
@@ -541,7 +540,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     @Test
     public void givenAnIssueFinalDecisionEventIfHearingsIsInThePastAndInTheFuture_ThenSendHearingCancellationRequest() {
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
+                hearingMessageHelper, ccdCallbackMapService, true);
 
         DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
@@ -577,7 +576,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     @Test
     public void givenAnIssueFinalDecisionEventIfHearingsIsInTheFutureOnly_ThenSendHearingCancellationRequest() {
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
+                hearingMessageHelper, ccdCallbackMapService, true);
 
         DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
@@ -604,7 +603,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     @Test
     public void givenAnIssueFinalDecisionEventIfHearingsListIsEmpty_ThenDoNotSendHearingCancellationRequest() {
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
+                hearingMessageHelper, ccdCallbackMapService, true);
 
         DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
@@ -622,7 +621,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     @Test
     public void givenAnIssueFinalDecisionEventIfHearingsExistsWithoutHearingDetails_ThenDoNotSendHearingCancellationRequest() {
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
+                hearingMessageHelper, ccdCallbackMapService, true);
 
         DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
@@ -636,7 +635,8 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
         verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
-=======
+    }
+
     public void givenCaseReadyForPostHearings_thenGrantCorrection() {
         ReflectionTestUtils.setField(handler, "isPostHearingEnabled", true);
         SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
@@ -650,6 +650,5 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
         Assertions.assertThat(response.getErrors()).isEmpty();
         verify(ccdCallbackMapService, times(1)).handleCcdCallbackMap(CorrectionActions.GRANT, sscsCaseData);
->>>>>>> remove submitted handler
     }
 }

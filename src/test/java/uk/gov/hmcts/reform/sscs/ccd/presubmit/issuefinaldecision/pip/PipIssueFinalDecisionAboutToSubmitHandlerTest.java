@@ -593,7 +593,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     @Test
     public void givenAnIssueFinalDecisionEventIfHearingsIsNull_ThenDoNotSendHearingCancellationRequest() {
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
+                hearingMessageHelper, ccdCallbackMapService, true);
         DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
                 .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
@@ -611,7 +611,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     @Test
     public void givenAnIssueFinalDecisionEventIfHearingsIsInThePastOnly_ThenDoNotSendHearingCancellationRequest() {
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
+                hearingMessageHelper, ccdCallbackMapService, true);
         DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
                 .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
@@ -647,7 +647,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     @Test
     public void givenAnIssueFinalDecisionEventIfHearingsIsInThePastAndInTheFuture_ThenSendHearingCancellationRequest() {
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
+                hearingMessageHelper, ccdCallbackMapService, true);
         DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
                 .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
@@ -683,7 +683,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     @Test
     public void givenAnIssueFinalDecisionEventIfHearingsIsInTheFutureOnly_ThenSendHearingCancellationRequest() {
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
+                hearingMessageHelper, ccdCallbackMapService, true);
         DocumentLink docLink = DocumentLink.builder()
                 .documentUrl("bla.com")
                 .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
