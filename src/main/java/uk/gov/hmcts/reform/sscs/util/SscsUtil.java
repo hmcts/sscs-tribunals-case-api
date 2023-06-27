@@ -149,7 +149,6 @@ public class SscsUtil {
     }
 
     public static DocumentType getIssueFinalDecisionDocumentType(SscsCaseData caseData, boolean isPostHearingsEnabled) {
-        System.out.println(caseData.getPostHearing());
         if (isPostHearingsEnabled
             && isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
             return DocumentType.CORRECTION_GRANTED;
