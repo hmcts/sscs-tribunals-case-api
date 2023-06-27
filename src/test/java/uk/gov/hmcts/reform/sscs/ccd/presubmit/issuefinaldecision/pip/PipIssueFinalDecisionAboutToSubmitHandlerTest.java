@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -67,6 +68,9 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     @Mock
     private ListAssistHearingMessageHelper hearingMessageHelper;
 
+    @Mock
+    private CcdCallbackMapService ccdCallbackMapService;
+
     private SscsCaseData sscsCaseData;
 
     private SscsDocument document;
@@ -85,7 +89,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), Arrays.asList(pipDecisionNoticeOutcomeService), new ArrayList<>());
 
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, false);
+                hearingMessageHelper, ccdCallbackMapService, false);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -390,7 +394,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     @Test
     public void givenAnIssueFinalDecisionEventForYesNoFlowWhenComparedToDwpQuestionComparedRatesAreNullButApprovalStatusSet_ThenDoNotDisplayAnError() {
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
+                hearingMessageHelper, ccdCallbackMapService, true);
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");

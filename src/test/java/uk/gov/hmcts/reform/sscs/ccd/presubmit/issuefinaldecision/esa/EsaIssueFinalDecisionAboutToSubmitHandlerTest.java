@@ -29,6 +29,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.assertj.core.api.Assertions;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +42,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
@@ -70,6 +72,9 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     @Mock
     private ListAssistHearingMessageHelper hearingMessageHelper;
 
+    @Mock
+    private CcdCallbackMapService ccdCallbackMapService;
+
     private SscsCaseData sscsCaseData;
 
     private DocumentLink documentLink;
@@ -88,7 +93,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), Arrays.asList(esaecisionNoticeOutcomeService), new ArrayList<>());
 
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, false);
+                hearingMessageHelper, ccdCallbackMapService, false);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -236,7 +241,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     @Test
     public void givenAnIssueFinalDecisionEventForGenerateNoticeFlowWhenAllowedOrRefusedIsNotNull_ThenDoNotDisplayAnError() {
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
+                hearingMessageHelper, ccdCallbackMapService, true);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(documentLink);
         callback.getCaseDetails().getCaseData().setWcaAppeal(YES);
         callback.getCaseDetails().getCaseData().setSupportGroupOnlyAppeal("Yes");
@@ -479,6 +484,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
+<<<<<<< HEAD
     public void givenAnIssueFinalDecisionEventIfHearingsIsNull_ThenDoNotSendHearingCancellationRequest() {
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
                 hearingMessageHelper, true);
@@ -630,5 +636,20 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
         verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+=======
+    public void givenCaseReadyForPostHearings_thenGrantCorrection() {
+        ReflectionTestUtils.setField(handler, "isPostHearingEnabled", true);
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.getPostHearing().getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
+        when(ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, sscsCaseData)).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assertions.assertThat(response.getErrors()).isEmpty();
+        verify(ccdCallbackMapService, times(1)).handleCcdCallbackMap(CorrectionActions.GRANT, sscsCaseData);
+>>>>>>> remove submitted handler
     }
 }
