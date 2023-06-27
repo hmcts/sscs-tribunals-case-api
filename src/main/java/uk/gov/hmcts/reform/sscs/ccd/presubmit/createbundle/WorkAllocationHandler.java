@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,20 +30,21 @@ public class WorkAllocationHandler implements PreSubmitCallbackHandler<SscsCaseD
     private IdamService idamService;
 
     private CaseAssignmentApi caseAssignmentApi;
-    
+
     public WorkAllocationHandler(CaseAssignmentApi caseAssignmentApi, IdamService idamService, @Value("${feature.work-allocation.enabled}") boolean workAllocationFeature) {
         this.caseAssignmentApi = caseAssignmentApi;
         this.idamService = idamService;
         this.workAllocationFeature = workAllocationFeature;
     }
-    
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.CREATE_BUNDLE
+                && (callback.getEvent() == EventType.CREATE_BUNDLE
+                ||  callback.getEvent() == EventType.NEW_CASE_ROLES_ASSIGNED)
                 && workAllocationFeature;
     }
 
@@ -55,12 +57,17 @@ public class WorkAllocationHandler implements PreSubmitCallbackHandler<SscsCaseD
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        sscsCaseData.getWorkAllocationFields().setAssignedCaseRoles(listAssignedCaseRoles(caseDetails.getId()));
-        
+        List<String> previouslyAssignedCaseRoles = mergeRoleList(
+                sscsCaseData.getWorkAllocationFields().getPreviouslyAssignedCaseRoles(),
+                sscsCaseData.getWorkAllocationFields().getAssignedCaseRoles());
+
+        sscsCaseData.getWorkAllocationFields().setAssignedCaseRoles(newlyAssignedCaseRoles(caseDetails.getId(), previouslyAssignedCaseRoles));
+        sscsCaseData.getWorkAllocationFields().setPreviouslyAssignedCaseRoles(previouslyAssignedCaseRoles);
+
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private List<String> listAssignedCaseRoles(long caseId) {
+    private List<String> newlyAssignedCaseRoles(long caseId, List<String> excludeRoles) {
         IdamTokens tokens = idamService.getIdamTokens();
 
         CaseAssignmentUserRolesResource response = caseAssignmentApi.getUserRoles(
@@ -72,9 +79,28 @@ public class WorkAllocationHandler implements PreSubmitCallbackHandler<SscsCaseD
             return response.getCaseAssignmentUserRoles().stream()
                     .map(a -> a.getCaseRole())
                     .distinct()
+                    .filter(r -> !excludeRoles.contains(r))
                     .collect(Collectors.toList());
         }
 
         return null;
     }
+
+    private List<String> mergeRoleList(List<String> previousRoles, List<String> currentRoles) {
+        List<String> mergedRoles = new ArrayList<>();
+
+        if (previousRoles != null) {
+            mergedRoles.addAll(previousRoles);
+        }
+
+        if (currentRoles != null) {
+            for (String role : currentRoles) {
+                if (!mergedRoles.contains(role)) {
+                    mergedRoles.add(role);
+                }
+            }
+        }
+        return mergedRoles;
+    }
 }
+
