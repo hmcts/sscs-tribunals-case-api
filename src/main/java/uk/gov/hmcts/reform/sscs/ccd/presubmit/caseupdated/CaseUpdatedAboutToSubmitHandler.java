@@ -163,27 +163,21 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void validateExcludedDate(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        System.out.println("***********************In validateHearingDate***********************");
+        List<ExcludeDate> excludedDates = response.getData().getAppeal().getHearingOptions().getExcludeDates();
 
-        List excludedDates = response.getData().getAppeal().getHearingOptions().getExcludeDates();
+        if (!excludedDates.isEmpty()) {
+            for(ExcludeDate excludedDate : excludedDates){
 
-        if (excludedDates.isEmpty()) {
-            //TODO: for each date in excluded dates check if it meets our criteria by checking the end and the start date against each other
+                excludedStartDate = LocalDateTime.parse(excludedDate.getValue().getStart());
+                excludedEndDate = LocalDateTime.parse(excludedDate.getValue().getEnd());
 
-            List hearings = sscsCaseData.getHearings();
-
-            System.out.println("***********************In getLatestHearing***********************");
-            excludedStartDate = response.getData().getLatestHearing().getValue().getStart();
-            excludedEndDate = response.getData().getLatestHearing().getValue().getEnd();
-
-            System.out.println("hearingStartDate: " + excludedStartDate + "\nhearingEndDate: " + excludedEndDate);
-
-            if (excludedStartDate == null) {
-                response.addWarning("Add a start date for excluded dates");
-            } else if (excludedEndDate == null) {
-                response.addWarning("Add an end date for excluded dates");
-            } else if (excludedStartDate.isAfter(excludedEndDate)) {
-                response.addWarning("Start date must be before end date for excluded dates");
+                if (excludedStartDate == null) {
+                    response.addWarning("Add a start date for excluded dates");
+                } else if (excludedEndDate == null) {
+                    response.addWarning("Add an end date for excluded dates");
+                } else if (excludedStartDate.isAfter(excludedEndDate)) {
+                    response.addWarning("Start date must be before end date for excluded dates");
+                }
             }
         }
     }
