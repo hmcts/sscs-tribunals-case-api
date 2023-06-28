@@ -93,7 +93,6 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     @Test
     @Parameters({"MID_EVENT", "ABOUT_TO_SUBMIT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
-        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
@@ -101,6 +100,18 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+    }
+
+    @Test
+    public void givenNullCaseDetails_thenReturnFalse() {
+        when(callback.getCaseDetails()).thenReturn(null);
+        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
+    }
+
+    @Test
+    public void givenNullCaseData_thenReturnFalse() {
+        when(caseDetails.getCaseData()).thenReturn(null);
+        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
 
     @Test
