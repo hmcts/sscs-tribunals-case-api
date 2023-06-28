@@ -168,7 +168,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         List excludedDates = response.getData().getAppeal().getHearingOptions().getExcludeDates();
 
         if (excludedDates.isEmpty()) {
-            //TODO: add loop to iterate through all hearings on case
+            //TODO: for each date in excluded dates check if it meets our criteria by checking the end and the start date against each other
+
             List hearings = sscsCaseData.getHearings();
 
             System.out.println("***********************In getLatestHearing***********************");
