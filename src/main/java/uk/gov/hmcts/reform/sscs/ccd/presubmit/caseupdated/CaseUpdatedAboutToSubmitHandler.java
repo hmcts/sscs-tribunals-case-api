@@ -149,24 +149,24 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateHearingOptions(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
-        validateExcludedDate(sscsCaseData, response);
         if (hearingOptions != null
             && sscsCaseData.getAppeal().getHearingType() != null
             && HearingType.ORAL.getValue().equals(sscsCaseData.getAppeal().getHearingType())
             && Boolean.FALSE.equals(hearingOptions.isWantsToAttendHearing())) {
             response.addWarning("There is a mismatch between the hearing type and the wants to attend field, "
                 + "all hearing options will be cleared please check if this is correct");
+            validateExcludedDate(sscsCaseData, response);
         }
     }
 
     private void validateExcludedDate(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        List<ExcludeDate> excludedDates = response.getData().getAppeal().getHearingOptions().getExcludeDates();
+        List<ExcludeDate> excludedDates = sscsCaseData.getAppeal().getHearingOptions().getExcludeDates();
 
         if (!excludedDates.isEmpty()) {
             LocalDateTime excludedStartDate;
             LocalDateTime excludedEndDate;
 
-            for(ExcludeDate excludedDate : excludedDates){
+            for (ExcludeDate excludedDate : excludedDates) {
 
                 excludedStartDate = LocalDateTime.parse(excludedDate.getValue().getStart());
                 excludedEndDate = LocalDateTime.parse(excludedDate.getValue().getEnd());
