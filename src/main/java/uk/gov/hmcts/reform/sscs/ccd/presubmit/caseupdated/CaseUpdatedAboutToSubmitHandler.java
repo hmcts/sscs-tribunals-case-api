@@ -47,8 +47,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final RefDataService refDataService;
     private final VenueService venueService;
     private final boolean caseAccessManagementFeature;
-    private LocalDateTime excludedStartDate;
-    private LocalDateTime excludedEndDate;
+
 
 
 
@@ -149,8 +148,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void validateHearingOptions(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        System.out.println("***********************In validateHearingOptions***********************");
-
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
         validateExcludedDate(sscsCaseData, response);
         if (hearingOptions != null
@@ -166,6 +163,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         List<ExcludeDate> excludedDates = response.getData().getAppeal().getHearingOptions().getExcludeDates();
 
         if (!excludedDates.isEmpty()) {
+            LocalDateTime excludedStartDate;
+            LocalDateTime excludedEndDate;
+
             for(ExcludeDate excludedDate : excludedDates){
 
                 excludedStartDate = LocalDateTime.parse(excludedDate.getValue().getStart());
