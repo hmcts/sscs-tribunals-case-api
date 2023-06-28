@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidential
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -46,8 +47,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final RefDataService refDataService;
     private final VenueService venueService;
     private final boolean caseAccessManagementFeature;
-    private LocalDateTime hearingStartDate;
-    private LocalDateTime hearingEndDate;
+    private LocalDateTime excludedStartDate;
+    private LocalDateTime excludedEndDate;
 
 
 
@@ -151,7 +152,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         System.out.println("***********************In validateHearingOptions***********************");
 
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
-        validateHearingDate(sscsCaseData, response);
+        validateExcludedDate(sscsCaseData, response);
         if (hearingOptions != null
             && sscsCaseData.getAppeal().getHearingType() != null
             && HearingType.ORAL.getValue().equals(sscsCaseData.getAppeal().getHearingType())
@@ -161,23 +162,27 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private void validateHearingDate(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+    private void validateExcludedDate(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         System.out.println("***********************In validateHearingDate***********************");
 
-        //TODO: add loop to iterate through all hearings on case
-        if (sscsCaseData.getLatestHearing() != null) {
+        List excludedDates = response.getData().getAppeal().getHearingOptions().getExcludeDates();
+
+        if (excludedDates.isEmpty()) {
+            //TODO: add loop to iterate through all hearings on case
+            List hearings = sscsCaseData.getHearings();
+
             System.out.println("***********************In getLatestHearing***********************");
-            hearingStartDate = response.getData().getLatestHearing().getValue().getStart();
-            hearingEndDate = response.getData().getLatestHearing().getValue().getEnd();
+            excludedStartDate = response.getData().getLatestHearing().getValue().getStart();
+            excludedEndDate = response.getData().getLatestHearing().getValue().getEnd();
 
-            System.out.println("hearingStartDate: " + hearingStartDate + "\nhearingEndDate: " + hearingEndDate);
+            System.out.println("hearingStartDate: " + excludedStartDate + "\nhearingEndDate: " + excludedEndDate);
 
-            if (hearingStartDate == null) {
-                response.addWarning("Add a start date for unavailable dates");
-            } else if (hearingEndDate == null) {
-                response.addWarning("Add an end date for unavailable dates");
-            } else if (hearingStartDate.isAfter(hearingEndDate)) {
-                response.addWarning("Start date must be before end date for unavailable dates");
+            if (excludedStartDate == null) {
+                response.addWarning("Add a start date for excluded dates");
+            } else if (excludedEndDate == null) {
+                response.addWarning("Add an end date for excluded dates");
+            } else if (excludedStartDate.isAfter(excludedEndDate)) {
+                response.addWarning("Start date must be before end date for excluded dates");
             }
         }
     }
