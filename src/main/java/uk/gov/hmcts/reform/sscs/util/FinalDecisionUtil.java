@@ -33,27 +33,15 @@ public class FinalDecisionUtil {
         CORRECTED
     }
 
-    public static void createFinalDecisionNoticeFromPreviewDraft(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, FinalDecisionType finalDecisionType, FooterService footerService) {
+    public static void issueFinalDecisionNoticeFromPreviewDraft(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, FinalDecisionType finalDecisionType, FooterService footerService) {
 
         SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
 
-        DocumentLink docLink;
-        DocumentType documentType;
+        DocumentType documentType = INITIAL.equals(finalDecisionType)
+            ? DocumentType.FINAL_DECISION_NOTICE
+            : DocumentType.CORRECTED_DECISION_NOTICE;
 
-        if (INITIAL.equals(finalDecisionType)) {
-            docLink = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument();
-            documentType = DocumentType.FINAL_DECISION_NOTICE;
-        } else {
-            docLink = sscsCaseData.getDocumentStaging().getPreviewDocument();
-            documentType = DocumentType.CORRECTED_DECISION_NOTICE;
-        }
-
-        DocumentLink documentLink = DocumentLink.builder()
-            .documentUrl(docLink.getDocumentUrl())
-            .documentFilename(docLink.getDocumentFilename())
-            .documentBinaryUrl(docLink.getDocumentBinaryUrl())
-            .build();
-
+        DocumentLink documentLink = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument();
         String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
         final SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelsh() ? TRANSLATION_REQUIRED : null;

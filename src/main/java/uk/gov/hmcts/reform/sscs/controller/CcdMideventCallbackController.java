@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.ResponseEntity.ok;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
 import com.opencsv.CSVReader;
@@ -19,6 +20,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdminCorrectionType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Correction;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
@@ -93,6 +96,13 @@ public class CcdMideventCallbackController {
             PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
             preSubmitCallbackResponse.addError("Unexpected error - benefit type is null");
             return ok(preSubmitCallbackResponse);
+        }
+
+        Correction correction = sscsCaseData.getPostHearing().getCorrection();
+        boolean isBodyCorrection = AdminCorrectionType.BODY.equals(correction.getAdminCorrectionType());
+        boolean isNoticeNotGenerated = isNoOrNull(sscsCaseData.getFinalDecisionNoticeGenerated());
+        if (isBodyCorrection || isNoticeNotGenerated) {
+            return null;
         }
 
         WriteFinalDecisionPreviewDecisionServiceBase writeFinalDecisionPreviewDecisionService = decisionNoticeService.getPreviewService(benefitType);

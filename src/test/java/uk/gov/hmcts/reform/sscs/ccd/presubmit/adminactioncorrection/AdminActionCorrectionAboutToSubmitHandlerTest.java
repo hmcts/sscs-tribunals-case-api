@@ -62,8 +62,8 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
             .documentBinaryUrl("url/binary")
             .build();
         caseData = SscsCaseData.builder()
-            .documentStaging(DocumentStaging.builder()
-                .previewDocument(docLink)
+            .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
+                .writeFinalDecisionPreviewDocument(docLink)
                 .build())
             .ccdCaseId("1234")
             .build();

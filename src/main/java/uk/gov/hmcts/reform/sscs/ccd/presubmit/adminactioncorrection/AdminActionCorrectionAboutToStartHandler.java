@@ -46,6 +46,8 @@ public class AdminActionCorrectionAboutToStartHandler implements PreSubmitCallba
             return response;
         }
 
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(null);
+
         return response;
     }
 
