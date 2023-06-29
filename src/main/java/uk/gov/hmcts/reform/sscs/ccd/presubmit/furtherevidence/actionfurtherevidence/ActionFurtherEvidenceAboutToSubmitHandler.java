@@ -63,6 +63,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private static final Set<State> ADDITION_VALID_STATES = Set.of(State.DORMANT_APPEAL_STATE,
             State.RESPONSE_RECEIVED,
             State.READY_TO_LIST,
+            State.LISTING_ERROR,
+            State.HANDLING_ERROR,
             State.HEARING,
             State.NOT_LISTABLE,
             State.WITH_DWP,
