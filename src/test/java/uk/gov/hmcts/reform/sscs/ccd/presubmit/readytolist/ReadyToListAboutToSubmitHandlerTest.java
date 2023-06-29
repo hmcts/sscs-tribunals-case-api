@@ -243,7 +243,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
                 .hearingDate(LocalDate.now().minusDays(10).toString())
                 .start(LocalDateTime.now().minusDays(10))
                 .hearingId(String.valueOf(1))
-                .venue(Venue.builder().name("").build())
+                .venue(Venue.builder().name("Venue 1").build())
                 .time("12:00")
                 .build();
         Hearing hearing1 = Hearing.builder().value(hearingDetails1).build();
@@ -268,6 +268,39 @@ public class ReadyToListAboutToSubmitHandlerTest {
         MatcherAssert.assertThat(response.getErrors().size(), is(0));
         MatcherAssert.assertThat(response.getWarnings().size(), is(1));
         MatcherAssert.assertThat(response.getWarnings().iterator().next(), is("There is already a hearing request in List assist, are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first"));
+    }
+
+    @Test
+    public void givenAListAssistCaseIfAHearingExistsInTheFutureAndUserProceedsThenSendAHearingRequestMessage() {
+        HearingDetails hearingDetails1 = HearingDetails.builder()
+                .hearingDate(LocalDate.now().minusDays(10).toString())
+                .start(LocalDateTime.now().minusDays(10))
+                .hearingId(String.valueOf(1))
+                .venue(Venue.builder().name("Venue 1").build())
+                .time("12:00")
+                .build();
+        Hearing hearing1 = Hearing.builder().value(hearingDetails1).build();
+
+        HearingDetails hearingDetails2 = HearingDetails.builder()
+                .hearingDate(LocalDate.now().plusDays(5).toString())
+                .start(LocalDateTime.now().plusDays(5))
+                .hearingId(String.valueOf(1))
+                .venue(Venue.builder().name("Venue 1").build())
+                .time("12:00")
+                .build();
+        Hearing hearing2 = Hearing.builder().value(hearingDetails2).build();
+
+        sscsCaseData = sscsCaseData.toBuilder()
+                .hearings(List.of(hearing1, hearing2))
+                .region("TEST")
+                .build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.isIgnoreWarnings()).thenReturn(true);
+        handler = new ReadyToListAboutToSubmitHandler(false, regionalProcessingCenterService, hearingMessagingServiceFactory);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        MatcherAssert.assertThat(response.getErrors().size(), is(0));
+        MatcherAssert.assertThat(response.getWarnings().size(), is(0));
     }
 
     private void verifyMessagingServiceCalled() {

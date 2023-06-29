@@ -1,12 +1,16 @@
 package uk.gov.hmcts.reform.sscs.helper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hasHearingScheduledInTheFuture;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.updateDirectionDueDateByAnAmountOfDays;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -87,5 +91,19 @@ public class SscsHelperTest {
 
         updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
         assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo("");
+    }
+
+    @Test
+    public void givenThereAreSomeHearingsInTheFuture_WhenTheHearingDataIsInvalid_ThenReturnFalse() {
+        HearingDetails hearingDetails = HearingDetails.builder()
+                .hearingDate(LocalDate.now().plusDays(5).toString())
+                .start(LocalDateTime.now().plusDays(5))
+                .hearingId(String.valueOf(1))
+                .venue(Venue.builder().name("").build())
+                .time("12:00")
+                .build();
+        Hearing hearing = Hearing.builder().value(hearingDetails).build();
+        sscsCaseData.setHearings(List.of(hearing));
+        assertFalse(hasHearingScheduledInTheFuture(sscsCaseData));
     }
 }
