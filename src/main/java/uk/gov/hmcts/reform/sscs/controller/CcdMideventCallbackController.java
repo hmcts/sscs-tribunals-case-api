@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.ResponseEntity.ok;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
 import com.opencsv.CSVReader;
@@ -100,9 +100,9 @@ public class CcdMideventCallbackController {
 
         Correction correction = sscsCaseData.getPostHearing().getCorrection();
         boolean isBodyCorrection = AdminCorrectionType.BODY.equals(correction.getAdminCorrectionType());
-        boolean isNoticeNotGenerated = isNoOrNull(sscsCaseData.getFinalDecisionNoticeGenerated());
-        if (isBodyCorrection || isNoticeNotGenerated) {
-            return null;
+        boolean isNoticeUploaded = NO.equals(sscsCaseData.getFinalDecisionNoticeGenerated());
+        if (isBodyCorrection || isNoticeUploaded) {
+            return ok(new PreSubmitCallbackResponse<>(sscsCaseData));
         }
 
         WriteFinalDecisionPreviewDecisionServiceBase writeFinalDecisionPreviewDecisionService = decisionNoticeService.getPreviewService(benefitType);

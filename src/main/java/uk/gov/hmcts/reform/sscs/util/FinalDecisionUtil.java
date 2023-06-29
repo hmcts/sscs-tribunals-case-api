@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -31,6 +33,36 @@ public class FinalDecisionUtil {
     public enum FinalDecisionType {
         INITIAL,
         CORRECTED
+    }
+
+    public static void writePreviewFinalDecisionNotice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, PreviewDocumentService previewDocumentService, DecisionNoticeService decisionNoticeService) {
+        State state = sscsCaseData.getState();
+        String benefitType = getBenefitType(sscsCaseData);
+        if (benefitType == null) {
+            preSubmitCallbackResponse.addError("Unexpected error - benefit type is null");
+        } else {
+            DecisionNoticeOutcomeService outcomeService =  decisionNoticeService.getOutcomeService(benefitType);
+            outcomeService.validate(preSubmitCallbackResponse, sscsCaseData);
+            if (!(State.READY_TO_LIST.equals(state) || State.WITH_DWP.equals(state))) {
+                sscsCaseData.setPreviousState(state);
+            }
+            previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_DECISION_NOTICE, sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+        }
+    }
+
+    public static void processDraftFinalDecisionNotice(Callback<SscsCaseData> callback, String userAuthorisation, SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, DecisionNoticeService decisionNoticeService) {
+        if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument() != null) {
+
+            String benefitType = FinalDecisionUtil.getBenefitType(sscsCaseData);
+
+            if (benefitType == null) {
+                response.addError("Unexpected error - benefit type is null");
+            }
+            WriteFinalDecisionPreviewDecisionServiceBase previewDecisionService = decisionNoticeService.getPreviewService(benefitType);
+            previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, userAuthorisation, true);
+        } else {
+            response.addError("No draft final decision notice found on case. Please use 'Write final decision' event before trying to issue.");
+        }
     }
 
     public static void issueFinalDecisionNoticeFromPreviewDraft(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, FinalDecisionType finalDecisionType, FooterService footerService) {
@@ -50,21 +82,6 @@ public class FinalDecisionUtil {
             sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
             log.info("Set the InterlocReviewState to {},  for case id : {}", sscsCaseData.getInterlocReviewState(), sscsCaseData.getCcdCaseId());
             sscsCaseData.setTranslationWorkOutstanding(YES.getValue());
-        }
-    }
-
-    public static void writePreviewFinalDecisionNotice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, PreviewDocumentService previewDocumentService, DecisionNoticeService decisionNoticeService) {
-        State state = sscsCaseData.getState();
-        String benefitType = getBenefitType(sscsCaseData);
-        if (benefitType == null) {
-            preSubmitCallbackResponse.addError("Unexpected error - benefit type is null");
-        } else {
-            DecisionNoticeOutcomeService outcomeService =  decisionNoticeService.getOutcomeService(benefitType);
-            outcomeService.validate(preSubmitCallbackResponse, sscsCaseData);
-            if (!(State.READY_TO_LIST.equals(state) || State.WITH_DWP.equals(state))) {
-                sscsCaseData.setPreviousState(state);
-            }
-            previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_DECISION_NOTICE, sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         }
     }
 
