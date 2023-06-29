@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.servicebus.HearingMessagingServiceFactory;
 
@@ -24,6 +25,9 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
     private final RegionalProcessingCenterService regionalProcessingCenterService;
 
     private final HearingMessagingServiceFactory hearingMessagingServiceFactory;
+
+    private static String GAPS_CASE_PROCEED_WARNING = "This is a GAPS case, If you do want to proceed, then please change the hearing route to List Assist";
+    private static String LIST_ASSIST_HEARING_EXIST_WARNING = "There is already a hearing request in List assist, are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first";
 
     public ReadyToListAboutToSubmitHandler(@Value("${feature.gaps-switchover.enabled}") boolean gapsSwitchOverFeature,
                                            @Autowired RegionalProcessingCenterService regionalProcessingCenterService,
@@ -52,8 +56,21 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         if (HearingRoute.GAPS == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()) {
+
+            if (!callback.isIgnoreWarnings()) {
+                PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+                response.addWarning(GAPS_CASE_PROCEED_WARNING);
+                return response;
+            }
+
             return HearingHandler.GAPS.handle(sscsCaseData, gapsSwitchOverFeature,
                 hearingMessagingServiceFactory.getMessagingService(HearingRoute.GAPS));
+        }
+
+        if (SscsHelper.hasHearingScheduledInTheFuture(sscsCaseData) && !callback.isIgnoreWarnings()) {
+            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+            response.addWarning(LIST_ASSIST_HEARING_EXIST_WARNING);
+            return response;
         }
         
         String region = sscsCaseData.getRegion();
