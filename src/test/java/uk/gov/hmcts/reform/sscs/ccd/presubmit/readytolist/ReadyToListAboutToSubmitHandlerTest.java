@@ -243,7 +243,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
                 .hearingDate(LocalDate.now().minusDays(10).toString())
                 .start(LocalDateTime.now().minusDays(10))
                 .hearingId(String.valueOf(1))
-                .venue(Venue.builder().name("Venue 1").build())
+                .venue(Venue.builder().name("").build())
                 .time("12:00")
                 .build();
         Hearing hearing1 = Hearing.builder().value(hearingDetails1).build();

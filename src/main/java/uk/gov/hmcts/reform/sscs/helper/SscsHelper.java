@@ -61,15 +61,19 @@ public class SscsHelper {
                 && StringUtils.isNotBlank(hearingDetails.getVenue().getName());
     }
 
+    private static boolean getValidHearing(Hearing hearing) {
+        HearingDetails hearingDetails = hearing.getValue();
+        if (isValidHearing(hearingDetails)) {
+            LocalDateTime hearingDateTime = getLocalDateTime(hearingDetails.getHearingDate(), hearingDetails.getTime());
+            return Optional.of(hearingDateTime).filter(d -> d.isAfter(LocalDateTime.now())).isPresent();
+        }
+        return false;
+    }
+
     public static boolean hasHearingScheduledInTheFuture(SscsCaseData caseData) {
-        Optional<Hearing> futureHearing = Optional.ofNullable(caseData.getHearings()).orElse(Collections.emptyList()).stream().filter(hearing -> {
-            HearingDetails hearingDetails = hearing.getValue();
-            if (isValidHearing(hearingDetails)) {
-                LocalDateTime hearingDateTime = getLocalDateTime(hearingDetails.getHearingDate(), hearingDetails.getTime());
-                return Optional.of(hearingDateTime).filter(d -> d.isAfter(LocalDateTime.now())).isPresent();
-            }
-            return false;
-        }).findFirst();
+        Optional<Hearing> futureHearing = Optional.ofNullable(caseData.getHearings())
+                .orElse(Collections.emptyList())
+                .stream().filter(SscsHelper::getValidHearing).findFirst();
         return futureHearing.isPresent();
     }
 }

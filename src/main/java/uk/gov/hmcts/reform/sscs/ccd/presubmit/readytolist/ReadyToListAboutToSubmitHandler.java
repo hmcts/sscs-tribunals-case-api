@@ -67,7 +67,8 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
                 hearingMessagingServiceFactory.getMessagingService(HearingRoute.GAPS));
         }
 
-        if (SscsHelper.hasHearingScheduledInTheFuture(sscsCaseData) && !callback.isIgnoreWarnings()) {
+        if (SscsHelper.hasHearingScheduledInTheFuture(sscsCaseData)
+                && !callback.isIgnoreWarnings()) {
             PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
             response.addWarning(LIST_ASSIST_HEARING_EXIST_WARNING);
             return response;
