@@ -95,15 +95,33 @@ public class SscsHelperTest {
 
     @Test
     public void givenThereAreSomeHearingsInTheFuture_WhenTheHearingDataIsInvalid_ThenReturnFalse() {
-        HearingDetails hearingDetails = HearingDetails.builder()
+        HearingDetails hearingDetails1 = HearingDetails.builder()
+                .hearingDate("")
+                .start(LocalDateTime.now().plusDays(5))
+                .hearingId(String.valueOf(1))
+                .venue(Venue.builder().name("Venue 1").build())
+                .time("12:00")
+                .build();
+        Hearing hearing1 = Hearing.builder().value(hearingDetails1).build();
+
+        HearingDetails hearingDetails2 = HearingDetails.builder()
                 .hearingDate(LocalDate.now().plusDays(5).toString())
                 .start(LocalDateTime.now().plusDays(5))
                 .hearingId(String.valueOf(1))
                 .venue(Venue.builder().name("").build())
                 .time("12:00")
                 .build();
-        Hearing hearing = Hearing.builder().value(hearingDetails).build();
-        sscsCaseData.setHearings(List.of(hearing));
+        Hearing hearing2 = Hearing.builder().value(hearingDetails2).build();
+
+        HearingDetails hearingDetails3 = HearingDetails.builder()
+                .hearingDate(LocalDate.now().plusDays(5).toString())
+                .start(LocalDateTime.now().plusDays(5))
+                .hearingId(String.valueOf(1))
+                .time("12:00")
+                .build();
+        Hearing hearing3 = Hearing.builder().value(hearingDetails3).build();
+
+        sscsCaseData.setHearings(List.of(hearing1, hearing2, hearing3));
         assertFalse(hasHearingScheduledInTheFuture(sscsCaseData));
     }
 }
