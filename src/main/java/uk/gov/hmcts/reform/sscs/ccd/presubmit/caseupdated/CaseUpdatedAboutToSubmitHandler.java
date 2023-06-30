@@ -162,12 +162,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             List<ExcludeDate> excludedDates = sscsCaseData.getAppeal().getHearingOptions().getExcludeDates();
 
             if (excludedDates != null) {
-                validateExcludedDate(sscsCaseData, response, excludedDates);
+                validateExcludedDate(response, excludedDates);
             }
         }
     }
 
-    private void validateExcludedDate(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, List<ExcludeDate> excludedDates) {
+    private void validateExcludedDate(PreSubmitCallbackResponse<SscsCaseData> response, List<ExcludeDate> excludedDates) {
 
         if (!excludedDates.isEmpty()) {
             LocalDate excludedStartDate;
