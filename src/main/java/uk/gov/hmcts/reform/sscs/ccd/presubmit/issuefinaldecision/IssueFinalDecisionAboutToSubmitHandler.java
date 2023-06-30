@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 
@@ -94,7 +93,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             sscsCaseData.setFinalDecisionNoticeGenerated(YesNo.valueOf(generateNotice.toUpperCase()));
         }
 
-        clearDraftDecisionNotice(preSubmitCallbackResponse);
+        FinalDecisionUtil.clearDraftDecisionNotice(preSubmitCallbackResponse);
 
         if (!(State.READY_TO_LIST.equals(sscsCaseData.getState())
             || State.WITH_DWP.equals(sscsCaseData.getState()))) {
@@ -131,11 +130,6 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             return false;
         }).findFirst();
         return futureHearing.isPresent();
-    }
-
-    private static void clearDraftDecisionNotice(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        preSubmitCallbackResponse.getData().getSscsDocument()
-            .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
     }
 
     private void verifyPreviewDocument(SscsCaseData sscsCaseData,

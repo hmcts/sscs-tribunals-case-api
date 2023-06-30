@@ -13,6 +13,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,10 +66,16 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
             .documentUrl("url")
             .documentBinaryUrl("url/binary")
             .build();
+        SscsDocument draftDecisionNotice = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType(DRAFT_DECISION_NOTICE.getValue())
+                .build())
+            .build();
         caseData = SscsCaseData.builder()
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionPreviewDocument(docLink)
                 .build())
+            .sscsDocument(new ArrayList<>(List.of(draftDecisionNotice)))
             .ccdCaseId("1234")
             .build();
         caseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
@@ -137,6 +145,9 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
             null,
             null);
         assertThat(response.getData().getPreviousState()).isEqualTo(State.APPEAL_CREATED);
+        assertThat(response.getData().getSscsDocument().stream()
+            .noneMatch(doc -> DRAFT_DECISION_NOTICE.getValue().equals(doc.getValue().getDocumentType())))
+            .isTrue();
     }
 
     @Test
@@ -167,6 +178,9 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
             null,
             null);
         assertThat(response.getData().getPreviousState()).isEqualTo(State.VOID_STATE);
+        assertThat(response.getData().getSscsDocument().stream()
+            .noneMatch(doc -> DRAFT_DECISION_NOTICE.getValue().equals(doc.getValue().getDocumentType())))
+            .isTrue();
     }
 
     @Test
@@ -197,6 +211,9 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
             null,
             null);
         assertThat(response.getData().getPreviousState()).isEqualTo(State.VOID_STATE);
+        assertThat(response.getData().getSscsDocument().stream()
+            .noneMatch(doc -> DRAFT_DECISION_NOTICE.getValue().equals(doc.getValue().getDocumentType())))
+            .isTrue();
     }
 
 

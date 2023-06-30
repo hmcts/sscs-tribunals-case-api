@@ -61,6 +61,7 @@ public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallb
             FinalDecisionUtil.writePreviewFinalDecisionNotice(sscsCaseData, preSubmitCallbackResponse, previewDocumentService, decisionNoticeService);
             FinalDecisionUtil.processDraftFinalDecisionNotice(callback, userAuthorisation, sscsCaseData, preSubmitCallbackResponse, FinalDecisionType.CORRECTED, decisionNoticeService);
             FinalDecisionUtil.issueFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse, FinalDecisionType.CORRECTED, footerService);
+            FinalDecisionUtil.clearDraftDecisionNotice(preSubmitCallbackResponse);
         }
 
         return preSubmitCallbackResponse;

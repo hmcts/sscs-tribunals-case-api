@@ -102,4 +102,9 @@ public class FinalDecisionUtil {
         return nonGenBenefitTypes.contains(benefitType) ? benefitType : "GEN";
     }
 
+    public static void clearDraftDecisionNotice(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        preSubmitCallbackResponse.getData().getSscsDocument()
+            .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
+    }
+
 }
