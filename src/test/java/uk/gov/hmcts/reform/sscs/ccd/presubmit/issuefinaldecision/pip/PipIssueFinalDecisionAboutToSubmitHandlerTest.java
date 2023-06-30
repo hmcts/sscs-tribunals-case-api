@@ -8,10 +8,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
@@ -20,6 +18,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,24 +36,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsPipCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
@@ -383,6 +365,16 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
 
+        HearingDetails hearingDetails = HearingDetails.builder()
+                .hearingDate(LocalDate.now().plusDays(1).toString())
+                .start(LocalDateTime.now().plusDays(1))
+                .hearingId(String.valueOf(1))
+                .venue(Venue.builder().name("Venue 1").build())
+                .time("12:00")
+                .build();
+        Hearing hearing = Hearing.builder().value(hearingDetails).build();
+        callback.getCaseDetails().getCaseData().setHearings(List.of(hearing));
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
@@ -490,5 +482,122 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+    }
+
+    @Test
+    public void givenAnIssueFinalDecisionEventIfHearingsIsNull_ThenDoNotSendHearingCancellationRequest() {
+        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
+                hearingMessageHelper, true);
+        DocumentLink docLink = DocumentLink.builder()
+                .documentUrl("bla.com")
+                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .build();
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        callback.getCaseDetails().getCaseData().setHearings(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+        verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+    }
+
+    @Test
+    public void givenAnIssueFinalDecisionEventIfHearingsIsInThePastOnly_ThenDoNotSendHearingCancellationRequest() {
+        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
+                hearingMessageHelper, true);
+        DocumentLink docLink = DocumentLink.builder()
+                .documentUrl("bla.com")
+                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .build();
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        HearingDetails hearingDetails1 = HearingDetails.builder()
+                .hearingDate(LocalDate.now().minusDays(10).toString())
+                .start(LocalDateTime.now().minusDays(10))
+                .hearingId(String.valueOf(1))
+                .venue(Venue.builder().name("Venue 1").build())
+                .time("12:00")
+                .build();
+        Hearing hearing1 = Hearing.builder().value(hearingDetails1).build();
+
+        HearingDetails hearingDetails2 = HearingDetails.builder()
+                .hearingDate(LocalDate.now().minusDays(5).toString())
+                .start(LocalDateTime.now().minusDays(5))
+                .hearingId(String.valueOf(1))
+                .venue(Venue.builder().name("Venue 1").build())
+                .time("12:00")
+                .build();
+        Hearing hearing2 = Hearing.builder().value(hearingDetails2).build();
+
+        callback.getCaseDetails().getCaseData().setHearings(List.of(hearing1, hearing2));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+        verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+    }
+
+    @Test
+    public void givenAnIssueFinalDecisionEventIfHearingsIsInThePastAndInTheFuture_ThenSendHearingCancellationRequest() {
+        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
+                hearingMessageHelper, true);
+        DocumentLink docLink = DocumentLink.builder()
+                .documentUrl("bla.com")
+                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .build();
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        HearingDetails hearingDetails1 = HearingDetails.builder()
+                .hearingDate(LocalDate.now().minusDays(10).toString())
+                .start(LocalDateTime.now().minusDays(10))
+                .hearingId(String.valueOf(1))
+                .venue(Venue.builder().name("Venue 1").build())
+                .time("12:00")
+                .build();
+        Hearing hearing1 = Hearing.builder().value(hearingDetails1).build();
+
+        HearingDetails hearingDetails2 = HearingDetails.builder()
+                .hearingDate(LocalDate.now().plusDays(5).toString())
+                .start(LocalDateTime.now().plusDays(5))
+                .hearingId(String.valueOf(1))
+                .venue(Venue.builder().name("Venue 1").build())
+                .time("12:00")
+                .build();
+        Hearing hearing2 = Hearing.builder().value(hearingDetails2).build();
+
+        callback.getCaseDetails().getCaseData().setHearings(List.of(hearing1, hearing2));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+    }
+
+    @Test
+    public void givenAnIssueFinalDecisionEventIfHearingsIsInTheFutureOnly_ThenSendHearingCancellationRequest() {
+        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
+                hearingMessageHelper, true);
+        DocumentLink docLink = DocumentLink.builder()
+                .documentUrl("bla.com")
+                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .build();
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        HearingDetails hearingDetails = HearingDetails.builder()
+                .hearingDate(LocalDate.now().plusDays(5).toString())
+                .start(LocalDateTime.now().plusDays(5))
+                .hearingId(String.valueOf(1))
+                .venue(Venue.builder().name("Venue 1").build())
+                .time("12:00")
+                .build();
+        Hearing hearing = Hearing.builder().value(hearingDetails).build();
+
+        callback.getCaseDetails().getCaseData().setHearings(List.of(hearing));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
     }
 }

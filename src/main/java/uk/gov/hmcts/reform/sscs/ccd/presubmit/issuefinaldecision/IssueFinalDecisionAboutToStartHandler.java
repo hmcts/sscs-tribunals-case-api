@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.util.FinalDecisionUtil;
+import uk.gov.hmcts.reform.sscs.util.FinalDecisionUtil.FinalDecisionType;
 
 @Service
 public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -44,7 +45,7 @@ public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        FinalDecisionUtil.processDraftFinalDecisionNotice(callback, userAuthorisation, sscsCaseData, response, decisionNoticeService);
+        FinalDecisionUtil.processDraftFinalDecisionNotice(callback, userAuthorisation, sscsCaseData, response, FinalDecisionType.INITIAL, decisionNoticeService);
 
         return response;
     }

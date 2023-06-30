@@ -59,7 +59,7 @@ public class AdminActionCorrectionAboutToSubmitHandler implements PreSubmitCallb
         if (AdminCorrectionType.HEADER.equals(adminCorrectionType)) {
             log.info("Handling header correction for case: {}", ccdCaseId);
             FinalDecisionUtil.writePreviewFinalDecisionNotice(sscsCaseData, preSubmitCallbackResponse, previewDocumentService, decisionNoticeService);
-            FinalDecisionUtil.processDraftFinalDecisionNotice(callback, userAuthorisation, sscsCaseData, preSubmitCallbackResponse, decisionNoticeService);
+            FinalDecisionUtil.processDraftFinalDecisionNotice(callback, userAuthorisation, sscsCaseData, preSubmitCallbackResponse, FinalDecisionType.CORRECTED, decisionNoticeService);
             FinalDecisionUtil.issueFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse, FinalDecisionType.CORRECTED, footerService);
         }
 

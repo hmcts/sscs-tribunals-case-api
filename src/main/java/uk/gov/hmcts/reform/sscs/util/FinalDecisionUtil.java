@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTED_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.FinalDecisionUtil.FinalDecisionType.INITIAL;
@@ -50,16 +52,20 @@ public class FinalDecisionUtil {
         }
     }
 
-    public static void processDraftFinalDecisionNotice(Callback<SscsCaseData> callback, String userAuthorisation, SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, DecisionNoticeService decisionNoticeService) {
+    public static void processDraftFinalDecisionNotice(Callback<SscsCaseData> callback, String userAuthorisation, SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, FinalDecisionType finalDecisionType, DecisionNoticeService decisionNoticeService) {
         if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument() != null) {
 
             String benefitType = FinalDecisionUtil.getBenefitType(sscsCaseData);
 
             if (benefitType == null) {
                 response.addError("Unexpected error - benefit type is null");
+                return;
             }
             WriteFinalDecisionPreviewDecisionServiceBase previewDecisionService = decisionNoticeService.getPreviewService(benefitType);
-            previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, userAuthorisation, true);
+            DocumentType documentType = INITIAL.equals(finalDecisionType)
+                ? FINAL_DECISION_NOTICE
+                : CORRECTED_DECISION_NOTICE;
+            previewDecisionService.preview(callback, documentType, userAuthorisation, true);
         } else {
             response.addError("No draft final decision notice found on case. Please use 'Write final decision' event before trying to issue.");
         }
@@ -70,7 +76,7 @@ public class FinalDecisionUtil {
         SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
 
         DocumentType documentType = INITIAL.equals(finalDecisionType)
-            ? DocumentType.FINAL_DECISION_NOTICE
+            ? FINAL_DECISION_NOTICE
             : DocumentType.CORRECTED_DECISION_NOTICE;
 
         DocumentLink documentLink = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument();

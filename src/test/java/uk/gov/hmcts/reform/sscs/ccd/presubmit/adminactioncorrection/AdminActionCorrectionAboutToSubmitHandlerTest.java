@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen.GenWriteFinalDecisionPreviewDecisionService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -37,6 +38,8 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
     private DecisionNoticeService decisionNoticeService;
     @Mock
     private PreviewDocumentService previewDocumentService;
+    @Mock
+    private GenWriteFinalDecisionPreviewDecisionService previewDecisionService;
     @Mock
     private DecisionNoticeOutcomeService decisionNoticeOutcomeService;
     @Mock
@@ -111,6 +114,7 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(decisionNoticeService.getOutcomeService(any(String.class))).thenReturn(decisionNoticeOutcomeService);
+        when(decisionNoticeService.getPreviewService(any(String.class))).thenReturn(previewDecisionService);
 
         caseData.setPreviousState(State.VOID_STATE);
         caseData.setState(State.APPEAL_CREATED);
@@ -120,6 +124,7 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(decisionNoticeOutcomeService, times(1)).validate(response, caseData);
+        verify(previewDecisionService, times(1)).preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION,true);
         verify(previewDocumentService, times(1)).writePreviewDocumentToSscsDocument(
             caseData,
             DRAFT_DECISION_NOTICE,
@@ -139,6 +144,7 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(decisionNoticeService.getOutcomeService(any(String.class))).thenReturn(decisionNoticeOutcomeService);
+        when(decisionNoticeService.getPreviewService(any(String.class))).thenReturn(previewDecisionService);
 
         caseData.setPreviousState(State.VOID_STATE);
         caseData.setState(State.READY_TO_LIST);
@@ -148,6 +154,7 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(decisionNoticeOutcomeService, times(1)).validate(response, caseData);
+        verify(previewDecisionService, times(1)).preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION,true);
         verify(previewDocumentService, times(1)).writePreviewDocumentToSscsDocument(
             caseData,
             DRAFT_DECISION_NOTICE,
@@ -167,6 +174,7 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(decisionNoticeService.getOutcomeService(any(String.class))).thenReturn(decisionNoticeOutcomeService);
+        when(decisionNoticeService.getPreviewService(any(String.class))).thenReturn(previewDecisionService);
 
         caseData.setPreviousState(State.VOID_STATE);
         caseData.setState(State.WITH_DWP);
@@ -176,6 +184,7 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(decisionNoticeOutcomeService, times(1)).validate(response, caseData);
+        verify(previewDecisionService, times(1)).preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION,true);
         verify(previewDocumentService, times(1)).writePreviewDocumentToSscsDocument(
             caseData,
             DRAFT_DECISION_NOTICE,
