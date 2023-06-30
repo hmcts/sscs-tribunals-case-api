@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -11,11 +13,14 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_RESTORE_CASES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_INFORMATION_RECEIVED;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
@@ -41,14 +46,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipWriteFinalDecisionPreviewDecisionService;
@@ -141,6 +139,60 @@ public class CcdMideventCallbackControllerTest {
                 .content(content))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"data\": {\"interlocReviewState\": \"welshTranslation\"}}"));
+    }
+
+    @Test
+    public void handleCcdMidEventPreviewFinalDecision_whenAdminActionCorrectionBody_doesNothing() throws Exception {
+        String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
+        String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build()).build();
+        sscsCaseData.getPostHearing().getCorrection().setAdminCorrectionType(AdminCorrectionType.BODY);
+        when(deserializer.deserialize(content)).thenReturn(new Callback<>(
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
+            Optional.empty(), INTERLOC_INFORMATION_RECEIVED, false));
+
+        String mvcResponse = mockMvc.perform(post("/ccdMidEventPreviewFinalDecision")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("ServiceAuthorization", "")
+                .header("Authorization", "")
+                .content(content))
+            .andReturn().getResponse().getContentAsString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> responseMap = objectMapper.readValue(mvcResponse, new TypeReference<>() {});
+        Map<String, Object> responseData = (Map<String, Object>) responseMap.get("data");
+        Map<String, Object> originalData = objectMapper.convertValue(sscsCaseData, new TypeReference<>() {});
+
+        assertEquals(originalData, responseData);
+        verifyNoInteractions(writeFinalDecisionPreviewDecisionService);
+    }
+
+    @Test
+    public void handleCcdMidEventPreviewFinalDecision_whenNoticeWasUploaded_doesNothing() throws Exception {
+        String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
+        String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build()).build();
+        sscsCaseData.setFinalDecisionNoticeGenerated(YesNo.NO);
+        when(deserializer.deserialize(content)).thenReturn(new Callback<>(
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
+            Optional.empty(), INTERLOC_INFORMATION_RECEIVED, false));
+
+        String mvcResponse = mockMvc.perform(post("/ccdMidEventPreviewFinalDecision")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("ServiceAuthorization", "")
+                .header("Authorization", "")
+                .content(content))
+            .andReturn().getResponse().getContentAsString();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> responseMap = objectMapper.readValue(mvcResponse, new TypeReference<>() {});
+        Map<String, Object> responseData = (Map<String, Object>) responseMap.get("data");
+        Map<String, Object> originalData = objectMapper.convertValue(sscsCaseData, new TypeReference<>() {});
+
+        assertEquals(originalData, responseData);
+        verifyNoInteractions(writeFinalDecisionPreviewDecisionService);
     }
 
     @Test

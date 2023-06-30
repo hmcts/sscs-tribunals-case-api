@@ -196,12 +196,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return isDocTypeRequiresReviewByJudge && isNotInterlocReviewByJudge;
     }
 
-    private static boolean isSetAsideApplicationWitWrongActionCode(String actionCode, String scannedDocumentType) {
-        boolean isDocTypeSetAsideApplication = ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType);
-        boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
-        return isDocTypeSetAsideApplication && isNotInterlocReviewByJudge;
-    }
-
     private static boolean isCorrectionApplicationWithWrongActionCode(String actionCode, String scannedDocumentType) {
         boolean isDocTypeCorrectionApplication = ScannedDocumentType.CORRECTION_APPLICATION.getValue().equals(scannedDocumentType);
         boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
