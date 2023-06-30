@@ -479,8 +479,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                                                   PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
                                                   ScannedDocument scannedDocument) {
         //check warning for bundle addition
-        boolean isWarningAdded = !ignoreWarnings
-                && !isBundleAdditionSelectedForActionType(sscsCaseData, scannedDocument);
+        boolean isWarningAdded = !isBundleAdditionSelectedForActionType(sscsCaseData, scannedDocument) && !ignoreWarnings;
 
         if (isWarningAdded) {
             preSubmitCallbackResponse.addWarning(
