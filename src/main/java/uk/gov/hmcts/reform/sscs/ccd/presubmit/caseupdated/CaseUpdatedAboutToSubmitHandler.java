@@ -8,7 +8,7 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -149,34 +149,43 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateHearingOptions(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
-        if (hearingOptions != null
-            && sscsCaseData.getAppeal().getHearingType() != null
-            && HearingType.ORAL.getValue().equals(sscsCaseData.getAppeal().getHearingType())
-            && Boolean.FALSE.equals(hearingOptions.isWantsToAttendHearing())) {
-            response.addWarning("There is a mismatch between the hearing type and the wants to attend field, "
-                + "all hearing options will be cleared please check if this is correct");
-            validateExcludedDate(sscsCaseData, response);
+
+        if (hearingOptions != null) {
+
+            if (sscsCaseData.getAppeal().getHearingType() != null
+                    && HearingType.ORAL.getValue().equals(sscsCaseData.getAppeal().getHearingType())
+                    && Boolean.FALSE.equals(hearingOptions.isWantsToAttendHearing())) {
+                response.addWarning("There is a mismatch between the hearing type and the wants to attend field, "
+                        + "all hearing options will be cleared please check if this is correct");
+            }
+
+            List<ExcludeDate> excludedDates = sscsCaseData.getAppeal().getHearingOptions().getExcludeDates();
+
+            if (excludedDates != null) {
+                validateExcludedDate(sscsCaseData, response, excludedDates);
+            }
         }
     }
 
-    private void validateExcludedDate(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        List<ExcludeDate> excludedDates = sscsCaseData.getAppeal().getHearingOptions().getExcludeDates();
+    private void validateExcludedDate(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, List<ExcludeDate> excludedDates) {
 
         if (!excludedDates.isEmpty()) {
-            LocalDateTime excludedStartDate;
-            LocalDateTime excludedEndDate;
+            LocalDate excludedStartDate;
+            LocalDate excludedEndDate;
 
             for (ExcludeDate excludedDate : excludedDates) {
 
-                excludedStartDate = LocalDateTime.parse(excludedDate.getValue().getStart());
-                excludedEndDate = LocalDateTime.parse(excludedDate.getValue().getEnd());
+                if (excludedDate.getValue().getStart() == null) {
+                    response.addError("Add a start date for excluded dates");
+                } else if (excludedDate.getValue().getEnd() == null) {
+                    response.addError("Add an end date for excluded dates");
+                } else {
+                    excludedStartDate = LocalDate.parse(excludedDate.getValue().getStart());
+                    excludedEndDate = LocalDate.parse(excludedDate.getValue().getEnd());
 
-                if (excludedStartDate == null) {
-                    response.addWarning("Add a start date for excluded dates");
-                } else if (excludedEndDate == null) {
-                    response.addWarning("Add an end date for excluded dates");
-                } else if (excludedStartDate.isAfter(excludedEndDate)) {
-                    response.addWarning("Start date must be before end date for excluded dates");
+                    if (excludedStartDate.isAfter(excludedEndDate)) {
+                        response.addError("Start date must be before end date for excluded dates");
+                    }
                 }
             }
         }
