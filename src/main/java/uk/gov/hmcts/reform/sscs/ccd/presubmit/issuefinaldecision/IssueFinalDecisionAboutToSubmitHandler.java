@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
@@ -41,7 +40,6 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     private final DecisionNoticeService decisionNoticeService;
     private final Validator validator;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
-    private final CcdCallbackMapService ccdCallbackMapService;
     private boolean isScheduleListingEnabled;
     @Value("${feature.snl.adjournment.enabled}")
     private boolean isAdjournmentEnabled;
@@ -49,15 +47,13 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     private boolean isPostHearingEnabled;
 
     public IssueFinalDecisionAboutToSubmitHandler(FooterService footerService,
-        DecisionNoticeService decisionNoticeService, Validator validator,
-            ListAssistHearingMessageHelper hearingMessageHelper,
-                                                  CcdCallbackMapService ccdCallbackMapService,
-                @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
+                                                  DecisionNoticeService decisionNoticeService, Validator validator,
+                                                  ListAssistHearingMessageHelper hearingMessageHelper,
+                                                  @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
         this.footerService = footerService;
         this.decisionNoticeService = decisionNoticeService;
         this.validator = validator;
         this.hearingMessageHelper = hearingMessageHelper;
-        this.ccdCallbackMapService = ccdCallbackMapService;
         this.isScheduleListingEnabled = isScheduleListingEnabled;
     }
 
@@ -89,17 +85,6 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
             return preSubmitCallbackResponse;
-        }
-
-        if (isPostHearingEnabled) {
-            Correction correction = sscsCaseData.getPostHearing().getCorrection();
-
-            if (isYes(correction.getCorrectionFinalDecisionInProgress())) {
-                correction.setCorrectionFinalDecisionInProgress(YesNo.NO);
-                sscsCaseData = ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, sscsCaseData);
-
-                preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-            }
         }
 
         createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
