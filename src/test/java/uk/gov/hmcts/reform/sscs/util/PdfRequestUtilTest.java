@@ -93,24 +93,6 @@ class PdfRequestUtilTest {
         assertDoesNotThrow(() -> PdfRequestUtil.getNoticeBody(sscsCaseData, true, true));
     }
 
-    @ParameterizedTest
-    @EnumSource(
-        value = PostHearingReviewType.class,
-        names = {
-            "SET_ASIDE",
-            "CORRECTION",
-            "STATEMENT_OF_REASONS",
-            "LIBERTY_TO_APPLY"
-        },
-        mode = EXCLUDE
-    )
-    void getNoticeBody_throwsExceptionForNotImplementedTypes(PostHearingReviewType postHearingReviewType) {
-        sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
-        assertThatThrownBy(() -> PdfRequestUtil.getNoticeBody(sscsCaseData, true, true))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageStartingWith("getNoticeBody has unexpected postHearingReviewType: ");
-    }
-
     @Test
     void getNoticeBody_throwsExceptionWhenLibertyToApplyAndIsPostHearingsBEnabledIsFalse() {
         sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
@@ -146,15 +128,6 @@ class PdfRequestUtilTest {
         sscsCaseData.getDocumentGeneration().setLibertyToApplyGenerateNotice(YES);
         sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
         assertThat(PdfRequestUtil.getGenerateNotice(sscsCaseData, true, true)).isEqualTo(YES);
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = PostHearingReviewType.class, names = {"PERMISSION_TO_APPEAL"})
-    void getGenerateNoticeThrowsError_whenUnimplementedPostHearingReviewType(PostHearingReviewType postHearingReviewType) {
-        sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
-        assertThatThrownBy(() -> PdfRequestUtil.getGenerateNotice(sscsCaseData, true, true))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageStartingWith("getGenerateNotice has unexpected PostHearingReviewType: ");
     }
 
     @Test

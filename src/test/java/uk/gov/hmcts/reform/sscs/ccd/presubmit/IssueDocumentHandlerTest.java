@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 
 import java.time.LocalDate;
@@ -266,19 +265,5 @@ class IssueDocumentHandlerTest {
         NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, true, USER_AUTHORISATION);
 
         assertThat(payload.getNoticeBody()).isEqualTo(bodyContent);
-    }
-
-    @ParameterizedTest
-    @EnumSource(
-        value = PostHearingReviewType.class,
-        names = {"PERMISSION_TO_APPEAL"})
-    void givenPostHearingReviewIsNotImplemented_thenThrowException(PostHearingReviewType postHearingReviewType) {
-        SscsCaseData sscsCaseData = buildCaseData();
-        sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
-
-        assertThatThrownBy(() ->
-            handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, true, USER_AUTHORISATION))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("getNoticeBody has unexpected postHearingReviewType: " + postHearingReviewType.getDescriptionEn());
     }
 }

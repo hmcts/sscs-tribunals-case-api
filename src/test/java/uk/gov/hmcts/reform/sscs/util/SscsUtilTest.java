@@ -8,16 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 class SscsUtilTest {
-    public static final String UNEXPECTED_POST_HEARING_REVIEW_TYPE_AND_ACTION = "getting the document type has an unexpected postHearingReviewType and action";
     private PostHearing postHearing;
 
     @BeforeEach
@@ -92,12 +86,16 @@ class SscsUtilTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PostHearingReviewType.class, names = {"PERMISSION_TO_APPEAL", "LIBERTY_TO_APPLY"})
-    void givenActionTypeNotSupported_throwError(PostHearingReviewType postHearingReviewType) {
-        postHearing.setReviewType(postHearingReviewType);
+    @CsvSource(value = {
+        "GRANT,PERMISSION_TO_APPEAL_GRANTED",
+        "REFUSE,PERMISSION_TO_APPEAL_REFUSED"
+    })
+    void givenActionTypePta_shouldReturnPtaDocument(PermissionToAppealActions action, DocumentType expectedDocumentType) {
+        postHearing.setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
+        postHearing.getPermissionToAppeal().setAction(action);
 
-        assertThatThrownBy(() -> getPostHearingReviewDocumentType(postHearing, true))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage(UNEXPECTED_POST_HEARING_REVIEW_TYPE_AND_ACTION);
+        DocumentType documentType = getPostHearingReviewDocumentType(postHearing, true);
+
+        assertThat(documentType).isEqualTo(expectedDocumentType);
     }
 }
