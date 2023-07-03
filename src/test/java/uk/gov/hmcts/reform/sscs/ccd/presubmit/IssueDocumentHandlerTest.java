@@ -300,6 +300,6 @@ class IssueDocumentHandlerTest {
         String updatedLabel = new IssueDocumentHandler()
             .setDocumentTypeLabelForPostHearing(caseDataGrant.getPostHearing(), documentType, documentTypeLabel);
 
-        Assertions.assertEquals(documentTypeLabel, updatedLabel);
+        Assertions.assertEquals(documentTypeLabel + " issued", updatedLabel);
     }
 }
