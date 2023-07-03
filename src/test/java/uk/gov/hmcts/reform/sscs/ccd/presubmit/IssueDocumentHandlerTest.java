@@ -286,7 +286,7 @@ class IssueDocumentHandlerTest {
     @ParameterizedTest
     @EnumSource(value = DocumentType.class, names = {"SET_ASIDE_APPLICATION"})
     public void givenPostHearingReviewActionTypeIsNotGrantOrRefuse_thenReturnDefaultDocumentLabel(DocumentType documentType) {
-        String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() + " issued" : documentType.getValue();
+        String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
 
         SscsCaseData caseDataGrant = SscsCaseData.builder()
             .ccdCaseId("1")
