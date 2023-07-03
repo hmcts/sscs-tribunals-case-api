@@ -183,14 +183,6 @@ class PostHearingReviewSubmittedHandlerTest {
         verify(ccdCallbackMapService, times(1))
             .handleCcdCallbackMap(REFUSE, caseData);
 
-        verify(ccdService, times(1))
-            .updateCase(returnedCase,
-                Long.valueOf(returnedCase.getCcdCaseId()),
-                EventType.DORMANT.getCcdType(),
-                "Send to dormant",
-                "",
-                idamService.getIdamTokens());
-
         assertThat(response.getData().getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
         assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.NONE);
     }

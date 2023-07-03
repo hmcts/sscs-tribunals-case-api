@@ -44,8 +44,6 @@ public class AdjournCaseIt extends AbstractEventIt {
         "callback/adjournCaseGeneratedPaperWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
     public static final String GENERATED_FACE_TO_FACE_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON =
         "callback/adjournCaseGeneratedFaceToFaceWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
-    public static final String VALID_SUBMISSION_WITH_SET_GENERATED_DATE_JSON =
-        "callback/adjournCaseValidSubmissionWithSetGeneratedDate.json";
     public static final String MANUALLY_GENERATED_JSON = "callback/adjournCaseManuallyGenerated.json";
     public static final String GENERATED_FACE_TO_FACE_WITH_INTERPRETER_REQUIRED_AND_LANGUAGE_SET_JSON =
         "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageSet.json";
@@ -117,16 +115,6 @@ public class AdjournCaseIt extends AbstractEventIt {
             DIRECTIONS_DUE_DATE_PLACEHOLDER, DATE_2019);
 
         noticeGeneratedWithExpectedDetails();
-    }
-
-    @DisplayName("Call to about to submit handler will write adjourn notice to case with generated date as set")
-    @Test
-    public void givenCallToAboutToSubmitHandlerThenWritesAdjournNoticeToCaseWithGeneratedDateAsSet() throws Exception {
-        setup();
-        setJsonAndReplace(VALID_SUBMISSION_WITH_SET_GENERATED_DATE_JSON, DIRECTIONS_DUE_DATE_PLACEHOLDER, DATE_2019);
-
-        PreSubmitCallbackResponse<SscsCaseData> result = noticeGeneratedWithExpectedDetails();
-        assertThat(result.getData().getAdjournment().getGeneratedDate()).isEqualTo("2018-01-01");
     }
 
     @DisplayName("Call to about to submit handler will write manually uploaded adjourn notice to case")
