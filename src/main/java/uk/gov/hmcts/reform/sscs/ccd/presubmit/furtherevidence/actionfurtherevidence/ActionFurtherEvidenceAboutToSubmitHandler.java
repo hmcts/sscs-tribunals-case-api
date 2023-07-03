@@ -340,7 +340,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private static boolean isStatementOfReasonsApplication(SscsCaseData sscsCaseData) {
         return isDocumentType(STATEMENT_OF_REASONS_APPLICATION, sscsCaseData);
     }
-
+  
     private static boolean isPermissionToAppealApplication(SscsCaseData sscsCaseData) {
         return isDocumentType(PERMISSION_TO_APPEAL_APPLICATION, sscsCaseData);
     }

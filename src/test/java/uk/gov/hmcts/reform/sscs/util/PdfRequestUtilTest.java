@@ -164,7 +164,6 @@ class PdfRequestUtilTest {
             .hasMessageStartingWith(String.format("isPostHearingsBEnabled is false - %s is not available", postHearingReviewType.getDescriptionEn()));
     }
 
-
     @Test
     void getGenerateNoticeReturnsExpected_withPostHearingReviewTypeSetAside() {
         sscsCaseData.getDocumentGeneration().setGenerateNotice(YES);
