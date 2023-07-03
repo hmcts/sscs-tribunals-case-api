@@ -115,9 +115,10 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenAWriteFinalDecisionEventForCorrectionWithPostHearingsEnabled_thenKeepData() {
+    @Parameters({"POST_HEARING", "DORMANT_APPEAL_STATE"})
+    public void givenAWriteFinalDecisionEventForCorrectionWithPostHearingsEnabled_thenKeepData(State state) {
         handler = new WriteFinalDecisionAboutToStartHandler(true);
-        when(caseDetails.getState()).thenReturn(State.POST_HEARING);
+        when(caseDetails.getState()).thenReturn(state);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
