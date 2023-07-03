@@ -184,15 +184,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         boolean isDocTypeRequiresReviewByJudge =
             ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType)
             || ScannedDocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue().equals(scannedDocumentType)
-            || ScannedDocumentType.LIBERTY_TO_APPLY_APPLICATION.getValue().equals(scannedDocumentType);
-        boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
-        return isDocTypeRequiresReviewByJudge && isNotInterlocReviewByJudge;
-    }
-
-    private static boolean isPostHearingApplicationWithWrongActionCode(String actionCode, String scannedDocumentType) {
-        boolean isDocTypeRequiresReviewByJudge =
-            ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType)
-            || ScannedDocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue().equals(scannedDocumentType)
             || ScannedDocumentType.LIBERTY_TO_APPLY_APPLICATION.getValue().equals(scannedDocumentType)
             || ScannedDocumentType.PERMISSION_TO_APPEAL_APPLICATION.getValue().equals(scannedDocumentType);
         boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
