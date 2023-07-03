@@ -1,8 +1,12 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -10,22 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.Nullable;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @Slf4j
@@ -85,11 +76,11 @@ public class SscsUtil {
         caseData.setSscsDocument(documents);
     }
 
-    public static void addDocumentToBundle(FooterService footerService, SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
+    public static void addDocumentToBundle(FooterService footerService, SscsCaseData sscsCaseData, SscsDocument sscsDocument, String overrideFileName) {
         DocumentLink url = sscsDocument.getValue().getDocumentLink();
         DocumentType documentType = DocumentType.fromValue(sscsDocument.getValue().getDocumentType());
         String dateIssued = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, null, null);
+        footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, overrideFileName, null);
     }
 
     public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {
@@ -97,11 +88,17 @@ public class SscsUtil {
         if (isPostHearingsEnabled && nonNull(postHearingReviewType)) {
             switch (postHearingReviewType) {
                 case SET_ASIDE:
+                    if (SetAsideActions.GRANT.equals(postHearing.getSetAside().getAction())) {
+                        return DocumentType.SET_ASIDE_GRANTED;
+                    }
                     if (SetAsideActions.REFUSE.equals(postHearing.getSetAside().getAction())) {
                         return DocumentType.SET_ASIDE_REFUSED;
                     }
                     break;
                 case CORRECTION:
+                    if (CorrectionActions.GRANT.equals(postHearing.getCorrection().getAction())) {
+                        return DocumentType.CORRECTION_GRANTED;
+                    }
                     if (CorrectionActions.REFUSE.equals(postHearing.getCorrection().getAction())) {
                         return DocumentType.CORRECTION_REFUSED;
                     }
@@ -138,5 +135,88 @@ public class SscsUtil {
 
     public static boolean isGapsCase(SscsCaseData sscsCaseData) {
         return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
+    }
+
+    @Nullable
+    public static DocumentType getDocumentTypeFromReviewType(PostHearingReviewType reviewType) {
+        if (isNull(reviewType)) {
+            return null;
+        }
+        switch (reviewType) {
+            case SET_ASIDE:
+                return DocumentType.SET_ASIDE_APPLICATION;
+            case CORRECTION:
+                return DocumentType.CORRECTION_APPLICATION;
+            case STATEMENT_OF_REASONS:
+            case PERMISSION_TO_APPEAL:
+            case LIBERTY_TO_APPLY:
+            default:
+                return null;
+        }
+    }
+
+    @Nullable
+    public static EventType getEventTypeFromDocumentReviewTypeAndAction(PostHearingReviewType reviewType, String actionName) {
+        if (isNull(reviewType) || isNull(actionName)) {
+            return null;
+        }
+        boolean isGrant = GRANT.getValue().equals(actionName);
+        boolean isRefuse = REFUSE.getValue().equals(actionName);
+
+        switch (reviewType) {
+            case SET_ASIDE:
+                if (isGrant) {
+                    return EventType.SET_ASIDE_GRANTED;
+                } else if (isRefuse) {
+                    return EventType.SET_ASIDE_REFUSED;
+                }
+                break;
+            case CORRECTION:
+                if (isGrant) {
+                    return EventType.CORRECTION_GRANTED;
+                } else if (isRefuse) {
+                    return EventType.CORRECTION_REFUSED;
+                }
+                break;
+            case STATEMENT_OF_REASONS:
+            case PERMISSION_TO_APPEAL:
+            case LIBERTY_TO_APPLY:
+            default:
+                // do nothing
+        }
+        return null;
+    }
+
+    @org.jetbrains.annotations.Nullable
+    public static CcdCallbackMap getCcdCallbackMap(PostHearing postHearing,
+                                                    PostHearingReviewType typeSelected) {
+        if (isNull(typeSelected)) {
+            return null;
+        }
+
+        switch (typeSelected) {
+            case SET_ASIDE:
+                SetAside setAside = postHearing.getSetAside();
+
+                if (isSetAsideRefusedSor(setAside)) {
+                    return SetAsideActions.REFUSE_SOR;
+                } else {
+                    return setAside.getAction();
+                }
+            case CORRECTION:
+                return postHearing.getCorrection().getAction();
+            case STATEMENT_OF_REASONS:
+                return postHearing.getStatementOfReasons().getAction();
+            case PERMISSION_TO_APPEAL:
+                return postHearing.getPermissionToAppeal().getAction();
+            case LIBERTY_TO_APPLY:
+                return postHearing.getLibertyToApply().getAction();
+            default:
+                return null;
+        }
+    }
+
+    public static boolean isSetAsideRefusedSor(SetAside setAside) {
+        return SetAsideActions.REFUSE.equals(setAside.getAction()) && isYes(setAside.getRequestStatementOfReasons());
     }
 }

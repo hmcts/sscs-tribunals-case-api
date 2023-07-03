@@ -62,7 +62,7 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
         String templateId = documentConfiguration.getDocuments().get(caseData.getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
 
         log.info("Direction Type is {} and templateId is {}", caseData.getDirectionTypeDl().getValue(), templateId);
-        return issueDocument(callback, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
+        return issueDocument(caseData, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
     }
 
 }

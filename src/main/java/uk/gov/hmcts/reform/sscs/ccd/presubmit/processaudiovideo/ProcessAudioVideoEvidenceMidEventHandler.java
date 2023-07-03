@@ -77,7 +77,7 @@ public class ProcessAudioVideoEvidenceMidEventHandler extends IssueDocumentHandl
 
         if (nonNull(selectedAudioVideoEvidenceDetails) && nonNull(processAudioVideoAction) && ACTIONS_THAT_REQUIRES_NOTICE.contains(processAudioVideoAction.getValue().getCode())) {
             String templateId = documentConfiguration.getDocuments().get(caseData.getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
-            return issueDocument(callback, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
+            return issueDocument(caseData, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
         }
 
         AudioVideoEvidence selectedAudioVideoEvidence = caseData.getAudioVideoEvidence().stream().filter(evidence -> isSelectedEvidence(evidence, caseData)).findFirst().orElse(null);

@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -280,5 +281,25 @@ class IssueDocumentHandlerTest {
             handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, true, USER_AUTHORISATION))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("getNoticeBody has unexpected postHearingReviewType: " + postHearingReviewType.getDescriptionEn());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = DocumentType.class, names = {"SET_ASIDE_APPLICATION"})
+    public void givenPostHearingReviewActionTypeIsNotGrantOrRefuse_thenReturnDefaultDocumentLabel(DocumentType documentType) {
+        String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() + " issued" : documentType.getValue();
+
+        SscsCaseData caseDataGrant = SscsCaseData.builder()
+            .ccdCaseId("1")
+            .build();
+        SetAside setAsideGrant = SetAside.builder()
+            .action(SetAsideActions.ISSUE_DIRECTIONS)
+            .build();
+
+        caseDataGrant.getPostHearing().setSetAside(setAsideGrant);
+
+        String updatedLabel = new IssueDocumentHandler()
+            .setDocumentTypeLabelForPostHearing(caseDataGrant.getPostHearing(), documentType, documentTypeLabel);
+
+        Assertions.assertEquals(documentTypeLabel, updatedLabel);
     }
 }

@@ -57,7 +57,7 @@ public class ActionPostponementRequestMidEventHandler extends IssueDocumentHandl
         if (isGrantPostponement(postponementRequest) || isRefusePostponement(postponementRequest)) {
             String templateId = documentConfiguration.getDocuments()
                     .get(caseData.getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
-            response = issueDocument(callback, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
+            response = issueDocument(caseData, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
         }
 
         return response;

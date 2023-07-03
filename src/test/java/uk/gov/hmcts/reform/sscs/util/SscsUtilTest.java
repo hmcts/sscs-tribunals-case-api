@@ -38,16 +38,6 @@ class SscsUtilTest {
     }
 
     @Test
-    void givenActionTypeSetAsideGrantedSelected_shouldThrowError() {
-        postHearing.setReviewType(PostHearingReviewType.SET_ASIDE);
-        postHearing.getSetAside().setAction(SetAsideActions.GRANT);
-
-        assertThatThrownBy(() -> getPostHearingReviewDocumentType(postHearing, true))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("getting the document type has an unexpected postHearingReviewType and action");
-    }
-
-    @Test
     void givenActionTypeSetAsideRefusedSelected_shouldReturnSetAsideRefusedDocument() {
         postHearing.setReviewType(PostHearingReviewType.SET_ASIDE);
         postHearing.getSetAside().setAction(SetAsideActions.REFUSE);
@@ -55,16 +45,6 @@ class SscsUtilTest {
         DocumentType documentType = getPostHearingReviewDocumentType(postHearing, true);
 
         assertThat(documentType).isEqualTo(DocumentType.SET_ASIDE_REFUSED);
-    }
-
-    @Test
-    void givenActionTypeCorrectionGrantedSelected_shouldThrowError() {
-        postHearing.setReviewType(PostHearingReviewType.CORRECTION);
-        postHearing.getCorrection().setAction(CorrectionActions.GRANT);
-
-        assertThatThrownBy(() -> getPostHearingReviewDocumentType(postHearing, true))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("getting the document type has an unexpected postHearingReviewType and action");
     }
 
     @Test
