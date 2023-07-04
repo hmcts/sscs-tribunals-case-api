@@ -84,6 +84,14 @@ public class SscsUtil {
     }
 
     public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {
+        if (isPostHearingsEnabled && nonNull(postHearing.getReviewType())) {
+            return getPostHearingReviewDocumentType(postHearing);
+        }
+
+        return DocumentType.DECISION_NOTICE;
+    }
+
+    private static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing) {
         PostHearingReviewType postHearingReviewType = postHearing.getReviewType();
         if (isPostHearingsEnabled && nonNull(postHearingReviewType)) {
             switch (postHearingReviewType) {
@@ -110,6 +118,11 @@ public class SscsUtil {
 
                     return DocumentType.STATEMENT_OF_REASONS_GRANTED;
                 case LIBERTY_TO_APPLY:
+                  if (LibertyToApplyActions.REFUSE.equals(postHearing.getLibertyToApply().getAction())) {
+                    return DocumentType.LIBERTY_TO_APPLY_REFUSED;
+                  }
+
+                  return DocumentType.LIBERTY_TO_APPLY_GRANTED;
                 case PERMISSION_TO_APPEAL:
                 default:
                     break;
