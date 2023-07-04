@@ -113,14 +113,26 @@ public class OnlineHearingService {
                     appellantSubscriptions);
         } else {
             List<CcdValue<OtherParty>> otherParties = sscsCaseDetails.getData().getOtherParties();
+            if (otherParties == null) {
+                log.info(format("Other parties for case [%d] is null", sscsCaseDetails.getId()));
+            } else {
+                log.info(format("Other parties for case [%d] has size [%d]", sscsCaseDetails.getId(), otherParties.size()));
+            }
             for (CcdValue<OtherParty> op : emptyIfNull(otherParties)) {
                 Map<UserType, Subscription> otherPartySubscriptions = getOtherPartySubscriptionMap(op);
+                log.info("Trying other party subscriptions");
+                for (UserType userType: otherPartySubscriptions.keySet()) {
+                    Subscription subscription = otherPartySubscriptions.get(userType);
+                    log.info(format("Found other party subscription: email [%s]", subscription.getEmail()));
+                }
                 if (isSignInSubscription(otherPartySubscriptions.values(), tya, email)) {
                     log.info(format("Returning other party details, name = [%s]", op.getValue().getName()));
                     return populateUserDetails(UserType.OTHER_PARTY, op.getValue().getName(),
                             op.getValue().getAddress(),
                             Optional.ofNullable(op.getValue().getContact()),
                             otherPartySubscriptions);
+                } else {
+                    log.info(format("isSignInSubscription is false for case [%d]", sscsCaseDetails.getId()));
                 }
             }
         }
