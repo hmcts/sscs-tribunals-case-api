@@ -46,7 +46,7 @@ mainClassName = 'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication'
 pmd {
     toolVersion = "6.55.0"
     ignoreFailures = true
-    sourceSets = [sourceSets.main, sourceSets.test]
+    sourceSets = [sourceSets.main]
     reportsDir = file("$project.buildDir/reports/pmd")
     ruleSetFiles = files("config/pmd/ruleset.xml")
 }
