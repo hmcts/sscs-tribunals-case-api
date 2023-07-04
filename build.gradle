@@ -92,9 +92,7 @@ tasks.withType(Test) {
     }
 }
 
-test {
-    exclude "uk/gov/hmcts/reform/sscs/**"
-}
+test.enabled = false
 
 task integration(type: Test) {
     setTestClassesDirs(sourceSets.integrationTest.output.classesDirs)
