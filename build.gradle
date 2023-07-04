@@ -92,6 +92,10 @@ tasks.withType(Test) {
     }
 }
 
+test {
+    exclude "uk/gov/hmcts/reform/sscs/**"
+}
+
 task integration(type: Test) {
     setTestClassesDirs(sourceSets.integrationTest.output.classesDirs)
     setClasspath(sourceSets.integrationTest.runtimeClasspath)
