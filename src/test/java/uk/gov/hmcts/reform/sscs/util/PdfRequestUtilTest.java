@@ -218,6 +218,14 @@ class PdfRequestUtilTest {
     }
 
     @Test
+    void getGenerateNoticeThrowsError_whenPermissionToAppealndIsPostHearingsBEnabledFalse() {
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
+        assertThatThrownBy(() -> PdfRequestUtil.getGenerateNotice(sscsCaseData, true, false))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("isPostHearingsBEnabled is false - Permission to Appeal is not available");
+    }
+
+    @Test
     void givenPostHearingsEnabledIsFalse_getGenerateNoticeReturnsGetGenerateNotice() {
         sscsCaseData.getDocumentGeneration().setGenerateNotice(YES);
         assertThat(PdfRequestUtil.getGenerateNotice(sscsCaseData, false, false)).isEqualTo(YES);
