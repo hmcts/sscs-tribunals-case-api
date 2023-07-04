@@ -83,7 +83,7 @@ public class SscsUtil {
         footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, overrideFileName, null);
     }
 
-    private static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {
+    public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {
         PostHearingReviewType postHearingReviewType = postHearing.getReviewType();
         if (isPostHearingsEnabled && nonNull(postHearingReviewType)) {
             switch (postHearingReviewType) {
