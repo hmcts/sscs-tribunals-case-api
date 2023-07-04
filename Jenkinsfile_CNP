@@ -97,14 +97,6 @@ withPipeline(type, product, component) {
     disableLegacyDeployment()
     syncBranchesWithMaster(branchesToSync)
 
-    post {
-        always {
-            junit(
-                    allowEmptyResults: true,
-                    testResults: '**/test-reports/*.xml'
-            )
-        }
-    }
     afterSuccess('akschartsinstall'){
         // Vars needed for AKS testing
         env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
