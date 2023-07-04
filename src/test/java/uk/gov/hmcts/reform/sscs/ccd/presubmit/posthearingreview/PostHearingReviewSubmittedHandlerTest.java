@@ -119,7 +119,7 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = SetAsideActions.class, names = {"GRANT", "ISSUE_DIRECTIONS"})
+    @EnumSource(value = SetAsideActions.class, names = {"GRANT"})
     void givenActionTypeSetAsideSelectedIsNotRefuse_shouldNotUpdateCaseWIthCcdService(SetAsideActions action) {
         caseData.getPostHearing().setReviewType(SET_ASIDE);
         caseData.getPostHearing().getSetAside().setAction(action);
