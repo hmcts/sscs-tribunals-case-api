@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCasePanelMembersExcluded;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
@@ -515,4 +516,17 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
             .getPanelMemberExclusions().getExcludedPanelMembers()).hasSize(2);
     }
 
+    @DisplayName("")
+    @Test
+    void givenHearingTypeIsDataToBeFixedOrNull_thenHearingWindowShouldBeNull() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+        Adjournment adjournment = sscsCaseData.getAdjournment();
+        adjournment.setNextHearingFirstAvailableDateAfterDate(null);
+        adjournment.setNextHearingFirstAvailableDateAfterPeriod(null);
+        adjournment.setNextHearingDateOrPeriod(null);
+        adjournment.setNextHearingDateType(null);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getHearingWindow()).isNull();
+    }
 }

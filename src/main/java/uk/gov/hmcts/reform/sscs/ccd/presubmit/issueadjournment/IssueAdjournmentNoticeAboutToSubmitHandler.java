@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod.PROVIDE_DATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.DATE_TO_BE_FIXED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.NON_STANDARD;
@@ -320,14 +321,18 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
     private void handleHearingWindow(SscsCaseData caseData, OverrideFields overrideFields) {
         HearingWindow hearingWindow = overrideFields.getHearingWindow();
+        Adjournment adjournment = caseData.getAdjournment();
+        AdjournCaseNextHearingDateType hearingDateType = adjournment.getNextHearingDateType();
+
+        if (isNull(hearingDateType) || DATE_TO_BE_FIXED.equals(hearingDateType)) {
+            return;
+        }
 
         if (hearingWindow == null) {
             hearingWindow = HearingWindow.builder().build();
             overrideFields.setHearingWindow(hearingWindow);
         }
 
-        Adjournment adjournment = caseData.getAdjournment();
-        AdjournCaseNextHearingDateType hearingDateType = adjournment.getNextHearingDateType();
         AdjournCaseNextHearingDateOrPeriod hearingDateOrPeriod = adjournment.getNextHearingDateOrPeriod();
 
         if (FIRST_AVAILABLE_DATE.equals(hearingDateType)) {
@@ -335,7 +340,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         }
 
         if (FIRST_AVAILABLE_DATE_AFTER.equals(hearingDateType)) {
-
             if (PROVIDE_DATE.equals(hearingDateOrPeriod)) {
                 hearingWindow.setDateRangeStart(adjournment.getNextHearingFirstAvailableDateAfterDate());
             } else if (PROVIDE_PERIOD.equals(hearingDateOrPeriod)) {
