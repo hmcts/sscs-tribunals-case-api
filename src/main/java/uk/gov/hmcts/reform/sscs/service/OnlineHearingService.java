@@ -180,7 +180,12 @@ public class OnlineHearingService {
     }
 
     private boolean isSignInSubscription(Collection<Subscription> subscriptionStream, String tya, String email) {
+<<<<<<< HEAD
         return subscriptionStream.stream().anyMatch(subscription -> subscription != null
                 && email.equalsIgnoreCase(subscription.getEmail()));
+=======
+        return subscriptionStream.stream().anyMatch(subscription -> subscription != null &&
+                email.equalsIgnoreCase(subscription.getEmail()));
+>>>>>>> 753662382... SSCS-11851 Return other party details
     }
 }
