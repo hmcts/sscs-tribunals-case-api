@@ -59,8 +59,12 @@ public class CitizenLoginService {
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
                 .collect(toList());
-        for (SscsCaseDetails sscsCaseDetailsItem : sscsCaseDetails) {
-            log.info(format("Found case with id [%d]", sscsCaseDetailsItem.getId()));
+        if (sscsCaseDetails != null) {
+            for (SscsCaseDetails sscsCaseDetailsItem : sscsCaseDetails) {
+                if (sscsCaseDetailsItem != null) {
+                    log.info(format("Found case with id [%d]", sscsCaseDetailsItem.getId()));
+                }
+            }
         }
         if (!isBlank(tya)) {
             log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));

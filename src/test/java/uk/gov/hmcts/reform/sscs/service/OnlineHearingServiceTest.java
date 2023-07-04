@@ -59,7 +59,7 @@ public class OnlineHearingServiceTest {
     public void loadHearingWithoutCorCase() {
         SscsCaseDetails sscsCaseDetails = createCaseDetails(someCaseId, "caseref", "firstname", "lastname", "paper");
 
-        Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails, null, null);
+        Optional<OnlineHearing> onlineHearing = underTest.loadHearing(sscsCaseDetails, null, "appellant@hmct.com");
 
         assertOnlineHearing(onlineHearing, sscsCaseDetails, "firstname lastname");
     }
