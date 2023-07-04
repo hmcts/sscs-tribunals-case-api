@@ -135,7 +135,7 @@ jacoco {
 }
 
 jacocoTestReport {
-    executionData(test, integration)
+    executionData(integration)
     reports {
         xml.required = true
         csv.required = false
@@ -442,7 +442,7 @@ bootJar {
 }
 
 jacocoTestReport {
-    executionData(test, integration)
+    executionData(integration)
     reports {
         xml.required = true
         csv.required = false
@@ -450,15 +450,7 @@ jacocoTestReport {
 }
 
 pitest {
-    targetClasses = ['uk.gov.hmcts.reform.sscs.service.*']
-    excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*',
-                       'uk.gov.hmcts.reform.sscs.builder.*',
-                       'uk.gov.hmcts.reform.sscs.domain.*',
-                       'uk.gov.hmcts.reform.sscs.exception.*',
-                       'uk.gov.hmcts.reform.sscs.healthcheck.*',
-                       'uk.gov.hmcts.reform.sscs.model.*',
-                       'uk.gov.hmcts.reform.sscs.transform.*',
-                       'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication']
+    excludedClasses = ['uk.gov.hmcts.reform.sscs.**.*']
     excludedMethods = ['equals', 'hashcode']
     jvmArgs = ['-Xms1G','-Xmx3G']
     enableDefaultIncrementalAnalysis = true
