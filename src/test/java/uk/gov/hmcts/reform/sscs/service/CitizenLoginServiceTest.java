@@ -87,9 +87,9 @@ public class CitizenLoginServiceTest {
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing1 = someOnlineHearing(111L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails1)).thenReturn(Optional.of(onlineHearing1));
+        when(onlineHearingService.loadHearing(sscsCaseDetails1, null, null)).thenReturn(Optional.of(onlineHearing1));
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2)).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, null)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
@@ -108,7 +108,7 @@ public class CitizenLoginServiceTest {
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2)).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, null)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
@@ -127,7 +127,7 @@ public class CitizenLoginServiceTest {
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2)).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, null)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
@@ -146,7 +146,7 @@ public class CitizenLoginServiceTest {
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2)).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, null)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findActiveCasesForCitizen(citizenIdamTokens);
 
@@ -165,7 +165,7 @@ public class CitizenLoginServiceTest {
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2)).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, null)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findActiveCasesForCitizen(citizenIdamTokens);
 
@@ -186,7 +186,7 @@ public class CitizenLoginServiceTest {
         when(sscsCcdConvertService.getCaseDetails(eq(caseDetails1))).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(caseDetails2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2)).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, null)).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findDormantCasesForCitizen(citizenIdamTokens);
 
@@ -204,7 +204,7 @@ public class CitizenLoginServiceTest {
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetailsWithDifferentTya);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
         OnlineHearing onlineHearing = someOnlineHearing(111L);
-        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya)).thenReturn(Optional.of(onlineHearing));
+        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya, null, null)).thenReturn(Optional.of(onlineHearing));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, tya);
 
@@ -223,7 +223,7 @@ public class CitizenLoginServiceTest {
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
 
         OnlineHearing onlineHearing = someOnlineHearing(111L);
-        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya)).thenReturn(Optional.of(onlineHearing));
+        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya, null, null)).thenReturn(Optional.of(onlineHearing));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, tya);
 
@@ -240,7 +240,7 @@ public class CitizenLoginServiceTest {
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetailsWithDifferentTya);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
         OnlineHearing onlineHearing = someOnlineHearing(111L);
-        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya)).thenReturn(Optional.of(onlineHearing));
+        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya, null, null)).thenReturn(Optional.of(onlineHearing));
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, tya);
 
         assertThat(casesForCitizen, is(singletonList(onlineHearing)));
