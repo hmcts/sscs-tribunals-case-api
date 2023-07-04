@@ -328,7 +328,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '99f6be4'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'e5e6a1b'
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.4'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.39.0'
@@ -339,9 +339,9 @@ dependencies {
     implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.4'
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.2'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.3'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.2'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.3'
 
     implementation group:'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.8.0'
