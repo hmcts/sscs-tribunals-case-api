@@ -153,18 +153,15 @@ class IssueDocumentHandlerTest {
         assertThat(payload.getIdamSurname()).isEqualTo("Barry Allen");
     }
 
-    @ParameterizedTest
-    @EnumSource(value = SetAsideActions.class, names = {"GRANT", "REFUSE"})
-    void givenSetAsideState_andPostHearingsIsEnabled_thenReturnSetAsideDecisionNotice(SetAsideActions setAsideActions) {
+    @Test
+    void givenSetAsideState_andPostHearingsIsEnabled_thenReturnSetAsideDecisionNotice() {
         final String originalLabel = "label";
         SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .ccdCaseId("1")
-            .postHearing(PostHearing.builder()
-                .setAside(SetAside.builder()
-                    .action(setAsideActions)
+                .ccdCaseId("1")
+                .postHearing(PostHearing.builder()
+                    .reviewType(PostHearingReviewType.SET_ASIDE)
                     .build())
-                .build())
-            .build();
+                .build();
 
         boolean isPostHearingsEnabled = true;
         String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, originalLabel, isPostHearingsEnabled);
@@ -173,16 +170,13 @@ class IssueDocumentHandlerTest {
         assertThat(documentTypeLabel).isEqualTo(expectedLabel);
     }
 
-    @ParameterizedTest
-    @EnumSource(value = SetAsideActions.class, names = {"GRANT", "REFUSE"})
-    void givenSetAsideState_andPostHearingsIsDisabled_thenReturnOriginalLabel(SetAsideActions setAsideActions) {
+    @Test
+    void givenSetAsideState_andPostHearingsIsDisabled_thenReturnOriginalLabel() {
         final String originalLabel = "label";
         SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .ccdCaseId("1")
-            .postHearing(PostHearing.builder()
-                .setAside(SetAside.builder()
-                    .action(setAsideActions)
-                    .build())
+                .ccdCaseId("1")
+                .postHearing(PostHearing.builder()
+                    .reviewType(PostHearingReviewType.SET_ASIDE)
                 .build())
             .build();
 

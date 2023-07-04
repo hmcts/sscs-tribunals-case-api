@@ -93,6 +93,20 @@ class SscsUtilTest {
     void givenActionTypePta_shouldReturnPtaDocument(PermissionToAppealActions action, DocumentType expectedDocumentType) {
         postHearing.setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
         postHearing.getPermissionToAppeal().setAction(action);
+      
+        DocumentType documentType = getPostHearingReviewDocumentType(postHearing, true);
+
+        assertThat(documentType).isEqualTo(expectedDocumentType);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+        "GRANT,LIBERTY_TO_APPLY_GRANTED",
+        "REFUSE,LIBERTY_TO_APPLY_REFUSED"
+    })
+    void givenActionTypeLta_shouldReturnLtaDocument(LibertyToApplyActions action, DocumentType expectedDocumentType) {
+        postHearing.setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
+        postHearing.getLibertyToApply().setAction(action);
 
         DocumentType documentType = getPostHearingReviewDocumentType(postHearing, true);
 
