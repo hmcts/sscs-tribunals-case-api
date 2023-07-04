@@ -9,7 +9,6 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.util.DataFixtures.someOnlineHearing;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
