@@ -52,15 +52,9 @@ public class OnlineHearingService {
         });
     }
 
-    //Load hearing with appellant details as user details
-    public Optional<OnlineHearing> loadHearing(SscsCaseDetails sscsCaseDeails) {
-        UserDetails userDetails = convertUserDetails(sscsCaseDeails, null, null, true);
-        return populateHearing(sscsCaseDeails, userDetails);
-    }
-
     //Load hearing with signed-in user details
     public Optional<OnlineHearing> loadHearing(SscsCaseDetails sscsCaseDeails, String tya, String email) {
-        UserDetails userDetails = convertUserDetails(sscsCaseDeails, tya, email, false);
+        UserDetails userDetails = convertUserDetails(sscsCaseDeails, tya, email);
         return populateHearing(sscsCaseDeails, userDetails);
     }
 
@@ -100,13 +94,16 @@ public class OnlineHearingService {
         );
     }
 
-    private UserDetails convertUserDetails(SscsCaseDetails sscsCaseDetails, String tya, String email, boolean onlyForAppellant) {
+    private UserDetails convertUserDetails(SscsCaseDetails sscsCaseDetails, String tya, String email) {
         Map<UserType, Subscription> appellantSubscriptions = getAppealSubscriptionMap(sscsCaseDetails);
-
+        for (UserType userType: appellantSubscriptions.keySet()) {
+            Subscription subscription = appellantSubscriptions.get(userType);
+            log.info(format("Appellant subscription: email [%s]", subscription.getEmail()));
+        }
         boolean isSignInSubscription = isSignInSubscription(appellantSubscriptions.values(), tya, email);
-        if (onlyForAppellant || isSignInSubscription) {
-            log.info(format("Returning appellant details, onlyForAppellant: [%b], isSignInSubscription: [%b]",
-                    onlyForAppellant, isSignInSubscription));
+        if (isSignInSubscription) {
+            log.info(format("Returning appellant details, isSignInSubscription: [%b]",
+                    isSignInSubscription));
             return populateUserDetails(UserType.APPELLANT, sscsCaseDetails.getData().getAppeal().getAppellant().getName(),
                     sscsCaseDetails.getData().getAppeal().getAppellant().getAddress(),
                     Optional.ofNullable(sscsCaseDetails.getData().getAppeal().getAppellant().getContact()),
@@ -179,6 +176,7 @@ public class OnlineHearingService {
     }
 
     private boolean isSignInSubscription(Collection<Subscription> subscriptionStream, String tya, String email) {
-        return subscriptionStream.stream().anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()) && email.equalsIgnoreCase(subscription.getEmail()));
+        return subscriptionStream.stream().anyMatch(subscription -> subscription != null &&
+                email.equalsIgnoreCase(subscription.getEmail()));
     }
 }
