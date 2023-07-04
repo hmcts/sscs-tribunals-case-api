@@ -103,8 +103,10 @@ public class OnlineHearingService {
     private UserDetails convertUserDetails(SscsCaseDetails sscsCaseDetails, String tya, String email, boolean onlyForAppellant) {
         Map<UserType, Subscription> appellantSubscriptions = getAppealSubscriptionMap(sscsCaseDetails);
 
-        if (onlyForAppellant || isSignInSubscription(appellantSubscriptions.values(), tya, email)) {
-            log.info(format("Returning appellant details, onlyForAppellant = [%b]", onlyForAppellant));
+        boolean isSignInSubscription = isSignInSubscription(appellantSubscriptions.values(), tya, email);
+        if (onlyForAppellant || isSignInSubscription) {
+            log.info(format("Returning appellant details, onlyForAppellant: [%b], isSignInSubscription: [%b]",
+                    onlyForAppellant, isSignInSubscription));
             return populateUserDetails(UserType.APPELLANT, sscsCaseDetails.getData().getAppeal().getAppellant().getName(),
                     sscsCaseDetails.getData().getAppeal().getAppellant().getAddress(),
                     Optional.ofNullable(sscsCaseDetails.getData().getAppeal().getAppellant().getContact()),
