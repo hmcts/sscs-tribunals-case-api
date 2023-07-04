@@ -49,7 +49,7 @@ public class CitizenLoginService {
     }
 
     public List<OnlineHearing> findCasesForCitizen(IdamTokens idamTokens, String tya) {
-        log.info(format("Find case: Searching for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
+        log.info(format("Find case: Searching for case with tya [%s] for user [%s] with email [%s]", tya, idamTokens.getUserId(), idamTokens.getEmail()));
         List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens);
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
