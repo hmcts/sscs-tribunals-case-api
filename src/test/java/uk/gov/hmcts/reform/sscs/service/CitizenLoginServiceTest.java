@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -50,7 +52,7 @@ public class CitizenLoginServiceTest {
         ccdService = mock(CcdService.class);
         case1 = mock(CaseDetails.class);
         case2 = mock(CaseDetails.class);
-        List<CaseDetails> cases = Arrays.asList(case1, case2);
+        List<CaseDetails> cases = asList(case1, case2);
         when(citizenCcdService.searchForCitizen(citizenIdamTokens)).thenReturn(cases);
         sscsCcdConvertService = mock(SscsCcdConvertService.class);
 
@@ -85,14 +87,14 @@ public class CitizenLoginServiceTest {
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing1 = someOnlineHearing(111L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails1, null, null)).thenReturn(Optional.of(onlineHearing1));
+        when(onlineHearingService.loadHearing(sscsCaseDetails1, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing1));
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, null)).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
         verify(sscsCcdConvertService, times(2)).getCaseDetails(any(CaseDetails.class));
-        // assertThat(casesForCitizen, is(asList(onlineHearing1, onlineHearing2)));
+        assertThat(casesForCitizen, is(asList(onlineHearing1, onlineHearing2)));
     }
 
     @Test
@@ -106,12 +108,12 @@ public class CitizenLoginServiceTest {
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, null)).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
         verify(sscsCcdConvertService).getCaseDetails(eq(case2));
-        // assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
+        assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
     }
 
     @Test
@@ -125,12 +127,12 @@ public class CitizenLoginServiceTest {
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, null)).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
         verify(sscsCcdConvertService).getCaseDetails(eq(case2));
-        // assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
+        assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
     }
 
     @Test
@@ -144,12 +146,12 @@ public class CitizenLoginServiceTest {
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, null)).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findActiveCasesForCitizen(citizenIdamTokens);
 
         verify(sscsCcdConvertService).getCaseDetails(eq(case2));
-        // assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
+        assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
     }
 
     @Test
@@ -163,12 +165,12 @@ public class CitizenLoginServiceTest {
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, null)).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findActiveCasesForCitizen(citizenIdamTokens);
 
         verify(sscsCcdConvertService).getCaseDetails(eq(case2));
-        // assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
+        assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
     }
 
     @Test
@@ -184,12 +186,12 @@ public class CitizenLoginServiceTest {
         when(sscsCcdConvertService.getCaseDetails(eq(caseDetails1))).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(caseDetails2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
-        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, null)).thenReturn(Optional.of(onlineHearing2));
+        when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
 
         List<OnlineHearing> casesForCitizen = underTest.findDormantCasesForCitizen(citizenIdamTokens);
 
         verify(sscsCcdConvertService).getCaseDetails(eq(caseDetails2));
-        // assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
+        assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
     }
 
     @Test
@@ -202,11 +204,11 @@ public class CitizenLoginServiceTest {
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetailsWithDifferentTya);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
         OnlineHearing onlineHearing = someOnlineHearing(111L);
-        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya, null, null)).thenReturn(Optional.of(onlineHearing));
+        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, tya);
 
-        // assertThat(casesForCitizen, is(singletonList(onlineHearing)));
+        assertThat(casesForCitizen, is(singletonList(onlineHearing)));
     }
 
     @Test
@@ -221,11 +223,11 @@ public class CitizenLoginServiceTest {
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
 
         OnlineHearing onlineHearing = someOnlineHearing(111L);
-        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya, null, null)).thenReturn(Optional.of(onlineHearing));
+        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, tya);
 
-        // assertThat(casesForCitizen, is(singletonList(onlineHearing)));
+        assertThat(casesForCitizen, is(singletonList(onlineHearing)));
     }
 
     @Test
@@ -238,10 +240,10 @@ public class CitizenLoginServiceTest {
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetailsWithDifferentTya);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
         OnlineHearing onlineHearing = someOnlineHearing(111L);
-        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya, null, null)).thenReturn(Optional.of(onlineHearing));
+        when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing));
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, tya);
 
-        // assertThat(casesForCitizen, is(singletonList(onlineHearing)));
+        assertThat(casesForCitizen, is(singletonList(onlineHearing)));
     }
 
     @Test
