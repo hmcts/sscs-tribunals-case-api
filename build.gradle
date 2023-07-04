@@ -46,7 +46,7 @@ mainClassName = 'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication'
 pmd {
     toolVersion = "6.55.0"
     ignoreFailures = true
-    sourceSets = [sourceSets.main]
+    sourceSets = [sourceSets.main, sourceSets.test]
     reportsDir = file("$project.buildDir/reports/pmd")
     ruleSetFiles = files("config/pmd/ruleset.xml")
 }
@@ -92,8 +92,6 @@ tasks.withType(Test) {
     }
 }
 
-test.enabled = false
-
 task integration(type: Test) {
     setTestClassesDirs(sourceSets.integrationTest.output.classesDirs)
     setClasspath(sourceSets.integrationTest.runtimeClasspath)
@@ -135,7 +133,7 @@ jacoco {
 }
 
 jacocoTestReport {
-    executionData(integration)
+    executionData(test, integration)
     reports {
         xml.required = true
         csv.required = false
@@ -442,7 +440,7 @@ bootJar {
 }
 
 jacocoTestReport {
-    executionData(integration)
+    executionData(test, integration)
     reports {
         xml.required = true
         csv.required = false
@@ -450,7 +448,15 @@ jacocoTestReport {
 }
 
 pitest {
-    excludedClasses = ['uk.gov.hmcts.reform.sscs.**.*']
+    targetClasses = ['uk.gov.hmcts.reform.sscs.service.*']
+    excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*',
+                       'uk.gov.hmcts.reform.sscs.builder.*',
+                       'uk.gov.hmcts.reform.sscs.domain.*',
+                       'uk.gov.hmcts.reform.sscs.exception.*',
+                       'uk.gov.hmcts.reform.sscs.healthcheck.*',
+                       'uk.gov.hmcts.reform.sscs.model.*',
+                       'uk.gov.hmcts.reform.sscs.transform.*',
+                       'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication']
     excludedMethods = ['equals', 'hashcode']
     jvmArgs = ['-Xms1G','-Xmx3G']
     enableDefaultIncrementalAnalysis = true
