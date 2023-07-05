@@ -88,7 +88,7 @@ public class CitizenLoginService {
         return convert;
     }
 
-    private SscsCaseDetails getByAppealNumber(SscsCaseDetails sscsCaseDetails) {
+    public SscsCaseDetails getByAppealNumber(SscsCaseDetails sscsCaseDetails) {
         log.info(format("Attempting to get case [%d] by tya", sscsCaseDetails.getId()));
         SscsCaseDetails newCaseDetails = sscsCaseDetails;
         if (sscsCaseDetails.getData() == null || sscsCaseDetails.getData().getSubscriptions() == null) {
@@ -106,7 +106,7 @@ public class CitizenLoginService {
         } else if (subs.getRepresentativeSubscription() != null
                 && subs.getRepresentativeSubscription().getTya() != null) {
             newCaseDetails = ccdService.findCaseByAppealNumber(subs.getRepresentativeSubscription().getTya(), idamService.getIdamTokens());
-            log.info(format("Got case [%d] by rep tya [%s]", sscsCaseDetails.getId(), subs.getAppointeeSubscription().getTya()));
+            log.info(format("Got case [%d] by rep tya [%s]", sscsCaseDetails.getId(), subs.getRepresentativeSubscription().getTya()));
         } else if (subs.getJointPartySubscription() != null
                 && subs.getJointPartySubscription().getTya() != null) {
             newCaseDetails = ccdService.findCaseByAppealNumber(subs.getJointPartySubscription().getTya(), idamService.getIdamTokens());
