@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.SearchCcdCaseService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
@@ -42,10 +43,13 @@ public class CitizenCcdServiceTest {
     @Mock
     private CcdService ccdService;
 
+    @Mock
+    private SearchCcdCaseService searchCcdCaseService;
+
     @Before
     public void setup() {
         openMocks(this);
-        citizenCcdService = new CitizenCcdService(citizenCcdClient, sscsCcdConvertService, ccdService);
+        citizenCcdService = new CitizenCcdService(citizenCcdClient, sscsCcdConvertService, ccdService, searchCcdCaseService);
     }
 
     @Test
