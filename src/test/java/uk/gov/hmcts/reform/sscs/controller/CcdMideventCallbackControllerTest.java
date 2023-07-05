@@ -108,7 +108,7 @@ public class CcdMideventCallbackControllerTest {
             Arrays.asList(writeFinalDecisionPreviewDecisionService));
 
         controller = new CcdMideventCallbackController(authorisationService, deserializer, decisionNoticeService,
-            adjournCasePreviewService, adjournCaseCcdService, restoreCasesService2);
+            adjournCasePreviewService, adjournCaseCcdService, restoreCasesService2, false);
         mockMvc = standaloneSetup(controller)
             .setMessageConverters(new ByteArrayHttpMessageConverter(), new StringHttpMessageConverter(),
                 new ResourceHttpMessageConverter(false), new SourceHttpMessageConverter<>(),
@@ -129,7 +129,7 @@ public class CcdMideventCallbackControllerTest {
 
         PreSubmitCallbackResponse response =
             new PreSubmitCallbackResponse(SscsCaseData.builder().interlocReviewState(InterlocReviewState.WELSH_TRANSLATION).build());
-        when(writeFinalDecisionPreviewDecisionService.preview(any(),eq(DocumentType.DRAFT_DECISION_NOTICE), anyString(), eq(false)))
+        when(writeFinalDecisionPreviewDecisionService.preview(any(),eq(DocumentType.DRAFT_DECISION_NOTICE), anyString(), eq(false), false))
                 .thenReturn(response);
 
         mockMvc.perform(post("/ccdMidEventPreviewFinalDecision")

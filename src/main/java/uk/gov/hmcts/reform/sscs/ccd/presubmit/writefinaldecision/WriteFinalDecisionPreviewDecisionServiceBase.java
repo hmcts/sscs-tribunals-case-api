@@ -42,7 +42,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
                                                            DecisionNoticeOutcomeService decisionNoticeOutcomeService,
                                                            DocumentConfiguration documentConfiguration,
                                                            VenueDataLoader venueDataLoader) {
-        super(generateFile, userDetailsService, languagePreference -> getTemplateId(documentConfiguration, languagePreference));
+        super(generateFile, userDetailsService, languagePreference -> getTemplateId(documentConfiguration, languagePreference), documentConfiguration);
         this.decisionNoticeQuestionService = decisionNoticeQuestionService;
         this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
         this.venueDataLoader = venueDataLoader;

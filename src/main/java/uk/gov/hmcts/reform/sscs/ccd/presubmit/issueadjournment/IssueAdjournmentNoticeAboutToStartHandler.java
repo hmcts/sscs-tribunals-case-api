@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static java.util.Objects.requireNonNull;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -16,14 +17,12 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 
 @Service
+@AllArgsConstructor
 public class IssueAdjournmentNoticeAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final AdjournCasePreviewService previewService;
-
-    @Autowired
-    public IssueAdjournmentNoticeAboutToStartHandler(AdjournCasePreviewService previewService) {
-        this.previewService = previewService;
-    }
+    @Value("${feature.postHearings.enabled}")
+    private final boolean isPostHearingsEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -52,7 +51,7 @@ public class IssueAdjournmentNoticeAboutToStartHandler implements PreSubmitCallb
             if (sscsCaseData.getAdjournment().getGeneratedDate() == null) {
                 response.addError("Adjourn case generated date not found. Please use 'Adjourn case' event or upload your adjourn case document.");
             } else {
-                previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, userAuthorisation, true);
+                previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, userAuthorisation, true, isPostHearingsEnabled);
             }
 
         } else if (sscsCaseData.getAdjournment().getPreviewDocument() == null) {

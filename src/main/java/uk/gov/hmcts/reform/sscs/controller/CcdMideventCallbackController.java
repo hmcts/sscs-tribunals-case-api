@@ -7,8 +7,10 @@ import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTH
 
 import com.opencsv.CSVReader;
 import java.io.InputStreamReader;
+
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,27 +36,16 @@ import uk.gov.hmcts.reform.sscs.util.FinalDecisionUtil;
 
 @RestController
 @Slf4j
+@AllArgsConstructor
 public class CcdMideventCallbackController {
-
     private final AuthorisationService authorisationService;
     private final SscsCaseCallbackDeserializer deserializer;
     private final DecisionNoticeService decisionNoticeService;
     private final AdjournCasePreviewService adjournCasePreviewService;
     private final AdjournCaseCcdService adjournCaseCcdService;
     private final RestoreCasesService2 restoreCasesService2;
-
-    @Autowired
-    public CcdMideventCallbackController(AuthorisationService authorisationService, SscsCaseCallbackDeserializer deserializer,
-                                         DecisionNoticeService decisionNoticeService,
-                                            AdjournCasePreviewService adjournCasePreviewService, AdjournCaseCcdService adjournCaseCcdService,
-                                            RestoreCasesService2 restoreCasesService2) {
-        this.authorisationService = authorisationService;
-        this.deserializer = deserializer;
-        this.decisionNoticeService = decisionNoticeService;
-        this.adjournCasePreviewService = adjournCasePreviewService;
-        this.adjournCaseCcdService = adjournCaseCcdService;
-        this.restoreCasesService2 = restoreCasesService2;
-    }
+    @Value("${feature.postHearings.enabled}")
+    private boolean isPostHearingsEnabled;
 
     @PostMapping(path = "/ccdMidEventAdjournCasePopulateVenueDropdown", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEventAdjournCasePopulateVenueDropdown(
@@ -107,7 +98,7 @@ public class CcdMideventCallbackController {
 
         WriteFinalDecisionPreviewDecisionServiceBase writeFinalDecisionPreviewDecisionService = decisionNoticeService.getPreviewService(benefitType);
 
-        return ok(writeFinalDecisionPreviewDecisionService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, userAuthorisation, false));
+        return ok(writeFinalDecisionPreviewDecisionService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, userAuthorisation, false, isPostHearingsEnabled));
     }
 
     @PostMapping(path = "/ccdMidEventPreviewAdjournCase", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -121,7 +112,7 @@ public class CcdMideventCallbackController {
 
         authorisationService.authorise(serviceAuthHeader);
 
-        return ok(adjournCasePreviewService.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, userAuthorisation, false));
+        return ok(adjournCasePreviewService.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, userAuthorisation, false, false));
     }
 
     @PostMapping(path = "/ccdMidEventAdminRestoreCases", produces = MediaType.APPLICATION_JSON_VALUE)

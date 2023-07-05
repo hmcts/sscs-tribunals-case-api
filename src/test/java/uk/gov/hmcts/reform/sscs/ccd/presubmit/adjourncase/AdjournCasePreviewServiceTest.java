@@ -62,6 +62,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
@@ -124,10 +125,13 @@ class AdjournCasePreviewServiceTest {
     @Mock
     private SignLanguagesService signLanguagesService;
 
+    @Mock
+    private DocumentConfiguration documentConfiguration;
+
     @BeforeEach
     void setUp() throws IOException {
         service = new AdjournCasePreviewService(generateFile, userDetailsService, venueDataLoader, TEMPLATE_ID,
-            signLanguagesService, judicialRefDataService);
+            signLanguagesService, judicialRefDataService, documentConfiguration);
         ReflectionTestUtils.setField(service, "adjournmentFeature", true);
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
@@ -294,7 +298,7 @@ class AdjournCasePreviewServiceTest {
     @NotNull
     private AdjournCaseTemplateBody getAdjournCaseTemplateBodyWithHearingTypeText(String nextHearingTypeText) {
         final PreSubmitCallbackResponse<SscsCaseData> response =
-            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false, false);
 
         checkPreviewDocument(response);
 
@@ -307,7 +311,7 @@ class AdjournCasePreviewServiceTest {
 
     private void checkDocumentIsNotCreatedAndReturnsError(String expected) {
         final PreSubmitCallbackResponse<SscsCaseData> response =
-            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false, false);
         String error = response.getErrors().stream().findFirst().orElse("");
         assertThat(error).isEqualTo(expected);
         assertThat(response.getData().getAdjournment().getPreviewDocument()).isNull();
@@ -325,7 +329,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setTypeOfNextHearing(nextHearingType);
 
         final PreSubmitCallbackResponse<SscsCaseData> response =
-            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false, false);
 
         checkPreviewDocument(response);
 
@@ -347,7 +351,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setTypeOfNextHearing(nextHearingType);
 
         final PreSubmitCallbackResponse<SscsCaseData> response =
-            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false, false);
 
         checkPreviewDocument(response);
 
@@ -373,7 +377,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setInterpreterLanguage(new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response =
-            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false, false);
 
         checkPreviewDocument(response);
 
@@ -412,7 +416,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setInterpreterLanguage(new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response =
-            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false, false);
 
         checkPreviewDocument(response);
 
@@ -438,7 +442,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setInterpreterLanguage(new DynamicList("French"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response =
-            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false, false);
 
         checkPreviewDocument(response);
 
@@ -614,7 +618,7 @@ class AdjournCasePreviewServiceTest {
 
     private void checkDefaultHearingDataForNullOrEmptyHearings(String nextHearingTypeText) {
         final PreSubmitCallbackResponse<SscsCaseData> response =
-            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false, false);
 
         assertThat(response.getErrors()).isEmpty();
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
@@ -929,7 +933,7 @@ class AdjournCasePreviewServiceTest {
 
         adjournment.setTypeOfNextHearing(nextHearingType);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
@@ -945,7 +949,7 @@ class AdjournCasePreviewServiceTest {
 
         adjournment.setTypeOfNextHearing(nextHearingType);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
@@ -959,7 +963,7 @@ class AdjournCasePreviewServiceTest {
 
         setAdjournmentHearingFirstOnSessionAtSpecificTime("am");
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be first in the morning session on the first available date");
     }
@@ -972,7 +976,7 @@ class AdjournCasePreviewServiceTest {
 
         setAdjournmentHearingFirstOnSessionAtSpecificTime("pm");
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be first in the afternoon session on the first available date");
     }
@@ -988,7 +992,7 @@ class AdjournCasePreviewServiceTest {
             .adjournCaseNextHearingFirstOnSession(List.of())
             .build());
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be re-scheduled on the first available date");
     }
@@ -1001,7 +1005,7 @@ class AdjournCasePreviewServiceTest {
 
         setAdjournmentHearingFirstOnSessionAtSpecificTime(null);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be first in the session on the first available date");
     }
@@ -1017,7 +1021,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingDateOrPeriod(PROVIDE_PERIOD);
         adjournment.setNextHearingFirstAvailableDateAfterPeriod(TWENTY_EIGHT_DAYS);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         String expectedDate = LocalDate.now().plusDays(28).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
@@ -1035,7 +1039,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingDateOrPeriod(PROVIDE_PERIOD);
         adjournment.setNextHearingFirstAvailableDateAfterPeriod(TWENTY_EIGHT_DAYS);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         String expectedDate = LocalDate.now().plusDays(28).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
@@ -1053,7 +1057,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingDateOrPeriod(PROVIDE_PERIOD);
         adjournment.setNextHearingFirstAvailableDateAfterPeriod(TWENTY_EIGHT_DAYS);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         String expectedDate = LocalDate.now().plusDays(28).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
@@ -1071,7 +1075,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingDateOrPeriod(PROVIDE_PERIOD);
         adjournment.setNextHearingFirstAvailableDateAfterPeriod(TWENTY_EIGHT_DAYS);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         String expectedDate = LocalDate.now().plusDays(28).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
@@ -1089,7 +1093,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingDateOrPeriod(PROVIDE_PERIOD);
         adjournment.setNextHearingFirstAvailableDateAfterPeriod(TWENTY_EIGHT_DAYS);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         String expectedDate = LocalDate.now().plusDays(28).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
@@ -1107,7 +1111,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingDateOrPeriod(PROVIDE_PERIOD);
         adjournment.setNextHearingFirstAvailableDateAfterPeriod(TWENTY_EIGHT_DAYS);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         String expectedDate = LocalDate.now().plusDays(28).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
@@ -1123,7 +1127,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingDateOrPeriod(PROVIDE_PERIOD);
         adjournment.setNextHearingFirstAvailableDateAfterPeriod(null);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false, false);
 
         checkDocumentIsNotCreatedAndReturnsError("No value set for adjournCaseNextHearingFirstAvailableDateAfterPeriod in case data");
     }
@@ -1139,7 +1143,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingDateOrPeriod(PROVIDE_DATE);
         adjournment.setNextHearingFirstAvailableDateAfterDate(LocalDate.parse("2020-01-01"));
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be first in the morning session on the first available date after 01/01/2020");
     }
@@ -1155,7 +1159,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingDateOrPeriod(PROVIDE_DATE);
         adjournment.setNextHearingFirstAvailableDateAfterDate(LocalDate.parse("2020-01-01"));
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be first in the afternoon session on the first available date after 01/01/2020");
     }
@@ -1171,7 +1175,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingDateOrPeriod(PROVIDE_DATE);
         adjournment.setNextHearingFirstAvailableDateAfterDate(LocalDate.parse("2020-01-01"));
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be first in the session on the first available date after 01/01/2020");
     }
@@ -1190,7 +1194,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingDateOrPeriod(PROVIDE_DATE);
         adjournment.setNextHearingFirstAvailableDateAfterDate(LocalDate.parse("2020-01-01"));
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be in the morning session on the first available date after 01/01/2020");
     }
@@ -1209,7 +1213,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingDateOrPeriod(PROVIDE_DATE);
         adjournment.setNextHearingFirstAvailableDateAfterDate(LocalDate.parse("2020-01-01"));
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be in the afternoon session on the first available date after 01/01/2020");
     }
@@ -1225,7 +1229,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingDateOrPeriod(PROVIDE_DATE);
         adjournment.setNextHearingFirstAvailableDateAfterDate(LocalDate.parse("2020-01-01"));
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be re-scheduled on the first available date after 01/01/2020");
     }
@@ -1239,7 +1243,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setTime(AdjournCaseTime.builder().build());
         adjournment.setNextHearingDateType(DATE_TO_BE_FIXED);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be re-scheduled on a date to be fixed");
     }
@@ -1253,7 +1257,7 @@ class AdjournCasePreviewServiceTest {
         setAdjournmentHearingFirstOnSessionAtSpecificTime("am");
         adjournment.setNextHearingDateType(DATE_TO_BE_FIXED);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be first in the morning session on a date to be fixed");
     }
@@ -1267,7 +1271,7 @@ class AdjournCasePreviewServiceTest {
         setAdjournmentHearingFirstOnSessionAtSpecificTime("pm");
         adjournment.setNextHearingDateType(DATE_TO_BE_FIXED);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be first in the afternoon session on a date to be fixed");
     }
@@ -1281,7 +1285,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setTime(AdjournCaseTime.builder().adjournCaseNextHearingSpecificTime("am").build());
         adjournment.setNextHearingDateType(DATE_TO_BE_FIXED);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be in the morning session on a date to be fixed");
     }
@@ -1295,7 +1299,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setTime(AdjournCaseTime.builder().adjournCaseNextHearingSpecificTime("pm").build());
         adjournment.setNextHearingDateType(DATE_TO_BE_FIXED);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be in the afternoon session on a date to be fixed");
     }
@@ -1309,7 +1313,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setTime(AdjournCaseTime.builder().build());
         adjournment.setNextHearingDateType(DATE_TO_BE_FIXED);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be re-scheduled on a date to be fixed");
     }
@@ -1323,7 +1327,7 @@ class AdjournCasePreviewServiceTest {
         setAdjournmentHearingFirstOnSessionAtSpecificTime(null);
         adjournment.setNextHearingDateType(DATE_TO_BE_FIXED);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be first in the session on a date to be fixed");
     }
@@ -1336,7 +1340,7 @@ class AdjournCasePreviewServiceTest {
 
         adjournment.setTime(AdjournCaseTime.builder().build());
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be re-scheduled on the first available date");
     }
@@ -1349,7 +1353,7 @@ class AdjournCasePreviewServiceTest {
 
         adjournment.setTime(null);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         checkTemplateBodyNextHearingDate("It will be re-scheduled on the first available date");
     }
@@ -1401,7 +1405,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingVenue(SAME_VENUE);
         adjournment.setNextHearingVenueSelected(list);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
@@ -1424,7 +1428,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingVenue(SOMEWHERE_ELSE);
         adjournment.setNextHearingVenueSelected(list);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
@@ -1446,9 +1450,9 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingVenueSelected(list);
 
         final PreSubmitCallbackResponse<SscsCaseData> response =
-            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+            service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
-        String error = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false).getErrors().stream().findFirst().orElse("");
+        String error = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false, false).getErrors().stream().findFirst().orElse("");
         assertThat(error).isEqualTo("adjournCaseNextHearingVenueSelected field should not be set");
         assertThat(response.getData().getAdjournment().getPreviewDocument()).isNull();
     }
@@ -1532,7 +1536,7 @@ class AdjournCasePreviewServiceTest {
 
         sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().name("Glasgow").build());
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
@@ -1555,7 +1559,7 @@ class AdjournCasePreviewServiceTest {
             .identity(Identity.builder().build())
             .build());
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false, false);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", nextHearingTypeText);
@@ -1570,7 +1574,7 @@ class AdjournCasePreviewServiceTest {
 
         adjournment.setTypeOfNextHearing(nextHearingType);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
@@ -1588,7 +1592,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setGeneratedDate(LOCAL_DATE);
         adjournment.setTypeOfNextHearing(nextHearingType);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
@@ -1607,7 +1611,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setGeneratedDate(LOCAL_DATE);
         adjournment.setTypeOfNextHearing(nextHearingType);
 
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, false);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);

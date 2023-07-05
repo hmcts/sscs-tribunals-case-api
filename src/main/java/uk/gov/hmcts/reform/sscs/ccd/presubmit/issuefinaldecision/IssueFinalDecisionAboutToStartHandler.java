@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
 import static java.util.Objects.requireNonNull;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -16,14 +17,12 @@ import uk.gov.hmcts.reform.sscs.util.FinalDecisionUtil;
 import uk.gov.hmcts.reform.sscs.util.FinalDecisionUtil.FinalDecisionType;
 
 @Service
+@AllArgsConstructor
 public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final DecisionNoticeService decisionNoticeService;
-
-    @Autowired
-    public IssueFinalDecisionAboutToStartHandler(DecisionNoticeService decisionNoticeService) {
-        this.decisionNoticeService = decisionNoticeService;
-    }
+    @Value("${feature.postHearings.enabled}")
+    private boolean isPostHearingsEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
