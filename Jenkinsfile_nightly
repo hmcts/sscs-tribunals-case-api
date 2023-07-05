@@ -45,7 +45,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 
 withNightlyPipeline(type, product, component) {
     env.TEST_URL = params.URL_TO_TEST
-    env.POST_HEARINGS_FEATURE = false
+    env.POST_HEARINGS_FEATURE = true
     env.Rules = params.SecurityRules
     env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
 
