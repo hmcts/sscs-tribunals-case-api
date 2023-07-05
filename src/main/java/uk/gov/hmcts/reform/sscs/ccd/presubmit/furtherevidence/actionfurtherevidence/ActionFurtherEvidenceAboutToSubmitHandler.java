@@ -206,15 +206,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             && isNotAdminActionCorrection;
     }
 
-    private static boolean isCorrectionApplicationWithWrongActionCode(String actionCode, String scannedDocumentType) {
-        boolean isDocTypeCorrectionApplication = ScannedDocumentType.CORRECTION_APPLICATION.getValue().equals(scannedDocumentType);
-        boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
-        boolean isNotAdminActionCorrection = !ADMIN_ACTION_CORRECTION.getCode().equals(actionCode);
-        return isDocTypeCorrectionApplication
-            && isNotInterlocReviewByJudge
-            && isNotAdminActionCorrection;
-    }
-
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");

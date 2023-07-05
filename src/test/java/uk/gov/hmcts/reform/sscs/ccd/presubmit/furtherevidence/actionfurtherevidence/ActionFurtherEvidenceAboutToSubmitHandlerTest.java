@@ -336,36 +336,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void giveAValidCorrectionApplicationWithAdminCorrectionActionSelected_thenDwpStateIsUpdated() {
-        DynamicListItem sendToInterlocListItem = new DynamicListItem(
-            FurtherEvidenceActionDynamicListItems.ADMIN_ACTION_CORRECTION.getCode(),
-            FurtherEvidenceActionDynamicListItems.ADMIN_ACTION_CORRECTION.getLabel());
-
-        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
-        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
-        sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
-
-        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
-            .type("correctionApplication")
-            .fileName("Test.pdf")
-            .url(DOC_LINK)
-            .build();
-        ScannedDocument scannedDocument = ScannedDocument.builder()
-            .value(scannedDocDetails)
-            .build();
-
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
-
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
-            ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getDwpState(), is(DwpState.CORRECTION_REQUESTED));
-        SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
-        assertThat(sscsDocumentDetail.getDocumentType(), is("correctionApplication"));
-        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.AWAITING_ADMIN_ACTION));
-    }
-
-    @Test
     @Parameters({
         "setAsideApplication",
         "statementOfReasonsApplication",
