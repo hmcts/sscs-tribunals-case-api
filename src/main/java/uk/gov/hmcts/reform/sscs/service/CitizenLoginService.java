@@ -9,6 +9,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -67,7 +68,7 @@ public class CitizenLoginService {
                             && sscsCaseDetailsItem.getId().equals(rawCaseDetails.getId())) {
                             for (String key: rawCaseDetails.getData().keySet()) {
                                 log.info(format("Case data for case [%d]: key [%s] value [%s]",
-                                        rawCaseDetails.getId(), key, rawCaseDetails.getData().get(key).toString()));
+                                        rawCaseDetails.getId(), key, Objects.toString(rawCaseDetails.getData().get(key), "null")));
                             }
                         }
                     }
