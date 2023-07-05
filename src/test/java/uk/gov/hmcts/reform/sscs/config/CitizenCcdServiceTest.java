@@ -198,4 +198,22 @@ public class CitizenCcdServiceTest {
 
         verify(citizenCcdClient).addUserToCase(eq(IDAM_TOKENS), eq(IDAM_TOKENS.getUserId()), eq(caseId));
     }
+
+    @Test
+    public void shouldFindCasesBySubscriptionEmail() {
+        SscsCaseData caseData = SscsCaseData.builder()
+                .appeal(Appeal.builder()
+                        .appellant(Appellant.builder()
+                                .address(Address.builder().postcode("TS1 1ST").build())
+                                .build()).build())
+                .subscriptions(Subscriptions.builder()
+                        .appellantSubscription(Subscription.builder()
+                                .email("dummy@email.com").build()).build())
+                .build();
+        Long caseId = 1234L;
+        when(ccdService.getByCaseId(caseId,IDAM_TOKENS)).thenReturn(SscsCaseDetails.builder().data(caseData).build());
+
+        citizenCcdService.findCaseBySubscriptionEmail(IDAM_TOKENS);
+
+    }
 }

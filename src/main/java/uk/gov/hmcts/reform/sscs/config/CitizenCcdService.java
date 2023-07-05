@@ -97,10 +97,10 @@ public class CitizenCcdService {
         return searchBuilder;
     }
 
-    private List<SscsCaseDetails> getCasesBySubscriptionEmail(String appealNumber, IdamTokens idamTokens) {
-        log.info("Finding case by appeal number {}", appealNumber);
+    private List<SscsCaseDetails> getCasesBySubscriptionEmail(String email, IdamTokens idamTokens) {
+        log.info("Finding cases by email");
 
-        SearchSourceBuilder searchBuilder = findCasesBySubscriptionEmail(appealNumber);
+        SearchSourceBuilder searchBuilder = findCasesBySubscriptionEmail(email);
 
 
         List<SscsCaseDetails> caseDetailsList = searchCcdCaseService.findCaseBySearchCriteria(searchBuilder.toString(), idamTokens);
