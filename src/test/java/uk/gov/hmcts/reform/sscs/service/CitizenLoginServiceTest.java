@@ -132,8 +132,8 @@ public class CitizenLoginServiceTest {
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
-//        verify(sscsCcdConvertService).getCaseDetails(eq(case2));
-//        assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
+        // verify(sscsCcdConvertService).getCaseDetails(eq(case2));
+        // assertThat(casesForCitizen, is(singletonList(onlineHearing2)));
     }
 
     @Test
