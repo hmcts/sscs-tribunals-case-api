@@ -17,7 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
@@ -60,7 +64,8 @@ public class CitizenLoginService {
             List<OnlineHearing> convert = convert(
                     sscsCaseDetails.stream()
                             .filter(casesWithSubscriptionMatchingTya(tya))
-                            .collect(toList())
+                            .collect(toList()),
+                    idamTokens.getEmail()
             );
             log.info(format("Find case: Found [%s] cases for tya [%s] for user [%s]", convert.size(), tya, idamTokens.getUserId()));
 
@@ -68,7 +73,7 @@ public class CitizenLoginService {
         }
 
         log.info(format("Searching for case without for user [%s]", idamTokens.getUserId()));
-        List<OnlineHearing> convert = convert(sscsCaseDetails);
+        List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
         log.info(format("Found [%s] cases without tya for user [%s]", convert.size(), idamTokens.getUserId()));
         return convert;
     }
@@ -82,7 +87,7 @@ public class CitizenLoginService {
                 .collect(toList());
 
         log.info(format("Searching for active case without for user [%s]", idamTokens.getUserId()));
-        List<OnlineHearing> convert = convert(sscsCaseDetails);
+        List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
         log.info(format("Found [%s] active cases for user [%s]", convert.size(), idamTokens.getUserId()));
         return convert;
     }
@@ -96,14 +101,14 @@ public class CitizenLoginService {
                 .collect(toList());
 
         log.info(format("Searching for dormant case without for user [%s]", idamTokens.getUserId()));
-        List<OnlineHearing> convert = convert(sscsCaseDetails);
+        List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
         log.info(format("Found [%s] dormant cases for user [%s]", convert.size(), idamTokens.getUserId()));
         return convert;
     }
 
-    private List<OnlineHearing> convert(List<SscsCaseDetails> sscsCaseDetails) {
+    private List<OnlineHearing> convert(List<SscsCaseDetails> sscsCaseDetails, String email) {
         return sscsCaseDetails.stream()
-                .map(onlineHearingService::loadHearing)
+                .map(sscsCase -> onlineHearingService.loadHearing(sscsCase, null, email))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(toList());
