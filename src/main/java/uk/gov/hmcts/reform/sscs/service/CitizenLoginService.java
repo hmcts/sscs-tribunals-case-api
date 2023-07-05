@@ -67,7 +67,7 @@ public class CitizenLoginService {
                         && sscsCaseDetailsItem.getId().equals(rawCaseDetails.getId())) {
                             for (String key: rawCaseDetails.getData().keySet()) {
                                 log.info(format("Case data for case [%d]: key [%s] value [%s]",
-                                        rawCaseDetails.getId(), key, rawCaseDetails.getData().get(key)));
+                                        rawCaseDetails.getId(), key, rawCaseDetails.getData().get(key).toString()));
                             }
                         }
                     }
