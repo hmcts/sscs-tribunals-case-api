@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
 @Slf4j
-public class RequestInfoIncompleteApplicationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class RequestForInformationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -24,7 +24,7 @@ public class RequestInfoIncompleteApplicationAboutToSubmitHandler implements Pre
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.REQUEST_INFO_INCOMPLETE;
+                && callback.getEvent() == EventType.REQUEST_FOR_INFORMATION;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class RequestInfoIncompleteApplicationAboutToSubmitHandler implements Pre
             || State.INCOMPLETE_APPLICATION.equals(caseDetails.getState())
             || State.INTERLOCUTORY_REVIEW_STATE.equals(caseDetails.getState())) {
 
-            log.info(String.format("Setting state to incompleteApplicationInformationReqsted for caseId %s", sscsCaseData.getCcdCaseId()));
+            log.info(String.format("Setting state to incompleteApplicationInformationRequested for caseId %s", sscsCaseData.getCcdCaseId()));
             sscsCaseData.setState(State.INCOMPLETE_APPLICATION_INFORMATION_REQUESTED);
         }
 

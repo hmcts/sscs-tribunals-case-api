@@ -43,7 +43,7 @@ public class ValidSendToInterlocMidEventHandler implements PreSubmitCallbackHand
 
         if (SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode())) {
             PdfRequestUtil.processRequestPdfAndSetPreviewDocument(PdfRequestUtil.PdfType.POSTPONEMENT, userAuthorisation, sscsCaseData, response,
-                generateFile, templateId);
+                generateFile, templateId, false);
         }
 
         validatePostponementRequests(sscsCaseData, response);

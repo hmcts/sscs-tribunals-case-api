@@ -36,6 +36,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -161,9 +162,9 @@ class AdjournCasePreviewServiceTest {
                 .value(HearingDetails.builder()
                     .hearingDate(HEARING_DATE)
                     .venue(Venue.builder()
-                        .name("Venue Name")
+                        .name("Liverpool")
                         .build())
-                    .venueId("someVenueId").build())
+                    .venueId("68").build())
                 .build()))
             .build();
         
@@ -1614,4 +1615,39 @@ class AdjournCasePreviewServiceTest {
         assertThat(payload.getGeneratedDate()).hasToString(LocalDate.now().toString());
     }
 
+    @Test
+    void givenPayloadWithOralCaseAdjournHearingType_thenPayloadContainsExpectedValuesForAdjournment() {
+        final String venueName = "Liverpool";
+
+        final PreSubmitCallbackResponse<SscsCaseData> response =
+            service.preview(callback,
+                DocumentType.DRAFT_ADJOURNMENT_NOTICE,
+                USER_AUTHORISATION,
+                false);
+
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
+            .forename("Joe").surname("Linton").build().getFullName());
+
+        Venue venue = Venue.builder().name(venueName).build();
+
+        when(venueDataLoader.getGapVenueName(venue, "68")).thenReturn(venueName);
+
+        NoticeIssuedTemplateBody payload = service.createPayload(response,
+            sscsCaseData,
+            "documentTypeLabel",
+            LocalDate.now(),
+            LocalDate.now(),
+            false,
+            false,
+            false,
+            USER_AUTHORISATION);
+
+        String faceToFaceValue = HearingType.FACE_TO_FACE.getKey();
+        AdjournCaseTemplateBody templateBody = payload.getAdjournCaseTemplateBody();
+
+        assertThat(venueName.equals(templateBody.getHeldAt()));
+        assertThat(venueName.equals(templateBody.getNextHearingVenue()));
+        assertThat(faceToFaceValue.equals(templateBody.getHearingType()));
+        assertThat(faceToFaceValue.equals(templateBody.getNextHearingType()));
+    }
 }

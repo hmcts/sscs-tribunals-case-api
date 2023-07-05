@@ -112,7 +112,15 @@ public class FooterServiceTest {
     }
 
     @Test
-    public void givenADocument_thenAddAFooter() throws Exception {
+    @Parameters({
+        "DIRECTION_NOTICE, issued",
+        "STATEMENT_OF_EVIDENCE, issued",
+        "SET_ASIDE_APPLICATION, received",
+        "CORRECTION_APPLICATION, received",
+        "STATEMENT_OF_REASONS_APPLICATION, received",
+        "LIBERTY_TO_APPLY_APPLICATION, received"
+    })
+    public void givenADocument_thenAddAFooter(DocumentType documentType, String verb) throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
         when(pdfStoreService.download(any())).thenReturn(pdfBytes);
 
@@ -123,16 +131,17 @@ public class FooterServiceTest {
         String now = LocalDate.now().toString();
 
         footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").documentFilename("afilename").build(),
-                sscsCaseData, DocumentType.DIRECTION_NOTICE, now, null, null, null);
+                sscsCaseData, documentType, now, null, null, null);
 
         assertEquals(2, sscsCaseData.getSscsDocument().size());
         SscsDocumentDetails footerDoc = sscsCaseData.getSscsDocument().get(0).getValue();
-        assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), footerDoc.getDocumentType());
-        assertEquals("Addition A - Directions Notice issued on " + now + ".pdf", footerDoc.getDocumentFileName());
+        assertEquals(documentType.getValue(), footerDoc.getDocumentType());
+        String expectedFilename = String.format("Addition A - %s %s on %s.pdf", documentType.getLabel(), verb, now);
+        assertEquals(expectedFilename, footerDoc.getDocumentFileName());
         assertEquals(now, footerDoc.getDocumentDateAdded());
         assertEquals(expectedDocumentUrl, footerDoc.getDocumentLink().getDocumentUrl());
         verify(pdfStoreService).storeDocument(any(), anyString());
-        assertEquals("Directions Notice", stringCaptor.getAllValues().get(0));
+        assertEquals(documentType.getLabel(), stringCaptor.getAllValues().get(0));
         assertEquals("Addition A", stringCaptor.getAllValues().get(1));
     }
 

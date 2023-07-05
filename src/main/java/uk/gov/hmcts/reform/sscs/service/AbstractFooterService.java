@@ -1,8 +1,14 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_APPLICATION;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.LIBERTY_TO_APPLY_APPLICATION;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.SET_ASIDE_APPLICATION;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.STATEMENT_OF_REASONS_APPLICATION;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ComparatorUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +45,16 @@ public abstract class AbstractFooterService<D extends AbstractDocument> {
 
             String bundleAddition = getNextBundleAddition(documents);
 
-            String bundleFileName = overrideFileName != null ? overrideFileName : buildBundleAdditionFileName(bundleAddition, label + " issued on " + dateIssued);
+            boolean isPostHearingApp = Set.of(SET_ASIDE_APPLICATION,
+                    CORRECTION_APPLICATION,
+                    STATEMENT_OF_REASONS_APPLICATION,
+                    LIBERTY_TO_APPLY_APPLICATION)
+                .contains(documentType);
+
+            String verb = isPostHearingApp ? " received on " : " issued on ";
+
+            String rightText = label + verb + dateIssued;
+            String bundleFileName = overrideFileName != null ? overrideFileName : buildBundleAdditionFileName(bundleAddition, rightText);
 
             url = addFooter(url, label, bundleAddition);
 

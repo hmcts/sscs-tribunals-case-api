@@ -1,18 +1,18 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.PdfRequestTemplateBody;
@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.PdfRequestTemplateBody;
 @Slf4j
 public class PdfRequestUtil {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    public static final String POST_HEARING_REQUEST_FILE_SUFFIX = " Application from FTA.pdf";
     private static String requestDetails;
     private static String title;
     private static StringBuilder additionalRequestDetails;
@@ -47,8 +48,8 @@ public class PdfRequestUtil {
         SscsCaseData sscsCaseData,
         PreSubmitCallbackResponse<SscsCaseData> response,
         GenerateFile generateFile,
-        String templateId
-    ) {
+        String templateId,
+        boolean isPostHearingsEnabled) {
         log.debug("Executing processRequestPdfAndSetPreviewDocument for caseId: {}", sscsCaseData.getCcdCaseId());
 
         additionalRequestDetails = new StringBuilder();
@@ -56,7 +57,11 @@ public class PdfRequestUtil {
         StringBuilder pdfUrlBuilder = new StringBuilder();
         switch (pdfType) {
             case POST_HEARING:
-                String postHearingDocumentTypeLabel = getPostHearingDocumentType(sscsCaseData).getLabel();
+                if (!isPostHearingsEnabled) {
+                    response.addError("Post hearings is not currently enabled");
+                    return response;
+                }
+                String postHearingDocumentTypeLabel = getPostHearingDocumentType(sscsCaseData.getPostHearing().getRequestType()).getLabel();
                 pdfUrlBuilder.append(postHearingDocumentTypeLabel)
                     .append(" from FTA");
                 handlePostHearing(sscsCaseData);
@@ -86,7 +91,7 @@ public class PdfRequestUtil {
                 sscsCaseData.getPostponementRequest().setPostponementPreviewDocument(previewDocument);
                 break;
             default:
-                throw new IllegalArgumentException("Unsupported event type for processRequestPdfAndSetPreviewDocument: " + pdfType);
+                // handled in first switch
         }
 
         return response;
@@ -110,22 +115,24 @@ public class PdfRequestUtil {
     }
 
     private static void handlePostHearing(SscsCaseData sscsCaseData) {
-        requestDetails = sscsCaseData.getDocumentGeneration().getBodyContent();
+        requestDetails = getRequestDetailsForPostHearingType(sscsCaseData);
         LocalDate issueFinalDecisionDate = sscsCaseData.getIssueFinalDecisionDate();
-        if (issueFinalDecisionDate == null) {
+        if (isNull(issueFinalDecisionDate)) {
             throw new IllegalArgumentException("issueFinalDecisionDate unexpectedly null for caseId: " + sscsCaseData.getCcdCaseId());
         }
-        String postHearingRequestType = sscsCaseData.getPostHearing().getRequestType().getDescriptionEn();
+
+        String requestTypeDescriptionEn = sscsCaseData.getPostHearing().getRequestType().getDescriptionEn();
         additionalRequestDetails.append("Date of decision issued: ")
             .append(issueFinalDecisionDate.format(DATE_TIME_FORMATTER))
             .append("\n")
             .append("Reason for ")
-            .append(postHearingRequestType)
+            .append(requestTypeDescriptionEn)
             .append(" application: ")
             .append(requestDetails)
             .append("\n");
-        title = String.format("%s Application from %s", postHearingRequestType, "FTA");
+        title = String.format("%s Application from %s", requestTypeDescriptionEn, "FTA");
     }
+
 
     private static DocumentLink getPreviewDocument(
         String pdfUrl,
@@ -152,18 +159,88 @@ public class PdfRequestUtil {
             .build();
     }
 
-    public static DocumentType getPostHearingDocumentType(SscsCaseData sscsCaseData) {
-        PostHearing postHearing = sscsCaseData.getPostHearing();
-        DocumentType documentType;
-
-        switch (postHearing.getRequestType()) {
+    public static DocumentType getPostHearingDocumentType(PostHearingRequestType postHearingRequestType) {
+        switch (postHearingRequestType) {
             case SET_ASIDE:
-                documentType = DocumentType.SET_ASIDE_APPLICATION;
-                break;
+                return DocumentType.SET_ASIDE_APPLICATION;
+            case CORRECTION:
+                return DocumentType.CORRECTION_APPLICATION;
+            case STATEMENT_OF_REASONS:
+                return DocumentType.STATEMENT_OF_REASONS_APPLICATION;
+            case LIBERTY_TO_APPLY:
+                return DocumentType.LIBERTY_TO_APPLY_APPLICATION;
+            case PERMISSION_TO_APPEAL:
             default:
-                throw new IllegalArgumentException("Unexpected request type: " + postHearing.getRequestType());
+                throw new IllegalArgumentException("Unexpected request type: " + postHearingRequestType);
         }
-        return documentType;
     }
 
+    public static String getNoticeBody(SscsCaseData caseData, boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
+        if (isPostHearingsEnabled) {
+            PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
+
+            switch (postHearingReviewType) {
+                case SET_ASIDE:
+                    return caseData.getDocumentGeneration().getBodyContent();
+                case CORRECTION:
+                    return caseData.getDocumentGeneration().getCorrectionBodyContent();
+                case STATEMENT_OF_REASONS:
+                    return caseData.getDocumentGeneration().getStatementOfReasonsBodyContent();
+                case LIBERTY_TO_APPLY:
+                    if (isPostHearingsBEnabled) {
+                        return caseData.getDocumentGeneration().getLibertyToApplyBodyContent();
+                    }
+                    throw new IllegalArgumentException("isPostHearingsBEnabled is false - Liberty to Apply is not available");
+                case PERMISSION_TO_APPEAL:
+                default:
+                    throw new IllegalArgumentException("getNoticeBody has unexpected postHearingReviewType: "
+                        + postHearingReviewType.getDescriptionEn());
+            }
+        }
+
+        return Optional.ofNullable(caseData.getDocumentGeneration().getBodyContent())
+            .orElse(caseData.getDocumentGeneration().getDirectionNoticeContent());
+    }
+
+    protected static String getRequestDetailsForPostHearingType(SscsCaseData sscsCaseData) {
+        PostHearingRequestType postHearingRequestType = sscsCaseData.getPostHearing().getRequestType();
+
+        switch (postHearingRequestType) {
+            case SET_ASIDE:
+                return sscsCaseData.getDocumentGeneration().getBodyContent();
+            case CORRECTION:
+                return sscsCaseData.getDocumentGeneration().getCorrectionBodyContent();
+            case STATEMENT_OF_REASONS:
+                return sscsCaseData.getDocumentGeneration().getStatementOfReasonsBodyContent();
+            case LIBERTY_TO_APPLY:
+                return sscsCaseData.getDocumentGeneration().getLibertyToApplyBodyContent();
+            case PERMISSION_TO_APPEAL:
+            default:
+                throw new IllegalArgumentException("getRequestDetailsForPostHearingType has unexpected postHearingRequestType: " + postHearingRequestType);
+        }
+    }
+
+    public static YesNo getGenerateNotice(SscsCaseData caseData, boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
+        PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
+        if (isPostHearingsEnabled && nonNull(postHearingReviewType)) {
+            switch (postHearingReviewType) {
+                case SET_ASIDE:
+                    return caseData.getDocumentGeneration().getGenerateNotice();
+                case CORRECTION:
+                    return caseData.getDocumentGeneration().getCorrectionGenerateNotice();
+                case STATEMENT_OF_REASONS:
+                    return caseData.getDocumentGeneration().getStatementOfReasonsGenerateNotice();
+                case LIBERTY_TO_APPLY:
+                    if (isPostHearingsBEnabled) {
+                        return caseData.getDocumentGeneration().getLibertyToApplyGenerateNotice();
+                    }
+                    throw new IllegalArgumentException("isPostHearingsBEnabled is false - Liberty to Apply is not available");
+                case PERMISSION_TO_APPEAL:
+                default:
+                    throw new IllegalArgumentException("getGenerateNotice has unexpected PostHearingReviewType: " + postHearingReviewType);
+            }
+        }
+
+        return caseData.getDocumentGeneration().getGenerateNotice();
+    }
 }

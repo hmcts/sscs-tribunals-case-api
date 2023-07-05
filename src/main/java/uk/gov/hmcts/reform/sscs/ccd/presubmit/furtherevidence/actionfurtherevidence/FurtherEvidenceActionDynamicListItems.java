@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public enum FurtherEvidenceActionDynamicListItems {
     ADMIN_ACTION_CORRECTION("adminActionCorrection", "Admin action correction"),
     INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE("informationReceivedForInterlocJudge", "Information received for Interloc - send to Judge"),
@@ -14,9 +16,4 @@ public enum FurtherEvidenceActionDynamicListItems {
 
     final String code;
     final String label;
-
-    FurtherEvidenceActionDynamicListItems(String code, String label) {
-        this.code = code;
-        this.label = label;
-    }
 }

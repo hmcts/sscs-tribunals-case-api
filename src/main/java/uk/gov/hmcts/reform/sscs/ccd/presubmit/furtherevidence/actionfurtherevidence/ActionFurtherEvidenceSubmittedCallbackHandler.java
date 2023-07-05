@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
@@ -7,8 +8,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 
 import java.time.LocalDate;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -22,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
+@RequiredArgsConstructor
 @Service
 public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     public static final String TCW_REVIEW_POSTPONEMENT_REQUEST = "Review hearing postponement request";
@@ -29,11 +32,11 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     private final CcdService ccdService;
     private final IdamService idamService;
 
-    @Autowired
-    public ActionFurtherEvidenceSubmittedCallbackHandler(CcdService ccdService, IdamService idamService) {
-        this.ccdService = ccdService;
-        this.idamService = idamService;
-    }
+    @Value("${feature.postHearings.enabled}")
+    private final boolean isPostHearingsEnabled;
+
+    @Value("${feature.postHearingsB.enabled}")
+    private final boolean isPostHearingsBEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -78,7 +81,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
 
     private SscsCaseDetails updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
         DynamicList furtherEvidenceAction = caseData.getFurtherEvidenceAction();
-        if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, ADMIN_ACTION_CORRECTION)) {
+        if (isPostHearingsEnabled && isFurtherEvidenceActionOptionValid(furtherEvidenceAction, ADMIN_ACTION_CORRECTION)) {
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
                 AWAITING_ADMIN_ACTION, ADMIN_ACTION_CORRECTION,
                 EventType.CORRECTION_REQUEST, "Admin action correction");
@@ -96,6 +99,10 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                     EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_JUDGE)) {
+            PostHearingRequestType postHearingRequestType = caseData.getPostHearing().getRequestType();
+            if (isPostHearingsEnabled && nonNull(postHearingRequestType)) {
+                return handlePostHearing(callback, caseData, postHearingRequestType);
+            }
             setSelectWhoReviewsCaseField(caseData, REVIEW_BY_JUDGE);
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
                     REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
@@ -123,6 +130,33 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                 EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
                 "Issue to all parties", idamService.getIdamTokens());
+    }
+
+    private SscsCaseDetails handlePostHearing(Callback<SscsCaseData> callback, SscsCaseData caseData, PostHearingRequestType postHearingRequestType) {
+        switch (postHearingRequestType) {
+            case SET_ASIDE:
+                return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
+                    REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
+                    EventType.SET_ASIDE_REQUEST, "Set aside request");
+            case CORRECTION:
+                return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
+                    REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
+                    EventType.CORRECTION_REQUEST, "Correction request");
+            case STATEMENT_OF_REASONS:
+                return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
+                    REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
+                    EventType.SOR_REQUEST, "Statement of reasons request");
+            case LIBERTY_TO_APPLY:
+                if (isPostHearingsBEnabled) {
+                    return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
+                        REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
+                        EventType.LIBERTY_TO_APPLY_REQUEST, "Liberty to apply request");
+                }
+                throw new IllegalStateException("Post hearings B is not enabled");
+            case PERMISSION_TO_APPEAL:
+            default:
+                throw new IllegalArgumentException("Post hearing request type is not implemented or recognised: " + postHearingRequestType);
+        }
     }
 
     private boolean isPostponementRequest(SscsCaseData caseData) {
