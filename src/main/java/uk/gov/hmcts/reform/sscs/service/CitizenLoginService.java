@@ -63,6 +63,15 @@ public class CitizenLoginService {
             for (SscsCaseDetails sscsCaseDetailsItem : sscsCaseDetails) {
                 if (sscsCaseDetailsItem != null) {
                     log.info(format("Found case with id [%d]", sscsCaseDetailsItem.getId()));
+                    for (CaseDetails rawCaseDetails : caseDetails) {
+                        if (sscsCaseDetailsItem.getId() != null
+                        && sscsCaseDetailsItem.getId().equals(rawCaseDetails.getId())) {
+                            for (String key: rawCaseDetails.getData().keySet()) {
+                                log.info(format("Case data for case [%d]: key [%s] value [%s]",
+                                        rawCaseDetails.getId(), key, rawCaseDetails.getData().get(key)));
+                            }
+                        }
+                    }
                 }
             }
         }
