@@ -273,6 +273,89 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenAnAppealWithIncorrectExcludedDateStartDateAfterEndDate_thenProvideErrorMessage() {
+        List<ExcludeDate> excludeDate = new ArrayList<>(List.of(
+                ExcludeDate.builder().value(DateRange.builder()
+                        .start("2023-06-17")
+                        .end("2023-05-18")
+                        .build()).build()));
+
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").build());
+        callback.getCaseDetails().getCaseData().getAppeal().getHearingOptions().setExcludeDates(excludeDate);
+
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().iterator().next(), is("Start date must be before end date for excluded dates"));
+    }
+
+    @Test
+    public void givenAnAppealWithIncorrectExcludedDatesStartDateEmpty_thenProvideErrorMessage() {
+        List<ExcludeDate> excludeDate = new ArrayList<>(List.of(
+                ExcludeDate.builder().value(DateRange.builder()
+                        .start(null)
+                        .end("2023-05-17")
+                        .build()).build()));
+
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").build());
+        callback.getCaseDetails().getCaseData().getAppeal().getHearingOptions().setExcludeDates(excludeDate);
+
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().iterator().next(), is("Add a start date for excluded dates"));
+    }
+
+    @Test
+    public void givenAnAppealWithIncorrectExcludedEndDate_thenProvideErrorMessage() {
+        List<ExcludeDate> excludeDate;
+        excludeDate = new ArrayList<>(List.of(
+                ExcludeDate.builder().value(DateRange.builder()
+                        .start("2023-06-17")
+                        .end(null)
+                        .build()).build()));
+
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").build());
+        callback.getCaseDetails().getCaseData().getAppeal().getHearingOptions().setExcludeDates(excludeDate);
+
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().iterator().next(), is("Add an end date for excluded dates"));
+    }
+
+    @Test
+    public void givenAnAppealWithEmptyExcludedDates_thenProvideErrorMessage() {
+        List<ExcludeDate> excludeDate;
+        excludeDate = new ArrayList<>(List.of(
+                ExcludeDate.builder().value(DateRange.builder()
+                        .start(null)
+                        .end(null)
+                        .build()).build()));
+
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").build());
+        callback.getCaseDetails().getCaseData().getAppeal().getHearingOptions().setExcludeDates(excludeDate);
+
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().iterator().next(), is("Add a start date for excluded dates"));
+    }
+
+    @Test
+    public void givenAnAppealWithCorrectExcludedDates_thenDontProvideError() {
+        List<ExcludeDate> excludeDate;
+        excludeDate = new ArrayList<>(List.of(
+                ExcludeDate.builder().value(DateRange.builder()
+                        .start("2023-06-17")
+                        .end("2023-06-19")
+                        .build()).build()));
+
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").build());
+        callback.getCaseDetails().getCaseData().getAppeal().getHearingOptions().setExcludeDates(excludeDate);
+
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().isEmpty(), is(true));
+    }
+
+    @Test
     public void givenAnAppealWithNewAppellantPostcodeAndNoAppointee_thenUpdateProcessingVenue() {
         when(regionalProcessingCenterService.getByPostcode("AB12 00B")).thenReturn(
             RegionalProcessingCenter.builder()
