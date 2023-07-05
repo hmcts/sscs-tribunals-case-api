@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.util.DataFixtures.someOnlineHearing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -81,6 +82,10 @@ public class CitizenLoginServiceTest {
                         .appellantSubscription(Subscription.builder()
                                 .email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build()).build()).build();
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
+        when(case1.getId()).thenReturn(111L);
+        when(case2.getId()).thenReturn(222L);
+        when(case1.getData()).thenReturn(Map.of("key", "value"));
+        when(case2.getData()).thenReturn(Map.of("key", "value"));
         when(case1.getState()).thenReturn(State.READY_TO_LIST.getId());
         when(case2.getState()).thenReturn(State.APPEAL_CREATED.getId());
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
