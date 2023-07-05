@@ -169,7 +169,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
         when(previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true)).thenReturn(response);
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        verify(previewDecisionService).preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
+        verify(previewDecisionService).preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true, false);
 
     }
 

@@ -17,6 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -57,8 +58,10 @@ class IssueAdjournmentNoticeAboutToStartHandlerTest {
             .build();
     }
 
-    @Test
-    void givenAboutToStartRequest_willGeneratePreviewFile() {
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void givenAboutToStartRequest_willGeneratePreviewFile(boolean isPostHearingsEnabled) {
+        ReflectionTestUtils.setField(handler,  "isPostHearingsEnabled", isPostHearingsEnabled);
         when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -67,11 +70,11 @@ class IssueAdjournmentNoticeAboutToStartHandlerTest {
         sscsCaseData.getAdjournment().setGenerateNotice(YES);
         sscsCaseData.getAdjournment().setGeneratedDate(LocalDate.now());
 
-        when(previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, USER_AUTHORISATION, true))
+        when(previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, isPostHearingsEnabled))
             .thenReturn(response);
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        verify(previewService).preview(callback, DocumentType.ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+        verify(previewService).preview(callback, DocumentType.ADJOURNMENT_NOTICE, USER_AUTHORISATION, true, isPostHearingsEnabled);
     }
 
     @Test
