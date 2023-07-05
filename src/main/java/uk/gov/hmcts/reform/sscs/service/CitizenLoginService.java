@@ -60,8 +60,8 @@ public class CitizenLoginService {
             for (SscsCaseDetails sscsCaseDetailsItem : sscsCaseDetails) {
                 if (sscsCaseDetailsItem != null) {
                     log.info(format("Found case with id [%d]", sscsCaseDetailsItem.getId()));
-                    if (sscsCaseDetailsItem.getData() != null &&
-                            sscsCaseDetailsItem.getData().getOtherParties() != null) {
+                    if (sscsCaseDetailsItem.getData() != null
+                            && sscsCaseDetailsItem.getData().getOtherParties() != null) {
                         log.info(format("Case [%d], other parties size [%d]",
                                 sscsCaseDetailsItem.getId(), sscsCaseDetailsItem.getData().getOtherParties().size()));
                     }
