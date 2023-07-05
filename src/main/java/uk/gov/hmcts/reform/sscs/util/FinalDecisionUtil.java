@@ -52,7 +52,7 @@ public class FinalDecisionUtil {
         }
     }
 
-    public static void processDraftFinalDecisionNotice(Callback<SscsCaseData> callback, String userAuthorisation, SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, FinalDecisionType finalDecisionType, DecisionNoticeService decisionNoticeService) {
+    public static void processDraftFinalDecisionNotice(Callback<SscsCaseData> callback, String userAuthorisation, SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, FinalDecisionType finalDecisionType, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled) {
         if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument() != null) {
 
             String benefitType = FinalDecisionUtil.getBenefitType(sscsCaseData);
@@ -65,7 +65,7 @@ public class FinalDecisionUtil {
             DocumentType documentType = INITIAL.equals(finalDecisionType)
                 ? FINAL_DECISION_NOTICE
                 : CORRECTED_DECISION_NOTICE;
-            previewDecisionService.preview(callback, documentType, userAuthorisation, true);
+            previewDecisionService.preview(callback, documentType, userAuthorisation, true, isPostHearingsEnabled);
         } else {
             response.addError("No draft final decision notice found on case. Please use 'Write final decision' event before trying to issue.");
         }

@@ -86,7 +86,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
             new DecisionNoticeService(Arrays.asList(),
                 Arrays.asList(pipDecisionNoticeOutcomeService), Arrays.asList(previewDecisionService));
 
-        handler = new IssueFinalDecisionAboutToStartHandler(decisionNoticeService);
+        handler = new IssueFinalDecisionAboutToStartHandler(decisionNoticeService, false);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

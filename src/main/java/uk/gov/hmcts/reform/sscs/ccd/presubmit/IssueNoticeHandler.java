@@ -36,6 +36,10 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
 
     protected abstract void setGeneratedDateIfRequired(SscsCaseData caseData, EventType eventType);
 
+    public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, DocumentType documentType, String userAuthorisation, boolean showIssueDate) {
+        return preview(callback, documentType, userAuthorisation, showIssueDate, false);
+    }
+
     public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, DocumentType documentType, String userAuthorisation, boolean showIssueDate, boolean isPostHearingsEnabled) {
 
         this.showIssueDate = showIssueDate;

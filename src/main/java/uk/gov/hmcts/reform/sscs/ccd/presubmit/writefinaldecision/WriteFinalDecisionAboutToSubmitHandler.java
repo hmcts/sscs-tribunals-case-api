@@ -1,15 +1,20 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+
 import java.time.LocalDate;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 import uk.gov.hmcts.reform.sscs.util.FinalDecisionUtil;
@@ -20,10 +25,12 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
     private final DecisionNoticeService decisionNoticeService;
     private final PreviewDocumentService previewDocumentService;
+    @Value("${feature.postHearings.enabled}")
+    private boolean isPostHearingsEnabled;
 
     @Autowired
     public WriteFinalDecisionAboutToSubmitHandler(DecisionNoticeService decisionNoticeService,
-                                                  PreviewDocumentService previewDocumentService) {
+        PreviewDocumentService previewDocumentService) {
         this.decisionNoticeService = decisionNoticeService;
         this.previewDocumentService = previewDocumentService;
     }
@@ -43,6 +50,7 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         }
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        State state = sscsCaseData.getState();
 
         // Due to a bug with CCD related to hidden fields, this field is not being set
         // on the final submission from CCD, so we need to reset it here
@@ -56,8 +64,28 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        FinalDecisionUtil.writePreviewFinalDecisionNotice(sscsCaseData, preSubmitCallbackResponse, previewDocumentService, decisionNoticeService);
+        String benefitType = FinalDecisionUtil.getBenefitType(sscsCaseData);
 
+        if (benefitType == null) {
+            preSubmitCallbackResponse.addError("Unexpected error - benefit type is null");
+        } else {
+
+            DecisionNoticeOutcomeService outcomeService = decisionNoticeService.getOutcomeService(benefitType);
+
+            outcomeService.validate(preSubmitCallbackResponse, sscsCaseData);
+
+            if (!(State.READY_TO_LIST.equals(state)
+                || State.WITH_DWP.equals(sscsCaseData.getState()))) {
+                sscsCaseData.setPreviousState(state);
+            }
+
+            boolean isNotCorrection = isNoOrNull(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
+            if (isPostHearingsEnabled && isNotCorrection) {
+                sscsCaseData.setFinalDecisionGeneratedDate(LocalDate.now());
+            }
+
+            previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_DECISION_NOTICE, sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
+        }
         return preSubmitCallbackResponse;
     }
 }

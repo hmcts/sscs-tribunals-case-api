@@ -132,7 +132,7 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(decisionNoticeOutcomeService, times(1)).validate(response, caseData);
-        verify(previewDecisionService, times(1)).preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION,true);
+        verify(previewDecisionService, times(1)).preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION,true, true);
         verify(previewDocumentService, times(1)).writePreviewDocumentToSscsDocument(
             caseData,
             DRAFT_DECISION_NOTICE,
@@ -165,7 +165,7 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(decisionNoticeOutcomeService, times(1)).validate(response, caseData);
-        verify(previewDecisionService, times(1)).preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION,true);
+        verify(previewDecisionService, times(1)).preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION,true, true);
         verify(previewDocumentService, times(1)).writePreviewDocumentToSscsDocument(
             caseData,
             DRAFT_DECISION_NOTICE,
@@ -198,7 +198,7 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(decisionNoticeOutcomeService, times(1)).validate(response, caseData);
-        verify(previewDecisionService, times(1)).preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION,true);
+        verify(previewDecisionService, times(1)).preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION,true, true);
         verify(previewDocumentService, times(1)).writePreviewDocumentToSscsDocument(
             caseData,
             DRAFT_DECISION_NOTICE,

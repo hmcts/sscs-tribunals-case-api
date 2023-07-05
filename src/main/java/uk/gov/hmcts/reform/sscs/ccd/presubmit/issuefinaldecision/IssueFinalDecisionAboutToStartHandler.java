@@ -44,7 +44,7 @@ public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        FinalDecisionUtil.processDraftFinalDecisionNotice(callback, userAuthorisation, sscsCaseData, response, FinalDecisionType.INITIAL, decisionNoticeService);
+        FinalDecisionUtil.processDraftFinalDecisionNotice(callback, userAuthorisation, sscsCaseData, response, FinalDecisionType.INITIAL, decisionNoticeService, isPostHearingsEnabled);
 
         return response;
     }

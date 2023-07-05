@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 
 import java.time.LocalDate;
@@ -107,8 +108,16 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                     CancellationReason.OTHER);
         }
 
-        if (isAdjournmentEnabled) {
+        boolean isNotCorrection = isNoOrNull(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
+        boolean shouldSetIssueFinalDecisionDate = isAdjournmentEnabled && (!isPostHearingsEnabled || isNotCorrection);
+        boolean shouldSetWriteFinalDecisionIdamSurname = isPostHearingsEnabled && isNotCorrection;
+
+        if (shouldSetIssueFinalDecisionDate) {
             sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());
+        }
+
+        if (shouldSetWriteFinalDecisionIdamSurname) {
+            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIdamSurname(sscsCaseData.getDocumentGeneration().getSignedBy());
         }
         return preSubmitCallbackResponse;
     }

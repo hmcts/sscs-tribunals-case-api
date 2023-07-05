@@ -47,7 +47,7 @@ class IssueAdjournmentNoticeAboutToStartHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new IssueAdjournmentNoticeAboutToStartHandler(previewService);
+        handler = new IssueAdjournmentNoticeAboutToStartHandler(previewService, false);
 
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
