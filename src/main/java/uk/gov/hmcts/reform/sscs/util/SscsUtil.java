@@ -137,32 +137,41 @@ public class SscsUtil {
     }
 
     public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {
-        PostHearingReviewType postHearingReviewType = postHearing.getReviewType();
-        if (isPostHearingsEnabled && nonNull(postHearingReviewType)) {
-            switch (postHearingReviewType) {
-                case SET_ASIDE:
-                    if (SetAsideActions.REFUSE.equals(postHearing.getSetAside().getAction())) {
-                        return DocumentType.SET_ASIDE_REFUSED;
-                    }
-                    break;
-                case CORRECTION:
-                    if (CorrectionActions.REFUSE.equals(postHearing.getCorrection().getAction())) {
-                        return DocumentType.CORRECTION_REFUSED;
-                    }
-                    break;
-                case STATEMENT_OF_REASONS:
-                    if (StatementOfReasonsActions.REFUSE.equals(postHearing.getStatementOfReasons().getAction())) {
-                        return DocumentType.STATEMENT_OF_REASONS_REFUSED;
-                    }
+        if (isPostHearingsEnabled && nonNull(postHearing.getReviewType())) {
+            return getPostHearingReviewDocumentType(postHearing);
+        }
 
-                    return DocumentType.STATEMENT_OF_REASONS_GRANTED;
-                case LIBERTY_TO_APPLY:
-                case PERMISSION_TO_APPEAL:
-                default:
-                    break;
-            }
-        } else {
-            return DocumentType.DECISION_NOTICE;
+        return DocumentType.DECISION_NOTICE;
+    }
+
+    private static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing) {
+        PostHearingReviewType postHearingReviewType = postHearing.getReviewType();
+        switch (postHearingReviewType) {
+            case SET_ASIDE:
+                if (SetAsideActions.REFUSE.equals(postHearing.getSetAside().getAction())) {
+                    return DocumentType.SET_ASIDE_REFUSED;
+                }
+                break;
+            case CORRECTION:
+                if (CorrectionActions.REFUSE.equals(postHearing.getCorrection().getAction())) {
+                    return DocumentType.CORRECTION_REFUSED;
+                }
+                break;
+            case STATEMENT_OF_REASONS:
+                if (StatementOfReasonsActions.REFUSE.equals(postHearing.getStatementOfReasons().getAction())) {
+                    return DocumentType.STATEMENT_OF_REASONS_REFUSED;
+                }
+
+                return DocumentType.STATEMENT_OF_REASONS_GRANTED;
+            case LIBERTY_TO_APPLY:
+                if (LibertyToApplyActions.REFUSE.equals(postHearing.getLibertyToApply().getAction())) {
+                    return DocumentType.LIBERTY_TO_APPLY_REFUSED;
+                }
+
+                return DocumentType.LIBERTY_TO_APPLY_GRANTED;
+            case PERMISSION_TO_APPEAL:
+            default:
+                break;
         }
 
         throw new IllegalArgumentException("getting the document type has an unexpected postHearingReviewType and action");
