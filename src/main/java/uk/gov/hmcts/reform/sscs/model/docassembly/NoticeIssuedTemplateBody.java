@@ -9,11 +9,14 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
 
-@Builder(toBuilder = true)
-@Value
+@SuperBuilder(toBuilder = true)
+@Setter
+@Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NoticeIssuedTemplateBody implements FormPayload {
     @JsonIgnore

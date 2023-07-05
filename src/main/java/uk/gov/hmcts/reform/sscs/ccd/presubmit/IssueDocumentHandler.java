@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.model.docassembly.CorrectedNoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Respondent;
@@ -45,8 +46,11 @@ public class IssueDocumentHandler {
         caseData.getAdjournment().setPreviewDocument(null);
     }
 
-    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response, SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation) {
-        NoticeIssuedTemplateBody formPayload = NoticeIssuedTemplateBody.builder()
+    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response, SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation, boolean isPostHearingsEnabled) {
+        NoticeIssuedTemplateBody formPayload;
+
+        if (isPostHearingsEnabled && DocumentType.CORRECTED_DECISION_NOTICE.getLabel().equals(documentTypeLabel)) {
+            formPayload = CorrectedNoticeIssuedTemplateBody.builder()
                 .appellantFullName(buildFullName(caseData))
                 .appointeeFullName(buildAppointeeName(caseData).orElse(null))
                 .caseId(caseData.getCcdCaseId())
@@ -54,14 +58,35 @@ public class IssueDocumentHandler {
                 .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
                 .respondents(getRespondents(caseData))
                 .noticeBody(Optional.ofNullable(caseData.getDocumentGeneration().getBodyContent())
-                        .orElse(caseData.getDocumentGeneration().getDirectionNoticeContent()))
+                    .orElse(caseData.getDocumentGeneration().getDirectionNoticeContent()))
                 .userName(caseData.getDocumentGeneration().getSignedBy())
                 .noticeType(documentTypeLabel.toUpperCase())
                 .userRole(caseData.getDocumentGeneration().getSignedRole())
                 .dateAdded(dateAdded)
-                .generatedDate(generatedDate)
-                .idamSurname(caseData.getDocumentGeneration().getSignedBy())
+                .generatedDate(caseData.getFinalDecisionGeneratedDate())
+                .idamSurname(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIdamSurname())
+                .correctedGeneratedDate(generatedDate)
+                .correctedDateIssued(LocalDate.now())
                 .build();
+        } else {
+            formPayload = NoticeIssuedTemplateBody.builder()
+                    .appellantFullName(buildFullName(caseData))
+                    .appointeeFullName(buildAppointeeName(caseData).orElse(null))
+                    .caseId(caseData.getCcdCaseId())
+                    .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
+                    .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
+                    .respondents(getRespondents(caseData))
+                    .noticeBody(Optional.ofNullable(caseData.getDocumentGeneration().getBodyContent())
+                            .orElse(caseData.getDocumentGeneration().getDirectionNoticeContent()))
+                    .userName(caseData.getDocumentGeneration().getSignedBy())
+                    .noticeType(documentTypeLabel.toUpperCase())
+                    .userRole(caseData.getDocumentGeneration().getSignedRole())
+                    .dateAdded(dateAdded)
+                    .generatedDate(generatedDate)
+                    .idamSurname(caseData.getDocumentGeneration().getSignedBy())
+                    .build();
+        }
+
 
         if (isScottish) {
             formPayload = formPayload.toBuilder().image(NoticeIssuedTemplateBody.SCOTTISH_IMAGE).build();
@@ -128,7 +153,7 @@ public class IssueDocumentHandler {
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        FormPayload formPayload = createPayload(response, caseData, embeddedDocumentTypeLabel, dateAdded, LocalDate.now(), isScottish, userAuthorisation);
+        FormPayload formPayload = createPayload(response, caseData, embeddedDocumentTypeLabel, dateAdded, LocalDate.now(), isScottish, userAuthorisation, false);
 
         if (!response.getErrors().isEmpty()) {
             return response;

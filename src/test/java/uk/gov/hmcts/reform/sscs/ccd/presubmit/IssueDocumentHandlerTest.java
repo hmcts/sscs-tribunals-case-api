@@ -132,7 +132,7 @@ public class IssueDocumentHandlerTest {
 
         String documentTypeLabel = "directions notice";
         LocalDate localDate = LocalDate.now();
-        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, documentTypeLabel, localDate, localDate, false, USER_AUTHORISATION);
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, documentTypeLabel, localDate, localDate, false, USER_AUTHORISATION, false);
         assertEquals("User Lloris", payload.getAppellantFullName());
         assertNull(payload.getAppointeeFullName());
         assertEquals("1", payload.getCaseId());
