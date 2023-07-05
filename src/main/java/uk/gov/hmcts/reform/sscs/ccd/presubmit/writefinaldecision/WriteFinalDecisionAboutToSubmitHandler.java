@@ -79,9 +79,11 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                 sscsCaseData.setPreviousState(state);
             }
 
-            boolean isNotCorrection = isNoOrNull(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
-            if (isPostHearingsEnabled && isNotCorrection) {
-                sscsCaseData.setFinalDecisionGeneratedDate(LocalDate.now());
+            if (isPostHearingsEnabled) {
+                boolean isNotCorrection = isNoOrNull(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
+                if (isNotCorrection) {
+                    sscsCaseData.setFinalDecisionGeneratedDate(LocalDate.now());
+                }
             }
 
             previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_DECISION_NOTICE, sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());

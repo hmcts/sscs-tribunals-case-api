@@ -55,9 +55,11 @@ public class IssueDocumentHandler {
         boolean isScottish, boolean isPostHearingsEnabled,
         boolean isPostHearingsBEnabled,
         String userAuthorisation) {
+
         NoticeIssuedTemplateBody formPayload;
 
-        if (isPostHearingsEnabled && DocumentType.CORRECTED_DECISION_NOTICE.getLabel().equals(documentTypeLabel)) {
+        boolean isCorrectedDecisionNotice = DocumentType.CORRECTED_DECISION_NOTICE.getLabel().equals(documentTypeLabel);
+        if (isPostHearingsEnabled && isCorrectedDecisionNotice) {
             formPayload = CorrectedNoticeIssuedTemplateBody.builder()
                 .appellantFullName(buildFullName(caseData))
                 .appointeeFullName(buildAppointeeName(caseData).orElse(null))
@@ -77,20 +79,20 @@ public class IssueDocumentHandler {
                 .build();
         } else {
             formPayload = NoticeIssuedTemplateBody.builder()
-                    .appellantFullName(buildFullName(caseData))
-                    .appointeeFullName(buildAppointeeName(caseData).orElse(null))
-                    .caseId(caseData.getCcdCaseId())
-                    .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
-                    .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
-                    .respondents(getRespondents(caseData))
-                    .noticeBody(PdfRequestUtil.getNoticeBody(caseData, isPostHearingsEnabled, isPostHearingsBEnabled))
-                    .userName(caseData.getDocumentGeneration().getSignedBy())
-                    .noticeType(documentTypeLabel.toUpperCase())
-                    .userRole(caseData.getDocumentGeneration().getSignedRole())
-                    .dateAdded(dateAdded)
-                    .generatedDate(generatedDate)
-                    .idamSurname(caseData.getDocumentGeneration().getSignedBy())
-                    .build();
+                .appellantFullName(buildFullName(caseData))
+                .appointeeFullName(buildAppointeeName(caseData).orElse(null))
+                .caseId(caseData.getCcdCaseId())
+                .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
+                .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
+                .respondents(getRespondents(caseData))
+                .noticeBody(PdfRequestUtil.getNoticeBody(caseData, isPostHearingsEnabled, isPostHearingsBEnabled))
+                .userName(caseData.getDocumentGeneration().getSignedBy())
+                .noticeType(documentTypeLabel.toUpperCase())
+                .userRole(caseData.getDocumentGeneration().getSignedRole())
+                .dateAdded(dateAdded)
+                .generatedDate(generatedDate)
+                .idamSurname(caseData.getDocumentGeneration().getSignedBy())
+                .build();
         }
 
         if (isScottish) {
