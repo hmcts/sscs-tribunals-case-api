@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
 import static java.util.Objects.requireNonNull;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -17,14 +18,12 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecis
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
 @Service
+@AllArgsConstructor
 public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final DecisionNoticeService decisionNoticeService;
-
-    @Autowired
-    public IssueFinalDecisionAboutToStartHandler(DecisionNoticeService decisionNoticeService) {
-        this.decisionNoticeService = decisionNoticeService;
-    }
+    @Value("${feature.postHearings.enabled}")
+    private boolean isPostHearingsEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -54,7 +53,7 @@ public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
                 response.addError("Unexpected error - benefit type is null");
             }
             WriteFinalDecisionPreviewDecisionServiceBase previewDecisionService = decisionNoticeService.getPreviewService(benefitType);
-            previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, userAuthorisation, true);
+            previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, userAuthorisation, true, isPostHearingsEnabled);
         } else {
             response.addError("No draft final decision notice found on case. Please use 'Write final decision' event before trying to issue.");
         }

@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
@@ -61,8 +62,9 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                                      VenueDataLoader venueDataLoader,
                                      @Value("${doc_assembly.adjourn_case}") String templateId,
                                      SignLanguagesService signLanguagesService,
-                                     JudicialRefDataService judicialRefDataService) {
-        super(generateFile, userDetailsService, languagePreference -> templateId);
+                                     JudicialRefDataService judicialRefDataService,
+                                     DocumentConfiguration documentConfiguration) {
+        super(generateFile, userDetailsService, languagePreference -> templateId, documentConfiguration);
         this.venueDataLoader = venueDataLoader;
         this.signLanguagesService = signLanguagesService;
         this.judicialRefDataService = judicialRefDataService;
