@@ -9,7 +9,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -54,23 +53,17 @@ public class CitizenLoginService {
 
     public List<OnlineHearing> findCasesForCitizen(IdamTokens idamTokens, String tya) {
         log.info(format("Find case: Searching for case with tya [%s] for user [%s] with email [%s]", tya, idamTokens.getUserId(), idamTokens.getEmail()));
-        List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens);
-        List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
-                .map(sscsCcdConvertService::getCaseDetails)
+        List<SscsCaseDetails> sscsCaseDetails = citizenCcdService.findCaseBySubscriptionEmail(idamTokens).stream()
                 .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
                 .toList();
         if (sscsCaseDetails != null) {
             for (SscsCaseDetails sscsCaseDetailsItem : sscsCaseDetails) {
                 if (sscsCaseDetailsItem != null) {
                     log.info(format("Found case with id [%d]", sscsCaseDetailsItem.getId()));
-                    for (CaseDetails rawCaseDetails : caseDetails) {
-                        if (sscsCaseDetailsItem.getId() != null
-                            && sscsCaseDetailsItem.getId().equals(rawCaseDetails.getId())) {
-                            for (String key: rawCaseDetails.getData().keySet()) {
-                                log.info(format("Case data for case [%d]: key [%s] value [%s]",
-                                        rawCaseDetails.getId(), key, Objects.toString(rawCaseDetails.getData().get(key), "null")));
-                            }
-                        }
+                    if (sscsCaseDetailsItem.getData() != null &&
+                            sscsCaseDetailsItem.getData().getOtherParties() != null) {
+                        log.info(format("Case [%d], other parties size [%d]",
+                                sscsCaseDetailsItem.getId(), sscsCaseDetailsItem.getData().getOtherParties().size()));
                     }
                 }
             }
