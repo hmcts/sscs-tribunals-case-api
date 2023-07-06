@@ -108,7 +108,7 @@ public class CitizenLoginServiceTest {
         List<SscsCaseDetails> sscsCaseDetails = new ArrayList<>();
         sscsCaseDetails.add(sscsCaseDetails1);
         sscsCaseDetails.add(sscsCaseDetails2);
-        when(citizenCcdService.findCaseBySubscriptionEmail(citizenIdamTokens)).thenReturn(sscsCaseDetails);
+        when(citizenCcdService.findCaseBySubscriptionEmail(any(), eq(citizenIdamTokens))).thenReturn(sscsCaseDetails);
         when(ccdService.findCaseByAppealNumber(any(), any())).thenReturn(sscsCaseDetails1);
         when(ccdService.findCaseByAppealNumber(any(), any())).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
@@ -203,7 +203,7 @@ public class CitizenLoginServiceTest {
         List<SscsCaseDetails> sscsCaseDetails = new ArrayList<>();
         sscsCaseDetails.add(sscsCaseDetailsWithDifferentTya);
         sscsCaseDetails.add(sscsCaseDetailsWithTya);
-        when(citizenCcdService.findCaseBySubscriptionEmail(any())).thenReturn(sscsCaseDetails);
+        when(citizenCcdService.findCaseBySubscriptionEmail(any(), any())).thenReturn(sscsCaseDetails);
         when(ccdService.findCaseByAppealNumber(any(), any())).thenReturn(sscsCaseDetailsWithDifferentTya);
         when(ccdService.findCaseByAppealNumber(any(), any())).thenReturn(sscsCaseDetailsWithTya);
         OnlineHearing onlineHearing = someOnlineHearing(111L);

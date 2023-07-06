@@ -213,7 +213,7 @@ public class CitizenCcdServiceTest {
         Long caseId = 1234L;
         when(ccdService.getByCaseId(caseId,IDAM_TOKENS)).thenReturn(SscsCaseDetails.builder().data(caseData).build());
 
-        citizenCcdService.findCaseBySubscriptionEmail(IDAM_TOKENS);
+        citizenCcdService.findCaseBySubscriptionEmail("test", IDAM_TOKENS);
 
     }
 }
