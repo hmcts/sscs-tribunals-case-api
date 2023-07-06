@@ -75,12 +75,6 @@ public class CitizenCcdService {
         }
     }
 
-    private CcdException logCcdException(String message, Exception ex) {
-        CcdException ccdException = new CcdException(message, ex);
-        log.error(message, ccdException);
-        return ccdException;
-    }
-
     public static SearchSourceBuilder findCasesBySubscriptionEmail(String email) {
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
         searchBuilder.query(QueryBuilders
@@ -93,6 +87,12 @@ public class CitizenCcdService {
                 .should(matchQuery("data.otherParties.value.otherPartyAppointeeSubscription.email", email))
                 .should(matchQuery("data.otherParties.value.otherPartyRepresentativeSubscription.email", email)));
         return searchBuilder;
+    }
+
+    private CcdException logCcdException(String message, Exception ex) {
+        CcdException ccdException = new CcdException(message, ex);
+        log.error(message, ccdException);
+        return ccdException;
     }
 
     private List<SscsCaseDetails> getCasesBySubscriptionEmail(String email, IdamTokens idamTokens) {
