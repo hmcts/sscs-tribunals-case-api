@@ -152,6 +152,42 @@ class IssueDocumentHandlerTest {
         assertThat(payload.getDateAdded()).isEqualTo(localDate);
         assertThat(payload.getGeneratedDate()).isEqualTo(localDate);
         assertThat(payload.getIdamSurname()).isEqualTo("Barry Allen");
+        assertThat(payload.getCorrectedJudgeName()).isNull();
+        assertThat(payload.getCorrectedGeneratedDate()).isNull();
+        assertThat(payload.getCorrectedDateIssued()).isNull();
+    }
+
+    @Test
+    void testDocumentPayloadValues_correctedDecisionNotice() {
+        SscsCaseData sscsCaseData = buildCaseData();
+        PostHearing postHearing = sscsCaseData.getPostHearing();
+        postHearing.setReviewType(PostHearingReviewType.CORRECTION);
+        sscsCaseData.getDocumentGeneration().setCorrectionBodyContent("correction body");
+        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
+        LocalDate originalGeneratedDate = LocalDate.of(2010, 1, 15);
+        sscsCaseData.setFinalDecisionGeneratedDate(originalGeneratedDate);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIdamSurname("Gilbert");
+
+        String documentTypeLabel = "Corrected decision notice";
+        LocalDate localDate = LocalDate.now();
+        NoticeIssuedTemplateBody
+            payload = handler.createPayload(null, sscsCaseData, documentTypeLabel, localDate, localDate, false, true, false, USER_AUTHORISATION);
+
+        assertThat(payload.getAppellantFullName()).isEqualTo("User Lloris");
+        assertThat(payload.getAppointeeFullName()).isNull();
+        assertThat(payload.getCaseId()).isEqualTo("1");
+        assertThat(payload.getNino()).isEqualTo("BB 22 55 66 B");
+        assertThat(payload.isShouldHideNino()).isFalse();
+        assertThat(payload.getRespondents()).hasSize(1);
+        assertThat(payload.getNoticeBody()).isEqualTo("correction body");
+        assertThat(payload.getUserName()).isEqualTo("Barry Allen");
+        assertThat(payload.getNoticeType()).isEqualTo("CORRECTED DECISION NOTICE");
+        assertThat(payload.getUserRole()).isEqualTo("Judge");
+        assertThat(payload.getDateAdded()).isEqualTo(localDate);
+        assertThat(payload.getGeneratedDate()).isEqualTo(originalGeneratedDate);
+        assertThat(payload.getIdamSurname()).isEqualTo("Gilbert");
+        assertThat(payload.getCorrectedGeneratedDate()).isEqualTo(localDate);
+        assertThat(payload.getCorrectedDateIssued()).isEqualTo(LocalDate.now());
     }
 
     @ParameterizedTest
