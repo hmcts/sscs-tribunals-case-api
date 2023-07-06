@@ -201,19 +201,25 @@ public class CitizenCcdServiceTest {
 
     @Test
     public void shouldFindCasesBySubscriptionEmail() {
-        SscsCaseData caseData = SscsCaseData.builder()
-                .appeal(Appeal.builder()
-                        .appellant(Appellant.builder()
-                                .address(Address.builder().postcode("TS1 1ST").build())
-                                .build()).build())
-                .subscriptions(Subscriptions.builder()
-                        .appellantSubscription(Subscription.builder()
-                                .email("dummy@email.com").build()).build())
-                .build();
-        Long caseId = 1234L;
-        when(ccdService.getByCaseId(caseId,IDAM_TOKENS)).thenReturn(SscsCaseDetails.builder().data(caseData).build());
+        SscsCaseData caseData = SscsCaseData.builder().build();
+        SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(caseData).build();
+        when(searchCcdCaseService.findCaseBySearchCriteria(any(), eq(IDAM_TOKENS))).thenReturn(List.of(caseDetails));
 
-        citizenCcdService.findCasesBySubscriptionEmail("test", IDAM_TOKENS);
+        List<SscsCaseDetails> cases = citizenCcdService.findCasesBySubscriptionEmail("test@test.com", IDAM_TOKENS);
 
+        assertEquals(1, cases.size());
+        assertEquals(caseDetails, cases.get(0));
+    }
+
+    @Test
+    public void shouldFilterOutDraftCases() {
+        SscsCaseData caseData = SscsCaseData.builder().build();
+        SscsCaseDetails caseDetails1 = SscsCaseDetails.builder().state(State.DRAFT.getId()).data(caseData).build();
+        SscsCaseDetails caseDetails2 = SscsCaseDetails.builder().state(State.DRAFT_ARCHIVED.getId()).data(caseData).build();
+        when(searchCcdCaseService.findCaseBySearchCriteria(any(), eq(IDAM_TOKENS))).thenReturn(List.of(caseDetails1, caseDetails2));
+
+        List<SscsCaseDetails> cases = citizenCcdService.findCasesBySubscriptionEmail("test@test.com", IDAM_TOKENS);
+
+        assertEquals(0, cases.size());
     }
 }
