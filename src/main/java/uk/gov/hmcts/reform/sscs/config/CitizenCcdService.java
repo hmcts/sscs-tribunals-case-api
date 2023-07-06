@@ -67,9 +67,9 @@ public class CitizenCcdService {
         return citizenCcdClient.searchForCitizenAllCases(idamTokens);
     }
 
-    public List<SscsCaseDetails> findCaseBySubscriptionEmail(IdamTokens idamTokens) {
+    public List<SscsCaseDetails> findCaseBySubscriptionEmail(String email, IdamTokens idamTokens) {
         try {
-            return getCasesBySubscriptionEmail(idamTokens.getEmail(), idamTokens);
+            return getCasesBySubscriptionEmail(email, idamTokens);
         } catch (Exception ex) {
             throw logCcdException(ERROR_WHILE_GETTING_CASE_FROM_CCD, ex);
         }

@@ -53,7 +53,7 @@ public class CitizenLoginService {
 
     public List<OnlineHearing> findCasesForCitizen(IdamTokens idamTokens, String tya) {
         log.info(format("Find case: Searching for case with tya [%s] for user [%s] with email [%s]", tya, idamTokens.getUserId(), idamTokens.getEmail()));
-        List<SscsCaseDetails> sscsCaseDetails = citizenCcdService.findCaseBySubscriptionEmail(idamService.getIdamTokens()).stream()
+        List<SscsCaseDetails> sscsCaseDetails = citizenCcdService.findCaseBySubscriptionEmail(idamTokens.getEmail(), idamService.getIdamTokens()).stream()
                 .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
                 .toList();
         if (sscsCaseDetails != null) {
@@ -117,7 +117,6 @@ public class CitizenLoginService {
         }
         return newCaseDetails;
     }
-
     public List<OnlineHearing> findActiveCasesForCitizen(IdamTokens idamTokens) {
         log.info(format("Find case: Searching for active case with for user [%s]", idamTokens.getUserId()));
         List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens);
