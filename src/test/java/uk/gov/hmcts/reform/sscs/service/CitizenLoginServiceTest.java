@@ -203,7 +203,7 @@ public class CitizenLoginServiceTest {
         List<SscsCaseDetails> sscsCaseDetails = new ArrayList<>();
         sscsCaseDetails.add(sscsCaseDetailsWithDifferentTya);
         sscsCaseDetails.add(sscsCaseDetailsWithTya);
-        when(citizenCcdService.findCaseBySubscriptionEmail(citizenIdamTokens)).thenReturn(sscsCaseDetails);
+        when(citizenCcdService.findCaseBySubscriptionEmail(any())).thenReturn(sscsCaseDetails);
         when(ccdService.findCaseByAppealNumber(any(), any())).thenReturn(sscsCaseDetailsWithDifferentTya);
         when(ccdService.findCaseByAppealNumber(any(), any())).thenReturn(sscsCaseDetailsWithTya);
         OnlineHearing onlineHearing = someOnlineHearing(111L);
