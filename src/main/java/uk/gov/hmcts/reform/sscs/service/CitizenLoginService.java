@@ -162,9 +162,8 @@ public class CitizenLoginService {
             final Stream<Subscription> otherPartySubscriptionStream = emptyIfNull(sscsCaseDetails.getData().getOtherParties()).stream()
                     .map(CcdValue::getValue)
                     .flatMap(op -> of(op.getOtherPartySubscription(), op.getOtherPartyAppointeeSubscription(), op.getOtherPartyRepresentativeSubscription()));
-
-
-            return concat(of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription()), otherPartySubscriptionStream)
+            return concat(of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription(), subscriptions.getJointPartySubscription()),
+                    otherPartySubscriptionStream)
                     .anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()));
         };
     }
@@ -175,7 +174,8 @@ public class CitizenLoginService {
             final Stream<Subscription> otherPartySubscriptionStream = emptyIfNull(sscsCaseDetails.getData().getOtherParties()).stream()
                     .map(CcdValue::getValue)
                     .flatMap(op -> of(op.getOtherPartySubscription(), op.getOtherPartyAppointeeSubscription(), op.getOtherPartyRepresentativeSubscription()));
-            return concat(of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription()), otherPartySubscriptionStream)
+            return concat(of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription(), subscriptions.getJointPartySubscription()),
+                    otherPartySubscriptionStream)
                     .anyMatch(subscription -> subscription != null && subscription.getTya() != null && email.equals(subscription.getEmail()));
         };
     }
