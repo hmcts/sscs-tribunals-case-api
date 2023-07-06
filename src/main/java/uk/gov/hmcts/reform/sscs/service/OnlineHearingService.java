@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
@@ -105,40 +104,21 @@ public class OnlineHearingService {
 
     private UserDetails convertUserDetails(SscsCaseDetails sscsCaseDetails, String tya, String email) {
         Map<UserType, Subscription> appellantSubscriptions = getAppealSubscriptionMap(sscsCaseDetails);
-        for (UserType userType: appellantSubscriptions.keySet()) {
-            Subscription subscription = appellantSubscriptions.get(userType);
-            log.info(format("Appellant subscription: email [%s]", subscription.getEmail()));
-        }
         boolean isSignInSubscription = isSignInSubscription(appellantSubscriptions.values(), tya, email);
         if (isSignInSubscription) {
-            log.info(format("Returning appellant details, isSignInSubscription: [%b]",
-                    isSignInSubscription));
             return populateUserDetails(UserType.APPELLANT, sscsCaseDetails.getData().getAppeal().getAppellant().getName(),
                     sscsCaseDetails.getData().getAppeal().getAppellant().getAddress(),
                     Optional.ofNullable(sscsCaseDetails.getData().getAppeal().getAppellant().getContact()),
                     appellantSubscriptions);
         } else {
             List<CcdValue<OtherParty>> otherParties = sscsCaseDetails.getData().getOtherParties();
-            if (otherParties == null) {
-                log.info(format("Other parties for case [%d] is null", sscsCaseDetails.getId()));
-            } else {
-                log.info(format("Other parties for case [%d] has size [%d]", sscsCaseDetails.getId(), otherParties.size()));
-            }
             for (CcdValue<OtherParty> op : emptyIfNull(otherParties)) {
                 Map<UserType, Subscription> otherPartySubscriptions = getOtherPartySubscriptionMap(op);
-                log.info("Trying other party subscriptions");
-                for (UserType userType: otherPartySubscriptions.keySet()) {
-                    Subscription subscription = otherPartySubscriptions.get(userType);
-                    log.info(format("Found other party subscription: email [%s]", subscription.getEmail()));
-                }
                 if (isSignInSubscription(otherPartySubscriptions.values(), tya, email)) {
-                    log.info(format("Returning other party details, name = [%s]", op.getValue().getName()));
                     return populateUserDetails(UserType.OTHER_PARTY, op.getValue().getName(),
                             op.getValue().getAddress(),
                             Optional.ofNullable(op.getValue().getContact()),
                             otherPartySubscriptions);
-                } else {
-                    log.info(format("isSignInSubscription is false for case [%d]", sscsCaseDetails.getId()));
                 }
             }
         }
