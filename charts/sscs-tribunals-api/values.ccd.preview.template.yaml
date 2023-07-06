@@ -821,7 +821,7 @@ wa-task-monitor:
     readinessDelay: 90
     environment:
       CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
-      TASK_MANAGEMENT_SERVICE_URL: http://{{ .Release.Name }}-wa-task-management-api
+      WA_TASK_MANAGEMENT_API_URL: http://{{ .Release.Name }}-wa-task-management-api
       CASE_EVENT_HANDLER_SERVICE_URL: http://{{ .Release.Name }}-wa-case-event-handler
       CCD_SEARCH_URL: http://{{ .Release.Name }}-ccd-data-store-api
       CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
