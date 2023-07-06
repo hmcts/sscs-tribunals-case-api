@@ -78,9 +78,11 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     public void setUp() throws IOException {
         openMocks(this);
         final Map<EventType, String> englishEventTypeDocs = new HashMap<>();
+        englishEventTypeDocs.put(EventType.CORRECTION_GRANTED, "TB-SCS-GNO-ENG-corrected-decision-notice.docx");
         englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-directions-notice.docx");
         englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-draft-decision-notice.docx");
         Map<EventType, String> welshEventTypeDocs = new HashMap<>();
+        welshEventTypeDocs.put(EventType.CORRECTION_GRANTED, "TB-SCS-GNO-ENG-corrected-decision-notice.docx");
         welshEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
         welshEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
         final Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
