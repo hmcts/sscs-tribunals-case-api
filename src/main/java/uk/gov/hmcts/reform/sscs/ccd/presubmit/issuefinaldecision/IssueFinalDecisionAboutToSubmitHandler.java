@@ -111,7 +111,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
                 if (isNotCorrection) {
                     sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());
-                    sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIdamSurname(sscsCaseData.getDocumentGeneration().getSignedBy());
+                    sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionIdamSurname(sscsCaseData.getDocumentGeneration().getSignedBy());
                 }
             }
         }

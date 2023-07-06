@@ -75,7 +75,7 @@ public class IssueDocumentHandler {
             SscsFinalDecisionCaseData finalDecisionCaseData = caseData.getSscsFinalDecisionCaseData();
 
             if (isNull(finalDecisionCaseData.getFinalDecisionIssuedDate())) {
-                finalDecisionCaseData.setWriteFinalDecisionIdamSurname(caseData.getDocumentGeneration().getSignedBy());
+                finalDecisionCaseData.setFinalDecisionIdamSurname(caseData.getDocumentGeneration().getSignedBy());
                 finalDecisionCaseData.setFinalDecisionGeneratedDate(generatedDate);
                 finalDecisionCaseData.setFinalDecisionIssuedDate(LocalDate.now());
             }
@@ -83,7 +83,7 @@ public class IssueDocumentHandler {
             if (DocumentType.CORRECTION_GRANTED.getLabel().equals(documentTypeLabel)) {
                 formPayload = formPayload.toBuilder()
                         .generatedDate(finalDecisionCaseData.getFinalDecisionGeneratedDate())
-                        .idamSurname(finalDecisionCaseData.getWriteFinalDecisionIdamSurname())
+                        .idamSurname(finalDecisionCaseData.getFinalDecisionIdamSurname())
                         .dateIssued(finalDecisionCaseData.getFinalDecisionIssuedDate())
                         .correctedJudgeName(caseData.getDocumentGeneration().getSignedBy())
                         .correctedGeneratedDate(generatedDate)
