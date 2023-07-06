@@ -802,7 +802,7 @@ wa-task-management-api:
     readinessDelay: 90
     environment:
       CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
-      ROLE_ASSIGNMENT_URL: http://{{ .Release.Name }}-am-role-assignment-service
+      ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
       POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
       POSTGRES_NAME: cft_task_db
       POSTGRES_USERNAME: postgres
@@ -825,7 +825,7 @@ wa-task-monitor:
       CASE_EVENT_HANDLER_SERVICE_URL: http://{{ .Release.Name }}-wa-case-event-handler
       CCD_SEARCH_URL: http://{{ .Release.Name }}-ccd-data-store-api
       CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
-      ROLE_ASSIGNMENT_URL: http://{{ .Release.Name }}-am-role-assignment-service
+      ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
       S2S_SECRET_TASK_MONITOR: ${S2S_SECRET_TASK_MONITOR}
       WA_IDAM_CLIENT_SECRET: ${WA_IDAM_CLIENT_SECRET}
       WA_SYSTEM_USERNAME: ${WA_SYSTEM_USERNAME}
@@ -840,7 +840,7 @@ wa-case-event-handler:
       CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
       CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
       CCD_SEARCH_URL: http://{{ .Release.Name }}-ccd-data-store-api
-      ROLE_ASSIGNMENT_URL: http://{{ .Release.Name }}-am-role-assignment-service
+      ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
       WA_WORKFLOW_API_URL: http://{{ .Release.Name }}-wa-workflow-api
       WA_TASK_MANAGEMENT_API_URL: http://{{ .Release.Name }}-wa-task-management-api
       AZURE_SERVICE_BUS_CONNECTION_STRING: ${SERVICE_BUS_CONNECTION_STRING}
@@ -881,6 +881,7 @@ wa-message-cron-service:
 ccd-message-publisher:
   java:
     ingressHost: ccd-message-publisher-${SERVICE_FQDN}
+
     releaseNameOverride: ${SERVICE_NAME}-ccd-message-publisher
     readinessDelay: 90
     environment:
