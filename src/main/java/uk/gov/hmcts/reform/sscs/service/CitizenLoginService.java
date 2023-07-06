@@ -118,6 +118,7 @@ public class CitizenLoginService {
         }
         return newCaseDetails;
     }
+
     public List<OnlineHearing> findActiveCasesForCitizen(IdamTokens idamTokens) {
         log.info(format("Find case: Searching for active case with for user [%s]", idamTokens.getUserId()));
         List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens);
