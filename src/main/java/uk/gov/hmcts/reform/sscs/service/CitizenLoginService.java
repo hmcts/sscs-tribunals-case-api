@@ -53,23 +53,11 @@ public class CitizenLoginService {
     }
 
     public List<OnlineHearing> findCasesForCitizen(IdamTokens idamTokens, String tya) {
-        log.info(format("Find case: Searching for case with tya [%s] for user [%s] with email [%s]", tya, idamTokens.getUserId(), idamTokens.getEmail()));
+        log.info(format("Find case: Searching for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
         List<SscsCaseDetails> sscsCaseDetails = citizenCcdService.findCaseBySubscriptionEmail(idamTokens.getEmail(), idamService.getIdamTokens()).stream()
                 .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
                 .filter(casesWithSubscriptionMatchingEmailWithTya(idamTokens.getEmail()))
                 .collect(toList());
-        if (sscsCaseDetails != null) {
-            for (SscsCaseDetails sscsCaseDetailsItem : sscsCaseDetails) {
-                if (sscsCaseDetailsItem != null) {
-                    log.info(format("Found case with id [%d]", sscsCaseDetailsItem.getId()));
-                    if (sscsCaseDetailsItem.getData() != null
-                            && sscsCaseDetailsItem.getData().getOtherParties() != null) {
-                        log.info(format("Case [%d], other parties size [%d]",
-                                sscsCaseDetailsItem.getId(), sscsCaseDetailsItem.getData().getOtherParties().size()));
-                    }
-                }
-            }
-        }
         if (!isBlank(tya)) {
             log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
             List<OnlineHearing> convert = convert(
@@ -87,37 +75,6 @@ public class CitizenLoginService {
         List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
         log.info(format("Found [%s] cases without tya for user [%s]", convert.size(), idamTokens.getUserId()));
         return convert;
-    }
-
-    public SscsCaseDetails getByAppealNumber(SscsCaseDetails sscsCaseDetails) {
-        log.info(format("Attempting to get case [%d] by tya", sscsCaseDetails.getId()));
-        SscsCaseDetails newCaseDetails = sscsCaseDetails;
-        if (sscsCaseDetails.getData() == null || sscsCaseDetails.getData().getSubscriptions() == null) {
-            return newCaseDetails;
-        }
-        Subscriptions subs = sscsCaseDetails.getData().getSubscriptions();
-        if (subs.getAppellantSubscription() != null
-            && subs.getAppellantSubscription().getTya() != null) {
-            newCaseDetails = ccdService.findCaseByAppealNumber(subs.getAppellantSubscription().getTya(), idamService.getIdamTokens());
-            log.info(format("Got case [%d] by appellant tya [%s]", sscsCaseDetails.getId(), subs.getAppellantSubscription().getTya()));
-        } else if (subs.getAppointeeSubscription() != null
-                && subs.getAppointeeSubscription().getTya() != null) {
-            newCaseDetails = ccdService.findCaseByAppealNumber(subs.getAppointeeSubscription().getTya(), idamService.getIdamTokens());
-            log.info(format("Got case [%d] by appointee tya [%s]", sscsCaseDetails.getId(), subs.getAppointeeSubscription().getTya()));
-        } else if (subs.getRepresentativeSubscription() != null
-                && subs.getRepresentativeSubscription().getTya() != null) {
-            newCaseDetails = ccdService.findCaseByAppealNumber(subs.getRepresentativeSubscription().getTya(), idamService.getIdamTokens());
-            log.info(format("Got case [%d] by rep tya [%s]", sscsCaseDetails.getId(), subs.getRepresentativeSubscription().getTya()));
-        } else if (subs.getJointPartySubscription() != null
-                && subs.getJointPartySubscription().getTya() != null) {
-            newCaseDetails = ccdService.findCaseByAppealNumber(subs.getJointPartySubscription().getTya(), idamService.getIdamTokens());
-            log.info(format("Got case [%d] by joint party tya [%s]", sscsCaseDetails.getId(), subs.getJointPartySubscription().getTya()));
-        } else if (subs.getSupporterSubscription() != null
-                && subs.getSupporterSubscription().getTya() != null) {
-            newCaseDetails = ccdService.findCaseByAppealNumber(subs.getSupporterSubscription().getTya(), idamService.getIdamTokens());
-            log.info(format("Got case [%d] by supporter tya [%s]", sscsCaseDetails.getId(), subs.getSupporterSubscription().getTya()));
-        }
-        return newCaseDetails;
     }
 
     public List<OnlineHearing> findActiveCasesForCitizen(IdamTokens idamTokens) {

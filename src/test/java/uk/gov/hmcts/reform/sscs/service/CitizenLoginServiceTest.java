@@ -401,16 +401,6 @@ public class CitizenLoginServiceTest {
         assertThat(sscsCaseDetails.isPresent(), is(false));
     }
 
-    @Test
-    public void shouldGetByAppealNumber() {
-        underTest.getByAppealNumber(createSscsCaseDetailsWithAppellantSubscription("test"));
-        underTest.getByAppealNumber(createSscsCaseDetailsWithAppointeeSubscription("test"));
-        underTest.getByAppealNumber(createSscsCaseDetailsWithRepSubscription("test"));
-        underTest.getByAppealNumber(createSscsCaseDetailsWithJointPartySubscription("test"));
-        underTest.getByAppealNumber(createSscsCaseDetailsWithSupporterSubscription("test"));
-    }
-
-
     private SscsCaseDetails createSscsCaseDetailsWithAppellantSubscription(String tya) {
         return createSscsCaseDetails(Subscriptions.builder()
                 .appellantSubscription(Subscription.builder()
