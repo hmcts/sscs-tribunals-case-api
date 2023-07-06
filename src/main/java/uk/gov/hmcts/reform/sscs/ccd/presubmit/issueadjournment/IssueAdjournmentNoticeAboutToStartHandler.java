@@ -52,7 +52,7 @@ public class IssueAdjournmentNoticeAboutToStartHandler implements PreSubmitCallb
             if (sscsCaseData.getAdjournment().getGeneratedDate() == null) {
                 response.addError("Adjourn case generated date not found. Please use 'Adjourn case' event or upload your adjourn case document.");
             } else {
-                previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, userAuthorisation, true);
+                previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, userAuthorisation, true, false);
             }
 
         } else if (sscsCaseData.getAdjournment().getPreviewDocument() == null) {

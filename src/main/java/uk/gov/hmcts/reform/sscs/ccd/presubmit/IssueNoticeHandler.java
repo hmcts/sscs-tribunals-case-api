@@ -12,27 +12,34 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @Slf4j
 public abstract class IssueNoticeHandler extends IssueDocumentHandler {
-
     protected final GenerateFile generateFile;
     protected final Function<LanguagePreference, String> templateId;
     protected boolean showIssueDate;
     protected final UserDetailsService userDetailsService;
+    protected final DocumentConfiguration documentConfiguration;
 
     public IssueNoticeHandler(GenerateFile generateFile, UserDetailsService userDetailsService,
-                              Function<LanguagePreference, String> templateId) {
+                              Function<LanguagePreference, String> templateId,
+                              DocumentConfiguration documentConfiguration) {
         this.generateFile = generateFile;
         this.templateId = templateId;
         this.userDetailsService = userDetailsService;
+        this.documentConfiguration = documentConfiguration;
     }
 
     protected abstract void setGeneratedDateIfRequired(SscsCaseData caseData, EventType eventType);
 
     public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, DocumentType documentType, String userAuthorisation, boolean showIssueDate) {
+        return preview(callback, documentType, userAuthorisation, showIssueDate, false);
+    }
+
+    public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, DocumentType documentType, String userAuthorisation, boolean showIssueDate, boolean isPostHearingsEnabled) {
 
         this.showIssueDate = showIssueDate;
 
@@ -42,8 +49,14 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
 
         setGeneratedDateIfRequired(sscsCaseData, callback.getEvent());
 
+        String templateIdString = templateId.apply(sscsCaseData.getLanguagePreference());
+
+        if (isPostHearingsEnabled && DocumentType.CORRECTION_GRANTED.equals(documentType)) {
+            templateIdString = documentConfiguration.getDocuments().get(sscsCaseData.getLanguagePreference()).get(EventType.CORRECTION_GRANTED);
+        }
+
         try {
-            return issueDocument(callback, documentType, templateId.apply(sscsCaseData.getLanguagePreference()), generateFile, userAuthorisation);
+            return issueDocument(callback, documentType, templateIdString, generateFile, userAuthorisation);
         } catch (IllegalStateException e) {
             log.error(e.getMessage() + ". Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
             preSubmitCallbackResponse.addError(e.getMessage());

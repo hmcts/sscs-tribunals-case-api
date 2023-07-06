@@ -2,19 +2,20 @@ package uk.gov.hmcts.reform.sscs.model.docassembly;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
 
-@Builder(toBuilder = true)
-@Value
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@SuperBuilder(toBuilder = true)
+@Setter
+@Getter
 public class NoticeIssuedTemplateBody implements FormPayload {
     @JsonIgnore
     public static final String SCOTTISH_IMAGE = "[userImage:schmcts.png]";
@@ -67,5 +68,4 @@ public class NoticeIssuedTemplateBody implements FormPayload {
     private WriteFinalDecisionTemplateContent writeFinalDecisionTemplateContent;
     @JsonProperty("idam_surname")
     private String idamSurname;
-
 }

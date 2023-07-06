@@ -131,7 +131,7 @@ public class CcdMideventCallbackControllerTest {
 
         PreSubmitCallbackResponse response =
             new PreSubmitCallbackResponse(SscsCaseData.builder().interlocReviewState(InterlocReviewState.WELSH_TRANSLATION).build());
-        when(writeFinalDecisionPreviewDecisionService.preview(any(),eq(DocumentType.DRAFT_DECISION_NOTICE), anyString(), eq(false)))
+        when(writeFinalDecisionPreviewDecisionService.preview(any(),eq(DocumentType.DRAFT_DECISION_NOTICE), anyString(), eq(false), eq(false)))
                 .thenReturn(response);
 
         mockMvc.perform(post("/ccdMidEventPreviewFinalDecision")

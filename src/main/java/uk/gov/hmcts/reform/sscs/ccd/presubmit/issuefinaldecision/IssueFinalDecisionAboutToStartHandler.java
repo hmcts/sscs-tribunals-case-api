@@ -26,7 +26,7 @@ public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
 
     private final DecisionNoticeService decisionNoticeService;
     @Value("${feature.postHearings.enabled}")
-    private boolean isPostHearingEnabled;
+    private boolean isPostHearingsEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -57,10 +57,10 @@ public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
                 response.addError("Unexpected error - benefit type is null");
             }
 
-            DocumentType docType = SscsUtil.getIssueFinalDecisionDocumentType(sscsCaseData, isPostHearingEnabled);
+            DocumentType docType = SscsUtil.getIssueFinalDecisionDocumentType(sscsCaseData, isPostHearingsEnabled);
 
             WriteFinalDecisionPreviewDecisionServiceBase previewDecisionService = decisionNoticeService.getPreviewService(benefitType);
-            previewDecisionService.preview(callback, docType, userAuthorisation, true);
+            previewDecisionService.preview(callback, docType, userAuthorisation, true, isPostHearingsEnabled);
         } else {
             response.addError("No draft final decision notice found on case. Please use 'Write final decision' event before trying to issue.");
         }

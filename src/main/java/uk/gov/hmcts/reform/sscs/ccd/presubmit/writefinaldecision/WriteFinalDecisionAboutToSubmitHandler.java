@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+
 import java.time.LocalDate;
 import java.util.*;
 import lombok.AllArgsConstructor;
@@ -78,6 +80,15 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
             previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, docType, docLink);
         }
+
+        if (isPostHearingsEnabled) {
+            Correction correction = sscsCaseData.getPostHearing().getCorrection();
+
+            if (isNoOrNull(correction.getCorrectionFinalDecisionInProgress())) {
+                sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionGeneratedDate(LocalDate.now());
+            }
+        }
+
         return preSubmitCallbackResponse;
     }
 }

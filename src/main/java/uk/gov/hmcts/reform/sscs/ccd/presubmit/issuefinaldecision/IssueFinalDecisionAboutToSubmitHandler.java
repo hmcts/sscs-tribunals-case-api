@@ -3,8 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 
 import java.time.LocalDate;
@@ -44,7 +43,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     @Value("${feature.snl.adjournment.enabled}")
     private boolean isAdjournmentEnabled;
     @Value("${feature.postHearings.enabled}")
-    private boolean isPostHearingEnabled;
+    private boolean isPostHearingsEnabled;
 
     public IssueFinalDecisionAboutToSubmitHandler(FooterService footerService,
                                                   DecisionNoticeService decisionNoticeService, Validator validator,
@@ -92,7 +91,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         if ((!(State.READY_TO_LIST.equals(sscsCaseData.getState())
             || State.WITH_DWP.equals(sscsCaseData.getState())))
-            && !(isPostHearingEnabled && isYes(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress()))) {
+            && !(isPostHearingsEnabled && isYes(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress()))) {
             sscsCaseData.setDwpState(FINAL_DECISION_ISSUED);
             sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         }
@@ -104,8 +103,18 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         }
 
         if (isAdjournmentEnabled) {
-            sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());
+            if (!isPostHearingsEnabled) {
+                sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());
+            } else {
+                boolean isNotCorrection = isNoOrNull(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
+
+                if (isNotCorrection) {
+                    sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());
+                    sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIdamSurname(sscsCaseData.getDocumentGeneration().getSignedBy());
+                }
+            }
         }
+
 
         return preSubmitCallbackResponse;
     }
@@ -176,7 +185,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             .build();
 
         String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        DocumentType docType = SscsUtil.getIssueFinalDecisionDocumentType(sscsCaseData, isPostHearingEnabled);
+        DocumentType docType = SscsUtil.getIssueFinalDecisionDocumentType(sscsCaseData, isPostHearingsEnabled);
 
         final SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelsh() ? TRANSLATION_REQUIRED : null;
         footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, docType, now, null, null, documentTranslationStatus);
