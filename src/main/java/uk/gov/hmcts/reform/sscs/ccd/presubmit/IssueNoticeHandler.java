@@ -50,13 +50,13 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
 
         setGeneratedDateIfRequired(sscsCaseData, callback.getEvent());
 
-        String templateIdString = templateId.apply(sscsCaseData.getLanguagePreference());
-
-        if (isPostHearingsEnabled && DocumentType.CORRECTED_DECISION_NOTICE.equals(documentType)) {
-            templateIdString = documentConfiguration.getDocuments().get(sscsCaseData.getLanguagePreference()).get(EventType.CORRECTION_GRANTED);
-        }
-
         try {
+            String templateIdString = templateId.apply(sscsCaseData.getLanguagePreference());
+
+            if (isPostHearingsEnabled && DocumentType.CORRECTED_DECISION_NOTICE.equals(documentType)) {
+                templateIdString = documentConfiguration.getDocuments().get(sscsCaseData.getLanguagePreference()).get(EventType.CORRECTION_GRANTED);
+            }
+
             return issueDocument(callback, documentType, templateIdString, generateFile, userAuthorisation);
         } catch (IllegalStateException e) {
             log.error(e.getMessage() + ". Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
