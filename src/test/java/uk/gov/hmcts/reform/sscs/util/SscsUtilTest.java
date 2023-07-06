@@ -88,7 +88,8 @@ class SscsUtilTest {
     @ParameterizedTest
     @CsvSource(value = {
         "GRANT,PERMISSION_TO_APPEAL_GRANTED",
-        "REFUSE,PERMISSION_TO_APPEAL_REFUSED"
+        "REFUSE,PERMISSION_TO_APPEAL_REFUSED",
+        "REVIEW,SET_ASIDE_REVIEW"
     })
     void givenActionTypePta_shouldReturnPtaDocument(PermissionToAppealActions action, DocumentType expectedDocumentType) {
         postHearing.setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);

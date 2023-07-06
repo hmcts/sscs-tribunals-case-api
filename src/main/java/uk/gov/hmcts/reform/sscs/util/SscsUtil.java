@@ -114,6 +114,8 @@ public class SscsUtil {
             case PERMISSION_TO_APPEAL:
                 if (PermissionToAppealActions.REFUSE.equals(postHearing.getPermissionToAppeal().getAction())) {
                     return DocumentType.PERMISSION_TO_APPEAL_REFUSED;
+                } else if (PermissionToAppealActions.REVIEW.equals(postHearing.getPermissionToAppeal().getAction())) {
+                    return DocumentType.SET_ASIDE_REVIEW;
                 }
 
                 return DocumentType.PERMISSION_TO_APPEAL_GRANTED;
