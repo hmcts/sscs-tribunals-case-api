@@ -67,7 +67,7 @@ public class CitizenCcdService {
         return citizenCcdClient.searchForCitizenAllCases(idamTokens);
     }
 
-    public List<SscsCaseDetails> findCaseBySubscriptionEmail(String email, IdamTokens idamTokens) {
+    public List<SscsCaseDetails> findCasesBySubscriptionEmail(String email, IdamTokens idamTokens) {
         try {
             return getCasesBySubscriptionEmail(email, idamTokens);
         } catch (Exception ex) {
