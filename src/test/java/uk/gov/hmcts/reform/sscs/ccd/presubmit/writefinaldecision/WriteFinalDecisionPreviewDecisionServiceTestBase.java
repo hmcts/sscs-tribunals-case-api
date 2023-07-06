@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.model.docassembly.CorrectedNoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
@@ -360,7 +361,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, isDescriptorFlowSupported(), true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -777,7 +778,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
@@ -798,7 +799,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").address(Address.builder().postcode("postcode").build()).build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
@@ -945,15 +946,40 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
     }
 
+    @Test
+    public void givenPostHearingsIsTrue_thenShowIssuedDateOnDocument() {
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setHigherRateScenarioFields(sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.CORRECTION);
+        sscsCaseData.getDocumentGeneration().setCorrectionBodyContent("test");
+
+        service.preview(callback, DocumentType.CORRECTION_GRANTED, USER_AUTHORISATION, true, true, true);
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
+                true, false, isDescriptorFlowSupported(), true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.CORRECTION_GRANTED));
+
+        assertEquals(LocalDate.now(), payload.getDateIssued());
+    }
+
     protected abstract boolean isDescriptorFlowSupported();
 
     protected NoticeIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String expectedAppointeeName, String dateOfDecision, boolean allowed, boolean isSetAside, boolean isDraft,
-        boolean isDescriptorFlow, boolean isGenerateFile, String templateId) {
+                                                          boolean isDescriptorFlow, boolean isGenerateFile, String templateId) {
+        return verifyTemplateBody(image, expectedName, expectedAppointeeName, dateOfDecision, allowed, isSetAside, isDraft, isDescriptorFlow, isGenerateFile, false, templateId);
+    }
+
+    protected NoticeIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String expectedAppointeeName, String dateOfDecision, boolean allowed, boolean isSetAside, boolean isDraft,
+        boolean isDescriptorFlow, boolean isGenerateFile, boolean isCorrection, String templateId) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         GenerateFileParams generateFileParams = capture.getValue();
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) generateFileParams.getFormPayload();
         assertEquals(image, payload.getImage());
-        if (isDraft) {
+        if (isCorrection) {
+            assertEquals("CORRECTION FINAL DECISION NOTICE", payload.getNoticeType());
+            assertTrue(CorrectedNoticeIssuedTemplateBody.class.equals(payload));
+        } else if (isDraft) {
             assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
         } else {
             assertEquals("DECISION NOTICE", payload.getNoticeType());

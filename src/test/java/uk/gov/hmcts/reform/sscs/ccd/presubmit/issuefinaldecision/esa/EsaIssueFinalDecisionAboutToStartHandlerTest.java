@@ -104,7 +104,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
             new DecisionNoticeService(Arrays.asList(),
                 Arrays.asList(esaDecisionNoticeOutcomeService), Arrays.asList(previewDecisionService));
 
-        handler = new IssueFinalDecisionAboutToStartHandler(decisionNoticeService, false);
+        handler = new IssueFinalDecisionAboutToStartHandler(decisionNoticeService, false, false);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -168,7 +168,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         when(previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true)).thenReturn(response);
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        verify(previewDecisionService).preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true, false);
+        verify(previewDecisionService).preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true, false, false);
 
     }
 

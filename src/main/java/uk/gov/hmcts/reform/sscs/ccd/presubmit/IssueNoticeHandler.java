@@ -36,10 +36,10 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
     protected abstract void setGeneratedDateIfRequired(SscsCaseData caseData, EventType eventType);
 
     public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, DocumentType documentType, String userAuthorisation, boolean showIssueDate) {
-        return preview(callback, documentType, userAuthorisation, showIssueDate, false);
+        return preview(callback, documentType, userAuthorisation, showIssueDate, false, false);
     }
 
-    public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, DocumentType documentType, String userAuthorisation, boolean showIssueDate, boolean isPostHearingsEnabled) {
+    public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, DocumentType documentType, String userAuthorisation, boolean showIssueDate, boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
 
         this.showIssueDate = showIssueDate;
 
@@ -56,7 +56,7 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
                 templateIdString = documentConfiguration.getDocuments().get(sscsCaseData.getLanguagePreference()).get(EventType.CORRECTION_GRANTED);
             }
 
-            return issueDocument(callback, documentType, templateIdString, generateFile, userAuthorisation);
+            return issueDocument(callback, documentType, templateIdString, generateFile, userAuthorisation, isPostHearingsEnabled, isPostHearingsBEnabled);
         } catch (IllegalStateException e) {
             log.error(e.getMessage() + ". Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
             preSubmitCallbackResponse.addError(e.getMessage());

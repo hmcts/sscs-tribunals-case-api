@@ -44,6 +44,8 @@ public class CcdMideventCallbackController {
     private final RestoreCasesService2 restoreCasesService2;
     @Value("${feature.postHearings.enabled}")
     private boolean isPostHearingsEnabled;
+    @Value("${feature.postHearingsB.enabled}")
+    private boolean isPostHearingsBEnabled;
 
     @Autowired
     public CcdMideventCallbackController(AuthorisationService authorisationService, SscsCaseCallbackDeserializer deserializer,
@@ -105,7 +107,7 @@ public class CcdMideventCallbackController {
         WriteFinalDecisionPreviewDecisionServiceBase writeFinalDecisionPreviewDecisionService = decisionNoticeService.getPreviewService(benefitType);
         DocumentType docType = SscsUtil.getWriteFinalDecisionDocumentType(sscsCaseData, isPostHearingsEnabled);
 
-        return ok(writeFinalDecisionPreviewDecisionService.preview(callback, docType, userAuthorisation, false, isPostHearingsEnabled));
+        return ok(writeFinalDecisionPreviewDecisionService.preview(callback, docType, userAuthorisation, false, isPostHearingsEnabled, isPostHearingsBEnabled));
     }
 
     @PostMapping(path = "/ccdMidEventPreviewAdjournCase", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -119,7 +121,7 @@ public class CcdMideventCallbackController {
 
         authorisationService.authorise(serviceAuthHeader);
 
-        return ok(adjournCasePreviewService.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, userAuthorisation, false, false));
+        return ok(adjournCasePreviewService.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, userAuthorisation, false));
     }
 
     @PostMapping(path = "/ccdMidEventAdminRestoreCases", produces = MediaType.APPLICATION_JSON_VALUE)

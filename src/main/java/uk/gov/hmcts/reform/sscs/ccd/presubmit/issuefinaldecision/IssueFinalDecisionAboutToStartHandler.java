@@ -27,6 +27,8 @@ public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
     private final DecisionNoticeService decisionNoticeService;
     @Value("${feature.postHearings.enabled}")
     private boolean isPostHearingsEnabled;
+    @Value("${feature.postHearingsB.enabled}")
+    private boolean isPostHearingsBEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -60,7 +62,7 @@ public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
             DocumentType docType = SscsUtil.getIssueFinalDecisionDocumentType(sscsCaseData, isPostHearingsEnabled);
 
             WriteFinalDecisionPreviewDecisionServiceBase previewDecisionService = decisionNoticeService.getPreviewService(benefitType);
-            previewDecisionService.preview(callback, docType, userAuthorisation, true, isPostHearingsEnabled);
+            previewDecisionService.preview(callback, docType, userAuthorisation, true, isPostHearingsEnabled, isPostHearingsBEnabled);
         } else {
             response.addError("No draft final decision notice found on case. Please use 'Write final decision' event before trying to issue.");
         }

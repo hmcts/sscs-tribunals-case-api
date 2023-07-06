@@ -1627,7 +1627,7 @@ class AdjournCasePreviewServiceTest {
             service.preview(callback,
                 DocumentType.DRAFT_ADJOURNMENT_NOTICE,
                 USER_AUTHORISATION,
-                false, false);
+                false);
 
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
             .forename("Joe").surname("Linton").build().getFullName());
