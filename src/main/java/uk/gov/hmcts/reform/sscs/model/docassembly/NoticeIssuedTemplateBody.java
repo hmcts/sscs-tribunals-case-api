@@ -68,4 +68,10 @@ public class NoticeIssuedTemplateBody implements FormPayload {
     private WriteFinalDecisionTemplateContent writeFinalDecisionTemplateContent;
     @JsonProperty("idam_surname")
     private String idamSurname;
+    @JsonProperty("corrected_judge_name")
+    private String correctedJudgeName;
+    @JsonProperty("corrected_generated_date")
+    private LocalDate correctedGeneratedDate;
+    @JsonProperty("corrected_date_issued")
+    private LocalDate correctedDateIssued;
 }

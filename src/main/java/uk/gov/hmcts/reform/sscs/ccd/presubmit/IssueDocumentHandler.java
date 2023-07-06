@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
@@ -20,7 +21,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.model.docassembly.CorrectedNoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Respondent;
@@ -55,42 +55,40 @@ public class IssueDocumentHandler {
                                                      boolean isScottish, boolean isPostHearingsEnabled,
                                                      boolean isPostHearingsBEnabled,
                                                      String userAuthorisation) {
-        NoticeIssuedTemplateBody formPayload;
+        NoticeIssuedTemplateBody formPayload = NoticeIssuedTemplateBody.builder()
+                .appellantFullName(buildFullName(caseData))
+                .appointeeFullName(buildAppointeeName(caseData).orElse(null))
+                .caseId(caseData.getCcdCaseId())
+                .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
+                .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
+                .respondents(getRespondents(caseData))
+                .noticeBody(PdfRequestUtil.getNoticeBody(caseData, isPostHearingsEnabled, isPostHearingsBEnabled))
+                .userName(caseData.getDocumentGeneration().getSignedBy())
+                .noticeType(documentTypeLabel.toUpperCase())
+                .userRole(caseData.getDocumentGeneration().getSignedRole())
+                .dateAdded(dateAdded)
+                .generatedDate(generatedDate)
+                .idamSurname(caseData.getDocumentGeneration().getSignedBy())
+                .build();
 
-        if (isPostHearingsEnabled && DocumentType.CORRECTION_GRANTED.getLabel().equals(documentTypeLabel)) {
-            formPayload = CorrectedNoticeIssuedTemplateBody.builder()
-                    .appellantFullName(buildFullName(caseData))
-                    .appointeeFullName(buildAppointeeName(caseData).orElse(null))
-                    .caseId(caseData.getCcdCaseId())
-                    .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
-                    .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
-                    .respondents(getRespondents(caseData))
-                    .noticeBody(PdfRequestUtil.getNoticeBody(caseData, true, isPostHearingsBEnabled))
-                    .userName(caseData.getDocumentGeneration().getSignedBy())
-                    .noticeType(documentTypeLabel.toUpperCase())
-                    .userRole(caseData.getDocumentGeneration().getSignedRole())
-                    .dateAdded(dateAdded)
-                    .generatedDate(caseData.getSscsFinalDecisionCaseData().getFinalDecisionGeneratedDate())
-                    .idamSurname(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIdamSurname())
-                    .correctedGeneratedDate(generatedDate)
-                    .correctedDateIssued(LocalDate.now())
-                    .build();
-        } else {
-            formPayload = NoticeIssuedTemplateBody.builder()
-                    .appellantFullName(buildFullName(caseData))
-                    .appointeeFullName(buildAppointeeName(caseData).orElse(null))
-                    .caseId(caseData.getCcdCaseId())
-                    .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
-                    .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
-                    .respondents(getRespondents(caseData))
-                    .noticeBody(PdfRequestUtil.getNoticeBody(caseData, isPostHearingsEnabled, isPostHearingsBEnabled))
-                    .userName(caseData.getDocumentGeneration().getSignedBy())
-                    .noticeType(documentTypeLabel.toUpperCase())
-                    .userRole(caseData.getDocumentGeneration().getSignedRole())
-                    .dateAdded(dateAdded)
-                    .generatedDate(generatedDate)
-                    .idamSurname(caseData.getDocumentGeneration().getSignedBy())
-                    .build();
+        if (isPostHearingsEnabled) {
+            SscsFinalDecisionCaseData finalDecisionCaseData = caseData.getSscsFinalDecisionCaseData();
+
+            if (isNull(finalDecisionCaseData.getFinalDecisionIssuedDate())) {
+                finalDecisionCaseData.setWriteFinalDecisionIdamSurname(caseData.getDocumentGeneration().getSignedBy());
+                finalDecisionCaseData.setFinalDecisionGeneratedDate(generatedDate);
+                finalDecisionCaseData.setFinalDecisionIssuedDate(LocalDate.now());
+            }
+
+            if (DocumentType.CORRECTION_GRANTED.getLabel().equals(documentTypeLabel)) {
+                formPayload = formPayload.toBuilder()
+                        .generatedDate(finalDecisionCaseData.getFinalDecisionGeneratedDate())
+                        .idamSurname(finalDecisionCaseData.getWriteFinalDecisionIdamSurname())
+                        .dateIssued(finalDecisionCaseData.getFinalDecisionIssuedDate())
+                        .correctedJudgeName(caseData.getDocumentGeneration().getSignedBy())
+                        .correctedGeneratedDate(generatedDate)
+                        .correctedDateIssued(LocalDate.now()).build();
+            }
         }
 
         if (isScottish) {
@@ -200,6 +198,11 @@ public class IssueDocumentHandler {
             PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
 
             if (nonNull(postHearingReviewType)) {
+                if (PostHearingReviewType.CORRECTION.equals(postHearingReviewType)
+                    && CorrectionActions.GRANT.equals(caseData.getPostHearing().getCorrection().getAction())) {
+                    return DocumentType.CORRECTION_GRANTED.getLabel();
+                }
+
                 return postHearingReviewType.getDescriptionEn() + " Decision Notice";
             }
         }

@@ -32,7 +32,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.model.docassembly.CorrectedNoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
@@ -361,7 +360,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, isDescriptorFlowSupported(), true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, isDescriptorFlowSupported(), true, false, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -953,6 +952,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.CORRECTION);
+        sscsCaseData.getPostHearing().getCorrection().setAction(CorrectionActions.GRANT);
         sscsCaseData.getDocumentGeneration().setCorrectionBodyContent("test");
 
         service.preview(callback, DocumentType.CORRECTION_GRANTED, USER_AUTHORISATION, true, true, true);
@@ -977,12 +977,11 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) generateFileParams.getFormPayload();
         assertEquals(image, payload.getImage());
         if (isCorrection) {
-            assertEquals("CORRECTION FINAL DECISION NOTICE", payload.getNoticeType());
-            assertTrue(CorrectedNoticeIssuedTemplateBody.class.equals(payload));
+            assertEquals(DocumentType.CORRECTION_GRANTED.getLabel().toUpperCase(), payload.getNoticeType());
         } else if (isDraft) {
-            assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
+            assertEquals(DocumentType.DRAFT_DECISION_NOTICE.getLabel().toUpperCase(), payload.getNoticeType());
         } else {
-            assertEquals("DECISION NOTICE", payload.getNoticeType());
+            assertEquals(DocumentType.DECISION_NOTICE.getLabel().toUpperCase(), payload.getNoticeType());
         }
         assertEquals(expectedName, payload.getAppellantFullName());
         assertEquals(expectedAppointeeName, payload.getAppointeeFullName());
