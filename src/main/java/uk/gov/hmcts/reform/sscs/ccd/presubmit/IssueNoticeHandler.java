@@ -57,7 +57,7 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
                 templateIdString = documentConfiguration.getDocuments().get(sscsCaseData.getLanguagePreference()).get(EventType.CORRECTION_GRANTED);
             }
 
-            return issueDocument(callback, documentType, templateIdString, generateFile, userAuthorisation);
+            return issueDocument(callback, documentType, templateIdString, generateFile, userAuthorisation, isPostHearingsEnabled, false);
         } catch (IllegalStateException e) {
             log.error(e.getMessage() + ". Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
             preSubmitCallbackResponse.addError(e.getMessage());

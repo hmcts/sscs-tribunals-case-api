@@ -159,12 +159,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel(), ADMIN_ACTION_CORRECTION.getLabel()));
         }
 
-        if (isSorApplicationWithWrongActionCode(actionCode, scannedDocumentType)) {
-            preSubmitCallbackResponse.addError(String
-                .format(furtherEvidenceActionMustBeSetTo,
-                    SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel()));
-        }
-
         if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals(scannedDocumentType)
                 && !OTHER_DOCUMENT_MANUAL.getCode().equals(actionCode)) {
             preSubmitCallbackResponse.addError(String
@@ -203,12 +197,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return isDocTypeCorrectionApplication
             && isNotInterlocReviewByJudge
             && isNotAdminActionCorrection;
-    }
-
-    private static boolean isSorApplicationWithWrongActionCode(String actionCode, String scannedDocumentType) {
-        boolean isDocTypeSorApplication = ScannedDocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue().equals(scannedDocumentType);
-        boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
-        return isDocTypeSorApplication && isNotInterlocReviewByJudge;
     }
 
     @Override
