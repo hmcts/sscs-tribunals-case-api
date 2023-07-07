@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
@@ -13,12 +12,15 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getWriteFinalDecisionDocume
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
+@ExtendWith(MockitoExtension.class)
 class SscsUtilTest {
     public static final String UNEXPECTED_POST_HEARING_REVIEW_TYPE_AND_ACTION = "getting the document type has an unexpected postHearingReviewType and action";
     private PostHearing postHearing;
@@ -26,7 +28,6 @@ class SscsUtilTest {
 
     @BeforeEach
     void setUp() {
-        openMocks(this);
         postHearing = PostHearing.builder()
             .correction(Correction.builder()
                 .correctionFinalDecisionInProgress(YesNo.NO)

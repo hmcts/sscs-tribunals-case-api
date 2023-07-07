@@ -90,9 +90,11 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
         clearTransientFields(preSubmitCallbackResponse);
 
+        boolean isCorrectionInProgress = isPostHearingsEnabled && isYes(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
+
         if ((!(State.READY_TO_LIST.equals(sscsCaseData.getState())
             || State.WITH_DWP.equals(sscsCaseData.getState())))
-            && !(isPostHearingsEnabled && isYes(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress()))) {
+            && !isCorrectionInProgress) {
             sscsCaseData.setDwpState(FINAL_DECISION_ISSUED);
             sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         }
@@ -106,7 +108,6 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         if (isAdjournmentEnabled) {
             sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());
         }
-
 
         return preSubmitCallbackResponse;
     }

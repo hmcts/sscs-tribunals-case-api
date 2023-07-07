@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 
 import java.util.*;
 import lombok.AllArgsConstructor;
@@ -41,7 +41,7 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
         SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);
 
         if (!isPostHearingsEnabled
-                || !isYes(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
+                || isNoOrNull(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
             clearTransientFields(sscsCaseData);
         }
 

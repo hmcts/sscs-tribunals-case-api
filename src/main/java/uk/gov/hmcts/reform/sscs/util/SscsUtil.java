@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.util;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -128,7 +128,7 @@ public class SscsUtil {
         if (documentTranslationStatus != null) {
             caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
             log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
-            caseData.setTranslationWorkOutstanding(YesNo.YES.getValue());
+            caseData.setTranslationWorkOutstanding(YES.getValue());
         }
     }
 
@@ -152,14 +152,9 @@ public class SscsUtil {
 
     public static void setCorrectionInProgress(CaseDetails<SscsCaseData> caseDetails, boolean isPostHearingsEnabled) {
         if (isPostHearingsEnabled) {
-            Correction correction = caseDetails.getCaseData().getPostHearing().getCorrection();
+            YesNo correctionInProgress = State.POST_HEARING.equals(caseDetails.getState()) || State.DORMANT_APPEAL_STATE.equals(caseDetails.getState()) ? YES : NO;
 
-            if ((State.POST_HEARING.equals(caseDetails.getState())
-                    || State.DORMANT_APPEAL_STATE.equals(caseDetails.getState()))) {
-                correction.setCorrectionFinalDecisionInProgress(YesNo.YES);
-            } else {
-                correction.setCorrectionFinalDecisionInProgress(YesNo.NO);
-            }
+            caseDetails.getCaseData().getPostHearing().getCorrection().setCorrectionFinalDecisionInProgress(correctionInProgress);
         }
     }
       
