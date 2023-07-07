@@ -625,7 +625,7 @@ sscs-ccd-callback-orchestrator:
 sscs-cor-frontend:
   enabled: true
   nodejs:
-    image: hmctspublic.azurecr.io/sscs-cor/frontend:latest
+    image: hmctspublic.azurecr.io/sscs-cor/frontend:pr-1014
     releaseNameOverride: ${SERVICE_NAME}-sscs-cor-frontend
     ingressHost: mya-${SERVICE_FQDN}
     environment:
@@ -641,7 +641,6 @@ sscs-cor-frontend:
       TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
       S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       REDIS_HOST: redis://${SERVICE_NAME}-redis-master
-      REDIS_PORT: 6379
       NODE_ENV: preview
     keyVaults:
       sscs:
