@@ -63,3 +63,7 @@ dependencies:
     version: 1.0.2
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: servicebus.enabled
+  - name: sscs-cor-frontend
+    version: 0.1.37
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: sscs-cor-frontend.enabled

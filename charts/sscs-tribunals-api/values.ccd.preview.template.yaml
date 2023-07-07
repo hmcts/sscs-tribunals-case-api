@@ -621,6 +621,25 @@ sscs-ccd-callback-orchestrator:
         secretRef: sscs-sb-preview
         key: primaryKey
 
+#Enable for MYA
+sscs-cor-frontend:
+  enabled: true
+  nodejs:
+    image: hmctspublic.azurecr.io/sscs-cor/frontend:latest
+    ingressHost: mya-${SERVICE_FQDN}
+    environment:
+      ADDITIONAL_EVIDENCE_FEATURE_FLAG: "true"
+      EVIDENCE_UPLOAD_QUESTION_PAGE_OVERRIDE_ALLOWED: "true"
+      HEARING_OUTCOME_TAB_ENABLED: "true"
+      MEDIA_FILES_ALLOWED_ENABLED: "true"
+      ALLOW_COOKIE_BANNER_ENABLED: "true"
+      REQUEST_TAB_ENABLED: "true"
+      IDAM_URL: https://idam-web-public.aat.platform.hmcts.net/login
+      IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+      SSCS_API_URL: http://${SERVICE_NAME}-java
+      TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
+      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      REDIS_HOST: redis://${SERVICE_NAME}-redis-master
 
 #Enable for SYA
 sscs-tribunals-frontend:
