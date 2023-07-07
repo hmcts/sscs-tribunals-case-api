@@ -762,6 +762,15 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         assertThat(response.getErrors().isEmpty(), is(true));
     }
 
+    @Test
+    public void givenAnAppealWithNoScheduledHearing_thenDontProvideError() {
+
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("No").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().isEmpty(), is(true));
+    }
+
     private long getNumberOfExpectedError(PreSubmitCallbackResponse<SscsCaseData> response) {
         return response.getErrors().stream()
                 .filter(error -> error.equalsIgnoreCase("Invalid characters are being used at the beginning of address fields, please correct"))
