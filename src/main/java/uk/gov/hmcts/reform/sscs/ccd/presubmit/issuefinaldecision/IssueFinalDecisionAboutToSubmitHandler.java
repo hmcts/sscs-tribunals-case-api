@@ -104,16 +104,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         }
 
         if (isAdjournmentEnabled) {
-            if (!isPostHearingsEnabled) {
-                sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());
-            } else {
-                boolean isNotCorrection = isNoOrNull(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
-
-                if (isNotCorrection) {
-                    sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());
-                    sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionIdamSurname(sscsCaseData.getDocumentGeneration().getSignedBy());
-                }
-            }
+            sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());
         }
 
 

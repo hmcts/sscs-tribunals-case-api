@@ -179,22 +179,24 @@ public class PdfRequestUtil {
         if (isPostHearingsEnabled) {
             PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
 
-            switch (postHearingReviewType) {
-                case SET_ASIDE:
-                    return caseData.getDocumentGeneration().getBodyContent();
-                case CORRECTION:
-                    return caseData.getDocumentGeneration().getCorrectionBodyContent();
-                case STATEMENT_OF_REASONS:
-                    return caseData.getDocumentGeneration().getStatementOfReasonsBodyContent();
-                case LIBERTY_TO_APPLY:
-                    if (isPostHearingsBEnabled) {
-                        return caseData.getDocumentGeneration().getLibertyToApplyBodyContent();
-                    }
-                    throw new IllegalArgumentException("isPostHearingsBEnabled is false - Liberty to Apply is not available");
-                case PERMISSION_TO_APPEAL:
-                default:
-                    throw new IllegalArgumentException("getNoticeBody has unexpected postHearingReviewType: "
-                        + postHearingReviewType.getDescriptionEn());
+            if (nonNull(postHearingReviewType)) {
+                switch (postHearingReviewType) {
+                    case SET_ASIDE:
+                        return caseData.getDocumentGeneration().getBodyContent();
+                    case CORRECTION:
+                        return caseData.getDocumentGeneration().getCorrectionBodyContent();
+                    case STATEMENT_OF_REASONS:
+                        return caseData.getDocumentGeneration().getStatementOfReasonsBodyContent();
+                    case LIBERTY_TO_APPLY:
+                        if (isPostHearingsBEnabled) {
+                            return caseData.getDocumentGeneration().getLibertyToApplyBodyContent();
+                        }
+                        throw new IllegalArgumentException("isPostHearingsBEnabled is false - Liberty to Apply is not available");
+                    case PERMISSION_TO_APPEAL:
+                    default:
+                        throw new IllegalArgumentException("getNoticeBody has unexpected postHearingReviewType: "
+                                + postHearingReviewType.getDescriptionEn());
+                }
             }
         }
 

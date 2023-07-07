@@ -951,14 +951,30 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.CORRECTION);
-        sscsCaseData.getPostHearing().getCorrection().setAction(CorrectionActions.GRANT);
+        sscsCaseData.getPostHearing().getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
         sscsCaseData.getDocumentGeneration().setCorrectionBodyContent("test");
 
         service.preview(callback, DocumentType.CORRECTION_GRANTED, USER_AUTHORISATION, true, true, true);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
                 true, false, isDescriptorFlowSupported(), true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.CORRECTION_GRANTED));
+
+        assertEquals(LocalDate.now(), payload.getDateIssued());
+    }
+
+    @Test
+    public void givenPostHearingsIsFalse_thenShowIssuedDateOnDocument() {
+        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        setHigherRateScenarioFields(sscsCaseData);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.getPostHearing().getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
+        sscsCaseData.getDocumentGeneration().setCorrectionBodyContent("test");
+
+        service.preview(callback, DocumentType.CORRECTION_GRANTED, USER_AUTHORISATION, true, false, false);
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
+                true, false, isDescriptorFlowSupported(), true, false, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now(), payload.getDateIssued());
     }
