@@ -82,7 +82,7 @@ public class SscsHelper {
 
         if (excludeDates.isEmpty()) {
             // when the user select yes to unavailable dates, but does not add an entry.
-            listOfErrors.add("Add an start date for unavailable dates");
+            listOfErrors.add("Add a start date for unavailable dates");
             listOfErrors.add("Add an end date for unavailable dates");
         }
 
