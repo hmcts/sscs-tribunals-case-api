@@ -109,8 +109,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
     }
 
     private boolean hasValidHearingOptionsAndWantsToExcludeDates(OtherParty otherParty) {
-        return otherParty != null
-            && otherParty.getHearingOptions() != null
+        return otherParty.getHearingOptions() != null
             && YesNo.isYes(otherParty.getHearingOptions().getWantsToAttend())
             && YesNo.isYes(otherParty.getHearingOptions().getScheduleHearing());
     }

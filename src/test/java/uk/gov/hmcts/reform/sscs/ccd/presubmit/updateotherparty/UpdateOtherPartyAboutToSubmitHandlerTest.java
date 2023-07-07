@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_3;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_4;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -601,6 +602,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         String error1 = iterator.next();
         assertEquals("Start date must be before end date", error1);
     }
+
 
     private boolean isSscs5CaseValidated(List<CcdValue<OtherParty>> otherParties) {
         return emptyIfNull(otherParties).stream()
