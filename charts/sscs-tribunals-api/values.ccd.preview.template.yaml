@@ -623,7 +623,7 @@ sscs-ccd-callback-orchestrator:
 
 #Enable for MYA
 sscs-cor-frontend:
-  enabled: false
+  enabled: true
   nodejs:
     image: hmctspublic.azurecr.io/sscs-cor/frontend:latest
     ingressHost: mya-${SERVICE_FQDN}
@@ -640,6 +640,14 @@ sscs-cor-frontend:
       TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
       S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       REDIS_HOST: redis://${SERVICE_NAME}-redis-master
+      REDIS_PORT: 6379
+      NODE_ENV: preview
+    keyVaults:
+      sscs:
+        secrets:
+          - sscs-cor-idam-client-secret
+          - idam-sscs-oauth2-client-secret
+          - sscs-s2s-secret
 
 #Enable for SYA
 sscs-tribunals-frontend:
