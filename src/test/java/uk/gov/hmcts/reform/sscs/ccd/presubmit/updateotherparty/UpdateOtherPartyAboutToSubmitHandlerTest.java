@@ -472,7 +472,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         Iterator<String> iterator = response.getErrors().iterator();
         String error1 = iterator.next();
         String error2 = iterator.next();
-        assertEquals("Add an start date for unavailable dates", error1);
+        assertEquals("Add a start date for unavailable dates", error1);
         assertEquals("Add an end date for unavailable dates", error2);
     }
 
@@ -505,7 +505,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         Iterator<String> iterator = response.getErrors().iterator();
         String error1 = iterator.next();
         String error2 = iterator.next();
-        assertEquals("Add an start date for unavailable dates", error1);
+        assertEquals("Add a start date for unavailable dates", error1);
         assertEquals("Add an end date for unavailable dates", error2);
     }
 
@@ -537,7 +537,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
 
         Iterator<String> iterator = response.getErrors().iterator();
         String error1 = iterator.next();
-        assertEquals("Add an start date for unavailable dates", error1);
+        assertEquals("Add a start date for unavailable dates", error1);
     }
 
     @Test

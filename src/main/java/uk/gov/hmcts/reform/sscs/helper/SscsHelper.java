@@ -60,7 +60,7 @@ public class SscsHelper {
         boolean isEndDateEmpty = StringUtils.isEmpty(excludeDate.getValue().getEnd());
 
         if (isStartDateEmpty) {
-            listOfErrors.add("Add an start date for unavailable dates");
+            listOfErrors.add("Add a start date for unavailable dates");
         }
         if (isEndDateEmpty) {
             listOfErrors.add("Add an end date for unavailable dates");

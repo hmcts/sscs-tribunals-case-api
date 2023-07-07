@@ -725,7 +725,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getErrors().iterator().next(), is("Add a end date for unavailable dates"));
+        assertThat(response.getErrors().iterator().next(), is("Add an end date for unavailable dates"));
     }
 
     @Test
