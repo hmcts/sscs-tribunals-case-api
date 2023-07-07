@@ -626,6 +626,7 @@ sscs-cor-frontend:
   enabled: true
   nodejs:
     image: hmctspublic.azurecr.io/sscs-cor/frontend:latest
+    releaseNameOverride: ${SERVICE_NAME}-sscs-cor-frontend
     ingressHost: mya-${SERVICE_FQDN}
     environment:
       ADDITIONAL_EVIDENCE_FEATURE_FLAG: "true"
@@ -654,6 +655,7 @@ sscs-tribunals-frontend:
   enabled: true
   nodejs:
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:prod-32cbe82-20220825134712
+    releaseNameOverride: ${SERVICE_NAME}-sscs-tribunals-frontend
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
