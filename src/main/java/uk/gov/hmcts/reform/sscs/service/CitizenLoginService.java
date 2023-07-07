@@ -54,10 +54,8 @@ public class CitizenLoginService {
 
     public List<OnlineHearing> findCasesForCitizen(IdamTokens idamTokens, String tya) {
         log.info(format("Find case: Searching for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
-        List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens);
-        List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
-                .map(sscsCcdConvertService::getCaseDetails)
-                .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
+        List<SscsCaseDetails> sscsCaseDetails = citizenCcdService.findCasesBySubscriptionEmail(idamTokens.getEmail(), idamService.getIdamTokens()).stream()
+                .filter(casesWithSubscriptionMatchingEmailWithTya(idamTokens.getEmail()))
                 .collect(toList());
         if (!isBlank(tya)) {
             log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
@@ -165,10 +163,21 @@ public class CitizenLoginService {
             final Stream<Subscription> otherPartySubscriptionStream = emptyIfNull(sscsCaseDetails.getData().getOtherParties()).stream()
                     .map(CcdValue::getValue)
                     .flatMap(op -> of(op.getOtherPartySubscription(), op.getOtherPartyAppointeeSubscription(), op.getOtherPartyRepresentativeSubscription()));
-
-
-            return concat(of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription()), otherPartySubscriptionStream)
+            return concat(of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription(), subscriptions.getJointPartySubscription()),
+                    otherPartySubscriptionStream)
                     .anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()));
+        };
+    }
+
+    private Predicate<SscsCaseDetails> casesWithSubscriptionMatchingEmailWithTya(String email) {
+        return sscsCaseDetails -> {
+            Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
+            final Stream<Subscription> otherPartySubscriptionStream = emptyIfNull(sscsCaseDetails.getData().getOtherParties()).stream()
+                    .map(CcdValue::getValue)
+                    .flatMap(op -> of(op.getOtherPartySubscription(), op.getOtherPartyAppointeeSubscription(), op.getOtherPartyRepresentativeSubscription()));
+            return concat(of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription(), subscriptions.getJointPartySubscription()),
+                    otherPartySubscriptionStream)
+                    .anyMatch(subscription -> subscription != null && subscription.getTya() != null && email.equals(subscription.getEmail()));
         };
     }
 
