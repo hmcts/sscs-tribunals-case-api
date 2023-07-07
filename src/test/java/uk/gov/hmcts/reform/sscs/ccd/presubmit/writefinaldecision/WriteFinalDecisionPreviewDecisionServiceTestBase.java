@@ -10,6 +10,8 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase.NoticeType.CORRECTED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase.NoticeType.DRAFT;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -358,7 +360,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, DRAFT, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -394,7 +396,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, DRAFT, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -430,7 +432,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, DRAFT, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -464,7 +466,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, DRAFT, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -499,7 +501,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, DRAFT, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -523,7 +525,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         assertTrue(response.getErrors().isEmpty());
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            true, true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, DRAFT, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -548,7 +550,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         assertTrue(response.getErrors().isEmpty());
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true,  true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true,  DRAFT, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -586,7 +588,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null,
-            "2018-10-10", true, true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            "2018-10-10", true, true, DRAFT, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -623,7 +625,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null,
-            "2018-10-10", true, true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            "2018-10-10", true, true, DRAFT, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -654,7 +656,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, DRAFT, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -689,7 +691,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .documentUrl(URL)
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, DRAFT,
             isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
@@ -721,7 +723,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, DRAFT, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -752,7 +754,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null,
-            "2018-10-10", true,true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            "2018-10-10", true,true, DRAFT, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -830,7 +832,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             .build(), response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            true,true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true,true, DRAFT, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
 
@@ -854,7 +856,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname", null,
-            "2018-10-10", true, true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            "2018-10-10", true, true, DRAFT, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
     }
 
     protected abstract void setDescriptorFlowIndicator(String value, SscsCaseData sscsCaseData);
@@ -884,7 +886,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", "Appointee Surname", "2018-10-10", true,
-            true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, DRAFT, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
     }
 
     @Test
@@ -897,7 +899,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, DRAFT, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now(), payload.getDateIssued());
     }
@@ -912,7 +914,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, DRAFT,
             isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
@@ -938,7 +940,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",  true, true, true,
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",  true, true, DRAFT,
             false, true, documentConfiguration.getDocuments().get(LanguagePreference.WELSH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
@@ -946,14 +948,23 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
     protected abstract boolean isDescriptorFlowSupported();
 
-    protected NoticeIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String expectedAppointeeName, String dateOfDecision, boolean allowed, boolean isSetAside, boolean isDraft,
+    public enum NoticeType {
+        CORRECTED,
+        DECISION,
+        DRAFT
+    }
+
+    protected NoticeIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String expectedAppointeeName,
+        String dateOfDecision, boolean allowed, boolean isSetAside, NoticeType noticeType,
         boolean isDescriptorFlow, boolean isGenerateFile, String templateId) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         GenerateFileParams generateFileParams = capture.getValue();
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) generateFileParams.getFormPayload();
         assertEquals(image, payload.getImage());
-        if (isDraft) {
+        if (DRAFT.equals(noticeType)) {
             assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
+        } else if (CORRECTED.equals(noticeType)) {
+            assertEquals("CORRECTED DECISION NOTICE", payload.getNoticeType());
         } else {
             assertEquals("DECISION NOTICE", payload.getNoticeType());
         }

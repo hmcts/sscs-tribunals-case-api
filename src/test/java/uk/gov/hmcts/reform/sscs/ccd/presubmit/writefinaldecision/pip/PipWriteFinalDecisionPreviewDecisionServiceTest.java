@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase.NoticeType.DECISION;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase.NoticeType.DRAFT;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -142,7 +144,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true, false, true,
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, DRAFT, false, true,
             documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
@@ -159,7 +161,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, DRAFT,
             true, false, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
@@ -176,7 +178,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, DRAFT,
             false, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
@@ -209,7 +211,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = appealAllowedExpectation;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, false, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(
+            appealAllowedExpectation, setAsideExpectation, DRAFT, true, false, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(
                 EventType.ISSUE_FINAL_DECISION));
 
         assertEquals("Judge Full Name", payload.getUserName());
@@ -259,7 +261,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = appealAllowedExpectation;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, false, false,
+            appealAllowedExpectation, setAsideExpectation, DRAFT, false, false,
             documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals("Judge Full Name", payload.getUserName());
@@ -329,7 +331,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
                 !"same".equalsIgnoreCase(comparission));
 
             NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-                appealAllowedExpectation, setAsideExpectation, true, true, true,
+                appealAllowedExpectation, setAsideExpectation, DRAFT, true, true,
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
             assertEquals("Judge Full Name", payload.getUserName());
@@ -418,7 +420,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
                 !"same".equalsIgnoreCase(comparission));
 
             NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-                appealAllowedExpectation, setAsideExpectation, true, true, true,
+                appealAllowedExpectation, setAsideExpectation, DRAFT, true, true,
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
             assertEquals("Judge Full Name", payload.getUserName());
@@ -509,7 +511,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
                 !"same".equalsIgnoreCase(comparission));
 
             NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-                appealAllowedExpectation, setAsideExpectation, false,
+                appealAllowedExpectation, setAsideExpectation, DECISION,
                 true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
             assertEquals("Judge Full Name", payload.getUserName());
@@ -598,7 +600,7 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true,
+            appealAllowedExpectation, setAsideExpectation, DRAFT, true, true,
             documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals("Judge Full Name", payload.getUserName());
