@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.ccd.service.SearchCcdCaseService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
@@ -43,13 +42,10 @@ public class CitizenCcdServiceTest {
     @Mock
     private CcdService ccdService;
 
-    @Mock
-    private SearchCcdCaseService searchCcdCaseService;
-
     @Before
     public void setup() {
         openMocks(this);
-        citizenCcdService = new CitizenCcdService(citizenCcdClient, sscsCcdConvertService, ccdService, searchCcdCaseService);
+        citizenCcdService = new CitizenCcdService(citizenCcdClient, sscsCcdConvertService, ccdService);
     }
 
     @Test
@@ -197,29 +193,5 @@ public class CitizenCcdServiceTest {
         citizenCcdService.associateCaseToCitizen(IDAM_TOKENS, caseId, IDAM_TOKENS);
 
         verify(citizenCcdClient).addUserToCase(eq(IDAM_TOKENS), eq(IDAM_TOKENS.getUserId()), eq(caseId));
-    }
-
-    @Test
-    public void shouldFindCasesBySubscriptionEmail() {
-        SscsCaseData caseData = SscsCaseData.builder().build();
-        SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(caseData).build();
-        when(searchCcdCaseService.findCaseBySearchCriteria(any(), eq(IDAM_TOKENS))).thenReturn(List.of(caseDetails));
-
-        List<SscsCaseDetails> cases = citizenCcdService.findCasesBySubscriptionEmail("test@test.com", IDAM_TOKENS);
-
-        assertEquals(1, cases.size());
-        assertEquals(caseDetails, cases.get(0));
-    }
-
-    @Test
-    public void shouldFilterOutDraftCases() {
-        SscsCaseData caseData = SscsCaseData.builder().build();
-        SscsCaseDetails caseDetails1 = SscsCaseDetails.builder().state(State.DRAFT.getId()).data(caseData).build();
-        SscsCaseDetails caseDetails2 = SscsCaseDetails.builder().state(State.DRAFT_ARCHIVED.getId()).data(caseData).build();
-        when(searchCcdCaseService.findCaseBySearchCriteria(any(), eq(IDAM_TOKENS))).thenReturn(List.of(caseDetails1, caseDetails2));
-
-        List<SscsCaseDetails> cases = citizenCcdService.findCasesBySubscriptionEmail("test@test.com", IDAM_TOKENS);
-
-        assertEquals(0, cases.size());
     }
 }
