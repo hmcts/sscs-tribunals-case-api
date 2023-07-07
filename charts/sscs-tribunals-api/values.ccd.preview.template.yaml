@@ -623,7 +623,7 @@ sscs-ccd-callback-orchestrator:
 
 #Enable for MYA
 sscs-cor-frontend:
-  enabled: true
+  enabled: false
   nodejs:
     image: hmctspublic.azurecr.io/sscs-cor/frontend:latest
     ingressHost: mya-${SERVICE_FQDN}
