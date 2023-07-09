@@ -61,7 +61,7 @@ public class CitizenLoginService {
                 .collect(toList());
         for (SscsCaseDetails sscsCaseDetailsItem: sscsCaseDetails) {
             if (sscsCaseDetailsItem != null) {
-                log.info("Found case [%d] for user [%s]", sscsCaseDetailsItem.getId(), idamTokens.getUserId());
+                log.info(format("Found case [%d] for user [%s]", sscsCaseDetailsItem.getId(), idamTokens.getUserId()));
             }
         }
         List<SscsCaseDetails> sscsCaseDetailsByEmail = citizenCcdService.findCasesBySubscriptionEmail(idamTokens.getEmail(), idamService.getIdamTokens()).stream()
@@ -69,7 +69,7 @@ public class CitizenLoginService {
                 .collect(toList());
         for (SscsCaseDetails sscsCaseDetailsItem: sscsCaseDetailsByEmail) {
             if (sscsCaseDetailsItem != null) {
-                log.info("Found case [%d] for user [%s] by email", sscsCaseDetailsItem.getId(), idamTokens.getUserId());
+                log.info(format("Found case [%d] for user [%s] by email", sscsCaseDetailsItem.getId(), idamTokens.getUserId()));
             }
         }
         if (!isBlank(tya)) {
