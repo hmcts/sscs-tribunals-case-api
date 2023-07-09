@@ -90,7 +90,7 @@ public class CitizenLoginService {
                 log.info(format("Found replacement case [%d]", sscsCaseDetails.getId()));
                 return caseDetails.get(0);
             } else {
-                log.info(format("Returning original case [%d]", sscsCaseDetails.getId()));
+                log.info(format("Returning original case [%d] with caseDetails size [%d]", sscsCaseDetails.getId(), caseDetails.size()));
                 return sscsCaseDetails;
             }
         } else {
