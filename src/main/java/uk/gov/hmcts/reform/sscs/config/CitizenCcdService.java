@@ -69,7 +69,7 @@ public class CitizenCcdService {
 
     public List<SscsCaseDetails> findCasesByCaseId(long caseId, IdamTokens idamTokens) {
         try {
-            return getCasesBySubscriptionEmail(caseId, idamTokens);
+            return getCasesByCaseId(caseId, idamTokens);
         } catch (Exception ex) {
             throw logCcdException(ERROR_WHILE_GETTING_CASE_FROM_CCD, ex);
         }
@@ -89,7 +89,7 @@ public class CitizenCcdService {
         return ccdException;
     }
 
-    private List<SscsCaseDetails> getCasesBySubscriptionEmail(long caseId, IdamTokens idamTokens) {
+    private List<SscsCaseDetails> getCasesByCaseId(long caseId, IdamTokens idamTokens) {
         SearchSourceBuilder searchBuilder = findCasesByCaseId(caseId);
 
         List<SscsCaseDetails> caseDetailsList = searchCcdCaseService.findCaseBySearchCriteria(searchBuilder.toString(), idamTokens);

@@ -85,7 +85,7 @@ public class CitizenLoginService {
 
     private SscsCaseDetails getCaseByCcdCaseId(SscsCaseDetails sscsCaseDetails) {
         if (sscsCaseDetails != null && sscsCaseDetails.getId() != null) {
-            List<SscsCaseDetails> caseDetails = citizenCcdService.findCasesByCaseId(sscsCaseDetails.getId(), idamService.getIdamTokens());
+            List<SscsCaseDetails> caseDetails = ccdService.findCaseBy("data.ccdCaseId", String.valueOf(sscsCaseDetails.getId()), idamService.getIdamTokens());
             if (caseDetails != null && caseDetails.size() == 1 && caseDetails.get(0) != null) {
                 log.info(format("Found replacement case [%d]", sscsCaseDetails.getId()));
                 return caseDetails.get(0);

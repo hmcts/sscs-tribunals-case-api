@@ -90,8 +90,8 @@ public class CitizenLoginServiceTest {
         when(onlineHearingService.loadHearing(sscsCaseDetails1, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing1));
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
         when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
-        when(citizenCcdService.findCasesByCaseId(eq(111L), any())).thenReturn(List.of(sscsCaseDetails1));
-        when(citizenCcdService.findCasesByCaseId(eq(222L), any())).thenReturn(List.of(sscsCaseDetails2));
+        when(ccdService.findCaseBy(eq("data.ccdCaseId"), eq("111"), any())).thenReturn(List.of(sscsCaseDetails1));
+        when(ccdService.findCaseBy(eq("data.ccdCaseId"), eq("222"), any())).thenReturn(List.of(sscsCaseDetails2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
 
