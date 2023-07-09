@@ -89,8 +89,10 @@ public class CitizenLoginServiceTest {
         when(onlineHearingService.loadHearing(sscsCaseDetails1, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing1));
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
         when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
+        when(citizenCcdService.findCasesBySubscriptionEmail(any(), any())).thenReturn(List.of(sscsCaseDetails1, sscsCaseDetails2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
+
 
         verify(sscsCcdConvertService, times(2)).getCaseDetails(any(CaseDetails.class));
         assertThat(casesForCitizen, is(asList(onlineHearing1, onlineHearing2)));
