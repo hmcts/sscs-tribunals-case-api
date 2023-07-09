@@ -194,18 +194,6 @@ public class CitizenLoginService {
         };
     }
 
-    private Predicate<SscsCaseDetails> casesWithSubscriptionMatchingEmailWithTya(String email) {
-        return sscsCaseDetails -> {
-            Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
-            final Stream<Subscription> otherPartySubscriptionStream = emptyIfNull(sscsCaseDetails.getData().getOtherParties()).stream()
-                    .map(CcdValue::getValue)
-                    .flatMap(op -> of(op.getOtherPartySubscription(), op.getOtherPartyAppointeeSubscription(), op.getOtherPartyRepresentativeSubscription()));
-            return concat(of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription(), subscriptions.getJointPartySubscription()),
-                    otherPartySubscriptionStream)
-                    .anyMatch(subscription -> subscription != null && subscription.getTya() != null && email.equals(subscription.getEmail()));
-        };
-    }
-
     private boolean caseHasSubscriptionWithTyaAndEmail(SscsCaseDetails sscsCaseDetails, String tya, String email) {
         Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
 
