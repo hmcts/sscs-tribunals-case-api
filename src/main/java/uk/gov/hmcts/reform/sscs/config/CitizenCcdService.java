@@ -67,25 +67,19 @@ public class CitizenCcdService {
         return citizenCcdClient.searchForCitizenAllCases(idamTokens);
     }
 
-    public List<SscsCaseDetails> findCasesBySubscriptionEmail(String email, IdamTokens idamTokens) {
+    public List<SscsCaseDetails> findCasesByCaseId(long caseId, IdamTokens idamTokens) {
         try {
-            return getCasesBySubscriptionEmail(email, idamTokens);
+            return getCasesBySubscriptionEmail(caseId, idamTokens);
         } catch (Exception ex) {
             throw logCcdException(ERROR_WHILE_GETTING_CASE_FROM_CCD, ex);
         }
     }
 
-    public static SearchSourceBuilder findCasesBySubscriptionEmail(String email) {
+    public static SearchSourceBuilder findCasesByCaseId(long caseId) {
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
         searchBuilder.query(QueryBuilders
                 .boolQuery()
-                .should(matchQuery("data.subscriptions.appellantSubscription.email", email))
-                .should(matchQuery("data.subscriptions.appointeeSubscription.email", email))
-                .should(matchQuery("data.subscriptions.representativeSubscription.email", email))
-                .should(matchQuery("data.subscriptions.jointPartySubscription.email", email))
-                .should(matchQuery("data.otherParties.value.otherPartySubscription.email", email))
-                .should(matchQuery("data.otherParties.value.otherPartyAppointeeSubscription.email", email))
-                .should(matchQuery("data.otherParties.value.otherPartyRepresentativeSubscription.email", email)));
+                .must(matchQuery("data.ccdCaseId", String.valueOf(caseId))));
         return searchBuilder;
     }
 
@@ -95,8 +89,8 @@ public class CitizenCcdService {
         return ccdException;
     }
 
-    private List<SscsCaseDetails> getCasesBySubscriptionEmail(String email, IdamTokens idamTokens) {
-        SearchSourceBuilder searchBuilder = findCasesBySubscriptionEmail(email);
+    private List<SscsCaseDetails> getCasesBySubscriptionEmail(long caseId, IdamTokens idamTokens) {
+        SearchSourceBuilder searchBuilder = findCasesByCaseId(caseId);
 
         List<SscsCaseDetails> caseDetailsList = searchCcdCaseService.findCaseBySearchCriteria(searchBuilder.toString(), idamTokens);
 

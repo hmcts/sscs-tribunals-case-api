@@ -58,18 +58,11 @@ public class CitizenLoginService {
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
+                .map(this::getCaseByCcdCaseId)
                 .collect(toList());
         for (SscsCaseDetails sscsCaseDetailsItem: sscsCaseDetails) {
             if (sscsCaseDetailsItem != null) {
                 log.info(format("Found case [%d] for user [%s]", sscsCaseDetailsItem.getId(), idamTokens.getUserId()));
-            }
-        }
-        List<SscsCaseDetails> sscsCaseDetailsByEmail = citizenCcdService.findCasesBySubscriptionEmail(idamTokens.getEmail(), idamService.getIdamTokens()).stream()
-                .filter(casesWithSubscriptionMatchingEmailWithTya(idamTokens.getEmail()))
-                .collect(toList());
-        for (SscsCaseDetails sscsCaseDetailsItem: sscsCaseDetailsByEmail) {
-            if (sscsCaseDetailsItem != null) {
-                log.info(format("Found case [%d] for user [%s] by email", sscsCaseDetailsItem.getId(), idamTokens.getUserId()));
             }
         }
         if (!isBlank(tya)) {
@@ -89,6 +82,22 @@ public class CitizenLoginService {
         List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
         log.info(format("Found [%s] cases without tya for user [%s]", convert.size(), idamTokens.getUserId()));
         return convert;
+    }
+
+    private SscsCaseDetails getCaseByCcdCaseId(SscsCaseDetails sscsCaseDetails) {
+        if (sscsCaseDetails != null && sscsCaseDetails.getId() != null) {
+            List<SscsCaseDetails> caseDetails = citizenCcdService.findCasesByCaseId(sscsCaseDetails.getId(), idamService.getIdamTokens());
+            if (caseDetails != null && caseDetails.size() == 1 && caseDetails.get(0) != null) {
+                log.info(format("Found replacement case [%d]", sscsCaseDetails.getId()));
+                return caseDetails.get(0);
+            } else {
+                log.info(format("Returning original case [%d]", sscsCaseDetails.getId()));
+                return sscsCaseDetails;
+            }
+        } else {
+            log.info("Returning original case");
+            return sscsCaseDetails;
+        }
     }
 
     public List<OnlineHearing> findActiveCasesForCitizen(IdamTokens idamTokens) {
