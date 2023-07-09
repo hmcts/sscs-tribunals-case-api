@@ -53,9 +53,24 @@ public class CitizenLoginService {
 
     public List<OnlineHearing> findCasesForCitizen(IdamTokens idamTokens, String tya) {
         log.info(format("Find case: Searching for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
-        List<SscsCaseDetails> sscsCaseDetails = citizenCcdService.findCasesBySubscriptionEmail(idamTokens.getEmail(), idamService.getIdamTokens()).stream()
+        List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens);
+        List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
+                .map(sscsCcdConvertService::getCaseDetails)
+                .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
+                .collect(toList());
+        for (SscsCaseDetails sscsCaseDetailsItem: sscsCaseDetails) {
+            if (sscsCaseDetailsItem != null) {
+                log.info(format("Found case [%d] for user [%s]", sscsCaseDetailsItem.getId(), idamTokens.getUserId()));
+            }
+        }
+        List<SscsCaseDetails> sscsCaseDetailsByEmail = citizenCcdService.findCasesBySubscriptionEmail(idamTokens.getEmail(), idamService.getIdamTokens()).stream()
                 .filter(casesWithSubscriptionMatchingEmailWithTya(idamTokens.getEmail()))
-                .toList();
+                .collect(toList());
+        for (SscsCaseDetails sscsCaseDetailsItem: sscsCaseDetailsByEmail) {
+            if (sscsCaseDetailsItem != null) {
+                log.info(format("Found case [%d] for user [%s] by email", sscsCaseDetailsItem.getId(), idamTokens.getUserId()));
+            }
+        }
         if (!isBlank(tya)) {
             log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
             List<OnlineHearing> convert = convert(
