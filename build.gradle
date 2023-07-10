@@ -260,7 +260,7 @@ dependencyManagement {
         }
 
         // CVE-2022-41881, CVE-2022-41915
-        dependencySet(group: 'io.netty', version: '4.1.92.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.94.Final') {
             entry 'netty-buffer'
             entry 'netty-common'
             entry 'netty-codec'
@@ -305,7 +305,7 @@ dependencies {
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.4'
 
-    implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '32.0.1-jre'
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.10'
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
@@ -328,7 +328,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.26.0'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.26.2'
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.4'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.39.0'
@@ -339,9 +339,9 @@ dependencies {
     implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.4'
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.2'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.3'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.2'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.3'
 
     implementation group:'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.8.0'
