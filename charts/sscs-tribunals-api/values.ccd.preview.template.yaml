@@ -572,7 +572,7 @@ sscs-tya-notif:
     environment:
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
       SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
-      TOPIC_NAME: "${SERVICE_NAME}-servicebus-tya"
+      TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       AMQP_USERNAME: "RootManageSharedAccessKey"
       JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
