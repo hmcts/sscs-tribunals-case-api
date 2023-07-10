@@ -635,7 +635,7 @@ sscs-cor-frontend:
       MEDIA_FILES_ALLOWED_ENABLED: "true"
       ALLOW_COOKIE_BANNER_ENABLED: "true"
       REQUEST_TAB_ENABLED: "true"
-      IDAM_URL: https://idam-web-public.aat.platform.hmcts.net/login
+      IDAM_URL: https://idam-web-public.aat.platform.hmcts.net/
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       SSCS_API_URL: http://${SERVICE_NAME}-java
       TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
@@ -659,6 +659,7 @@ sscs-tribunals-frontend:
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
+      REDIS_PORT: 6379
       APPINSIGHTS_ROLE_NAME: ${SERVICE_NAME}
       PCQ_URL: "https://pcq.aat.platform.hmcts.net"
       FT_ANTENNA_WEBCHAT: false
