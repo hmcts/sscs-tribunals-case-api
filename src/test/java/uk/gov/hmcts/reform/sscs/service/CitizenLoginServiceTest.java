@@ -75,13 +75,15 @@ public class CitizenLoginServiceTest {
         SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).data(SscsCaseData.builder()
                 .subscriptions(Subscriptions.builder()
                         .appellantSubscription(Subscription.builder()
-                                .tya("someTya")
                             .email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build()).build()).build();
         SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).data(SscsCaseData.builder()
                 .subscriptions(Subscriptions.builder()
                         .appellantSubscription(Subscription.builder()
                                 .email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build()).build()).build();
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
+        when(citizenCcdService.findCasesBySubscriptionEmail(SUBSCRIPTION_EMAIL_ADDRESS, serviceIdamTokens)).thenReturn(
+                List.of(sscsCaseDetails1, sscsCaseDetails2)
+        );
         when(case1.getState()).thenReturn(State.READY_TO_LIST.getId());
         when(case2.getState()).thenReturn(State.APPEAL_CREATED.getId());
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
@@ -90,11 +92,8 @@ public class CitizenLoginServiceTest {
         when(onlineHearingService.loadHearing(sscsCaseDetails1, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing1));
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
         when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
-        when(ccdService.findCaseBy(eq("data.ccdCaseId"), eq("111"), any())).thenReturn(List.of(sscsCaseDetails1));
-        when(ccdService.findCaseBy(eq("data.ccdCaseId"), eq("222"), any())).thenReturn(List.of(sscsCaseDetails2));
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, null);
-
 
         verify(sscsCcdConvertService, times(2)).getCaseDetails(any(CaseDetails.class));
         assertThat(casesForCitizen, is(asList(onlineHearing1, onlineHearing2)));
@@ -105,10 +104,12 @@ public class CitizenLoginServiceTest {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
+        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).build();
         SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
         when(case1.getState()).thenReturn(State.DRAFT.getId());
         when(case2.getState()).thenReturn(State.APPEAL_CREATED.getId());
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
+        when(sscsCcdConvertService.getCaseDetails(eq(case1))).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
         when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
@@ -124,10 +125,12 @@ public class CitizenLoginServiceTest {
         List<CaseDetails> caseDetails = new ArrayList<>();
         caseDetails.add(case1);
         caseDetails.add(case2);
+        SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).build();
         SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
         when(case1.getState()).thenReturn(State.DRAFT_ARCHIVED.getId());
         when(case2.getState()).thenReturn(State.READY_TO_LIST.getId());
         when(citizenCcdService.searchForCitizenAllCases(citizenIdamTokens)).thenReturn(caseDetails);
+        when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetails1);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
         when(onlineHearingService.loadHearing(sscsCaseDetails2, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing2));
