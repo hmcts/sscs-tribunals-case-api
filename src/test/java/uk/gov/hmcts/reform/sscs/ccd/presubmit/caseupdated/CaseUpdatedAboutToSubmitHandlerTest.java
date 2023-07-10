@@ -82,7 +82,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseDataBefore;
 
-    private Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
+    private Appeal appeal;
 
     @Before
     public void setUp() {
@@ -137,6 +137,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
             .roles(List.of(SUPER_USER.getValue()))
             .build());
+
+        appeal = callback.getCaseDetails().getCaseData().getAppeal();
     }
 
     @Test
