@@ -54,16 +54,12 @@ public class CitizenLoginService {
     public List<OnlineHearing> findCasesForCitizen(IdamTokens idamTokens, String tya) {
         log.info(format("Find case: Searching for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
         List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens);
+        List<SscsCaseDetails> sscsCaseDetailsBySubscriptionEmail = citizenCcdService.findCasesBySubscriptionEmail(idamTokens.getEmail(), idamService.getIdamTokens());
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
-                .map(this::getCaseByCcdCaseId)
+                .peek(sscsCaseDetailsItem -> attachOtherPartyDetails(sscsCaseDetailsItem, sscsCaseDetailsBySubscriptionEmail))
                 .collect(toList());
-        for (SscsCaseDetails sscsCaseDetailsItem: sscsCaseDetails) {
-            if (sscsCaseDetailsItem != null) {
-                log.info(format("Found case [%d] for user [%s]", sscsCaseDetailsItem.getId(), idamTokens.getUserId()));
-            }
-        }
         if (!isBlank(tya)) {
             log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
             List<OnlineHearing> convert = convert(
@@ -83,20 +79,14 @@ public class CitizenLoginService {
         return convert;
     }
 
-    private SscsCaseDetails getCaseByCcdCaseId(SscsCaseDetails sscsCaseDetails) {
-        if (sscsCaseDetails != null && sscsCaseDetails.getId() != null) {
-            List<SscsCaseDetails> caseDetails = ccdService.findCaseBy("data.ccdCaseId", String.valueOf(sscsCaseDetails.getId()), idamService.getIdamTokens());
-            if (caseDetails != null && caseDetails.size() == 1 && caseDetails.get(0) != null) {
-                log.info(format("Found replacement case [%d]", sscsCaseDetails.getId()));
-                return caseDetails.get(0);
-            } else {
-                log.info(format("Returning original case [%d] with caseDetails size [%d]", sscsCaseDetails.getId(), caseDetails.size()));
-                return sscsCaseDetails;
-            }
-        } else {
-            log.info("Returning original case");
-            return sscsCaseDetails;
-        }
+    private void attachOtherPartyDetails(SscsCaseDetails sscsCaseDetailsItem, List<SscsCaseDetails> sscsCaseDetailsBySubscriptionEmail) {
+        sscsCaseDetailsBySubscriptionEmail.stream()
+                .filter(sscsCaseDetails -> sscsCaseDetails.getId() != null && sscsCaseDetails.getId().equals(sscsCaseDetailsItem.getId()))
+                .findFirst()
+                .ifPresentOrElse(sscsCaseDetails -> {
+                    log.info(format("Setting other parties for case [%d]", sscsCaseDetails.getId()));
+                    sscsCaseDetailsItem.getData().setOtherParties(sscsCaseDetails.getData().getOtherParties());
+                }, () -> log.info(format("Found no matching case with other parties for case [%d]", sscsCaseDetailsItem.getId())));
     }
 
     public List<OnlineHearing> findActiveCasesForCitizen(IdamTokens idamTokens) {
