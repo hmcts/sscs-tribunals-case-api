@@ -56,6 +56,10 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
+    private Appeal appeal = Appeal.builder()
+            .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+            .build();
+
     @Before
     public void setUp() {
         openMocks(this);
@@ -455,10 +459,6 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         otherParty2.getValue().setRole(Role.builder().name("PayingParent").build());
         otherParty3.getValue().setRole(Role.builder().name("Other").build());
 
-        Appeal appeal = Appeal.builder()
-            .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-            .build();
-
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .appeal(appeal)
             .otherParties(Arrays.asList(otherParty1, otherParty2, otherParty3)).build();
@@ -487,10 +487,6 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         ExcludeDate excludeDate3 = ExcludeDate.builder().value(DateRange.builder().start("2023-01-01").end("2023-01-02").build()).build();
 
         otherParty.getValue().getHearingOptions().setExcludeDates(List.of(excludeDate1, excludeDate2, excludeDate3));
-
-        Appeal appeal = Appeal.builder()
-            .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-            .build();
 
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .appeal(appeal)
@@ -521,10 +517,6 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
 
         otherParty.getValue().getHearingOptions().setExcludeDates(List.of(excludeDate1, excludeDate2, excludeDate3));
 
-        Appeal appeal = Appeal.builder()
-            .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-            .build();
-
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .appeal(appeal)
             .otherParties(List.of(otherParty)).build();
@@ -551,10 +543,6 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         ExcludeDate excludeDate3 = ExcludeDate.builder().value(DateRange.builder().start("2023-03-01").end("2023-04-02").build()).build();
 
         otherParty.getValue().getHearingOptions().setExcludeDates(List.of(excludeDate1, excludeDate2, excludeDate3));
-
-        Appeal appeal = Appeal.builder()
-            .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-            .build();
 
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .appeal(appeal)
@@ -583,9 +571,6 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
 
         otherParty.getValue().getHearingOptions().setExcludeDates(List.of(excludeDate1, excludeDate2, excludeDate3));
 
-        Appeal appeal = Appeal.builder()
-            .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
-            .build();
 
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .appeal(appeal)

@@ -82,6 +82,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseDataBefore;
 
+    private Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
+
     @Before
     public void setUp() {
         openMocks(this);
@@ -687,8 +689,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                         .end("2023-05-18")
                         .build()).build()));
 
-        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("Yes").build());
-        callback.getCaseDetails().getCaseData().getAppeal().getHearingOptions().setExcludeDates(excludeDate);
+        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("Yes").build());
+        appeal.getHearingOptions().setExcludeDates(excludeDate);
 
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -703,8 +705,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                         .end("2023-05-17")
                         .build()).build()));
 
-        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("Yes").build());
-        callback.getCaseDetails().getCaseData().getAppeal().getHearingOptions().setExcludeDates(excludeDate);
+        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("Yes").build());
+        appeal.getHearingOptions().setExcludeDates(excludeDate);
 
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -720,8 +722,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                         .end(null)
                         .build()).build()));
 
-        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("Yes").build());
-        callback.getCaseDetails().getCaseData().getAppeal().getHearingOptions().setExcludeDates(excludeDate);
+        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("Yes").build());
+        appeal.getHearingOptions().setExcludeDates(excludeDate);
 
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -737,8 +739,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                         .end(null)
                         .build()).build()));
 
-        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("Yes").build());
-        callback.getCaseDetails().getCaseData().getAppeal().getHearingOptions().setExcludeDates(excludeDate);
+        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("Yes").build());
+        appeal.getHearingOptions().setExcludeDates(excludeDate);
 
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -754,8 +756,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                         .end("2023-06-19")
                         .build()).build()));
 
-        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("Yes").build());
-        callback.getCaseDetails().getCaseData().getAppeal().getHearingOptions().setExcludeDates(excludeDate);
+        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("Yes").build());
+        appeal.getHearingOptions().setExcludeDates(excludeDate);
 
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -765,7 +767,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Test
     public void givenAnAppealWithNoScheduledHearing_thenDontProvideError() {
 
-        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("No").build());
+        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("No").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().isEmpty(), is(true));
