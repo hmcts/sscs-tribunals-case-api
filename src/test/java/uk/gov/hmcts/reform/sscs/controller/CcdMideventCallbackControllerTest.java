@@ -41,6 +41,7 @@ import org.springframework.http.converter.support.AllEncompassingFormHttpMessage
 import org.springframework.http.converter.xml.SourceHttpMessageConverter;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -143,6 +144,7 @@ public class CcdMideventCallbackControllerTest {
 
     @Test
     public void handleCcdMidEventPreviewFinalDecision_whenAdminActionCorrectionBody_doesNothing() throws Exception {
+        ReflectionTestUtils.setField(controller,  "isPostHearingsEnabled", true);
         String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
         String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
@@ -170,6 +172,7 @@ public class CcdMideventCallbackControllerTest {
 
     @Test
     public void handleCcdMidEventPreviewFinalDecision_whenNoticeWasUploaded_doesNothing() throws Exception {
+        ReflectionTestUtils.setField(controller,  "isPostHearingsEnabled", true);
         String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
         String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 

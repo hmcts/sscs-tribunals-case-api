@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 import static java.util.Objects.requireNonNull;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -21,8 +20,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewServ
 public class IssueAdjournmentNoticeAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final AdjournCasePreviewService previewService;
-    @Value("${feature.postHearings.enabled}")
-    private final boolean isPostHearingsEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -51,7 +48,7 @@ public class IssueAdjournmentNoticeAboutToStartHandler implements PreSubmitCallb
             if (sscsCaseData.getAdjournment().getGeneratedDate() == null) {
                 response.addError("Adjourn case generated date not found. Please use 'Adjourn case' event or upload your adjourn case document.");
             } else {
-                previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, userAuthorisation, true, isPostHearingsEnabled);
+                previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, userAuthorisation, true, false);
             }
 
         } else if (sscsCaseData.getAdjournment().getPreviewDocument() == null) {

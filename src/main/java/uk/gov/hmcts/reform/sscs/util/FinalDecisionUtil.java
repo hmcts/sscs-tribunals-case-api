@@ -62,7 +62,7 @@ public class FinalDecisionUtil {
                 return;
             }
             WriteFinalDecisionPreviewDecisionServiceBase previewDecisionService = decisionNoticeService.getPreviewService(benefitType);
-            DocumentType documentType = INITIAL.equals(finalDecisionType)
+            DocumentType documentType = !isPostHearingsEnabled || INITIAL.equals(finalDecisionType)
                 ? FINAL_DECISION_NOTICE
                 : CORRECTED_DECISION_NOTICE;
             previewDecisionService.preview(callback, documentType, userAuthorisation, true, isPostHearingsEnabled);

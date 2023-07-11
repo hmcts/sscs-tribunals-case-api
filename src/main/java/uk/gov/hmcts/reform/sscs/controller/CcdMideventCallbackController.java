@@ -88,11 +88,13 @@ public class CcdMideventCallbackController {
             return ok(preSubmitCallbackResponse);
         }
 
-        Correction correction = sscsCaseData.getPostHearing().getCorrection();
-        boolean isBodyCorrection = AdminCorrectionType.BODY.equals(correction.getAdminCorrectionType());
-        boolean isNoticeUploaded = NO.equals(sscsCaseData.getFinalDecisionNoticeGenerated());
-        if (isBodyCorrection || isNoticeUploaded) {
-            return ok(new PreSubmitCallbackResponse<>(sscsCaseData));
+        if (isPostHearingsEnabled) {
+            Correction correction = sscsCaseData.getPostHearing().getCorrection();
+            boolean isBodyCorrection = AdminCorrectionType.BODY.equals(correction.getAdminCorrectionType());
+            boolean isNoticeUploaded = NO.equals(sscsCaseData.getFinalDecisionNoticeGenerated());
+            if (isBodyCorrection || isNoticeUploaded) {
+                return ok(new PreSubmitCallbackResponse<>(sscsCaseData));
+            }
         }
 
         WriteFinalDecisionPreviewDecisionServiceBase writeFinalDecisionPreviewDecisionService = decisionNoticeService.getPreviewService(benefitType);

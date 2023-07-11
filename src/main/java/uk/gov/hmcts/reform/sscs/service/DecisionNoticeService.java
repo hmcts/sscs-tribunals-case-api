@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;

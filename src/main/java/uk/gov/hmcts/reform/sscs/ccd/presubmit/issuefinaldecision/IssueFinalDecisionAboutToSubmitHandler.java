@@ -105,8 +105,8 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                     CancellationReason.OTHER);
         }
 
-        boolean isNotCorrection = isNoOrNull(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
-        boolean shouldSetIssueFinalDecisionDate = isAdjournmentEnabled && (!isPostHearingsEnabled || isNotCorrection);
+        boolean isNotCorrection = !isPostHearingsEnabled || isNoOrNull(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
+        boolean shouldSetIssueFinalDecisionDate = isAdjournmentEnabled && (isNotCorrection);
         boolean shouldSetWriteFinalDecisionIdamSurname = isPostHearingsEnabled && isNotCorrection;
 
         if (shouldSetIssueFinalDecisionDate) {
