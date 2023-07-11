@@ -179,16 +179,13 @@ public class IssueDocumentHandler {
     }
 
     protected String getDocumentTypeLabel(SscsCaseData caseData, DocumentType documentType, String documentTypeLabel, boolean isPostHearingsEnabled) {
-
         String embeddedDocumentTypeLabel = (FINAL_DECISION_NOTICE.equals(documentType) ? "Decision Notice" : documentTypeLabel);
 
         if (isPostHearingsEnabled) {
-            PostHearing postHearing = caseData.getPostHearing();
-            if (nonNull(postHearing.getSetAside().getAction())) {
-                CcdCallbackMap action = postHearing.getSetAside().getAction();
-                boolean isGrantOrRefuseSetAsideAction = action.toString().equals(SetAsideActions.GRANT.getCcdDefinition())
-                        || action.toString().equals(SetAsideActions.REFUSE.getCcdDefinition());
-                embeddedDocumentTypeLabel =  isGrantOrRefuseSetAsideAction ? "Set Aside Decision Notice" : embeddedDocumentTypeLabel;
+            PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
+
+            if (nonNull(postHearingReviewType)) {
+                return postHearingReviewType.getDescriptionEn() + " Decision Notice";
             }
         }
 
