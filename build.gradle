@@ -263,7 +263,7 @@ dependencyManagement {
         }
 
         // CVE-2022-41881, CVE-2022-41915
-        dependencySet(group: 'io.netty', version: '4.1.92.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.94.Final') {
             entry 'netty-buffer'
             entry 'netty-common'
             entry 'netty-codec'
@@ -312,7 +312,7 @@ dependencies {
     implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
 
-    implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '32.1.1-jre'
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.10'
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
@@ -335,9 +335,8 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '526e79f'
-
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: 'b05079a'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '583bf6b'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '146a9ec'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.39.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.4'
@@ -347,9 +346,9 @@ dependencies {
     implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.4'
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.2'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.3'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.2'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.3'
 
     implementation group:'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.8.0'
@@ -365,7 +364,7 @@ dependencies {
         exclude group: 'commons-io', module: 'commons-io'
     }
 
-    implementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
+    implementation group: 'commons-io', name: 'commons-io', version:  '2.13.0'
 
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.4'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
@@ -380,12 +379,12 @@ dependencies {
 
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.81"
 
-    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
+    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.13.0'
 
-    functionalTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.11.0'
+    functionalTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.13.0'
 
-    implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
+    implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
 
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
         exclude group: 'com.vaadin.external.google', module: 'android-json'
@@ -404,16 +403,16 @@ dependencies {
     testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
     // https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy-dep
-    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.14.4'
+    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-dep', version: '1.14.5'
 
 
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 
-    testImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
-    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
-    functionalTestImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
-    functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
-    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
+    testImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
+    functionalTestImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
+    functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
+    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
 
     testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.9.3')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
@@ -433,7 +432,7 @@ dependencies {
     contractTestImplementation sourceSets.test.runtimeClasspath
 
     cftlibImplementation group: 'org.springframework.boot', name: 'spring-boot-devtools'
-    cftlibAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
+    cftlibAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
 
 }
 // this is required to force Java running on the Azure Windows Server OS into using
