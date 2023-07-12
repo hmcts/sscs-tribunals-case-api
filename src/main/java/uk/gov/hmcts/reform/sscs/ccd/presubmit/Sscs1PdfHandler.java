@@ -57,6 +57,8 @@ public class Sscs1PdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
             createAppealPdf(caseData);
         }
 
+        caseData.getSchedulingAndListingFields().setHearingRoute(caseData.getAppeal().getHearingOptions().getHearingRoute());
+
         return sscsCaseDataPreSubmitCallbackResponse;
     }
 
