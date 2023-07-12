@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_D
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +62,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
         updateHearingTypeForNonSscs1Case(sscsCaseData, response, hasSystemUserRole);
         SscsHelper.updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
+        validateHearingVideoEmail(sscsCaseData, response);
 
         if (sscsCaseData.getAppeal() != null && sscsCaseData.getAppeal().getBenefitType() != null
             && isBenefitTypeValidForOtherPartyValidation(sscsCaseData.getBenefitType())) {
@@ -85,6 +87,23 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private boolean isBenefitTypeValidForOtherPartyValidation(Optional<Benefit> benefitType) {
         return benefitType.filter(benefit -> SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
+    }
+
+    private void validateHearingVideoEmail(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        List<CcdValue<OtherParty>> otherParties = Optional.ofNullable(sscsCaseData.getOtherParties()).orElse(Collections.emptyList());
+
+        for (CcdValue<OtherParty> otherParty : otherParties) {
+            HearingSubtype hearingSubtype = otherParty.getValue().getHearingSubtype();
+
+            if (hearingSubtype != null
+                && YesNo.isYes(hearingSubtype.getWantsHearingTypeVideo())) {
+
+                String hearingVideoEmail = hearingSubtype.getHearingVideoEmail();
+                if (!SscsHelper.isEmailValid(hearingVideoEmail)) {
+                    response.addError("Hearing video email address must be valid email address");
+                }
+            }
+        }
     }
 
     private void updateHearingTypeForNonSscs1Case(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response, boolean hasSystemUserRole) {

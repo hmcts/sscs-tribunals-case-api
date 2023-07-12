@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler;
+import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
@@ -120,6 +121,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
 
         updateHearingTypeForNonSscs1Case(sscsCaseData, preSubmitCallbackResponse, hasSystemUserRole);
+        validateHearingVideoEmail(sscsCaseData, preSubmitCallbackResponse);
 
         //validate benefit type and dwp issuing office for updateCaseData event triggered by user, which is not by CaseLoader
         if (!hasSystemUserRole) {
@@ -128,6 +130,18 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         return preSubmitCallbackResponse;
+    }
+
+    private void validateHearingVideoEmail(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        HearingSubtype hearingSubtype = sscsCaseData.getAppeal().getHearingSubtype();
+        if (hearingSubtype != null
+            && YesNo.isYes(hearingSubtype.getWantsHearingTypeVideo())) {
+
+            String hearingVideoEmail = hearingSubtype.getHearingVideoEmail();
+            if (!SscsHelper.isEmailValid(hearingVideoEmail)) {
+                response.addError("Hearing video email address must be valid email address");
+            }
+        }
     }
 
     private void validateAndUpdateDwpHandlingOffice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {

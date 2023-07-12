@@ -1032,6 +1032,23 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Parameters({"null", "", "sample", "sample.com"})
+    public void givenACaseWhenUserWantsHearingTypeVideoButTheEmailIsInvalid_thenThrowAnError(String email) {
+        HearingSubtype hearingSubtype = HearingSubtype.builder()
+                .wantsHearingTypeVideo("Yes")
+                .hearingVideoEmail(email)
+                .build();
+        Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
+        appeal.setHearingSubtype(hearingSubtype);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getWarnings().size(), is(0));
+        assertEquals("Hearing video email address must be valid email address", response.getErrors().stream().findFirst().get());
+    }
+
+    @Test
     @Parameters({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
         "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
         "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare","guaranteedMinimumPension,Guaranteed Minimum Pension",
