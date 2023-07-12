@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.updateDirectionDueDateB
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -119,8 +120,9 @@ public class SscsHelperTest {
         "email@example.com (Joe Smith),false",
         "email@example..com,false",
         "Abc..123@example.com,false",
+        "null,false",
     })
-    public void givenAListOfEmails_ThenVerifyIfEmailIsValidOrNot(String email, boolean isValid) {
+    public void givenAListOfEmails_ThenVerifyIfEmailIsValidOrNot(@Nullable String email, boolean isValid) {
         assertThat(isEmailValid(email)).isEqualTo(isValid);
     }
 }

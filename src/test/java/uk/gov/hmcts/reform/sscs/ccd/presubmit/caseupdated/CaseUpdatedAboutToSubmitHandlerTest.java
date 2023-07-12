@@ -1033,7 +1033,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"null", "", "sample", "sample.com"})
-    public void givenACaseWhenUserWantsHearingTypeVideoButTheEmailIsInvalid_thenThrowAnError(String email) {
+    public void givenACaseWhenUserWantsHearingTypeVideoButTheEmailIsInvalid_thenThrowAnError(@Nullable String email) {
         HearingSubtype hearingSubtype = HearingSubtype.builder()
                 .wantsHearingTypeVideo("Yes")
                 .hearingVideoEmail(email)

@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -368,7 +369,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"null", "", "sample", "sample.com"})
-    public void givenACaseWhenUserWantsHearingTypeVideoButTheEmailIsInvalidForSingleOtherParty_thenThrowAnError(String email) {
+    public void givenACaseWhenUserWantsHearingTypeVideoButTheEmailIsInvalidForSingleOtherParty_thenThrowAnError(@Nullable String email) {
         HearingSubtype hearingSubtype = HearingSubtype.builder()
                 .wantsHearingTypeVideo("Yes")
                 .hearingVideoEmail(email)
@@ -396,7 +397,7 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"null", "", "sample", "sample.com"})
-    public void givenACaseWhenUserWantsHearingTypeVideoButTheEmailIsInvalidForMultipleOtherParty_thenThrowAnError(String email) {
+    public void givenACaseWhenUserWantsHearingTypeVideoButTheEmailIsInvalidForMultipleOtherParty_thenThrowAnError(@Nullable String email) {
         HearingSubtype hearingSubtype1 = HearingSubtype.builder()
                 .wantsHearingTypeVideo("Yes")
                 .hearingVideoEmail("example@example.com")
