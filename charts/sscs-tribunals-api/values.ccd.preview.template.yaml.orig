@@ -564,15 +564,17 @@ sscs-evidence-share:
 # click create
 # azure steps should be repeated every time PR is undeployed from preview
 sscs-tya-notif:
-  enabled: false
+  enabled: true
   java:
+<<<<<<< HEAD
     image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2399
+=======
+    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2393-24d96b1-20230704145756
+>>>>>>> 5397fe10f9f78adf313cb3250e3dcbaa81053576
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
-      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
-      TOPIC_NAME: "${SERVICE_NAME}-servicebus-tya"
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       AMQP_USERNAME: "RootManageSharedAccessKey"
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
@@ -630,7 +632,7 @@ sscs-ccd-callback-orchestrator:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:prod-32cbe82-20220825134712
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:prod-99baf80-20230629135543
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
