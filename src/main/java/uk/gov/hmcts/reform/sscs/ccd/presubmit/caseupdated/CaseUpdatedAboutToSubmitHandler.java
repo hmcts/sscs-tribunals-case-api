@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler;
-import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
@@ -33,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
+import uk.gov.hmcts.reform.sscs.utility.EmailUtil;
 
 @Component
 @Slf4j
@@ -138,7 +138,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             && YesNo.isYes(hearingSubtype.getWantsHearingTypeVideo())) {
 
             String hearingVideoEmail = hearingSubtype.getHearingVideoEmail();
-            if (!SscsHelper.isEmailValid(hearingVideoEmail)) {
+            if (!EmailUtil.isEmailValid(hearingVideoEmail)) {
                 response.addError("Hearing video email address must be valid email address");
             }
         }

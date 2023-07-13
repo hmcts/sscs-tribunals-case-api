@@ -3,16 +3,12 @@ package uk.gov.hmcts.reform.sscs.helper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.isEmailValid;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.updateDirectionDueDateByAnAmountOfDays;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 public class SscsHelperTest {
@@ -91,38 +87,5 @@ public class SscsHelperTest {
 
         updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
         assertThat(sscsCaseData.getDirectionDueDate()).isEqualTo("");
-    }
-
-    @ParameterizedTest
-    @CsvSource({
-        "email@example.com,true",
-        "firstname.lastname@example.com,true",
-        "email@subdomain.example.com,true",
-        "firstname+lastname@example.com,true",
-        "email@123.123.123.123,true",
-        "1234567890@example.com,true",
-        "email@example-one.com,true",
-        "_______@example.com,true",
-        "email@example.name,true",
-        "email@example.museum,true",
-        "email@example.co.jp,true",
-        "firstname-lastname@example.com,true",
-        "plainaddress,false",
-        "#@%^%#$@#$@#.com,false",
-        "@example.com,false",
-        "Joe Smith <email@example.com>,false",
-        "email.example.com,false",
-        "email@example@example.com,false",
-        ".email@example.com,false",
-        "email.@example.com,false",
-        "email..email@example.com,false",
-        "あいうえお@example.com,false",
-        "email@example.com (Joe Smith),false",
-        "email@example..com,false",
-        "Abc..123@example.com,false",
-        "null,false",
-    })
-    public void givenAListOfEmails_ThenVerifyIfEmailIsValidOrNot(@Nullable String email, boolean isValid) {
-        assertThat(isEmailValid(email)).isEqualTo(isValid);
     }
 }

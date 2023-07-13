@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
+import uk.gov.hmcts.reform.sscs.utility.EmailUtil;
 
 
 @Component
@@ -99,7 +100,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
                 && YesNo.isYes(hearingSubtype.getWantsHearingTypeVideo())) {
 
                 String hearingVideoEmail = hearingSubtype.getHearingVideoEmail();
-                if (!SscsHelper.isEmailValid(hearingVideoEmail)) {
+                if (!EmailUtil.isEmailValid(hearingVideoEmail)) {
                     response.addError("Hearing video email address must be valid email address");
                 }
             }
