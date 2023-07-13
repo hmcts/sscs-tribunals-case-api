@@ -1038,14 +1038,40 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .wantsHearingTypeVideo("Yes")
                 .hearingVideoEmail(email)
                 .build();
-        Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
-        appeal.setHearingSubtype(hearingSubtype);
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingSubtype(hearingSubtype);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getWarnings().size(), is(0));
         assertEquals("Hearing video email address must be valid email address", response.getErrors().stream().findFirst().get());
+    }
+
+    @Test
+    public void givenACaseWhenUserDoesNotWantsHearingTypeVideo_thenDoNotThrowAnError() {
+        HearingSubtype hearingSubtype = HearingSubtype.builder()
+                .wantsHearingTypeVideo("No")
+                .build();
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingSubtype(hearingSubtype);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
+    }
+
+    @Test
+    public void givenACaseWhenDoesNotWantsHearingTypeVideoAndTheEmailIsValid_thenDoNotThrowAnError() {
+        HearingSubtype hearingSubtype = HearingSubtype.builder()
+                .wantsHearingTypeVideo("Yes")
+                .hearingVideoEmail("sample@example.com")
+                .build();
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingSubtype(hearingSubtype);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
     }
 
     @Test
