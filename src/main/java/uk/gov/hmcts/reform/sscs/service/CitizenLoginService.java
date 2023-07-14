@@ -53,7 +53,7 @@ public class CitizenLoginService {
 
     public List<OnlineHearing> findCasesForCitizen(IdamTokens idamTokens, String tya) {
         log.info(format("Find case: Searching for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
-        List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens.getUserId(), idamTokens);
+        List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens);
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
@@ -80,19 +80,16 @@ public class CitizenLoginService {
 
     private void attachOtherPartyDetails(SscsCaseDetails sscsCaseDetailsItem) {
         if (sscsCaseDetailsItem.getData().getOtherParties() == null) {
-            log.info(format("Attaching other party details from ccd service for [%d]", sscsCaseDetailsItem.getId()));
             SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(sscsCaseDetailsItem.getId(), idamService.getIdamTokens());
             if (sscsCaseDetails != null) {
                 sscsCaseDetailsItem.getData().setOtherParties(sscsCaseDetails.getData().getOtherParties());
             }
-        } else {
-            log.info(format("Already have other party details for [%d]", sscsCaseDetailsItem.getId()));
         }
     }
 
     public List<OnlineHearing> findActiveCasesForCitizen(IdamTokens idamTokens) {
         log.info(format("Find case: Searching for active case with for user [%s]", idamTokens.getUserId()));
-        List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens.getUserId(), idamTokens);
+        List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens);
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterActiveCasesForCitizen)

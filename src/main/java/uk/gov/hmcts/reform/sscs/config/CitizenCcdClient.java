@@ -73,13 +73,13 @@ public class CitizenCcdClient {
 
     }
 
-    public List<CaseDetails> searchForCitizenAllCases(String userId, IdamTokens idamTokens) {
+    public List<CaseDetails> searchForCitizenAllCases(IdamTokens idamTokens) {
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("sortDirection", "desc");
         return coreCaseDataApi.searchForCitizen(
                 idamTokens.getIdamOauth2Token(),
                 idamTokens.getServiceAuthorization(),
-                userId,
+                idamTokens.getUserId(),
                 ccdRequestDetails.getJurisdictionId(),
                 ccdRequestDetails.getCaseTypeId(),
                 searchCriteria

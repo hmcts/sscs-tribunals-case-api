@@ -61,11 +61,7 @@ public class CitizenCcdService {
     }
 
     public List<CaseDetails> searchForCitizenAllCases(IdamTokens idamTokens) {
-        return citizenCcdClient.searchForCitizenAllCases(idamTokens.getUserId(), idamTokens);
-    }
-
-    public List<CaseDetails> searchForCitizenAllCases(String userId, IdamTokens idamTokens) {
-        return citizenCcdClient.searchForCitizenAllCases(userId, idamTokens);
+        return citizenCcdClient.searchForCitizenAllCases(idamTokens);
     }
 
     public SaveCaseResult saveCase(SscsCaseData caseData, IdamTokens idamTokens) {
