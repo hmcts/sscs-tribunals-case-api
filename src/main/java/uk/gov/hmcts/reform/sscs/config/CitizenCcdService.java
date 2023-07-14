@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.ccd.service.SearchCcdCaseService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
@@ -31,17 +30,14 @@ public class CitizenCcdService {
     private final CitizenCcdClient citizenCcdClient;
     private final SscsCcdConvertService sscsCcdConvertService;
     private final CcdService ccdService;
-    private final SearchCcdCaseService searchCcdCaseService;
 
     @Autowired
     CitizenCcdService(CitizenCcdClient citizenCcdClient,
                       SscsCcdConvertService sscsCcdConvertService,
-                      CcdService ccdService,
-                      SearchCcdCaseService searchCcdCaseService) {
+                      CcdService ccdService) {
         this.citizenCcdClient = citizenCcdClient;
         this.sscsCcdConvertService = sscsCcdConvertService;
         this.ccdService = ccdService;
-        this.searchCcdCaseService = searchCcdCaseService;
     }
 
 
