@@ -211,6 +211,7 @@ public class CitizenLoginServiceTest {
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
         OnlineHearing onlineHearing = someOnlineHearing(111L);
         when(onlineHearingService.loadHearing(sscsCaseDetailsWithTya, null, "someEmail@exaple.com")).thenReturn(Optional.of(onlineHearing));
+        when(ccdService.getByCaseId(anyLong(), eq(serviceIdamTokens))).thenReturn(sscsCaseDetailsWithTya);
 
         List<OnlineHearing> casesForCitizen = underTest.findCasesForCitizen(citizenIdamTokens, tya);
 

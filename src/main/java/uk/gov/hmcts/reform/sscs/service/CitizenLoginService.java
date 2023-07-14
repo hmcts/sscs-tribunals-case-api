@@ -86,7 +86,15 @@ public class CitizenLoginService {
                 .ifPresentOrElse(sscsCaseDetails -> {
                     log.info(format("Setting other parties for case [%d]", sscsCaseDetails.getId()));
                     sscsCaseDetailsItem.getData().setOtherParties(sscsCaseDetails.getData().getOtherParties());
-                }, () -> log.info(format("Found no matching case with other parties for case [%d]", sscsCaseDetailsItem.getId())));
+                }, () -> {
+                    log.info(format("Found no matching case with other parties for case [%d], retrieving by case id", sscsCaseDetailsItem.getId()));
+                    SscsCaseDetails byCaseId = ccdService.getByCaseId(sscsCaseDetailsItem.getId(), idamService.getIdamTokens());
+                    if (byCaseId != null) {
+                        log.info(format("Found case by case id [%d] with other parties size [%d]", sscsCaseDetailsItem.getId(),
+                                byCaseId.getData().getOtherParties() != null ? byCaseId.getData().getOtherParties().size() : -1));
+                        sscsCaseDetailsItem.getData().setOtherParties(byCaseId.getData().getOtherParties());
+                    }
+                });
     }
 
     public List<OnlineHearing> findActiveCasesForCitizen(IdamTokens idamTokens) {
