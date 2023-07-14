@@ -11,11 +11,13 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -135,6 +137,58 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
         assertEquals(1, selectHearingDetails.size());
         assertEquals("1111", selectHearingDetails.get(0).getCode());
         assertEquals("good value 09:00:00 06 Jun 2021", selectHearingDetails.get(0).getLabel());
+    }
+
+    @Test
+    @Parameters({"null", "", " ", "  "})
+    public void givenHearingsListHasPastDate_WithInvalidTime_ReturnList(@Nullable String time) {
+        List<Hearing> hearingList = new ArrayList<>();
+
+        HearingDetails hearingDetails = HearingDetails.builder()
+                .hearingId("1")
+                .venue(Venue.builder().name("venue name").build())
+                .hearingDate("2021-06-06")
+                .time(time).build();
+
+        hearingList.add(Hearing.builder().value(hearingDetails).build());
+
+        sscsCaseData.setHearings(unmodifiableList(hearingList));
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+
+        List<DynamicListItem> selectHearingDetails = response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems();
+        assertEquals(hearingList.size(), selectHearingDetails.size());
+        assertTrue(selectHearingDetails.stream().allMatch(o -> "venue name 06 Jun 2021".equals(o.getLabel())));
+    }
+
+    @Test
+    @Parameters({"null", "", " ", "  "})
+    public void givenHearingsIsOnToday_WithInvalidTime_ReturnList(@Nullable String time) {
+        List<Hearing> hearingList = new ArrayList<>();
+
+        LocalDate now = LocalDate.now();
+        HearingDetails hearingDetails1 = HearingDetails.builder()
+                .hearingId("1")
+                .venue(Venue.builder().name("venue name").build())
+                .hearingDate(now.toString())
+                .time(time).build();
+        HearingDetails hearingDetails2 = HearingDetails.builder()
+                .hearingId("2")
+                .venue(Venue.builder().name("venue name").build())
+                .hearingDate(now.toString())
+                .time(time).build();
+
+        hearingList.add(Hearing.builder().value(hearingDetails1).build());
+        hearingList.add(Hearing.builder().value(hearingDetails2).build());
+
+        sscsCaseData.setHearings(unmodifiableList(hearingList));
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+
+        List<DynamicListItem> selectHearingDetails = response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems();
+        assertEquals(hearingList.size(), selectHearingDetails.size());
+        String label = "venue name " + now.format(DateTimeFormatter.ofPattern("dd MMM yyyy"));
+        assertTrue(selectHearingDetails.stream().allMatch(o -> label.equals(o.getLabel())));
     }
 
     @Test
