@@ -198,28 +198,4 @@ public class CitizenCcdServiceTest {
 
         verify(citizenCcdClient).addUserToCase(eq(IDAM_TOKENS), eq(IDAM_TOKENS.getUserId()), eq(caseId));
     }
-
-    @Test
-    public void shouldFindCasesBySubscriptionEmail() {
-        SscsCaseData caseData = SscsCaseData.builder().build();
-        SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(caseData).build();
-        when(searchCcdCaseService.findCaseBySearchCriteria(any(), eq(IDAM_TOKENS))).thenReturn(List.of(caseDetails));
-
-        List<SscsCaseDetails> cases = citizenCcdService.findCasesBySubscriptionEmail("test@test.com", IDAM_TOKENS);
-
-        assertEquals(1, cases.size());
-        assertEquals(caseDetails, cases.get(0));
-    }
-
-    @Test
-    public void shouldFilterOutDraftCases() {
-        SscsCaseData caseData = SscsCaseData.builder().build();
-        SscsCaseDetails caseDetails1 = SscsCaseDetails.builder().state(State.DRAFT.getId()).data(caseData).build();
-        SscsCaseDetails caseDetails2 = SscsCaseDetails.builder().state(State.DRAFT_ARCHIVED.getId()).data(caseData).build();
-        when(searchCcdCaseService.findCaseBySearchCriteria(any(), eq(IDAM_TOKENS))).thenReturn(List.of(caseDetails1, caseDetails2));
-
-        List<SscsCaseDetails> cases = citizenCcdService.findCasesBySubscriptionEmail("test@test.com", IDAM_TOKENS);
-
-        assertEquals(0, cases.size());
-    }
 }

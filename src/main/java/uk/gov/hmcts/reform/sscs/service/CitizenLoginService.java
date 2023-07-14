@@ -53,12 +53,11 @@ public class CitizenLoginService {
 
     public List<OnlineHearing> findCasesForCitizen(IdamTokens idamTokens, String tya) {
         log.info(format("Find case: Searching for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
-        List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens);
-        List<SscsCaseDetails> sscsCaseDetailsBySubscriptionEmail = citizenCcdService.findCasesBySubscriptionEmail(idamTokens.getEmail(), idamService.getIdamTokens());
+        List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens.getUserId(), idamService.getIdamTokens());
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
-                .peek(sscsCaseDetailsItem -> attachOtherPartyDetails(sscsCaseDetailsItem, sscsCaseDetailsBySubscriptionEmail))
+                .peek(this::attachOtherPartyDetails)
                 .collect(toList());
         if (!isBlank(tya)) {
             log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
@@ -79,27 +78,21 @@ public class CitizenLoginService {
         return convert;
     }
 
-    private void attachOtherPartyDetails(SscsCaseDetails sscsCaseDetailsItem, List<SscsCaseDetails> sscsCaseDetailsBySubscriptionEmail) {
-        sscsCaseDetailsBySubscriptionEmail.stream()
-                .filter(sscsCaseDetails -> sscsCaseDetails.getId() != null && sscsCaseDetails.getId().equals(sscsCaseDetailsItem.getId()))
-                .findFirst()
-                .ifPresentOrElse(sscsCaseDetails -> {
-                    log.info(format("Setting other parties for case [%d]", sscsCaseDetails.getId()));
-                    sscsCaseDetailsItem.getData().setOtherParties(sscsCaseDetails.getData().getOtherParties());
-                }, () -> {
-                    log.info(format("Found no matching case with other parties for case [%d], retrieving by case id", sscsCaseDetailsItem.getId()));
-                    SscsCaseDetails byCaseId = ccdService.getByCaseId(sscsCaseDetailsItem.getId(), idamService.getIdamTokens());
-                    if (byCaseId != null) {
-                        log.info(format("Found case by case id [%d] with other parties size [%d]", sscsCaseDetailsItem.getId(),
-                                byCaseId.getData().getOtherParties() != null ? byCaseId.getData().getOtherParties().size() : -1));
-                        sscsCaseDetailsItem.getData().setOtherParties(byCaseId.getData().getOtherParties());
-                    }
-                });
+    private void attachOtherPartyDetails(SscsCaseDetails sscsCaseDetailsItem) {
+        if (sscsCaseDetailsItem.getData().getOtherParties() == null) {
+            log.info(format("Attaching other party details from ccd service for [%d]", sscsCaseDetailsItem.getId()));
+            SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(sscsCaseDetailsItem.getId(), idamService.getIdamTokens());
+            if (sscsCaseDetails != null) {
+                sscsCaseDetailsItem.getData().setOtherParties(sscsCaseDetails.getData().getOtherParties());
+            }
+        } else {
+            log.info(format("Already have other party details for [%d]", sscsCaseDetailsItem.getId()));
+        }
     }
 
     public List<OnlineHearing> findActiveCasesForCitizen(IdamTokens idamTokens) {
         log.info(format("Find case: Searching for active case with for user [%s]", idamTokens.getUserId()));
-        List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens);
+        List<CaseDetails> caseDetails = citizenCcdService.searchForCitizenAllCases(idamTokens.getUserId(), idamTokens);
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterActiveCasesForCitizen)
