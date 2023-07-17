@@ -84,8 +84,8 @@ def secretsForPR = [
                 secret('s2s-secret-task-monitor', 'S2S_SECRET_TASK_MONITOR'),
                 secret('s2s-secret-workflow-api', 'S2S_SECRET_WORKFLOW_API'),
                 secret('wa-idam-client-secret', 'WA_IDAM_CLIENT_SECRET'),
-                secret('wa-system-username', ' WA_SYSTEM_USERNAME'),
-                secret('wa-system-password', ' WA_SYSTEM_PASSWORD')
+                secret('wa-system-username', 'WA_SYSTEM_USERNAME'),
+                secret('wa-system-password', 'WA_SYSTEM_PASSWORD')
         ]
 ]
 
