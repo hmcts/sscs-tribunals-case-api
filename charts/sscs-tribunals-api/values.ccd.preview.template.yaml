@@ -535,6 +535,7 @@ ccd:
       - caseworker-sscs-bulkscan
       - caseworker-sscs-pcqextractor
       - caseworker-sscs-hmrcresponsewriter
+      - caseworker-wa-task-configuration
 elastic:
   enabled: true
 
