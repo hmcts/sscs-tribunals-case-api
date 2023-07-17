@@ -474,6 +474,7 @@ ccd:
         IDAM_OAUTH2_CLIENT_SECRET: ${CCD_API_GATEWAY_IDAM_CLIENT_SECRET}
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
       ingressIP: ${INGRESS_IP}
+      ingressHost: gateway-${SERVICE_FQDN}
       disableKeyVaults: true
 
   ccd-user-profile-importer:
