@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
@@ -36,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.service.VenueService;
 @Slf4j
 public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final AssociatedCaseLinkHelper associatedCaseLinkHelper;
     private final AirLookupService airLookupService;
@@ -145,37 +147,51 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
+    private List<String> validatePartyCaseDAta(Entity entity, String partyType){
+
+        List<String> listOfWarnings = new ArrayList<>();
+
+        if (entity !=null) {
+
+
+            if (entity.getName().getFirstName() == null) {
+                listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", partyType));
+            }
+            if (entity.getName().getLastName() == null) {
+                listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", partyType));
+            }
+            if (entity.getAddress().getLine1() == null) {
+                listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 1", partyType));
+            }
+            if (entity.getAddress().getLine2() == null) {
+                listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 2", partyType));
+            }
+            if (entity.getAddress().getPostcode() == null) {
+                listOfWarnings.add(String.format(WARNING_MESSAGE, "Postcode", partyType));
+            }
+            if (entity.getIdentity().getDob() == null) {
+                listOfWarnings.add(String.format(WARNING_MESSAGE, "Date of Birth", partyType));
+            }
+            if (entity.getIdentity().getNino() == null) {
+                listOfWarnings.add(String.format(WARNING_MESSAGE, "National Insurance Number", partyType));
+            }
+
+        }
+
+        return listOfWarnings;
+
+    }
+
+
     private void validateAppellantCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
 
         Appellant appellantInfo = sscsCaseData.getAppeal().getAppellant();
-        List<String> listOfWarnings = new ArrayList<>();
 
-        if (appellantInfo !=null){
+        List<String> warnings = validatePartyCaseDAta(appellantInfo, "Appellant");
 
+        if (!warnings.isEmpty()) {
 
-            if (appellantInfo.getName().getFirstName() == null){
-                listOfWarnings.add("First Name has not been provided for the Appellant, do you want to ignore this warning and proceed?");
-            }
-            if (appellantInfo.getName().getLastName() == null){
-                listOfWarnings.add("Last Name has not been provided for the Appellant, do you want to ignore this warning and proceed?");
-            }
-            if (appellantInfo.getAddress().getLine1() == null){
-                listOfWarnings.add("Address Line 1 has not been provided for the Appellant, do you want to ignore this warning and proceed?");
-            }
-            if (appellantInfo.getAddress().getLine2() == null){
-                listOfWarnings.add("Address Line 2 has not been provided for the Appellant, do you want to ignore this warning and proceed?");
-            }
-            if (appellantInfo.getAddress().getPostcode() == null){
-                listOfWarnings.add("Postcode has not been provided for the Appellant, do you want to ignore this warning and proceed?");
-            }
-            if (appellantInfo.getIdentity().getDob() == null){
-                listOfWarnings.add("Date Of Birth has not been provided for the Appellant, do you want to ignore this warning and proceed?");
-            }
-            if (appellantInfo.getIdentity().getNino() == null){
-                listOfWarnings.add("National Insurance Number has not been provided for the Appellant, do you want to ignore this warning and proceed?");
-            }
-
-            response.addWarnings(listOfWarnings);
+            response.addWarnings(warnings);
 
         }
     }
@@ -183,65 +199,49 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void validateAppointeeCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
 
         Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
-        boolean isAppointee = Boolean.parseBoolean(sscsCaseData.getAppeal().getAppellant().getIsAppointee());
+        List<String> warnings = validatePartyCaseDAta(appointeeInfo, "Appointee");
+
+        if (!warnings.isEmpty()){
+            response.addWarnings(warnings);
+        }
+
+    }
+
+    private List<String> validateRepAndJointPartyCaseData(Entity entity, String entityType){
+
         List<String> listOfWarnings = new ArrayList<>();
 
-        if (isAppointee){
-            if(appointeeInfo.getName().getFirstName() == null){
-                listOfWarnings.add("First Name has not been provided for the Appointee, do you want to ignore this warning and proceed?");
+        if (entity != null){
+            if (entity.getName().getFirstName() == null){
+                listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", entityType));
             }
-            if(appointeeInfo.getName().getLastName() == null){
-                listOfWarnings.add("Last Name has not been provided for the Appointee, do you want to ignore this warning and proceed?");
+            if (entity.getName().getLastName() == null){
+                listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", entityType));
             }
-            if(appointeeInfo.getIdentity().getDob() == null){
-                listOfWarnings.add("Date of Birth has not been provided for the Appointee, do you want to ignore this warning and proceed?");
-            }
-            if(appointeeInfo.getIdentity().getNino() == null){
-                listOfWarnings.add("National Insurance Number has not been provided for the Appointee, do you want to ignore this warning and proceed?");
-            }
-            if(appointeeInfo.getAddress().getLine1() == null){
-                listOfWarnings.add("Address Line 1 has not been provided for the Appointee, do you want to ignore this warning and proceed?");
-            }
-            if(appointeeInfo.getAddress().getLine2() == null){
-                listOfWarnings.add("Address Line 2 has not been provided for the Appointee, do you want to ignore this warning and proceed?");
-            }
-            if(appointeeInfo.getAddress().getPostcode() == null){
-                listOfWarnings.add("Postcode has not been provided for the Appointee, do you want to ignore this warning and proceed?");
-            }
-
-            response.addWarnings(listOfWarnings);
         }
+        return listOfWarnings;
     }
 
     private void validateRepresentativeNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
+
         Representative representativeInfo = sscsCaseData.getAppeal().getRep();
-        List<String> listOfWarnings = new ArrayList<>();
-        if (representativeInfo != null){
-            if (representativeInfo.getName().getFirstName() == null){
-                listOfWarnings.add("First Name has not been provided for the Representative, do you want to ignore this warning and proceed?");
-            }
-            if (representativeInfo.getName().getLastName() == null){
-                listOfWarnings.add("Last Name has not been provided for the Representative, do you want to ignore this warning and proceed?");
-            }
-            Set<String> errorSet = new HashSet<>(listOfWarnings);
-            response.addWarnings(listOfWarnings);
+       List<String> warnings = validateRepAndJointPartyCaseData(representativeInfo, "Representative");
+
+        if (!warnings.isEmpty()) {
+            response.addWarnings(warnings);
         }
 
     }
 
     private void validateJointPartyNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
         JointParty jointPartyInfo = sscsCaseData.getJointParty();
-        List<String> listOfWarnings = new ArrayList<>();
 
-        if (jointPartyInfo != null){
-            if (jointPartyInfo.getName().getFirstName() == null){
-                listOfWarnings.add("First Name has not been provided for the Joint Party, do you want to ignore this warning and proceed?");
-            }
-            if (jointPartyInfo.getName().getLastName() == null){
-                listOfWarnings.add("Last Name has not been provided for the Joint Party, do you want to ignore this warning and proceed?");
-            }
+        List<String> warnings = validateRepAndJointPartyCaseData(jointPartyInfo, "Joint Party");
 
-            response.addWarnings(listOfWarnings);
+        if (!warnings.isEmpty()){
+
+            response.addWarnings(warnings);
+
         }
     }
 
