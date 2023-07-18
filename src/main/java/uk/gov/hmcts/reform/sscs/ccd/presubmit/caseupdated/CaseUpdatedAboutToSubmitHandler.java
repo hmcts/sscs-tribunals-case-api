@@ -132,6 +132,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             validateJointPartyNameData(sscsCaseData, preSubmitCallbackResponse);
         }
 
+
+
+
         return preSubmitCallbackResponse;
     }
 
@@ -197,12 +200,15 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void validateAppointeeCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
+         YesNo hasAppointee = sscsCaseData.getHasOtherPartyAppointee();
 
-        Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
-        List<String> warnings = validatePartyCaseDAta(appointeeInfo, "Appointee");
+        if (hasAppointee == YES) {
+            Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
+            List<String> warnings = validatePartyCaseDAta(appointeeInfo, "Appointee");
 
-        if (!warnings.isEmpty()){
-            response.addWarnings(warnings);
+            if (!warnings.isEmpty()) {
+                response.addWarnings(warnings);
+            }
         }
 
     }
@@ -224,24 +230,28 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateRepresentativeNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
 
-        Representative representativeInfo = sscsCaseData.getAppeal().getRep();
-       List<String> warnings = validateRepAndJointPartyCaseData(representativeInfo, "Representative");
+        final boolean hasRepresentative = sscsCaseData.isThereARepresentative();
+        if (hasRepresentative == true) {
+            Representative representativeInfo = sscsCaseData.getAppeal().getRep();
+            List<String> warnings = validateRepAndJointPartyCaseData(representativeInfo, "Representative");
 
-        if (!warnings.isEmpty()) {
-            response.addWarnings(warnings);
+            if (!warnings.isEmpty()) {
+                response.addWarnings(warnings);
+            }
         }
-
     }
 
     private void validateJointPartyNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
         JointParty jointPartyInfo = sscsCaseData.getJointParty();
 
+        final boolean hasJointParty = sscsCaseData.isThereAJointParty();
+        if (hasJointParty == true){
         List<String> warnings = validateRepAndJointPartyCaseData(jointPartyInfo, "Joint Party");
 
-        if (!warnings.isEmpty()){
+        if (!warnings.isEmpty()) {
 
             response.addWarnings(warnings);
-
+        }
         }
     }
 
