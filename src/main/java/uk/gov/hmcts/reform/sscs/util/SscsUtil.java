@@ -142,8 +142,7 @@ public class SscsUtil {
     }
 
     public static DocumentType getIssueFinalDecisionDocumentType(SscsCaseData caseData, boolean isPostHearingsEnabled) {
-        if (isPostHearingsEnabled
-            && isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
+        if (isCorrectionInProgress(caseData, isPostHearingsEnabled)) {
             return DocumentType.CORRECTION_GRANTED;
         }
 
@@ -156,6 +155,10 @@ public class SscsUtil {
 
             caseDetails.getCaseData().getPostHearing().getCorrection().setCorrectionFinalDecisionInProgress(correctionInProgress);
         }
+    }
+
+    public static boolean isCorrectionInProgress(SscsCaseData caseData, boolean isPostHearingsEnabled) {
+        return isPostHearingsEnabled && isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
     }
       
     public static boolean isGapsCase(SscsCaseData sscsCaseData) {

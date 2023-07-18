@@ -78,7 +78,7 @@ public class IssueDocumentHandler {
                 finalDecisionCaseData.setFinalDecisionIssuedDate(LocalDate.now());
             }
 
-            if (DocumentType.CORRECTION_GRANTED.getLabel().equals(documentTypeLabel)) {
+            if (isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
                 formPayload = formPayload.toBuilder()
                         .generatedDate(finalDecisionCaseData.getFinalDecisionGeneratedDate())
                         .idamSurname(finalDecisionCaseData.getFinalDecisionIdamSurname())
@@ -174,7 +174,7 @@ public class IssueDocumentHandler {
 
         final String generatedFileUrl = generateFile.assemble(params);
 
-        documentTypeLabel = documentTypeLabel + ((DRAFT_DECISION_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType)) ? " generated" : " issued");
+        documentTypeLabel = documentTypeLabel + ((DRAFT_CORRECTED_NOTICE.equals(documentType) || DRAFT_DECISION_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType)) ? " generated" : " issued");
 
         final String filename = String.format("%s on %s.pdf", documentTypeLabel, dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
@@ -200,7 +200,7 @@ public class IssueDocumentHandler {
             }
 
             if (isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
-                return DocumentType.CORRECTION_GRANTED.getLabel();
+                return documentTypeLabel;
             }
         }
 

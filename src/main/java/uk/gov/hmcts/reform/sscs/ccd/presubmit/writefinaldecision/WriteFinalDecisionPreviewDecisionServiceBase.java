@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Slf4j
@@ -82,8 +83,14 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         final NoticeIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
 
-        builder.userName(buildSignedInJudgeName(userAuthorisation));
-        builder.idamSurname(buildSignedInJudgeSurname(userAuthorisation));
+        if (SscsUtil.isCorrectionInProgress(caseData, isPostHearingsEnabled)) {
+            builder.dateIssued(caseData.getSscsFinalDecisionCaseData().getFinalDecisionIssuedDate());
+            builder.correctedJudgeName(buildSignedInJudgeName(userAuthorisation));
+            builder.correctedDateIssued(showIssueDate ? LocalDate.now() : null);
+        } else {
+            builder.userName(buildSignedInJudgeName(userAuthorisation));
+            builder.idamSurname(buildSignedInJudgeSurname(userAuthorisation));
+        }
 
         writeFinalDecisionBuilder.summaryOfOutcomeDecision(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDetailsOfDecision());
 
@@ -167,8 +174,9 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         validateRequiredProperties(payload);
 
-
-        if (showIssueDate) {
+        if (SscsUtil.isCorrectionInProgress(caseData, isPostHearingsEnabled)) {
+            builder.dateIssued(caseData.getSscsFinalDecisionCaseData().getFinalDecisionIssuedDate());
+        } else if (showIssueDate) {
             builder.dateIssued(LocalDate.now());
         } else {
             builder.dateIssued(null);
