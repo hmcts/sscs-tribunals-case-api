@@ -273,6 +273,6 @@ class IssueDocumentHandlerTest {
         assertThatThrownBy(() ->
             handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, true, USER_AUTHORISATION))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("getNoticeBody has unexpected postHearingReviewType: " + postHearingReviewType.getDescriptionEn());
+            .hasMessage("caseData has unexpected postHearingReviewType: " + postHearingReviewType.getDescriptionEn());
     }
 }
