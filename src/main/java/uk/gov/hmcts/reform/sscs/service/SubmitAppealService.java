@@ -256,6 +256,10 @@ public class SubmitAppealService {
         String processingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
         sscsCaseData.setProcessingVenue(processingVenue);
 
+        if (sscsCaseData.getIsConfidentialCase() == null) {
+            sscsCaseData.setIsConfidentialCase(YesNo.NO);
+        }
+
         if (caseAccessManagementFeature
                 && StringUtils.isNotEmpty(processingVenue)
                 && rpc != null) {
