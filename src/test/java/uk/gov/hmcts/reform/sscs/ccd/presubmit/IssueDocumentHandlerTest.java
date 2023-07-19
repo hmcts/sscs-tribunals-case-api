@@ -164,7 +164,7 @@ class IssueDocumentHandlerTest {
                 .build();
 
         boolean isPostHearingsEnabled = true;
-        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, originalLabel, isPostHearingsEnabled);
+        String documentTypeLabel = new IssueDocumentHandler().getEmbeddedDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, originalLabel, isPostHearingsEnabled);
 
         String expectedLabel = "Set Aside Decision Notice";
         assertThat(documentTypeLabel).isEqualTo(expectedLabel);
@@ -181,7 +181,7 @@ class IssueDocumentHandlerTest {
             .build();
 
         boolean isPostHearingsEnabled = false;
-        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, originalLabel, isPostHearingsEnabled);
+        String documentTypeLabel = new IssueDocumentHandler().getEmbeddedDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, originalLabel, isPostHearingsEnabled);
 
         assertThat(documentTypeLabel).isEqualTo(originalLabel);
     }
@@ -198,7 +198,7 @@ class IssueDocumentHandlerTest {
                .build())
             .build();
 
-        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel, false);
+        String documentTypeLabel = new IssueDocumentHandler().getEmbeddedDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel, false);
         assertThat(documentTypeLabel).isEqualTo(expectedDefaultDocumentLabel);
     }
 
@@ -209,7 +209,7 @@ class IssueDocumentHandlerTest {
             .ccdCaseId("1")
             .build();
 
-        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel, false);
+        String documentTypeLabel = new IssueDocumentHandler().getEmbeddedDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel, false);
         assertThat(documentTypeLabel).isEqualTo(expectedDefaultDocumentLabel);
     }
 

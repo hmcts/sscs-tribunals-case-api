@@ -77,6 +77,7 @@ class PostHearingReviewMidEventHandlerTest {
                 .correctionGenerateNotice(YES)
                 .statementOfReasonsGenerateNotice(YES)
                 .libertyToApplyGenerateNotice(YES)
+                .permissionToAppealGenerateNotice(YES)
                 .build())
             .appeal(Appeal.builder().appellant(Appellant.builder()
                     .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
@@ -118,10 +119,9 @@ class PostHearingReviewMidEventHandlerTest {
     @EnumSource(
         value = PostHearingReviewType.class,
         names = {
-            "SET_ASIDE",
-            "CORRECTION",
             "STATEMENT_OF_REASONS",
-            "LIBERTY_TO_APPLY"
+            "LIBERTY_TO_APPLY",
+            "PERMISSION_TO_APPEAL"
         })
     void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentField(PostHearingReviewType postHearingReviewType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -144,7 +144,8 @@ class PostHearingReviewMidEventHandlerTest {
         DocumentLink previewDocument = response.getData().getDocumentStaging().getPreviewDocument();
         assertThat(previewDocument).isNotNull();
 
-        String expectedFilename = String.format("Decision Notice issued on %s.pdf",
+        String expectedFilename = String.format("%s Granted Decision Notice issued on %s.pdf",
+            postHearingReviewType.getShortDescriptionEn(),
             LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         assertThat(previewDocument.getDocumentFilename()).isEqualTo(expectedFilename);
