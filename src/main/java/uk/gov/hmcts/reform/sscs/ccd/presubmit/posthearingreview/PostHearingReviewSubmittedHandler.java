@@ -103,9 +103,9 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
 
                 if (isSetAsideRefusedSor(setAside)) {
                     return SetAsideActions.REFUSE_SOR;
-                } else {
-                    return setAside.getAction();
                 }
+
+                return setAside.getAction();
             case CORRECTION:
                 return postHearing.getCorrection().getAction();
             case STATEMENT_OF_REASONS:
