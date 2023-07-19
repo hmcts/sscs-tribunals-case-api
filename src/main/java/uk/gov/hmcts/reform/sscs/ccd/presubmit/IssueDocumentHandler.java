@@ -119,7 +119,6 @@ public class IssueDocumentHandler {
     }
 
     protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation, boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
-
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         if ((ADJOURNMENT_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType))

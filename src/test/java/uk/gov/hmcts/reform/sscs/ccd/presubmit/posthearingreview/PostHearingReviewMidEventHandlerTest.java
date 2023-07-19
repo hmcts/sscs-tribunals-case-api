@@ -164,6 +164,47 @@ class PostHearingReviewMidEventHandlerTest {
         assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
     }
 
+    @Test
+    void givenReviewTypeIsNull_NoticeUsesDefaultDecisionNoticeName() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        when(generateFile.assemble(any())).thenReturn(URL);
+        when(callback.getPageId()).thenReturn(PAGE_ID_GENERATE_NOTICE);
+
+        when(documentConfiguration.getDocuments()).thenReturn(new HashMap<>(Map.of(
+                LanguagePreference.ENGLISH,  new HashMap<>(Map.of(
+                        DECISION_ISSUED, TEMPLATE_ID)
+                ))
+        ));
+
+        caseData.getPostHearing().setReviewType(null);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        DocumentLink previewDocument = response.getData().getDocumentStaging().getPreviewDocument();
+        assertThat(previewDocument).isNotNull();
+
+        String expectedFilename = String.format("Decision Notice issued on %s.pdf",
+                LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+
+        assertThat(previewDocument.getDocumentFilename()).isEqualTo(expectedFilename);
+        assertThat(previewDocument.getDocumentBinaryUrl()).isEqualTo(URL + "/binary");
+        assertThat(previewDocument.getDocumentUrl()).isEqualTo(URL);
+
+        verify(generateFile, times(1)).assemble(any());
+
+        verify(generateFile, atLeastOnce()).assemble(capture.capture());
+
+        var value = capture.getValue();
+        NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
+        assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
+        assertThat(payload.getNoticeType()).isEqualTo("DECISION NOTICE");
+        assertThat(payload.getAppellantFullName()).isEqualTo("Appellant Lastname");
+        assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
+    }
+
     @ParameterizedTest
     @EnumSource(
         value = YesNo.class,
