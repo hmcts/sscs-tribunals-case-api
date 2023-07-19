@@ -12,10 +12,11 @@ import time
 # Namespace as first argument
 namespace = ""
 if len(sys.argv) == 1:
-    sys.exit("You need to provide the namespace when running a script: \n"
-             "'python3 cleanPreview.py <namespace>'")
+    sys.exit("You need to provide the namespace and sudo password when running a script: \n"
+             "'python3 cleanPreview.py <namespace> <pwd>'")
 
 namespace = sys.argv[1]
+pwd = sys.argv[2]
 
 try:
     s = subprocess.check_output('docker ps', shell=True)
@@ -24,7 +25,7 @@ except subprocess.CalledProcessError:
     print("Docker is not running")
     print("Starting docker daemon")
 
-    os.system('echo pwd | sudo -S dockerd > /dev/null 2>&1 & >> ~/.zshrc')
+    os.system(f'echo {pwd} | sudo -S dockerd > /dev/null 2>&1 & >> ~/.zshrc')
     # Pause for 5s for the docker to start
     time.sleep(5)
 
