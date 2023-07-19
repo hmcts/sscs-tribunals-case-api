@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
@@ -65,7 +66,7 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
             caseData.getDocumentGeneration().setSignedBy(userDetailsService.buildLoggedInUserName(userAuthorisation));
             caseData.getDocumentGeneration().setSignedRole(userDetailsService.getUserRole(userAuthorisation));
 
-            response = issueDocument(callback, DECISION_NOTICE, templateId, generateFile, userAuthorisation, isPostHearingsEnabled, isPostHearingsBEnabled);
+            response = issueDocument(callback, SscsUtil.getPostHearingReviewDocumentType(caseData.getPostHearing(), isPostHearingsEnabled), templateId, generateFile, userAuthorisation, isPostHearingsEnabled, isPostHearingsBEnabled);
         }
 
         return response;
