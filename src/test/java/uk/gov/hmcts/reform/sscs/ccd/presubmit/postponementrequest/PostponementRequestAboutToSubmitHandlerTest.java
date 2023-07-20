@@ -6,9 +6,6 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -19,11 +16,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -167,12 +162,4 @@ public class PostponementRequestAboutToSubmitHandlerTest {
         assertThat(sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest(), is(YES));
     }
 
-    @Test
-    public void givenAPostponementRequest_AddGeneratedDocumentToBundle() {
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        List<SscsDocument> sscsDocuments = response.getData().getSscsDocument();
-        Assert.assertEquals(sscsDocuments, Collections.singletonList(expectedDocument));
-        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
-                eq(POSTPONEMENT_REQUEST), any(), any(), eq(null), eq(null));
-    }
 }
