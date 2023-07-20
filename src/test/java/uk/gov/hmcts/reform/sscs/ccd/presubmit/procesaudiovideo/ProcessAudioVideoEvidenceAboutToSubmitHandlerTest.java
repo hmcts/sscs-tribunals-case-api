@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -80,7 +81,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
 
         documentConfiguration.setDocuments(documents);
-        handler = new ProcessAudioVideoEvidenceAboutToSubmitHandler(footerService, userDetailsService, true);
+        handler = new ProcessAudioVideoEvidenceAboutToSubmitHandler(footerService, userDetailsService);
+        ReflectionTestUtils.setField(handler, "isPostHearingsBEnabled", false);
 
         sscsCaseData = SscsCaseData.builder()
             .documentGeneration(DocumentGeneration.builder()

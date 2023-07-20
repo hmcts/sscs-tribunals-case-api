@@ -53,8 +53,8 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     private final ListAssistHearingMessageHelper hearingMessageHelper;
     @Value("${feature.snl.enabled}")
     private boolean isScheduleListingEnabled;
-    @Value("${feature.typeahead.enabled}")
-    private boolean isTypeaheadEnabled;
+    @Value("${feature.postHearingsB.enabled}")
+    private boolean isPostHearingsBEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -172,7 +172,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         caseData.setTempNoteDetail(null);
         caseData.setShowRip1DocPage(null);
 
-        if (isTypeaheadEnabled) {
+        if (isPostHearingsBEnabled) {
             caseData.setReservedToJudgeInterloc(null);
         } else {
             caseData.setReservedToJudge(null);

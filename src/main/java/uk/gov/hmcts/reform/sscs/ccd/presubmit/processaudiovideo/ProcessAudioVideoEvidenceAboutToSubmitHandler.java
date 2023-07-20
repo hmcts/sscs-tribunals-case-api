@@ -70,8 +70,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
 
     private final FooterService footerService;
     protected final UserDetailsService userDetailsService;
-    @Value("${feature.typeahead.enabled}")
-    private final boolean isTypeaheadEnabled;
+    @Value("${feature.postHearingsB.enabled}")
+    private boolean isPostHearingsBEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -362,7 +362,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         caseData.setShowRip1DocPage(null);
         caseData.setProcessAudioVideoReviewState(null);
 
-        if (isTypeaheadEnabled) {
+        if (isPostHearingsBEnabled) {
             caseData.setReservedToJudgeInterloc(null);
         } else {
             caseData.setReservedToJudge(null);
