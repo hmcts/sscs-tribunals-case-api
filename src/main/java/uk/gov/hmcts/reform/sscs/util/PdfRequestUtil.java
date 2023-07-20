@@ -178,30 +178,31 @@ public class PdfRequestUtil {
 
     public static NoticeIssuedTemplateBody populateNoticeBodySignedByAndSignedRole(SscsCaseData caseData, NoticeIssuedTemplateBody formPayload, boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
         NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder formPayloadBuilder = formPayload.toBuilder();
+        DocumentGeneration documentGeneration = caseData.getDocumentGeneration();
         if (isPostHearingsEnabled) {
             PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
 
             switch (postHearingReviewType) {
                 case SET_ASIDE:
-                    formPayloadBuilder.noticeBody(caseData.getDocumentGeneration().getBodyContent());
-                    formPayloadBuilder.userName(caseData.getDocumentGeneration().getSignedBy());
-                    formPayloadBuilder.userRole(caseData.getDocumentGeneration().getSignedRole());
+                    formPayloadBuilder.noticeBody(documentGeneration.getBodyContent());
+                    formPayloadBuilder.userName(documentGeneration.getSignedBy());
+                    formPayloadBuilder.userRole(documentGeneration.getSignedRole());
                     return formPayloadBuilder.build();
                 case CORRECTION:
-                    formPayloadBuilder.noticeBody(caseData.getDocumentGeneration().getCorrectionBodyContent());
-                    formPayloadBuilder.userName(caseData.getDocumentGeneration().getCorrectionSignedBy());
-                    formPayloadBuilder.userRole(caseData.getDocumentGeneration().getCorrectionSignedRole());
+                    formPayloadBuilder.noticeBody(documentGeneration.getCorrectionBodyContent());
+                    formPayloadBuilder.userName(documentGeneration.getCorrectionSignedBy());
+                    formPayloadBuilder.userRole(documentGeneration.getCorrectionSignedRole());
                     return formPayloadBuilder.build();
                 case STATEMENT_OF_REASONS:
-                    formPayloadBuilder.noticeBody(caseData.getDocumentGeneration().getStatementOfReasonsBodyContent());
-                    formPayloadBuilder.userName(caseData.getDocumentGeneration().getStatementOfReasonsSignedBy());
-                    formPayloadBuilder.userRole(caseData.getDocumentGeneration().getStatementOfReasonsSignedRole());
+                    formPayloadBuilder.noticeBody(documentGeneration.getStatementOfReasonsBodyContent());
+                    formPayloadBuilder.userName(documentGeneration.getStatementOfReasonsSignedBy());
+                    formPayloadBuilder.userRole(documentGeneration.getStatementOfReasonsSignedRole());
                     return formPayloadBuilder.build();
                 case LIBERTY_TO_APPLY:
                     if (isPostHearingsBEnabled) {
-                        formPayloadBuilder.noticeBody(caseData.getDocumentGeneration().getLibertyToApplyBodyContent());
-                        formPayloadBuilder.userName(caseData.getDocumentGeneration().getLibertyToApplySignedBy());
-                        formPayloadBuilder.userRole(caseData.getDocumentGeneration().getLibertyToApplySignedRole());
+                        formPayloadBuilder.noticeBody(documentGeneration.getLibertyToApplyBodyContent());
+                        formPayloadBuilder.userName(documentGeneration.getLibertyToApplySignedBy());
+                        formPayloadBuilder.userRole(documentGeneration.getLibertyToApplySignedRole());
                         return formPayloadBuilder.build();
                     }
                     throw new IllegalArgumentException("isPostHearingsBEnabled is false - Liberty to Apply is not available");
@@ -211,10 +212,10 @@ public class PdfRequestUtil {
                             + postHearingReviewType.getDescriptionEn());
             }
         }
-        formPayloadBuilder.noticeBody(Optional.ofNullable(caseData.getDocumentGeneration().getBodyContent())
-                .orElse(caseData.getDocumentGeneration().getDirectionNoticeContent()));
-        formPayloadBuilder.userName(caseData.getDocumentGeneration().getSignedBy());
-        formPayloadBuilder.userRole(caseData.getDocumentGeneration().getSignedRole());
+        formPayloadBuilder.noticeBody(Optional.ofNullable(documentGeneration.getBodyContent())
+                .orElse(documentGeneration.getDirectionNoticeContent()));
+        formPayloadBuilder.userName(documentGeneration.getSignedBy());
+        formPayloadBuilder.userRole(documentGeneration.getSignedRole());
         return formPayloadBuilder.build();
     }
 
@@ -223,7 +224,7 @@ public class PdfRequestUtil {
 
         switch (postHearingRequestType) {
             case SET_ASIDE:
-                return sscsCaseData.getDocumentGeneration().getBodyContent();
+                return sscsdocumentGeneration.getBodyContent();
             case CORRECTION:
                 return sscsCaseData.getDocumentGeneration().getCorrectionBodyContent();
             case STATEMENT_OF_REASONS:
