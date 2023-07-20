@@ -337,6 +337,9 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             }
             log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
         }
+
+        caseData.setPrePostHearing(null);
+
         return sscsCaseDataPreSubmitCallbackResponse;
     }
 
