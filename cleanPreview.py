@@ -3,6 +3,7 @@ import subprocess
 import sys
 import time
 
+
 # TODO:
 # Wort adding condition to check if given namespace exists. For example fetch the NS and check if given argument exists
 # in the list
@@ -72,7 +73,6 @@ def create_cmds():
     elif deployments_to_delete.count(pod_name_to_delete_string):
         kubectl_delete_cmds[0] = kubectl_delete_cmds[0] + pod_name_to_delete_string + " "
 
-
 pr_numbers = []
 for pod in pods:
     if pod.__contains__('-pr-'):
@@ -81,21 +81,4 @@ for pod in pods:
         pr_number = pr_number[:pr_number.index('-')]
         pr_numbers.append(pr_number)
 
-for pr_number in pr_numbers:
-    if pr_numbers.count(pr_number) == 1 or pr_numbers.count(pr_number) == 2:
-        create_cmds()
-
-if kubectl_delete_cmds[0].__contains__("-pr-"):
-    print('---DELETING DEPLOYMENTS---')
-    print('\n'.join(deployments_to_delete))
-    subprocess.check_output(kubectl_delete_cmds[0], shell=True)
-else:
-    print('No deployments to delete...\n')
-
-if kubectl_delete_cmds[1].__contains__("-pr-"):
-    print('---DELETING STS---')
-    print('\n'.join(sts_to_delete))
-    subprocess.check_output(kubectl_delete_cmds[1], shell=True)
-else:
-    print('No sts to delete...')
 
