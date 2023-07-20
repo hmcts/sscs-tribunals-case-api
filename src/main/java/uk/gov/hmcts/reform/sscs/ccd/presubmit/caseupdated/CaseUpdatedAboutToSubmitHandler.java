@@ -157,25 +157,25 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (entity !=null) {
 
 
-            if (entity.getName().getFirstName() == null) {
+            if (entity.getName().getFirstName().isEmpty()) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", partyType));
             }
-            if (entity.getName().getLastName() == null) {
+            if (entity.getName().getLastName().isEmpty()) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", partyType));
             }
-            if (entity.getAddress().getLine1() == null) {
+            if (entity.getAddress().getLine1().isEmpty()) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 1", partyType));
             }
-            if (entity.getAddress().getLine2() == null) {
+            if (entity.getAddress().getLine2().isEmpty()) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 2", partyType));
             }
-            if (entity.getAddress().getPostcode() == null) {
+            if (entity.getAddress().getPostcode().isEmpty()) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "Postcode", partyType));
             }
-            if (entity.getIdentity().getDob() == null) {
+            if (entity.getIdentity().getDob().isEmpty()) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "Date of Birth", partyType));
             }
-            if (entity.getIdentity().getNino() == null) {
+            if (entity.getIdentity().getNino().isEmpty()) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "National Insurance Number", partyType));
             }
 
@@ -200,18 +200,14 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void validateAppointeeCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
-         YesNo hasAppointee = sscsCaseData.getHasOtherPartyAppointee();
 
-
-
-        if (hasAppointee == YES) {
             Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
             List<String> warnings = validatePartyCaseDAta(appointeeInfo, "Appointee");
 
             if (!warnings.isEmpty()) {
                 response.addWarnings(warnings);
             }
-        }
+
 
     }
 
@@ -220,10 +216,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         List<String> listOfWarnings = new ArrayList<>();
 
         if (entity != null){
-            if (entity.getName().getFirstName() == null){
+            if (entity.getName().getFirstName().isEmpty()){
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", entityType));
             }
-            if (entity.getName().getLastName() == null){
+            if (entity.getName().getLastName().isEmpty()){
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", entityType));
             }
         }
