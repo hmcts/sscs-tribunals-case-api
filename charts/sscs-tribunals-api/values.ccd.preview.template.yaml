@@ -104,6 +104,7 @@ xui-webapp:
       SERVICES_WA_WORKFLOW_API_URL: http://{{ .Release.Name }}-wa-workflow-api
       SERVICES_WORK_ALLOCATION_TASK_API: http://{{ .Release.Name }}-wa-task-management-api
       JURISDICTIONS: SSCS
+      WA_SUPPORTED_JURISDICTIONS: SSCS
       LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
       FEATURE_WORKALLOCATION_ENABLED: true
       FEATURE_REDIS_ENABLED: false
