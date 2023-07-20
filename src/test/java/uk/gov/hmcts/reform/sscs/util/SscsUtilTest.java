@@ -89,7 +89,21 @@ class SscsUtilTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PostHearingReviewType.class, names = {"PERMISSION_TO_APPEAL", "LIBERTY_TO_APPLY"})
+    @CsvSource(value = {
+        "GRANT,LIBERTY_TO_APPLY_GRANTED",
+        "REFUSE,LIBERTY_TO_APPLY_REFUSED"
+    })
+    void givenActionTypeLta_shouldReturnLtaDocument(LibertyToApplyActions action, DocumentType expectedDocumentType) {
+        postHearing.setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
+        postHearing.getLibertyToApply().setAction(action);
+
+        DocumentType documentType = getPostHearingReviewDocumentType(postHearing, true);
+
+        assertThat(documentType).isEqualTo(expectedDocumentType);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = PostHearingReviewType.class, names = {"PERMISSION_TO_APPEAL"})
     void givenActionTypeNotSupported_throwError(PostHearingReviewType postHearingReviewType) {
         postHearing.setReviewType(postHearingReviewType);
 
