@@ -46,6 +46,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private final DwpAddressLookupService dwpAddressLookupService;
     private final int dwpResponseDueDays;
     private final int dwpResponseDueDaysChildSupport;
+    @Value("${feature.postHearings.enabled}")
+    private final boolean isPostHearingsEnabled;
 
     @Autowired
     public DirectionIssuedAboutToSubmitHandler(FooterService footerService, ServiceRequestExecutor serviceRequestExecutor,
@@ -53,13 +55,15 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                                                @Value("${bulk_scan.validateEndpoint}") String validateEndpoint,
                                                DwpAddressLookupService dwpAddressLookupService,
                                                @Value("${dwp.response.due.days}") int dwpResponseDueDays,
-                                               @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport) {
+                                               @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport,
+                                               @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
         this.footerService = footerService;
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bulkScanEndpoint = String.format("%s%s", trimToEmpty(bulkScanUrl), trimToEmpty(validateEndpoint));
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.dwpResponseDueDays = dwpResponseDueDays;
         this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
+        this.isPostHearingsEnabled = isPostHearingsEnabled;
     }
 
     @Override
@@ -338,7 +342,9 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
         }
 
-        caseData.setPrePostHearing(null);
+        if (isPostHearingsEnabled) {
+            caseData.setPrePostHearing(null);
+        }
 
         return sscsCaseDataPreSubmitCallbackResponse;
     }
