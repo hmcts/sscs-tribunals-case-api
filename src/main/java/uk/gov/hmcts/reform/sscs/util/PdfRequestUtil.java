@@ -224,7 +224,7 @@ public class PdfRequestUtil {
 
         switch (postHearingRequestType) {
             case SET_ASIDE:
-                return sscsdocumentGeneration.getBodyContent();
+                return sscsCaseData.getDocumentGeneration().getBodyContent();
             case CORRECTION:
                 return sscsCaseData.getDocumentGeneration().getCorrectionBodyContent();
             case STATEMENT_OF_REASONS:
