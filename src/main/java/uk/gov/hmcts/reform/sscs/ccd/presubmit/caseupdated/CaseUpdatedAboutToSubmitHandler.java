@@ -202,6 +202,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void validateAppointeeCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
          YesNo hasAppointee = sscsCaseData.getHasOtherPartyAppointee();
 
+
+
         if (hasAppointee == YES) {
             Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
             List<String> warnings = validatePartyCaseDAta(appointeeInfo, "Appointee");
@@ -231,7 +233,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void validateRepresentativeNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
 
         final boolean hasRepresentative = sscsCaseData.isThereARepresentative();
-        if (hasRepresentative == true) {
+        if (hasRepresentative) {
             Representative representativeInfo = sscsCaseData.getAppeal().getRep();
             List<String> warnings = validateRepAndJointPartyCaseData(representativeInfo, "Representative");
 
@@ -245,7 +247,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         JointParty jointPartyInfo = sscsCaseData.getJointParty();
 
         final boolean hasJointParty = sscsCaseData.isThereAJointParty();
-        if (hasJointParty == true){
+        if (hasJointParty){
         List<String> warnings = validateRepAndJointPartyCaseData(jointPartyInfo, "Joint Party");
 
         if (!warnings.isEmpty()) {
