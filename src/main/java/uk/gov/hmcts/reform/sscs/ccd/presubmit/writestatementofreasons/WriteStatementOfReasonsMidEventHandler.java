@@ -61,8 +61,6 @@ public class WriteStatementOfReasonsMidEventHandler extends IssueDocumentHandler
             String templateId = documentConfiguration.getDocuments()
                 .get(caseData.getLanguagePreference()).get(EventType.DECISION_ISSUED);
 
-            caseData.getDocumentGeneration().setSignedBy(userDetailsService.buildLoggedInUserName(userAuthorisation));
-            caseData.getDocumentGeneration().setSignedRole(userDetailsService.getUserRole(userAuthorisation));
             response = issueDocument(callback, STATEMENT_OF_REASONS, templateId, generateFile, userAuthorisation, isPostHearingsEnabled, isPostHearingsBEnabled);
         }
 
