@@ -30,8 +30,12 @@ public class UserDetailsService {
         return userDetails.getSurname().orElse("");
     }
 
+    public List<String> getUserRoles(String userAuthorisation) {
+        return getUserInfo(userAuthorisation).getRoles();
+    }
+
     public String getUserRole(String userAuthorisation) {
-        List<String> users = getUserInfo(userAuthorisation).getRoles();
+        List<String> users = getUserRoles(userAuthorisation);
 
         for (UserRole userRole : UserRole.values()) {
             if (users.contains(userRole.getValue())) {
