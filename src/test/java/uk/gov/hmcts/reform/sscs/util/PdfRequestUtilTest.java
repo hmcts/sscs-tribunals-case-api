@@ -212,7 +212,7 @@ class PdfRequestUtilTest {
     }
 
     @ParameterizedTest
-    @MethodSource("caseDataByPHReviewType")
+    @MethodSource("caseDataByPostHearingReviewType")
     void signedBySignedRole_populatesFromCorrectFields(SscsCaseData sscsCaseData) {
         NoticeIssuedTemplateBody templateBody = PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(sscsCaseData,
                 NoticeIssuedTemplateBody.builder().build(), true, true);
@@ -221,7 +221,7 @@ class PdfRequestUtilTest {
         assertThat(templateBody.getUserRole()).isEqualTo("signed role");
     }
 
-    private static Stream<Arguments> caseDataByPHReviewType() {
+    private static Stream<Arguments> caseDataByPostHearingReviewType() {
         return Stream.of(
                 Arguments.of(SscsCaseData.builder()
                         .postHearing(PostHearing.builder().reviewType(PostHearingReviewType.SET_ASIDE).build())
