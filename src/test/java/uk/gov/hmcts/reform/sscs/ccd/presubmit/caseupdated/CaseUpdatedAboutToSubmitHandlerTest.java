@@ -22,6 +22,7 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import org.elasticsearch.cluster.metadata.AliasAction;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -188,6 +189,55 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         assertEquals("002DD", response.getData().getCaseCode());
     }
+
+    @Test
+    public void givenACaseUpdatedEventWithEmptyAppelantDetails_thenProvideAnError(){
+
+        Appellant appellant = Appellant.builder()
+                .name(Name.builder().firstName("").lastName("").build())
+                .address(Address.builder().line1("").line2("").postcode("").build())
+                .identity(Identity.builder().nino("").dob("").build())
+                .build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getWarnings().size(), is(7));
+      }
+
+    @Test
+    public void givenACaseUpdatedEventWithEmptyAppointeeDetails_thenProvideAnError(){
+
+        Appointee appointee = Appointee.builder()
+                .name(Name.builder().firstName("").lastName("").build())
+                .address(Address.builder().line1("").line2("").postcode("").build())
+                .identity(Identity.builder().nino("").dob("").build())
+                .build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getWarnings().size(), is(7));
+    }
+
+    @Test
+    public void givenACaseUpdatedEventWithEmptyRepresentativeDetails_thenProvideAnError(){
+
+       Representative representative = Representative.builder()
+                .name(Name.builder().firstName("").lastName("").build())
+                .build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getWarnings().size(), is(2));
+    }
+
+    @Test
+    public void givenACaseUpdatedEventWithEmptyJointPartyDetails_thenProvideAnError(){
+
+        JointParty jointParty = JointParty.builder()
+                .name(Name.builder().firstName("").lastName("").build())
+                .build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getWarnings().size(), is(2));
+    }
+
 
     @Test
     public void givenAnAppealWithPostcode_updateRpc() {

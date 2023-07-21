@@ -157,25 +157,25 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (entity !=null) {
 
 
-            if (entity.getName().getFirstName().isEmpty()) {
+            if (StringUtils.isBlank(entity.getName().getFirstName())) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", partyType));
             }
-            if (entity.getName().getLastName().isEmpty()) {
+            if (StringUtils.isBlank(entity.getName().getLastName())) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", partyType));
             }
-            if (entity.getAddress().getLine1().isEmpty()) {
+            if (StringUtils.isBlank(entity.getAddress().getLine1())) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 1", partyType));
             }
-            if (entity.getAddress().getLine2().isEmpty()) {
+            if (StringUtils.isBlank(entity.getAddress().getLine2())) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 2", partyType));
             }
-            if (entity.getAddress().getPostcode().isEmpty()) {
+            if (StringUtils.isBlank(entity.getAddress().getPostcode())) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "Postcode", partyType));
             }
-            if (entity.getIdentity().getDob().isEmpty()) {
+            if (StringUtils.isBlank(entity.getIdentity().getDob())) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "Date of Birth", partyType));
             }
-            if (entity.getIdentity().getNino().isEmpty()) {
+            if (StringUtils.isBlank(entity.getIdentity().getNino())) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "National Insurance Number", partyType));
             }
 
@@ -216,10 +216,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         List<String> listOfWarnings = new ArrayList<>();
 
         if (entity != null){
-            if (entity.getName().getFirstName().isEmpty()){
+            if (StringUtils.isBlank(entity.getName().getFirstName())){
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", entityType));
             }
-            if (entity.getName().getLastName().isEmpty()){
+            if (StringUtils.isBlank(entity.getName().getLastName())){
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", entityType));
             }
         }
