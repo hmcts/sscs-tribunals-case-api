@@ -87,6 +87,15 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     }
 
     @Test
+    public void givenStateIsNorDormantOrPostHearings_thenErrorsShouldBeEmpty() {
+        when(caseDetails.getState()).thenReturn(State.VALID_APPEAL);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals(response.getErrors().size(), 0);
+    }
+
+    @Test
     public void givenStateIsDormantAndFeePaidJudge_thenThrowError() {
         when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
         when(userDetailsService.getUserRoles(USER_AUTHORISATION)).thenReturn(List.of(UserRole.FEE_PAID_JUDGE.getValue()));
