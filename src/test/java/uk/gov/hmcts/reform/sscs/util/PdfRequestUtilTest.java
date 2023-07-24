@@ -101,9 +101,10 @@ class PdfRequestUtilTest {
     @Test
     void getNoticeBody_throwsExceptionWhenPermissionToApplyAndIsPostHearingsBEnabledIsFalse() {
         sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
-        assertThatThrownBy(() -> PdfRequestUtil.getNoticeBody(sscsCaseData, true, false))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("isPostHearingsBEnabled is false - Permission to Appeal is not available");
+        assertThatThrownBy(() -> PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(sscsCaseData,
+                NoticeIssuedTemplateBody.builder().build(), true, false))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageStartingWith("isPostHearingsBEnabled is false - Permission to Appeal is not available");
     }
 
     @Test

@@ -210,6 +210,8 @@ public class PdfRequestUtil {
                 case PERMISSION_TO_APPEAL:
                     if (isPostHearingsBEnabled) {
                         formPayloadBuilder.noticeBody(caseData.getDocumentGeneration().getPermissionToAppealBodyContent());
+                        formPayloadBuilder.userName(documentGeneration.getPermissionToAppealSignedBy());
+                        formPayloadBuilder.userRole(documentGeneration.getPermissionToAppealSignedRole());
                         return formPayloadBuilder.build();
                     }
                     throw new IllegalArgumentException("isPostHearingsBEnabled is false - Permission to Appeal is not available");
