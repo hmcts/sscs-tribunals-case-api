@@ -662,8 +662,6 @@ sscs-tribunals-frontend:
           - postcode-lookup-token
           - AppInsightsInstrumentationKey
           - pcq-token-key
-          - sscs-redis-access-key
-          - sscs-redis-connection-string
 
 redis:
   enabled: true
