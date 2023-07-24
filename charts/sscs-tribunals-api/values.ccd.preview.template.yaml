@@ -639,9 +639,11 @@ sscs-tribunals-frontend:
   enabled: true
   nodejs:
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:prod-32cbe82-20220825134712
+    releaseNameOverride: ${SERVICE_NAME}-sscs-tribunals-frontend
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
+      REDIS_PORT: 6379
       APPINSIGHTS_ROLE_NAME: ${SERVICE_NAME}
       PCQ_URL: "https://pcq.aat.platform.hmcts.net"
       FT_ANTENNA_WEBCHAT: false
@@ -670,7 +672,8 @@ redis:
   cluster:
     enabled: false
     slaveCount: 0
-  usePassword: false
+  auth:
+    enabled: false
   master:
     persistence:
       enabled: false
