@@ -484,7 +484,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                                                   PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
                                                   ScannedDocument scannedDocument) {
         //check warning for bundle addition
-        if (!ignoreWarnings && !isBundleAdditionSelectedForActionType(sscsCaseData, scannedDocument)) {
+        if (!isBundleAdditionSelectedForActionType(sscsCaseData, scannedDocument) && !ignoreWarnings) {
             preSubmitCallbackResponse.addWarning(
                 "No documents have been ticked to be added as an addition. These document(s) will NOT be added to "
                     + "the bundle. Are you sure?");
