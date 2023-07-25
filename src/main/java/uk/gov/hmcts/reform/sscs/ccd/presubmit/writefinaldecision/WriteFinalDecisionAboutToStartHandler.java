@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import java.util.List;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,9 +46,13 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (isPostHearingsEnabled
-                && (State.DORMANT_APPEAL_STATE.equals(state) || State.POST_HEARING.equals(state))
-                && !userDetailsService.getUserRoles(userAuthorisation).contains(UserRole.SALARIED_JUDGE.getValue())) {
-            preSubmitCallbackResponse.addError("You do not have access to proceed");
+                && (State.DORMANT_APPEAL_STATE.equals(state) || State.POST_HEARING.equals(state))) {
+            List<String> userRoles = userDetailsService.getUserRoles(userAuthorisation);
+
+            if (userRoles.contains(UserRole.JUDGE.getValue())
+                    && !userRoles.contains(UserRole.SALARIED_JUDGE.getValue())) {
+                preSubmitCallbackResponse.addError("You do not have access to proceed");
+            }
         }
 
         return preSubmitCallbackResponse;
