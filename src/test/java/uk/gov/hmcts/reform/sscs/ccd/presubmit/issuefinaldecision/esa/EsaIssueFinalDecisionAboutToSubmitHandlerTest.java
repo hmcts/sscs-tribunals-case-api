@@ -27,6 +27,7 @@ import junitparams.Parameters;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -356,5 +357,44 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
         assertThat(response.getData().getState(), is(State.WITH_DWP));
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_RESPONDED));
+    }
+
+    @Test
+    public void givenWriteFinalDecisionPostHearingsEnabledAndNoNullIssueFinalDate_shouldNotUpdateFinalCaseData() {
+        ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", true);
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        callback.getCaseDetails().getCaseData().setState(State.WITH_DWP);
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.DIRECTION_RESPONDED);
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionIssuedDate(LocalDate.now());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+
+        Assertions.assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionIdamSurname());
+        Assertions.assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionGeneratedDate());
+    }
+
+    @Test
+    public void givenWriteFinalDecisionPostHearingsEnabledAndNoIssueFinalDate_shouldUpdateFinalCaseData() {
+        ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", true);
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        callback.getCaseDetails().getCaseData().setState(State.WITH_DWP);
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.DIRECTION_RESPONDED);
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionIssuedDate(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+
+        assertEquals(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionIssuedDate(), LocalDate.now());
     }
 }

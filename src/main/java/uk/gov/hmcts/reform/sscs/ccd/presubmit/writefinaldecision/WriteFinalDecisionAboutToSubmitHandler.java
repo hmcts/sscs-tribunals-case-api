@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -80,10 +79,7 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                 SscsFinalDecisionCaseData finalDecisionCaseData = sscsCaseData.getSscsFinalDecisionCaseData();
 
                 if (isNull(finalDecisionCaseData.getFinalDecisionIssuedDate())) {
-                    String idamSurname = sscsCaseData.getDocumentGeneration().getSignedBy();
-                    idamSurname = nonNull(idamSurname) ? idamSurname : userDetailsService.buildLoggedInUserName(userAuthorisation);
-
-                    finalDecisionCaseData.setFinalDecisionIdamSurname(idamSurname);
+                    finalDecisionCaseData.setFinalDecisionIdamSurname(userDetailsService.buildLoggedInUserName(userAuthorisation));
                     finalDecisionCaseData.setFinalDecisionGeneratedDate(LocalDate.now());
                 }   
             }
