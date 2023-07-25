@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
@@ -87,17 +88,24 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             return preSubmitCallbackResponse;
         }
 
+        if (isPostHearingsEnabled) {
+            SscsFinalDecisionCaseData finalDecisionCaseData = sscsCaseData.getSscsFinalDecisionCaseData();
+
+            if (isNull(finalDecisionCaseData.getFinalDecisionIssuedDate())) {
+                finalDecisionCaseData.setFinalDecisionIssuedDate(LocalDate.now());
+            }
+        }
+
         createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
         clearTransientFields(preSubmitCallbackResponse);
 
-        boolean isCorrectionInProgress = isPostHearingsEnabled && isYes(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
-
         if ((!(State.READY_TO_LIST.equals(sscsCaseData.getState())
             || State.WITH_DWP.equals(sscsCaseData.getState())))
-            && !isCorrectionInProgress) {
+            && !SscsUtil.isCorrectionInProgress(sscsCaseData, isPostHearingsEnabled)) {
             sscsCaseData.setDwpState(FINAL_DECISION_ISSUED);
             sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         }
+
         if (eligibleForHearingsCancel.test(callback) && hasHearingScheduledInTheFuture(sscsCaseData)) {
             log.info("Issue Final Decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());

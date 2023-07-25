@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 import java.time.LocalDate;
 import java.util.*;
 import lombok.AllArgsConstructor;
@@ -15,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
@@ -24,6 +28,7 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
     private final DecisionNoticeService decisionNoticeService;
     private final PreviewDocumentService previewDocumentService;
+    private final UserDetailsService userDetailsService;
     @Value("${feature.postHearings.enabled}")
     private boolean isPostHearingsEnabled;
 
@@ -69,6 +74,18 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             if (!(State.READY_TO_LIST.equals(state)
                 || State.WITH_DWP.equals(sscsCaseData.getState()))) {
                 sscsCaseData.setPreviousState(state);
+            }
+            
+            if (isPostHearingsEnabled) {
+                SscsFinalDecisionCaseData finalDecisionCaseData = sscsCaseData.getSscsFinalDecisionCaseData();
+
+                if (isNull(finalDecisionCaseData.getFinalDecisionIssuedDate())) {
+                    String idamSurname = sscsCaseData.getDocumentGeneration().getSignedBy();
+                    idamSurname = nonNull(idamSurname) ? idamSurname : userDetailsService.buildLoggedInUserName(userAuthorisation);
+
+                    finalDecisionCaseData.setFinalDecisionIdamSurname(idamSurname);
+                    finalDecisionCaseData.setFinalDecisionGeneratedDate(LocalDate.now());
+                }   
             }
 
             SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
@@ -71,12 +70,6 @@ public class IssueDocumentHandler {
 
         if (isPostHearingsEnabled) {
             SscsFinalDecisionCaseData finalDecisionCaseData = caseData.getSscsFinalDecisionCaseData();
-
-            if (isNull(finalDecisionCaseData.getFinalDecisionIssuedDate())) {
-                finalDecisionCaseData.setFinalDecisionIdamSurname(caseData.getDocumentGeneration().getSignedBy());
-                finalDecisionCaseData.setFinalDecisionGeneratedDate(generatedDate);
-                finalDecisionCaseData.setFinalDecisionIssuedDate(LocalDate.now());
-            }
 
             if (isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
                 formPayload = formPayload.toBuilder()

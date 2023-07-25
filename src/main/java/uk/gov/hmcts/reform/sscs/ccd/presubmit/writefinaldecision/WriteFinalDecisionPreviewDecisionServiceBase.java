@@ -83,10 +83,13 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         final NoticeIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
 
+        SscsFinalDecisionCaseData finalDecisionCaseData = caseData.getSscsFinalDecisionCaseData();
+
         if (SscsUtil.isCorrectionInProgress(caseData, isPostHearingsEnabled)) {
-            builder.dateIssued(caseData.getSscsFinalDecisionCaseData().getFinalDecisionIssuedDate());
+            builder.dateIssued(finalDecisionCaseData.getFinalDecisionIssuedDate());
             builder.correctedJudgeName(buildSignedInJudgeName(userAuthorisation));
             builder.correctedDateIssued(showIssueDate ? LocalDate.now() : null);
+            builder.idamSurname(finalDecisionCaseData.getFinalDecisionIdamSurname());
         } else {
             builder.userName(buildSignedInJudgeName(userAuthorisation));
             builder.idamSurname(buildSignedInJudgeSurname(userAuthorisation));

@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 public class WriteFinalDecisionAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -31,12 +32,14 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     private DecisionNoticeOutcomeService decisionNoticeOutcomeService;
     @Mock
     private PreviewDocumentService previewDocumentService;
+    @Mock
+    private UserDetailsService userDetailsService;
 
     @Before
     public void setUp() {
         openMocks(this);
 
-        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeService, previewDocumentService, false);
+        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeService, previewDocumentService, userDetailsService, false);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("childSupport").build());

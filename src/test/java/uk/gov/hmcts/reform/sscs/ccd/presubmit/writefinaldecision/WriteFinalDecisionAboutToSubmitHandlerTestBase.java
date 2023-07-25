@@ -23,10 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
-import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
+import uk.gov.hmcts.reform.sscs.service.*;
 
 public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends DecisionNoticeQuestionService> {
 
@@ -43,6 +40,7 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
     protected DecisionNoticeOutcomeService decisionNoticeOutcomeService;
     protected DecisionNoticeService decisionNoticeService;
     protected PreviewDocumentService previewDocumentService;
+    protected UserDetailsService userDetailsService;
     protected SscsCaseData sscsCaseData;
 
     protected abstract DecisionNoticeOutcomeService createOutcomeService(T decisionNoticeQuestionService);
@@ -57,7 +55,7 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
         openMocks(this);
         decisionNoticeService = new DecisionNoticeService(Arrays.asList(decisionNoticeQuestionService), Arrays.asList(createOutcomeService(decisionNoticeQuestionService)), Arrays.asList());
         previewDocumentService = new PreviewDocumentService();
-        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeService, previewDocumentService, false);
+        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeService, previewDocumentService, userDetailsService, false);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

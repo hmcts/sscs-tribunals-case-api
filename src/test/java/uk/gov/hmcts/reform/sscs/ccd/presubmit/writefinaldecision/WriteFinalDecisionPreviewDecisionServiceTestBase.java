@@ -948,54 +948,6 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
     }
 
-    @Test
-    public void givenPostHearingsIsTrue_thenShowIssuedDateOnDocument() {
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
-        setHigherRateScenarioFields(sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(DATE_OF_DECISION);
-        sscsCaseData.getPostHearing().getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
-
-        service.preview(callback, DocumentType.CORRECTION_GRANTED, USER_AUTHORISATION, true, true, true);
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPEllANT_NAME, null, DATE_OF_DECISION, true,
-                true, false, isDescriptorFlowSupported(), true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.CORRECTION_GRANTED));
-
-        assertEquals(LocalDate.now(), payload.getDateIssued());
-    }
-
-    @Test
-    public void givenPostHearingsIsFalse_thenShowIssuedDateOnDocument() {
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
-        setHigherRateScenarioFields(sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(DATE_OF_DECISION);
-        sscsCaseData.getPostHearing().getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
-
-        service.preview(callback, DocumentType.CORRECTION_GRANTED, USER_AUTHORISATION, true, false, false);
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPEllANT_NAME, null, DATE_OF_DECISION, true,
-                true, false, isDescriptorFlowSupported(), true, false, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals(LocalDate.now(), payload.getDateIssued());
-    }
-
-    @Test
-    public void givenPostHearingsIsTrueAndDocumentIsFinalDecision_thenCreateFinalDecisionDocument() {
-        setDescriptorFlowIndicator(isDescriptorFlowSupported() ? "yes" : "no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
-        setHigherRateScenarioFields(sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(DATE_OF_DECISION);
-        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionIssuedDate(LocalDate.now());
-
-        service.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true, true, true);
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPEllANT_NAME, null, DATE_OF_DECISION, true,
-                true, false, isDescriptorFlowSupported(), true, false, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals(LocalDate.now(), payload.getDateIssued());
-    }
-
     protected abstract boolean isDescriptorFlowSupported();
 
     protected NoticeIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String expectedAppointeeName, String dateOfDecision, boolean allowed, boolean isSetAside, boolean isDraft,
