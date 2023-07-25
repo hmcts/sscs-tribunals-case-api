@@ -77,9 +77,9 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
 
     @Test
     @Parameters({"POST_HEARING", "DORMANT_APPEAL_STATE"})
-    public void givenStateIsDormantOrPostHearingsAndNotFeePaidJudge_thenErrorsShouldBeEmpty(State state) {
+    public void givenStateIsDormantOrPostHearingsAndIsSalariedJudge_thenErrorsShouldBeEmpty(State state) {
         when(caseDetails.getState()).thenReturn(state);
-        when(userDetailsService.getUserRoles(USER_AUTHORISATION)).thenReturn(List.of(UserRole.JUDGE.getValue()));
+        when(userDetailsService.getUserRoles(USER_AUTHORISATION)).thenReturn(List.of(UserRole.SALARIED_JUDGE.getValue()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -96,9 +96,9 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenStateIsDormantAndFeePaidJudge_thenThrowError() {
+    public void givenStateIsDormantAndIsntSalariedJudge_thenThrowError() {
         when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
-        when(userDetailsService.getUserRoles(USER_AUTHORISATION)).thenReturn(List.of(UserRole.FEE_PAID_JUDGE.getValue()));
+        when(userDetailsService.getUserRoles(USER_AUTHORISATION)).thenReturn(List.of(UserRole.JUDGE.getValue()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 

@@ -46,7 +46,7 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
 
         if (isPostHearingsEnabled
                 && (State.DORMANT_APPEAL_STATE.equals(state) || State.POST_HEARING.equals(state))
-                && userDetailsService.getUserRoles(userAuthorisation).contains(UserRole.FEE_PAID_JUDGE.getValue())) {
+                && !userDetailsService.getUserRoles(userAuthorisation).contains(UserRole.SALARIED_JUDGE.getValue())) {
             preSubmitCallbackResponse.addError("You do not have access to proceed");
         }
 
