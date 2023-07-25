@@ -1019,6 +1019,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        assertNull(updated.getData().getDwpState());
         assertNull(updated.getData().getDwpFurtherEvidenceStates());
     }
 
