@@ -79,7 +79,7 @@ xui-webapp:
   nodejs:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
-    image: hmctspublic.azurecr.io/xui/webapp:latest
+    image: hmctspublic.azurecr.io/xui/webapp:3178
     ingressHost: xui-${SERVICE_FQDN}
     memoryLimits: 1836Mi
     cpuLimits: 1900m
@@ -474,6 +474,7 @@ ccd:
         IDAM_OAUTH2_CLIENT_SECRET: ${CCD_API_GATEWAY_IDAM_CLIENT_SECRET}
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
       ingressIP: ${INGRESS_IP}
+      ingressHost: gateway-${SERVICE_FQDN}
       disableKeyVaults: true
 
   ccd-user-profile-importer:
