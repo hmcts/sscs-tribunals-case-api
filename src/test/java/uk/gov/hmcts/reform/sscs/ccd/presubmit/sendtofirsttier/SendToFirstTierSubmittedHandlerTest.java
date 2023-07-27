@@ -17,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest.PostHearingRequestAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 
 @ExtendWith(MockitoExtension.class)
