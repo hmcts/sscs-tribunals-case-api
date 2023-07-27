@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.sendtofirsttier;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,7 +61,7 @@ public class SendToFirstTierSubmittedHandlerTest {
     @Test
     void givenAInvalidEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(UPPER_TRIBUNAL_DECISION);
-        assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
+        assertThatIllegalStateException().isThrownBy(() -> handler.handle(SUBMITTED, callback, "userAuth"));
     }
 
     @Test
