@@ -21,9 +21,6 @@ public class SendToFirstTierSubmittedHandler implements PreSubmitCallbackHandler
 
     private final CcdCallbackMapService ccdCallbackMapService;
 
-    @Value("${feature.postHearings.enabled}")
-    private final boolean isPostHearingsEnabled;
-
     @Value("${feature.postHearingsB.enabled}")
     private final boolean isPostHearingsBEnabled;
 
@@ -34,15 +31,14 @@ public class SendToFirstTierSubmittedHandler implements PreSubmitCallbackHandler
 
         return callbackType.equals(CallbackType.SUBMITTED)
                 && callback.getEvent() == EventType.SEND_TO_FIRST_TIER
-                && isPostHearingsEnabled && isPostHearingsBEnabled;
+                && isPostHearingsBEnabled;
     }
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        caseData = ccdCallbackMapService.handleCcdCallbackMap(caseData.getPostHearing().getSendToFirstTier().getAction(),
-                callback.getCaseDetails().getCaseData());
+        caseData = ccdCallbackMapService.handleCcdCallbackMap(caseData.getPostHearing().getSendToFirstTier().getAction(), caseData);
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }

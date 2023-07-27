@@ -42,13 +42,13 @@ public class SendToFirstTierSubmittedHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new SendToFirstTierSubmittedHandler(ccdCallbackMapService, true, true);
+        handler = new SendToFirstTierSubmittedHandler(ccdCallbackMapService, true);
 
         caseData = SscsCaseData.builder()
                 .ccdCaseId(String.valueOf(CASE_ID))
                 .postHearing(PostHearing.builder()
-                        .sendToFirstTier(SendToFirstTier.builder().build())
-                        .build())
+                    .sendToFirstTier(SendToFirstTier.builder().build())
+                    .build())
                 .build();
     }
 
@@ -71,7 +71,7 @@ public class SendToFirstTierSubmittedHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new SendToFirstTierSubmittedHandler(ccdCallbackMapService, true, true);
+        handler = new SendToFirstTierSubmittedHandler(ccdCallbackMapService, true);
         when(callback.getEvent()).thenReturn(UPPER_TRIBUNAL_DECISION);
         assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }
@@ -84,9 +84,7 @@ public class SendToFirstTierSubmittedHandlerTest {
                 .build());
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-
         when(caseDetails.getCaseData()).thenReturn(caseData);
-
         when(ccdCallbackMapService.handleCcdCallbackMap(value, caseData))
                 .thenReturn(SscsCaseData.builder().build());
 
@@ -94,7 +92,6 @@ public class SendToFirstTierSubmittedHandlerTest {
                 handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-
         verify(ccdCallbackMapService, times(1))
                 .handleCcdCallbackMap(value, caseData);
     }
