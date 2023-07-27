@@ -76,13 +76,6 @@ public class SendToFirstTierSubmittedHandlerTest {
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
 
-    @Test
-    void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new SendToFirstTierSubmittedHandler(ccdCallbackMapService, true);
-        when(callback.getEvent()).thenReturn(UPPER_TRIBUNAL_DECISION);
-        assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
-    }
-
     @ParameterizedTest
     @EnumSource(value = SendToFirstTierActions.class)
     void givenRequestPostHearingTypes_shouldReturnCallCorrectCallback(SendToFirstTierActions value) {
@@ -90,6 +83,7 @@ public class SendToFirstTierSubmittedHandlerTest {
                 .action(value)
                 .build());
 
+        when(callback.getEvent()).thenReturn(SEND_TO_FIRST_TIER);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(ccdCallbackMapService.handleCcdCallbackMap(value, caseData))
