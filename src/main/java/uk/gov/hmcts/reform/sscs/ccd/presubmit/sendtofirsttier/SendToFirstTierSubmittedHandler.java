@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.decisionremade;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.sendtofirsttier;
 
 import static java.util.Objects.requireNonNull;
 
