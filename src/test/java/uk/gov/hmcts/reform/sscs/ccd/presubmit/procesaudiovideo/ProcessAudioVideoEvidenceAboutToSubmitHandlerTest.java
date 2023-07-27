@@ -27,9 +27,9 @@ import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Spy;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -40,7 +40,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoEvidenceAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
-import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
@@ -63,8 +62,6 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    private ArgumentCaptor<GenerateFileParams> capture;
-
     @Mock
     private FooterService footerService;
 
@@ -85,6 +82,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
 
         documentConfiguration.setDocuments(documents);
         handler = new ProcessAudioVideoEvidenceAboutToSubmitHandler(footerService, userDetailsService);
+        ReflectionTestUtils.setField(handler, "isPostHearingsBEnabled", false);
 
         sscsCaseData = SscsCaseData.builder()
             .documentGeneration(DocumentGeneration.builder()
@@ -198,7 +196,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDocumentGeneration().getSignedRole());
         assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
         assertNull(response.getData().getDocumentStaging().getDateAdded());
-        assertNull(response.getData().getReservedToJudge());
+        assertNull(response.getData().getReservedToJudgeInterloc());
 
         DocumentLink expectedDocumentLink = DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build();
 
@@ -243,7 +241,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDocumentGeneration().getSignedRole());
         assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
         assertNull(response.getData().getDocumentStaging().getDateAdded());
-        assertNull(response.getData().getReservedToJudge());
+        assertNull(response.getData().getReservedToJudgeInterloc());
 
         DocumentLink expectedDocumentLink = DocumentLink.builder().documentFilename("statement1.pdf").documentUrl("statement1.url").documentBinaryUrl("statement1.url/binary").build();
 
@@ -314,7 +312,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDocumentGeneration().getSignedRole());
         assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
         assertNull(response.getData().getDocumentStaging().getDateAdded());
-        assertNull(response.getData().getReservedToJudge());
+        assertNull(response.getData().getReservedToJudgeInterloc());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
@@ -378,7 +376,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDocumentGeneration().getSignedRole());
         assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
         assertNull(response.getData().getDocumentStaging().getDateAdded());
-        assertNull(response.getData().getReservedToJudge());
+        assertNull(response.getData().getReservedToJudgeInterloc());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
@@ -419,7 +417,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDocumentGeneration().getSignedRole());
         assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
         assertNull(response.getData().getDocumentStaging().getDateAdded());
-        assertNull(response.getData().getReservedToJudge());
+        assertNull(response.getData().getReservedToJudgeInterloc());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         verify(footerService).addFooter(eq(DocumentLink.builder().documentFilename("RIP 1 document uploaded on " + LocalDate.now().toString() + ".pdf").documentUrl("rip1.com").documentBinaryUrl("rip1.com/binary").build()), eq("RIP 1 document"), eq("A"));
@@ -478,7 +476,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDocumentGeneration().getSignedRole());
         assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
         assertNull(response.getData().getDocumentStaging().getDateAdded());
-        assertNull(response.getData().getReservedToJudge());
+        assertNull(response.getData().getReservedToJudgeInterloc());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
@@ -507,7 +505,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDocumentGeneration().getSignedRole());
         assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
         assertNull(response.getData().getDocumentStaging().getDateAdded());
-        assertNull(response.getData().getReservedToJudge());
+        assertNull(response.getData().getReservedToJudgeInterloc());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
@@ -527,7 +525,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDocumentGeneration().getSignedRole());
         assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
         assertNull(response.getData().getDocumentStaging().getDateAdded());
-        assertNull(response.getData().getReservedToJudge());
+        assertNull(response.getData().getReservedToJudgeInterloc());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
@@ -661,7 +659,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandlerTest {
         assertNull(response.getData().getDocumentGeneration().getSignedRole());
         assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
         assertNull(response.getData().getDocumentStaging().getDateAdded());
-        assertNull(response.getData().getReservedToJudge());
+        assertNull(response.getData().getReservedToJudgeInterloc());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE), any(), any(), eq(null), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
         verify(footerService).addFooter(eq(DocumentLink.builder().documentFilename("RIP 1 document uploaded on " + LocalDate.now().toString() + ".pdf").documentUrl("rip1.com").documentBinaryUrl("rip1.com/binary").build()), eq("RIP 1 document"), eq("A"));

@@ -223,7 +223,6 @@
       },
       "directionDueDate": "2120-10-10",
       "processAudioVideoReviewState": null,
-      "reservedToJudge": "wqdqwd",
       "tempNoteDetail": "My note",
       "selectedAudioVideoEvidence": {
         "list_items": [
@@ -575,7 +574,6 @@
       "previewDocument": "PUBLIC",
       "processAudioVideoAction": "PUBLIC",
       "processAudioVideoReviewState": "PUBLIC",
-      "reservedToJudge": "PUBLIC",
       "selectedAudioVideoEvidence": "PUBLIC",
       "selectedAudioVideoEvidenceDetails": {
         "classification": "PUBLIC",
@@ -948,7 +946,6 @@
       "previewDocument": "PUBLIC",
       "processAudioVideoAction": "PUBLIC",
       "processAudioVideoReviewState": "PUBLIC",
-      "reservedToJudge": "PUBLIC",
       "selectedAudioVideoEvidence": "PUBLIC",
       "selectedAudioVideoEvidenceDetails": {
         "classification": "PUBLIC",
