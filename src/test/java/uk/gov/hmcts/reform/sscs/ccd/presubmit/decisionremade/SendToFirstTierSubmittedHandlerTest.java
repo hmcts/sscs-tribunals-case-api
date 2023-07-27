@@ -21,12 +21,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 
 @ExtendWith(MockitoExtension.class)
-public class DecisionRemadeSubmittedHandlerTest {
+public class SendToFirstTierSubmittedHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     public static final long CASE_ID = 1234L;
 
-    private DecisionRemadeSubmittedHandler handler;
+    private SendToFirstTierSubmittedHandler handler;
 
     @Mock
     private CcdCallbackMapService ccdCallbackMapService;
@@ -42,19 +42,19 @@ public class DecisionRemadeSubmittedHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new DecisionRemadeSubmittedHandler(ccdCallbackMapService, true);
+        handler = new SendToFirstTierSubmittedHandler(ccdCallbackMapService, true, true);
 
         caseData = SscsCaseData.builder()
                 .ccdCaseId(String.valueOf(CASE_ID))
                 .postHearing(PostHearing.builder()
-                        .decisionRemade(new DecisionRemade())
+                        .sendToFirstTier(SendToFirstTier.builder().build())
                         .build())
                 .build();
     }
 
     @Test
     void givenAValidSubmittedEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(DECISION_REMADE);
+        when(callback.getEvent()).thenReturn(SEND_TO_FIRST_TIER);
         assertThat(handler.canHandle(SUBMITTED, callback)).isTrue();
     }
 
@@ -71,15 +71,15 @@ public class DecisionRemadeSubmittedHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new DecisionRemadeSubmittedHandler(ccdCallbackMapService, true);
+        handler = new SendToFirstTierSubmittedHandler(ccdCallbackMapService, true, true);
         when(callback.getEvent()).thenReturn(UPPER_TRIBUNAL_DECISION);
         assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }
 
     @ParameterizedTest
-    @EnumSource(value = UpperTribunalDecision.class)
-    void givenRequestPostHearingTypes_shouldReturnCallCorrectCallback(UpperTribunalDecision value) {
-        caseData.getPostHearing().setDecisionRemade(new DecisionRemade());
+    @EnumSource(value = SendToFirstTierActions.class)
+    void givenRequestPostHearingTypes_shouldReturnCallCorrectCallback(SendToFirstTierActions value) {
+        caseData.getPostHearing().setSendToFirstTier(SendToFirstTier.builder().build());
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 

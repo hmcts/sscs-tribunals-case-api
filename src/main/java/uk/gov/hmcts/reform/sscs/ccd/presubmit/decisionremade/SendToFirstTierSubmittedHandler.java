@@ -17,11 +17,15 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class DecisionRemadeSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class SendToFirstTierSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
     private final CcdCallbackMapService ccdCallbackMapService;
+
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
+    @Value("${feature.postHearingsB.enabled}")
+    private final boolean isPostHearingsBEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -29,14 +33,16 @@ public class DecisionRemadeSubmittedHandler implements PreSubmitCallbackHandler<
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
-                && callback.getEvent() == EventType.DECISION_REMADE
-                && isPostHearingsEnabled;
+                && callback.getEvent() == EventType.SEND_TO_FIRST_TIER
+                && isPostHearingsEnabled && isPostHearingsBEnabled;
     }
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
-        SscsCaseData caseData = ccdCallbackMapService.handleCcdCallbackMap(uk.gov.hmcts.reform.sscs.ccd.domain.UpperTribunalDecision.UPPER_TRIBUNAL_DECISION, callback.getCaseDetails().getCaseData());
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData = ccdCallbackMapService.handleCcdCallbackMap(caseData.getPostHearing().getSendToFirstTier().getAction(),
+                callback.getCaseDetails().getCaseData());
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }
