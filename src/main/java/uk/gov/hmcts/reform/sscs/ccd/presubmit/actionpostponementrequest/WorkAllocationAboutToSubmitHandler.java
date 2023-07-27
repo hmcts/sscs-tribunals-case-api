@@ -1,5 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
+import static java.util.Objects.requireNonNull;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -8,14 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Optional;
-
-import static java.util.Objects.requireNonNull;
 
 @Service
 @Slf4j
@@ -54,14 +53,14 @@ public class WorkAllocationAboutToSubmitHandler implements PreSubmitCallbackHand
 
     private Integer calculateDaysToHearing(List<Hearing> hearings) {
         if (hearings != null) {
-           Optional<LocalDate> nextHearingDate = hearings.stream()
+            Optional<LocalDate> nextHearingDate = hearings.stream()
                 .map(h -> hearingDate(h))
-                .filter(d -> d!=null)
+                .filter(d -> d != null)
                 .filter(d -> !d.isBefore(LocalDate.now()))
                 .min(LocalDate::compareTo);
-           if(nextHearingDate.isPresent()) {
+            if (nextHearingDate.isPresent()) {
                 return Math.toIntExact(LocalDate.now().until(nextHearingDate.get(), ChronoUnit.DAYS));
-           }
+            }
         }
         return null;
     }

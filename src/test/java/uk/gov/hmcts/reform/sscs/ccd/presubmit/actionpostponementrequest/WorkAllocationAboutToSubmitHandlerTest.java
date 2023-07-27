@@ -11,7 +11,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -119,7 +118,7 @@ public class WorkAllocationAboutToSubmitHandlerTest {
         handler = new WorkAllocationAboutToSubmitHandler(true);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, null);
 
-        assertEquals(new Integer(7), response.getData().getWorkAllocationFields().getDaysToHearing());
+        assertEquals(Integer.valueOf(7), response.getData().getWorkAllocationFields().getDaysToHearing());
     }
 
     @Test
@@ -133,7 +132,7 @@ public class WorkAllocationAboutToSubmitHandlerTest {
         handler = new WorkAllocationAboutToSubmitHandler(true);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, null);
 
-        assertEquals(new Integer(7), response.getData().getWorkAllocationFields().getDaysToHearing());
+        assertEquals(Integer.valueOf(7), response.getData().getWorkAllocationFields().getDaysToHearing());
     }
 
     private String today(int plusDays) {
