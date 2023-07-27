@@ -4,8 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest.PostHearingRequestAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 
 @ExtendWith(MockitoExtension.class)
@@ -61,6 +61,13 @@ public class SendToFirstTierSubmittedHandlerTest {
     @Test
     void givenAInvalidEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(UPPER_TRIBUNAL_DECISION);
+        assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
+    }
+
+    @Test
+    void givenPostHearingsBEnabledFalse_thenReturnFalse() {
+        handler = new SendToFirstTierSubmittedHandler(ccdCallbackMapService, false);
+        when(callback.getEvent()).thenReturn(SEND_TO_FIRST_TIER);
         assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }
 
