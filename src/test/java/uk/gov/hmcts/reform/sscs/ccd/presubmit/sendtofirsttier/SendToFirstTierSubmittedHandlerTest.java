@@ -79,7 +79,9 @@ public class SendToFirstTierSubmittedHandlerTest {
     @ParameterizedTest
     @EnumSource(value = SendToFirstTierActions.class)
     void givenRequestPostHearingTypes_shouldReturnCallCorrectCallback(SendToFirstTierActions value) {
-        caseData.getPostHearing().setSendToFirstTier(SendToFirstTier.builder().build());
+        caseData.getPostHearing().setSendToFirstTier(SendToFirstTier.builder()
+                .action(value)
+                .build());
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
