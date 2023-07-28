@@ -61,7 +61,7 @@ public class SendToFirstTierSubmittedHandlerTest {
     @Test
     void givenAInvalidEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(UPPER_TRIBUNAL_DECISION);
-        assertThatIllegalStateException().isThrownBy(() -> handler.handle(SUBMITTED, callback, "userAuth"));
+        assertThatIllegalStateException().isThrownBy(() -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
     }
 
     @Test

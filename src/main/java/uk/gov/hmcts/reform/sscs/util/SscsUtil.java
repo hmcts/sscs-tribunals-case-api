@@ -47,14 +47,14 @@ public class SscsUtil {
     }
 
     public static void addDocumentToDocumentTabAndBundle(FooterService footerService,
-                                                         SscsCaseData caseData, DocumentType documentType) {
-        DocumentLink url = caseData.getDocumentStaging().getPreviewDocument();
-
-        if (nonNull(url)) {
+                                                         SscsCaseData caseData,
+                                                         DocumentLink documentLink,
+                                                         DocumentType documentType) {
+        if (nonNull(documentLink)) {
             String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
             SscsDocumentTranslationStatus documentTranslationStatus = getDocumentTranslationStatus(caseData);
 
-            footerService.createFooterAndAddDocToCase(url, caseData, documentType, now,
+            footerService.createFooterAndAddDocToCase(documentLink, caseData, documentType, now,
                 null, null, documentTranslationStatus);
 
             updateTranslationStatus(caseData, documentTranslationStatus);
