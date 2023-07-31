@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.sendtofirsttier;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -12,22 +11,20 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
-import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
-import java.util.Objects;
-
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.UPLOAD;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class SendToFirstTierAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    private final FooterService footerService;
+
     @Value("${feature.postHearingsB.enabled}")
     private final boolean isPostHearingsBEnabled;
-    private final FooterService footerService;
+
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
