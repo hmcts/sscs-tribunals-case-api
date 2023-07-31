@@ -107,9 +107,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                     .code("PIP")
                     .build())
                 .appellant(Appellant.builder()
-                    .address(Address.builder()
-                        .postcode("CM120NS")
-                        .build())
+                        .name(Name.builder().firstName("First").lastName("Last").build())
+                        .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
+                        .identity(Identity.builder().nino("Nino").dob("Dob").build())
                     .build())
                 .build())
             .benefitCode("002")
@@ -120,9 +120,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             .ccdCaseId("ccdId")
             .appeal(Appeal.builder()
                 .appellant(Appellant.builder()
-                    .address(Address.builder()
-                        .postcode("CM120NS")
-                        .build())
+                        .name(Name.builder().firstName("First").lastName("Last").build())
+                        .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
+                        .identity(Identity.builder().nino("Nino").dob("Dob").build())
                     .build())
                 .build())
             .build();
@@ -191,7 +191,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenACaseUpdatedEventWithEmptyAppelantDetails_thenProvideAnError(){
+    public void givenACaseUpdatedEventWithEmptyAppellantDetails_thenProvideAnError(){
 
         Appellant appellant = Appellant.builder()
                 .name(Name.builder().firstName("").lastName("").build())
