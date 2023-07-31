@@ -26,7 +26,6 @@ public class PostponementRequestService {
     public void processPostponementRequest(SscsCaseData sscsCaseData, UploadParty uploadParty) {
         ensureSscsDocumentsIsNotNull(sscsCaseData);
         final SscsDocument sscsDocument = buildNewSscsDocumentFromPostponementRequest(sscsCaseData, uploadParty);
-        addToSscsDocuments(sscsCaseData, sscsDocument);
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
         sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(YES);
@@ -43,9 +42,7 @@ public class PostponementRequestService {
                 .build()).build();
     }
 
-    private void addToSscsDocuments(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
-        sscsCaseData.getSscsDocument().add(sscsDocument);
-    }
+
 
     private void clearTransientFields(SscsCaseData sscsCaseData) {
         sscsCaseData.getPostponementRequest().setPostponementRequestDetails(null);
