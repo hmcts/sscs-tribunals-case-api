@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,10 +11,12 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -45,6 +48,8 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
 
         if (response.getErrors().isEmpty()) {
             postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.DWP);
+            List<SscsDocument> documents = sscsCaseData.getSscsDocument();
+            SscsUtil.addDocumentToBundle(footerService, sscsCaseData, documents.get(documents.size() - 1));
         }
 
         return response;
