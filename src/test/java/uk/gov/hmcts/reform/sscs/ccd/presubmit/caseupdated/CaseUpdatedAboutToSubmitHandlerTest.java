@@ -110,7 +110,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                         .name(Name.builder().firstName("First").lastName("Last").build())
                         .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
                         .identity(Identity.builder().nino("Nino").dob("Dob").build())
-                    .build())
+                        .build())
                 .build())
             .benefitCode("002")
             .issueCode("DD")
@@ -366,7 +366,10 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
 
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().address(Address.builder().postcode("AB12 00B").build()).build());
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder()
+                .name(Name.builder().firstName("First").lastName("Last").build())
+                .identity(Identity.builder().nino("Nino").dob("Dob").build())
+                .address(Address.builder().postcode("AB12 00B").build()).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -414,10 +417,16 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             .thenReturn(venueB);
         when(refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId)).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("regionId").build());
 
+
+
         Appellant appellant = callback.getCaseDetails().getCaseData().getAppeal().getAppellant();
         appellant.getAddress().setPostcode("AB12 00B");
         appellant.setIsAppointee("Yes");
-        appellant.setAppointee(Appointee.builder().address(Address.builder().postcode(postCode).build()).build());
+        appellant.setAppointee(Appointee.builder()
+                .name(Name.builder().build())
+                .address(Address.builder().postcode(postCode).build())
+                .identity(Identity.builder().build())
+                .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -545,7 +554,10 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         numberOfExpectedError = getNumberOfExpectedError(response);
         assertEquals(0, numberOfExpectedError);
 
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().address(address).build());
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder()
+                .name(Name.builder().build())
+                .identity(Identity.builder().build())
+                .address(address).build());
         response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         numberOfExpectedError = getNumberOfExpectedError(response);
         assertEquals(0, numberOfExpectedError);
