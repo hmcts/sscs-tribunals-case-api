@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.sendtofirsttier;
 
 import static java.util.Objects.requireNonNull;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -70,7 +71,7 @@ public class SendToFirstTierAboutToSubmitHandler implements PreSubmitCallbackHan
         return response;
     }
 
-    private DocumentType getSendToFirstTierDocumentType(SendToFirstTierActions action) {
+    private DocumentType getSendToFirstTierDocumentType(@NonNull SendToFirstTierActions action) {
         switch (action) {
             case DECISION_REMADE:
                 return DocumentType.UPPER_TRIBUNALS_DECISION_REMADE;

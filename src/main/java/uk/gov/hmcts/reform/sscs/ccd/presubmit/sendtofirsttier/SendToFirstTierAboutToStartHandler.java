@@ -39,7 +39,9 @@ public class SendToFirstTierAboutToStartHandler implements PreSubmitCallbackHand
             throw new IllegalStateException("Cannot handle callback");
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
         SscsUtil.clearPostHearingFields(caseData);
 
         return response;

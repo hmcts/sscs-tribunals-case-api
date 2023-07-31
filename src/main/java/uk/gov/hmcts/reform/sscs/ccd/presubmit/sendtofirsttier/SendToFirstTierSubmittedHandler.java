@@ -41,7 +41,9 @@ public class SendToFirstTierSubmittedHandler implements PreSubmitCallbackHandler
             throw new IllegalStateException("Cannot handle callback");
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+
         caseData = ccdCallbackMapService.handleCcdCallbackMap(caseData.getPostHearing().getSendToFirstTier().getAction(), caseData);
+
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }
