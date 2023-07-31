@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @RunWith(JUnitParamsRunner.class)
 public class PostponementRequestServiceTest {
@@ -46,6 +47,13 @@ public class PostponementRequestServiceTest {
     private SscsCaseData caseData;
 
     private PreSubmitCallbackResponse<SscsCaseData> response;
+
+    private final FooterService footerService;
+
+    public PostponementRequestServiceTest(FooterService footerService) {
+        this.footerService = footerService;
+    }
+
 
     @Before
     public void setup() {
@@ -74,6 +82,7 @@ public class PostponementRequestServiceTest {
                 .build())))
             .build();
 
+
         response = new PreSubmitCallbackResponse<>(caseData);
     }
 
@@ -85,6 +94,8 @@ public class PostponementRequestServiceTest {
         caseData.setOriginalSender(originalSender);
 
         postponementRequestService.processPostponementRequest(caseData, uploadParty);
+        List<SscsDocument> documents = caseData.getSscsDocument();
+        SscsUtil.addDocumentToBundle(footerService, caseData, documents.get(documents.size() - 1));
 
         assertThat(caseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
         assertThat(caseData.getInterlocReferralReason()).isEqualTo(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
