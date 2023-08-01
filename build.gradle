@@ -558,7 +558,7 @@ bootWithCCD {
     //URLs for services running in Docker require host.docker.internal to resolve properly
     environment 'XUI_DOCUMENTS_API', 'http://host.docker.internal:5005'
     environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
-    environment 'IDAM_SIMULATOR_BASE_URL', 'http://rse-idam-simulator:5000'
+    environment 'IDAM_SIMULATOR_BASE_URL', 'http://rse-idam-simulator:5062'
     //URLs for other services can resolve localhost
     environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
     environment 'S2S_URL', 'http://localhost:4502'
