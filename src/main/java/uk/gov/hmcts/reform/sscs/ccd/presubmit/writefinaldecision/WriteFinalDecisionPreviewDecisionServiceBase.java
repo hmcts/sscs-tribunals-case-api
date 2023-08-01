@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 
 import java.time.LocalDate;
@@ -83,6 +84,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         final NoticeIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
 
+        String heldBefore = buildHeldBefore(caseData, userAuthorisation);
+
         SscsFinalDecisionCaseData finalDecisionCaseData = caseData.getSscsFinalDecisionCaseData();
 
         if (SscsUtil.isCorrectionInProgress(caseData, isPostHearingsEnabled)) {
@@ -90,14 +93,19 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             builder.correctedJudgeName(buildSignedInJudgeName(userAuthorisation));
             builder.correctedDateIssued(showIssueDate ? LocalDate.now() : null);
             builder.idamSurname(finalDecisionCaseData.getFinalDecisionIdamSurname());
+            heldBefore = finalDecisionCaseData.getFinalDecisionHeldBefore();
         } else {
             builder.userName(buildSignedInJudgeName(userAuthorisation));
             builder.idamSurname(buildSignedInJudgeSurname(userAuthorisation));
+
+            if (isPostHearingsEnabled && isNull(finalDecisionCaseData.getFinalDecisionHeldBefore())) {
+                finalDecisionCaseData.setFinalDecisionIdamSurname(heldBefore);
+            }
         }
 
-        writeFinalDecisionBuilder.summaryOfOutcomeDecision(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDetailsOfDecision());
+        writeFinalDecisionBuilder.heldBefore(heldBefore);
 
-        writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
+        writeFinalDecisionBuilder.summaryOfOutcomeDecision(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDetailsOfDecision());
 
         setHearings(writeFinalDecisionBuilder, caseData);
 
