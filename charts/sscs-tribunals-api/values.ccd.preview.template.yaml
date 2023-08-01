@@ -772,7 +772,7 @@ servicebus:
     queues:
       - name: sscs-orchestrator-queue-preview
 
-#Work Allocation
+#Work Allocation services
 wa:
   enabled: true
 
