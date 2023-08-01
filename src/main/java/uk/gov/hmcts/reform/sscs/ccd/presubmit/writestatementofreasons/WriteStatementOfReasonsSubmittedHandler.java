@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.WriteStatementOfReasons;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
@@ -43,6 +44,8 @@ public class WriteStatementOfReasonsSubmittedHandler implements PreSubmitCallbac
         log.info("Write Statement of Reasons: processing submitted handler for case {}", caseId);
 
         caseData = ccdCallbackMapService.handleCcdCallbackMap(WriteStatementOfReasons.IN_TIME, caseData);
+
+        SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
