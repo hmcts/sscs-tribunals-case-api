@@ -612,11 +612,9 @@ sscs-ccd-callback-orchestrator:
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     readinessDelay: 90
     environment:
-      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
-      TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
-      AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
-      AMQP_USERNAME: "RootManageSharedAccessKey"
-
+      SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
+      TOPIC_NAME: "sscs-evidenceshare-topic-aat"
+      AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
 
 #Enable for SYA
 sscs-tribunals-frontend:
