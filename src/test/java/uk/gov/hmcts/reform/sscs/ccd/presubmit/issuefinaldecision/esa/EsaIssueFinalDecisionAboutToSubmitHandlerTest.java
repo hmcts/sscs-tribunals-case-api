@@ -169,6 +169,41 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenAnIssueFinalDecisionEventRemoveDraftDecisionNotice() {
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(documentLink);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
+
+        SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(DRAFT_DECISION_NOTICE.getValue()).build()).build();
+        SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(FINAL_DECISION_NOTICE.getValue()).build()).build();
+
+        List<SscsDocument> documentList = new ArrayList<>(List.of(document1, document2));
+        callback.getCaseDetails().getCaseData().setSscsDocument(documentList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+        assertEquals(1, response.getData().getSscsDocument().size());
+    }
+
+    @Test
+    public void givenAnIssueFinalDecisionEventWhenDocumentTypeIsNullThenRemoveDraftDecisionNotice() {
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(documentLink);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
+
+        SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(FINAL_DECISION_NOTICE.getValue()).build()).build();
+        SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build();
+        SscsDocument document3 = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(DRAFT_DECISION_NOTICE.getValue()).build()).build();
+
+        List<SscsDocument> documentList = new ArrayList<>(List.of(document1, document2, document3));
+        callback.getCaseDetails().getCaseData().setSscsDocument(documentList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+        assertEquals(2, response.getData().getSscsDocument().size());
+    }
+
+    @Test
     public void givenAnIssueFinalDecisionEventForGenerateNoticeFlowWhenAllowedOrRefusedIsNull_ThenDisplayAnError() {
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(documentLink);
         callback.getCaseDetails().getCaseData().setWcaAppeal(YES);
