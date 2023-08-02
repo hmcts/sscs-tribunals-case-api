@@ -612,7 +612,7 @@ sscs-ccd-callback-orchestrator:
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     readinessDelay: 90
     environment:
-      DUMMY: true
+      DUMMY: false
       SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
       TOPIC_NAME: "sscs-evidenceshare-topic-aat"
       AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
