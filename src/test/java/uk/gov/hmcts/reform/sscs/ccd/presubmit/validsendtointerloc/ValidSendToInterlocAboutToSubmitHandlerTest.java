@@ -125,7 +125,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         List<SscsDocument> documents = sscsCaseData.getSscsDocument();
-        SscsUtil.addDocumentToBundle(footerService, sscsCaseData, documents.get(documents.size() - 1));
+        SscsUtil.addDocumentToBundle(footerService, sscsCaseData, documents.get(documents.size() - 1), true);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
 
