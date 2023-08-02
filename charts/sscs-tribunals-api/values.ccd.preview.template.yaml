@@ -616,10 +616,6 @@ sscs-ccd-callback-orchestrator:
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       AMQP_USERNAME: "RootManageSharedAccessKey"
-    secrets:
-      AMQP_PASSWORD:
-        secretRef: sscs-sb-preview
-        key: primaryKey
 
 
 #Enable for SYA
