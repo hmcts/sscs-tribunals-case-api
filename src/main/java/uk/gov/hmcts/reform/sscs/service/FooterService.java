@@ -28,17 +28,7 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
     }
 
     public void createFooterAndAddDocToCase(DocumentLink url, SscsCaseData caseData, DocumentType documentType, String dateIssued, LocalDate dateAdded, String overrideFileName, SscsDocumentTranslationStatus documentTranslationStatus) {
-
-        String label = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
-        log.info(label + " adding footer appendix document link: {} and caseId {}", url, caseData.getCcdCaseId());
-        FooterDetails footerDetails = addFooterToExistingToContentAndCreateNewUrl(url, caseData.getSscsDocument(), documentType, overrideFileName, dateIssued);
-
-        if (nonNull(footerDetails)) {
-            SscsDocument sscsDocument = createFooterDocument(footerDetails.getUrl(), footerDetails.getBundleAddition(), footerDetails.getBundleFileName(), dateAdded, documentType, documentTranslationStatus);
-            SscsUtil.addDocumentToCaseDataDocuments(caseData, sscsDocument);
-        } else {
-            log.info("Could not find {} document for caseId {} so skipping generating footer", label, caseData.getCcdCaseId());
-        }
+        createFooterAndAddDocToCase(url, caseData, documentType, dateIssued, dateAdded, overrideFileName,documentTranslationStatus, true);
     }
 
 
@@ -64,5 +54,21 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
         }
 
         return null;
+    }
+
+    public void createFooterAndAddDocToCase(DocumentLink url, SscsCaseData caseData, DocumentType documentType, String dateIssued, LocalDate dateAdded, String overrideFileName, SscsDocumentTranslationStatus documentTranslationStatus, boolean shouldAddDocumentToCaseData) {
+
+        String label = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
+        log.info(label + " adding footer appendix document link: {} and caseId {}", url, caseData.getCcdCaseId());
+        FooterDetails footerDetails = addFooterToExistingToContentAndCreateNewUrl(url, caseData.getSscsDocument(), documentType, overrideFileName, dateIssued);
+
+        if (nonNull(footerDetails)) {
+            SscsDocument sscsDocument = createFooterDocument(footerDetails.getUrl(), footerDetails.getBundleAddition(), footerDetails.getBundleFileName(), dateAdded, documentType, documentTranslationStatus);
+            if(shouldAddDocumentToCaseData){
+                SscsUtil.addDocumentToCaseDataDocuments(caseData, sscsDocument);
+            }
+        } else {
+            log.info("Could not find {} document for caseId {} so skipping generating footer", label, caseData.getCcdCaseId());
+        }
     }
 }

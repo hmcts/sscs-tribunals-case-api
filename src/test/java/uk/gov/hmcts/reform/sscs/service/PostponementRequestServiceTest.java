@@ -95,7 +95,7 @@ public class PostponementRequestServiceTest {
 
         postponementRequestService.processPostponementRequest(caseData, uploadParty);
         List<SscsDocument> documents = caseData.getSscsDocument();
-        SscsUtil.addDocumentToBundle(footerService, caseData, documents.get(documents.size() - 1));
+        SscsUtil.addDocumentToBundle(footerService, caseData, documents.get(documents.size() - 1), true);
 
         assertThat(caseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
         assertThat(caseData.getInterlocReferralReason()).isEqualTo(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
