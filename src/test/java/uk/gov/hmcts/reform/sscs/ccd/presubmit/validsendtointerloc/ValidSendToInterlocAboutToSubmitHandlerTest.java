@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.*;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -28,7 +29,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @RunWith(JUnitParamsRunner.class)
 public class ValidSendToInterlocAboutToSubmitHandlerTest {
@@ -41,7 +44,11 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
     private SscsCaseData sscsCaseData;
+    private final FooterService footerService;
 
+    public ValidSendToInterlocAboutToSubmitHandlerTest(FooterService footerService) {
+        this.footerService = footerService;
+    }
 
     @Before
     public void setUp() {
@@ -117,6 +124,8 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
         when(callback.isIgnoreWarnings()).thenReturn(true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        List<SscsDocument> documents = sscsCaseData.getSscsDocument();
+        SscsUtil.addDocumentToBundle(footerService, sscsCaseData, documents.get(documents.size() - 1));
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
 
