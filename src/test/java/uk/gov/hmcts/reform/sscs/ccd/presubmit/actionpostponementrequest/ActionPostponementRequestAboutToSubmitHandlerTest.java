@@ -11,6 +11,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.WELSH_TRANSLATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest.ActionPostponementRequestAboutToSubmitHandler.POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX;
@@ -192,6 +194,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     @Test
     public void givenAGrantedPostponement_thenClearReviewStateAndReferralReasonAndFlagAndAddNoteAndDwpStateAndDecisionDocAdded() {
+        sscsCaseData.getPostponementRequest().setListingOption(READY_TO_LIST.toString());
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -243,6 +246,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     @Test
     public void givenAGrantedPostponement_shouldSendCancellation() {
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
+        sscsCaseData.getPostponementRequest().setListingOption(READY_TO_LIST.toString());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -253,9 +257,31 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenAGrantedPostponement_shouldUpdateCaseStateToReadyToList() {
+        sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
+        sscsCaseData.getPostponementRequest().setListingOption(READY_TO_LIST.toString());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getState()).isEqualTo(READY_TO_LIST);
+    }
+
+    @Test
+    public void givenAGrantedPostponement_shouldUpdateCaseStateToNotListable() {
+        sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
+        sscsCaseData.getPostponementRequest().setListingOption(NOT_LISTABLE.toString());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getState()).isEqualTo(NOT_LISTABLE);
+    }
+
+    @Test
     public void givenAGrantedPostponementAndReadyToList_shouldSetPostponementCorrectly() {
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
-        sscsCaseData.getPostponementRequest().setListingOption("readyToList");
+        sscsCaseData.getPostponementRequest().setListingOption(READY_TO_LIST.toString());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -274,7 +300,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     public void givenAGrantedPostponementAndNotListable_shouldSetPostponementCorrectly() {
 
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
-        sscsCaseData.getPostponementRequest().setListingOption("notListable");
+        sscsCaseData.getPostponementRequest().setListingOption(NOT_LISTABLE.toString());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

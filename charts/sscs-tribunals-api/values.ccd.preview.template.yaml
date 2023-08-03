@@ -487,8 +487,7 @@ ccd:
       - sscs-citizen2@hmcts.net|SSCS|Benefit|appealCreated
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
-  ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:SSCS-11213-1
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-10603-1
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -507,7 +506,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: SSCS-11213-1
+      CCD_DEF_VERSION: S-10603-1
     secrets: []
     userRoles:
       - citizen
@@ -540,8 +539,8 @@ sscs-evidence-share:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
-      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-evidence"
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       AMQP_USERNAME: "RootManageSharedAccessKey"
       ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
@@ -554,10 +553,19 @@ sscs-evidence-share:
         secretRef: sscs-sb-preview
         key: primaryKey
 
+# tya disabled by default due of requirements of additional topic subscriptions which is not possible currently configure and should be done manually
+# if your PR requires tya-notif change enabled to true
+# deploy to preview as usual
+# and when go to azure portal and search for sscs-sb-preview
+# click topics and select your PR topic
+# click subscriptions and click add subscription button (+ subscription)
+# into name field add name: sscs-tribunals-api-pr-##YOUR PR NUMBER ##-servicebus-tya (example: sscs-tribunals-api-pr-3290-servicebus-tya)
+# click create
+# azure steps should be repeated every time PR is undeployed from preview
 sscs-tya-notif:
-  enabled: true
+  enabled: false
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2392
+    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
@@ -566,6 +574,8 @@ sscs-tya-notif:
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       AMQP_USERNAME: "RootManageSharedAccessKey"
+      TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
       JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
       JOB_SCHEDULER_DB_HOST: ${SERVICE_NAME}-postgresql
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
@@ -617,7 +627,7 @@ sscs-ccd-callback-orchestrator:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:prod-32cbe82-20220825134712
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:prod-99baf80-20230629135543
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
