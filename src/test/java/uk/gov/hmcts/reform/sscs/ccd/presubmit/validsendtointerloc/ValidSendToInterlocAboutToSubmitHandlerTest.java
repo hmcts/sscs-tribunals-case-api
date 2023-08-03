@@ -44,11 +44,6 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
     private SscsCaseData sscsCaseData;
-    private final FooterService footerService;
-
-    public ValidSendToInterlocAboutToSubmitHandlerTest(FooterService footerService) {
-        this.footerService = footerService;
-    }
 
     @Before
     public void setUp() {
@@ -125,6 +120,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         List<SscsDocument> documents = sscsCaseData.getSscsDocument();
+        FooterService footerService = null;
         SscsUtil.addDocumentToBundle(footerService, sscsCaseData, documents.get(documents.size() - 1), true);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
