@@ -176,7 +176,6 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     @Parameters({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
     public void givenPostponementRequestInterlocSendToTcw_returnAnErrorIfNoOriginalSenderSelected(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
-
         sscsCaseData = sscsCaseData.toBuilder().selectWhoReviewsCase(new DynamicList(
                         new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()),
                         Arrays.asList(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()),
