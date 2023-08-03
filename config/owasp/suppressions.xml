@@ -42,5 +42,7 @@
    file name: spring-security-config-5.8.3.jar
    ]]></notes>
     <cve>CVE-2023-34035</cve>
+    <cve>CVE-2023-3782</cve>
+    <cve>CVE-2023-3635</cve>
   </suppress>
 </suppressions>
