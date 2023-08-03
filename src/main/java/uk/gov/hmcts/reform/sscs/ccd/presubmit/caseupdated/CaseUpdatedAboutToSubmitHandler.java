@@ -203,9 +203,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
         List<String> warnings = validatePartyCaseDAta(appointeeInfo, "Appointee");
 
-            if (!warnings.isEmpty()) {
-                response.addWarnings(warnings);
-            }
+        if (!warnings.isEmpty()) {
+            response.addWarnings(warnings);
+        }
     }
 
     private List<String> validateRepAndJointPartyCaseData(Entity entity, String entityType) {
@@ -232,6 +232,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             List<String> warnings = validateRepAndJointPartyCaseData(representativeInfo, "Representative");
 
             if (!warnings.isEmpty()) {
+
                 response.addWarnings(warnings);
             }
         }
@@ -242,12 +243,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         final boolean hasJointParty = sscsCaseData.isThereAJointParty();
         if (hasJointParty) {
-        List<String> warnings = validateRepAndJointPartyCaseData(jointPartyInfo, "Joint Party");
+            List<String> warnings = validateRepAndJointPartyCaseData(jointPartyInfo, "Joint Party");
 
-        if (!warnings.isEmpty()) {
+            if (!warnings.isEmpty()) {
 
-            response.addWarnings(warnings);
-        }
+                response.addWarnings(warnings);
+            }
         }
     }
 

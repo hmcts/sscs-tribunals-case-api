@@ -22,7 +22,6 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.elasticsearch.cluster.metadata.AliasAction;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -191,7 +190,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenACaseUpdatedEventWithEmptyAppellantDetails_thenProvideAnError(){
+    public void givenACaseUpdatedEventWithEmptyAppellantDetails_thenProvideAnError() {
 
         Appellant appellant = Appellant.builder()
                 .name(Name.builder().firstName("").lastName("").build())
@@ -201,10 +200,10 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getWarnings().size(), is(7));
-      }
+    }
 
     @Test
-    public void givenACaseUpdatedEventWithEmptyAppointeeDetails_thenProvideAnError(){
+    public void givenACaseUpdatedEventWithEmptyAppointeeDetails_thenProvideAnError() {
 
         Appointee appointee = Appointee.builder()
                 .name(Name.builder().firstName("").lastName("").build())
@@ -217,18 +216,21 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenACaseUpdatedEventWithEmptyRepresentativeDetails_thenProvideAnError(){
+    public void givenACaseUpdatedEventWithEmptyRepresentativeDetails_thenProvideAnError() {
 
-       Representative representative = Representative.builder()
+        Representative representative = Representative.builder()
                 .name(Name.builder().firstName("").lastName("").build())
+                .hasRepresentative(YES.getValue())
                 .build();
+        callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
+        callback.getCaseDetails().getCaseData().setHasRepresentative(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getWarnings().size(), is(2));
     }
 
     @Test
-    public void givenACaseUpdatedEventWithEmptyJointPartyDetails_thenProvideAnError(){
+    public void givenACaseUpdatedEventWithEmptyJointPartyDetails_thenProvideAnError() {
 
         JointParty jointParty = JointParty.builder()
                 .name(Name.builder().firstName("").lastName("").build())
@@ -498,8 +500,11 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         " Ho.use, ., \"101 House, House",
         " ., ãHouse, âHouse, &101 House"})
     public void givenACaseUpdateEventWithInvalidRepresentativeAddressDetails_thenReturnError(String line1, String line2, String town, String county) {
+
         Representative representative = Representative.builder().address(buildAddress(line1, line2, county, town)).build();
+
         callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
+        callback.getCaseDetails().getCaseData().setHasRepresentative(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         long numberOfExpectedError = getNumberOfExpectedError(response);
