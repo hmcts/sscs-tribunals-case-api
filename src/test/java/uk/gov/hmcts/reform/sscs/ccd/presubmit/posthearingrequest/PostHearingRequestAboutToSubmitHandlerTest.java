@@ -24,18 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @ExtendWith(MockitoExtension.class)
@@ -125,6 +114,7 @@ class PostHearingRequestAboutToSubmitHandlerTest {
     void shouldReturnWithoutError_whenPreviewDocFilenameContainsRequestTypeDescriptionEn(PostHearingRequestType requestType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(callback.getEvent()).thenReturn(POST_HEARING_REQUEST);
         DocumentLink documentLink = DocumentLink.builder()
             .documentFilename(requestType.getDescriptionEn())
             .build();
@@ -148,6 +138,7 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         String filename,
         DocumentType documentType
     ) {
+        when(callback.getEvent()).thenReturn(POST_HEARING_REQUEST);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         caseData.getPostHearing().setRequestType(requestType);
@@ -163,7 +154,7 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         expectedDocument.getValue().setDocumentType(documentType.getValue());
         expectedDocument.getValue().setDocumentLink(postHearingDoc);
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
-            eq(documentType), any(), any(), eq(null), eq(null));
+            eq(documentType), any(), any(), eq(null), eq(null), eq(POST_HEARING_REQUEST));
     }
 
     @ParameterizedTest

@@ -54,7 +54,8 @@ public class SendToFirstTierAboutToSubmitHandler implements PreSubmitCallbackHan
         if (response.getErrors().isEmpty()) {
             SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData,
                 caseData.getPostHearing().getSendToFirstTier().getDecisionDocument(),
-                getSendToFirstTierDocumentType(caseData.getPostHearing().getSendToFirstTier().getAction()));
+                getSendToFirstTierDocumentType(caseData.getPostHearing().getSendToFirstTier().getAction()),
+                callback.getEvent());
         }
         return response;
     }

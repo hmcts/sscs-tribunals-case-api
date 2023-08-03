@@ -54,7 +54,8 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
         if (response.getErrors().isEmpty()) {
             SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData,
                 caseData.getDocumentStaging().getPreviewDocument(),
-                PdfRequestUtil.getPostHearingDocumentType(caseData.getPostHearing().getRequestType()));
+                PdfRequestUtil.getPostHearingDocumentType(caseData.getPostHearing().getRequestType()),
+                callback.getEvent());
         }
 
         return response;
