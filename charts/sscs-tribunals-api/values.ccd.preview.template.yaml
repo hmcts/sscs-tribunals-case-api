@@ -606,7 +606,7 @@ sscs-tya-notif:
           - notification-test-key
 
 sscs-ccd-callback-orchestrator:
-  enabled: true
+  enabled: false
   java:
     image: hmctspublic.azurecr.io/sscs/ccd-callback-orchestrator:pr-1074
     releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
