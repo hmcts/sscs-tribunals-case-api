@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
@@ -150,11 +149,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private List<String> validatePartyCaseDAta(Entity entity, String partyType){
+    private List<String> validatePartyCaseDAta(Entity entity, String partyType) {
 
         List<String> listOfWarnings = new ArrayList<>();
 
-        if (entity !=null) {
+        if (entity != null) {
 
 
             if (StringUtils.isBlank(entity.getName().getFirstName())) {
@@ -201,25 +200,24 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateAppointeeCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
 
-            Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
-            List<String> warnings = validatePartyCaseDAta(appointeeInfo, "Appointee");
+        Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
+        List<String> warnings = validatePartyCaseDAta(appointeeInfo, "Appointee");
 
             if (!warnings.isEmpty()) {
                 response.addWarnings(warnings);
             }
-
-
     }
 
-    private List<String> validateRepAndJointPartyCaseData(Entity entity, String entityType){
+    private List<String> validateRepAndJointPartyCaseData(Entity entity, String entityType) {
 
         List<String> listOfWarnings = new ArrayList<>();
 
-        if (entity != null){
-            if (StringUtils.isBlank(entity.getName().getFirstName())){
+        if (entity != null) {
+
+            if (StringUtils.isBlank(entity.getName().getFirstName())) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", entityType));
             }
-            if (StringUtils.isBlank(entity.getName().getLastName())){
+            if (StringUtils.isBlank(entity.getName().getLastName())) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", entityType));
             }
         }
@@ -243,7 +241,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         JointParty jointPartyInfo = sscsCaseData.getJointParty();
 
         final boolean hasJointParty = sscsCaseData.isThereAJointParty();
-        if (hasJointParty){
+        if (hasJointParty) {
         List<String> warnings = validateRepAndJointPartyCaseData(jointPartyInfo, "Joint Party");
 
         if (!warnings.isEmpty()) {
