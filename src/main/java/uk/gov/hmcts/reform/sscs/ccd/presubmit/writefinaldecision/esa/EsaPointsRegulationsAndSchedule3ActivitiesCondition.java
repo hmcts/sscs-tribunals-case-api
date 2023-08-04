@@ -15,6 +15,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -183,7 +185,6 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
         }
     }
 
-    // BEGIN-NOSCAN
     @Override
     public Optional<String> getOptionalErrorMessage(DecisionNoticeQuestionService questionService, SscsCaseData sscsCaseData) {
         List<String> primaryCriteriaSatisfiedMessages =
@@ -191,14 +192,14 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
                 .map(c -> c.getOptionalIsSatisfiedMessage(sscsCaseData))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .toList();
+                .collect(Collectors.toList());
 
         List<String> validationErrorMessages =
                 validationConditions.stream()
                 .map(e -> e.getOptionalErrorMessage(sscsCaseData))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .toList();
+                .collect(Collectors.toList());
 
         List<String> criteriaSatisfiedMessages = new ArrayList<>();
         if (displayPointsSatisfiedMessageOnError) {
@@ -213,7 +214,6 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
         }
         return Optional.empty();
     }
-    // END-NOSCAN
 
     public static Function<SscsCaseData, List<String>> getAllAnswersExtractor() {
         return sscsCaseData -> CollectionUtils.collate(emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion()),
