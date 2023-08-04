@@ -155,29 +155,35 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         if (entity != null) {
 
-
-            if (StringUtils.isBlank(entity.getName().getFirstName())) {
-                listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", partyType));
-            }
-            if (StringUtils.isBlank(entity.getName().getLastName())) {
-                listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", partyType));
-            }
-            if (StringUtils.isBlank(entity.getAddress().getLine1())) {
-                listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 1", partyType));
-            }
-            if (StringUtils.isBlank(entity.getAddress().getLine2())) {
-                listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 2", partyType));
-            }
-            if (StringUtils.isBlank(entity.getAddress().getPostcode())) {
-                listOfWarnings.add(String.format(WARNING_MESSAGE, "Postcode", partyType));
-            }
-            if (StringUtils.isBlank(entity.getIdentity().getDob())) {
-                listOfWarnings.add(String.format(WARNING_MESSAGE, "Date of Birth", partyType));
-            }
-            if (StringUtils.isBlank(entity.getIdentity().getNino())) {
-                listOfWarnings.add(String.format(WARNING_MESSAGE, "National Insurance Number", partyType));
+          if (entity.getName() != null) {
+              if (StringUtils.isBlank(entity.getName().getFirstName())) {
+                    listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", partyType));
+              }
+              if (StringUtils.isBlank(entity.getName().getLastName())) {
+                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", partyType));
+              }
             }
 
+          if (entity.getAddress() != null) {
+              if (StringUtils.isBlank(entity.getAddress().getLine1())) {
+                  listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 1", partyType));
+              }
+              if (StringUtils.isBlank(entity.getAddress().getLine2())) {
+                  listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 2", partyType));
+              }
+              if (StringUtils.isBlank(entity.getAddress().getPostcode())) {
+                  listOfWarnings.add(String.format(WARNING_MESSAGE, "Postcode", partyType));
+              }
+          }
+
+          if (entity.getIdentity() != null) {
+              if (StringUtils.isBlank(entity.getIdentity().getDob())) {
+                  listOfWarnings.add(String.format(WARNING_MESSAGE, "Date of Birth", partyType));
+              }
+              if (StringUtils.isBlank(entity.getIdentity().getNino())) {
+                  listOfWarnings.add(String.format(WARNING_MESSAGE, "National Insurance Number", partyType));
+              }
+          }
         }
 
         return listOfWarnings;

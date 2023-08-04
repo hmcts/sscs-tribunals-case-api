@@ -199,6 +199,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .identity(Identity.builder().nino("").dob("").build())
                 .build();
 
+        callback.getCaseDetails().getCaseData().getAppeal().setAppellant(appellant);
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getWarnings().size(), is(7));
     }
@@ -211,6 +213,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .address(Address.builder().line1("").line2("").postcode("").build())
                 .identity(Identity.builder().nino("").dob("").build())
                 .build();
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(appointee);
 
         callback.getCaseDetails().getCaseData().setHasOtherPartyAppointee(YES);
 
@@ -240,6 +244,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .hasJointParty(YES)
                 .build();
 
+        callback.getCaseDetails().getCaseData().setJointParty(jointParty);
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getWarnings().size(), is(2));
     }
@@ -264,9 +270,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Test
     public void givenMultipleAssociatedCases_thenAddAllAssociatedCaseLinksToCase() {
         Appellant appellant = Appellant.builder()
-                .name(Name.builder().firstName("New").lastName("Name").build())
-                .address(Address.builder().line1("Line 1").line2("Line 2").postcode("Postcode").build())
-                .identity(Identity.builder().nino("AB223344B").dob("DOB").build()).build();
+                .build();
         SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
         SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().ccdCaseId("56765676").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
@@ -920,6 +924,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         assertNull(response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
         assertNull(response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
         assertNull(response.getData().getCaseAccessManagementFields().getCaseNamePublic());
+
     }
 
     @Test
