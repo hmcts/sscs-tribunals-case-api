@@ -170,12 +170,13 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueFinalDecisionEventRemoveDraftDecisionNotice() {
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(documentLink);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("no");
 
-        SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(DRAFT_DECISION_NOTICE.getValue()).build()).build();
-        SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(FINAL_DECISION_NOTICE.getValue()).build()).build();
+        SscsDocument document1 = buildSscsDocumentWithDocumentType(DRAFT_DECISION_NOTICE.getValue());
+        SscsDocument document2 = buildSscsDocumentWithDocumentType(FINAL_DECISION_NOTICE.getValue());
 
         List<SscsDocument> documentList = new ArrayList<>(List.of(document1, document2));
         callback.getCaseDetails().getCaseData().setSscsDocument(documentList);
@@ -187,13 +188,14 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueFinalDecisionEventWhenDocumentTypeIsNullThenRemoveDraftDecisionNotice() {
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(documentLink);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("no");
 
-        SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(FINAL_DECISION_NOTICE.getValue()).build()).build();
-        SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build();
-        SscsDocument document3 = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(DRAFT_DECISION_NOTICE.getValue()).build()).build();
+        SscsDocument document1 = buildSscsDocumentWithDocumentType(FINAL_DECISION_NOTICE.getValue());
+        SscsDocument document2 = buildSscsDocumentWithDocumentType(null);
+        SscsDocument document3 = buildSscsDocumentWithDocumentType(DRAFT_DECISION_NOTICE.getValue());
 
         List<SscsDocument> documentList = new ArrayList<>(List.of(document1, document2, document3));
         callback.getCaseDetails().getCaseData().setSscsDocument(documentList);
@@ -665,5 +667,10 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
         verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+    }
+
+    private SscsDocument buildSscsDocumentWithDocumentType(String documentType) {
+        SscsDocumentDetails sscsDocumentDetails = SscsDocumentDetails.builder().documentType(documentType).build();
+        return SscsDocument.builder().value(sscsDocumentDetails).build();
     }
 }

@@ -165,13 +165,14 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     @Test
     public void givenAnIssueFinalDecisionEventRemoveDraftDecisionNotice() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("no");
+        SscsFinalDecisionCaseData finalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        finalDecisionCaseData.setWriteFinalDecisionPreviewDocument(docLink);
+        finalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        finalDecisionCaseData.setWriteFinalDecisionGenerateNotice("no");
+        finalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("no");
 
-        SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(DRAFT_DECISION_NOTICE.getValue()).build()).build();
-        SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(FINAL_DECISION_NOTICE.getValue()).build()).build();
+        SscsDocument document1 = buildSscsDocumentWithDocumentType(DRAFT_DECISION_NOTICE.getValue());
+        SscsDocument document2 = buildSscsDocumentWithDocumentType(FINAL_DECISION_NOTICE.getValue());
 
         List<SscsDocument> documentList = new ArrayList<>(List.of(document1, document2));
         callback.getCaseDetails().getCaseData().setSscsDocument(documentList);
@@ -184,14 +185,15 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     @Test
     public void givenAnIssueFinalDecisionEventWhenDocumentTypeIsNullThenRemoveDraftDecisionNotice() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("no");
+        SscsFinalDecisionCaseData finalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        finalDecisionCaseData.setWriteFinalDecisionPreviewDocument(docLink);
+        finalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        finalDecisionCaseData.setWriteFinalDecisionGenerateNotice("no");
+        finalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("no");
 
-        SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(FINAL_DECISION_NOTICE.getValue()).build()).build();
-        SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build();
-        SscsDocument document3 = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(DRAFT_DECISION_NOTICE.getValue()).build()).build();
+        SscsDocument document1 = buildSscsDocumentWithDocumentType(FINAL_DECISION_NOTICE.getValue());
+        SscsDocument document2 = buildSscsDocumentWithDocumentType(null);
+        SscsDocument document3 = buildSscsDocumentWithDocumentType(DRAFT_DECISION_NOTICE.getValue());
 
         List<SscsDocument> documentList = new ArrayList<>(List.of(document1, document2, document3));
         callback.getCaseDetails().getCaseData().setSscsDocument(documentList);
@@ -740,5 +742,10 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
         verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+    }
+
+    private SscsDocument buildSscsDocumentWithDocumentType(String documentType) {
+        SscsDocumentDetails sscsDocumentDetails = SscsDocumentDetails.builder().documentType(documentType).build();
+        return SscsDocument.builder().value(sscsDocumentDetails).build();
     }
 }
