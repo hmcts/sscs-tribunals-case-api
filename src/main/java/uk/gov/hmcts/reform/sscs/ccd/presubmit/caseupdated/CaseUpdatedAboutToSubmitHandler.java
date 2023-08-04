@@ -125,9 +125,32 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (!hasSystemUserRole) {
             validateAndUpdateDwpHandlingOffice(sscsCaseData, preSubmitCallbackResponse);
             validateHearingOptions(sscsCaseData, preSubmitCallbackResponse);
+            validateAppellantAddress(sscsCaseData, preSubmitCallbackResponse);
         }
 
         return preSubmitCallbackResponse;
+    }
+
+    private void validateAppellantAddress(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+
+        // TODO : Validation for postcode format
+        // TODO : Maybe implement a feature for adding the entity so that the same method can be used for eg. Appellant, Appointee etc
+        Appellant appellantInfo = sscsCaseData.getAppeal().getAppellant();
+        String addressLine1 = appellantInfo.getAddress().getLine1();
+        String postcode = appellantInfo.getAddress().getPostcode();
+
+        if(!addressLine1.isBlank() || !postcode.isBlank()){
+
+            if(!postcode.isBlank() && addressLine1.isBlank()){
+                response.addError("You must enter address line 1 for the appellant");
+            }
+
+            if(postcode.isBlank() && !addressLine1.isBlank()){
+                response.addError("You must enter a valid UK postcode for the appellant");
+            }
+
+        }
+
     }
 
     private void validateAndUpdateDwpHandlingOffice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
