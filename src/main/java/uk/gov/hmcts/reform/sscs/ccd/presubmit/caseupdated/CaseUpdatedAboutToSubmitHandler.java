@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler;
+import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
@@ -32,6 +33,8 @@ import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
+
+import javax.validation.ConstraintValidatorContext;
 
 @Component
 @Slf4j
@@ -45,6 +48,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final RefDataService refDataService;
     private final VenueService venueService;
     private final boolean caseAccessManagementFeature;
+    private PostcodeValidator postcodeValidator = new PostcodeValidator();
+    private static ConstraintValidatorContext context;
+
 
     @SuppressWarnings("squid:S107")
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
@@ -133,23 +139,41 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateAppellantAddress(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
 
-        // TODO : Validation for postcode format
         // TODO : Maybe implement a feature for adding the entity so that the same method can be used for eg. Appellant, Appointee etc
+
         Appellant appellantInfo = sscsCaseData.getAppeal().getAppellant();
         String addressLine1 = appellantInfo.getAddress().getLine1();
         String postcode = appellantInfo.getAddress().getPostcode();
 
-        if(!addressLine1.isBlank() || !postcode.isBlank()){
 
-            if(!postcode.isBlank() && addressLine1.isBlank()){
-                response.addError("You must enter address line 1 for the appellant");
-            }
-
-            if(postcode.isBlank() && !addressLine1.isBlank()){
+        if(!addressLine1.isBlank()){
+            if(postcode.isBlank() || !postcodeValidator.isValid(postcode,context)){
                 response.addError("You must enter a valid UK postcode for the appellant");
             }
-
+        } else {
+              if(!postcode.isBlank() && postcodeValidator.isValid(postcode,context) ){
+                  response.addError("You must enter address line 1 for the appellant");
+              }
         }
+
+
+
+
+//        if(!addressLine1.isBlank() || !postcode.isBlank()){
+//
+//            if(postcodeValidator.isValid(postcode, context)){
+//
+//            }
+//
+//            if((!postcode.isBlank() && postcodeValidator.isValid(postcode,context)) && addressLine1.isBlank()){
+//                response.addError("You must enter address line 1 for the appellant");
+//            }
+//
+//            if(postcode.isBlank() && !addressLine1.isBlank()){
+//                response.addError("You must enter a valid UK postcode for the appellant");
+//            }
+//
+//        }
 
     }
 
