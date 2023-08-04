@@ -31,6 +31,8 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest extends BaseHandler {
     @Rule
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
+    public static final String DATA_FURTHER_EVIDENCE_ACTION_LIST_ITEMS = "data.furtherEvidenceAction.list_items";
+
     @Test
     public void givenAboutToStartCallback_shouldSetItemsInFurtherActionDropdownMenu() throws Exception {
 
@@ -47,13 +49,14 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest extends BaseHandler {
             .statusCode(HttpStatus.SC_OK)
             .log().all(true)
             .assertThat().body("data.furtherEvidenceAction.value.code", equalTo("issueFurtherEvidence"))
-            .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "issueFurtherEvidence")))
-            .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "otherDocumentManual")))
-            .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "informationReceivedForInterlocJudge")))
-            .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "informationReceivedForInterlocTcw")))
-            .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "sendToInterlocReviewByJudge")))
-            .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "sendToInterlocReviewByTcw")))
-            .assertThat().body("data.furtherEvidenceAction.list_items", hasSize(6));
+            .assertThat().body(DATA_FURTHER_EVIDENCE_ACTION_LIST_ITEMS, hasItem(hasEntry("code", "issueFurtherEvidence")))
+            .assertThat().body(DATA_FURTHER_EVIDENCE_ACTION_LIST_ITEMS, hasItem(hasEntry("code", "otherDocumentManual")))
+            .assertThat().body(DATA_FURTHER_EVIDENCE_ACTION_LIST_ITEMS, hasItem(hasEntry("code", "informationReceivedForInterlocJudge")))
+            .assertThat().body(DATA_FURTHER_EVIDENCE_ACTION_LIST_ITEMS, hasItem(hasEntry("code", "informationReceivedForInterlocTcw")))
+            .assertThat().body(DATA_FURTHER_EVIDENCE_ACTION_LIST_ITEMS, hasItem(hasEntry("code", "sendToInterlocReviewByJudge")))
+            .assertThat().body(DATA_FURTHER_EVIDENCE_ACTION_LIST_ITEMS, hasItem(hasEntry("code", "sendToInterlocReviewByTcw")))
+            .assertThat().body(DATA_FURTHER_EVIDENCE_ACTION_LIST_ITEMS, hasItem(hasEntry("code", "adminActionCorrection")))
+            .assertThat().body(DATA_FURTHER_EVIDENCE_ACTION_LIST_ITEMS, hasSize(7));
 
     }
 }
