@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -272,7 +271,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
         List<SessionDate> dates = appeal.getHearingOptions().getExcludeDates()
             .stream()
             .map(f -> new SessionDate(f.getValue()))
-            .collect(Collectors.toList());
+            .toList();
 
         return new SessionDatesCantAttend(dates);
     }
@@ -715,7 +714,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
                 documentDownloadService.getFileSize(f.getValue().getDocumentLink().getDocumentBinaryUrl()),
                 f.getValue())
             )
-            .collect(Collectors.toList());
+            .toList();
 
         return new SessionEvidenceUpload(sessionEvidences);
     }

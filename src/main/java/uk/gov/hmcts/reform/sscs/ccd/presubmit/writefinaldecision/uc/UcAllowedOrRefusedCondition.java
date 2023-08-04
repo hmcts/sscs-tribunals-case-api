@@ -20,7 +20,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
@@ -308,14 +307,14 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
                 .map(c -> c.getOptionalIsSatisfiedMessage(sscsCaseData))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .toList();
 
         final List<String> validationErrorMessages =
                 validationConditions.stream()
                 .map(e -> e.getOptionalErrorMessage(sscsCaseData))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .toList();
 
         List<String> criteriaSatisfiedMessages = new ArrayList<>();
         if (primaryPointsCondition.isPresent()) {
