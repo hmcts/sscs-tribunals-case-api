@@ -51,6 +51,7 @@ services:
       - LOG_OUTPUT=single
       - JSON_CONSOLE_PRETTY_PRINT=false
       - S2S_NAMES_WHITELIST:jui_webapp,em_ccd_orchestrator,em_gw,sscs
+      - FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK=false
     ports:
       - 4630:8080
     networks:
