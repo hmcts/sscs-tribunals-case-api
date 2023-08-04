@@ -80,11 +80,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         NoticeIssuedTemplateBody formPayload = super
             .createPayload(response, caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, isPostHearingsEnabled, isPostHearingsBEnabled, userAuthorisation);
-        WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
 
         final NoticeIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
-
-        String heldBefore = buildHeldBefore(caseData, userAuthorisation);
 
         SscsFinalDecisionCaseData finalDecisionCaseData = caseData.getSscsFinalDecisionCaseData();
 
@@ -93,16 +90,22 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             builder.correctedJudgeName(buildSignedInJudgeName(userAuthorisation));
             builder.correctedDateIssued(showIssueDate ? LocalDate.now() : null);
             builder.idamSurname(finalDecisionCaseData.getFinalDecisionIdamSurname());
-            heldBefore = finalDecisionCaseData.getFinalDecisionHeldBefore();
         } else {
             builder.userName(buildSignedInJudgeName(userAuthorisation));
             builder.idamSurname(buildSignedInJudgeSurname(userAuthorisation));
-
-            if (isPostHearingsEnabled && isNull(finalDecisionCaseData.getFinalDecisionHeldBefore())) {
-                finalDecisionCaseData.setFinalDecisionIdamSurname(heldBefore);
-            }
         }
 
+        String heldBefore = buildHeldBefore(caseData, userAuthorisation);
+
+        if (isPostHearingsEnabled) {
+            if (isNull(finalDecisionCaseData.getFinalDecisionHeldBefore())) {
+                finalDecisionCaseData.setFinalDecisionHeldBefore(heldBefore);
+            }
+
+            heldBefore = finalDecisionCaseData.getFinalDecisionHeldBefore();
+        }
+
+        WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
         writeFinalDecisionBuilder.heldBefore(heldBefore);
 
         writeFinalDecisionBuilder.summaryOfOutcomeDecision(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDetailsOfDecision());
