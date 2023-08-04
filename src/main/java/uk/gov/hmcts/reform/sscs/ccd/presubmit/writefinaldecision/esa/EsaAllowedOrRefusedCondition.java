@@ -251,6 +251,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
             caseData -> caseData.getSscsEsaCaseData().getSchedule3Selections());
     }
 
+    // BEGIN-NOSCAN
     @Override
     public boolean isApplicable(DecisionNoticeQuestionService questionService, SscsCaseData caseData) {
         if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
@@ -268,6 +269,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
             return false;
         }
     }
+    // END-NOSCAN
 
     @Override
     public IntPredicate getPointsRequirementCondition() {

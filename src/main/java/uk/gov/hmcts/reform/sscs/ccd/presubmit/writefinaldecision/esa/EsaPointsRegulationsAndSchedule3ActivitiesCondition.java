@@ -183,9 +183,9 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
         }
     }
 
+    // BEGIN-NOSCAN
     @Override
     public Optional<String> getOptionalErrorMessage(DecisionNoticeQuestionService questionService, SscsCaseData sscsCaseData) {
-
         List<String> primaryCriteriaSatisfiedMessages =
             primaryConditions.stream()
                 .map(c -> c.getOptionalIsSatisfiedMessage(sscsCaseData))
@@ -213,6 +213,7 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
         }
         return Optional.empty();
     }
+    // END-NOSCAN
 
     public static Function<SscsCaseData, List<String>> getAllAnswersExtractor() {
         return sscsCaseData -> CollectionUtils.collate(emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion()),

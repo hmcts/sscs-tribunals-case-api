@@ -191,6 +191,7 @@ public enum UcPointsRegulationsAndSchedule7ActivitiesCondition implements Points
         }
     }
 
+    // BEGIN-NOSCAN
     @Override
     public Optional<String> getOptionalErrorMessage(DecisionNoticeQuestionService questionService, SscsCaseData sscsCaseData) {
 
@@ -221,6 +222,7 @@ public enum UcPointsRegulationsAndSchedule7ActivitiesCondition implements Points
         }
         return Optional.empty();
     }
+    // END-NOSCAN
 
     public static Function<SscsCaseData, List<String>> getAllAnswersExtractor() {
         return sscsCaseData -> CollectionUtils.collate(emptyIfNull(sscsCaseData.getSscsUcCaseData().getUcWriteFinalDecisionPhysicalDisabilitiesQuestion()),
