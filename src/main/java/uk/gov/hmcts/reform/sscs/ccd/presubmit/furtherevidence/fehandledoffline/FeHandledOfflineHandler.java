@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.fehandledoffline;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -57,7 +56,6 @@ public class FeHandledOfflineHandler implements PreSubmitCallbackHandler<SscsCas
         }
         return sscsDocument.stream()
             .filter(doc -> "No".equals(doc.getValue().getEvidenceIssued()))
-            .collect(Collectors.toList());
-
+            .toList();
     }
 }
