@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -69,7 +68,6 @@ public class UploadWelshDocumentsAboutToStartHandler implements PreSubmitCallbac
                         && a.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED))
                 .filter(b -> !Arrays.asList(DocumentType.DECISION_NOTICE.getValue(), DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE, DocumentType.DIRECTION_NOTICE.getValue())
                         .contains(b.getValue().getDocumentType()))
-                .collect(Collectors.toList());
+                .toList();
     }
-
 }
