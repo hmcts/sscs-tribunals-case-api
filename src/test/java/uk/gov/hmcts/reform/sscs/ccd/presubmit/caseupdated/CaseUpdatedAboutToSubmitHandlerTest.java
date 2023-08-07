@@ -109,7 +109,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .appellant(Appellant.builder()
                         .name(Name.builder().firstName("First").lastName("Last").build())
                         .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
-                        .identity(Identity.builder().nino("Nino").dob("Dob").build())
+                        .identity(Identity.builder().nino("AB223344B").dob("1995-12-20").build())
                         .build())
                 .build())
             .benefitCode("002")
@@ -122,7 +122,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .appellant(Appellant.builder()
                         .name(Name.builder().firstName("First").lastName("Last").build())
                         .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
-                        .identity(Identity.builder().nino("Nino").dob("Dob").build())
+                        .identity(Identity.builder().nino("AB223344B").dob("1995-12-20").build())
                     .build())
                 .build())
             .build();
@@ -270,6 +270,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Test
     public void givenMultipleAssociatedCases_thenAddAllAssociatedCaseLinksToCase() {
         Appellant appellant = Appellant.builder()
+                .identity(Identity.builder().nino("AB223344B").dob("1995-12-20").build())
                 .build();
         SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
         SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().ccdCaseId("56765676").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
