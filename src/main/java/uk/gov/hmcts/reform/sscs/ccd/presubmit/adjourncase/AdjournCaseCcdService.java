@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -26,9 +25,8 @@ public class AdjournCaseCcdService {
 
     private List<DynamicListItem> getSortedVenueItems(Predicate<VenueRpcDetails> predicate, boolean prefixWithRpc) {
         List<DynamicListItem> venueItems = venueRpcDetailsService.getVenues(predicate).stream().map(v ->
-            new DynamicListItem(v.getVenueId(),
-                v.getVenueDisplayString(prefixWithRpc))).collect(Collectors.toList());
-        Collections.sort(venueItems, new DynamicListItemComparator());
+                new DynamicListItem(v.getVenueId(),
+                        v.getVenueDisplayString(prefixWithRpc))).sorted(new DynamicListItemComparator()).collect(Collectors.toList());
         return venueItems;
     }
 
