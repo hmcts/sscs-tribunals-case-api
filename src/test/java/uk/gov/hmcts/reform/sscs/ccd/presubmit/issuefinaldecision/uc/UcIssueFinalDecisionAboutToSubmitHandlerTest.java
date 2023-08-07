@@ -158,6 +158,45 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenAnIssueFinalDecisionEventRemoveDraftDecisionNotice() {
+        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(docLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("no");
+
+        SscsDocument document1 = buildSscsDocumentWithDocumentType(DRAFT_DECISION_NOTICE.getValue());
+        SscsDocument document2 = buildSscsDocumentWithDocumentType(FINAL_DECISION_NOTICE.getValue());
+
+        List<SscsDocument> documentList = new ArrayList<>(List.of(document1, document2));
+        callback.getCaseDetails().getCaseData().setSscsDocument(documentList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+        assertEquals(1, response.getData().getSscsDocument().size());
+    }
+
+    @Test
+    public void givenAnIssueFinalDecisionEventWhenDocumentTypeIsNullThenRemoveDraftDecisionNotice() {
+        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(docLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("no");
+
+        SscsDocument document1 = buildSscsDocumentWithDocumentType(FINAL_DECISION_NOTICE.getValue());
+        SscsDocument document2 = buildSscsDocumentWithDocumentType(null);
+        SscsDocument document3 = buildSscsDocumentWithDocumentType(DRAFT_DECISION_NOTICE.getValue());
+
+        List<SscsDocument> documentList = new ArrayList<>(List.of(document1, document2, document3));
+        callback.getCaseDetails().getCaseData().setSscsDocument(documentList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+        assertEquals(2, response.getData().getSscsDocument().size());
+    }
+
+    @Test
     public void givenAnIssueFinalDecisionEventForGenerateNoticeFlowWhenAllowedOrRefusedIsNull_ThenDisplayAnError() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
@@ -525,5 +564,10 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
         verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+    }
+
+    private SscsDocument buildSscsDocumentWithDocumentType(String documentType) {
+        SscsDocumentDetails sscsDocumentDetails = SscsDocumentDetails.builder().documentType(documentType).build();
+        return SscsDocument.builder().value(sscsDocumentDetails).build();
     }
 }

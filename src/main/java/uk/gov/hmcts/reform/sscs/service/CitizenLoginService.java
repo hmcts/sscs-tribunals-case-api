@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
@@ -58,13 +57,13 @@ public class CitizenLoginService {
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
-                .collect(toList());
+                .toList();
         if (!isBlank(tya)) {
             log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
             List<OnlineHearing> convert = convert(
                     sscsCaseDetails.stream()
                             .filter(casesWithSubscriptionMatchingTya(tya))
-                            .collect(toList()),
+                            .toList(),
                     idamTokens.getEmail()
             );
             log.info(format("Find case: Found [%s] cases for tya [%s] for user [%s]", convert.size(), tya, idamTokens.getUserId()));
@@ -84,7 +83,7 @@ public class CitizenLoginService {
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterActiveCasesForCitizen)
-                .collect(toList());
+                .toList();
 
         log.info(format("Searching for active case without for user [%s]", idamTokens.getUserId()));
         List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
@@ -98,7 +97,7 @@ public class CitizenLoginService {
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterDormantCasesForCitizen)
-                .collect(toList());
+                .toList();
 
         log.info(format("Searching for dormant case without for user [%s]", idamTokens.getUserId()));
         List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
@@ -111,7 +110,7 @@ public class CitizenLoginService {
                 .map(sscsCase -> onlineHearingService.loadHearing(sscsCase, null, email))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(toList());
+                .toList();
     }
 
     public Optional<OnlineHearing> associateCaseToCitizen(IdamTokens citizenIdamTokens, String tya, String email, String postcode) {
