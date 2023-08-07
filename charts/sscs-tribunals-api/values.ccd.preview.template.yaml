@@ -552,8 +552,8 @@ sscs-evidence-share:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
-      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-evidence"
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       AMQP_USERNAME: "RootManageSharedAccessKey"
       ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
@@ -583,10 +583,10 @@ sscs-tya-notif:
     readinessDelay: 45
     environment:
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
-      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
-      TOPIC_NAME: "${SERVICE_NAME}-servicebus-tya"
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       AMQP_USERNAME: "RootManageSharedAccessKey"
+      TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
       JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
       JOB_SCHEDULER_DB_HOST: ${SERVICE_NAME}-postgresql
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
@@ -638,8 +638,7 @@ sscs-ccd-callback-orchestrator:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
-    releaseNameOverride: ${SERVICE_NAME}-sscs-tribunals-frontend
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:prod-99baf80-20230629135543
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master

@@ -31,3 +31,7 @@ build
 
 *.hprof
 *.log
+
+# Application insight
+lib/applicationinsights-agent-*.jar
+lib/applicationinsights.log

@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -185,7 +184,7 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
             return requests.stream()
                     .map(request -> request.getValue().getSscsHearingRecording())
                     .filter(recording -> hearingId.equalsIgnoreCase(recording.getHearingId()))
-                    .collect(Collectors.toList());
+                    .toList();
         }
         return List.of();
     }

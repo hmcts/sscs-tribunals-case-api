@@ -44,4 +44,15 @@
     <cve>CVE-2023-34034</cve>
     <cve>CVE-2023-34035</cve>
   </suppress>
+  <suppress until = "2023-09-01">
+    <notes><![CDATA[
+   file name: guava-31.1-jre.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.google\.guava/guava@.*$</packageUrl>
+    <cve>CVE-2023-2976</cve>
+  </suppress>
+  <suppress until = "2023-09-01">
+    <cve>CVE-2023-3782</cve>
+    <cve>CVE-2023-3635</cve>
+  </suppress>
 </suppressions>
