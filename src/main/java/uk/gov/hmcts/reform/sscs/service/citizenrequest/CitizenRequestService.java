@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -79,25 +78,25 @@ public class CitizenRequestService {
                     releasedHearingRecordings.stream()
                     .filter(hasRequestedByParty(party, otherPartyId))
                     .map(request -> populateCitizenHearingRecordings(request.getValue().getSscsHearingRecording()))
-                    .collect(Collectors.toList());
+                    .toList();
 
             List<HearingRecordingRequest> requestedHearingRecordings = sscsCaseData.getSscsHearingRecordingCaseData().getRequestedHearings();
             List<CitizenHearingRecording> requestedRecordings = CollectionUtils.isEmpty(requestedHearingRecordings) ? List.of() :
                     requestedHearingRecordings.stream()
                     .filter(hasRequestedByParty(party, otherPartyId))
                     .map(request -> populateCitizenHearingRecordings(request.getValue().getSscsHearingRecording()))
-                    .collect(Collectors.toList());
+                    .toList();
 
             List<String> allRequestedHearingIds = Stream.of(releasedRecordings, requestedRecordings)
                     .flatMap(Collection::stream)
                     .map(CitizenHearingRecording::getHearingId)
-                    .collect(Collectors.toList());
+                    .toList();
 
             List<CitizenHearingRecording> requestableRecordings = sscsCaseData.getHearings().stream()
                     .filter(hearing -> isHearingWithRecording(hearing, sscsCaseData.getSscsHearingRecordingCaseData()))
                     .filter(hearing -> !allRequestedHearingIds.contains(hearing.getValue().getHearingId()))
                     .map(this::populateCitizenHearingRecordings)
-                    .collect(Collectors.toList());
+                    .toList();
 
             return new HearingRecordingResponse(releasedRecordings, requestedRecordings, requestableRecordings);
         }
@@ -173,7 +172,7 @@ public class CitizenRequestService {
                                 .fileType(getExtension(r.getValue().getDocumentFilename()))
                                 .documentUrl(stripUrl(r.getValue().getDocumentBinaryUrl()))
                                 .build())
-                        .collect(Collectors.toList()))
+                        .toList())
                 .build();
     }
 
