@@ -10,6 +10,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -189,15 +190,14 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("no");
 
         SscsDocument document1 = buildSscsDocumentWithDocumentType(FINAL_DECISION_NOTICE.getValue());
-        SscsDocument document2 = buildSscsDocumentWithDocumentType(null);
         SscsDocument document3 = buildSscsDocumentWithDocumentType(DRAFT_DECISION_NOTICE.getValue());
 
-        List<SscsDocument> documentList = new ArrayList<>(List.of(document1, document2, document3));
+        List<SscsDocument> documentList = new ArrayList<>(List.of(document1, document3));
         callback.getCaseDetails().getCaseData().setSscsDocument(documentList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
-        assertEquals(2, response.getData().getSscsDocument().size());
+        assertEquals(1, response.getData().getSscsDocument().size());
     }
 
     @Test

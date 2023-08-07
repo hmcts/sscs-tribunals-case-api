@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +38,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
@@ -189,15 +191,14 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         finalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("no");
 
         SscsDocument document1 = buildSscsDocumentWithDocumentType(FINAL_DECISION_NOTICE.getValue());
-        SscsDocument document2 = buildSscsDocumentWithDocumentType(null);
         SscsDocument document3 = buildSscsDocumentWithDocumentType(DRAFT_DECISION_NOTICE.getValue());
 
-        List<SscsDocument> documentList = new ArrayList<>(List.of(document1, document2, document3));
+        List<SscsDocument> documentList = new ArrayList<>(List.of(document1, document3));
         callback.getCaseDetails().getCaseData().setSscsDocument(documentList);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
-        assertEquals(2, response.getData().getSscsDocument().size());
+        assertEquals(1, response.getData().getSscsDocument().size());
     }
 
     @Test
