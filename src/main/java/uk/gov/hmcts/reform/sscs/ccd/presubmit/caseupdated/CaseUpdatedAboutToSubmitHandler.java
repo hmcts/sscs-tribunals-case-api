@@ -146,6 +146,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         String postcode = appellantInfo.getAddress().getPostcode();
 
 
+
         if(!addressLine1.isBlank()){
             if(postcode.isBlank() || !postcodeValidator.isValid(postcode,context)){
                 response.addError("You must enter a valid UK postcode for the appellant");

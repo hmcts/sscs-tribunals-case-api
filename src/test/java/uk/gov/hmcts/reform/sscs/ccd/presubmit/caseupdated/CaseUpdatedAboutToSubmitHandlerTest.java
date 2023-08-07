@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -188,6 +189,28 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         assertEquals("002DD", response.getData().getCaseCode());
     }
+
+    @Test
+    @Parameters({"Appellant", "Appointee", "Representative", "Joint Party"})
+    public void givenAppellantHasFirstLineOfAddressAndNoPostcode_thenProvideAnError(Entity entity){
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1("67 Somewhere Road");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("You must enter a valid UK postcode for the " + entity , response.getErrors().toString().toLowerCase());
+    }
+
+    @Test
+    public void givenAppellantHasFirstLineOfAddressAndInvalidPostcode_thenProvideAnError(){
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1("67 Somewhere Road");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("73GH Y7U");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("You must enter a valid UK postcode for the appellant", response.getErrors().toString());
+    }
+
 
     @Test
     public void givenAnAppealWithPostcode_updateRpc() {
