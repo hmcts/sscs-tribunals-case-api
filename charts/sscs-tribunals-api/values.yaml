@@ -4,6 +4,7 @@ java:
   readinessPath: '/health/readiness'
   aadIdentityName: sscs
   ingressHost: sscs-tribunals-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  memoryLimits: '4096Mi'
   keyVaults:
     sscs:
       resourceGroup: sscs

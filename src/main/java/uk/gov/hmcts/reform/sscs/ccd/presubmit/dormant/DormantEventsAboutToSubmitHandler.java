@@ -79,19 +79,11 @@ public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandl
 
             CancellationReason cancellationReason = null;
             switch (callback.getEvent()) {
-                case ADMIN_SEND_TO_DORMANT_APPEAL_STATE:
-                    cancellationReason = CancellationReason.OTHER;
-                    break;
-                case CONFIRM_LAPSED:
-                case LAPSED_REVISED:
-                    cancellationReason = CancellationReason.LAPSED;
-                    break;
-                case WITHDRAWN:
-                    cancellationReason = CancellationReason.WITHDRAWN;
-                    break;
-                default: log.info("CaseID: {} - Event: {} is not handled for cancellation reason",
+                case ADMIN_SEND_TO_DORMANT_APPEAL_STATE -> cancellationReason = CancellationReason.OTHER;
+                case CONFIRM_LAPSED, LAPSED_REVISED -> cancellationReason = CancellationReason.LAPSED;
+                case WITHDRAWN -> cancellationReason = CancellationReason.WITHDRAWN;
+                default -> log.info("CaseID: {} - Event: {} is not handled for cancellation reason",
                         caseID, callback.getEvent());
-                    break;
             }
 
             log.info("CaseID: {} - Event: {}. HearingRoute is List Assist - Sending cancellation message",

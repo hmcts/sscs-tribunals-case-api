@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -63,7 +62,7 @@ public class UploadHearingRecordingAboutToStartHandler implements PreSubmitCallb
                                         + " " + checkHearingTime(hearing.getValue().getTime()),
                                 hearingTimeformatter)))
                 .map(hearing -> new DynamicListItem(hearing.getValue().getHearingId(), selectHearing(hearing)))
-                .collect(Collectors.toList());
+                .toList();
         if (validHearings.isEmpty()) {
             response.addError("No hearing has been conducted on this case");
             return response;

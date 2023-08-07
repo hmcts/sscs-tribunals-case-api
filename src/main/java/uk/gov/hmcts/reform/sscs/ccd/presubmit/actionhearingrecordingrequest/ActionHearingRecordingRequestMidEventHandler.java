@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REQUESTED;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,13 +130,12 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
                 .map(this::toDynamicListItem)
                 .orElse(new DynamicListItem("", ""));
 
-        List<DynamicListItem> others = List.of(GRANTED, REFUSED, REQUESTED).stream()
+        List<DynamicListItem> others = Stream.of(GRANTED, REFUSED, REQUESTED)
                 .filter(status -> isPartyStatusRequestedOrOtherOptions(partyStatus, status))
                 .map(this::toDynamicListItem)
-                .collect(Collectors.toList());
+                .toList();
 
         return new DynamicList(selected, others);
-
     }
 
     private boolean isPartyStatusRequestedOrOtherOptions(Optional<RequestStatus> partyStatus, RequestStatus status) {
@@ -157,7 +156,7 @@ public class ActionHearingRecordingRequestMidEventHandler implements PreSubmitCa
                 .filter(s -> s.getValue().getHearingId().equals(h.getValue().getHearingId()))
                 .flatMap(s -> emptyIfNull(s.getValue().getRecordings()).stream())
                 .map(r -> CcdValue.<DocumentLink>builder().value(r.getValue()).build())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @NotNull
