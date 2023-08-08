@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCaseWithDwpAndHmcts;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -55,7 +54,7 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
         return items.stream()
             .filter(item -> !item.equals(ADMIN_ACTION_CORRECTION) || isPostHearingsEnabled)
             .map(item -> new DynamicListItem(item.getCode(), item.getLabel()))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {

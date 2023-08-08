@@ -55,7 +55,7 @@ public class PdfACompliance {
             // DublinCoreSchema dc = xmp.createAndAddDublinCoreSchema();
             // dc.setTitle(file);
 
-            PDFAIdentificationSchema id = xmp.createAndAddPFAIdentificationSchema();
+            PDFAIdentificationSchema id = xmp.createAndAddPDFAIdentificationSchema();
             id.setPart(PdfAPart.one.value);
             id.setConformance(PdfAConformance.B.toString());
 
