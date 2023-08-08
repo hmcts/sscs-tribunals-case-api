@@ -14,6 +14,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -34,7 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
+
 
 @RunWith(JUnitParamsRunner.class)
 public class PostponementRequestServiceTest {
@@ -42,18 +44,18 @@ public class PostponementRequestServiceTest {
     private static final LocalDateTime HEARING_DATE_TIME = LocalDateTime.of(2023, 12, 1, 1, 0);
     private static final LocalDateTime EXCLUDED_DATE_TIME = LocalDateTime.of(2024, 11, 2, 1, 0);
     public static final String DOCUMENT_FILENAME = "example.pdf";
+    private static final String USER_AUTHORISATION = "Bearer token";
     private final PostponementRequestService postponementRequestService = new PostponementRequestService();
-
+    private Callback<SscsCaseData> callback;
     private SscsCaseData caseData;
 
     private PreSubmitCallbackResponse<SscsCaseData> response;
 
-    private final FooterService footerService;
+    @Mock
+    private FooterService footerService;
 
-    public PostponementRequestServiceTest(FooterService footerService) {
-        this.footerService = footerService;
+    public PostponementRequestServiceTest() {
     }
-
 
     @Before
     public void setup() {
@@ -82,7 +84,6 @@ public class PostponementRequestServiceTest {
                 .build())))
             .build();
 
-
         response = new PreSubmitCallbackResponse<>(caseData);
     }
 
@@ -94,8 +95,6 @@ public class PostponementRequestServiceTest {
         caseData.setOriginalSender(originalSender);
 
         postponementRequestService.processPostponementRequest(caseData, uploadParty);
-        List<SscsDocument> documents = caseData.getSscsDocument();
-        SscsUtil.addDocumentToBundle(footerService, caseData, documents.get(documents.size() - 1), true);
 
         assertThat(caseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
         assertThat(caseData.getInterlocReferralReason()).isEqualTo(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
