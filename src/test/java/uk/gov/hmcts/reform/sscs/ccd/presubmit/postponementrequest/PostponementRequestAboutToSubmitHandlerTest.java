@@ -47,7 +47,6 @@ import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @RunWith(JUnitParamsRunner.class)
 public class PostponementRequestAboutToSubmitHandlerTest {
@@ -155,8 +154,6 @@ public class PostponementRequestAboutToSubmitHandlerTest {
 
         assertThat(sscsCaseData.getSscsDocument().size(), is(1));
         final SscsDocument document = sscsCaseData.getSscsDocument().get(0);
-        List<SscsDocument> documents = sscsCaseData.getSscsDocument();
-        SscsUtil.addDocumentToBundle(footerService, sscsCaseData, documents.get(documents.size() - 1), false);
         assertThat(document.getValue().getDocumentType(), is(POSTPONEMENT_REQUEST.getValue()));
         assertThat(document.getValue().getDocumentLink().getDocumentFilename(), is("example.pdf"));
         assertThat(document.getValue().getOriginalPartySender(), is(UploadParty.DWP.getValue()));
