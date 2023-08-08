@@ -125,7 +125,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         if (caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionReasons() != null && !caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionReasons().isEmpty()) {
             writeFinalDecisionBuilder.reasonsForDecision(
-                caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionReasons().stream().map(CollectionItem::getValue).collect(Collectors.toList()));
+                caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionReasons().stream().map(CollectionItem::getValue).toList());
         } else {
             writeFinalDecisionBuilder.reasonsForDecision(null);
         }
@@ -221,7 +221,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             .map(pair ->
                 buildDescriptorFromActivityAnswer(activityQuestionlookup.getByKey(pair.getLeft()), pair.getRight()))
             .sorted(new DescriptorLexicographicalComparator())
-            .collect(Collectors.toList());
+            .toList();
     }
 
     protected Descriptor buildDescriptorFromActivityAnswer(ActivityQuestion activityQuestion, ActivityAnswer answer) {
