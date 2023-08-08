@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_RESPONSE
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -73,7 +72,7 @@ public class ManageDwpDocumentsAboutToStartHandler extends ResponseEventsAboutTo
     private List<DwpDocument> getDwpDocumentsToKeepAfterMigration(SscsCaseData sscsCaseData) {
         final List<DwpDocument> dwpResponseDocument = keepDwpDocumentIfRemovedFromTheMigrationToTheDwpDocumentsCollection(DWP_RESPONSE, sscsCaseData.getDwpResponseDocument(), sscsCaseData.getDwpDocuments());
         final List<DwpDocument> dwpEvidenceBundle = keepDwpDocumentIfRemovedFromTheMigrationToTheDwpDocumentsCollection(DWP_EVIDENCE_BUNDLE, sscsCaseData.getDwpEvidenceBundleDocument(), sscsCaseData.getDwpDocuments());
-        return Stream.of(dwpEvidenceBundle, dwpResponseDocument).flatMap(Collection::stream).collect(Collectors.toList());
+        return Stream.of(dwpEvidenceBundle, dwpResponseDocument).flatMap(Collection::stream).toList();
     }
 
     private void addBackDwpDocumentsIfTheyWereRemovedFromTheMigration(SscsCaseData sscsCaseData, Collection<DwpDocument> dwpDocumentsToKeepAfterMigration) {
@@ -88,7 +87,6 @@ public class ManageDwpDocumentsAboutToStartHandler extends ResponseEventsAboutTo
                 .filter(doc -> doc.getValue().getDocumentType().equals(dwpDocumentType.getValue()))
                 .filter(doc -> dwpResponseDocument != null)
                 .filter(doc -> dwpResponseDocument.getDocumentLink() != null)
-                .collect(Collectors.toList());
+                .toList();
     }
-
 }
