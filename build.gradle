@@ -25,6 +25,7 @@ gitProperties {
 }
 
 
+
 group = 'uk.gov.hmcts.reform'
 version = '1.0.0'
 
@@ -44,7 +45,11 @@ compileTestJava {
 
 tasks.withType(Copy).all { duplicatesStrategy 'warn' }
 
-mainClassName = 'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication'
+application {
+    mainClassName = 'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication'
+}
+
+
 
 pmd {
     toolVersion = "6.55.0"
@@ -126,7 +131,7 @@ task contract(type: Test, description: 'Runs the pact contract tests.', group: '
 }
 
 task fortifyScan(type: JavaExec)  {
-    main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+    mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
     classpath += sourceSets.test.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
@@ -140,7 +145,7 @@ jacocoTestReport {
     reports {
         xml.required = true
         csv.required = false
-        xml.destination file("${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+        xml.outputLocation = file("${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml")
     }
 }
 
@@ -447,7 +452,7 @@ dependencies {
 applicationDefaultJvmArgs = ["-Dfile.encoding=UTF-8"]
 
 bootJar {
-    archiveName 'tribunals-case-api.jar'
+    archiveFileName = 'tribunals-case-api.jar'
     manifest {
         attributes 'Implementation-Title': project.name,
                 'Implementation-Version': project.version
