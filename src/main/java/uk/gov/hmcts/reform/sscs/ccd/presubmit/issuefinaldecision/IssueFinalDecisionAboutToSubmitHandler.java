@@ -4,31 +4,24 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
@@ -99,7 +92,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             sscsCaseData.setDwpState(FINAL_DECISION_ISSUED);
             sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         }
-        if (eligibleForHearingsCancel.test(callback)) {
+        if (eligibleForHearingsCancel.test(callback) && hasHearingScheduledInTheFuture(sscsCaseData)) {
             log.info("Issue Final Decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
                     sscsCaseData.getCcdCaseId());
             hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
@@ -110,6 +103,25 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());
         }
         return preSubmitCallbackResponse;
+    }
+
+    private boolean isValidHearing(HearingDetails hearingDetails) {
+        return hearingDetails != null
+            && StringUtils.isNotBlank(hearingDetails.getHearingDate())
+            && hearingDetails.getVenue() != null
+            && StringUtils.isNotBlank(hearingDetails.getVenue().getName());
+    }
+
+    private boolean hasHearingScheduledInTheFuture(SscsCaseData caseData) {
+        Optional<Hearing> futureHearing = Optional.ofNullable(caseData.getHearings()).orElse(Collections.emptyList()).stream().filter(hearing -> {
+            HearingDetails hearingDetails = hearing.getValue();
+            if (isValidHearing(hearingDetails)) {
+                LocalDateTime hearingDateTime = getLocalDateTime(hearingDetails.getHearingDate(), hearingDetails.getTime());
+                return Optional.of(hearingDateTime).filter(d -> d.isAfter(LocalDateTime.now())).isPresent();
+            }
+            return false;
+        }).findFirst();
+        return futureHearing.isPresent();
     }
 
     private void verifyPreviewDocument(SscsCaseData sscsCaseData,
@@ -278,7 +290,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(null);
 
         preSubmitCallbackResponse.getData().getSscsDocument()
-                .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
+                .removeIf(doc -> DRAFT_DECISION_NOTICE.getValue().equals(doc.getValue().getDocumentType()));
     }
 
 }
