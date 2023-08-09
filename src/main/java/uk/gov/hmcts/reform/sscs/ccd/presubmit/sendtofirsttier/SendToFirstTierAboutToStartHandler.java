@@ -42,7 +42,7 @@ public class SendToFirstTierAboutToStartHandler implements PreSubmitCallbackHand
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        SscsUtil.clearPostHearingFields(caseData);
+        SscsUtil.clearPostHearingFields(caseData, isPostHearingsBEnabled);
 
         return response;
     }

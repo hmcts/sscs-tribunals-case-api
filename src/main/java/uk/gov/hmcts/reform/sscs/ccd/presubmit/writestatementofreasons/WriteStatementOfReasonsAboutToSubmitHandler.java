@@ -46,7 +46,9 @@ public class WriteStatementOfReasonsAboutToSubmitHandler implements PreSubmitCal
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
         if (response.getErrors().isEmpty()) {
-            SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData, DocumentType.STATEMENT_OF_REASONS);
+            SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData,
+                caseData.getDocumentStaging().getPreviewDocument(),
+                DocumentType.STATEMENT_OF_REASONS);
         }
 
         return response;
