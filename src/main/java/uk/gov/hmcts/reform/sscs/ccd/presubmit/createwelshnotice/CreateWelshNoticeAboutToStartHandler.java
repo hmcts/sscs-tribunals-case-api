@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -66,7 +65,7 @@ public class CreateWelshNoticeAboutToStartHandler implements PreSubmitCallbackHa
                         || a.getValue().getDocumentType().equals(AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE.getValue())
                         || a.getValue().getDocumentType().equals(POSTPONEMENT_REQUEST_DIRECTION_NOTICE.getValue())
                         || a.getValue().getDocumentType().equals(DIRECTION_NOTICE.getValue())))
-                .collect(Collectors.toList());
+                .toList();
 
         sscsDocuments.forEach(sscsDocument -> listNoticeDocumentOptions.add(new DynamicListItem(sscsDocument.getValue().getDocumentLink().getDocumentFilename(),
                 sscsDocument.getValue().getDocumentLink().getDocumentFilename())));
