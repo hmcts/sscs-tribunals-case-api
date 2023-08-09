@@ -147,7 +147,8 @@ class PdfRequestUtilTest {
     @Test
     void getNoticeBody_throwsExceptionWhenPermissionToAppealAndIsPostHearingsBEnabledIsFalse() {
         sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
-        assertThatThrownBy(() -> PdfRequestUtil.getNoticeBody(sscsCaseData, true, false))
+        assertThatThrownBy(() -> PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(sscsCaseData,
+                NoticeIssuedTemplateBody.builder().build(), true, false))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageStartingWith("isPostHearingsBEnabled is false - Permission to Appeal is not available");
     }
@@ -164,7 +165,8 @@ class PdfRequestUtilTest {
     )
     void getNoticeBody_throwsExceptionWhenPostHearingsBEnabledIsFalse(PostHearingReviewType postHearingReviewType) {
         sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
-        assertThatThrownBy(() -> PdfRequestUtil.getNoticeBody(sscsCaseData, true, false))
+        assertThatThrownBy(() -> PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(sscsCaseData,
+                NoticeIssuedTemplateBody.builder().build(), true, false))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageStartingWith(String.format("isPostHearingsBEnabled is false - %s is not available", postHearingReviewType.getDescriptionEn()));
     }
@@ -173,19 +175,22 @@ class PdfRequestUtilTest {
     void getNoticeBody_returnsBodyContentWhenPostHearingReviewTypeIsNull() {
         sscsCaseData.getDocumentGeneration().setBodyContent(EXPECTED_CONTENT);
         sscsCaseData.getPostHearing().setReviewType(null);
-        assertThat(PdfRequestUtil.getNoticeBody(sscsCaseData, true, true)).isEqualTo(EXPECTED_CONTENT);
+        assertThat(PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(sscsCaseData,
+                NoticeIssuedTemplateBody.builder().build(), true, true).getNoticeBody()).isEqualTo(EXPECTED_CONTENT);
     }
 
     @Test
     void getNoticeBody_returnsBodyContentWhenPostHearingsIsDisabled() {
         sscsCaseData.getDocumentGeneration().setBodyContent(EXPECTED_CONTENT);
-        assertThat(PdfRequestUtil.getNoticeBody(sscsCaseData, false, false)).isEqualTo(EXPECTED_CONTENT);
+        assertThat(PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(sscsCaseData,
+                NoticeIssuedTemplateBody.builder().build(), false, false).getNoticeBody()).isEqualTo(EXPECTED_CONTENT);
     }
 
     @Test
     void getNoticeBody_returnsDirectionNoticeContentWhenBodyContentIsNull() {
         sscsCaseData.getDocumentGeneration().setDirectionNoticeContent(EXPECTED_CONTENT);
-        assertThat(PdfRequestUtil.getNoticeBody(sscsCaseData, false, false)).isEqualTo(EXPECTED_CONTENT);
+        assertThat(PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(sscsCaseData,
+                NoticeIssuedTemplateBody.builder().build(), false, false).getNoticeBody()).isEqualTo(EXPECTED_CONTENT);
     }
 
     @Test
