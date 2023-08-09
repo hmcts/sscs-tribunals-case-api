@@ -71,7 +71,7 @@ public class SscsHelper {
             LocalDate endDate = LocalDate.parse(excludeDate.getValue().getEnd());
 
             if (startDate.isAfter(endDate)) {
-                listOfErrors.add("Start date must be before end date");
+                listOfErrors.add("Unavailability start date must be before end date");
             }
         }
     }
