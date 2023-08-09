@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
@@ -67,8 +66,7 @@ public abstract class DecisionNoticeOutcomeService {
         if (questionService.getPointsConditionEnumClasses() != null) {
             for (Class<? extends PointsCondition<?>> pointsConditionEnumClass : questionService.getPointsConditionEnumClasses()) {
                 if (validationErrorMessages.isEmpty()) {
-                    getDecisionNoticePointsValidationErrorMessages(pointsConditionEnumClass, questionService, sscsCaseData)
-                        .forEach(validationErrorMessages::add);
+                    validationErrorMessages.addAll(getDecisionNoticePointsValidationErrorMessages(pointsConditionEnumClass, questionService, sscsCaseData));
                 }
             }
         }
@@ -85,9 +83,7 @@ public abstract class DecisionNoticeOutcomeService {
         }
     }
 
-
     private <T extends PointsCondition<?>> List<String> getDecisionNoticePointsValidationErrorMessages(Class<T> enumType, DecisionNoticeQuestionService decisionNoticeQuestionService, SscsCaseData sscsCaseData) {
-
         return Arrays.stream(enumType.getEnumConstants())
             .filter(pointsCondition -> pointsCondition.isApplicable(
                 decisionNoticeQuestionService, sscsCaseData))
@@ -95,8 +91,6 @@ public abstract class DecisionNoticeOutcomeService {
                 pointsCondition.getOptionalErrorMessage(decisionNoticeQuestionService, sscsCaseData))
             .filter(Optional::isPresent)
             .map(Optional::get)
-            .collect(Collectors.toList());
+            .toList();
     }
-
-
 }

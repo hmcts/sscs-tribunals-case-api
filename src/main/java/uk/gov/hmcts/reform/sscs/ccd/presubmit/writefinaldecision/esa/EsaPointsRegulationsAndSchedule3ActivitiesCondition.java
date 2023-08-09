@@ -186,7 +186,6 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
 
     @Override
     public Optional<String> getOptionalErrorMessage(DecisionNoticeQuestionService questionService, SscsCaseData sscsCaseData) {
-
         List<String> primaryCriteriaSatisfiedMessages =
             primaryConditions.stream()
                 .map(c -> c.getOptionalIsSatisfiedMessage(sscsCaseData))
