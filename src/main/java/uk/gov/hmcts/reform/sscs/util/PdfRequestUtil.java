@@ -208,10 +208,6 @@ public class PdfRequestUtil {
                         }
                         throw new IllegalArgumentException("isPostHearingsBEnabled is false - Liberty to Apply is not available");
                     case PERMISSION_TO_APPEAL:
-                        if (isPostHearingsBEnabled) {
-                            return caseData.getDocumentGeneration().getPermissionToAppealBodyContent();
-                        }
-                        throw new IllegalArgumentException("isPostHearingsBEnabled is false - Permission to Appeal is not available");
                     default:
                         throw new IllegalArgumentException("getNoticeBody has unexpected postHearingReviewType: "
                             + postHearingReviewType.getDescriptionEn());

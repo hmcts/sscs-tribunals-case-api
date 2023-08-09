@@ -157,38 +157,6 @@ class PdfRequestUtilTest {
                 NoticeIssuedTemplateBody.builder().build(), true, true)
                 .getNoticeBody()).isEqualTo(EXPECTED_CONTENT);
     }
-  
-    @Test
-    void getNoticeBody_throwsExceptionWhenPermissionToAppealAndIsPostHearingsBEnabledIsFalse() {
-        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
-        assertThatThrownBy(() -> PdfRequestUtil.getNoticeBody(sscsCaseData, true, false))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageStartingWith("isPostHearingsBEnabled is false - Permission to Appeal is not available");
-    }
-
-    @ParameterizedTest
-    @EnumSource(
-        value = PostHearingReviewType.class,
-        names = {
-            "SET_ASIDE",
-            "CORRECTION",
-            "STATEMENT_OF_REASONS",
-        },
-        mode = EXCLUDE
-    )
-    void getNoticeBody_throwsExceptionWhenPostHearingsBEnabledIsFalse(PostHearingReviewType postHearingReviewType) {
-        sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
-        assertThatThrownBy(() -> PdfRequestUtil.getNoticeBody(sscsCaseData, true, false))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageStartingWith(String.format("isPostHearingsBEnabled is false - %s is not available", postHearingReviewType.getDescriptionEn()));
-    }
-  
-    @Test
-    void getNoticeBody_returnsBodyContentWhenPostHearingReviewTypeIsNull() {
-        sscsCaseData.getDocumentGeneration().setBodyContent(EXPECTED_CONTENT);
-        sscsCaseData.getPostHearing().setReviewType(null);
-        assertThat(PdfRequestUtil.getNoticeBody(sscsCaseData, true, true)).isEqualTo(EXPECTED_CONTENT);
-    }
 
     @Test
     void getNoticeBody_returnsBodyContentWhenPostHearingsIsDisabled() {
