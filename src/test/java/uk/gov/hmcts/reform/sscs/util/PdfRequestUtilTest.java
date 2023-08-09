@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 class PdfRequestUtilTest {
 
+    public static final String EXPECTED_CONTENT = "Expected body content";
     SscsCaseData sscsCaseData;
 
     static boolean postHearingRequestTypeHasMoreThan5Values() {
@@ -162,6 +163,25 @@ class PdfRequestUtilTest {
         assertThatThrownBy(() -> PdfRequestUtil.getNoticeBody(sscsCaseData, true, false))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageStartingWith(String.format("isPostHearingsBEnabled is false - %s is not available", postHearingReviewType.getDescriptionEn()));
+    }
+  
+    @Test
+    void getNoticeBody_returnsBodyContentWhenPostHearingReviewTypeIsNull() {
+        sscsCaseData.getDocumentGeneration().setBodyContent(EXPECTED_CONTENT);
+        sscsCaseData.getPostHearing().setReviewType(null);
+        assertThat(PdfRequestUtil.getNoticeBody(sscsCaseData, true, true)).isEqualTo(EXPECTED_CONTENT);
+    }
+
+    @Test
+    void getNoticeBody_returnsBodyContentWhenPostHearingsIsDisabled() {
+        sscsCaseData.getDocumentGeneration().setBodyContent(EXPECTED_CONTENT);
+        assertThat(PdfRequestUtil.getNoticeBody(sscsCaseData, false, false)).isEqualTo(EXPECTED_CONTENT);
+    }
+
+    @Test
+    void getNoticeBody_returnsDirectionNoticeContentWhenBodyContentIsNull() {
+        sscsCaseData.getDocumentGeneration().setDirectionNoticeContent(EXPECTED_CONTENT);
+        assertThat(PdfRequestUtil.getNoticeBody(sscsCaseData, false, false)).isEqualTo(EXPECTED_CONTENT);
     }
 
     @Test

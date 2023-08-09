@@ -133,7 +133,6 @@ public class PdfRequestUtil {
         title = String.format("%s Application from %s", requestTypeDescriptionEn, "FTA");
     }
 
-
     private static DocumentLink getPreviewDocument(
         String pdfUrl,
         String userAuthorisation,
@@ -180,26 +179,28 @@ public class PdfRequestUtil {
         if (isPostHearingsEnabled) {
             PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
 
-            switch (postHearingReviewType) {
-                case SET_ASIDE:
-                    return caseData.getDocumentGeneration().getBodyContent();
-                case CORRECTION:
-                    return caseData.getDocumentGeneration().getCorrectionBodyContent();
-                case STATEMENT_OF_REASONS:
-                    return caseData.getDocumentGeneration().getStatementOfReasonsBodyContent();
-                case LIBERTY_TO_APPLY:
-                    if (isPostHearingsBEnabled) {
-                        return caseData.getDocumentGeneration().getLibertyToApplyBodyContent();
-                    }
-                    throw new IllegalArgumentException("isPostHearingsBEnabled is false - Liberty to Apply is not available");
-                case PERMISSION_TO_APPEAL:
-                    if (isPostHearingsBEnabled) {
-                        return caseData.getDocumentGeneration().getPermissionToAppealBodyContent();
-                    }
+            if (nonNull(postHearingReviewType)) {
+                switch (postHearingReviewType) {
+                    case SET_ASIDE:
+                        return caseData.getDocumentGeneration().getBodyContent();
+                    case CORRECTION:
+                        return caseData.getDocumentGeneration().getCorrectionBodyContent();
+                    case STATEMENT_OF_REASONS:
+                        return caseData.getDocumentGeneration().getStatementOfReasonsBodyContent();
+                    case LIBERTY_TO_APPLY:
+                        if (isPostHearingsBEnabled) {
+                            return caseData.getDocumentGeneration().getLibertyToApplyBodyContent();
+                        }
+                        throw new IllegalArgumentException("isPostHearingsBEnabled is false - Liberty to Apply is not available");
+                    case PERMISSION_TO_APPEAL:
+                        if (isPostHearingsBEnabled) {
+                            return caseData.getDocumentGeneration().getPermissionToAppealBodyContent();
+                        }
                     throw new IllegalArgumentException("isPostHearingsBEnabled is false - Permission to Appeal is not available");
-                default:
-                    throw new IllegalArgumentException("getNoticeBody has unexpected postHearingReviewType: "
-                        + postHearingReviewType.getDescriptionEn());
+                    default:
+                        throw new IllegalArgumentException("getNoticeBody has unexpected postHearingReviewType: "
+                            + postHearingReviewType.getDescriptionEn());
+                }
             }
         }
 
