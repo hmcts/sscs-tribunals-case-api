@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -254,7 +255,7 @@ class IssueDocumentHandlerTest {
     void givenPostHearingReviewIsLta_thenUseLtaBody() {
         SscsCaseData sscsCaseData = buildCaseData();
         sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
-        String bodyContent = "sor body content";
+        String bodyContent = "lta body content";
         sscsCaseData.getDocumentGeneration().setLibertyToApplyBodyContent(bodyContent);
 
         NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, true, USER_AUTHORISATION);
@@ -262,11 +263,33 @@ class IssueDocumentHandlerTest {
         assertThat(payload.getNoticeBody()).isEqualTo(bodyContent);
     }
 
+    @Test
+    void givenPostHearingReviewIsPta_thenUsePtaBody() {
+        SscsCaseData sscsCaseData = buildCaseData();
+        sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
+        String bodyContent = "pta body content";
+        sscsCaseData.getDocumentGeneration().setPermissionToAppealBodyContent(bodyContent);
+
+        NoticeIssuedTemplateBody payload = handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, true, USER_AUTHORISATION);
+
+        assertThat(payload.getNoticeBody()).isEqualTo(bodyContent);
+    }
+
+    @EnabledIf("postHearingReviewTypeHasMoreThan5Values")
     @ParameterizedTest
     @EnumSource(
         value = PostHearingReviewType.class,
-        names = {"PERMISSION_TO_APPEAL"})
-    void givenPostHearingReviewIsNotImplemented_thenThrowException(PostHearingReviewType postHearingReviewType) {
+        names = {
+            "SET_ASIDE",
+            "CORRECTION",
+            "STATEMENT_OF_REASONS",
+            "LIBERTY_TO_APPLY",
+            "PERMISSION_TO_APPEAL"
+            // TODO add post hearings B types as they are implemented
+        },
+        mode = EnumSource.Mode.EXCLUDE
+    )
+    void givenPostHearingReviewTypeIsNotImplemented_thenThrowException(PostHearingReviewType postHearingReviewType) {
         SscsCaseData sscsCaseData = buildCaseData();
         sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
 
@@ -274,5 +297,9 @@ class IssueDocumentHandlerTest {
             handler.createPayload(null, sscsCaseData, "doctype", LocalDate.now(), LocalDate.now(), false, true, true, USER_AUTHORISATION))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("caseData has unexpected postHearingReviewType: " + postHearingReviewType.getDescriptionEn());
+    }
+
+    static boolean postHearingReviewTypeHasMoreThan5Values() {
+        return PostHearingReviewType.values().length > 5;
     }
 }
