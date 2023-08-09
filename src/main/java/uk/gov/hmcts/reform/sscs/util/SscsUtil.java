@@ -36,8 +36,10 @@ public class SscsUtil {
         return allowedStates.contains(state);
     }
 
-    public static void clearPostHearingFields(SscsCaseData caseData) {
-        caseData.setPostHearing(null);
+    public static void clearPostHearingFields(SscsCaseData caseData, boolean isPostHearingsEnabled) {
+        if (isPostHearingsEnabled) {
+            caseData.setPostHearing(PostHearing.builder().build());
+        }
         clearDocumentTransientFields(caseData);
     }
 

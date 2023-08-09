@@ -47,7 +47,8 @@ public abstract class AbstractFooterService<D extends AbstractDocument> {
                     STATEMENT_OF_REASONS_APPLICATION,
                     LIBERTY_TO_APPLY_APPLICATION,
                     UPPER_TRIBUNALS_DECISION_REMADE,
-                    UPPER_TRIBUNALS_DECISION_REFUSED)
+                    UPPER_TRIBUNALS_DECISION_REFUSED,
+                    PERMISSION_TO_APPEAL_APPLICATION)
                 .contains(documentType);
 
             String verb = isPostHearingApp ? " received on " : " issued on ";
