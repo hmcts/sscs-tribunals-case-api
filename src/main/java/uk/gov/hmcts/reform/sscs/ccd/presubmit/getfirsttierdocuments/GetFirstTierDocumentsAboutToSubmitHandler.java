@@ -1,10 +1,11 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.getfirsttierdocuments;
 
 import static java.util.Objects.requireNonNull;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.bundling.BundlingHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -17,7 +18,13 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class GetFirstTierDocumentsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    @Value("${feature.postHearings.enabled}")
+    private final boolean isPostHearingsEnabled;
+
+    @Value("${feature.postHearingsB.enabled}")
+    private final boolean isPostHearingsBEnabled;
 
     @Autowired
     private final BundlingHandler bundlingHandler;
@@ -28,7 +35,9 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.CREATE_BUNDLE;
+                && callback.getEvent() == EventType.GET_FIRST_TIER_DOCUMENTS
+                && isPostHearingsEnabled
+                && isPostHearingsBEnabled;
     }
 
     @Override
