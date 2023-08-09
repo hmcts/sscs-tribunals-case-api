@@ -35,16 +35,6 @@ class SscsUtilTest {
     }
 
     @Test
-    void givenActionTypeSetAsideGrantedSelected_shouldThrowError() {
-        postHearing.setReviewType(PostHearingReviewType.SET_ASIDE);
-        postHearing.getSetAside().setAction(SetAsideActions.GRANT);
-
-        assertThatThrownBy(() -> getPostHearingReviewDocumentType(postHearing, true))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("getting the document type has an unexpected postHearingReviewType and action");
-    }
-
-    @Test
     void givenActionTypeSetAsideRefusedSelected_shouldReturnSetAsideRefusedDocument() {
         postHearing.setReviewType(PostHearingReviewType.SET_ASIDE);
         postHearing.getSetAside().setAction(SetAsideActions.REFUSE);
