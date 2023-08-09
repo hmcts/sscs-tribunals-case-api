@@ -199,6 +199,6 @@ public class SscsHelperTest {
 
         Iterator<String> iterator = response.getErrors().iterator();
         String error1 = iterator.next();
-        assertEquals("Start date must be before end date", error1);
+        assertEquals("Unavailability start date must be before end date", error1);
     }
 }
