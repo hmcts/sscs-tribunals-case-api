@@ -1,20 +1,16 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writestatementofreasons;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DECISION_ISSUED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REVIEW;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview.PostHearingReviewMidEventHandler.PAGE_ID_GENERATE_NOTICE;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -39,19 +35,18 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @ExtendWith(MockitoExtension.class)
-class PostHearingReviewMidEventHandlerTest {
+class WriteStatementOfReasonsMidEventHandlerTest {
+    public static final String URL = "http://dm-store/documents/123";
     private static final String USER_AUTHORISATION = "Bearer token";
-
-    private static final String URL = "http://dm-store/documents/123";
-    private static final String TEMPLATE_ID = "TB-SCS-GNO-ENG-00091.docx";
+    public static final String CASE_ID = "123123";
+    public static final String GENERATE_DOCUMENT = "generateDocument";
+    public static final String TEMPLATE_ID = "template.docx";
 
     @Mock
     private Callback<SscsCaseData> callback;
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-
-    private SscsCaseData caseData;
 
     private ArgumentCaptor<GenerateFileParams> capture;
 
@@ -64,25 +59,22 @@ class PostHearingReviewMidEventHandlerTest {
     @Mock
     private UserDetailsService userDetailsService;
 
-    private PostHearingReviewMidEventHandler handler;
+    private SscsCaseData caseData;
 
+    private WriteStatementOfReasonsMidEventHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, userDetailsService, true, true);
+        handler = new WriteStatementOfReasonsMidEventHandler(documentConfiguration, generateFile, userDetailsService, true, true);
 
         caseData = SscsCaseData.builder()
+            .ccdCaseId(CASE_ID)
             .documentGeneration(DocumentGeneration.builder()
                 .generateNotice(YES)
-                .correctionGenerateNotice(YES)
-                .statementOfReasonsGenerateNotice(YES)
-                .libertyToApplyGenerateNotice(YES)
-                .permissionToAppealGenerateNotice(YES)
                 .build())
             .appeal(Appeal.builder().appellant(Appellant.builder()
-                    .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
-                    .identity(Identity.builder().build()).build()).build())
-            .directionDueDate(LocalDate.now().plusDays(1).toString())
+                .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
+                .identity(Identity.builder().build()).build()).build())
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .hearingRoute(LIST_ASSIST)
                 .build())
@@ -93,7 +85,7 @@ class PostHearingReviewMidEventHandlerTest {
 
     @Test
     void givenAValidMidEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
+        when(callback.getEvent()).thenReturn(SOR_WRITE);
         assertThat(handler.canHandle(MID_EVENT, callback)).isTrue();
     }
 
@@ -110,35 +102,39 @@ class PostHearingReviewMidEventHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, userDetailsService, false, false);
-        when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
+        handler = new WriteStatementOfReasonsMidEventHandler(documentConfiguration, generateFile, userDetailsService, false, false);
+        when(callback.getEvent()).thenReturn(SOR_WRITE);
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
 
     @ParameterizedTest
-    @EnumSource(
-        value = PostHearingReviewType.class,
-        names = {
-            "SET_ASIDE",
-            "CORRECTION",
-            "STATEMENT_OF_REASONS",
-            "LIBERTY_TO_APPLY",
-            "PERMISSION_TO_APPEAL"
-        })
-    void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentField(PostHearingReviewType postHearingReviewType) {
+    @EnumSource(value = YesNo.class, names = "NO")
+    @NullSource
+    void givenGenerateNoticeIsNoOrNull_doNothing(YesNo value) {
+        caseData.getDocumentGeneration().setGenerateNotice(value);
+
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
 
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void givenGenerateNoticeYes_generateNotice() {
         when(generateFile.assemble(any())).thenReturn(URL);
-        when(callback.getPageId()).thenReturn(PAGE_ID_GENERATE_NOTICE);
-
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
         when(documentConfiguration.getDocuments()).thenReturn(new HashMap<>(Map.of(
             LanguagePreference.ENGLISH,  new HashMap<>(Map.of(
                 DECISION_ISSUED, TEMPLATE_ID)
             ))
         ));
 
-        caseData.getPostHearing().setReviewType(postHearingReviewType);
+        caseData.getDocumentGeneration().setBodyContent("Something");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -146,7 +142,7 @@ class PostHearingReviewMidEventHandlerTest {
         DocumentLink previewDocument = response.getData().getDocumentStaging().getPreviewDocument();
         assertThat(previewDocument).isNotNull();
 
-        String expectedFilename = String.format("Decision Notice issued on %s.pdf",
+        String expectedFilename = String.format("Statement of Reasons issued on %s.pdf",
             LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         assertThat(previewDocument.getDocumentFilename()).isEqualTo(expectedFilename);
@@ -160,43 +156,20 @@ class PostHearingReviewMidEventHandlerTest {
         var value = capture.getValue();
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
-        assertThat(payload.getNoticeType()).isEqualTo(postHearingReviewType.getDescriptionEn().toUpperCase() + " DECISION NOTICE");
+        assertThat(payload.getNoticeType()).isEqualTo("STATEMENT OF REASONS");
         assertThat(payload.getAppellantFullName()).isEqualTo("Appellant Lastname");
         assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
-    }
-
-    @ParameterizedTest
-    @EnumSource(
-        value = YesNo.class,
-        names = {"NO"})
-    @NullSource
-    void givenGenerateNoticeNotYes_doNothing(YesNo value) {
-        caseData.getDocumentGeneration().setGenerateNotice(value);
-
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-
-        when(callback.getPageId()).thenReturn("generateNotice");
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-
-        verifyNoInteractions(generateFile);
     }
 
     @Test
     void givenOtherPageId_doNothing() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
-
-        when(callback.getPageId()).thenReturn("test page id");
+        when(callback.getPageId()).thenReturn("something else");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-
-        verifyNoInteractions(generateFile);
     }
 
 }
