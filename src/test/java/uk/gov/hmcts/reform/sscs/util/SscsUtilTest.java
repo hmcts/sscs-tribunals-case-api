@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getIssueFinalDecisionDocume
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPostHearingReviewDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getWriteFinalDecisionDocumentType;
 
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,16 +49,6 @@ class SscsUtilTest {
     void givenPostHearingsReviewTypeIsNull_returnDecisionNotice() {
         DocumentType documentType = getPostHearingReviewDocumentType(postHearing, true);
         assertThat(documentType).isEqualTo(DocumentType.DECISION_NOTICE);
-    }
-
-    @Test
-    void givenActionTypeSetAsideGrantedSelected_shouldThrowError() {
-        postHearing.setReviewType(PostHearingReviewType.SET_ASIDE);
-        postHearing.getSetAside().setAction(SetAsideActions.GRANT);
-
-        assertThatThrownBy(() -> getPostHearingReviewDocumentType(postHearing, true))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("getting the document type has an unexpected postHearingReviewType and action");
     }
 
     @Test
@@ -160,5 +151,45 @@ class SscsUtilTest {
     void givenPostHearingsFlagIsFalseAndCorrectionInProgress_shouldReturnFinalDecisionNotice() {
         postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
         assertThat(getIssueFinalDecisionDocumentType(caseData, false)).isEqualTo(FINAL_DECISION_NOTICE);
+    }
+  
+    @Test
+    void givenPostHearingsEnabledFalse_clearPostHearingsFieldClearsDocumentFields_butDoesNotAlterPostHearing() {
+        postHearing.setRequestType(PostHearingRequestType.SET_ASIDE);
+        SscsCaseData caseData = SscsCaseData.builder()
+            .postHearing(postHearing)
+            .documentGeneration(DocumentGeneration.builder()
+                .generateNotice(YesNo.YES)
+                .build())
+            .documentStaging(DocumentStaging.builder()
+                .dateAdded(LocalDate.now())
+                .build())
+            .build();
+
+        SscsUtil.clearPostHearingFields(caseData, false);
+
+        assertThat(caseData.getPostHearing().getRequestType()).isNotNull();
+        assertThat(caseData.getDocumentGeneration().getGenerateNotice()).isNull();
+        assertThat(caseData.getDocumentStaging().getDateAdded()).isNull();
+    }
+
+    @Test
+    void givenPostHearingsEnabledTrue_clearPostHearingsFieldClearsDocumentFields_andClearsPostHearing() {
+        postHearing.setRequestType(PostHearingRequestType.SET_ASIDE);
+        SscsCaseData caseData = SscsCaseData.builder()
+            .postHearing(postHearing)
+            .documentGeneration(DocumentGeneration.builder()
+                .generateNotice(YesNo.YES)
+                .build())
+            .documentStaging(DocumentStaging.builder()
+                .dateAdded(LocalDate.now())
+                .build())
+            .build();
+
+        SscsUtil.clearPostHearingFields(caseData, true);
+
+        assertThat(caseData.getPostHearing().getRequestType()).isNull();
+        assertThat(caseData.getDocumentGeneration().getGenerateNotice()).isNull();
+        assertThat(caseData.getDocumentStaging().getDateAdded()).isNull();
     }
 }

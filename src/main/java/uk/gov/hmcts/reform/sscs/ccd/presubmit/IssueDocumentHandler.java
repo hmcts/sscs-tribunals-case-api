@@ -59,10 +59,7 @@ public class IssueDocumentHandler {
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
                 .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
                 .respondents(getRespondents(caseData))
-                .noticeBody(PdfRequestUtil.getNoticeBody(caseData, isPostHearingsEnabled, isPostHearingsBEnabled))
-                .userName(caseData.getDocumentGeneration().getSignedBy())
                 .noticeType(documentTypeLabel.toUpperCase())
-                .userRole(caseData.getDocumentGeneration().getSignedRole())
                 .dateAdded(dateAdded)
                 .generatedDate(generatedDate)
                 .idamSurname(caseData.getDocumentGeneration().getSignedBy())
@@ -81,6 +78,8 @@ public class IssueDocumentHandler {
                         .correctedDateIssued(LocalDate.now()).build();
             }
         }
+      
+        formPayload = PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(caseData, formPayload, isPostHearingsEnabled, isPostHearingsBEnabled);
 
         if (isScottish) {
             formPayload = formPayload.toBuilder().image(NoticeIssuedTemplateBody.SCOTTISH_IMAGE).build();
