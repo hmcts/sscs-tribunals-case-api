@@ -641,7 +641,7 @@ sscs-ccd-callback-orchestrator:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:prod-ff1aa10-20230809100711s
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:prod-ff1aa10-20230809100711
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
