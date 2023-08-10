@@ -64,7 +64,27 @@ public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
                 "jointPartyId",
                 "appeal.appellant.appointee.id",
                 "appeal.appellant.id",
-                "appeal.rep.id")
+                "appeal.rep.id",
+                "correction",
+                "correctionBodyContent",
+                "bodyContent",
+                "correctionGenerateNotice",
+                "generateNotice",
+                "dateAdded",
+                "directionNoticeContent",
+                "libertyToApply",
+                "libertyToApplyBodyContent",
+                "libertyToApplyGenerateNotice",
+                "permissionToAppeal",
+                "postHearingRequestType",
+                "postHearingReviewType",
+                "previewDocument",
+                "setAside",
+                "signedBy",
+                "signedRole",
+                "statementOfReasons",
+                "statementOfReasonsBodyContent",
+                "statementOfReasonsGenerateNotice")
             .isEqualTo(expectedCaseData);
     }
 

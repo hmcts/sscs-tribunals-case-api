@@ -565,9 +565,9 @@ sscs-evidence-share:
 # click create
 # azure steps should be repeated every time PR is undeployed from preview
 sscs-tya-notif:
-  enabled: false
+  enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
+    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2404
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
@@ -585,6 +585,8 @@ sscs-tya-notif:
       HOURS_END_TIME: 23
       RUN_DB_MIGRATION_ON_STARTUP: true
       TEST_RECIPIENTS_POSTCODE: "*"
+      POST_HEARINGS_FEATURE: true
+      POST_HEARINGS_B_FEATURE: true
     secrets:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
@@ -751,7 +753,7 @@ hmc-cft-hearing-service:
 servicebus:
   enabled: true
   resourceGroup: sscs-aso-preview-rg
-  sbNamespace: sscs
+  sbNamespace: sscs-servicebus-preview
   #Each topic/queue matches up to one used in the config above
   setup:
     topics:
