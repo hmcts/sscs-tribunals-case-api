@@ -82,6 +82,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseDataBefore;
 
+    private Appeal appeal;
+
     @Before
     public void setUp() {
         openMocks(this);
@@ -135,6 +137,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
             .roles(List.of(SUPER_USER.getValue()))
             .build());
+
+        appeal = callback.getCaseDetails().getCaseData().getAppeal();
     }
 
     @Test
@@ -677,6 +681,98 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             assertThat(response.getWarnings(), hasItems("There is a mismatch between the hearing type and the wants to attend field, "
                 + "all hearing options will be cleared please check if this is correct"));
         }
+    }
+
+    @Test
+    public void givenAnAppealWithIncorrectExcludedDateStartDateAfterEndDate_thenProvideErrorMessage() {
+        List<ExcludeDate> excludeDate = new ArrayList<>(List.of(
+                ExcludeDate.builder().value(DateRange.builder()
+                        .start("2023-06-17")
+                        .end("2023-05-18")
+                        .build()).build()));
+
+        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("Yes").build());
+        appeal.getHearingOptions().setExcludeDates(excludeDate);
+
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().iterator().next(), is("Unavailability start date must be before end date"));
+    }
+
+    @Test
+    public void givenAnAppealWithIncorrectExcludedDatesStartDateEmpty_thenProvideErrorMessage() {
+        List<ExcludeDate> excludeDate = new ArrayList<>(List.of(
+                ExcludeDate.builder().value(DateRange.builder()
+                        .start(null)
+                        .end("2023-05-17")
+                        .build()).build()));
+
+        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("Yes").build());
+        appeal.getHearingOptions().setExcludeDates(excludeDate);
+
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().iterator().next(), is("Add a start date for unavailable dates"));
+    }
+
+    @Test
+    public void givenAnAppealWithIncorrectExcludedEndDate_thenProvideErrorMessage() {
+        List<ExcludeDate> excludeDate;
+        excludeDate = new ArrayList<>(List.of(
+                ExcludeDate.builder().value(DateRange.builder()
+                        .start("2023-06-17")
+                        .end(null)
+                        .build()).build()));
+
+        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("Yes").build());
+        appeal.getHearingOptions().setExcludeDates(excludeDate);
+
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().iterator().next(), is("Add an end date for unavailable dates"));
+    }
+
+    @Test
+    public void givenAnAppealWithEmptyExcludedDates_thenProvideErrorMessage() {
+        List<ExcludeDate> excludeDate;
+        excludeDate = new ArrayList<>(List.of(
+                ExcludeDate.builder().value(DateRange.builder()
+                        .start(null)
+                        .end(null)
+                        .build()).build()));
+
+        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("Yes").build());
+        appeal.getHearingOptions().setExcludeDates(excludeDate);
+
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().iterator().next(), is("Add a start date for unavailable dates"));
+    }
+
+    @Test
+    public void givenAnAppealWithCorrectExcludedDates_thenDontProvideError() {
+        List<ExcludeDate> excludeDate;
+        excludeDate = new ArrayList<>(List.of(
+                ExcludeDate.builder().value(DateRange.builder()
+                        .start("2023-06-17")
+                        .end("2023-06-19")
+                        .build()).build()));
+
+        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("Yes").build());
+        appeal.getHearingOptions().setExcludeDates(excludeDate);
+
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().isEmpty(), is(true));
+    }
+
+    @Test
+    public void givenAnAppealWithNoScheduledHearing_thenDontProvideError() {
+
+        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").scheduleHearing("No").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().isEmpty(), is(true));
     }
 
     private long getNumberOfExpectedError(PreSubmitCallbackResponse<SscsCaseData> response) {

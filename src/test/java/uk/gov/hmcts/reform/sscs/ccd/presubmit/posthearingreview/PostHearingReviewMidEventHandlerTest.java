@@ -77,6 +77,7 @@ class PostHearingReviewMidEventHandlerTest {
                 .correctionGenerateNotice(YES)
                 .statementOfReasonsGenerateNotice(YES)
                 .libertyToApplyGenerateNotice(YES)
+                .permissionToAppealGenerateNotice(YES)
                 .build())
             .appeal(Appeal.builder().appellant(Appellant.builder()
                     .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
@@ -121,7 +122,8 @@ class PostHearingReviewMidEventHandlerTest {
             "SET_ASIDE",
             "CORRECTION",
             "STATEMENT_OF_REASONS",
-            "LIBERTY_TO_APPLY"
+            "LIBERTY_TO_APPLY",
+            "PERMISSION_TO_APPEAL"
         })
     void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentField(PostHearingReviewType postHearingReviewType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
