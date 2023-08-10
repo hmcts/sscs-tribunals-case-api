@@ -159,7 +159,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             && HearingType.PAPER.getValue().equals(sscsCaseData.getAppeal().getHearingType())
             && isBenefitTypeValidForHearingTypeValidation(response.getData().getBenefitType())
             && sscsCaseData.getAppeal().getHearingOptions().isWantsToAttendHearing().equals(Boolean.TRUE)) {
-            
+
             response.getData().getAppeal().setHearingType(HearingType.ORAL.getValue());
             if (!hasSystemUserRole) {
                 response.addWarning("The hearing type will be changed from Paper to Oral as at least one of the"
