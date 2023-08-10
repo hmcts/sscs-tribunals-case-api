@@ -62,9 +62,6 @@ public class PostHearingReviewMidEventHandler extends IssueDocumentHandler imple
             String templateId = documentConfiguration.getDocuments()
                 .get(caseData.getLanguagePreference()).get(DECISION_ISSUED);
 
-            caseData.getDocumentGeneration().setSignedBy(userDetailsService.buildLoggedInUserName(userAuthorisation));
-            caseData.getDocumentGeneration().setSignedRole(userDetailsService.getUserRole(userAuthorisation));
-
             response = issueDocument(callback, SscsUtil.getPostHearingReviewDocumentType(caseData.getPostHearing(), isPostHearingsEnabled), templateId, generateFile, userAuthorisation, isPostHearingsEnabled, isPostHearingsBEnabled);
         }
 

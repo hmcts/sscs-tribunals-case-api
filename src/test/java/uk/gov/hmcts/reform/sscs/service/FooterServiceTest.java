@@ -118,7 +118,8 @@ public class FooterServiceTest {
         "SET_ASIDE_APPLICATION, received",
         "CORRECTION_APPLICATION, received",
         "STATEMENT_OF_REASONS_APPLICATION, received",
-        "LIBERTY_TO_APPLY_APPLICATION, received"
+        "LIBERTY_TO_APPLY_APPLICATION, received",
+        "PERMISSION_TO_APPEAL_APPLICATION, received",
     })
     public void givenADocument_thenAddAFooter(DocumentType documentType, String verb) throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
@@ -146,7 +147,7 @@ public class FooterServiceTest {
     }
 
     @Test
-    public void givenADocumentWithOverridenDateAndFileName_thenAddAFooterWithOverriddenValues() throws Exception {
+    public void givenADocumentWithOverriddenDateAndFileName_thenAddAFooterWithOverriddenValues() throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
         when(pdfStoreService.download(any())).thenReturn(pdfBytes);
 
@@ -155,12 +156,12 @@ public class FooterServiceTest {
         when(pdfWatermarker.shrinkAndWatermarkPdf(any(), stringCaptor.capture(), stringCaptor.capture())).thenReturn(new byte[]{});
 
         footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").documentFilename("afilename").build(),
-                sscsCaseData, DocumentType.DIRECTION_NOTICE, LocalDate.now().toString(), LocalDate.now().minusDays(1), "overriden.pdf", null);
+                sscsCaseData, DocumentType.DIRECTION_NOTICE, LocalDate.now().toString(), LocalDate.now().minusDays(1), "overridden.pdf", null);
 
         assertEquals(2, sscsCaseData.getSscsDocument().size());
         SscsDocumentDetails footerDoc = sscsCaseData.getSscsDocument().get(0).getValue();
         assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), footerDoc.getDocumentType());
-        assertEquals("overriden.pdf", footerDoc.getDocumentFileName());
+        assertEquals("overridden.pdf", footerDoc.getDocumentFileName());
         assertEquals(LocalDate.now().minusDays(1).toString(), footerDoc.getDocumentDateAdded());
         assertEquals(expectedDocumentUrl, footerDoc.getDocumentLink().getDocumentUrl());
         verify(pdfStoreService).storeDocument(any(), anyString());
