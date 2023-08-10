@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
-import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -43,8 +42,6 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
     private SscsCaseData sscsCaseData;
 
-    @Mock
-    private FooterService footerService;
 
     @Before
     public void setUp() {
@@ -179,6 +176,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     @Parameters({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
     public void givenPostponementRequestInterlocSendToTcw_returnAnErrorIfNoOriginalSenderSelected(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
+
         sscsCaseData = sscsCaseData.toBuilder().selectWhoReviewsCase(new DynamicList(
                         new DynamicListItem(POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()),
                         Arrays.asList(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()),

@@ -42,6 +42,7 @@ public class PostponementRequestServiceTest {
     private static final LocalDateTime EXCLUDED_DATE_TIME = LocalDateTime.of(2024, 11, 2, 1, 0);
     public static final String DOCUMENT_FILENAME = "example.pdf";
     private final PostponementRequestService postponementRequestService = new PostponementRequestService();
+
     private SscsCaseData caseData;
 
     private PreSubmitCallbackResponse<SscsCaseData> response;
