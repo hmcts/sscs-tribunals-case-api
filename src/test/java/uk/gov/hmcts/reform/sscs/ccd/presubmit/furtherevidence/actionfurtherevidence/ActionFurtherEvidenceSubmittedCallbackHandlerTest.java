@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevid
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -16,10 +18,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -170,7 +176,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         "SET_ASIDE, setAsideRequest",
         "CORRECTION, correctionRequest",
         "STATEMENT_OF_REASONS, sORRequest",
-        "LIBERTY_TO_APPLY, libertyToApplyRequest"
+        "LIBERTY_TO_APPLY, libertyToApplyRequest",
+        "PERMISSION_TO_APPEAL, permissionToAppealRequest"
     })
     public void givenPostHearingAndFurtherEvidenceActionIsReviewByJudge_shouldTriggerEventAndUpdateCaseCorrectly(
         PostHearingRequestType requestType, String eventType) {
@@ -196,9 +203,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                 anyString(), any(IdamTokens.class));
     }
 
+    @Ignore("Re-enable once new post hearings B types are added to the enum")
     @Test
-    @Parameters({
-        "PERMISSION_TO_APPEAL, permissionToAppealRequest"
+    @Parameters({ // TODO add remaining post hearing B types once implemented
     })
     public void givenPostHearingNotImplementedAndFurtherEvidenceActionIsReviewByJudge_shouldThrowException(
         PostHearingRequestType requestType, String eventType) {
@@ -221,7 +228,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @Test
     @Parameters({
-        "LIBERTY_TO_APPLY, libertyToApplyRequest"
+        "LIBERTY_TO_APPLY, libertyToApplyRequest",
+        "PERMISSION_TO_APPEAL, permissionToAppealRequest"
+        // TODO add remaining post hearing B types once implemented
     })
     public void givenPostHearingsBNotEnabledAndFurtherEvidenceActionIsReviewByJudge_shouldThrowException(
         PostHearingRequestType requestType, String eventType) {

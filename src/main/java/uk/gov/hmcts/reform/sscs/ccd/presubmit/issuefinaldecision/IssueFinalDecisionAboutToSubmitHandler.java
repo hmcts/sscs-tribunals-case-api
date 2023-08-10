@@ -290,7 +290,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(null);
 
         preSubmitCallbackResponse.getData().getSscsDocument()
-                .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
+                .removeIf(doc -> DRAFT_DECISION_NOTICE.getValue().equals(doc.getValue().getDocumentType()));
     }
 
 }
