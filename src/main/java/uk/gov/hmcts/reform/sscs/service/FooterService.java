@@ -9,13 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
-import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
@@ -49,7 +44,8 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
     }
 
     protected SscsDocument createFooterDocument(DocumentLink url, String bundleAddition, String documentFileName,
-                                                LocalDate dateAdded, DocumentType documentType, SscsDocumentTranslationStatus documentTranslationStatus) {
+                                                LocalDate dateAdded, DocumentType documentType, SscsDocumentTranslationStatus documentTranslationStatus,
+                                                EventType eventType) {
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName(documentFileName)
                 .documentLink(url)
@@ -57,18 +53,23 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
                 .documentDateAdded(Optional.ofNullable(dateAdded).orElse(LocalDate.now()).format(DateTimeFormatter.ISO_DATE))
                 .documentType(documentType.getValue())
                 .documentTranslationStatus(documentTranslationStatus)
-                .originalPartySender(getOriginalPartySender(url))
+                .originalPartySender(getOriginalPartySender(eventType))
                 .build())
                 .build();
     }
 
-    private String getOriginalPartySender(DocumentLink url) {
-        if (nonNull(url)) {
-            String documentFileName = url.getDocumentFilename();
-
-            return nonNull(documentFileName) && documentFileName.endsWith(PdfRequestUtil.POST_HEARING_REQUEST_FILE_SUFFIX) ? "FTA" : null;
+    private String getOriginalPartySender(EventType eventType) {
+        if (eventType != null) {
+            switch (eventType) {
+                case POST_HEARING_REQUEST:
+                    return "FTA";
+                case SEND_TO_FIRST_TIER:
+                    return "Upper Tribunal";
+                default:
+                    return null;
+            }
+        } else {
+            return null;
         }
-
-        return null;
     }
 }
