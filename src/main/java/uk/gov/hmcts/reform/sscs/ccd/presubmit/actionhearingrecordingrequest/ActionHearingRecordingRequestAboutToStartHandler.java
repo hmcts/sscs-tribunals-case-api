@@ -8,7 +8,6 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,15 +61,15 @@ public class ActionHearingRecordingRequestAboutToStartHandler implements PreSubm
         List<String> hearingIdsWithRecording = emptyIfNull(sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()).stream()
                 .map(d -> d.getValue().getHearingId())
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         List<Hearing> hearingsWithRecording = emptyIfNull(sscsCaseData.getHearings()).stream()
                 .filter(hearing -> hearingIdsWithRecording.contains(hearing.getValue().getHearingId()))
-                .collect(Collectors.toList());
+                .toList();
 
         List<DynamicListItem> validHearingsDynamicList = hearingsWithRecording.stream()
                 .map(hearing -> new DynamicListItem(hearing.getValue().getHearingId(), selectHearing(hearing)))
-                .collect(Collectors.toList());;
+                .toList();
 
         sscsCaseData.getSscsHearingRecordingCaseData().setSelectHearingDetails(
                 new DynamicList(new DynamicListItem("", ""), validHearingsDynamicList));
