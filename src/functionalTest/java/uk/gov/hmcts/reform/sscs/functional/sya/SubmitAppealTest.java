@@ -134,7 +134,27 @@ public class SubmitAppealTest {
                 "appeal.appellant.id",
                 "appeal.appellant.appointee.id",
                 "appeal.rep.id",
-                "jointPartyId")
+                "jointPartyId",
+                "correction",
+                "correctionBodyContent",
+                "bodyContent",
+                "correctionGenerateNotice",
+                "generateNotice",
+                "dateAdded",
+                "directionNoticeContent",
+                "libertyToApply",
+                "libertyToApplyBodyContent",
+                "libertyToApplyGenerateNotice",
+                "permissionToAppeal",
+                "postHearingRequestType",
+                "postHearingReviewType",
+                "previewDocument",
+                "setAside",
+                "signedBy",
+                "signedRole",
+                "statementOfReasons",
+                "statementOfReasonsBodyContent",
+                "statementOfReasonsGenerateNotice")
             .isEqualTo(changeExpectedFields(expectedResponse, nino, mrnDate));
 
         assertEquals(expectedState, sscsCaseDetails.getState());
