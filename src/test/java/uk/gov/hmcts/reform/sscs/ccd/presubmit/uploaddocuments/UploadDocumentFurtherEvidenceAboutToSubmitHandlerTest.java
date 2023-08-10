@@ -111,7 +111,27 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
                 "data.jointPartyId",
                 "data.appeal.appellant.appointee.id",
                 "data.appeal.appellant.id",
-                "data.appeal.rep.id")
+                "data.appeal.rep.id",
+                "data.correction",
+                "data.correctionBodyContent",
+                "data.bodyContent",
+                "data.correctionGenerateNotice",
+                "data.generateNotice",
+                "data.dateAdded",
+                "data.directionNoticeContent",
+                "data.libertyToApply",
+                "data.libertyToApplyBodyContent",
+                "data.libertyToApplyGenerateNotice",
+                "data.permissionToAppeal",
+                "data.postHearingRequestType",
+                "data.postHearingReviewType",
+                "data.previewDocument",
+                "data.setAside",
+                "data.signedBy",
+                "data.signedRole",
+                "data.statementOfReasons",
+                "data.statementOfReasonsBodyContent",
+                "data.statementOfReasonsGenerateNotice")
             .isEqualTo(getExpectedResponse());
         assertNull(actualCaseData.getData().getDwpState());
         assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());
