@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 
 import java.time.LocalDate;
