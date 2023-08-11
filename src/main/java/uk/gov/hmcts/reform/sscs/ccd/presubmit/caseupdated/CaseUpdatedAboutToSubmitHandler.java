@@ -132,7 +132,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (!hasSystemUserRole) {
             validateAndUpdateDwpHandlingOffice(sscsCaseData, preSubmitCallbackResponse);
             validateHearingOptions(sscsCaseData, preSubmitCallbackResponse);
-            validateAppellantAddress(sscsCaseData, preSubmitCallbackResponse);
+            validateAppellantAddress(sscsCaseData,preSubmitCallbackResponse);
         }
 
         return preSubmitCallbackResponse;
@@ -146,16 +146,17 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         String addressLine1 = appellantInfo.getAddress().getLine1();
         String postcode = appellantInfo.getAddress().getPostcode();
 
+        if(!StringUtils.isBlank(addressLine1) || !StringUtils.isBlank(postcode)) {
 
-
-        if(!addressLine1.isBlank()){
-            if(postcode.isBlank() || !postcodeValidator.isValid(postcode,context)){
-                response.addError("You must enter a valid UK postcode for the appellant");
+            if (!StringUtils.isBlank(addressLine1)) {
+                if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
+                    response.addError("You must enter a valid UK postcode for the appellant");
+                }
+            } else {
+                if (!StringUtils.isBlank(postcode) && postcodeValidator.isValid(postcode, context)) {
+                    response.addError("You must enter address line 1 for the appellant");
+                }
             }
-        } else {
-              if(!postcode.isBlank() && postcodeValidator.isValid(postcode,context) ){
-                  response.addError("You must enter address line 1 for the appellant");
-              }
         }
 
     }
@@ -169,12 +170,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         String postcode = representativeInfo.getAddress().getPostcode();
 
 
-        if (!addressLine1.isBlank()) {
-            if (postcode.isBlank() || !postcodeValidator.isValid(postcode, context)) {
+        if (!addressLine1.isEmpty()) {
+            if (postcode.isEmpty() || !postcodeValidator.isValid(postcode, context)) {
                 response.addError("You must enter a valid UK postcode for the representative");
             }
         } else {
-            if (!postcode.isBlank() && postcodeValidator.isValid(postcode, context)) {
+            if (!postcode.isEmpty() && postcodeValidator.isValid(postcode, context)) {
                 response.addError("You must enter address line 1 for the representative");
             }
         }
@@ -189,12 +190,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         String postcode = jointPartyInfo.getAddress().getPostcode();
 
 
-        if (!addressLine1.isBlank()) {
-            if (postcode.isBlank() || !postcodeValidator.isValid(postcode, context)) {
+        if (!addressLine1.isEmpty()) {
+            if (postcode.isEmpty() || !postcodeValidator.isValid(postcode, context)) {
                 response.addError("You must enter a valid UK postcode for the Joint Party");
             }
         } else {
-            if (!postcode.isBlank() && postcodeValidator.isValid(postcode, context)) {
+            if (!postcode.isEmpty() && postcodeValidator.isValid(postcode, context)) {
                 response.addError("You must enter address line 1 for the Joint Party");
             }
         }
@@ -209,12 +210,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         String postcode = appointeeInfo.getAddress().getPostcode();
 
 
-        if (!addressLine1.isBlank()) {
-            if (postcode.isBlank() || !postcodeValidator.isValid(postcode, context)) {
+        if (!addressLine1.isEmpty()) {
+            if (postcode.isEmpty() || !postcodeValidator.isValid(postcode, context)) {
                 response.addError("You must enter a valid UK postcode for the Appointee ");
             }
         } else {
-            if (!postcode.isBlank() && postcodeValidator.isValid(postcode, context)) {
+            if (!postcode.isEmpty() && postcodeValidator.isValid(postcode, context)) {
                 response.addError("You must enter address line 1 for the Appointee");
             }
         }
