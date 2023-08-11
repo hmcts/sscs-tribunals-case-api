@@ -158,25 +158,66 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
               }
         }
 
+    }
+
+    private void validateRepresentativeAddress(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+
+        // TODO : Maybe implement a feature for adding the entity so that the same method can be used for eg. Appellant, Appointee etc
+
+        Representative representativeInfo = sscsCaseData.getAppeal().getRep();
+        String addressLine1 = representativeInfo.getAddress().getLine1();
+        String postcode = representativeInfo.getAddress().getPostcode();
 
 
+        if (!addressLine1.isBlank()) {
+            if (postcode.isBlank() || !postcodeValidator.isValid(postcode, context)) {
+                response.addError("You must enter a valid UK postcode for the representative");
+            }
+        } else {
+            if (!postcode.isBlank() && postcodeValidator.isValid(postcode, context)) {
+                response.addError("You must enter address line 1 for the representative");
+            }
+        }
+    }
 
-//        if(!addressLine1.isBlank() || !postcode.isBlank()){
-//
-//            if(postcodeValidator.isValid(postcode, context)){
-//
-//            }
-//
-//            if((!postcode.isBlank() && postcodeValidator.isValid(postcode,context)) && addressLine1.isBlank()){
-//                response.addError("You must enter address line 1 for the appellant");
-//            }
-//
-//            if(postcode.isBlank() && !addressLine1.isBlank()){
-//                response.addError("You must enter a valid UK postcode for the appellant");
-//            }
-//
-//        }
+    private void validateJointPartyAddress(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
 
+        // TODO : Maybe implement a feature for adding the entity so that the same method can be used for eg. Appellant, Appointee etc
+
+        JointParty jointPartyInfo = sscsCaseData.getJointParty();
+        String addressLine1 = jointPartyInfo.getAddress().getLine1();
+        String postcode = jointPartyInfo.getAddress().getPostcode();
+
+
+        if (!addressLine1.isBlank()) {
+            if (postcode.isBlank() || !postcodeValidator.isValid(postcode, context)) {
+                response.addError("You must enter a valid UK postcode for the Joint Party");
+            }
+        } else {
+            if (!postcode.isBlank() && postcodeValidator.isValid(postcode, context)) {
+                response.addError("You must enter address line 1 for the Joint Party");
+            }
+        }
+    }
+
+    private void validateAppointeeAddress(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+
+        // TODO : Maybe implement a feature for adding the entity so that the same method can be used for eg. Appellant, Appointee etc
+
+        Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
+        String addressLine1 = appointeeInfo.getAddress().getLine1();
+        String postcode = appointeeInfo.getAddress().getPostcode();
+
+
+        if (!addressLine1.isBlank()) {
+            if (postcode.isBlank() || !postcodeValidator.isValid(postcode, context)) {
+                response.addError("You must enter a valid UK postcode for the Appointee ");
+            }
+        } else {
+            if (!postcode.isBlank() && postcodeValidator.isValid(postcode, context)) {
+                response.addError("You must enter address line 1 for the Appointee");
+            }
+        }
     }
 
     private void validateAndUpdateDwpHandlingOffice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
