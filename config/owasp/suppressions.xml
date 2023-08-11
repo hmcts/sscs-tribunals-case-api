@@ -1,17 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-  <suppress until="2023-05-03">
+  <suppress until="2023-09-01">
     <notes><![CDATA[
    file name: commons-fileupload-1.4.jar
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/commons\-fileupload/commons\-fileupload@.*$</packageUrl>
     <cve>CVE-2023-24998</cve>
   </suppress>
-  <suppress until="2023-05-03">
+  <suppress until="2023-09-01">
     <notes><![CDATA[
    file name: json-20230227.jar
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/org\.json/json@.*$</packageUrl>
     <cve>CVE-2022-45688</cve>
+  </suppress>
+  <suppress until="2023-09-01">
+    <cve>CVE-2023-20863</cve>
+  </suppress>
+  <suppress until="2023-09-01">
+    <cve>CVE-2023-34411</cve>
+  </suppress>
+  <suppress until = "2023-09-01">
+    <cve>CVE-2023-35116</cve>
+    <cve>CVE-2023-2976</cve>
+  </suppress>
+  <suppress until = "2023-09-01">
+    <notes><![CDATA[
+   file name: guava-31.1-jre.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.google\.guava/guava@.*$</packageUrl>
+    <cve>CVE-2023-2976</cve>
+  </suppress>
+  <suppress until = "2023-09-01">
+    <cve>CVE-2023-3782</cve>
+    <cve>CVE-2023-3635</cve>
   </suppress>
 </suppressions>

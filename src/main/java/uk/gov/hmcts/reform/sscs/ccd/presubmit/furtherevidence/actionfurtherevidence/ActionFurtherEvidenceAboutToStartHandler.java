@@ -4,8 +4,9 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.util.PartiesOnCaseUtil.getPartiesOnCaseWithDwpAndHmcts;
 
-import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -14,7 +15,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
+@AllArgsConstructor
 public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    @Value("${feature.postHearings.enabled}")
+    private final boolean isPostHearingsEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -41,20 +46,15 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
     }
 
     private void setFurtherEvidenceActionDropdown(SscsCaseData sscsCaseData) {
-        List<DynamicListItem> listOptions = new ArrayList<>();
-
-        populateListWithItems(listOptions, ISSUE_FURTHER_EVIDENCE, OTHER_DOCUMENT_MANUAL,
-                INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
-                SEND_TO_INTERLOC_REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_TCW, ADMIN_ACTION_CORRECTION);
-
+        List<DynamicListItem> listOptions = getFurtherActionEvidenceItems(List.of(values()));
         sscsCaseData.setFurtherEvidenceAction(new DynamicList(listOptions.get(0), listOptions));
     }
 
-    private void populateListWithItems(List<DynamicListItem> listOptions,
-                                       FurtherEvidenceActionDynamicListItems... items) {
-        for (FurtherEvidenceActionDynamicListItems item : items) {
-            listOptions.add(new DynamicListItem(item.getCode(), item.getLabel()));
-        }
+    private List<DynamicListItem> getFurtherActionEvidenceItems(List<FurtherEvidenceActionDynamicListItems> items) {
+        return items.stream()
+            .filter(item -> !item.equals(ADMIN_ACTION_CORRECTION) || isPostHearingsEnabled)
+            .map(item -> new DynamicListItem(item.getCode(), item.getLabel()))
+            .toList();
     }
 
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {

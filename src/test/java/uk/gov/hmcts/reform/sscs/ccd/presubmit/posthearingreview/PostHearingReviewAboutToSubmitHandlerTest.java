@@ -15,11 +15,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewAboutToSubmitHandlerTest {
-
-    private static final String DOCUMENT_URL = "dm-store/documents/123";
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -31,11 +30,14 @@ class PostHearingReviewAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private FooterService footerService;
+
     private SscsCaseData caseData;
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewAboutToSubmitHandler(true);
+        handler = new PostHearingReviewAboutToSubmitHandler(footerService, true);
 
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -43,13 +45,6 @@ class PostHearingReviewAboutToSubmitHandlerTest {
             .ccdCaseId("1234")
             .documentGeneration(DocumentGeneration.builder()
                 .directionNoticeContent("Body Content")
-                .build())
-            .documentStaging(DocumentStaging.builder()
-                .previewDocument(DocumentLink.builder()
-                    .documentUrl(DOCUMENT_URL)
-                    .documentBinaryUrl(DOCUMENT_URL + "/binary")
-                    .documentFilename("decisionIssued.pdf")
-                    .build())
                 .build())
             .build();
     }
@@ -73,7 +68,7 @@ class PostHearingReviewAboutToSubmitHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewAboutToSubmitHandler(false);
+        handler = new PostHearingReviewAboutToSubmitHandler(footerService,false);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
@@ -87,42 +82,5 @@ class PostHearingReviewAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void givenHearingIsNull_thenCaseStatusNotChanged() {
-        caseData.setState(State.DORMANT_APPEAL_STATE);
-        handler.updateCaseStatus(caseData);
-        assertThat(caseData.getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
-    }
-
-    @Test
-    void givenSetAsideStateIsNull_thenCaseStatusNotChanged() {
-        caseData = SscsCaseData.builder()
-            .state(State.DORMANT_APPEAL_STATE)
-            .postHearing(PostHearing.builder()
-                .setAside(SetAside.builder()
-                    .action(null)
-                    .build())
-                .build())
-            .build();
-
-        handler.updateCaseStatus(caseData);
-        assertThat(caseData.getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
-    }
-
-    @Test
-    void givenSetAsideState_thenCaseStatusChanged() {
-        caseData = SscsCaseData.builder()
-            .state(State.DORMANT_APPEAL_STATE)
-            .postHearing(PostHearing.builder()
-                .setAside(SetAside.builder()
-                    .action(SetAsideActions.GRANT)
-                    .build())
-                .build())
-            .build();
-
-        handler.updateCaseStatus(caseData);
-        assertThat(caseData.getState()).isEqualTo(State.NOT_LISTABLE);
     }
 }

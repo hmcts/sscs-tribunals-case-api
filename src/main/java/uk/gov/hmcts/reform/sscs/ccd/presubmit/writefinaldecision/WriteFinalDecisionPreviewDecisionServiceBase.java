@@ -62,8 +62,11 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
     }
 
     @Override
-    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response, SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
-        String userAuthorisation) {
+    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response,
+                                                     SscsCaseData caseData, String documentTypeLabel,
+                                                     LocalDate dateAdded, LocalDate generatedDate,
+                                                     boolean isScottish, boolean isPostHearingsEnabled,
+                                                     boolean isPostHearingsBEnabled, String userAuthorisation) {
 
         String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(caseData);
 
@@ -74,7 +77,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         decisionNoticeOutcomeService.performPreOutcomeIntegrityAdjustments(caseData);
 
         NoticeIssuedTemplateBody formPayload = super
-            .createPayload(response, caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, userAuthorisation);
+            .createPayload(response, caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, isPostHearingsEnabled, isPostHearingsBEnabled, userAuthorisation);
         WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
 
         final NoticeIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
@@ -107,6 +110,9 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         if ("na".equals(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType())) {
             caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(null);
         }
+
+        writeFinalDecisionBuilder.appointeeName(buildName(caseData, true));
+
         writeFinalDecisionBuilder.endDate(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate());
         writeFinalDecisionBuilder.startDate(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionStartDate());
         writeFinalDecisionBuilder.isIndefinite(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate() == null);
@@ -119,7 +125,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         if (caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionReasons() != null && !caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionReasons().isEmpty()) {
             writeFinalDecisionBuilder.reasonsForDecision(
-                caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionReasons().stream().map(CollectionItem::getValue).collect(Collectors.toList()));
+                caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionReasons().stream().map(CollectionItem::getValue).toList());
         } else {
             writeFinalDecisionBuilder.reasonsForDecision(null);
         }
@@ -127,7 +133,19 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         writeFinalDecisionBuilder.anythingElse(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAnythingElse());
 
         writeFinalDecisionBuilder.hearingType(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionTypeOfHearing());
-        writeFinalDecisionBuilder.attendedHearing("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion()));
+
+        if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equalsIgnoreCase("Yes")) {
+            writeFinalDecisionBuilder.appointeeOnCase(true);
+        }
+
+        if (caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion() != null && caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppointeeAttendedQuestion().equalsIgnoreCase("yes")) {
+            writeFinalDecisionBuilder.appointeeAttended(true);
+        }
+
+        if (caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion() != null && caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion().equalsIgnoreCase("yes")) {
+            writeFinalDecisionBuilder.attendedHearing(true);
+        }
+
         writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
         if (isOtherPartyPresent(caseData) && CollectionUtils.isNotEmpty(caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions())) {
             writeFinalDecisionBuilder.otherPartyNamesAttendedHearing(caseData.getSscsFinalDecisionCaseData().getOtherPartyAttendedQuestions().stream()
@@ -203,7 +221,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             .map(pair ->
                 buildDescriptorFromActivityAnswer(activityQuestionlookup.getByKey(pair.getLeft()), pair.getRight()))
             .sorted(new DescriptorLexicographicalComparator())
-            .collect(Collectors.toList());
+            .toList();
     }
 
     protected Descriptor buildDescriptorFromActivityAnswer(ActivityQuestion activityQuestion, ActivityAnswer answer) {

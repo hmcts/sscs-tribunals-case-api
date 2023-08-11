@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
@@ -57,6 +58,8 @@ public class PostHearingRequestSubmittedHandler implements PreSubmitCallbackHand
                 typeSelected));
             return response;
         }
+
+        SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
 
         caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
 

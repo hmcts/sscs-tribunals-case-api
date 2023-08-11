@@ -10,7 +10,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -69,15 +68,12 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     }
 
     @Override
-    protected NoticeIssuedTemplateBody createPayload(
-        PreSubmitCallbackResponse<SscsCaseData> response,
-        SscsCaseData caseData,
-        String documentTypeLabel,
-        LocalDate dateAdded,
-        LocalDate generatedDate,
-        boolean isScottish,
-        String userAuthorisation
-    ) {
+    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response,
+                                                     SscsCaseData caseData, String documentTypeLabel,
+                                                     LocalDate dateAdded, LocalDate generatedDate,
+                                                     boolean isScottish, boolean isPostHearingsEnabled,
+                                                     boolean isPostHearingsBEnabled,
+                                                     String userAuthorisation) {
         Adjournment adjournment = caseData.getAdjournment();
         NoticeIssuedTemplateBody formPayload = super.createPayload(
             response,
@@ -86,6 +82,8 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             dateAdded,
             adjournment.getGeneratedDate(),
             isScottish,
+            isPostHearingsEnabled,
+            isPostHearingsBEnabled,
             userAuthorisation);
         AdjournCaseTemplateBodyBuilder adjournCaseBuilder = AdjournCaseTemplateBody.builder();
 
@@ -101,14 +99,14 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         if (adjournment.getReasons() != null && !adjournment.getReasons().isEmpty()) {
             adjournCaseBuilder.reasonsForDecision(
-                adjournment.getReasons().stream().map(CollectionItem::getValue).collect(Collectors.toList()));
+                adjournment.getReasons().stream().map(CollectionItem::getValue).toList());
         } else {
             adjournCaseBuilder.reasonsForDecision(null);
         }
 
         if (adjournment.getAdditionalDirections() != null) {
             adjournCaseBuilder.additionalDirections(adjournment.getAdditionalDirections().stream()
-                .map(CollectionItem::getValue).collect(Collectors.toList()));
+                .map(CollectionItem::getValue).toList());
         }
 
         String hearingType = adjournment.getTypeOfHearing() != null
@@ -360,11 +358,11 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                 .map(panelMember ->
                     judicialRefDataService.getJudicialUserFullName(panelMember.getPersonalCode()))
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList()));
+                .toList());
         } else {
             List<String> panelMembers = Stream.of(adjournment.getDisabilityQualifiedPanelMemberName(),
                 adjournment.getMedicallyQualifiedPanelMemberName(), adjournment.getOtherPanelMemberName())
-                .filter(org.apache.commons.lang3.StringUtils::isNotBlank).collect(Collectors.toList());
+                .filter(org.apache.commons.lang3.StringUtils::isNotBlank).toList();
 
             names.addAll(panelMembers);
         }

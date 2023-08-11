@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 
@@ -13,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 
 @Service
 public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -38,6 +42,9 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         setDirectionTypeDropDown(sscsCaseData);
         setExtensionNextEventDropdown(callback.getCaseDetails().getState(), sscsCaseData);
+
+        clearFields(sscsCaseData);
+        setPartiesToSendLetter(sscsCaseData);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
@@ -48,7 +55,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.toString(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.toString(), PROVIDE_INFORMATION.getLabel()));
 
-        if (YesNo.YES.equals(sscsCaseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding())) {
+        if (isYes(sscsCaseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding())) {
             listOptions.add(new DynamicListItem(REFUSE_HEARING_RECORDING_REQUEST.toString(), REFUSE_HEARING_RECORDING_REQUEST.getLabel()));
         }
 
@@ -87,5 +94,45 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         DynamicListItem selectedValue = null != sscsCaseData.getExtensionNextEventDl() && sscsCaseData.getExtensionNextEventDl().getValue() != null
                 ? sscsCaseData.getExtensionNextEventDl().getValue() : new DynamicListItem("", "");
         sscsCaseData.setExtensionNextEventDl(new DynamicList(selectedValue, listOptions));
+    }
+
+    private void clearFields(SscsCaseData sscsCaseData) {
+        sscsCaseData.setConfidentialityType(null);
+        sscsCaseData.setSendDirectionNoticeToFTA(null);
+        sscsCaseData.setSendDirectionNoticeToRepresentative(null);
+        sscsCaseData.setSendDirectionNoticeToOtherPartyRep(null);
+        sscsCaseData.setSendDirectionNoticeToOtherPartyAppointee(null);
+        sscsCaseData.setSendDirectionNoticeToOtherParty(null);
+        sscsCaseData.setSendDirectionNoticeToJointParty(null);
+        sscsCaseData.setSendDirectionNoticeToAppellantOrAppointee(null);
+    }
+
+    private void setPartiesToSendLetter(SscsCaseData sscsCaseData) {
+
+        YesNo hasOtherParty = OtherPartyDataUtil.isOtherPartyPresent(sscsCaseData) ? YES : NO;
+        YesNo hasOtherPartyRep = NO;
+        YesNo hasOtherPartyAppointee = NO;
+
+        if (isYes(hasOtherParty)) {
+            boolean hasOtherPartyRepBoolean = sscsCaseData.getOtherParties().stream().map(CcdValue::getValue).anyMatch(OtherParty::hasRepresentative);
+            boolean hasOtherPartyAppointeeBoolean = sscsCaseData.getOtherParties().stream().map(CcdValue::getValue).anyMatch(OtherParty::hasAppointee);
+
+            if (hasOtherPartyRepBoolean) {
+                hasOtherPartyRep = YES;
+            }
+
+            if (hasOtherPartyAppointeeBoolean) {
+                hasOtherPartyAppointee = YES;
+            }
+        }
+        YesNo hasRepresentative = sscsCaseData.isThereARepresentative() ? YES : NO;
+        sscsCaseData.setHasRepresentative(hasRepresentative);
+
+        sscsCaseData.setHasOtherPartyRep(hasOtherPartyRep);
+        sscsCaseData.setHasOtherPartyAppointee(hasOtherPartyAppointee);
+        sscsCaseData.setHasOtherParties(hasOtherParty);
+
+        YesNo hasJointParty = sscsCaseData.isThereAJointParty() ? YES : NO;
+        sscsCaseData.setHasJointParty(hasJointParty);
     }
 }

@@ -7,8 +7,8 @@ services:
     environment:
       - SERVER_PORT=8080
       - CALLBACK_DOMAIN=rpa-em-ccd-orchestrator
-      - IDAM_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5000}
-      - OPEN_ID_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5000}/o
+      - IDAM_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5062}
+      - OPEN_ID_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5062}/o
       - S2S_BASE_URI=http://host.docker.internal:4502
       - APPINSIGHTS_INSTRUMENTATIONKEY=test_app
       - DM_STORE_APP_URL=http://dm-store:5005
@@ -41,8 +41,8 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
       - S2S_BASE_URI=http://host.docker.internal:4502
       - CDAM_URL=http://host.docker.internal:4455
-      - IDAM_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5000}
-      - OPEN_ID_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5000}/o
+      - IDAM_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5062}
+      - OPEN_ID_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5062}/o
       - ENABLE_LIQUIBASE=true
       - APPINSIGHTS_INSTRUMENTATIONKEY=test-key
       - DM_STORE_APP_URL=http://localhost:5005
@@ -51,6 +51,7 @@ services:
       - LOG_OUTPUT=single
       - JSON_CONSOLE_PRETTY_PRINT=false
       - S2S_NAMES_WHITELIST:jui_webapp,em_ccd_orchestrator,em_gw,sscs
+      - FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK=false
     ports:
       - 4630:8080
     networks:

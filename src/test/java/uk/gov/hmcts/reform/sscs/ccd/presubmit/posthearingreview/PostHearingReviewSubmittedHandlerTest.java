@@ -119,7 +119,7 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = SetAsideActions.class, names = {"GRANT", "ISSUE_DIRECTIONS"})
+    @EnumSource(value = SetAsideActions.class, names = {"GRANT"})
     void givenActionTypeSetAsideSelectedIsNotRefuse_shouldNotUpdateCaseWIthCcdService(SetAsideActions action) {
         caseData.getPostHearing().setReviewType(SET_ASIDE);
         caseData.getPostHearing().getSetAside().setAction(action);
@@ -182,14 +182,6 @@ class PostHearingReviewSubmittedHandlerTest {
 
         verify(ccdCallbackMapService, times(1))
             .handleCcdCallbackMap(REFUSE, caseData);
-
-        verify(ccdService, times(1))
-            .updateCase(returnedCase,
-                Long.valueOf(returnedCase.getCcdCaseId()),
-                EventType.DORMANT.getCcdType(),
-                "Send to dormant",
-                "",
-                idamService.getIdamTokens());
 
         assertThat(response.getData().getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
         assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.NONE);

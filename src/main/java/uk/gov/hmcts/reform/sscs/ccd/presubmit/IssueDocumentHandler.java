@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Respondent;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
+import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 
 
 @Slf4j
@@ -33,7 +34,7 @@ public class IssueDocumentHandler {
 
     // Fields used for a short period in case progression are transient,
     // relevant for a short period of the case lifecycle.
-    protected void clearTransientFields(SscsCaseData caseData, State beforeState) {
+    protected void clearTransientFields(SscsCaseData caseData) {
         clearBasicTransientFields(caseData);
         caseData.setExtensionNextEventDl(null);
     }
@@ -47,7 +48,12 @@ public class IssueDocumentHandler {
         caseData.getAdjournment().setPreviewDocument(null);
     }
 
-    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response, SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation) {
+    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response,
+                                                     SscsCaseData caseData, String documentTypeLabel,
+                                                     LocalDate dateAdded, LocalDate generatedDate,
+                                                     boolean isScottish, boolean isPostHearingsEnabled,
+                                                     boolean isPostHearingsBEnabled,
+                                                     String userAuthorisation) {
         NoticeIssuedTemplateBody formPayload = NoticeIssuedTemplateBody.builder()
                 .appellantFullName(buildFullName(caseData))
                 .appointeeFullName(buildAppointeeName(caseData).orElse(null))
@@ -55,15 +61,13 @@ public class IssueDocumentHandler {
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
                 .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
                 .respondents(getRespondents(caseData))
-                .noticeBody(Optional.ofNullable(caseData.getDocumentGeneration().getBodyContent())
-                        .orElse(caseData.getDocumentGeneration().getDirectionNoticeContent()))
-                .userName(caseData.getDocumentGeneration().getSignedBy())
                 .noticeType(documentTypeLabel.toUpperCase())
-                .userRole(caseData.getDocumentGeneration().getSignedRole())
                 .dateAdded(dateAdded)
                 .generatedDate(generatedDate)
                 .idamSurname(caseData.getDocumentGeneration().getSignedBy())
                 .build();
+
+        formPayload = PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(caseData, formPayload, isPostHearingsEnabled, isPostHearingsBEnabled);
 
         if (isScottish) {
             formPayload = formPayload.toBuilder().image(NoticeIssuedTemplateBody.SCOTTISH_IMAGE).build();
@@ -109,7 +113,11 @@ public class IssueDocumentHandler {
                 || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
     }
 
-    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation, boolean isPostHearingsEnabled) {
+    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
+        return issueDocument(callback, documentType, templateId, generateFile, userAuthorisation, false, false);
+    }
+
+    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation, boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
@@ -129,7 +137,7 @@ public class IssueDocumentHandler {
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        FormPayload formPayload = createPayload(response, caseData, embeddedDocumentTypeLabel, dateAdded, LocalDate.now(), isScottish, userAuthorisation);
+        FormPayload formPayload = createPayload(response, caseData, embeddedDocumentTypeLabel, dateAdded, LocalDate.now(), isScottish, isPostHearingsEnabled, isPostHearingsBEnabled, userAuthorisation);
 
         if (!response.getErrors().isEmpty()) {
             return response;
@@ -161,21 +169,14 @@ public class IssueDocumentHandler {
         return response;
     }
 
-    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
-        return issueDocument(callback, documentType, templateId, generateFile, userAuthorisation, false);
-    }
-
     protected String getDocumentTypeLabel(SscsCaseData caseData, DocumentType documentType, String documentTypeLabel, boolean isPostHearingsEnabled) {
-
         String embeddedDocumentTypeLabel = (FINAL_DECISION_NOTICE.equals(documentType) ? "Decision Notice" : documentTypeLabel);
 
         if (isPostHearingsEnabled) {
-            PostHearing postHearing = caseData.getPostHearing();
-            if (nonNull(postHearing.getSetAside().getAction())) {
-                CcdCallbackMap action = postHearing.getSetAside().getAction();
-                boolean isGrantOrRefuseSetAsideAction = action.toString().equals(SetAsideActions.GRANT.getCcdDefinition())
-                        || action.toString().equals(SetAsideActions.REFUSE.getCcdDefinition());
-                embeddedDocumentTypeLabel =  isGrantOrRefuseSetAsideAction ? "Set Aside Decision Notice" : embeddedDocumentTypeLabel;
+            PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
+
+            if (nonNull(postHearingReviewType)) {
+                return postHearingReviewType.getDescriptionEn() + " Decision Notice";
             }
         }
 

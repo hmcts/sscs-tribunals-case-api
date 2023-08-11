@@ -194,7 +194,27 @@ public class SubmitDraftTest {
                 "appeal.appellant.id",
                 "appeal.appellant.appointee.id",
                 "appeal.rep.id",
-                "jointPartyId")
+                "jointPartyId",
+                "correction",
+                "correctionBodyContent",
+                "bodyContent",
+                "correctionGenerateNotice",
+                "generateNotice",
+                "dateAdded",
+                "directionNoticeContent",
+                "libertyToApply",
+                "libertyToApplyBodyContent",
+                "libertyToApplyGenerateNotice",
+                "permissionToAppeal",
+                "postHearingRequestType",
+                "postHearingReviewType",
+                "previewDocument",
+                "setAside",
+                "signedBy",
+                "signedRole",
+                "statementOfReasons",
+                "statementOfReasonsBodyContent",
+                "statementOfReasonsGenerateNotice")
             .isEqualTo(changeExpectedFields(expectedResponse, nino, mrnDate));
 
         assertEquals(expectedState, sscsCaseDetails.getState());
@@ -215,12 +235,14 @@ public class SubmitDraftTest {
     @Test
     public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() {
         Response response = saveDraft(draftAppeal);
+
         response.then()
             .statusCode(anyOf(is(HttpStatus.SC_OK), is(HttpStatus.SC_CREATED)))
             .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
         String responseHeader = response.getHeader(LOCATION_HEADER_NAME);
 
         Response response2 = saveDraft(draftAppeal);
+
         response2.then()
             .statusCode(HttpStatus.SC_OK)
             .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);

@@ -45,8 +45,6 @@ public class PostHearingRequestAboutToStartHandler implements PreSubmitCallbackH
             return response;
         }
 
-        SscsUtil.clearDocumentTransientFields(caseData);
-
         return response;
     }
 }

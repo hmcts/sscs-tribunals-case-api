@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
@@ -212,7 +211,7 @@ public class SubmitAppealService {
 
         return caseDetailsList.stream()
                 .map(convertAIntoBService::convert)
-                .collect(toList());
+                .toList();
     }
 
     private IdamTokens getUserTokens(String oauth2Token) {
@@ -398,9 +397,13 @@ public class SubmitAppealService {
 
         SaveCaseResult result;
 
+        log.info("saveDraftCaseInCcd {}", forceCreate);
+
         if (Boolean.TRUE.equals(forceCreate)) {
+            log.info("saveDraftCaseInCcd createDraft");
             result = citizenCcdService.createDraft(caseData, idamTokens);
         } else {
+            log.info("saveDraftCaseInCcd saveCase");
             result = citizenCcdService.saveCase(caseData, idamTokens);
         }
 

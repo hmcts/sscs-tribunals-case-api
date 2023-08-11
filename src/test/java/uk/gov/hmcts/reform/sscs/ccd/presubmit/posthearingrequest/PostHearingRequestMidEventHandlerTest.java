@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.GENERATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -27,7 +28,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 
@@ -91,7 +91,7 @@ class PostHearingRequestMidEventHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE"})
+    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE", "CORRECTION", "STATEMENT_OF_REASONS", "LIBERTY_TO_APPLY", "PERMISSION_TO_APPEAL"})
     void givenGenerateNoticeNo_doNothing(PostHearingRequestType requestType) {
         caseData.getDocumentGeneration().setGenerateNotice(NO);
         caseData.getPostHearing().setRequestType(requestType);
@@ -106,7 +106,7 @@ class PostHearingRequestMidEventHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE"})
+    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE", "CORRECTION", "STATEMENT_OF_REASONS", "LIBERTY_TO_APPLY", "PERMISSION_TO_APPEAL"})
     void givenGenerateNoticeNull_doNothing(PostHearingRequestType requestType) {
         caseData.getDocumentGeneration().setGenerateNotice(null);
         caseData.getPostHearing().setRequestType(requestType);
@@ -121,7 +121,7 @@ class PostHearingRequestMidEventHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE"}) // TODO add all other types as their feature code is implemented
+    @EnumSource(value = PostHearingRequestType.class, names = {"SET_ASIDE", "CORRECTION", "STATEMENT_OF_REASONS", "LIBERTY_TO_APPLY", "PERMISSION_TO_APPEAL"})
     void givenGenerateNoticeYes_generateNotice(PostHearingRequestType postHearingRequestType) {
         String dmUrl = "http://dm-store/documents/123";
         when(generateFile.assemble(any())).thenReturn(dmUrl);
@@ -130,8 +130,17 @@ class PostHearingRequestMidEventHandlerTest {
         when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
 
         caseData.getPostHearing().setRequestType(postHearingRequestType);
-        caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
-        caseData.getDocumentGeneration().setBodyContent("Something");
+        caseData.getPostHearing().getSetAside().setRequestFormat(GENERATE);
+        caseData.getPostHearing().getCorrection().setRequestFormat(GENERATE);
+        caseData.getPostHearing().getStatementOfReasons().setRequestFormat(GENERATE);
+        caseData.getPostHearing().getLibertyToApply().setRequestFormat(GENERATE);
+        caseData.getPostHearing().getPermissionToAppeal().setRequestFormat(GENERATE);
+        String content = "Something";
+        caseData.getDocumentGeneration().setBodyContent(content);
+        caseData.getDocumentGeneration().setCorrectionBodyContent(content);
+        caseData.getDocumentGeneration().setStatementOfReasonsBodyContent(content);
+        caseData.getDocumentGeneration().setLibertyToApplyBodyContent(content);
+        caseData.getDocumentGeneration().setPermissionToAppealBodyContent(content);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -154,7 +163,7 @@ class PostHearingRequestMidEventHandlerTest {
         when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
 
         caseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
-        caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
+        caseData.getPostHearing().getSetAside().setRequestFormat(GENERATE);
         caseData.getDocumentGeneration().setBodyContent(emptyValue);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -171,7 +180,7 @@ class PostHearingRequestMidEventHandlerTest {
         when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
 
         caseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
-        caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.GENERATE);
+        caseData.getPostHearing().getSetAside().setRequestFormat(GENERATE);
         caseData.setIssueFinalDecisionDate(null);
 
         assertThatThrownBy(() -> handler.handle(MID_EVENT, callback, USER_AUTHORISATION))
@@ -188,6 +197,25 @@ class PostHearingRequestMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void givenPostHearingsEnabledFalse_addsErrorToResponse() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
+
+        caseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setRequestFormat(GENERATE);
+
+        handler = new PostHearingRequestMidEventHandler(false, generateFile, templateId);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors())
+            .isNotEmpty()
+            .hasSize(1)
+            .containsOnly("Post hearings is not currently enabled");
     }
 
 }
