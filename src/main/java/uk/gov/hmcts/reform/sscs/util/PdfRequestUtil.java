@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.PdfRequestTemplateBody;
 
 @Slf4j
@@ -169,37 +170,61 @@ public class PdfRequestUtil {
             case LIBERTY_TO_APPLY:
                 return DocumentType.LIBERTY_TO_APPLY_APPLICATION;
             case PERMISSION_TO_APPEAL:
+                return DocumentType.PERMISSION_TO_APPEAL_APPLICATION;
             default:
                 throw new IllegalArgumentException("Unexpected request type: " + postHearingRequestType);
         }
     }
 
-    public static String getNoticeBody(SscsCaseData caseData, boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
+    public static NoticeIssuedTemplateBody populateNoticeBodySignedByAndSignedRole(SscsCaseData caseData, NoticeIssuedTemplateBody formPayload, boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
+        NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder formPayloadBuilder = formPayload.toBuilder();
+        DocumentGeneration documentGeneration = caseData.getDocumentGeneration();
         if (isPostHearingsEnabled) {
             PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
+          
             if (nonNull(postHearingReviewType)) {
                 switch (postHearingReviewType) {
                     case SET_ASIDE:
-                        return caseData.getDocumentGeneration().getBodyContent();
+                        formPayloadBuilder.noticeBody(documentGeneration.getBodyContent());
+                        formPayloadBuilder.userName(documentGeneration.getSignedBy());
+                        formPayloadBuilder.userRole(documentGeneration.getSignedRole());
+                        return formPayloadBuilder.build();
                     case CORRECTION:
-                        return caseData.getDocumentGeneration().getCorrectionBodyContent();
+                        formPayloadBuilder.noticeBody(documentGeneration.getCorrectionBodyContent());
+                        formPayloadBuilder.userName(documentGeneration.getCorrectionSignedBy());
+                        formPayloadBuilder.userRole(documentGeneration.getCorrectionSignedRole());
+                        return formPayloadBuilder.build();
                     case STATEMENT_OF_REASONS:
-                        return caseData.getDocumentGeneration().getStatementOfReasonsBodyContent();
+                        formPayloadBuilder.noticeBody(documentGeneration.getStatementOfReasonsBodyContent());
+                        formPayloadBuilder.userName(documentGeneration.getStatementOfReasonsSignedBy());
+                        formPayloadBuilder.userRole(documentGeneration.getStatementOfReasonsSignedRole());
+                        return formPayloadBuilder.build();
                     case LIBERTY_TO_APPLY:
                         if (isPostHearingsBEnabled) {
-                            return caseData.getDocumentGeneration().getLibertyToApplyBodyContent();
+                            formPayloadBuilder.noticeBody(documentGeneration.getLibertyToApplyBodyContent());
+                            formPayloadBuilder.userName(documentGeneration.getLibertyToApplySignedBy());
+                            formPayloadBuilder.userRole(documentGeneration.getLibertyToApplySignedRole());
+                            return formPayloadBuilder.build();
                         }
                         throw new IllegalArgumentException("isPostHearingsBEnabled is false - Liberty to Apply is not available");
                     case PERMISSION_TO_APPEAL:
+                        if (isPostHearingsBEnabled) {
+                            formPayloadBuilder.noticeBody(documentGeneration.getPermissionToAppealBodyContent());
+                            return formPayloadBuilder.build();
+                        }
+                        throw new IllegalArgumentException("isPostHearingsBEnabled is false - Permission to Appeal is not available");
                     default:
-                        throw new IllegalArgumentException("getNoticeBody has unexpected postHearingReviewType: "
-                            + postHearingReviewType.getDescriptionEn());
+                        throw new IllegalArgumentException("caseData has unexpected postHearingReviewType: "
+                                + postHearingReviewType.getDescriptionEn());
                 }
             }
         }
 
-        return Optional.ofNullable(caseData.getDocumentGeneration().getBodyContent())
-            .orElse(caseData.getDocumentGeneration().getDirectionNoticeContent());
+        formPayloadBuilder.noticeBody(Optional.ofNullable(documentGeneration.getBodyContent())
+                .orElse(documentGeneration.getDirectionNoticeContent()));
+        formPayloadBuilder.userName(documentGeneration.getSignedBy());
+        formPayloadBuilder.userRole(documentGeneration.getSignedRole());
+        return formPayloadBuilder.build();
     }
 
     protected static String getRequestDetailsForPostHearingType(SscsCaseData sscsCaseData) {
@@ -215,6 +240,7 @@ public class PdfRequestUtil {
             case LIBERTY_TO_APPLY:
                 return sscsCaseData.getDocumentGeneration().getLibertyToApplyBodyContent();
             case PERMISSION_TO_APPEAL:
+                return sscsCaseData.getDocumentGeneration().getPermissionToAppealBodyContent();
             default:
                 throw new IllegalArgumentException("getRequestDetailsForPostHearingType has unexpected postHearingRequestType: " + postHearingRequestType);
         }
@@ -236,6 +262,10 @@ public class PdfRequestUtil {
                     }
                     throw new IllegalArgumentException("isPostHearingsBEnabled is false - Liberty to Apply is not available");
                 case PERMISSION_TO_APPEAL:
+                    if (isPostHearingsBEnabled) {
+                        return caseData.getDocumentGeneration().getPermissionToAppealGenerateNotice();
+                    }
+                    throw new IllegalArgumentException("isPostHearingsBEnabled is false - Permission to Appeal is not available");
                 default:
                     throw new IllegalArgumentException("getGenerateNotice has unexpected PostHearingReviewType: " + postHearingReviewType);
             }
