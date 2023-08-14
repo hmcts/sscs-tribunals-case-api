@@ -36,7 +36,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
     public DecisionIssuedAboutToSubmitHandler(FooterService footerService, ListAssistHearingMessageHelper
             hearingMessageHelper, @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled,
-            @Value("${feature.postHearingsA.enabled}") boolean isPostHearingsEnabled) {
+            @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
         this.footerService = footerService;
         this.hearingMessageHelper = hearingMessageHelper;
         this.isScheduleListingEnabled = isScheduleListingEnabled;
