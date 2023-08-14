@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
@@ -39,6 +40,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
     private final FooterService footerService;
     private final DecisionNoticeService decisionNoticeService;
+    private final UserDetailsService userDetailsService;
     private final Validator validator;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
     private boolean isScheduleListingEnabled;
@@ -48,11 +50,14 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     private boolean isPostHearingsEnabled;
 
     public IssueFinalDecisionAboutToSubmitHandler(FooterService footerService,
-                                                  DecisionNoticeService decisionNoticeService, Validator validator,
+                                                  DecisionNoticeService decisionNoticeService,
+                                                  UserDetailsService userDetailsService,
+                                                  Validator validator,
                                                   ListAssistHearingMessageHelper hearingMessageHelper,
                                                   @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
         this.footerService = footerService;
         this.decisionNoticeService = decisionNoticeService;
+        this.userDetailsService = userDetailsService;
         this.validator = validator;
         this.hearingMessageHelper = hearingMessageHelper;
         this.isScheduleListingEnabled = isScheduleListingEnabled;
@@ -93,6 +98,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
             if (isNull(finalDecisionCaseData.getFinalDecisionIssuedDate())) {
                 finalDecisionCaseData.setFinalDecisionIssuedDate(LocalDate.now());
+                finalDecisionCaseData.setFinalDecisionHeldBefore(SscsUtil.buildWriteFinalDecisionHeldBefore(sscsCaseData, userDetailsService.buildLoggedInUserName(userAuthorisation)));
             }
         }
 

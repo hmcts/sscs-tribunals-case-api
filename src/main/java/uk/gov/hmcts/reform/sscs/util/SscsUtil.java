@@ -10,10 +10,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Slf4j
 public class SscsUtil {
@@ -174,5 +176,21 @@ public class SscsUtil {
       
     public static boolean isGapsCase(SscsCaseData sscsCaseData) {
         return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
+    }
+
+    public static String buildWriteFinalDecisionHeldBefore(SscsCaseData caseData, @NonNull String signedInJudgeName) {
+        List<String> names = new ArrayList<>();
+
+        names.add(signedInJudgeName);
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDisabilityQualifiedPanelMemberName())) {
+            names.add(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
+        }
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
+            names.add(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
+        }
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionOtherPanelMemberName())) {
+            names.add(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionOtherPanelMemberName());
+        }
+        return StringUtils.getGramaticallyJoinedStrings(names);
     }
 }

@@ -38,10 +38,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.*;
 
 @RunWith(JUnitParamsRunner.class)
 public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
@@ -64,6 +61,9 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     private FooterService footerService;
 
     @Mock
+    private UserDetailsService userDetailsService;
+
+    @Mock
     private ListAssistHearingMessageHelper hearingMessageHelper;
 
     private SscsCaseData sscsCaseData;
@@ -83,8 +83,8 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
         decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), Arrays.asList(esaecisionNoticeOutcomeService), new ArrayList<>());
 
-        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, false);
+        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, userDetailsService,
+                validator, hearingMessageHelper, false);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -345,6 +345,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         callback.getCaseDetails().getCaseData().setState(State.VOID_STATE);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn("judge name");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getState(), is(State.DORMANT_APPEAL_STATE));
@@ -361,6 +362,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         callback.getCaseDetails().getCaseData().setState(State.VOID_STATE);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(" judge name");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getState(), is(State.VOID_STATE));
@@ -427,6 +429,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setState(State.WITH_DWP);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.DIRECTION_RESPONDED);
         sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionIssuedDate(null);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn("judge name");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

@@ -5,7 +5,6 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPrese
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,7 +27,6 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
-import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Slf4j
 public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends IssueNoticeHandler {
@@ -269,22 +267,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
     }
 
     protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
-        List<String> names = new ArrayList<>();
-        String signedInJudgeName = buildSignedInJudgeName(userAuthorisation);
-        if (signedInJudgeName == null) {
-            throw new IllegalStateException("Unable to obtain signed in user name");
-        }
-        names.add(signedInJudgeName);
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDisabilityQualifiedPanelMemberName())) {
-            names.add(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
-        }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
-            names.add(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
-        }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionOtherPanelMemberName())) {
-            names.add(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionOtherPanelMemberName());
-        }
-        return StringUtils.getGramaticallyJoinedStrings(names);
+        return SscsUtil.buildWriteFinalDecisionHeldBefore(caseData, buildSignedInJudgeName(userAuthorisation));
     }
 
     @Override
