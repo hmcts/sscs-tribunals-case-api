@@ -27,6 +27,7 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
         createFooterAndAddDocToCase(url, caseData, documentType, dateIssued, dateAdded, overrideFileName, documentTranslationStatus, null, true);
     }
 
+    @SuppressWarnings({"squid:S107"})
     public void createFooterAndAddDocToCase(DocumentLink url, SscsCaseData caseData, DocumentType documentType, String dateIssued, LocalDate dateAdded,
                                             String overrideFileName, SscsDocumentTranslationStatus documentTranslationStatus, EventType eventType, boolean shouldAddDocumentToCaseData) {
 
