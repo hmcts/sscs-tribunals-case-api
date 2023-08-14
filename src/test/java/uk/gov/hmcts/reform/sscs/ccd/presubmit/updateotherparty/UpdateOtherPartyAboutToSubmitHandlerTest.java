@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_3;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_4;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -54,6 +55,10 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
     private IdamService idamService;
 
     private SscsCaseData sscsCaseData;
+
+    private Appeal appeal = Appeal.builder()
+            .benefitType(BenefitType.builder().code(Benefit.CHILD_SUPPORT.getShortName()).build())
+            .build();
 
     @Before
     public void setUp() {
@@ -439,6 +444,149 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
         assertEquals(0, response.getWarnings().size());
         assertEquals(hearingType, response.getData().getAppeal().getHearingType());
     }
+
+    @Test
+    public void givenAnyCaseUnavailableDatesSelectedButEmptyExcludedDates_thenThrowError() {
+        CcdValue<OtherParty> otherParty1 = buildOtherParty("Yes", NO);
+        CcdValue<OtherParty> otherParty2 = buildOtherParty("Yes", NO);
+        CcdValue<OtherParty> otherParty3 = buildOtherParty("Yes", NO);
+
+        otherParty1.getValue().getHearingOptions().setScheduleHearing("Yes");
+        otherParty2.getValue().getHearingOptions().setScheduleHearing("Yes");
+        otherParty3.getValue().getHearingOptions().setScheduleHearing("Yes");
+
+        otherParty1.getValue().setRole(Role.builder().name("ReceivingParent").build());
+        otherParty2.getValue().setRole(Role.builder().name("PayingParent").build());
+        otherParty3.getValue().setRole(Role.builder().name("Other").build());
+
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .appeal(appeal)
+            .otherParties(Arrays.asList(otherParty1, otherParty2, otherParty3)).build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(2, response.getErrors().size());
+
+        Iterator<String> iterator = response.getErrors().iterator();
+        String error1 = iterator.next();
+        String error2 = iterator.next();
+        assertEquals("Add a start date for unavailable dates", error1);
+        assertEquals("Add an end date for unavailable dates", error2);
+    }
+
+    @Test
+    public void givenAnyCaseUnavailableDatesSelectedButNoDatesProvided_thenThrowError() {
+        CcdValue<OtherParty> otherParty = buildOtherParty("Yes", NO);
+        otherParty.getValue().getHearingOptions().setScheduleHearing("Yes");
+        otherParty.getValue().setRole(Role.builder().name("ReceivingParent").build());
+
+        ExcludeDate excludeDate1 = ExcludeDate.builder().value(DateRange.builder().start("").end("").build()).build();
+        ExcludeDate excludeDate2 = ExcludeDate.builder().value(DateRange.builder().start(null).end(null).build()).build();
+        ExcludeDate excludeDate3 = ExcludeDate.builder().value(DateRange.builder().start("2023-01-01").end("2023-01-02").build()).build();
+
+        otherParty.getValue().getHearingOptions().setExcludeDates(List.of(excludeDate1, excludeDate2, excludeDate3));
+
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .appeal(appeal)
+            .otherParties(List.of(otherParty)).build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(2, response.getErrors().size());
+
+        Iterator<String> iterator = response.getErrors().iterator();
+        String error1 = iterator.next();
+        String error2 = iterator.next();
+        assertEquals("Add a start date for unavailable dates", error1);
+        assertEquals("Add an end date for unavailable dates", error2);
+    }
+
+    @Test
+    public void givenAnyCaseUnavailableDatesSelectedButNoStartDatesProvided_thenThrowError() {
+        CcdValue<OtherParty> otherParty = buildOtherParty("Yes", NO);
+        otherParty.getValue().getHearingOptions().setScheduleHearing("Yes");
+        otherParty.getValue().setRole(Role.builder().name("ReceivingParent").build());
+
+        ExcludeDate excludeDate1 = ExcludeDate.builder().value(DateRange.builder().start("").end("2023-01-01").build()).build();
+        ExcludeDate excludeDate2 = ExcludeDate.builder().value(DateRange.builder().start(null).end("2023-02-01").build()).build();
+        ExcludeDate excludeDate3 = ExcludeDate.builder().value(DateRange.builder().start("2023-03-01").end("2023-04-02").build()).build();
+
+        otherParty.getValue().getHearingOptions().setExcludeDates(List.of(excludeDate1, excludeDate2, excludeDate3));
+
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .appeal(appeal)
+            .otherParties(List.of(otherParty)).build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(1, response.getErrors().size());
+
+        Iterator<String> iterator = response.getErrors().iterator();
+        String error1 = iterator.next();
+        assertEquals("Add a start date for unavailable dates", error1);
+    }
+
+    @Test
+    public void givenAnyCaseUnavailableDatesSelectedButNoEndDatesProvided_thenThrowError() {
+        CcdValue<OtherParty> otherParty = buildOtherParty("Yes", NO);
+        otherParty.getValue().getHearingOptions().setScheduleHearing("Yes");
+        otherParty.getValue().setRole(Role.builder().name("ReceivingParent").build());
+
+        ExcludeDate excludeDate1 = ExcludeDate.builder().value(DateRange.builder().start("2023-01-01").end("").build()).build();
+        ExcludeDate excludeDate2 = ExcludeDate.builder().value(DateRange.builder().start("2023-02-01").end(null).build()).build();
+        ExcludeDate excludeDate3 = ExcludeDate.builder().value(DateRange.builder().start("2023-03-01").end("2023-04-02").build()).build();
+
+        otherParty.getValue().getHearingOptions().setExcludeDates(List.of(excludeDate1, excludeDate2, excludeDate3));
+
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .appeal(appeal)
+            .otherParties(List.of(otherParty)).build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(1, response.getErrors().size());
+
+        Iterator<String> iterator = response.getErrors().iterator();
+        String error1 = iterator.next();
+        assertEquals("Add an end date for unavailable dates", error1);
+    }
+
+    @Test
+    public void givenAnyCaseUnavailableDatesSelectedButStartDateIsAfterEndDate_thenThrowError() {
+        CcdValue<OtherParty> otherParty = buildOtherParty("Yes", NO);
+        otherParty.getValue().getHearingOptions().setScheduleHearing("Yes");
+        otherParty.getValue().setRole(Role.builder().name("ReceivingParent").build());
+
+        ExcludeDate excludeDate1 = ExcludeDate.builder().value(DateRange.builder().start("2023-01-01").end("2023-01-01").build()).build();
+        ExcludeDate excludeDate2 = ExcludeDate.builder().value(DateRange.builder().start("2023-01-02").end("2023-01-01").build()).build();
+        ExcludeDate excludeDate3 = ExcludeDate.builder().value(DateRange.builder().start("2023-03-01").end("2023-04-02").build()).build();
+
+        otherParty.getValue().getHearingOptions().setExcludeDates(List.of(excludeDate1, excludeDate2, excludeDate3));
+
+
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .appeal(appeal)
+            .otherParties(List.of(otherParty)).build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(1, response.getErrors().size());
+
+        Iterator<String> iterator = response.getErrors().iterator();
+        String error1 = iterator.next();
+        assertEquals("Unavailability start date must be before end date", error1);
+    }
+
 
     private boolean isSscs5CaseValidated(List<CcdValue<OtherParty>> otherParties) {
         return emptyIfNull(otherParties).stream()
