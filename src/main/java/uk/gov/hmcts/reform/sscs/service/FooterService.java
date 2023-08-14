@@ -24,11 +24,11 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
 
     public void createFooterAndAddDocToCase(DocumentLink url, SscsCaseData caseData, DocumentType documentType, String dateIssued, LocalDate dateAdded,
                                             String overrideFileName, SscsDocumentTranslationStatus documentTranslationStatus) {
-        createFooterAndAddDocToCase(url, caseData, documentType, dateIssued, dateAdded, overrideFileName, documentTranslationStatus, null);
+        createFooterAndAddDocToCase(url, caseData, documentType, dateIssued, dateAdded, overrideFileName, documentTranslationStatus, null, true);
     }
 
     public void createFooterAndAddDocToCase(DocumentLink url, SscsCaseData caseData, DocumentType documentType, String dateIssued, LocalDate dateAdded,
-                                            String overrideFileName, SscsDocumentTranslationStatus documentTranslationStatus, EventType eventType) {
+                                            String overrideFileName, SscsDocumentTranslationStatus documentTranslationStatus, EventType eventType, boolean shouldAddDocumentToCaseData) {
 
         String label = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
         log.info(label + " adding footer appendix document link: {} and caseId {}", url, caseData.getCcdCaseId());
@@ -37,7 +37,9 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
         if (nonNull(footerDetails)) {
             SscsDocument sscsDocument = createFooterDocument(footerDetails.getUrl(), footerDetails.getBundleAddition(), footerDetails.getBundleFileName(),
                 dateAdded, documentType, documentTranslationStatus, eventType);
-            SscsUtil.addDocumentToCaseDataDocuments(caseData, sscsDocument);
+            if (shouldAddDocumentToCaseData) {
+                SscsUtil.addDocumentToCaseDataDocuments(caseData, sscsDocument);
+            }
         } else {
             log.info("Could not find {} document for caseId {} so skipping generating footer", label, caseData.getCcdCaseId());
         }
