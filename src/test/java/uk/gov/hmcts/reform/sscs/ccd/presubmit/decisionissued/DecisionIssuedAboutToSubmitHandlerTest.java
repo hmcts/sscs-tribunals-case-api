@@ -1,15 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.decisionissued;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DecisionType.STRIKE_OUT;
@@ -79,7 +73,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, false);
+        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, false, false);
         when(callback.getEvent()).thenReturn(EventType.DECISION_ISSUED);
 
         SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("myTest.doc").build()).build();
@@ -172,7 +166,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void willCopyThePreviewFileToTheInterlocDecisionDocumentAndAddFooter() {
-        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, true);
+        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, true, false);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -255,7 +249,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenDecisionIssuedWelshAndCaseIsWelsh_SetDwpStateAndOutcomeToStruckOut() {
-        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, true);
+        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, true, false);
         expectedWelshDocument = SscsWelshDocument.builder()
                 .value(SscsWelshDocumentDetails.builder()
                         .documentFileName("welshDecisionDocFilename")
@@ -317,7 +311,17 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void shouldClearInterlocReferralReason() {
+    public void shouldNotClearInterlocReferralReasonIfPostHearingsNotEnabled() {
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_CORRECTION_APPLICATION);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(InterlocReferralReason.REVIEW_CORRECTION_APPLICATION, response.getData().getInterlocReferralReason());
+    }
+
+    @Test
+    public void shouldClearInterlocReferralReasonIfPostHearingsEnabled() {
+        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, true, true);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_CORRECTION_APPLICATION);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

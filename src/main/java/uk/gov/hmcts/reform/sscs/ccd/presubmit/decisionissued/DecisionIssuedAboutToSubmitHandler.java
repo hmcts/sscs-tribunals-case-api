@@ -32,12 +32,15 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
     private final FooterService footerService;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
     private boolean isScheduleListingEnabled;
+    private boolean isPostHearingsEnabled;
 
     public DecisionIssuedAboutToSubmitHandler(FooterService footerService, ListAssistHearingMessageHelper
-            hearingMessageHelper, @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
+            hearingMessageHelper, @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled,
+            @Value("${feature.postHearingsA.enabled}") boolean isPostHearingsEnabled) {
         this.footerService = footerService;
         this.hearingMessageHelper = hearingMessageHelper;
         this.isScheduleListingEnabled = isScheduleListingEnabled;
+        this.isPostHearingsEnabled = isPostHearingsEnabled;
     }
 
     @Override
@@ -54,7 +57,9 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        clearInterlocReferralReason(caseData);
+        if (isPostHearingsEnabled) {
+            clearInterlocReferralReason(caseData);
+        }
 
         final PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         DocumentLink url = null;
