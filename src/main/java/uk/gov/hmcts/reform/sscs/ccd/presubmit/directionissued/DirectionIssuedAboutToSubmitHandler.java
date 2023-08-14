@@ -298,6 +298,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                                                                   DocumentLink url,
                                                                   SscsDocumentTranslationStatus documentTranslationStatus) {
 
+        clearInterlocReferralReason(caseData);
+
         caseData = updateCaseForDirectionType(caseDetails, caseData, documentTranslationStatus);
 
 
@@ -346,4 +348,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 && !caseData.getReinstatementOutcome().equals(RequestOutcome.REFUSED));
     }
 
+    // SSCS-11486 AC3
+    private void clearInterlocReferralReason(SscsCaseData caseData) {
+        caseData.setInterlocReferralReason(null);
+    }
 }

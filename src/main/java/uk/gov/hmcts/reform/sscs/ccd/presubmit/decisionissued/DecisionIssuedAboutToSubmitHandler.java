@@ -54,6 +54,8 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
+        clearInterlocReferralReason(caseData);
+
         final PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         DocumentLink url = null;
         if (nonNull(callback.getCaseDetails().getCaseData().getDocumentStaging().getPreviewDocument()) && callback.getEvent() == EventType.DECISION_ISSUED) {
@@ -126,4 +128,9 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
             && SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
             .       orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
             && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
+
+    // SSCS-11486 AC4
+    private void clearInterlocReferralReason(SscsCaseData caseData) {
+        caseData.setInterlocReferralReason(null);
+    }
 }
