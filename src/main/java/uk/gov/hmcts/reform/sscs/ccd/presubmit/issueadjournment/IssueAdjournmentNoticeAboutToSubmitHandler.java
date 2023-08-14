@@ -171,19 +171,25 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     }
 
     private void updateHearingOptions(SscsCaseData sscsCaseData) {
+        HearingOptions hearingOptions  = sscsCaseData.getAppeal().getHearingOptions();
+        if (isNull(hearingOptions)) {
+            hearingOptions = HearingOptions.builder().build();
+        }
+
         Adjournment adjournment = sscsCaseData.getAdjournment();
 
-        if (adjournment.getInterpreterRequired() != null) {
-            HearingOptions hearingOptions = HearingOptions.builder().build();
-            if (sscsCaseData.getAppeal().getHearingOptions() != null) {
-                hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
-            }
+        if (nonNull(adjournment.getInterpreterRequired())) {
             DynamicList interpreterLanguage = adjournment.getInterpreterLanguage();
-            hearingOptions.setLanguages(nonNull(interpreterLanguage.getValue()) ? interpreterLanguage.getValue().getLabel() : "");
+            hearingOptions.setLanguages(nonNull(interpreterLanguage.getValue().getLabel()) ? interpreterLanguage.getValue().getLabel() : NO.getValue());
             hearingOptions.setLanguageInterpreter(adjournment.getInterpreterRequired().getValue());
-
-            sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
+        } else {
+            hearingOptions.setLanguages(null);
+            hearingOptions.setLanguageInterpreter(NO.getValue());
+            adjournment.setInterpreterLanguage(null);
+            adjournment.setInterpreterRequired(NO);
         }
+
+        sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
     }
 
     private void updateRpc(SscsCaseData sscsCaseData) {
