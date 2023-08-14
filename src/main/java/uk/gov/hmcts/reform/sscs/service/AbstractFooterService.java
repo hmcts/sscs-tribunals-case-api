@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_APPLICATION;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.LIBERTY_TO_APPLY_APPLICATION;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.SET_ASIDE_APPLICATION;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.STATEMENT_OF_REASONS_APPLICATION;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +45,10 @@ public abstract class AbstractFooterService<D extends AbstractDocument> {
             boolean isPostHearingApp = Set.of(SET_ASIDE_APPLICATION,
                     CORRECTION_APPLICATION,
                     STATEMENT_OF_REASONS_APPLICATION,
-                    LIBERTY_TO_APPLY_APPLICATION)
+                    LIBERTY_TO_APPLY_APPLICATION,
+                    UPPER_TRIBUNALS_DECISION_REMADE,
+                    UPPER_TRIBUNALS_DECISION_REFUSED,
+                    PERMISSION_TO_APPEAL_APPLICATION)
                 .contains(documentType);
 
             String verb = isPostHearingApp ? " received on " : " issued on ";
