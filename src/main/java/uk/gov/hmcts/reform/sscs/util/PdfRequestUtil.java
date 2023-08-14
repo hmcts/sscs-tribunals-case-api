@@ -219,6 +219,7 @@ public class PdfRequestUtil {
                 }
             }
         }
+
         formPayloadBuilder.noticeBody(Optional.ofNullable(documentGeneration.getBodyContent())
                 .orElse(documentGeneration.getDirectionNoticeContent()));
         formPayloadBuilder.userName(documentGeneration.getSignedBy());
