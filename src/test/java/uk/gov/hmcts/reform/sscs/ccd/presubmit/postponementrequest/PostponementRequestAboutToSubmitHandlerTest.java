@@ -173,6 +173,6 @@ public class PostponementRequestAboutToSubmitHandlerTest {
         List<SscsDocument> sscsDocuments = response.getData().getSscsDocument();
         Assert.assertEquals(sscsDocuments, Collections.singletonList(expectedDocument));
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
-                eq(POSTPONEMENT_REQUEST), any(), any(), eq(null), eq(null));
+                eq(POSTPONEMENT_REQUEST), any(), any(), eq(null), eq(null), any(), eq(false));
     }
 }

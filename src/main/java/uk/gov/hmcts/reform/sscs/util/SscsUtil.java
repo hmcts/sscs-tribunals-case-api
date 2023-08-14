@@ -66,7 +66,7 @@ public class SscsUtil {
             SscsDocumentTranslationStatus documentTranslationStatus = getDocumentTranslationStatus(caseData);
 
             footerService.createFooterAndAddDocToCase(documentLink, caseData, documentType, now,
-                null, null, documentTranslationStatus, eventType);
+                null, null, documentTranslationStatus, eventType, true);
 
             updateTranslationStatus(caseData, documentTranslationStatus);
         }
@@ -82,11 +82,11 @@ public class SscsUtil {
         caseData.setSscsDocument(documents);
     }
 
-    public static void addDocumentToBundle(FooterService footerService, SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
+    public static void addDocumentToBundle(FooterService footerService, SscsCaseData sscsCaseData, SscsDocument sscsDocument, boolean shouldAddToDocuments) {
         DocumentLink url = sscsDocument.getValue().getDocumentLink();
         DocumentType documentType = DocumentType.fromValue(sscsDocument.getValue().getDocumentType());
         String dateIssued = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, null, null);
+        footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, null, null, null, shouldAddToDocuments);
     }
 
     public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {
