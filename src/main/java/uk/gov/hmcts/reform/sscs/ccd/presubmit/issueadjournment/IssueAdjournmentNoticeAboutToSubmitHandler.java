@@ -180,7 +180,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         if (nonNull(adjournment.getInterpreterRequired())) {
             DynamicList interpreterLanguage = adjournment.getInterpreterLanguage();
-            hearingOptions.setLanguages(nonNull(interpreterLanguage.getValue().getLabel()) ? interpreterLanguage.getValue().getLabel() : NO.getValue());
+            hearingOptions.setLanguages(nonNull(interpreterLanguage.getValue()) ? interpreterLanguage.getValue().getLabel() : NO.getValue());
             hearingOptions.setLanguageInterpreter(adjournment.getInterpreterRequired().getValue());
         } else {
             hearingOptions.setLanguages(null);
