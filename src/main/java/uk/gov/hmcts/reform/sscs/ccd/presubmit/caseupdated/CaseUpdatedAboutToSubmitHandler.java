@@ -262,8 +262,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private List<String> validatePartyCaseDAta(Entity entity, String partyType) {
-
+    private List<String> validatePartyCaseData(Entity entity, String partyType) {
         List<String> listOfWarnings = new ArrayList<>();
 
         if (entity != null) {
@@ -276,7 +275,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", partyType));
                 }
             }
-
             if (entity.getAddress() != null) {
                 if (StringUtils.isBlank(entity.getAddress().getLine1())) {
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 1", partyType));
@@ -288,7 +286,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "Postcode", partyType));
                 }
             }
-
             if (entity.getIdentity() != null) {
                 if (StringUtils.isBlank(entity.getIdentity().getDob())) {
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "Date of Birth", partyType));
@@ -298,29 +295,22 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                 }
             }
         }
-
         return listOfWarnings;
-
     }
 
 
     private void validateAppellantCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-
         Appellant appellantInfo = sscsCaseData.getAppeal().getAppellant();
-
-        List<String> warnings = validatePartyCaseDAta(appellantInfo, "Appellant");
+        List<String> warnings = validatePartyCaseData(appellantInfo, "Appellant");
 
         if (!warnings.isEmpty()) {
-
             response.addWarnings(warnings);
-
         }
     }
 
     private void validateAppointeeCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
-
         Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
-        List<String> warnings = validatePartyCaseDAta(appointeeInfo, "Appointee");
+        List<String> warnings = validatePartyCaseData(appointeeInfo, "Appointee");
 
         if (!warnings.isEmpty()) {
             response.addWarnings(warnings);
@@ -328,11 +318,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private List<String> validateRepAndJointPartyCaseData(Entity entity, String entityType) {
-
         List<String> listOfWarnings = new ArrayList<>();
 
         if (entity != null) {
-
             if (StringUtils.isBlank(entity.getName().getFirstName())) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", entityType));
             }
@@ -344,14 +332,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void validateRepresentativeNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
-
         final boolean hasRepresentative = sscsCaseData.isThereARepresentative();
+
         if (hasRepresentative) {
             Representative representativeInfo = sscsCaseData.getAppeal().getRep();
             List<String> warnings = validateRepAndJointPartyCaseData(representativeInfo, "Representative");
-
             if (!warnings.isEmpty()) {
-
                 response.addWarnings(warnings);
             }
         }
@@ -359,13 +345,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateJointPartyNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
         JointParty jointPartyInfo = sscsCaseData.getJointParty();
-
         final boolean hasJointParty = sscsCaseData.isThereAJointParty();
+
         if (hasJointParty) {
             List<String> warnings = validateRepAndJointPartyCaseData(jointPartyInfo, "Joint Party");
-
             if (!warnings.isEmpty()) {
-
                 response.addWarnings(warnings);
             }
         }

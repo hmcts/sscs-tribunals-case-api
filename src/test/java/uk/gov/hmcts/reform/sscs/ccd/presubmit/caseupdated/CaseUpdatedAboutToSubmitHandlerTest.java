@@ -193,61 +193,52 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     public void givenACaseUpdatedEventWithEmptyAppellantDetails_thenProvideAnError() {
-
         Appellant appellant = Appellant.builder()
                 .name(Name.builder().firstName("").lastName("").build())
                 .address(Address.builder().line1("").line2("").postcode("").build())
                 .identity(Identity.builder().nino("").dob("").build())
                 .build();
-
         callback.getCaseDetails().getCaseData().getAppeal().setAppellant(appellant);
-
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertThat(response.getWarnings().size(), is(7));
     }
 
     @Test
     public void givenACaseUpdatedEventWithEmptyAppointeeDetails_thenProvideAnError() {
-
         Appointee appointee = Appointee.builder()
                 .name(Name.builder().firstName("").lastName("").build())
                 .address(Address.builder().line1("").line2("").postcode("").build())
                 .identity(Identity.builder().nino("").dob("").build())
                 .build();
-
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(appointee);
-
         callback.getCaseDetails().getCaseData().setHasOtherPartyAppointee(YES);
-
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertThat(response.getWarnings().size(), is(7));
     }
 
     @Test
     public void givenACaseUpdatedEventWithEmptyRepresentativeDetails_thenProvideAnError() {
-
         Representative representative = Representative.builder()
                 .name(Name.builder().firstName("").lastName("").build())
                 .hasRepresentative(YES.getValue())
                 .build();
         callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
-
-
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertThat(response.getWarnings().size(), is(2));
     }
 
     @Test
     public void givenACaseUpdatedEventWithEmptyJointPartyDetails_thenProvideAnError() {
-
         JointParty jointParty = JointParty.builder()
                 .name(Name.builder().firstName("").lastName("").build())
                 .hasJointParty(YES)
                 .build();
-
         callback.getCaseDetails().getCaseData().setJointParty(jointParty);
-
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertThat(response.getWarnings().size(), is(2));
     }
 
