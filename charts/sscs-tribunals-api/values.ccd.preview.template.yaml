@@ -885,10 +885,10 @@ wa-message-cron-service:
     environment:
       WA_CASE_EVENT_HANDLER_SERVICE_URL: http://{{ .Release.Name }}-wa-case-event-handler
 
-wa-task-batch-service:
+wa-task-batch-service-initiation:
   job:
     kind: CronJob
-    releaseNameOverride: ${SERVICE_NAME}-wa-task-batch-service
+    releaseNameOverride: ${SERVICE_NAME}-wa-task-batch-service-initiation
     schedule: "*/5 * * * *"
     aadIdentityName: wa
     keyVaults:
@@ -900,6 +900,23 @@ wa-task-batch-service:
       S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
       WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
       JOB_NAME: "INITIATION"
+      ALLOW_CONFIG_MUTATIONS: true
+
+wa-task-batch-service-termination:
+  job:
+    kind: CronJob
+    releaseNameOverride: ${SERVICE_NAME}-wa-task-batch-service-termination
+    schedule: "*/5 * * * *"
+    aadIdentityName: wa
+    keyVaults:
+      wa:
+        secrets:
+          - s2s-secret-task-monitor
+    environment:
+      S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+      S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
+      WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
+      JOB_NAME: "TERMINATION"
       ALLOW_CONFIG_MUTATIONS: true
 
 ccd-message-publisher:
