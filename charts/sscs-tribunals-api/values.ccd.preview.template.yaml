@@ -819,6 +819,7 @@ wa-task-management-api:
       WA_IDAM_CLIENT_SECRET: ${WA_IDAM_CLIENT_SECRET}
       WA_SYSTEM_USERNAME: ${WA_SYSTEM_USERNAME}
       WA_SYSTEM_PASSWORD: ${WA_SYSTEM_PASSWORD}
+      ALLOWED_CASE_TYPES: "benefit"
 
 wa-task-monitor:
   java:
