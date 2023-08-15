@@ -4,9 +4,11 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE_ON_THE_DAY;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.SEND_TO_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.DWP;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -17,23 +19,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Note;
-import uk.gov.hmcts.reform.sscs.ccd.domain.NoteDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.NotePad;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
@@ -48,6 +38,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     public static final String POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX = "Postponement sent to judge - ";
 
     private final UserDetailsService userDetailsService;
+    private final IdamService idamService;
     private final PostponementRequestService postponementRequestService;
     private final FooterService footerService;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
@@ -89,6 +80,8 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             refusePostponement(sscsCaseData);
         } else if (GRANT.getValue().equals(actionRequested)) {
             grantPostponement(sscsCaseData, response);
+        } else if (REFUSE_ON_THE_DAY.getValue().equals(actionRequested)) {
+            refuseOnTheDay(userAuthorisation, sscsCaseData);
         } else {
             log.info("Action postponement request: unhandled requested action {} for case {}", actionRequested,
                 caseId);
@@ -129,6 +122,19 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             .build());
 
         sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(NO);
+    }
+
+    private void refuseOnTheDay(String userAuthorisation, SscsCaseData sscsCaseData) {
+        final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
+        final boolean hasDwpUserRole = userDetails.hasRole(DWP);
+
+        if (!hasDwpUserRole) {
+            return;
+        }
+
+        sscsCaseData.setDwpState(null);
+        sscsCaseData.setInterlocReviewState(null);
+        sscsCaseData.setState(State.HEARING);
     }
 
     private void cancelHearing(SscsCaseData sscsCaseData) {
