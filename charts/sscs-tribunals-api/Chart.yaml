@@ -87,8 +87,8 @@ dependencies:
   - name: wa-task-batch-service
     version: ~0.0.15
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-    condition: false
-  - name: wa-task-batch-service
+    condition: wa.enabled
+  - name: wa-task-batch-service-termination
     version: ~0.0.15
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wa.enabled
