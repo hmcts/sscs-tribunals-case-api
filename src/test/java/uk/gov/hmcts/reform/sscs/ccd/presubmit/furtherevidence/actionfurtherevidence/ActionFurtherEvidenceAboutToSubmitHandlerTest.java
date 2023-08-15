@@ -1251,8 +1251,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"READY_TO_LIST,1", "RESPONSE_RECEIVED,1", "DORMANT_APPEAL_STATE,1", "HEARING,1", "WITH_DWP,1", "VALID_APPEAL,0", "NOT_LISTABLE,1"})
-    public void shouldSetBundleAdditionBasedOnPreviousState(@Nullable State state, int occurrs) {
+    @Parameters({"READY_TO_LIST,1", "RESPONSE_RECEIVED,1", "DORMANT_APPEAL_STATE,1", "HEARING,1", "WITH_DWP,1", "VALID_APPEAL,0", "NOT_LISTABLE,1", "LISTING_ERROR,1", "HANDLING_ERROR,1"})
+    public void shouldSetBundleAdditionBasedOnPreviousState(@Nullable State state, int occurrence) {
 
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), false, false);
 
@@ -1260,9 +1260,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         when(caseDetails.getState()).thenReturn(state);
         when(footerService.getNextBundleAddition(any())).thenReturn("A");
 
-        ScannedDocument scannedDocument = ScannedDocument.builder().value(
-            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
-                .url(DOC_LINK).build()).build();
+        ScannedDocumentDetails scannedDocumentDetails = ScannedDocumentDetails.builder()
+                .fileName("filename.pdf")
+                .type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
+                .url(DOC_LINK)
+                .build();
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+                .value(scannedDocumentDetails)
+                .build();
         List<ScannedDocument> docs = new ArrayList<>();
 
         docs.add(scannedDocument);
@@ -1270,7 +1275,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(occurrs, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
+        assertEquals(occurrence, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
     }
 
     @Test

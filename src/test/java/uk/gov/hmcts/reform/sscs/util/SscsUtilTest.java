@@ -34,24 +34,18 @@ class SscsUtilTest {
         assertThat(documentType).isEqualTo(DocumentType.DECISION_NOTICE);
     }
 
-    @Test
-    void givenActionTypeSetAsideGrantedSelected_shouldThrowError() {
+    @ParameterizedTest
+    @CsvSource(value = {
+        "GRANT,SET_ASIDE_GRANTED",
+        "REFUSE,SET_ASIDE_REFUSED"
+    })
+    void givenActionTypeSetAside_shouldReturnSetAsideDocument(SetAsideActions action, DocumentType expectedDocumentType) {
         postHearing.setReviewType(PostHearingReviewType.SET_ASIDE);
-        postHearing.getSetAside().setAction(SetAsideActions.GRANT);
-
-        assertThatThrownBy(() -> getPostHearingReviewDocumentType(postHearing, true))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("getting the document type has an unexpected postHearingReviewType and action");
-    }
-
-    @Test
-    void givenActionTypeSetAsideRefusedSelected_shouldReturnSetAsideRefusedDocument() {
-        postHearing.setReviewType(PostHearingReviewType.SET_ASIDE);
-        postHearing.getSetAside().setAction(SetAsideActions.REFUSE);
+        postHearing.getSetAside().setAction(action);
 
         DocumentType documentType = getPostHearingReviewDocumentType(postHearing, true);
 
-        assertThat(documentType).isEqualTo(DocumentType.SET_ASIDE_REFUSED);
+        assertThat(documentType).isEqualTo(expectedDocumentType);
     }
 
     @Test
