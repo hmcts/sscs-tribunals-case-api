@@ -34,8 +34,12 @@ class SscsUtilTest {
         assertThat(documentType).isEqualTo(DocumentType.DECISION_NOTICE);
     }
 
-    @Test
-    void givenActionTypeSetAsideRefusedSelected_shouldReturnSetAsideRefusedDocument() {
+    @ParameterizedTest
+    @CsvSource(value = {
+        "GRANT,SET_ASIDE_GRANTED",
+        "REFUSE,SET_ASIDE_REFUSED"
+    })
+    void givenActionTypeSetAside_shouldReturnSetAsideDocument(SetAsideActions action, DocumentType expectedDocumentType) {
         postHearing.setReviewType(PostHearingReviewType.SET_ASIDE);
         postHearing.getSetAside().setAction(action);
 
