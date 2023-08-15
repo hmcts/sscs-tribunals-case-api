@@ -4,6 +4,7 @@ java:
   readinessPath: '/health/readiness'
   aadIdentityName: sscs
   ingressHost: sscs-tribunals-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  memoryLimits: '4096Mi'
   keyVaults:
     sscs:
       resourceGroup: sscs
@@ -36,8 +37,8 @@ java:
         - docmosis-endpoint
         - name: docmosis-api-key
           alias: PDF_SERVICE_ACCESS_KEY
-        - name: AppInsightsInstrumentationKey
-          alias: azure.application-insights.instrumentation-key
+        - name: app-insights-connection-string
+          alias: app-insights-connection-string
         - name: sscs-servicebus-connection-string-tf
           alias: HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING
   environment:

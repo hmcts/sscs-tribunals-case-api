@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.lang.String.format;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
@@ -17,7 +16,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
@@ -54,13 +57,14 @@ public class CitizenLoginService {
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
-                .collect(toList());
+                .toList();
         if (!isBlank(tya)) {
             log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
             List<OnlineHearing> convert = convert(
                     sscsCaseDetails.stream()
                             .filter(casesWithSubscriptionMatchingTya(tya))
-                            .collect(toList())
+                            .toList(),
+                    idamTokens.getEmail()
             );
             log.info(format("Find case: Found [%s] cases for tya [%s] for user [%s]", convert.size(), tya, idamTokens.getUserId()));
 
@@ -68,7 +72,7 @@ public class CitizenLoginService {
         }
 
         log.info(format("Searching for case without for user [%s]", idamTokens.getUserId()));
-        List<OnlineHearing> convert = convert(sscsCaseDetails);
+        List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
         log.info(format("Found [%s] cases without tya for user [%s]", convert.size(), idamTokens.getUserId()));
         return convert;
     }
@@ -79,10 +83,10 @@ public class CitizenLoginService {
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterActiveCasesForCitizen)
-                .collect(toList());
+                .toList();
 
         log.info(format("Searching for active case without for user [%s]", idamTokens.getUserId()));
-        List<OnlineHearing> convert = convert(sscsCaseDetails);
+        List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
         log.info(format("Found [%s] active cases for user [%s]", convert.size(), idamTokens.getUserId()));
         return convert;
     }
@@ -93,20 +97,20 @@ public class CitizenLoginService {
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterDormantCasesForCitizen)
-                .collect(toList());
+                .toList();
 
         log.info(format("Searching for dormant case without for user [%s]", idamTokens.getUserId()));
-        List<OnlineHearing> convert = convert(sscsCaseDetails);
+        List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
         log.info(format("Found [%s] dormant cases for user [%s]", convert.size(), idamTokens.getUserId()));
         return convert;
     }
 
-    private List<OnlineHearing> convert(List<SscsCaseDetails> sscsCaseDetails) {
+    private List<OnlineHearing> convert(List<SscsCaseDetails> sscsCaseDetails, String email) {
         return sscsCaseDetails.stream()
-                .map(onlineHearingService::loadHearing)
+                .map(sscsCase -> onlineHearingService.loadHearing(sscsCase, null, email))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(toList());
+                .toList();
     }
 
     public Optional<OnlineHearing> associateCaseToCitizen(IdamTokens citizenIdamTokens, String tya, String email, String postcode) {
