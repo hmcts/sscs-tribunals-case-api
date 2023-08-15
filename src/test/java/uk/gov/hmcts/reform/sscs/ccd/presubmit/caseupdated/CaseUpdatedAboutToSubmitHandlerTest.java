@@ -22,7 +22,6 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.elasticsearch.cluster.metadata.AliasAction;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
