@@ -32,7 +32,6 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -70,8 +69,6 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
 
     private final FooterService footerService;
     protected final UserDetailsService userDetailsService;
-    @Value("${feature.postHearingsB.enabled}")
-    private boolean isPostHearingsBEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -361,11 +358,5 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         caseData.setSelectedAudioVideoEvidenceDetails(null);
         caseData.setShowRip1DocPage(null);
         caseData.setProcessAudioVideoReviewState(null);
-
-        if (isPostHearingsBEnabled) {
-            caseData.setReservedToJudgeInterloc(null);
-        } else {
-            caseData.setReservedToJudge(null);
-        }
     }
 }
