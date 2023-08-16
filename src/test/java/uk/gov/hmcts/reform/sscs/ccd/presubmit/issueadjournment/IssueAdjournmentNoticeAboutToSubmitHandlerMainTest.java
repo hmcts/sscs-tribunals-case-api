@@ -12,17 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingPeriod;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 
@@ -196,5 +186,23 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
         var overrideFields = schedulingAndListingFields.getOverrideFields();
         var expectedDate = LocalDate.now().plusDays(28);
         assertThat(overrideFields.getHearingWindow().getDateRangeStart()).isEqualTo(expectedDate);
+    }
+
+    @Test
+    void givenCaseCanBeListedStraightAway_thenSetStateToReadyToList() {
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(YesNo.YES);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size()).isEqualTo(0);
+        assertThat(response.getData().getState()).isEqualTo(State.READY_TO_LIST);
+    }
+
+    @Test
+    void givenCaseCannotBeListedStraightAway_thenSetStateToNotListable() {
+        sscsCaseData.getAdjournment().setCanCaseBeListedRightAway(YesNo.NO);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size()).isEqualTo(0);
+        assertThat(response.getData().getState()).isEqualTo(State.NOT_LISTABLE);
     }
 }
