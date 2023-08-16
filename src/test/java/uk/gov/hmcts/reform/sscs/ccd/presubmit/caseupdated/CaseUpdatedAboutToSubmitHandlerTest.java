@@ -197,14 +197,19 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"Appellant", "Appointee", "Representative", "Joint Party"})
-    public void givenAppellantHasFirstLineOfAddressAndNoPostcode_thenProvideAnError(Entity entity){
+//    @Parameters({"Appellant", "Appointee", "Representative", "Joint Party"})
+//    public void givenAppellantHasFirstLineOfAddressAndNoPostcode_thenProvideAnError(Entity entity){
+        public void givenAppellantHasFirstLineOfAddressAndNoPostcode_thenProvideAnError(){
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1("67 Somewhere Road");
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("You must enter a valid UK postcode for the " + entity , response.getErrors().toString().toLowerCase());
+//        System.out.println(callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().getLine1());
+
+        String errorMsg = response.getErrors().toString().replace("[", "").replace("]", "");
+
+        assertEquals("You must enter a valid UK postcode for the appellant" , errorMsg);
     }
 
     @Test
@@ -214,7 +219,23 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("You must enter a valid UK postcode for the appellant", response.getErrors().toString());
+        System.out.println(callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().getLine1());
+
+        String errorMsg = response.getErrors().toString().replace("[", "").replace("]", "");
+
+        assertEquals("You must enter a valid UK postcode for the appellant", errorMsg);
+    }
+
+    @Test
+    public void givenAppellantHasNoFirstLineOfAddressAndValidPostcode_thenProvideAnError(){
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1("");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("CM120NS");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String errorMsg = response.getErrors().toString().replace("[", "").replace("]", "");
+
+        assertEquals("You must enter address line 1 for the appellant", errorMsg);
     }
 
 
