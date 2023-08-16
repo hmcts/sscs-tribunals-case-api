@@ -566,7 +566,7 @@ sscs-evidence-share:
 sscs-tya-notif:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2407-75ab7bd-20230811105341
+    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2407-81e853c-20230815144515
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
