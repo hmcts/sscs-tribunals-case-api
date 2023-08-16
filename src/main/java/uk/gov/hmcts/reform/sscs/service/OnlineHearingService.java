@@ -12,8 +12,17 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -51,15 +60,9 @@ public class OnlineHearingService {
         });
     }
 
-    //Load hearing with appellant details as user details
-    public Optional<OnlineHearing> loadHearing(SscsCaseDetails sscsCaseDeails) {
-        UserDetails userDetails = convertUserDetails(sscsCaseDeails, null, null, true);
-        return populateHearing(sscsCaseDeails, userDetails);
-    }
-
     //Load hearing with signed-in user details
     public Optional<OnlineHearing> loadHearing(SscsCaseDetails sscsCaseDeails, String tya, String email) {
-        UserDetails userDetails = convertUserDetails(sscsCaseDeails, tya, email, false);
+        UserDetails userDetails = convertUserDetails(sscsCaseDeails, tya, email);
         return populateHearing(sscsCaseDeails, userDetails);
     }
 
@@ -99,16 +102,17 @@ public class OnlineHearingService {
         );
     }
 
-    private UserDetails convertUserDetails(SscsCaseDetails sscsCaseDetails, String tya, String email, boolean onlyForAppellant) {
+    private UserDetails convertUserDetails(SscsCaseDetails sscsCaseDetails, String tya, String email) {
         Map<UserType, Subscription> appellantSubscriptions = getAppealSubscriptionMap(sscsCaseDetails);
-
-        if (onlyForAppellant || isSignInSubscription(appellantSubscriptions.values(), tya, email)) {
+        boolean isSignInSubscription = isSignInSubscription(appellantSubscriptions.values(), tya, email);
+        if (isSignInSubscription) {
             return populateUserDetails(UserType.APPELLANT, sscsCaseDetails.getData().getAppeal().getAppellant().getName(),
                     sscsCaseDetails.getData().getAppeal().getAppellant().getAddress(),
                     Optional.ofNullable(sscsCaseDetails.getData().getAppeal().getAppellant().getContact()),
                     appellantSubscriptions);
         } else {
-            for (CcdValue<OtherParty> op : emptyIfNull(sscsCaseDetails.getData().getOtherParties())) {
+            List<CcdValue<OtherParty>> otherParties = sscsCaseDetails.getData().getOtherParties();
+            for (CcdValue<OtherParty> op : emptyIfNull(otherParties)) {
                 Map<UserType, Subscription> otherPartySubscriptions = getOtherPartySubscriptionMap(op);
                 if (isSignInSubscription(otherPartySubscriptions.values(), tya, email)) {
                     return populateUserDetails(UserType.OTHER_PARTY, op.getValue().getName(),
@@ -174,6 +178,7 @@ public class OnlineHearingService {
     }
 
     private boolean isSignInSubscription(Collection<Subscription> subscriptionStream, String tya, String email) {
-        return subscriptionStream.stream().anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()) && email.equalsIgnoreCase(subscription.getEmail()));
+        return subscriptionStream.stream().anyMatch(subscription -> subscription != null
+                && email.equalsIgnoreCase(subscription.getEmail()));
     }
 }
