@@ -284,7 +284,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
                 if (PAPER.equals(nextHearingType.getHearingChannel())) {
                     wantsToAttend = NO.toString();
-                    hearingType = uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.HearingType.PAPER.getValue();
+                    hearingType = uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.PAPER.getValue();
                 }
 
                 log.info("Updating hearing type to {} and wants to attend to {}", hearingType, wantsToAttend);
