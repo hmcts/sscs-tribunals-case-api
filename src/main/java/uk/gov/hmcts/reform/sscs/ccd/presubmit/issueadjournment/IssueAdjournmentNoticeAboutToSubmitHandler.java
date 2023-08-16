@@ -107,11 +107,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             sscsCaseData.setDwpState(ADJOURNMENT_NOTICE_ISSUED);
-            if (isYes(sscsCaseData.getAdjournment().getCanCaseBeListedRightAway())) {
-                sscsCaseData.setState(State.READY_TO_LIST);
-            } else {
-                sscsCaseData.setState(State.NOT_LISTABLE);
-            }
+
+            sscsCaseData.setState(isYes(sscsCaseData.getAdjournment().getCanCaseBeListedRightAway()) ? State.READY_TO_LIST : State.NOT_LISTABLE);
         } else {
             log.info("Case is a Welsh case so Adjournment Notice requires translation for case id : {}", sscsCaseData.getCcdCaseId());
             sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
