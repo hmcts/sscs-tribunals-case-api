@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -197,23 +196,19 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-//    @Parameters({"Appellant", "Appointee", "Representative", "Joint Party"})
-//    public void givenAppellantHasFirstLineOfAddressAndNoPostcode_thenProvideAnError(Entity entity){
-        public void givenAppellantHasFirstLineOfAddressAndNoPostcode_thenProvideAnError(){
+        public void givenAppellantHasFirstLineOfAddressAndNoPostcode_thenProvideAnError() {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1("67 Somewhere Road");
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-//        System.out.println(callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().getLine1());
-
         String errorMsg = response.getErrors().toString().replace("[", "").replace("]", "");
 
-        assertEquals("You must enter a valid UK postcode for the appellant" , errorMsg);
+        assertEquals("You must enter a valid UK postcode for the appellant", errorMsg);
     }
 
     @Test
-    public void givenAppellantHasFirstLineOfAddressAndInvalidPostcode_thenProvideAnError(){
+    public void givenAppellantHasFirstLineOfAddressAndInvalidPostcode_thenProvideAnError() {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1("67 Somewhere Road");
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("73GH Y7U");
 
@@ -227,7 +222,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAppellantHasNoFirstLineOfAddressAndValidPostcode_thenProvideAnError(){
+    public void givenAppellantHasNoFirstLineOfAddressAndValidPostcode_thenProvideAnError() {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1("");
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("CM120NS");
 

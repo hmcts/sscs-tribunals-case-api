@@ -31,11 +31,11 @@ import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import javax.validation.ConstraintValidatorContext;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
 
-import javax.validation.ConstraintValidatorContext;
 
 @Component
 @Slf4j
@@ -133,28 +133,38 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             validateAndUpdateDwpHandlingOffice(sscsCaseData, preSubmitCallbackResponse);
             validateHearingOptions(sscsCaseData, preSubmitCallbackResponse);
             validateAppellantAddress(sscsCaseData,preSubmitCallbackResponse);
+
+            if (sscsCaseData.getAppeal().getAppellant().getAppointee() != null) {
+                validateAppointeeAddress(sscsCaseData,preSubmitCallbackResponse);
+            }
+            if (sscsCaseData.getHasRepresentative() != null) {
+                validateRepresentativeAddress(sscsCaseData,preSubmitCallbackResponse);
+            }
+            if (sscsCaseData.getHasJointParty() != null) {
+                validateJointPartyAddress(sscsCaseData,preSubmitCallbackResponse);
+            }
         }
 
         return preSubmitCallbackResponse;
     }
 
     private void validateAppellantAddress(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-
-        // TODO : Maybe implement a feature for adding the entity so that the same method can be used for eg. Appellant, Appointee etc
-
         Appellant appellantInfo = sscsCaseData.getAppeal().getAppellant();
         String addressLine1 = appellantInfo.getAddress().getLine1();
-        String postcode = appellantInfo.getAddress().getPostcode();
+        String postcode = appellantInfo.getAddress().getPostcode() ;
+        // TODO : Maybe implement a feature for adding the entity so that the same method can be used for eg. Appellant, Appointee etc
+        if(isNotBlank(addressLine1) || isNotBlank(postcode)) {
 
-        if(!StringUtils.isBlank(addressLine1) || !StringUtils.isBlank(postcode)) {
+            if (!StringUtils.isBlank(addressLine1) || !StringUtils.isBlank(postcode)) {
 
-            if (!StringUtils.isBlank(addressLine1)) {
-                if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
-                    response.addError("You must enter a valid UK postcode for the appellant");
-                }
-            } else {
-                if (!StringUtils.isBlank(postcode) && postcodeValidator.isValid(postcode, context)) {
-                    response.addError("You must enter address line 1 for the appellant");
+                if (!StringUtils.isBlank(addressLine1)) {
+                    if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
+                        response.addError("You must enter a valid UK postcode for the appellant");
+                    }
+                } else {
+                    if (!StringUtils.isBlank(postcode) && postcodeValidator.isValid(postcode, context)) {
+                        response.addError("You must enter address line 1 for the appellant");
+                    }
                 }
             }
         }
@@ -209,16 +219,18 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         String addressLine1 = appointeeInfo.getAddress().getLine1();
         String postcode = appointeeInfo.getAddress().getPostcode();
 
-
-        if (!addressLine1.isEmpty()) {
-            if (postcode.isEmpty() || !postcodeValidator.isValid(postcode, context)) {
-                response.addError("You must enter a valid UK postcode for the Appointee ");
-            }
-        } else {
-            if (!postcode.isEmpty() && postcodeValidator.isValid(postcode, context)) {
-                response.addError("You must enter address line 1 for the Appointee");
+        if(isNotBlank(addressLine1) || isNotBlank(postcode)) {
+            if (!addressLine1.isEmpty()) {
+                if (postcode.isEmpty() || !postcodeValidator.isValid(postcode, context)) {
+                    response.addError("You must enter a valid UK postcode for the Appointee ");
+                }
+            } else {
+                if (!postcode.isEmpty() && postcodeValidator.isValid(postcode, context)) {
+                    response.addError("You must enter address line 1 for the Appointee");
+                }
             }
         }
+
     }
 
     private void validateAndUpdateDwpHandlingOffice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
