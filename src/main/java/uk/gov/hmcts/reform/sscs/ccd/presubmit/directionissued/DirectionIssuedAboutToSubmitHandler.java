@@ -5,9 +5,7 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REJECT_HEARING_RECORDING_REQUEST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_INFORMATION;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.NONE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
@@ -46,6 +44,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private final DwpAddressLookupService dwpAddressLookupService;
     private final int dwpResponseDueDays;
     private final int dwpResponseDueDaysChildSupport;
+    private final boolean isPostHearingsEnabled;
 
     @Autowired
     public DirectionIssuedAboutToSubmitHandler(FooterService footerService, ServiceRequestExecutor serviceRequestExecutor,
@@ -53,13 +52,15 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                                                @Value("${bulk_scan.validateEndpoint}") String validateEndpoint,
                                                DwpAddressLookupService dwpAddressLookupService,
                                                @Value("${dwp.response.due.days}") int dwpResponseDueDays,
-                                               @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport) {
+                                               @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport,
+                                               @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
         this.footerService = footerService;
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bulkScanEndpoint = String.format("%s%s", trimToEmpty(bulkScanUrl), trimToEmpty(validateEndpoint));
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.dwpResponseDueDays = dwpResponseDueDays;
         this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
+        this.isPostHearingsEnabled = isPostHearingsEnabled;
     }
 
     @Override
@@ -298,6 +299,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                                                                   DocumentLink url,
                                                                   SscsDocumentTranslationStatus documentTranslationStatus) {
 
+        if (isPostHearingsEnabled) {
+            clearInterlocReferralReason(caseData);
+        }
+
         caseData = updateCaseForDirectionType(caseDetails, caseData, documentTranslationStatus);
 
 
@@ -346,4 +351,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 && !caseData.getReinstatementOutcome().equals(RequestOutcome.REFUSED));
     }
 
+    // SSCS-11486 AC3
+    private void clearInterlocReferralReason(SscsCaseData caseData) {
+        caseData.setInterlocReferralReason(null);
+    }
 }
