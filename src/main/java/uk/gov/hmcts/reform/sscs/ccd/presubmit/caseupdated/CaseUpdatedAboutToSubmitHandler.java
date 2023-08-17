@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidential
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.validation.ConstraintValidatorContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +32,6 @@ import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
-import javax.validation.ConstraintValidatorContext;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
@@ -133,7 +133,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             validateAndUpdateDwpHandlingOffice(sscsCaseData, preSubmitCallbackResponse);
             validateHearingOptions(sscsCaseData, preSubmitCallbackResponse);
             validateAppellantAddress(sscsCaseData,preSubmitCallbackResponse);
-
             if (sscsCaseData.getAppeal().getAppellant().getAppointee() != null) {
                 validateAppointeeAddress(sscsCaseData,preSubmitCallbackResponse);
             }
@@ -151,12 +150,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void validateAppellantAddress(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         Appellant appellantInfo = sscsCaseData.getAppeal().getAppellant();
         String addressLine1 = appellantInfo.getAddress().getLine1();
-        String postcode = appellantInfo.getAddress().getPostcode() ;
-        // TODO : Maybe implement a feature for adding the entity so that the same method can be used for eg. Appellant, Appointee etc
-        if(isNotBlank(addressLine1) || isNotBlank(postcode)) {
+        String postcode = appellantInfo.getAddress().getPostcode();
 
+        if (isNotBlank(addressLine1) || isNotBlank(postcode)) {
             if (!StringUtils.isBlank(addressLine1) || !StringUtils.isBlank(postcode)) {
-
                 if (!StringUtils.isBlank(addressLine1)) {
                     if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
                         response.addError("You must enter a valid UK postcode for the appellant");
@@ -180,12 +177,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         String postcode = representativeInfo.getAddress().getPostcode();
 
 
-        if (!addressLine1.isEmpty()) {
-            if (postcode.isEmpty() || !postcodeValidator.isValid(postcode, context)) {
+        if (!StringUtils.isBlank(addressLine1)) {
+            if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
                 response.addError("You must enter a valid UK postcode for the representative");
             }
         } else {
-            if (!postcode.isEmpty() && postcodeValidator.isValid(postcode, context)) {
+            if (!StringUtils.isBlank(postcode) && postcodeValidator.isValid(postcode, context)) {
                 response.addError("You must enter address line 1 for the representative");
             }
         }
@@ -200,12 +197,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         String postcode = jointPartyInfo.getAddress().getPostcode();
 
 
-        if (!addressLine1.isEmpty()) {
-            if (postcode.isEmpty() || !postcodeValidator.isValid(postcode, context)) {
+        if (!StringUtils.isBlank(addressLine1)) {
+            if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
                 response.addError("You must enter a valid UK postcode for the Joint Party");
             }
         } else {
-            if (!postcode.isEmpty() && postcodeValidator.isValid(postcode, context)) {
+            if (!StringUtils.isBlank(postcode) && postcodeValidator.isValid(postcode, context)) {
                 response.addError("You must enter address line 1 for the Joint Party");
             }
         }
@@ -219,13 +216,13 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         String addressLine1 = appointeeInfo.getAddress().getLine1();
         String postcode = appointeeInfo.getAddress().getPostcode();
 
-        if(isNotBlank(addressLine1) || isNotBlank(postcode)) {
-            if (!addressLine1.isEmpty()) {
-                if (postcode.isEmpty() || !postcodeValidator.isValid(postcode, context)) {
+        if (isNotBlank(addressLine1) || isNotBlank(postcode)) {
+            if (!StringUtils.isBlank(addressLine1)) {
+                if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
                     response.addError("You must enter a valid UK postcode for the Appointee ");
                 }
             } else {
-                if (!postcode.isEmpty() && postcodeValidator.isValid(postcode, context)) {
+                if (!StringUtils.isBlank(postcode) && postcodeValidator.isValid(postcode, context)) {
                     response.addError("You must enter address line 1 for the Appointee");
                 }
             }
