@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,10 +58,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     OTHER_DOCUMENT_MANUAL, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
                     SEND_TO_INTERLOC_REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_TCW)
             .map(FurtherEvidenceActionDynamicListItems::getCode)
-            .collect(Collectors.toUnmodifiableList());
+            .toList();
     private static final Set<State> ADDITION_VALID_STATES = Set.of(State.DORMANT_APPEAL_STATE,
             State.RESPONSE_RECEIVED,
             State.READY_TO_LIST,
+            State.LISTING_ERROR,
+            State.HANDLING_ERROR,
             State.HEARING,
             State.NOT_LISTABLE,
             State.WITH_DWP,
@@ -184,7 +185,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         boolean isDocTypeRequiresReviewByJudge =
             ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType)
             || ScannedDocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue().equals(scannedDocumentType)
-            || ScannedDocumentType.LIBERTY_TO_APPLY_APPLICATION.getValue().equals(scannedDocumentType);
+            || ScannedDocumentType.LIBERTY_TO_APPLY_APPLICATION.getValue().equals(scannedDocumentType)
+            || ScannedDocumentType.PERMISSION_TO_APPEAL_APPLICATION.getValue().equals(scannedDocumentType);
         boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
         return isDocTypeRequiresReviewByJudge && isNotInterlocReviewByJudge;
     }
@@ -286,6 +288,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     sscsCaseData.setDwpState(DwpState.LIBERTY_TO_APPLY_REQUESTED);
                 }
             }
+
+            if (isPostHearingsBEnabled && isPermissionToAppealApplication(sscsCaseData)) {
+                sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.PERMISSION_TO_APPEAL);
+                if (isOriginalSenderDwp(sscsCaseData)) {
+                    sscsCaseData.setDwpState(DwpState.PERMISSION_TO_APPEAL_REQUESTED);
+                }
+            }
         }
 
         buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState(), callback.isIgnoreWarnings(), preSubmitCallbackResponse);
@@ -329,12 +338,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return isDocumentType(LIBERTY_TO_APPLY_APPLICATION, sscsCaseData);
     }
 
-    private static boolean isPermissionToAppealApplication(SscsCaseData sscsCaseData) {
-        return isDocumentType(PERMISSION_TO_APPEAL_APPLICATION, sscsCaseData);
-    }
-
     private static boolean isStatementOfReasonsApplication(SscsCaseData sscsCaseData) {
         return isDocumentType(STATEMENT_OF_REASONS_APPLICATION, sscsCaseData);
+    }
+  
+    private static boolean isPermissionToAppealApplication(SscsCaseData sscsCaseData) {
+        return isDocumentType(PERMISSION_TO_APPEAL_APPLICATION, sscsCaseData);
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {
@@ -477,13 +486,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                                                   PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
                                                   ScannedDocument scannedDocument) {
         //check warning for bundle addition
-        if (!ignoreWarnings && !isBundleAdditionSelectedForActionType(sscsCaseData, scannedDocument)) {
+        boolean isWarningAdded = !isBundleAdditionSelectedForActionType(sscsCaseData, scannedDocument) && !ignoreWarnings;
+
+        if (isWarningAdded) {
             preSubmitCallbackResponse.addWarning(
                 "No documents have been ticked to be added as an addition. These document(s) will NOT be added to "
                     + "the bundle. Are you sure?");
-            return true;
         }
-        return false;
+        return isWarningAdded;
     }
 
     private void setReinstateCaseFieldsIfReinstatementRequest(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
@@ -700,6 +710,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
         if (ScannedDocumentType.LIBERTY_TO_APPLY_APPLICATION.getValue().equals(docType)) {
             return LIBERTY_TO_APPLY_APPLICATION;
+        }
+        if (ScannedDocumentType.PERMISSION_TO_APPEAL_APPLICATION.getValue().equals(docType)) {
+            return PERMISSION_TO_APPEAL_APPLICATION;
         }
 
         final Optional<DocumentType> optionalDocumentType = stream(PartyItemList.values())

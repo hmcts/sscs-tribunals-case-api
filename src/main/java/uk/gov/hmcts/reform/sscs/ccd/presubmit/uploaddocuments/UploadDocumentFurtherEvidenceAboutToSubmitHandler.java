@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
 import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.REQUEST_FOR_HEARING_RECORDING;
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -143,12 +141,12 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
                             .getDocumentFilename()))
                         .build())
                     .build())
-            .collect(toList());
+            .toList();
 
         addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, newAudioVideoEvidence.stream()
             .map(audioVideoEvidence -> audioVideoEvidence.getValue().getDocumentType())
             .filter(Objects::nonNull)
-            .collect(Collectors.toUnmodifiableList()), EVENT_TYPE);
+            .toList(), EVENT_TYPE);
 
         if (!newAudioVideoEvidence.isEmpty()) {
             if (sscsCaseData.getAudioVideoEvidence() == null) {
@@ -166,7 +164,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
 
         if (sscsCaseData.getDraftSscsFurtherEvidenceDocument() != null) {
             List<SscsFurtherEvidenceDoc> sscsFurtherEvidenceDocList = sscsCaseData.getDraftSscsFurtherEvidenceDocument().stream()
-                .filter(draftDoc -> REQUEST_FOR_HEARING_RECORDING.getId().equals(draftDoc.getValue().getDocumentType())).collect(toList());
+                .filter(draftDoc -> REQUEST_FOR_HEARING_RECORDING.getId().equals(draftDoc.getValue().getDocumentType())).toList();
 
             if (sscsCaseData.getSscsHearingRecordingCaseData() != null
                 && sscsCaseData.getSscsHearingRecordingCaseData().getRequestingParty() != null
