@@ -14,7 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -77,17 +76,23 @@ public class SscsUtil {
                 .distinct()
                 .map(panelMember -> new CollectionItem<>(panelMember.getIdamId(), panelMember))
                 .filter(not(panelMembersList::contains))
-                .collect(Collectors.toList()));
+                .toList());
 
             if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
                 log.info("Excluding {} panel members with Personal Codes {}", adjournmentPanelMembers.size(),
-                    adjournmentPanelMembers.stream().map(JudicialUserBase::getPersonalCode).collect(Collectors.toList()));
+                    adjournmentPanelMembers.stream()
+                            .filter(Objects::nonNull)
+                            .map(JudicialUserBase::getPersonalCode)
+                            .toList());
 
                 exclusions.setExcludedPanelMembers(panelMembersList);
                 exclusions.setArePanelMembersExcluded(YES);
             } else if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.RESERVED)) {
                 log.info("Reserving {} panel members with Personal Codes {}", adjournmentPanelMembers.size(),
-                    adjournmentPanelMembers.stream().map(JudicialUserBase::getPersonalCode).collect(Collectors.toList()));
+                    adjournmentPanelMembers.stream()
+                            .filter(Objects::nonNull)
+                            .map(JudicialUserBase::getPersonalCode)
+                            .toList());
 
                 exclusions.setReservedPanelMembers(panelMembersList);
                 exclusions.setArePanelMembersReserved(YES);

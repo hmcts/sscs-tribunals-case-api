@@ -35,18 +35,15 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
-import uk.gov.hmcts.reform.sscs.service.AirLookupService;
-import uk.gov.hmcts.reform.sscs.service.FooterService;
-import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
-import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
+import uk.gov.hmcts.reform.sscs.service.*;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
 @AllArgsConstructor
 public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
     private final FooterService footerService;
     private final Validator validator;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
@@ -92,7 +89,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             calculateDueDate(sscsCaseData);
 
             if (sscsCaseData.getAdjournment().getPreviewDocument() != null) {
-                processResponse(sscsCaseData, preSubmitCallbackResponse, documentTranslationStatus);
+                processResponse(sscsCaseData, preSubmitCallbackResponse, documentTranslationStatus, userAuthorisation);
             } else {
                 preSubmitCallbackResponse.addError("There is no Draft Adjournment Notice on the case so adjournment cannot be issued");
             }
@@ -102,7 +99,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     }
 
     private void processResponse(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
-        SscsDocumentTranslationStatus documentTranslationStatus) {
+        SscsDocumentTranslationStatus documentTranslationStatus, String userAuthorisation) {
         createAdjournmentNoticeFromPreviewDraft(preSubmitCallbackResponse, documentTranslationStatus);
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
@@ -121,7 +118,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         if (isAdjournmentEnabled) {
             updateHearingOptions(sscsCaseData);
             updateRpc(sscsCaseData);
-            updatePanelMembers(sscsCaseData);
+            updatePanelMembers(sscsCaseData, userAuthorisation);
             updateOverrideFields(sscsCaseData);
 
             if (SscsUtil.isSAndLCase(sscsCaseData)
@@ -218,7 +215,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             .findFirst().orElse(HearingChannel.PAPER);
     }
 
-    private void updatePanelMembers(SscsCaseData caseData) {
+    private void updatePanelMembers(SscsCaseData caseData, String userAuthorisation) {
         Adjournment adjournment = caseData.getAdjournment();
         AdjournCasePanelMembersExcluded panelMemberExcluded = adjournment.getPanelMembersExcluded();
 
@@ -230,7 +227,10 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
                 caseData.getSchedulingAndListingFields().setPanelMemberExclusions(panelMemberExclusions);
             }
 
-            SscsUtil.setAdjournmentPanelMembersExclusions(panelMemberExclusions, adjournment.getPanelMembers(), panelMemberExcluded);
+            List<JudicialUserBase> membersToExcluded = adjournment.getPanelMembers();
+            membersToExcluded.add(adjournment.getSignedInUser());
+
+            SscsUtil.setAdjournmentPanelMembersExclusions(panelMemberExclusions, membersToExcluded, panelMemberExcluded);
         }
     }
 

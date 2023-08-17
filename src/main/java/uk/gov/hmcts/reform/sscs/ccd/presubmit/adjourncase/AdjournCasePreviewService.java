@@ -353,6 +353,8 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         if (adjournmentFeature) {
             List<JudicialUserBase> panelMembers = adjournment.getPanelMembers();
 
+            adjournment.setSignedInUser(userDetailsService.getLoggedInUserAsJudicialUser(userAuthorisation));
+
             names.addAll(panelMembers.stream()
                 .filter(panelMember -> isNotBlank(panelMember.getPersonalCode()))
                 .map(panelMember ->

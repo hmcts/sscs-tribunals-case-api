@@ -3,22 +3,19 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.util.Objects.isNull;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 
 @Service
+@AllArgsConstructor
 public class UserDetailsService {
-
     protected final IdamClient idamClient;
-
-    @Autowired
-    public UserDetailsService(IdamClient idamClient) {
-        this.idamClient = idamClient;
-    }
+    protected final JudicialRefDataService judicialRefDataService;
 
     public String buildLoggedInUserName(String userAuthorisation) {
         UserDetails userDetails = getUserDetails(userAuthorisation);
@@ -56,5 +53,14 @@ public class UserDetailsService {
             throw new IllegalStateException("Unable to obtain signed in user details");
         }
         return userDetails;
+    }
+
+    public JudicialUserBase getLoggedInUserAsJudicialUser(String userAuthorisation) {
+        UserInfo userInfo = getUserInfo(userAuthorisation);
+
+        String idamId = userInfo.getUid();
+        String personalCode = judicialRefDataService.getPersonalCode(idamId);
+
+        return new JudicialUserBase(idamId, personalCode);
     }
 }
