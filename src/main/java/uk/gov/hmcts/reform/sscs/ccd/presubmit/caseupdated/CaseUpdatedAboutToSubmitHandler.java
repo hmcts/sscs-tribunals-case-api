@@ -11,7 +11,6 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidential
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.validation.ConstraintValidatorContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import javax.validation.ConstraintValidatorContext;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
@@ -132,7 +132,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (!hasSystemUserRole) {
             validateAndUpdateDwpHandlingOffice(sscsCaseData, preSubmitCallbackResponse);
             validateHearingOptions(sscsCaseData, preSubmitCallbackResponse);
-            validateAppellantAddress(sscsCaseData,preSubmitCallbackResponse);
+            //validateAppellantAddress(sscsCaseData,preSubmitCallbackResponse);
+            findPartyAddresses(sscsCaseData, preSubmitCallbackResponse);
             if (sscsCaseData.getAppeal().getAppellant().getAppointee() != null) {
                 validateAppointeeAddress(sscsCaseData,preSubmitCallbackResponse);
             }
@@ -145,6 +146,30 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         return preSubmitCallbackResponse;
+    }
+
+    private void validateAddress(PreSubmitCallbackResponse<SscsCaseData> response, Entity party, String partyName) {
+        String addressLine1 = party.getAddress().getLine1();
+        String postcode = party.getAddress().getPostcode();
+
+        if (!StringUtils.isBlank(addressLine1) || !StringUtils.isBlank(postcode)) {
+            if (!StringUtils.isBlank(addressLine1)) {
+                if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
+                    response.addError("You must enter a valid UK postcode for the " + partyName);
+                }
+            } else {
+                if (!StringUtils.isBlank(postcode) && postcodeValidator.isValid(postcode, context)) {
+                    response.addError("You must enter address line 1 for the " + partyName);
+                }
+            }
+        }
+    }
+
+    private void findPartyAddresses(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        validateAddress(response, sscsCaseData.getAppeal().getAppellant(), "appellant");
+        validateAddress(response, sscsCaseData.getAppeal().getRep(), "representative");
+        validateAddress(response, sscsCaseData.getJointParty(), "joint party");
+        validateAddress(response, sscsCaseData.getAppeal().getAppellant().getAppointee(), "appointee");
     }
 
     private void validateAppellantAddress(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
