@@ -152,30 +152,23 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         String addressLine1 = appellantInfo.getAddress().getLine1();
         String postcode = appellantInfo.getAddress().getPostcode();
 
-        if (isNotBlank(addressLine1) || isNotBlank(postcode)) {
-            if (!StringUtils.isBlank(addressLine1) || !StringUtils.isBlank(postcode)) {
-                if (!StringUtils.isBlank(addressLine1)) {
-                    if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
-                        response.addError("You must enter a valid UK postcode for the appellant");
-                    }
-                } else {
-                    if (!StringUtils.isBlank(postcode) && postcodeValidator.isValid(postcode, context)) {
-                        response.addError("You must enter address line 1 for the appellant");
-                    }
+        if (!StringUtils.isBlank(addressLine1) || !StringUtils.isBlank(postcode)) {
+            if (!StringUtils.isBlank(addressLine1)) {
+                if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
+                    response.addError("You must enter a valid UK postcode for the appellant");
+                }
+            } else {
+                if (!StringUtils.isBlank(postcode) && postcodeValidator.isValid(postcode, context)) {
+                    response.addError("You must enter address line 1 for the appellant");
                 }
             }
         }
-
     }
 
     private void validateRepresentativeAddress(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-
-        // TODO : Maybe implement a feature for adding the entity so that the same method can be used for eg. Appellant, Appointee etc
-
         Representative representativeInfo = sscsCaseData.getAppeal().getRep();
         String addressLine1 = representativeInfo.getAddress().getLine1();
         String postcode = representativeInfo.getAddress().getPostcode();
-
 
         if (!StringUtils.isBlank(addressLine1)) {
             if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
@@ -189,13 +182,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void validateJointPartyAddress(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-
-        // TODO : Maybe implement a feature for adding the entity so that the same method can be used for eg. Appellant, Appointee etc
-
         JointParty jointPartyInfo = sscsCaseData.getJointParty();
         String addressLine1 = jointPartyInfo.getAddress().getLine1();
         String postcode = jointPartyInfo.getAddress().getPostcode();
-
 
         if (!StringUtils.isBlank(addressLine1)) {
             if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
@@ -209,9 +198,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void validateAppointeeAddress(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-
-        // TODO : Maybe implement a feature for adding the entity so that the same method can be used for eg. Appellant, Appointee etc
-
         Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
         String addressLine1 = appointeeInfo.getAddress().getLine1();
         String postcode = appointeeInfo.getAddress().getPostcode();
