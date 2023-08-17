@@ -887,22 +887,22 @@ wa-message-cron-service:
 
 wa-task-batch-service:
   jobs:
-    - job: "wa-task-batch-service-1"
-      kind: CronJob
-      releaseNameOverride: ${SERVICE_NAME}-wa-task-batch-service-1
-      name: ${SERVICE_NAME}-wa-task-batch-service1-1
-      schedule: "*/5 * * * *"
-      aadIdentityName: wa
-      keyVaults:
-        wa:
-          secrets:
-            - s2s-secret-task-monitor
-      environment:
-        S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-        S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
-        WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
-        JOB_NAME: "INITIATION"
-        ALLOW_CONFIG_MUTATIONS: true
+#    - job: "wa-task-batch-service-1"
+#      kind: CronJob
+#      releaseNameOverride: ${SERVICE_NAME}-wa-task-batch-service-1
+#      name: ${SERVICE_NAME}-wa-task-batch-service1-1
+#      schedule: "*/5 * * * *"
+#      aadIdentityName: wa
+#      keyVaults:
+#        wa:
+#          secrets:
+#            - s2s-secret-task-monitor
+#      environment:
+#        S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+#        S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
+#        WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
+#        JOB_NAME: "INITIATION"
+#        ALLOW_CONFIG_MUTATIONS: true
     - job: "wa-task-batch-termination"
       kind: CronJob
       releaseNameOverride: ${SERVICE_NAME}-wa-task-batch-termination
