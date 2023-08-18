@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
@@ -152,16 +151,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         String addressLine1 = party.getAddress().getLine1();
         String postcode = party.getAddress().getPostcode();
 
-        if (!StringUtils.isBlank(addressLine1) || !StringUtils.isBlank(postcode)) {
-            if (!StringUtils.isBlank(addressLine1)) {
-                if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
-                    response.addError("You must enter a valid UK postcode for the " + partyName);
-                }
-            } else {
-                if (!StringUtils.isBlank(postcode) && postcodeValidator.isValid(postcode, context)) {
-                    response.addError("You must enter address line 1 for the " + partyName);
-                }
-            }
+        if(isBlank(addressLine1)){
+            response.addError("You must enter address line 1 for the " + partyName);
+        }
+
+        if(isBlank(postcode) || !isBlank(postcode) && !postcodeValidator.isValid(postcode, context)){
+            response.addError("You must enter a valid UK postcode for the " + partyName);
         }
     }
 

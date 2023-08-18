@@ -20,11 +20,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
+import junitparams.NamedParameters;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -193,6 +197,30 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("002DD", response.getData().getCaseCode());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"appellant","representative","joint party","appointee"})
+    public void givenPartyTypeHasFirstLineOfAddressAndNoPostcode_thenProvideAnError(String partyName) {
+
+        List<Entity> allParties= List.of(
+          callback.getCaseDetails().getCaseData().getAppeal().getAppellant(),
+          callback.getCaseDetails().getCaseData().getAppeal().getRep(),
+          callback.getCaseDetails().getCaseData().getJointParty(),
+          callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAppointee()
+        );
+
+        allParties.forEach(party-> {
+            party.getAddress().setLine1("67 Somewhere Road");
+            party.getAddress().setPostcode(null);
+        });
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String errorMsg = response.getErrors().toString().replace("[", "").replace("]", "");
+
+        assertEquals("You must enter a valid UK postcode for the " + partyName, errorMsg);
+
     }
 
     @Test
