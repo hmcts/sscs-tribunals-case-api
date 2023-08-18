@@ -906,24 +906,14 @@ wa-task-batch-service:
 wa-task-batch-termination:
   job:
     kind: CronJob
-    useInterpodAntiAffinity: true
-    image: hmctspublic.azurecr.io/wa/task-batch-service:prod-60334c7-20230810124701 #{"$imagepolicy": "flux-system:wa-task-batch-termination"}
-    chart:
-      spec:
-        chart: ./stable/wa-task-batch-service
-        sourceRef:
-          kind: GitRepository
-          name: hmcts-charts
-          namespace: flux-system
-        interval: 1m
-      releaseNameOverride: ${SERVICE_NAME}-wa-task-batch-termination
-      name: ${SERVICE_NAME}-wa-task-batch-termination
-      schedule: "*/5 * * * *"
-      aadIdentityName: wa
-      keyVaults:
-        wa:
-          secrets:
-            - s2s-secret-task-monitor
+    releaseNameOverride: ${SERVICE_NAME}-wa-task-batch-termination
+    name: ${SERVICE_NAME}-wa-task-batch-termination
+    schedule: "*/5 * * * *"
+    aadIdentityName: wa
+    keyVaults:
+      wa:
+        secrets:
+          - s2s-secret-task-monitor
     environment:
       S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
       S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
