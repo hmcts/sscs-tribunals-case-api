@@ -903,7 +903,7 @@ wa-task-batch-service:
       JOB_NAME: "INITIATION"
       ALLOW_CONFIG_MUTATIONS: true
 
-wa-task-batch-termination:
+wa-task-batch-service:
   job:
     kind: CronJob
     releaseNameOverride: ${SERVICE_NAME}-wa-task-batch-termination
