@@ -6,13 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -171,21 +176,24 @@ class PdfRequestUtilTest {
         sscsCaseData.getDocumentGeneration().setBodyContent(EXPECTED_CONTENT);
         sscsCaseData.getPostHearing().setReviewType(null);
         assertThat(PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(sscsCaseData,
-                NoticeIssuedTemplateBody.builder().build(), true, true).getNoticeBody()).isEqualTo(EXPECTED_CONTENT);
+                NoticeIssuedTemplateBody.builder().build(), true, true)
+                .getNoticeBody()).isEqualTo(EXPECTED_CONTENT);
     }
 
     @Test
     void getNoticeBody_returnsBodyContentWhenPostHearingsIsDisabled() {
         sscsCaseData.getDocumentGeneration().setBodyContent(EXPECTED_CONTENT);
         assertThat(PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(sscsCaseData,
-                NoticeIssuedTemplateBody.builder().build(), false, false).getNoticeBody()).isEqualTo(EXPECTED_CONTENT);
+                NoticeIssuedTemplateBody.builder().build(), false, false)
+                .getNoticeBody()).isEqualTo(EXPECTED_CONTENT);
     }
 
     @Test
     void getNoticeBody_returnsDirectionNoticeContentWhenBodyContentIsNull() {
         sscsCaseData.getDocumentGeneration().setDirectionNoticeContent(EXPECTED_CONTENT);
         assertThat(PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(sscsCaseData,
-                NoticeIssuedTemplateBody.builder().build(), false, false).getNoticeBody()).isEqualTo(EXPECTED_CONTENT);
+                NoticeIssuedTemplateBody.builder().build(), false, false)
+                .getNoticeBody()).isEqualTo(EXPECTED_CONTENT);
     }
 
     @Test
@@ -259,6 +267,53 @@ class PdfRequestUtilTest {
     void givenPostHearingReviewTypeIsNull_getGenerateNoticeReturnsGetGenerateNotice() {
         sscsCaseData.getDocumentGeneration().setGenerateNotice(YES);
         assertThat(PdfRequestUtil.getGenerateNotice(sscsCaseData, true, true)).isEqualTo(YES);
+    }
+
+    @ParameterizedTest
+    @MethodSource("caseDataByPostHearingReviewType")
+    void signedBySignedRole_populatesFromCorrectFields(SscsCaseData sscsCaseData) {
+        NoticeIssuedTemplateBody templateBody = PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(sscsCaseData,
+                NoticeIssuedTemplateBody.builder().build(), true, true);
+        assertThat(templateBody.getNoticeBody()).isEqualTo("body content");
+        assertThat(templateBody.getUserName()).isEqualTo("signed by");
+        assertThat(templateBody.getUserRole()).isEqualTo("signed role");
+    }
+
+    private static Stream<Arguments> caseDataByPostHearingReviewType() {
+        return Stream.of(
+                Arguments.of(SscsCaseData.builder()
+                        .postHearing(PostHearing.builder().reviewType(PostHearingReviewType.SET_ASIDE).build())
+                        .documentGeneration(DocumentGeneration.builder()
+                                .bodyContent("body content")
+                                .signedBy("signed by")
+                                .signedRole("signed role")
+                                .build())
+                        .build()),
+                Arguments.of(SscsCaseData.builder()
+                        .postHearing(PostHearing.builder().reviewType(PostHearingReviewType.CORRECTION).build())
+                        .documentGeneration(DocumentGeneration.builder()
+                                .correctionBodyContent("body content")
+                                .correctionSignedBy("signed by")
+                                .correctionSignedRole("signed role")
+                                .build())
+                        .build()),
+                Arguments.of(SscsCaseData.builder()
+                        .postHearing(PostHearing.builder().reviewType(PostHearingReviewType.STATEMENT_OF_REASONS).build())
+                        .documentGeneration(DocumentGeneration.builder()
+                                .statementOfReasonsBodyContent("body content")
+                                .statementOfReasonsSignedBy("signed by")
+                                .statementOfReasonsSignedRole("signed role")
+                                .build())
+                        .build()),
+                Arguments.of(SscsCaseData.builder()
+                        .postHearing(PostHearing.builder().reviewType(PostHearingReviewType.LIBERTY_TO_APPLY).build())
+                        .documentGeneration(DocumentGeneration.builder()
+                                .libertyToApplyBodyContent("body content")
+                                .libertyToApplySignedBy("signed by")
+                                .libertyToApplySignedRole("signed role")
+                                .build())
+                        .build())
+        );
     }
 
 }

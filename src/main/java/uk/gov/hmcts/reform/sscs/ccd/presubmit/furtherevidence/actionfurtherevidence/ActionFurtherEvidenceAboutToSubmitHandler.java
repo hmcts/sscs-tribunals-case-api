@@ -62,6 +62,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private static final Set<State> ADDITION_VALID_STATES = Set.of(State.DORMANT_APPEAL_STATE,
             State.RESPONSE_RECEIVED,
             State.READY_TO_LIST,
+            State.LISTING_ERROR,
+            State.HANDLING_ERROR,
             State.HEARING,
             State.NOT_LISTABLE,
             State.WITH_DWP,
@@ -484,13 +486,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                                                   PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
                                                   ScannedDocument scannedDocument) {
         //check warning for bundle addition
-        if (!ignoreWarnings && !isBundleAdditionSelectedForActionType(sscsCaseData, scannedDocument)) {
+        boolean isWarningAdded = !isBundleAdditionSelectedForActionType(sscsCaseData, scannedDocument) && !ignoreWarnings;
+
+        if (isWarningAdded) {
             preSubmitCallbackResponse.addWarning(
                 "No documents have been ticked to be added as an addition. These document(s) will NOT be added to "
                     + "the bundle. Are you sure?");
-            return true;
         }
-        return false;
+        return isWarningAdded;
     }
 
     private void setReinstateCaseFieldsIfReinstatementRequest(SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
