@@ -10,7 +10,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.9.11'
     id 'org.owasp.dependencycheck' version '8.3.1'
     id 'au.com.dius.pact' version '4.3.15'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.674'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.771'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -335,11 +335,11 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'SSCS-11855-SNAPSHOT'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'e4cd408'
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.10'
 
-    implementation group: 'com.azure', name: 'azure-core', version: '1.41.0'
-    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.1'
+    implementation group: 'com.azure', name: 'azure-core', version: '1.42.0'
+    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.2'
 
     implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.5.8'
 
@@ -392,8 +392,8 @@ dependencies {
 
     testImplementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version:  '4.5.14'
 
-    testImplementation group: 'com.azure', name: 'azure-core', version: '1.41.0'
-    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.1'
+    testImplementation group: 'com.azure', name: 'azure-core', version: '1.42.0'
+    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.2'
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.37.0'
@@ -558,7 +558,7 @@ bootWithCCD {
     //URLs for services running in Docker require host.docker.internal to resolve properly
     environment 'XUI_DOCUMENTS_API', 'http://host.docker.internal:5005'
     environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
-    environment 'IDAM_SIMULATOR_BASE_URL', 'http://rse-idam-simulator:5000'
+    environment 'IDAM_SIMULATOR_BASE_URL', 'http://rse-idam-simulator:5062'
     //URLs for other services can resolve localhost
     environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
     environment 'S2S_URL', 'http://localhost:4502'
