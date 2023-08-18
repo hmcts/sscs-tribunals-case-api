@@ -19,11 +19,14 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.NamedParameters;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.assertj.core.api.Assertions;
+import org.elasticsearch.cluster.metadata.AliasAction;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -116,8 +119,32 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                             .line1("123 the Street")
                         .postcode("CM120NS")
                         .build())
+                        .appointee(
+                                Appointee.builder()
+                                        .address(Address.builder()
+                                                .line1("123 the Street")
+                                                .postcode("CM120NS")
+                                                .build()
+                                        )
+                                        .build()
+                        )
                     .build())
+                    .rep(Representative.builder().address(Address.builder()
+                            .line1("123 the Street")
+                            .postcode("CM120NS")
+                            .build()
+                    )
+                            .build()
+                    )
                 .build())
+                .jointParty(JointParty.builder()
+                        .address(Address.builder()
+                                .line1("123 the street")
+                                .postcode("CM120NS")
+                                .build()
+                        )
+                        .build()
+                )
             .benefitCode("002")
             .issueCode("DD")
             .build();
@@ -130,9 +157,33 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                             .line1("123 the Street")
                         .postcode("CM120NS")
                         .build())
+                        .appointee(
+                                Appointee.builder()
+                                        .address(Address.builder()
+                                                .line1("123 the Street")
+                                                .postcode("CM120NS")
+                                                .build()
+                                        )
+                                        .build()
+
+                        )
                     .build())
+                    .rep(Representative.builder().address(Address.builder()
+                            .line1("123 the Street")
+                            .postcode("CM120NS")
+                            .build()
+                    )
+                                    .build()
+                    )
                 .build())
-            .build();
+                .jointParty(JointParty.builder()
+                        .address(Address.builder()
+                                .postcode("CM120NS")
+                                .build()
+                        )
+                                .build()
+                )
+                        .build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -199,68 +250,69 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         assertEquals("002DD", response.getData().getCaseCode());
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"appellant","representative","joint party","appointee"})
-    public void givenPartyTypeHasFirstLineOfAddressAndNoPostcode_thenProvideAnError(String partyName) {
 
-        List<Entity> allParties= List.of(
-          callback.getCaseDetails().getCaseData().getAppeal().getAppellant(),
-          callback.getCaseDetails().getCaseData().getAppeal().getRep(),
-          callback.getCaseDetails().getCaseData().getJointParty(),
-          callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAppointee()
-        );
+    @Test
+    public void givenPartyTypeHasFirstLineOfAddressAndNoPostcode_thenProvideAnError() {
 
-        allParties.forEach(party-> {
-            party.getAddress().setLine1("67 Somewhere Road");
-            party.getAddress().setPostcode(null);
-        });
+        var caseData = callback.getCaseDetails().getCaseData();
+
+        caseData.getAppeal().getAppellant().getAddress().setPostcode(null);
+        caseData.getAppeal().getRep().getAddress().setPostcode(null);
+        caseData.getJointParty().getAddress().setPostcode(null);
+        caseData.getAppeal().getAppellant().getAppointee().getAddress().setPostcode(null);
+
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        String errorMsg = response.getErrors().toString().replace("[", "").replace("]", "");
+        Set<String> expectedErrorMessages = Set.of("You must enter a valid UK postcode for the appellant",
+                "You must enter a valid UK postcode for the representative",
+                "You must enter a valid UK postcode for the joint party",
+                "You must enter a valid UK postcode for the appointee");
 
-        assertEquals("You must enter a valid UK postcode for the " + partyName, errorMsg);
-
+        assertThat(response.getErrors(), is(expectedErrorMessages));
     }
 
     @Test
-        public void givenAppellantHasFirstLineOfAddressAndNoPostcode_thenProvideAnError() {
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1("67 Somewhere Road");
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode(null);
+    public void givenPartyTypeHasFirstLineOfAddressAndInvalidPostcode_thenProvideAnError() {
+
+        var caseData = callback.getCaseDetails().getCaseData();
+
+        caseData.getAppeal().getAppellant().getAddress().setPostcode("73GH Y7U");
+        caseData.getAppeal().getRep().getAddress().setPostcode("73GH Y7U");
+        caseData.getJointParty().getAddress().setPostcode("73GH Y7U");
+        caseData.getAppeal().getAppellant().getAppointee().getAddress().setPostcode("73GH Y7U");
+
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        String errorMsg = response.getErrors().toString().replace("[", "").replace("]", "");
+        Set<String> expectedErrorMessages = Set.of("You must enter a valid UK postcode for the appellant",
+                "You must enter a valid UK postcode for the representative",
+                "You must enter a valid UK postcode for the joint party",
+                "You must enter a valid UK postcode for the appointee");
 
-        assertEquals("You must enter a valid UK postcode for the appellant", errorMsg);
+        assertThat(response.getErrors(), is(expectedErrorMessages));
     }
 
     @Test
-    public void givenAppellantHasFirstLineOfAddressAndInvalidPostcode_thenProvideAnError() {
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1("67 Somewhere Road");
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("73GH Y7U");
+    public void givenPartyTypeHasNoFirstLineOfAddressAndValidPostcode_thenProvideAnError() {
+
+        var caseData = callback.getCaseDetails().getCaseData();
+
+        caseData.getAppeal().getAppellant().getAddress().setLine1(null);
+        caseData.getAppeal().getRep().getAddress().setLine1(null);
+        caseData.getJointParty().getAddress().setLine1(null);
+        caseData.getAppeal().getAppellant().getAppointee().getAddress().setLine1(null);
+
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        System.out.println(callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().getLine1());
+        Set<String> expectedErrorMessages = Set.of("You must enter address line 1 for the appellant",
+                "You must enter address line 1 for the representative",
+                "You must enter address line 1 for the joint party",
+                "You must enter address line 1 for the appointee");
 
-        String errorMsg = response.getErrors().toString().replace("[", "").replace("]", "");
-
-        assertEquals("You must enter a valid UK postcode for the appellant", errorMsg);
+        assertThat(response.getErrors(), is(expectedErrorMessages));
     }
-
-    @Test
-    public void givenAppellantHasNoFirstLineOfAddressAndValidPostcode_thenProvideAnError() {
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1("");
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("CM120NS");
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        String errorMsg = response.getErrors().toString().replace("[", "").replace("]", "");
-
-        assertEquals("You must enter address line 1 for the appellant", errorMsg);
-    }
-
 
     @Test
     public void givenAnAppealWithPostcode_updateRpc() {

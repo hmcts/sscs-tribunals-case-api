@@ -131,23 +131,13 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (!hasSystemUserRole) {
             validateAndUpdateDwpHandlingOffice(sscsCaseData, preSubmitCallbackResponse);
             validateHearingOptions(sscsCaseData, preSubmitCallbackResponse);
-            //validateAppellantAddress(sscsCaseData,preSubmitCallbackResponse);
-            findPartyAddresses(sscsCaseData, preSubmitCallbackResponse);
-            if (sscsCaseData.getAppeal().getAppellant().getAppointee() != null) {
-                validateAppointeeAddress(sscsCaseData,preSubmitCallbackResponse);
-            }
-            if (sscsCaseData.getHasRepresentative() != null) {
-                validateRepresentativeAddress(sscsCaseData,preSubmitCallbackResponse);
-            }
-            if (sscsCaseData.getHasJointParty() != null) {
-                validateJointPartyAddress(sscsCaseData,preSubmitCallbackResponse);
-            }
+            validatingPartyAddresses(sscsCaseData, preSubmitCallbackResponse);
         }
 
         return preSubmitCallbackResponse;
     }
 
-    private void validateAddress(PreSubmitCallbackResponse<SscsCaseData> response, Entity party, String partyName) {
+    private void validateAddressAndPostcode(PreSubmitCallbackResponse<SscsCaseData> response, Entity party, String partyName) {
         String addressLine1 = party.getAddress().getLine1();
         String postcode = party.getAddress().getPostcode();
 
@@ -160,80 +150,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private void findPartyAddresses(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        validateAddress(response, sscsCaseData.getAppeal().getAppellant(), "appellant");
-        validateAddress(response, sscsCaseData.getAppeal().getRep(), "representative");
-        validateAddress(response, sscsCaseData.getJointParty(), "joint party");
-        validateAddress(response, sscsCaseData.getAppeal().getAppellant().getAppointee(), "appointee");
-    }
-
-    private void validateAppellantAddress(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        Appellant appellantInfo = sscsCaseData.getAppeal().getAppellant();
-        String addressLine1 = appellantInfo.getAddress().getLine1();
-        String postcode = appellantInfo.getAddress().getPostcode();
-
-        if (!StringUtils.isBlank(addressLine1) || !StringUtils.isBlank(postcode)) {
-            if (!StringUtils.isBlank(addressLine1)) {
-                if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
-                    response.addError("You must enter a valid UK postcode for the appellant");
-                }
-            } else {
-                if (!StringUtils.isBlank(postcode) && postcodeValidator.isValid(postcode, context)) {
-                    response.addError("You must enter address line 1 for the appellant");
-                }
-            }
-        }
-    }
-
-    private void validateRepresentativeAddress(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        Representative representativeInfo = sscsCaseData.getAppeal().getRep();
-        String addressLine1 = representativeInfo.getAddress().getLine1();
-        String postcode = representativeInfo.getAddress().getPostcode();
-
-        if (!StringUtils.isBlank(addressLine1)) {
-            if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
-                response.addError("You must enter a valid UK postcode for the representative");
-            }
-        } else {
-            if (!StringUtils.isBlank(postcode) && postcodeValidator.isValid(postcode, context)) {
-                response.addError("You must enter address line 1 for the representative");
-            }
-        }
-    }
-
-    private void validateJointPartyAddress(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        JointParty jointPartyInfo = sscsCaseData.getJointParty();
-        String addressLine1 = jointPartyInfo.getAddress().getLine1();
-        String postcode = jointPartyInfo.getAddress().getPostcode();
-
-        if (!StringUtils.isBlank(addressLine1)) {
-            if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
-                response.addError("You must enter a valid UK postcode for the Joint Party");
-            }
-        } else {
-            if (!StringUtils.isBlank(postcode) && postcodeValidator.isValid(postcode, context)) {
-                response.addError("You must enter address line 1 for the Joint Party");
-            }
-        }
-    }
-
-    private void validateAppointeeAddress(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-        Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
-        String addressLine1 = appointeeInfo.getAddress().getLine1();
-        String postcode = appointeeInfo.getAddress().getPostcode();
-
-        if (isNotBlank(addressLine1) || isNotBlank(postcode)) {
-            if (!StringUtils.isBlank(addressLine1)) {
-                if (StringUtils.isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
-                    response.addError("You must enter a valid UK postcode for the Appointee ");
-                }
-            } else {
-                if (!StringUtils.isBlank(postcode) && postcodeValidator.isValid(postcode, context)) {
-                    response.addError("You must enter address line 1 for the Appointee");
-                }
-            }
-        }
-
+    private void validatingPartyAddresses(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant(), "appellant");
+        validateAddressAndPostcode(response, sscsCaseData.getAppeal().getRep(), "representative");
+        validateAddressAndPostcode(response, sscsCaseData.getJointParty(), "joint party");
+        validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant().getAppointee(), "appointee");
     }
 
     private void validateAndUpdateDwpHandlingOffice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
