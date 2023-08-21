@@ -96,6 +96,14 @@ dependencies:
     version: ~0.0.15
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wa.enabled
+  - name: wa-task-batch-service
+    version: ~0.0.15
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: wa-task-batch-termination.enabled
+  - name: wa-task-batch-service
+    version: ~0.0.15
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: wa-task-batch-reconfiguration.enabled
   - name: wa-message-cron-service
     version: ~0.0.3
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
