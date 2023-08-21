@@ -36,7 +36,6 @@ import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
-import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewMidEventHandlerTest {
@@ -61,15 +60,12 @@ class PostHearingReviewMidEventHandlerTest {
     @Mock
     private DocumentConfiguration documentConfiguration;
 
-    @Mock
-    private UserDetailsService userDetailsService;
-
     private PostHearingReviewMidEventHandler handler;
 
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, userDetailsService, true, true);
+        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, true, true);
 
         caseData = SscsCaseData.builder()
             .documentGeneration(DocumentGeneration.builder()
@@ -110,7 +106,7 @@ class PostHearingReviewMidEventHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, userDetailsService, false, false);
+        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, false, false);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
@@ -141,7 +137,7 @@ class PostHearingReviewMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        DocumentLink previewDocument = response.getData().getDocumentStaging().getPreviewDocument();
+        DocumentLink previewDocument = response.getData().getDocumentStaging().getPostHearingPreviewDocument();
         assertThat(previewDocument).isNotNull();
 
         String expectedFilename = String.format("%s Granted Decision Notice issued on %s.pdf",
@@ -183,7 +179,7 @@ class PostHearingReviewMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        DocumentLink previewDocument = response.getData().getDocumentStaging().getPreviewDocument();
+        DocumentLink previewDocument = response.getData().getDocumentStaging().getPostHearingPreviewDocument();
         assertThat(previewDocument).isNotNull();
 
         String expectedFilename = String.format("Decision Notice issued on %s.pdf",

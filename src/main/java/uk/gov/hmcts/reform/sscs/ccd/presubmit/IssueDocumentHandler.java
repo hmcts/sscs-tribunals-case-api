@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 
 @Slf4j
 public class IssueDocumentHandler {
-
     private static final String GLASGOW = "GLASGOW";
 
     // Fields used for a short period in case progression are transient,

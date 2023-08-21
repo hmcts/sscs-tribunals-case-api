@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @Slf4j
 public abstract class IssueNoticeHandler extends IssueDocumentHandler {
-
     protected final GenerateFile generateFile;
     protected final Function<LanguagePreference, String> templateId;
     protected boolean showIssueDate;
