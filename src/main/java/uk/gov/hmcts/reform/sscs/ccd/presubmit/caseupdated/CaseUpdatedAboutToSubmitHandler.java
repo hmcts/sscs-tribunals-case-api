@@ -302,23 +302,23 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void validateAppellantCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         Appellant appellantInfo = sscsCaseData.getAppeal().getAppellant();
 
-            List<String> warnings = validatePartyCaseData(appellantInfo, "Appellant");
+        List<String> warnings = validatePartyCaseData(appellantInfo, "Appellant");
 
-            if (!warnings.isEmpty()) {
-                 response.addWarnings(warnings);
+        if (!warnings.isEmpty()) {
+            response.addWarnings(warnings);
+        }
     }
-}
 
     private void validateAppointeeCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
         Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
 
-        if (sscsCaseData.getAppeal().getAppellant().getIsAppointee().equals("Yes")){
+        if (sscsCaseData.getAppeal().getAppellant().getIsAppointee().equals("Yes")) {
 
             List<String> warnings = validatePartyCaseData(appointeeInfo, "Appointee");
 
             if (!warnings.isEmpty()) {
-                 response.addWarnings(warnings);
-             }
+                response.addWarnings(warnings);
+            }
         }
     }
 
