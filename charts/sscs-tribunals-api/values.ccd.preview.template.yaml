@@ -909,7 +909,7 @@ wa-task-batch-termination:
     job:
       kind: CronJob
       releaseNameOverride: ${SERVICE_NAME}-wa-task-batch-termination
-      name: ${SERVICE_NAME}-wa-task-batch-service
+      name: ${SERVICE_NAME}-wa-task-batch-termination
       schedule: "*/5 * * * *"
       aadIdentityName: wa
       keyVaults:
