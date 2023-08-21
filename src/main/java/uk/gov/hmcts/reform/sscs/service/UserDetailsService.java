@@ -4,6 +4,7 @@ import static java.util.Objects.isNull;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.idam.UserRole;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 public class UserDetailsService {
     protected final IdamClient idamClient;
@@ -59,6 +61,9 @@ public class UserDetailsService {
         UserInfo userInfo = getUserInfo(userAuthorisation);
 
         String idamId = userInfo.getUid();
+
+        log.info("getting personal code for idamId: {}", idamId);
+
         String personalCode = judicialRefDataService.getPersonalCode(idamId);
 
         return new JudicialUserBase(idamId, personalCode);
