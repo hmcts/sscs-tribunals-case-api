@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidential
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.validation.ConstraintValidatorContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +31,6 @@ import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
-import javax.validation.ConstraintValidatorContext;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
@@ -141,11 +141,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         String addressLine1 = party.getAddress().getLine1();
         String postcode = party.getAddress().getPostcode();
 
-        if(isBlank(addressLine1)){
+        if (isBlank(addressLine1)) {
             response.addError("You must enter address line 1 for the " + partyName);
         }
 
-        if(isBlank(postcode) || !isBlank(postcode) && !postcodeValidator.isValid(postcode, context)){
+        if (isBlank(postcode) || !isBlank(postcode) && !postcodeValidator.isValid(postcode, context)) {
             response.addError("You must enter a valid UK postcode for the " + partyName);
         }
     }

@@ -20,18 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import junitparams.JUnitParamsRunner;
-import junitparams.NamedParameters;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.assertj.core.api.Assertions;
-import org.elasticsearch.cluster.metadata.AliasAction;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
