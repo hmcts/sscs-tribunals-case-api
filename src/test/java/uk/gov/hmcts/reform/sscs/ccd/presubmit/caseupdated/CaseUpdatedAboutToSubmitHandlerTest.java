@@ -117,7 +117,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             .issueCode("DD")
             .build();
 
-        sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
 
         sscsCaseDataBefore = SscsCaseData.builder()
             .ccdCaseId("ccdId")
@@ -200,7 +199,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .address(Address.builder().line1("").line2("").postcode("").build())
                 .identity(Identity.builder().nino("").dob("").build())
                 .build();
-        appellant.setIsAppointee("No");
         callback.getCaseDetails().getCaseData().getAppeal().setAppellant(appellant);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -209,11 +207,13 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     public void givenACaseUpdatedEventWithEmptyAppointeeDetails_thenProvideAnError() {
+        sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
         Appointee appointee = Appointee.builder()
                 .name(Name.builder().firstName("").lastName("").build())
                 .address(Address.builder().line1("").line2("").postcode("").build())
                 .identity(Identity.builder().nino("").dob("").build())
                 .build();
+
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(appointee);
         callback.getCaseDetails().getCaseData().setHasOtherPartyAppointee(YES);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -267,7 +267,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         Appellant appellant = Appellant.builder()
                 .identity(Identity.builder().nino("AB223344B").dob("1995-12-20").build())
                 .build();
-        appellant.setIsAppointee("No");
 
 
         SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
@@ -972,7 +971,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                                 .identity(Identity.builder().dob("1").nino("Nino").build())
                                 .build())
                         .build());
-        sscsCaseData.getAppeal().getAppellant().setIsAppointee("No");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals("New Name", response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
         assertEquals("New Name", response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
@@ -989,7 +987,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                                 .identity(Identity.builder().dob("1").nino("Nino").build())
                                 .build())
                         .build());
-        sscsCaseData.getAppeal().getAppellant().setIsAppointee("No");
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -1008,7 +1005,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .benefitType(new BenefitType("UC", "Universal credit"))
                 .appellant(Appellant.builder().build())
                 .build());
-        sscsCaseData.getAppeal().getAppellant().setIsAppointee("No");
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -1032,7 +1028,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                     .identity(Identity.builder().dob("1").nino("Nino").build())
                 .build())
             .build());
-        sscsCaseData.getAppeal().getAppellant().setIsAppointee("No");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -1066,7 +1061,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                         .identity(Identity.builder().dob("1").nino("Nino").build())
                         .build())
                 .build());
-        sscsCaseData.getAppeal().getAppellant().setIsAppointee("No");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals("universalCredit", response.getData().getCaseAccessManagementFields().getCaseAccessCategory());
         assertEquals("Universal Credit", response.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getLabel());
@@ -1093,7 +1087,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                         .identity(Identity.builder().dob("1").nino("Nino").build())
                         .build())
                 .build());
-        sscsCaseData.getAppeal().getAppellant().setIsAppointee("No");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
@@ -1116,7 +1109,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                         .identity(Identity.builder().dob("1").nino("Nino").build())
                         .build())
                 .build());
-        sscsCaseData.getAppeal().getAppellant().setIsAppointee("No");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getWarnings().size());
@@ -1139,7 +1131,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                         .identity(Identity.builder().dob("1").nino("Nino").build())
                         .build())
                 .build());
-        sscsCaseData.getAppeal().getAppellant().setIsAppointee("No");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("personalIndependencePayment", response.getData().getCaseAccessManagementFields().getCaseAccessCategory());
@@ -1164,7 +1155,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                         .identity(Identity.builder().dob("1").nino("Nino").build())
                         .build())
                 .build());
-        sscsCaseData.getAppeal().getAppellant().setIsAppointee("No");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());

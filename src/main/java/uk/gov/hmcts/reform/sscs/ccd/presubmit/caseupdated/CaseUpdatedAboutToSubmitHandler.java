@@ -311,9 +311,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateAppointeeCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
         Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
+        String isAppointee = sscsCaseData.getAppeal().getAppellant().getIsAppointee();
 
-        if (sscsCaseData.getAppeal().getAppellant().getIsAppointee().equals("Yes")) {
-
+        if (isAppointee != null && isAppointee.equals("Yes") && appointeeInfo != null) {
             List<String> warnings = validatePartyCaseData(appointeeInfo, "Appointee");
 
             if (!warnings.isEmpty()) {
