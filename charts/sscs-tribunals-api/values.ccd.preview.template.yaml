@@ -566,7 +566,7 @@ sscs-evidence-share:
 sscs-tya-notif:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2411
+    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2404
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
@@ -586,7 +586,7 @@ sscs-tya-notif:
       TEST_RECIPIENTS_POSTCODE: "*"
       POST_HEARINGS_FEATURE: true
       POST_HEARINGS_B_FEATURE: true
-      DUMMY: false
+      DUMMY: true
     secrets:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
