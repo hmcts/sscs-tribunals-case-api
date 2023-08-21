@@ -301,19 +301,24 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateAppellantCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         Appellant appellantInfo = sscsCaseData.getAppeal().getAppellant();
-        List<String> warnings = validatePartyCaseData(appellantInfo, "Appellant");
 
-        if (!warnings.isEmpty()) {
-            response.addWarnings(warnings);
-        }
+            List<String> warnings = validatePartyCaseData(appellantInfo, "Appellant");
+
+            if (!warnings.isEmpty()) {
+                 response.addWarnings(warnings);
     }
+}
 
     private void validateAppointeeCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
         Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
-        List<String> warnings = validatePartyCaseData(appointeeInfo, "Appointee");
 
-        if (!warnings.isEmpty()) {
-            response.addWarnings(warnings);
+        if (sscsCaseData.getAppeal().getAppellant().getIsAppointee().equals("Yes")){
+
+            List<String> warnings = validatePartyCaseData(appointeeInfo, "Appointee");
+
+            if (!warnings.isEmpty()) {
+                 response.addWarnings(warnings);
+             }
         }
     }
 
