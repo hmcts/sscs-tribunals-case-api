@@ -49,7 +49,7 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
         if (response.getErrors().isEmpty()) {
             postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.DWP);
             List<SscsDocument> documents = sscsCaseData.getSscsDocument();
-            SscsUtil.addDocumentToBundle(footerService, sscsCaseData, documents.get(documents.size() - 1), false);
+            SscsUtil.addDocumentToBundle(footerService, sscsCaseData, documents.get(documents.size() - 1), callback.getEvent(), false);
         }
 
         return response;

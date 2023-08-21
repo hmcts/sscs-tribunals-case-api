@@ -82,11 +82,11 @@ public class SscsUtil {
         caseData.setSscsDocument(documents);
     }
 
-    public static void addDocumentToBundle(FooterService footerService, SscsCaseData sscsCaseData, SscsDocument sscsDocument, boolean shouldAddToDocuments) {
+    public static void addDocumentToBundle(FooterService footerService, SscsCaseData sscsCaseData, SscsDocument sscsDocument, EventType eventType, boolean shouldAddToDocuments) {
         DocumentLink url = sscsDocument.getValue().getDocumentLink();
         DocumentType documentType = DocumentType.fromValue(sscsDocument.getValue().getDocumentType());
         String dateIssued = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, null, null, null, shouldAddToDocuments);
+        footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, null, null, eventType, shouldAddToDocuments);
     }
 
     public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {
