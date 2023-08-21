@@ -90,7 +90,7 @@ public class CitizenLoginServiceTest {
         SscsCaseDetails sscsCaseDetails1 = SscsCaseDetails.builder().id(111L).data(SscsCaseData.builder()
                 .subscriptions(Subscriptions.builder()
                         .appellantSubscription(Subscription.builder()
-                            .email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build()).build()).build();
+                                .email(SUBSCRIPTION_EMAIL_ADDRESS).build()).build()).build()).build();
         SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).data(SscsCaseData.builder()
                 .subscriptions(Subscriptions.builder()
                         .appellantSubscription(Subscription.builder()

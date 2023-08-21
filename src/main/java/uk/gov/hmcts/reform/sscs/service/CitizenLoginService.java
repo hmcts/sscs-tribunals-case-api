@@ -58,7 +58,7 @@ public class CitizenLoginService {
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
                 .peek(this::attachOtherPartyDetails)
-                .collect(toList());
+                .toList();
         if (!isBlank(tya)) {
             log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
             List<OnlineHearing> convert = convert(
