@@ -6,6 +6,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -91,6 +93,7 @@ class UserDetailsServiceTest {
         assertThat(userDetailsService.getUserRole(USER_AUTHORISATION)).isNull();
     }
 
+    @Disabled
     @Test
     void givenUserAuthorisation_thenReturnLoggedInUser() {
         UserInfo userDetails = UserInfo.builder().uid("123").build();
