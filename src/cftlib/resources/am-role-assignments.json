@@ -58,5 +58,25 @@
       }
     ],
     "overrideAll": true
+  },
+  {
+    "email": "judge@example.com",
+    "id": "fbd1ba5b-9251-3bd7-b8d1-677d8e5ccbb6",
+    "roleAssignments": [
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "judge",
+        "grantType": "STANDARD",
+        "roleCategory": "JUDICIAL",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "Benefit",
+          "jurisdiction": "SSCS"
+        },
+        "authorisations": []
+      }
+    ],
+    "overrideAll": true
   }
 ]
