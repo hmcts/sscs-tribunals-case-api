@@ -1,16 +1,16 @@
 plugins {
     id 'application'
     id 'pmd'
-    id 'org.sonarqube' version '4.2.1.3168'
+    id 'org.sonarqube' version '4.3.0.3225'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.7.12'
+    id 'org.springframework.boot' version '2.7.14'
     id 'uk.gov.hmcts.java' version '0.12.43'
     id 'com.gorylenko.gradle-git-properties' version '2.4.1'
     id 'com.github.ben-manes.versions' version '0.46.0'
     id "info.solidsoft.pitest" version '1.9.11'
     id 'org.owasp.dependencycheck' version '8.3.1'
     id 'au.com.dius.pact' version '4.3.15'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.674'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.771'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -28,8 +28,11 @@ gitProperties {
 group = 'uk.gov.hmcts.reform'
 version = '1.0.0'
 
-sourceCompatibility = 11
-targetCompatibility = 11
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
 
 compileJava {
     options.compilerArgs << '-parameters' << '-Xlint:deprecation' << "-Xlint:unchecked"
@@ -260,7 +263,7 @@ dependencyManagement {
         }
 
         // CVE-2022-41881, CVE-2022-41915
-        dependencySet(group: 'io.netty', version: '4.1.94.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.95.Final') {
             entry 'netty-buffer'
             entry 'netty-common'
             entry 'netty-codec'
@@ -283,12 +286,13 @@ dependencyManagement {
         }
 
         imports {
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.7"
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.8"
         }
     }
 }
 
 dependencies {
+    implementation group: 'org.springframework.boot', name: 'spring-boot-autoconfigure'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
@@ -296,14 +300,17 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-activemq'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security'
 
-    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.8.3'
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.3'
-    implementation group: 'org.springframework.security', name: 'spring-security-config', version: '5.8.3'
-    implementation group: 'org.springframework.security', name: 'spring-security-web', version: '5.8.3'
+    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.8.5'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.5'
+    implementation group: 'org.springframework.security', name: 'spring-security-config', version: '5.8.5'
+    implementation group: 'org.springframework.security', name: 'spring-security-web', version: '5.8.5'
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.4'
+    implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
 
     implementation group: 'com.google.guava', name: 'guava', version: '32.1.1-jre'
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.10'
@@ -328,11 +335,11 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'c17738c'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.4'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.26.10'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.10'
 
-    implementation group: 'com.azure', name: 'azure-core', version: '1.41.0'
-    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.1'
+    implementation group: 'com.azure', name: 'azure-core', version: '1.42.0'
+    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.2'
 
     implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.5.8'
 
@@ -385,8 +392,8 @@ dependencies {
 
     testImplementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version:  '4.5.14'
 
-    testImplementation group: 'com.azure', name: 'azure-core', version: '1.41.0'
-    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.1'
+    testImplementation group: 'com.azure', name: 'azure-core', version: '1.42.0'
+    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.2'
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.37.0'
@@ -410,6 +417,7 @@ dependencies {
     testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.9.3')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
     testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine'
+    testImplementation group: 'com.h2database', name: 'h2', version: '2.1.214'
 
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
@@ -418,7 +426,7 @@ dependencies {
     //pact contract testing
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
 
-    contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.12'
+    contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.14'
 
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
@@ -550,7 +558,7 @@ bootWithCCD {
     //URLs for services running in Docker require host.docker.internal to resolve properly
     environment 'XUI_DOCUMENTS_API', 'http://host.docker.internal:5005'
     environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
-    environment 'IDAM_SIMULATOR_BASE_URL', 'http://rse-idam-simulator:5000'
+    environment 'IDAM_SIMULATOR_BASE_URL', 'http://rse-idam-simulator:5062'
     //URLs for other services can resolve localhost
     environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
     environment 'S2S_URL', 'http://localhost:4502'

@@ -73,7 +73,7 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
 
         boolean isSetAsideRefusedSor = isSetAsideRefusedSor(postHearing);
 
-        SscsUtil.clearPostHearingFields(caseData);
+        SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
 
         caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
 

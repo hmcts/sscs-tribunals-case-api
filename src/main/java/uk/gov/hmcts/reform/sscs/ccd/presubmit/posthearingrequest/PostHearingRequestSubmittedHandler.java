@@ -59,7 +59,7 @@ public class PostHearingRequestSubmittedHandler implements PreSubmitCallbackHand
             return response;
         }
 
-        SscsUtil.clearPostHearingFields(caseData);
+        SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
 
         caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
 
