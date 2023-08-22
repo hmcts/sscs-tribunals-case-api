@@ -849,7 +849,7 @@ wa-case-event-handler:
       AZURE_SERVICE_BUS_CONNECTION_STRING: ${SERVICE_BUS_CONNECTION_STRING}
       AZURE_SERVICE_BUS_TOPIC_NAME: ccd-case-events
       AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: ccd-case-events
-      AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME: ccd-case-events
+      AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME: sscs-tribunals-api-pr-3156
       POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
       POSTGRES_NAME: wa-case-event-handler
       POSTGRES_USERNAME: hmcts
@@ -880,6 +880,7 @@ wa-message-cron-service:
     releaseNameOverride: ${SERVICE_NAME}-wa-message-cron-service
     environment:
       WA_CASE_EVENT_HANDLER_SERVICE_URL: http://{{ .Release.Name }}-wa-case-event-handler
+
 
 wa:
   enabled: true
@@ -943,6 +944,7 @@ wa-reconfiguration-batch:
       WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
       JOB_NAME: "RECONFIGURATION"
       ALLOW_CONFIG_MUTATIONS: true
+
 
 ccd-message-publisher:
   java:
