@@ -1,0 +1,18 @@
+job:
+  image: hmctspublic.azurecr.io/wa/task-batch-service:latest
+  schedule: "*/5 * * * *"
+  aadIdentityName: wa
+  keyVaults:
+    wa:
+      secrets:
+        - s2s-secret-task-monitor
+  environment:
+    S2S_URL: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
+    WA_TASK_MONITOR_SERVICE_URL: "http://wa-task-monitor-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    JOB_NAME: "TERMINATION"
+    ALLOW_CONFIG_MUTATIONS: true
+global:
+  jobKind: CronJob
+  enableKeyVaults: true
+  environment: aat
