@@ -889,11 +889,12 @@ wa:
     enabled: true
   terminationBatchCron:
     enabled: true
+
 wa-initiation-batch:
   job:
     kind: CronJob
-    releaseNameOverride: ${SERVICE_NAME}-wa-task-batch-service
-    name: ${SERVICE_NAME}-wa-task-batch-service
+    releaseNameOverride: ${SERVICE_NAME}-wa-initiation-batch
+    name: ${SERVICE_NAME}-wa-initiation-batch
     schedule: "*/5 * * * *"
     aadIdentityName: wa
     keyVaults:
@@ -910,8 +911,8 @@ wa-initiation-batch:
 wa-termination-batch:
   job:
     kind: CronJob
-    releaseNameOverride: ${SERVICE_NAME}-wa-task-batch-termination
-    name: ${SERVICE_NAME}-wa-task-batch-termination
+    releaseNameOverride: ${SERVICE_NAME}-wa-termination-batch
+    name: ${SERVICE_NAME}-wa-termination-batch
     schedule: "*/5 * * * *"
     aadIdentityName: wa
     keyVaults:
@@ -928,8 +929,8 @@ wa-termination-batch:
 wa-reconfiguration-batch:
   job:
     kind: CronJob
-    releaseNameOverride: ${SERVICE_NAME}-wa-task-batch-reconfiguration
-    name: ${SERVICE_NAME}-wa-task-batch-reconfiguration
+    releaseNameOverride: ${SERVICE_NAME}-wa-job-reconfiguration
+    name: ${SERVICE_NAME}-wa-job-reconfiguration
     schedule: "*/5 * * * *"
     aadIdentityName: wa
     keyVaults:
