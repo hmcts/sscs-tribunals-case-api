@@ -203,6 +203,7 @@ public class Sscs1PdfHandlerTest {
         when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
 
         callback.getCaseDetails().getCaseData().setCaseCreated(null);
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().hearingRoute(HearingRoute.GAPS).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
