@@ -354,7 +354,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             List<JudicialUserBase> panelMembers = adjournment.getPanelMembers();
 
             try {
-                //adjournment.setSignedInUser(userDetailsService.getLoggedInUserAsJudicialUser(userAuthorisation));
+                adjournment.setSignedInUser(userDetailsService.getLoggedInUserAsJudicialUser(userAuthorisation));
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
