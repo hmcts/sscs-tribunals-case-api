@@ -66,6 +66,9 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     @Mock
     private ListAssistHearingMessageHelper hearingMessageHelper;
 
+    @Mock
+    private VenueDataLoader venueDataLoader;
+
     private SscsCaseData sscsCaseData;
 
     private DocumentLink documentLink;
@@ -84,7 +87,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), Arrays.asList(esaecisionNoticeOutcomeService), new ArrayList<>());
 
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, userDetailsService,
-                validator, hearingMessageHelper, false);
+                validator, hearingMessageHelper, venueDataLoader, false);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

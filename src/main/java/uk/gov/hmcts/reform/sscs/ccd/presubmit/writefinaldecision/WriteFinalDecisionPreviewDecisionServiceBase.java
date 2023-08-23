@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getLastValidHearing;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -93,22 +94,27 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             builder.idamSurname(buildSignedInJudgeSurname(userAuthorisation));
         }
 
+        WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
+
+        setHearings(writeFinalDecisionBuilder, caseData);
+
+        String heldAt = writeFinalDecisionBuilder.build().getHeldAt();
         String heldBefore = buildHeldBefore(caseData, userAuthorisation);
 
         if (isPostHearingsEnabled) {
             if (isNull(finalDecisionCaseData.getFinalDecisionHeldBefore())) {
                 finalDecisionCaseData.setFinalDecisionHeldBefore(heldBefore);
+                finalDecisionCaseData.setFinalDecisionHeldAt(heldAt);
             }
 
             heldBefore = finalDecisionCaseData.getFinalDecisionHeldBefore();
+            heldAt = finalDecisionCaseData.getFinalDecisionHeldAt();
         }
 
-        WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
         writeFinalDecisionBuilder.heldBefore(heldBefore);
+        writeFinalDecisionBuilder.heldAt(heldAt);
 
         writeFinalDecisionBuilder.summaryOfOutcomeDecision(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDetailsOfDecision());
-
-        setHearings(writeFinalDecisionBuilder, caseData);
 
         Outcome outcome = decisionNoticeOutcomeService.determineOutcome(caseData);
         if (outcome == null) {
@@ -216,10 +222,12 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
                 if (finalHearing.getHearingDate() != null) {
                     writeFinalDecisionBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
                 }
+
                 if (finalHearing.getVenue() != null) {
                     String venueName = venueDataLoader.getGapVenueName(finalHearing.getVenue(), finalHearing.getVenueId());
                     writeFinalDecisionBuilder.heldAt(venueName);
                 }
+
                 return;
             }
         }

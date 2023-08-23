@@ -12,9 +12,11 @@ import java.util.List;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Slf4j
@@ -192,5 +194,35 @@ public class SscsUtil {
             names.add(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionOtherPanelMemberName());
         }
         return StringUtils.getGramaticallyJoinedStrings(names);
+    }
+
+    public static String buildWriteFinalDecisionHeldAt(SscsCaseData caseData, VenueDataLoader venueDataLoader) {
+        if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
+            HearingDetails finalHearing = getLastValidHearing(caseData);
+            if (nonNull(finalHearing)) {
+                if (nonNull(finalHearing.getVenue())) {
+                    return venueDataLoader.getGapVenueName(finalHearing.getVenue(), finalHearing.getVenueId());
+                }
+
+                return "";
+            }
+        }
+
+        return "In Chambers";
+    }
+
+    public static HearingDetails getLastValidHearing(SscsCaseData caseData) {
+        for (Hearing hearing : caseData.getHearings()) {
+            if (hearing != null) {
+                HearingDetails hearingDetails = hearing.getValue();
+                if (hearingDetails != null
+                        && org.apache.commons.lang3.StringUtils.isNotBlank(hearingDetails.getHearingDate())
+                        && hearingDetails.getVenue() != null
+                        && org.apache.commons.lang3.StringUtils.isNotBlank(hearingDetails.getVenue().getName())) {
+                    return hearingDetails;
+                }
+            }
+        }
+        return null;
     }
 }

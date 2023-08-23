@@ -2,14 +2,11 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
@@ -74,21 +71,6 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
         }
         return WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getName()
                 .getFullNameNoTitle(), ' ', '.');
-    }
-
-    protected HearingDetails getLastValidHearing(SscsCaseData caseData) {
-        for (Hearing hearing : caseData.getHearings()) {
-            if (hearing != null) {
-                HearingDetails hearingDetails = hearing.getValue();
-                if (hearingDetails != null
-                    && StringUtils.isNotBlank(hearingDetails.getHearingDate())
-                    && hearingDetails.getVenue() != null
-                    && StringUtils.isNotBlank(hearingDetails.getVenue().getName())) {
-                    return hearingDetails;
-                }
-            }
-        }
-        return null;
     }
 
     protected String buildSignedInJudgeName(String userAuthorisation) {

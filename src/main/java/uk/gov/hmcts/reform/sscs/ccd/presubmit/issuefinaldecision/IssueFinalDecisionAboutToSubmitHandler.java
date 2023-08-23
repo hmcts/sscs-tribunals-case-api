@@ -28,21 +28,18 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
-import uk.gov.hmcts.reform.sscs.service.FooterService;
-import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.*;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
 public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
     private final FooterService footerService;
     private final DecisionNoticeService decisionNoticeService;
     private final UserDetailsService userDetailsService;
     private final Validator validator;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
+    private final VenueDataLoader venueDataLoader;
     private boolean isScheduleListingEnabled;
     @Value("${feature.snl.adjournment.enabled}")
     private boolean isAdjournmentEnabled;
@@ -54,12 +51,14 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                                                   UserDetailsService userDetailsService,
                                                   Validator validator,
                                                   ListAssistHearingMessageHelper hearingMessageHelper,
+                                                  VenueDataLoader venueDataLoader,
                                                   @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
         this.footerService = footerService;
         this.decisionNoticeService = decisionNoticeService;
         this.userDetailsService = userDetailsService;
         this.validator = validator;
         this.hearingMessageHelper = hearingMessageHelper;
+        this.venueDataLoader = venueDataLoader;
         this.isScheduleListingEnabled = isScheduleListingEnabled;
     }
 
@@ -99,6 +98,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             if (isNull(finalDecisionCaseData.getFinalDecisionIssuedDate())) {
                 finalDecisionCaseData.setFinalDecisionIssuedDate(LocalDate.now());
                 finalDecisionCaseData.setFinalDecisionHeldBefore(SscsUtil.buildWriteFinalDecisionHeldBefore(sscsCaseData, userDetailsService.buildLoggedInUserName(userAuthorisation)));
+                finalDecisionCaseData.setFinalDecisionHeldAt(SscsUtil.buildWriteFinalDecisionHeldAt(sscsCaseData, venueDataLoader));
             }
         }
 
