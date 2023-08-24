@@ -1065,7 +1065,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Test
     public void givenOldCaseNameExists_shouldStillSetNewCaseName() {
         sscsCaseDataBefore.getCaseAccessManagementFields().setCaseNameHmctsInternal("Harvey Specter");
-        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setName(new Name("", "Louis", "Litt" ));
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setName(new Name("", "Louis", "Litt"));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
