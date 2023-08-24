@@ -208,7 +208,7 @@ public class SscsUtil {
             }
         }
 
-        return "In Chambers";
+        return "In chambers";
     }
 
     public static HearingDetails getLastValidHearing(SscsCaseData caseData) {

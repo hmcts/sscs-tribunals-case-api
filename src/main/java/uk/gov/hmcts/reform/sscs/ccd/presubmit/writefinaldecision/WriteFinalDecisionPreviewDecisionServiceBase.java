@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getLastValidHearing;
 
@@ -216,23 +217,20 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData, WriteFinalDecisionTemplateBody payload);
 
     private void setHearings(WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder, SscsCaseData caseData) {
-        if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
+        String heldAt = SscsUtil.buildWriteFinalDecisionHeldAt(caseData, venueDataLoader);
+
+        if (!"In chambers".equals(heldAt)) {
             HearingDetails finalHearing = getLastValidHearing(caseData);
-            if (finalHearing != null) {
-                if (finalHearing.getHearingDate() != null) {
-                    writeFinalDecisionBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
-                }
 
-                if (finalHearing.getVenue() != null) {
-                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getVenue(), finalHearing.getVenueId());
-                    writeFinalDecisionBuilder.heldAt(venueName);
-                }
-
-                return;
+            if (nonNull(finalHearing) && nonNull(finalHearing.getHearingDate())) {
+                writeFinalDecisionBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
             }
+        } else {
+            writeFinalDecisionBuilder.heldOn(LocalDate.now());
         }
-        writeFinalDecisionBuilder.heldOn(LocalDate.now());
-        writeFinalDecisionBuilder.heldAt("In chambers");
+
+
+        writeFinalDecisionBuilder.heldAt(heldAt);
     }
 
     protected abstract void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData);
