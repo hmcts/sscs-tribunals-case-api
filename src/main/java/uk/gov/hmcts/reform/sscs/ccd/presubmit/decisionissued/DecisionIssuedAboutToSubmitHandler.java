@@ -107,6 +107,9 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
         log.info("Saved the new interloc decision document for case id: " + caseData.getCcdCaseId());
         cancelHearing(callback);
+
+        caseData.setIssueInterlocDecisionDate(LocalDate.now());
+
         return sscsCaseDataPreSubmitCallbackResponse;
     }
 
