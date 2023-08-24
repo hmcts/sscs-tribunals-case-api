@@ -332,4 +332,13 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
             assertEquals("You need to upload PDF documents only", error);
         }
     }
+
+    @Test
+    public void shouldSetIssueDecisionDate() {
+        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, true);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(LocalDate.now(), response.getData().getIssueInterlocDecisionDate());
+    }
 }
