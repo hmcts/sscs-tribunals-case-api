@@ -4,7 +4,7 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -13,13 +13,15 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final PreviewDocumentService previewDocumentService;
+    private final UserDetailsService userDetailsService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -44,6 +46,12 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             sscsCaseData,
             DRAFT_ADJOURNMENT_NOTICE,
             adjournment.getPreviewDocument());
+
+        try {
+            adjournment.setSignedInUser(userDetailsService.getLoggedInUserAsJudicialUser(userAuthorisation));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
 
         adjournment.setGeneratedDate(LocalDate.now());
 
