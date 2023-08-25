@@ -62,9 +62,11 @@ public class UserDetailsService {
 
         String idamId = userInfo.getUid();
 
-        log.info("getting personal code for idamId: {}", idamId);
+        log.info("Getting personal code for idamId: {}", idamId);
 
         String personalCode = judicialRefDataService.getPersonalCode(idamId);
+
+        log.info("Got personal code of {}", personalCode);
 
         return new JudicialUserBase(idamId, personalCode);
     }
