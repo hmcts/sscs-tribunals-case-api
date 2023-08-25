@@ -155,6 +155,12 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                 }
                 throw new IllegalStateException("Post hearings B is not enabled");
             case PERMISSION_TO_APPEAL:
+                if (isPostHearingsBEnabled) {
+                    return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
+                        REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
+                        EventType.PERMISSION_TO_APPEAL_REQUEST, "Permission to appeal request");
+                }
+                throw new IllegalStateException("Post hearings B is not enabled");
             default:
                 throw new IllegalArgumentException("Post hearing request type is not implemented or recognised: " + postHearingRequestType);
         }

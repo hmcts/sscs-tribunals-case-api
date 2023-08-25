@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -104,7 +103,7 @@ public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallba
         OfficeMapping[] offices = service.getDwpOfficeMappings(sscsCaseData.getAppeal().getBenefitType().getCode());
         List<DynamicListItem> listOptions = Arrays.stream(offices)
                 .map(office -> new DynamicListItem(office.getMapping().getCcd(), office.getMapping().getCcd()))
-                .collect(Collectors.toUnmodifiableList());
+                .toList();
 
         DynamicListItem selectedDynamicListItem = selectedOfficeMapping
                 .flatMap(selectedOffice -> listOptions.stream().filter(office -> office.getCode().equals(selectedOffice.getMapping().getCcd())).findFirst()).orElse(new DynamicListItem(null, null));
