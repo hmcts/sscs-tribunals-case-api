@@ -129,9 +129,23 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         }
 
         clearBasicTransientFields(sscsCaseData);
+        clearAdjournmentTransientFields(sscsCaseData);
 
         preSubmitCallbackResponse.getData().getSscsDocument()
                 .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
+    }
+
+    private void clearAdjournmentTransientFields(SscsCaseData caseData) {
+        if (isAdjournmentEnabled) {
+            Adjournment adjournment = caseData.getAdjournment();
+            if (nonNull(adjournment)) {
+                adjournment.setPreviewDocument(null);
+                adjournment.setPanelMembersExcluded(null);
+                adjournment.setPanelMember1(null);
+                adjournment.setPanelMember2(null);
+                adjournment.setPanelMember3(null);
+            }
+        }
     }
 
     private void calculateDueDate(SscsCaseData sscsCaseData) {

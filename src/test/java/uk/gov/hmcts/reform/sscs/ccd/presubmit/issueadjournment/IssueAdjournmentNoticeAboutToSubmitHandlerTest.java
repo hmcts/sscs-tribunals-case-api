@@ -529,4 +529,18 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(sscsCaseData.getSchedulingAndListingFields().getOverrideFields().getHearingWindow()).isNull();
     }
+
+    @Test
+    void adjournmentPanelShouldBeNull() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+        sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
+        sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().idamId("1").build());
+        sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().idamId("3").build());
+
+        var result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        SscsCaseData caseData = result.getData();
+        Adjournment adjournment = caseData.getAdjournment();
+
+        assertThat(adjournment.getPanelMembers()).isNullOrEmpty();
+    }
 }
