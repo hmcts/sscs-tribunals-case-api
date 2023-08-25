@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -92,13 +91,13 @@ class UserDetailsServiceTest {
         assertThat(userDetailsService.getUserRole(USER_AUTHORISATION)).isNull();
     }
 
-    @Disabled
     @Test
     void givenUserAuthorisation_thenReturnLoggedInUser() {
-        UserInfo userDetails = UserInfo.builder().uid("123").build();
+        String idamId = "123";
+        UserInfo userDetails = UserInfo.builder().uid(idamId).build();
         when(idamClient.getUserInfo(USER_AUTHORISATION)).thenReturn(userDetails);
-        when(judicialRefDataService.getPersonalCode("123")).thenReturn("456");
+        when(judicialRefDataService.getJudicialUser(idamId)).thenReturn(new JudicialUserBase(idamId, "456"));
 
-        assertThat(userDetailsService.getLoggedInUserAsJudicialUser(USER_AUTHORISATION)).isEqualTo(new JudicialUserBase("123", "456"));
+        assertThat(userDetailsService.getLoggedInUserAsJudicialUser(USER_AUTHORISATION)).isEqualTo(new JudicialUserBase(idamId, "456"));
     }
 }
