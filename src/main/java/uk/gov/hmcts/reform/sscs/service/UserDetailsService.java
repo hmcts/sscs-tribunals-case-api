@@ -64,10 +64,6 @@ public class UserDetailsService {
 
         log.info("Getting personal code for idamId: {}", idamId);
 
-        JudicialUserBase judicialUserBase = judicialRefDataService.getJudicialUser(idamId);
-
-        log.info("Got personal code of {}", judicialUserBase.getPersonalCode());
-
-        return judicialUserBase;
+        return judicialRefDataService.getJudicialUser(idamId);
     }
 }

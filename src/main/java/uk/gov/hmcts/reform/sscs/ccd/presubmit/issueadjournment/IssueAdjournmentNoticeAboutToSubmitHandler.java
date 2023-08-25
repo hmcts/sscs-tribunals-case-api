@@ -89,7 +89,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             calculateDueDate(sscsCaseData);
 
             if (sscsCaseData.getAdjournment().getPreviewDocument() != null) {
-                processResponse(sscsCaseData, preSubmitCallbackResponse, documentTranslationStatus, userAuthorisation);
+                processResponse(sscsCaseData, preSubmitCallbackResponse, documentTranslationStatus);
             } else {
                 preSubmitCallbackResponse.addError("There is no Draft Adjournment Notice on the case so adjournment cannot be issued");
             }
@@ -99,7 +99,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     }
 
     private void processResponse(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
-        SscsDocumentTranslationStatus documentTranslationStatus, String userAuthorisation) {
+        SscsDocumentTranslationStatus documentTranslationStatus) {
         createAdjournmentNoticeFromPreviewDraft(preSubmitCallbackResponse, documentTranslationStatus);
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
@@ -118,7 +118,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         if (isAdjournmentEnabled) {
             updateHearingOptions(sscsCaseData);
             updateRpc(sscsCaseData);
-            updatePanelMembers(sscsCaseData, userAuthorisation);
+            updatePanelMembers(sscsCaseData);
             updateOverrideFields(sscsCaseData);
 
             if (SscsUtil.isSAndLCase(sscsCaseData)
@@ -144,6 +144,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
                 adjournment.setPanelMember1(null);
                 adjournment.setPanelMember2(null);
                 adjournment.setPanelMember3(null);
+                adjournment.setSignedInUser(null);
             }
         }
     }
@@ -229,7 +230,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             .findFirst().orElse(HearingChannel.PAPER);
     }
 
-    private void updatePanelMembers(SscsCaseData caseData, String userAuthorisation) {
+    private void updatePanelMembers(SscsCaseData caseData) {
         Adjournment adjournment = caseData.getAdjournment();
         AdjournCasePanelMembersExcluded panelMemberExcluded = adjournment.getPanelMembersExcluded();
 
