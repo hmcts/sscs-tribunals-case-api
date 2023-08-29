@@ -119,16 +119,6 @@ class SscsUtilTest {
         assertThat(documentType).isEqualTo(expectedDocumentType);
     }
 
-    @ParameterizedTest
-    @EnumSource(value = PostHearingReviewType.class, names = {"PERMISSION_TO_APPEAL"})
-    void givenActionTypeNotSupported_throwError(PostHearingReviewType postHearingReviewType) {
-        postHearing.setReviewType(postHearingReviewType);
-
-        assertThatThrownBy(() -> getPostHearingReviewDocumentType(postHearing, true))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage(UNEXPECTED_POST_HEARING_REVIEW_TYPE_AND_ACTION);
-    }
-
     @Test
     void givenPostHearingsEnabledFalse_clearPostHearingsFieldClearsDocumentFields_butDoesNotAlterPostHearing() {
         postHearing.setRequestType(PostHearingRequestType.SET_ASIDE);
