@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.UPLOAD;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -24,18 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @ExtendWith(MockitoExtension.class)
@@ -118,11 +108,15 @@ class PostHearingRequestAboutToSubmitHandlerTest {
     @ParameterizedTest
     @EnumSource(value = PostHearingRequestType.class, names = {
         "SET_ASIDE",
-        "CORRECTION"
+        "CORRECTION",
+        "STATEMENT_OF_REASONS",
+        "LIBERTY_TO_APPLY",
+        "PERMISSION_TO_APPEAL"
     })
     void shouldReturnWithoutError_whenPreviewDocFilenameContainsRequestTypeDescriptionEn(PostHearingRequestType requestType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(callback.getEvent()).thenReturn(POST_HEARING_REQUEST);
         DocumentLink documentLink = DocumentLink.builder()
             .documentFilename(requestType.getDescriptionEn())
             .build();
@@ -137,13 +131,17 @@ class PostHearingRequestAboutToSubmitHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "SET_ASIDE,Set Aside Application from FTA.pdf,SET_ASIDE_APPLICATION",
-        "CORRECTION,Correction Application from FTA.pdf,CORRECTION_APPLICATION"
+        "CORRECTION,Correction Application from FTA.pdf,CORRECTION_APPLICATION",
+        "STATEMENT_OF_REASONS,Statement of Reasons Application from FTA.pdf,STATEMENT_OF_REASONS_APPLICATION",
+        "LIBERTY_TO_APPLY,Liberty to Apply Application from FTA.pdf,LIBERTY_TO_APPLY_APPLICATION",
+        "PERMISSION_TO_APPEAL,Permission to Appeal Application from FTA.pdf,PERMISSION_TO_APPEAL_APPLICATION"
     })
     void givenAPostHearingRequest_footerServiceIsCalledToCreateDocAndAddToBundle(
         PostHearingRequestType requestType,
         String filename,
         DocumentType documentType
     ) {
+        when(callback.getEvent()).thenReturn(POST_HEARING_REQUEST);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         caseData.getPostHearing().setRequestType(requestType);
@@ -159,14 +157,17 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         expectedDocument.getValue().setDocumentType(documentType.getValue());
         expectedDocument.getValue().setDocumentLink(postHearingDoc);
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
-            eq(documentType), any(), any(), eq(null), eq(null));
+            eq(documentType), any(), any(), eq(null), eq(null), eq(POST_HEARING_REQUEST));
     }
 
     @ParameterizedTest
     @EnumSource(value = PostHearingRequestType.class,
         names = {
             "SET_ASIDE",
-            "CORRECTION"
+            "CORRECTION",
+            "STATEMENT_OF_REASONS",
+            "LIBERTY_TO_APPLY",
+            "PERMISSION_TO_APPEAL"
         })
     void givenPreviewDocumentIsNotAPostHearingDoc_andRequestFormatIsNotUpload_doesNotGenerateADocument(PostHearingRequestType requestType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -188,7 +189,10 @@ class PostHearingRequestAboutToSubmitHandlerTest {
     @EnumSource(value = PostHearingRequestType.class,
         names = {
             "SET_ASIDE",
-            "CORRECTION"
+            "CORRECTION",
+            "STATEMENT_OF_REASONS",
+            "LIBERTY_TO_APPLY",
+            "PERMISSION_TO_APPEAL"
         })
     void givenPreviewDocumentIsNull_andRequestFormatIsNotUpload_doesNotGenerateADocument(PostHearingRequestType requestType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -205,13 +209,23 @@ class PostHearingRequestAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = PostHearingRequestType.class,
-        names = {"SET_ASIDE"})
+        names = {
+            "SET_ASIDE",
+            "CORRECTION",
+            "STATEMENT_OF_REASONS",
+            "LIBERTY_TO_APPLY",
+            "PERMISSION_TO_APPEAL"
+        })
     void givenUploadedDocument_previewDocumentIsRenamedToExpectedPostHearingFormat(PostHearingRequestType postHearingRequestType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         caseData.getPostHearing().setRequestType(postHearingRequestType);
-        caseData.getPostHearing().getSetAside().setRequestFormat(RequestFormat.UPLOAD);
+        caseData.getPostHearing().getSetAside().setRequestFormat(UPLOAD);
+        caseData.getPostHearing().getCorrection().setRequestFormat(UPLOAD);
+        caseData.getPostHearing().getStatementOfReasons().setRequestFormat(UPLOAD);
+        caseData.getPostHearing().getLibertyToApply().setRequestFormat(UPLOAD);
+        caseData.getPostHearing().getPermissionToAppeal().setRequestFormat(UPLOAD);
         String dmUrl = "http://dm-store/documents/123";
         DocumentLink uploadedDocument = DocumentLink.builder()
             .documentFilename("A random filename.pdf")

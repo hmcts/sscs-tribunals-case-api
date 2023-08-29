@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.NotePad;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
@@ -120,6 +121,8 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         log.info("Action postponement request: postponement listingOption {} mapped to Event {} for case {}",
             listingOption, postponementEventType, sscsCaseData.getCcdCaseId());
 
+        sscsCaseData.setState(State.getById(listingOption));
+
         sscsCaseData.setPostponement(Postponement.builder()
             .unprocessedPostponement(YES)
             .postponementEvent(postponementEventType)
@@ -148,7 +151,9 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     }
 
     private void addDirectionNotice(SscsCaseData caseData) {
-        SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData, POSTPONEMENT_REQUEST_DIRECTION_NOTICE);
+        SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData,
+                caseData.getDocumentStaging().getPreviewDocument(),
+                POSTPONEMENT_REQUEST_DIRECTION_NOTICE);
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {
