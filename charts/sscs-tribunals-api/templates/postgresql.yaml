@@ -23,7 +23,7 @@ spec:
    tier: Burstable
  administratorLogin: hmcts
  administratorLoginPassword:
-   name: sscs-postgresql
+   name: sscs-postgres
    key: PASSWORD
  storage:
    storageSizeGB: 32
