@@ -140,10 +140,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             Adjournment adjournment = caseData.getAdjournment();
             if (nonNull(adjournment)) {
                 adjournment.setPreviewDocument(null);
-                adjournment.setPanelMembersExcluded(null);
-                adjournment.setPanelMember1(null);
-                adjournment.setPanelMember2(null);
-                adjournment.setPanelMember3(null);
                 adjournment.setSignedInUser(null);
             }
         }
