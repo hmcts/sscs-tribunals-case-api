@@ -8,7 +8,7 @@ spec:
     name: sscs-flexibleserver-postgres
   charset: utf8
 ---
-apiVersion: flexibleservers.dbforpostgresql.azure.com/v1api20210601
+apiVersion: dbforpostgresql.azure.com/v1api20210601
 kind: FlexibleServer
 metadata:
  name: sscs-flexibleserver-postgres
