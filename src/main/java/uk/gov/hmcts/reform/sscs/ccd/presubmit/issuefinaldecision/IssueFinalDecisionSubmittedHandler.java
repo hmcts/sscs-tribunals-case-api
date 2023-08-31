@@ -48,6 +48,8 @@ public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
             if (isYes(correction.getCorrectionFinalDecisionInProgress())) {
                 correction.setCorrectionFinalDecisionInProgress(NO);
                 caseData = ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, caseData);
+
+                return new PreSubmitCallbackResponse<>(caseData);
             }
         }
 

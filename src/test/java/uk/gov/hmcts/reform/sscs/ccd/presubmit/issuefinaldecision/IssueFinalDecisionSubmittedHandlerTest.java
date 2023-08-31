@@ -102,7 +102,7 @@ public class IssueFinalDecisionSubmittedHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verify(callbackOrchestratorService, times(1)).sendMessageToCallbackOrchestrator(callback);
+        verify(callbackOrchestratorService, times(0)).sendMessageToCallbackOrchestrator(callback);
         verify(ccdCallbackMapService, times(1)).handleCcdCallbackMap(CorrectionActions.GRANT, sscsCaseData);
         assertThat(response.getErrors()).isEmpty();
         assertThat(response.getData().getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress()).isEqualTo(NO);
