@@ -3,6 +3,8 @@ kind: FlexibleServersDatabase
 metadata:
   name: {{ .Release.Name }}
   namespace: sscs
+  annotations:
+    skipreconcile: "true"
 spec:
   owner:
     name: sscs-flexibleserver-postgres
