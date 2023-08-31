@@ -505,7 +505,7 @@ ccd:
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
 
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S11100DnonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S11100EnonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -524,7 +524,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S11100DnonProd
+      CCD_DEF_VERSION: S11100EnonProd
     secrets: []
     userRoles:
       - citizen
@@ -779,10 +779,6 @@ servicebus:
     queues:
       - name: sscs-orchestrator-queue-preview
 
-#Work Allocation services
-wa:
-  enabled: true
-
 camunda-bpm:
   enabled: true
   java:
@@ -890,10 +886,21 @@ wa-message-cron-service:
     environment:
       WA_CASE_EVENT_HANDLER_SERVICE_URL: http://{{ .Release.Name }}-wa-case-event-handler
 
-wa-task-batch-service:
+
+wa:
+  enabled: true
+  taskBatchCron:
+    enabled: true
+  reconfigurationBatchCron:
+    enabled: true
+  terminationBatchCron:
+    enabled: true
+
+wa-initiation-batch:
   job:
     kind: CronJob
-    releaseNameOverride: ${SERVICE_NAME}-wa-task-batch-service
+    releaseNameOverride: ${SERVICE_NAME}-wa-initiation-batch
+    name: ${SERVICE_NAME}-wa-initiation-batch
     schedule: "*/5 * * * *"
     aadIdentityName: wa
     keyVaults:
@@ -906,6 +913,43 @@ wa-task-batch-service:
       WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
       JOB_NAME: "INITIATION"
       ALLOW_CONFIG_MUTATIONS: true
+
+wa-termination-batch:
+  job:
+    kind: CronJob
+    releaseNameOverride: ${SERVICE_NAME}-wa-termination-batch
+    name: ${SERVICE_NAME}-wa-termination-batch
+    schedule: "*/5 * * * *"
+    aadIdentityName: wa
+    keyVaults:
+      wa:
+        secrets:
+          - s2s-secret-task-monitor
+    environment:
+      S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+      S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
+      WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
+      JOB_NAME: "TERMINATION"
+      ALLOW_CONFIG_MUTATIONS: true
+
+wa-reconfiguration-batch:
+  job:
+    kind: CronJob
+    releaseNameOverride: ${SERVICE_NAME}-wa-job-reconfiguration
+    name: ${SERVICE_NAME}-wa-job-reconfiguration
+    schedule: "*/5 * * * *"
+    aadIdentityName: wa
+    keyVaults:
+      wa:
+        secrets:
+          - s2s-secret-task-monitor
+    environment:
+      S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+      S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
+      WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
+      JOB_NAME: "RECONFIGURATION"
+      ALLOW_CONFIG_MUTATIONS: true
+
 
 ccd-message-publisher:
   java:
