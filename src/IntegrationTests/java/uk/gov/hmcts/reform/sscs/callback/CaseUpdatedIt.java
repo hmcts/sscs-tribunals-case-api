@@ -57,7 +57,6 @@ public class CaseUpdatedIt extends AbstractEventIt {
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-
         assertEquals("Basildon CC", result.getData().getProcessingVenue());
         assertEquals("698118", result.getData().getCaseManagementLocation().getBaseLocation());
         assertEquals("2", result.getData().getCaseManagementLocation().getRegion());
