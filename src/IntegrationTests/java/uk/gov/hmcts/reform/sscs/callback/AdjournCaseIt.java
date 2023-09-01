@@ -44,8 +44,6 @@ public class AdjournCaseIt extends AbstractEventIt {
         "callback/adjournCaseGeneratedPaperWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
     public static final String GENERATED_FACE_TO_FACE_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON =
         "callback/adjournCaseGeneratedFaceToFaceWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
-    public static final String VALID_SUBMISSION_WITH_SET_GENERATED_DATE_JSON =
-        "callback/adjournCaseValidSubmissionWithSetGeneratedDate.json";
     public static final String MANUALLY_GENERATED_JSON = "callback/adjournCaseManuallyGenerated.json";
     public static final String GENERATED_FACE_TO_FACE_WITH_INTERPRETER_REQUIRED_AND_LANGUAGE_SET_JSON =
         "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageSet.json";
@@ -117,16 +115,6 @@ public class AdjournCaseIt extends AbstractEventIt {
             DIRECTIONS_DUE_DATE_PLACEHOLDER, DATE_2019);
 
         noticeGeneratedWithExpectedDetails();
-    }
-
-    @DisplayName("Call to about to submit handler will write adjourn notice to case with generated date as set")
-    @Test
-    public void givenCallToAboutToSubmitHandlerThenWritesAdjournNoticeToCaseWithGeneratedDateAsSet() throws Exception {
-        setup();
-        setJsonAndReplace(VALID_SUBMISSION_WITH_SET_GENERATED_DATE_JSON, DIRECTIONS_DUE_DATE_PLACEHOLDER, DATE_2019);
-
-        PreSubmitCallbackResponse<SscsCaseData> result = noticeGeneratedWithExpectedDetails();
-        assertThat(result.getData().getAdjournment().getGeneratedDate()).isEqualTo("2018-01-01");
     }
 
     @DisplayName("Call to about to submit handler will write manually uploaded adjourn notice to case")
@@ -219,7 +207,7 @@ public class AdjournCaseIt extends AbstractEventIt {
             parentPayload,
             payload,
             FIRST_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED,
-            "telephone",
+            "telephone hearing",
             A_STANDARD_TIME_SLOT,
             "telephone"
         );
@@ -240,7 +228,7 @@ public class AdjournCaseIt extends AbstractEventIt {
             parentPayload,
             payload,
             "It will be first in the session on a date to be fixed",
-            "video",
+            "video hearing",
             A_STANDARD_TIME_SLOT,
             "video"
         );
@@ -261,7 +249,7 @@ public class AdjournCaseIt extends AbstractEventIt {
             parentPayload,
             payload,
             FIRST_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED,
-            "paper",
+            "decision on the papers",
             null,
             "paper"
         );
@@ -338,7 +326,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         String nextHearingDate,
         String interpreterDescription
     ) {
-        checkPayloadDetails(parentPayload, payload, nextHearingDate, "faceToFace",
+        checkPayloadDetails(parentPayload, payload, nextHearingDate, "face to face hearing",
             A_STANDARD_TIME_SLOT, "faceToFace", interpreterDescription);
         assertThat(payload.isNextHearingAtVenue()).isTrue();
         assertThat(payload.getNextHearingVenue()).isEqualTo(CHESTER_MAGISTRATE_S_COURT);

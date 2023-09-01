@@ -25,9 +25,29 @@
     "roleAssignments": [
       {
         "roleType": "ORGANISATION",
-        "roleName": "CTSC-Administrator",
+        "roleName": "ctsc",
         "grantType": "STANDARD",
         "roleCategory": "CTSC",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "Benefit",
+          "jurisdiction": "SSCS"
+        },
+        "authorisations": []
+      }
+    ],
+    "overrideAll": true
+  },
+  {
+    "email": "regional-centre-admin@fake.hmcts.net",
+    "id": "e11c7f69-3154-33e4-ad3d-18e9a0918ed9",
+    "roleAssignments": [
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "regional-centre-admin",
+        "grantType": "STANDARD",
+        "roleCategory": "ADMIN",
         "classification": "PUBLIC",
         "readOnly": false,
         "attributes": {

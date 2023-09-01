@@ -1,7 +1,7 @@
-ARG APP_INSIGHTS_AGENT_VERSION=3.4.8
-FROM hmctspublic.azurecr.io/base/java:11-distroless
+ARG APP_INSIGHTS_AGENT_VERSION=3.4.13
+FROM hmctspublic.azurecr.io/base/java:17-distroless
 
-COPY lib/AI-Agent.xml /opt/app/
+COPY lib/applicationinsights.json /opt/app/
 COPY build/libs/tribunals-case-api.jar /opt/app/
 
 EXPOSE 8080

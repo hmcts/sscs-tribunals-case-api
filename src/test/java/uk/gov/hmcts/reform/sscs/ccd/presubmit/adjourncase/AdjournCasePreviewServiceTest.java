@@ -191,9 +191,9 @@ class AdjournCasePreviewServiceTest {
         assertThat(body.getHeldBefore()).isNotNull();
         assertThat(body.getHeldOn()).isNotNull();
 
-        if (HearingType.FACE_TO_FACE.getKey().equals(nextHearingTypeText)) {
+        if (HearingType.FACE_TO_FACE.getValue().equals(nextHearingTypeText)) {
             verifyFaceToFaceTemplateBody(body);
-        } else if (HearingType.PAPER.getKey().equals(nextHearingTypeText)) {
+        } else if (HearingType.PAPER.getValue().equals(nextHearingTypeText)) {
             verifyPaperTemplateBody(body);
         } else {
             verifyVideoOrTelephoneTemplateBody(body);
@@ -286,7 +286,7 @@ class AdjournCasePreviewServiceTest {
         NoticeIssuedTemplateBody body = verifyTemplateBody(
             NoticeIssuedTemplateBody.ENGLISH_IMAGE,
             APPELLANT_FULL_NAME,
-            "faceToFace"
+            "face to face hearing"
         );
         assertThat(body.getAdjournCaseTemplateBody().getNextHearingDate()).isEqualTo(expected);
     }
@@ -330,7 +330,7 @@ class AdjournCasePreviewServiceTest {
         checkPreviewDocument(response);
 
         HearingType hearingType = HearingType.getByKey(nextHearingType.getCcdDefinition());
-        String nextHearingTypeText = hearingType.getKey();
+        String nextHearingTypeText = hearingType.getValue();
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         AdjournCaseTemplateBody body = checkCommonPreviewParams(payload);
@@ -351,7 +351,7 @@ class AdjournCasePreviewServiceTest {
 
         checkPreviewDocument(response);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody payload = verifyTemplateBody(
             NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
@@ -377,7 +377,7 @@ class AdjournCasePreviewServiceTest {
 
         checkPreviewDocument(response);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         AdjournCaseTemplateBody body = checkCommonPreviewParams(payload);
@@ -416,7 +416,7 @@ class AdjournCasePreviewServiceTest {
 
         checkPreviewDocument(response);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         AdjournCaseTemplateBody body = checkCommonPreviewParams(payload);
@@ -442,7 +442,7 @@ class AdjournCasePreviewServiceTest {
 
         checkPreviewDocument(response);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         AdjournCaseTemplateBody body = checkCommonPreviewParams(payload);
@@ -502,7 +502,7 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldAt()).isEqualTo(GAP_VENUE_NAME);
@@ -557,7 +557,7 @@ class AdjournCasePreviewServiceTest {
 
         sscsCaseData.setHearings(Arrays.asList(null, hearing1));
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldAt()).isEqualTo(IN_CHAMBERS);
@@ -577,7 +577,7 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldAt()).isEqualTo(IN_CHAMBERS);
@@ -594,7 +594,7 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = new ArrayList<>();
         sscsCaseData.setHearings(hearings);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         checkDefaultHearingDataForNullOrEmptyHearings(nextHearingTypeText);
     }
 
@@ -608,7 +608,7 @@ class AdjournCasePreviewServiceTest {
 
         sscsCaseData.setHearings(null);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         checkDefaultHearingDataForNullOrEmptyHearings(nextHearingTypeText);
     }
 
@@ -644,7 +644,7 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldOn()).hasToString("2019-01-02");
@@ -664,7 +664,7 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(null, hearing);
         sscsCaseData.setHearings(hearings);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldOn()).hasToString("2019-01-02");
@@ -686,7 +686,7 @@ class AdjournCasePreviewServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldOn()).hasToString(HEARING_DATE);
@@ -713,7 +713,7 @@ class AdjournCasePreviewServiceTest {
 
         adjournment.setTypeOfNextHearing(nextHearingType);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         if (isOralHearing(nextHearingType)) {
@@ -730,7 +730,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setTypeOfNextHearing(AdjournCaseTypeOfHearing.PAPER);
         adjournment.setNextHearingListingDuration(2);
 
-        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText("paper");
+        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText("decision on the papers");
 
         assertThat(body.getNextHearingTimeslot()).isNull();
     }
@@ -746,7 +746,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.MINUTES);
         adjournment.setNextHearingListingDuration(120);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         checkOralHearingTimeslot(nextHearingTypeText, nextHearingType, "120 minutes");
     }
 
@@ -761,7 +761,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.MINUTES);
         adjournment.setNextHearingListingDuration(1);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         checkOralHearingTimeslot(nextHearingTypeText, nextHearingType, "1 minute");
     }
 
@@ -776,7 +776,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS);
         adjournment.setNextHearingListingDuration(2);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         checkOralHearingTimeslot(nextHearingTypeText, nextHearingType, "2 sessions");
     }
 
@@ -791,7 +791,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS);
         adjournment.setNextHearingListingDuration(1);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         checkOralHearingTimeslot(nextHearingTypeText, nextHearingType, "1 session");
     }
 
@@ -808,7 +808,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setMedicallyQualifiedPanelMemberName(PANEL_MEMBER_2_NAME);
         adjournment.setOtherPanelMemberName(OTHER_PANEL_MEMBER_NAME);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + ", "
@@ -836,7 +836,7 @@ class AdjournCasePreviewServiceTest {
         when(judicialRefDataService.getJudicialUserFullName(OTHER_PANEL_MEMBER_PERSONAL_CODE))
             .thenReturn(OTHER_PANEL_MEMBER_NAME);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + ", "
@@ -861,7 +861,7 @@ class AdjournCasePreviewServiceTest {
         when(judicialRefDataService.getJudicialUserFullName(PANEL_MEMBER_2_PERSONAL_CODE))
             .thenReturn(PANEL_MEMBER_2_NAME);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + ", "
@@ -882,7 +882,7 @@ class AdjournCasePreviewServiceTest {
         when(judicialRefDataService.getJudicialUserFullName(PANEL_MEMBER_1_PERSONAL_CODE))
             .thenReturn(PANEL_MEMBER_1_NAME);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + " and " + PANEL_MEMBER_1_NAME);
@@ -897,7 +897,7 @@ class AdjournCasePreviewServiceTest {
 
         adjournment.setTypeOfNextHearing(nextHearingType);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME);
@@ -914,7 +914,7 @@ class AdjournCasePreviewServiceTest {
         adjournment.setPanelMember1(null);
         adjournment.setPanelMember2(null);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
         assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME);
@@ -931,7 +931,7 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
         assertThat(templateBody.getAdjournCaseTemplateBody().getNextHearingVenue()).isEqualTo(GAP_VENUE_NAME);
     }
@@ -947,7 +947,7 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
     }
 
@@ -1403,7 +1403,7 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
         assertThat(templateBody.getAdjournCaseTemplateBody().getNextHearingVenue()).isEqualTo(GAP_VENUE_NAME);
     }
@@ -1426,7 +1426,7 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
         assertThat(templateBody.getAdjournCaseTemplateBody().getNextHearingVenue()).isEqualTo(GAP_VENUE_NAME);
     }
@@ -1534,7 +1534,7 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
     }
 
@@ -1557,7 +1557,7 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", nextHearingTypeText);
     }
 
@@ -1572,7 +1572,7 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         assertThat(payload.getDateIssued()).isEqualTo(LocalDate.now());
@@ -1590,7 +1590,7 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         assertThat(payload.getGeneratedDate()).hasToString(LocalDate.now().toString());
@@ -1609,7 +1609,7 @@ class AdjournCasePreviewServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getKey();
+        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
 
         assertThat(payload.getGeneratedDate()).hasToString(LocalDate.now().toString());
@@ -1637,6 +1637,7 @@ class AdjournCasePreviewServiceTest {
             "documentTypeLabel",
             LocalDate.now(),
             LocalDate.now(),
+            false,
             false,
             false,
             USER_AUTHORISATION);
