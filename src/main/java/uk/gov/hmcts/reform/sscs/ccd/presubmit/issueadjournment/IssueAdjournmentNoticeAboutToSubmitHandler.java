@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
+import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.service.*;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
@@ -50,6 +51,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     private final VenueDataLoader venueDataLoader;
     private final AirLookupService airLookupService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
+    private final HearingDurationsService hearingDurationsService;
 
     @Value("${feature.snl.adjournment.enabled}")
     private boolean isAdjournmentEnabled; // TODO SSCS-10951
@@ -274,10 +276,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             fields.setAppellantInterpreter(interpreter);
         }
 
-        if (isNull(fields.getDuration())) {
-            Integer duration = handleHearingDuration(caseData);
-            fields.setDuration(duration);
-        }
+        Integer duration = handleHearingDuration(caseData);
+        fields.setDuration(duration);
 
         updateHearingChannelAndWantsToAttend(caseData);
         handleHearingWindow(caseData, fields);
@@ -322,15 +322,18 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         Integer duration = caseData.getAdjournment().getNextHearingListingDuration();
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
 
-        if (duration != null && NON_STANDARD.equals(durationType)) {
+        if (nonNull(duration) && NON_STANDARD.equals(durationType)) {
             AdjournCaseNextHearingDurationUnits units = caseData.getAdjournment().getNextHearingListingDurationUnits();
             if (units == AdjournCaseNextHearingDurationUnits.SESSIONS && duration >= MIN_HEARING_SESSION_DURATION) {
                 return duration * DURATION_SESSIONS_MULTIPLIER;
             } else if (units == AdjournCaseNextHearingDurationUnits.MINUTES && duration >= MIN_HEARING_DURATION) {
                 return duration;
             }
+
+            return DURATION_DEFAULT;
         }
-        return DURATION_DEFAULT;
+
+        return hearingDurationsService.getHearingDurationBenefitIssueCodes(caseData);
     }
 
     private void handleHearingWindow(SscsCaseData caseData, OverrideFields overrideFields) {

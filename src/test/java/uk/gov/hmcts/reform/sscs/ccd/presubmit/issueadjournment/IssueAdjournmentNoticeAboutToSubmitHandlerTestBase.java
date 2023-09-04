@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
 import uk.gov.hmcts.reform.sscs.service.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,6 +71,9 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
     protected AirLookupService airLookupService;
 
     @Mock
+    protected HearingDurationsService hearingDurationsService;
+
+    @Mock
     protected RegionalProcessingCenterService regionalProcessingCenterService;
 
     protected SscsCaseData sscsCaseData;
@@ -83,7 +87,7 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
 
     @BeforeEach
     protected void setUp() {
-        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, validator, hearingMessageHelper, venueDataLoader, airLookupService, regionalProcessingCenterService, true);
+        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, validator, hearingMessageHelper, venueDataLoader, airLookupService, regionalProcessingCenterService, hearingDurationsService, true);
 
         List<SscsDocument> documentList = new ArrayList<>();
 
