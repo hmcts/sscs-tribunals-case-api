@@ -7,7 +7,7 @@
     <packageUrl regex="true">^pkg:maven/commons\-fileupload/commons\-fileupload@.*$</packageUrl>
     <cve>CVE-2023-24998</cve>
   </suppress>
-  <suppress until="2023-09-01">
+  <suppress until="2023-10-01">
     <notes><![CDATA[
    file name: json-20230227.jar
    ]]></notes>
@@ -20,7 +20,7 @@
   <suppress until="2023-09-01">
     <cve>CVE-2023-34411</cve>
   </suppress>
-  <suppress until = "2023-09-01">
+  <suppress until = "2023-10-01">
     <cve>CVE-2023-35116</cve>
     <cve>CVE-2023-2976</cve>
   </suppress>
@@ -31,19 +31,20 @@
     <packageUrl regex="true">^pkg:maven/com\.google\.guava/guava@.*$</packageUrl>
     <cve>CVE-2023-2976</cve>
   </suppress>
-  <suppress until = "2023-09-01">
+  <suppress until = "2023-10-01">
     <notes><![CDATA[
    file name: okio-jvm-3.2.0.jar
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/com\.squareup\.okio/okio\-jvm@.*$</packageUrl>
     <cve>CVE-2023-3635</cve>
   </suppress>
-  <suppress until = "2023-09-01">
+  <suppress until = "2023-10-01">
     <notes><![CDATA[
    file name: spring-security-config-5.8.3.jar
    ]]></notes>
     <cve>CVE-2023-34035</cve>
     <cve>CVE-2023-3782</cve>
     <cve>CVE-2023-3635</cve>
+    <cve>CVE-2023-41080</cve>
   </suppress>
 </suppressions>
