@@ -143,9 +143,9 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
         assertThat(updatedCaseDetails.getData().getCaseBundles())
             .hasSize(expectedBundles)
             .extracting(Bundle::getValue)
-            .allSatisfy(bundleDetails -> {
-                assertThat(bundleDetails.getStitchedDocument()).isNull();
-                assertThat(bundleDetails.getStitchStatus()).isEqualTo("DONE");
+            .allSatisfy(BundleDetails -> {
+                assertThat(BundleDetails.getStitchedDocument()).isNotNull();
+                assertThat(BundleDetails.getStitchStatus()).isEqualTo("DONE");
             });
     }
 }
