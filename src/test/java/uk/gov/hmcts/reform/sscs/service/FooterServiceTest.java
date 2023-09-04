@@ -16,6 +16,7 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,19 +28,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.pdf.PdfState;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
 
@@ -113,15 +102,18 @@ public class FooterServiceTest {
 
     @Test
     @Parameters({
-        "DIRECTION_NOTICE, issued",
-        "STATEMENT_OF_EVIDENCE, issued",
-        "SET_ASIDE_APPLICATION, received",
-        "CORRECTION_APPLICATION, received",
-        "STATEMENT_OF_REASONS_APPLICATION, received",
-        "LIBERTY_TO_APPLY_APPLICATION, received",
-        "PERMISSION_TO_APPEAL_APPLICATION, received",
+        "DIRECTION_NOTICE, issued, DIRECTION_ISSUED,",
+        "STATEMENT_OF_EVIDENCE, issued, POST_HEARING_REQUEST, FTA",
+        "SET_ASIDE_APPLICATION, received, POST_HEARING_REQUEST, FTA",
+        "CORRECTION_APPLICATION, received, POST_HEARING_REQUEST, FTA",
+        "STATEMENT_OF_REASONS_APPLICATION, received, POST_HEARING_REQUEST, FTA",
+        "LIBERTY_TO_APPLY_APPLICATION, received, POST_HEARING_REQUEST, FTA",
+        "PERMISSION_TO_APPEAL_APPLICATION, received, POST_HEARING_REQUEST, FTA",
+        "UPPER_TRIBUNALS_DECISION_REMADE, received, SEND_TO_FIRST_TIER, Upper Tribunal",
+        "UPPER_TRIBUNALS_DECISION_REFUSED, received, SEND_TO_FIRST_TIER, Upper Tribunal",
+        "UPPER_TRIBUNALS_DECISION_REMITTED, received, REMIT_TO_FIRST_TIER, Upper Tribunal"
     })
-    public void givenADocument_thenAddAFooter(DocumentType documentType, String verb) throws Exception {
+    public void givenADocument_thenAddAFooter(DocumentType documentType, String verb, EventType eventType, String originalSender) throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
         when(pdfStoreService.download(any())).thenReturn(pdfBytes);
 
@@ -132,7 +124,7 @@ public class FooterServiceTest {
         String now = LocalDate.now().toString();
 
         footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").documentFilename("afilename").build(),
-                sscsCaseData, documentType, now, null, null, null);
+                sscsCaseData, documentType, now, null, null, null, eventType);
 
         assertEquals(2, sscsCaseData.getSscsDocument().size());
         SscsDocumentDetails footerDoc = sscsCaseData.getSscsDocument().get(0).getValue();
@@ -144,6 +136,7 @@ public class FooterServiceTest {
         verify(pdfStoreService).storeDocument(any(), anyString());
         assertEquals(documentType.getLabel(), stringCaptor.getAllValues().get(0));
         assertEquals("Addition A", stringCaptor.getAllValues().get(1));
+        assertEquals(StringUtils.stripToNull(originalSender), footerDoc.getOriginalPartySender());
     }
 
     @Test

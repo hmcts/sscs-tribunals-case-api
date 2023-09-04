@@ -48,6 +48,7 @@ public abstract class AbstractFooterService<D extends AbstractDocument> {
                     LIBERTY_TO_APPLY_APPLICATION,
                     UPPER_TRIBUNALS_DECISION_REMADE,
                     UPPER_TRIBUNALS_DECISION_REFUSED,
+                    UPPER_TRIBUNALS_DECISION_REMITTED,
                     PERMISSION_TO_APPEAL_APPLICATION)
                 .contains(documentType);
 
