@@ -45,5 +45,6 @@
     <cve>CVE-2023-34035</cve>
     <cve>CVE-2023-3782</cve>
     <cve>CVE-2023-3635</cve>
+    <cve>CVE-2023-41080</cve>
   </suppress>
 </suppressions>
