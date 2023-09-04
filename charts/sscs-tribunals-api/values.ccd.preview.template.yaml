@@ -4,6 +4,10 @@ tags:
 
 java:
   image: ${IMAGE_NAME}
+  memoryLimits: "8Gi"
+  memoryRequests: "1Gi"
+  cpuRequests: "2"
+  cpuLimits: 2000m
   readinessDelay: 45
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
@@ -77,12 +81,14 @@ ccd-case-document-am-api:
 xui-webapp:
   enabled: true
   nodejs:
+    memoryLimits: "4Gi"
+    cpuLimits: 2000m
+    memoryRequests: "1Gi"
+    cpuRequests: "1"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
     ingressHost: xui-${SERVICE_FQDN}
-    memoryLimits: 1836Mi
-    cpuLimits: 1900m
     environment:
       HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
       HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
@@ -629,6 +635,8 @@ sscs-ccd-callback-orchestrator:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
+    memoryLimits: "2Gi"
+    cpuLimits: 2000m
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
     environment:
