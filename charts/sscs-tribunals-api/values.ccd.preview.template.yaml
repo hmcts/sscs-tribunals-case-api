@@ -36,6 +36,7 @@ java:
     SCHEDULE_LISTING_FEATURE: true
     POST_HEARINGS_FEATURE: true
     POST_HEARINGS_B_FEATURE: true
+    GAPS_SWITCHOVER_FEATURE: true
     DUMMY: true
 
 idam-pr:
