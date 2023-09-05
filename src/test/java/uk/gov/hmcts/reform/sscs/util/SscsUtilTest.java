@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPostHearingReviewDocumentType;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.*;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,9 +11,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 
 class SscsUtilTest {
+    SessionCategoryMapService categoryMapSerivce = new SessionCategoryMapService();
     public static final String UNEXPECTED_POST_HEARING_REVIEW_TYPE_AND_ACTION = "getting the document type has an unexpected postHearingReviewType and action";
     private PostHearing postHearing;
 
@@ -144,6 +147,25 @@ class SscsUtilTest {
         assertThat(caseData.getPostHearing().getRequestType()).isNull();
         assertThat(caseData.getDocumentGeneration().getGenerateNotice()).isNull();
         assertThat(caseData.getDocumentStaging().getDateAdded()).isNull();
+    }
+
+    @Test
+    void givenCorrectIssueAndBenefitCode_dontAddErrorToResponse() {
+        SscsCaseData caseData = SscsCaseData.builder().benefitCode("002").issueCode("DD").build();
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+        validateBenefitIssueCode(caseData, response, categoryMapSerivce);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void givenWrongIssueAndBenefitCode_addErrorToResponse() {
+        SscsCaseData caseData = SscsCaseData.builder().benefitCode("31231232").issueCode("XA").build();
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+        validateBenefitIssueCode(caseData, response, categoryMapSerivce);
+
+        assertThat(response.getErrors().size()).isEqualTo(1);
+        assertThat(response.getErrors()).contains(INVALID_BENEFIT_ISSUE_CODE);
     }
 
 }

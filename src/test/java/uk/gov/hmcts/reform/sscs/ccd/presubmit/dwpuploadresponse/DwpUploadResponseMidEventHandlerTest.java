@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
@@ -54,7 +55,8 @@ public class DwpUploadResponseMidEventHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new DwpUploadResponseMidEventHandler();
+        SessionCategoryMapService categoryMapSerivce = new SessionCategoryMapService();
+        handler = new DwpUploadResponseMidEventHandler(categoryMapSerivce);
 
         openMocks(this);
 

@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -11,11 +14,15 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @Slf4j
 public class SscsUtil {
+
+    public static final String INVALID_BENEFIT_ISSUE_CODE = "Incorrect benefit/issue code combination";
 
     private SscsUtil() {
         //
@@ -144,5 +151,17 @@ public class SscsUtil {
 
     public static boolean isGapsCase(SscsCaseData sscsCaseData) {
         return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
+    }
+
+    public static void validateBenefitIssueCode(SscsCaseData caseData,
+                                                PreSubmitCallbackResponse<SscsCaseData> response,
+                                                SessionCategoryMapService categoryMapSerivce) {
+        boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
+        boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
+
+        if (isNull(categoryMapSerivce.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
+                isSecondDoctorPresent, fqpmRequired))) {
+            response.addError(INVALID_BENEFIT_ISSUE_CODE);
+        }
     }
 }
