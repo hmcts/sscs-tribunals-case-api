@@ -769,7 +769,6 @@ servicebus:
     queues:
       - name: sscs-orchestrator-queue-preview
 
-#Add postgres sql databases
 postgresql:
   enabled: true
   flexibleserver: sscs-flexibleserver-postgres-preview
