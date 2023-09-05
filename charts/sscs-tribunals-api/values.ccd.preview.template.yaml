@@ -772,7 +772,6 @@ servicebus:
 postgresql:
   enabled: true
   flexibleserver: sscs-flexibleserver-postgres-preview
-  #Each topic/queue matches up to one used in the config above
   setup:
     databases:
     - name: data-store
