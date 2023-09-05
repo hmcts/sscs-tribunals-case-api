@@ -507,7 +507,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S-SCI-5nonProd
+      CCD_DEF_VERSION: S-SCI-5-nonProd
     secrets: []
     userRoles:
       - citizen
