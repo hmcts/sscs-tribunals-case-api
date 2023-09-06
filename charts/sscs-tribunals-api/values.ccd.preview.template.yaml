@@ -157,6 +157,7 @@ ccd:
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     enableKeyVaults: true
     devMode: true
+    postgresHostname: "sscs-flexibleserver-postgres-preview.postgres.database.azure.com"
 
   am-role-assignment-service:
     java:
@@ -167,7 +168,7 @@ ccd:
       readinessDelay: 240
       livenessDelay: 240
       environment:
-        ROLE_ASSIGNMENT_DB_HOST: "sscs-flexibleserver-postgres-preview.postgres.database.azure.com"
+        ROLE_ASSIGNMENT_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
         ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
         AM_ROLE_ASSIGNMENT_SERVICE_SECRET: AAAAAAAAAAAAAAAA
@@ -391,7 +392,7 @@ ccd:
       image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
       imagePullPolicy: Always
       enviroment:
-        USER_PROFILE_DB_HOST: "sscs-flexibleserver-postgres-preview.postgres.database.azure.com"
+        USER_PROFILE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
         USER_PROFILE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_definition,ccd_admin,sscs
       keyVaults: [ ]
@@ -401,7 +402,7 @@ ccd:
       image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
       imagePullPolicy: Always
       environment:
-        DEFINITION_STORE_DB_HOST: "sscs-flexibleserver-postgres-preview.postgres.database.azure.com"
+        DEFINITION_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator,ccd_case_document_am_api
@@ -419,7 +420,7 @@ ccd:
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
       environment:
-        DATA_STORE_DB_HOST: "sscs-flexibleserver-postgres-preview.postgres.database.azure.com"
+        DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
         DEFINITION_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
@@ -557,7 +558,7 @@ sscs-tya-notif:
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
       JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
-      JOB_SCHEDULER_DB_HOST: "sscs-flexibleserver-postgres-preview.postgres.database.azure.com"
+      JOB_SCHEDULER_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       JOB_SCHEDULER_DB_USERNAME: hmcts
       HOURS_START_TIME: 0
@@ -702,7 +703,7 @@ hmc-cft-hearing-service:
       HMC_SERVICE_BUS_SUBSCRIPTION: "hmc-to-sscs-subscription"
       HMC_SERVICE_BUS_QUEUE: hmc-from-hmi
       HMC_OUTBOUND_SERVICE_BUS_QUEUE: hmc-to-hmi
-      CFT_HEARING_SERVICE_DB_HOST: "sscs-flexibleserver-postgres-preview.postgres.database.azure.com"
+      CFT_HEARING_SERVICE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
       CFT_HEARING_SERVICE_DB_NAME: "hmc-cft-hearing-service"
       CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       CFT_HEARING_SERVICE_DB_PORT: 5432
