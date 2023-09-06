@@ -45,12 +45,10 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        PreSubmitCallbackResponse<SscsCaseData> response =
-                new PreSubmitCallbackResponse<>(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-
-        validatePostponementRequests(sscsCaseData, response);
         validateBenefitIssueCode(sscsCaseData, response, categoryMapSerivce);
+        validatePostponementRequests(sscsCaseData, response);
         forceToAddOtherPartyOnSscs2Case(sscsCaseData, response);
 
         return response;

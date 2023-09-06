@@ -120,7 +120,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("1234")
-            .benefitCode("002")
+            .benefitCode("022")
             .issueCode("CC")
             .dwpFurtherInfo("Yes")
             .dwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build()).build())
@@ -153,7 +153,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenADwpUploadResponseEvent_thenSetCaseCode() {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals("002CC", response.getData().getCaseCode());
+        assertEquals("022CC", response.getData().getCaseCode());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpResponseDate());
     }
 
@@ -352,6 +352,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         List<String> elementList = new ArrayList<>();
         elementList.add("testElement");
         sscsCaseData.setElementsDisputedList(elementList);
+        sscsCaseData.setCaseCode("001");
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("uc").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
