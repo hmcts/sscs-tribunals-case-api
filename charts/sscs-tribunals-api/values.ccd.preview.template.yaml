@@ -3,6 +3,14 @@ tags:
   sscs-ccd-idam-pr: true
 
 java:
+  memoryRequests: 2Gi
+  cpuRequests: 2000m
+  memoryLimits: 8Gi
+  cpuLimits: 3500m
+  devmemoryRequests: 6Gi
+  devcpuRequests: 2000m
+  devmemoryLimits: 8Gi
+  devcpuLimits: 4500m
   image: ${IMAGE_NAME}
   readinessDelay: 45
   environment:
@@ -77,12 +85,18 @@ ccd-case-document-am-api:
 xui-webapp:
   enabled: true
   nodejs:
+    memoryRequests: 2Gi
+    cpuRequests: 2000m
+    memoryLimits: 4Gi
+    cpuLimits: 3500m
+    devmemoryRequests: 6Gi
+    devcpuRequests: 2000m
+    devmemoryLimits: 8Gi
+    devcpuLimits: 4500m
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
     ingressHost: xui-${SERVICE_FQDN}
-    memoryLimits: 1836Mi
-    cpuLimits: 1900m
     environment:
       HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
       HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
