@@ -4,6 +4,10 @@ tags:
 
 java:
   image: ${IMAGE_NAME}
+  memoryLimits: "8Gi"
+  memoryRequests: "1Gi"
+  cpuRequests: "2"
+  cpuLimits: 2000m
   readinessDelay: 45
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
@@ -77,12 +81,14 @@ ccd-case-document-am-api:
 xui-webapp:
   enabled: true
   nodejs:
+    memoryLimits: "4Gi"
+    cpuLimits: 2000m
+    memoryRequests: "1Gi"
+    cpuRequests: "1"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
     ingressHost: xui-${SERVICE_FQDN}
-    memoryLimits: 1836Mi
-    cpuLimits: 1900m
     environment:
       HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
       HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
@@ -488,7 +494,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-10603-1
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-10526nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -507,7 +513,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S-10603-1
+      CCD_DEF_VERSION: S-10526nonProd
     secrets: []
     userRoles:
       - citizen
@@ -584,6 +590,8 @@ sscs-tya-notif:
       HOURS_END_TIME: 23
       RUN_DB_MIGRATION_ON_STARTUP: true
       TEST_RECIPIENTS_POSTCODE: "*"
+      POST_HEARINGS_FEATURE: true
+      POST_HEARINGS_B_FEATURE: true
     secrets:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
@@ -626,7 +634,9 @@ sscs-ccd-callback-orchestrator:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:prod-99baf80-20230629135543
+    memoryLimits: "2Gi"
+    cpuLimits: 2000m
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
@@ -750,7 +760,7 @@ hmc-cft-hearing-service:
 servicebus:
   enabled: true
   resourceGroup: sscs-aso-preview-rg
-  sbNamespace: sscs
+  sbNamespace: sscs-servicebus-preview
   #Each topic/queue matches up to one used in the config above
   setup:
     topics:

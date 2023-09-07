@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.builder;
 
 import static java.time.LocalDateTime.of;
 import static java.time.LocalDateTime.parse;
-import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_1;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_2;
@@ -221,7 +220,7 @@ public class TrackYourAppealJsonBuilder {
                         || DocumentType.FINAL_DECISION_NOTICE.getValue().equals(d.getValue().getDocumentType()))
                 .map(AbstractDocument::getValue)
                 .sorted(createDateAddedComparator())
-                .collect(toList());
+                .toList();
 
         for (SscsDocumentDetails detail : outcomeDocs) {
             ObjectNode documentNode = JsonNodeFactory.instance.objectNode();
@@ -398,9 +397,7 @@ public class TrackYourAppealJsonBuilder {
     }
 
     private List<Event> buildHistoricalEvents(List<Event> events, List<Event> latestEvents) {
-
-        return events.stream().skip(latestEvents.size()).collect(toList());
-
+        return events.stream().skip(latestEvents.size()).toList();
     }
 
     private String getAppealStatus(List<Event> events) {
@@ -418,27 +415,20 @@ public class TrackYourAppealJsonBuilder {
     }
 
     private void buildEventNode(Event event, ObjectNode eventNode, Map<Event, Document> eventDocumentMap, Map<Event, Hearing> eventHearingMap) {
-
         switch (getEventType(event)) {
-            case APPEAL_RECEIVED:
-            case DWP_RESPOND_OVERDUE:
-                eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, MAX_DWP_RESPONSE_DAYS, true));
-                break;
-            case EVIDENCE_RECEIVED:
+            case APPEAL_RECEIVED, DWP_RESPOND_OVERDUE ->
+                    eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, MAX_DWP_RESPONSE_DAYS, true));
+            case EVIDENCE_RECEIVED -> {
                 Document document = eventDocumentMap.get(event);
                 if (document != null) {
                     eventNode.put(EVIDENCE_TYPE, document.getValue().getEvidenceType());
                     eventNode.put(EVIDENCE_PROVIDED_BY, document.getValue().getEvidenceProvidedBy());
                 }
-                break;
-            case DWP_RESPOND:
-            case PAST_HEARING_BOOKED:
-            case POSTPONED:
-                eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
-                    DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS, false));
-                break;
-            case HEARING_BOOKED:
-            case NEW_HEARING_BOOKED:
+            }
+            case DWP_RESPOND, PAST_HEARING_BOOKED, POSTPONED ->
+                    eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
+                            DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS, false));
+            case HEARING_BOOKED, NEW_HEARING_BOOKED -> {
                 Hearing hearing = eventHearingMap.get(event);
                 if (hearing != null) {
                     eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
@@ -450,23 +440,20 @@ public class TrackYourAppealJsonBuilder {
                     eventNode.put(ADDRESS_LINE_3, hearing.getValue().getVenue().getAddress().getTown());
                     eventNode.put(GOOGLE_MAP_URL, hearing.getValue().getVenue().getGoogleMapLink());
                 }
-                break;
-            case ADJOURNED:
+            }
+            case ADJOURNED -> {
                 eventNode.put(ADJOURNED_DATE, getUtcDate((event)));
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
-                    ADJOURNED_HEARING_DATE_CONTACT_WEEKS, false));
+                        ADJOURNED_HEARING_DATE_CONTACT_WEEKS, false));
                 eventNode.put(ADJOURNED_LETTER_RECEIVED_BY_DATE, getCalculatedDate(event,
-                    ADJOURNED_LETTER_RECEIVED_MAX_DAYS, true));
+                        ADJOURNED_LETTER_RECEIVED_MAX_DAYS, true));
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
-                    ADJOURNED_HEARING_DATE_CONTACT_WEEKS, false));
-                break;
-            case DORMANT:
-            case HEARING:
-                eventNode.put(DECISION_LETTER_RECEIVE_BY_DATE, getBusinessDay(event,
+                        ADJOURNED_HEARING_DATE_CONTACT_WEEKS, false));
+            }
+            case DORMANT, HEARING -> eventNode.put(DECISION_LETTER_RECEIVE_BY_DATE, getBusinessDay(event,
                     HEARING_DECISION_LETTER_RECEIVED_MAX_DAYS));
-                break;
-            default:
-                break;
+            default -> {
+            }
         }
     }
 

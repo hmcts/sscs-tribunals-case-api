@@ -7,7 +7,6 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.lowerCase;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
@@ -22,7 +21,7 @@ public class PostcodeUtil {
                 .map(CcdValue::getValue)
                 .filter(op -> hasOtherPartyGotEmailSubscription(op, email))
                 .map(op -> normalise(op.getAddress().getPostcode()))
-                .collect(Collectors.toList());
+                .toList();
 
         String appealPostcode = sscsCaseDetails.getData().getAppeal().getAppellant().getAddress().getPostcode();
         String normalisedAppealPostcode = normalise(appealPostcode);
