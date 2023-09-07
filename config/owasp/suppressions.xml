@@ -46,4 +46,10 @@
     <cve>CVE-2023-3782</cve>
     <cve>CVE-2023-3635</cve>
   </suppress>
+  <suppress until = "2023-10-01">
+    <notes><![CDATA[
+    Apache Tomcat
+    ]]></notes>
+    <cve>CVE-2023-41080</cve>
+  </suppress>
 </suppressions>

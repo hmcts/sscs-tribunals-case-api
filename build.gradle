@@ -3,7 +3,7 @@ plugins {
     id 'pmd'
     id 'org.sonarqube' version '4.3.0.3225'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.7.14'
+    id 'org.springframework.boot' version '2.7.15'
     id 'uk.gov.hmcts.java' version '0.12.43'
     id 'com.gorylenko.gradle-git-properties' version '2.4.1'
     id 'com.github.ben-manes.versions' version '0.46.0'
