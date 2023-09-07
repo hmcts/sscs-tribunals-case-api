@@ -2061,7 +2061,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setScannedDocuments(docs);
 
         ActionFurtherEvidenceAboutToSubmitHandler handler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService,
-                bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true), false);
+                bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(true), false, false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
