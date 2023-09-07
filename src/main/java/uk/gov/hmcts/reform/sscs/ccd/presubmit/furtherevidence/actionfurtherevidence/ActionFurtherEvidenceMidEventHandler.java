@@ -180,7 +180,7 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
         return pdfReadableErrorList.stream()
                 .filter(pdfReadable -> pdfReadable.getPdfState().equals(pdfState))
                 .map(PdfReadable::getFilename)
-                .collect(toUnmodifiableList());
+                .toList();
     }
 
     private void checkForWarningsAndErrorsOnScannedDocuments(SscsCaseData sscsCaseData, Boolean ignoreWarnings,

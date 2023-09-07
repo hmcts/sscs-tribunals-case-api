@@ -3,7 +3,7 @@ plugins {
     id 'pmd'
     id 'org.sonarqube' version '4.3.0.3225'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.7.14'
+    id 'org.springframework.boot' version '2.7.15'
     id 'uk.gov.hmcts.java' version '0.12.43'
     id 'com.gorylenko.gradle-git-properties' version '2.4.1'
     id 'com.github.ben-manes.versions' version '0.46.0'
@@ -335,11 +335,11 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6caa7a1b5f'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '3b45cdb'
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.4'
 
-    implementation group: 'com.azure', name: 'azure-core', version: '1.41.0'
-    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.1'
+    implementation group: 'com.azure', name: 'azure-core', version: '1.42.0'
+    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.2'
 
     implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.5.8'
 
@@ -392,8 +392,8 @@ dependencies {
 
     testImplementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version:  '4.5.14'
 
-    testImplementation group: 'com.azure', name: 'azure-core', version: '1.41.0'
-    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.1'
+    testImplementation group: 'com.azure', name: 'azure-core', version: '1.42.0'
+    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.2'
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.37.0'
