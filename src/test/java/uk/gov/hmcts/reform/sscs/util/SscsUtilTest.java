@@ -175,6 +175,6 @@ class SscsUtilTest {
         validateBenefitIssueCode(caseData, response, categoryMapSerivce);
 
         assertThat(response.getErrors().size()).isEqualTo(1);
-        assertThat(response.getErrors()).contains(THE_BENEFIT_CODE_IS_NOT_IN_USE);
+        assertThat(response.getErrors()).contains(BENEFIT_CODE_NOT_IN_USE);
     }
 }

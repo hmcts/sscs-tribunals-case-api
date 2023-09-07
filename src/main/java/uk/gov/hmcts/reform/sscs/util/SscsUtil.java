@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 public class SscsUtil {
 
     public static final String INVALID_BENEFIT_ISSUE_CODE = "Incorrect benefit/issue code combination";
-    public static final String THE_BENEFIT_CODE_IS_NOT_IN_USE = "The benefit code is not in use";
+    public static final String BENEFIT_CODE_NOT_IN_USE = "The benefit code selected is not in use";
 
     private SscsUtil() {
         //
@@ -162,7 +162,7 @@ public class SscsUtil {
 
 
         if (isNull(Benefit.getBenefitFromBenefitCode(caseData.getBenefitCode()))) {
-            response.addError(THE_BENEFIT_CODE_IS_NOT_IN_USE);
+            response.addError(BENEFIT_CODE_NOT_IN_USE);
         }
 
 
