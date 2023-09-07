@@ -22,7 +22,6 @@
     <notes><![CDATA[
     file name:tomcat-embed-websocket-9.0.78.jar
     ]]></notes>
-    <packageUrl>pkg:maven/org.apache.tomcat.embed/tomcat-embed-websocket@9.0.78</packageUrl>
     <cve>CVE-2023-41080</cve>
   </suppress>
 </suppressions>
