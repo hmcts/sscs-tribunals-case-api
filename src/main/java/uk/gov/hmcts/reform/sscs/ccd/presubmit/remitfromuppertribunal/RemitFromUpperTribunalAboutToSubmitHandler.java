@@ -1,8 +1,7 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.remittofirsttier;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.remitfromuppertribunal;
 
 import static java.util.Objects.requireNonNull;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +18,7 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class RemitToFirstTierAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class RemitFromUpperTribunalAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final FooterService footerService;
 
@@ -33,7 +32,7 @@ public class RemitToFirstTierAboutToSubmitHandler implements PreSubmitCallbackHa
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.REMIT_TO_FIRST_TIER
+                && callback.getEvent() == EventType.REMIT_FROM_UPPER_TRIBUNAL
                 && isPostHearingsBEnabled;
     }
 
@@ -52,7 +51,7 @@ public class RemitToFirstTierAboutToSubmitHandler implements PreSubmitCallbackHa
 
         if (response.getErrors().isEmpty()) {
             SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData,
-                caseData.getPostHearing().getRemitToFirstTier().getRemittanceDocument(),
+                caseData.getPostHearing().getRemitFromUpperTribunal().getRemittanceDocument(),
                 DocumentType.UPPER_TRIBUNALS_DECISION_REMITTED,
                 callback.getEvent());
         }
@@ -61,8 +60,8 @@ public class RemitToFirstTierAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private PreSubmitCallbackResponse<SscsCaseData> validateRequest(SscsCaseData caseData) {
         final PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-        RemitToFirstTier remitToFirstTier = caseData.getPostHearing().getRemitToFirstTier();
-        if (remitToFirstTier.getRemittanceDocument() == null) {
+        RemitFromUpperTribunal remitFromUpperTribunal = caseData.getPostHearing().getRemitFromUpperTribunal();
+        if (remitFromUpperTribunal.getRemittanceDocument() == null) {
             response.addError("There is no remittance document");
         }
         return response;

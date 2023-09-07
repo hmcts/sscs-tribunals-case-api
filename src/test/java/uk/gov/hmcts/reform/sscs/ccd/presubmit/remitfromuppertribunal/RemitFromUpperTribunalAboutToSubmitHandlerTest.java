@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.remittofirsttier;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.remitfromuppertribunal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
@@ -10,22 +10,19 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.sendtofirsttier.SendToFirstTierAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @ExtendWith(MockitoExtension.class)
-public class RemitToFirstTierAboutToSubmitHandlerTest {
+public class RemitFromUpperTribunalAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private RemitToFirstTierAboutToSubmitHandler handler;
+    private RemitFromUpperTribunalAboutToSubmitHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -40,12 +37,12 @@ public class RemitToFirstTierAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new RemitToFirstTierAboutToSubmitHandler(footerService, true);
+        handler = new RemitFromUpperTribunalAboutToSubmitHandler(footerService, true);
 
         caseData = SscsCaseData.builder()
                 .ccdCaseId("1234")
                 .postHearing(PostHearing.builder()
-                    .remitToFirstTier(RemitToFirstTier.builder()
+                    .remitFromUpperTribunal(RemitFromUpperTribunal.builder()
                         .remittanceDocument(DocumentLink.builder()
                             .documentBinaryUrl("binaryUrl")
                             .documentFilename("filename")
@@ -59,7 +56,7 @@ public class RemitToFirstTierAboutToSubmitHandlerTest {
 
     @Test
     void givenAValidSubmittedEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(REMIT_TO_FIRST_TIER);
+        when(callback.getEvent()).thenReturn(REMIT_FROM_UPPER_TRIBUNAL);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isTrue();
     }
 
@@ -71,7 +68,7 @@ public class RemitToFirstTierAboutToSubmitHandlerTest {
 
     @Test
     void givenPostHearingsBEnabledFalse_thenReturnFalse() {
-        handler = new RemitToFirstTierAboutToSubmitHandler(footerService, false);
+        handler = new RemitFromUpperTribunalAboutToSubmitHandler(footerService, false);
         when(callback.getEvent()).thenReturn(SEND_TO_FIRST_TIER);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
@@ -85,7 +82,7 @@ public class RemitToFirstTierAboutToSubmitHandlerTest {
     void shouldReturnWithoutError() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(callback.getEvent()).thenReturn(REMIT_TO_FIRST_TIER);
+        when(callback.getEvent()).thenReturn(REMIT_FROM_UPPER_TRIBUNAL);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -93,12 +90,12 @@ public class RemitToFirstTierAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
     }
 
-   @Test
+    @Test
     void shouldErrorIfNoRemittanceDocument() {
-        caseData.getPostHearing().getRemitToFirstTier().setRemittanceDocument(null);
+        caseData.getPostHearing().getRemitFromUpperTribunal().setRemittanceDocument(null);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(callback.getEvent()).thenReturn(REMIT_TO_FIRST_TIER);
+        when(callback.getEvent()).thenReturn(REMIT_FROM_UPPER_TRIBUNAL);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

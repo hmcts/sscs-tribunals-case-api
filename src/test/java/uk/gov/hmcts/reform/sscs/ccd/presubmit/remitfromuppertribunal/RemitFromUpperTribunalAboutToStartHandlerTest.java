@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.remittofirsttier;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.remitfromuppertribunal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
@@ -15,14 +15,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.sendtofirsttier.SendToFirstTierAboutToStartHandler;
 
 @ExtendWith(MockitoExtension.class)
-public class RemitToFirstTierAboutToStartHandlerTest {
+public class RemitFromUpperTribunalAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private RemitToFirstTierAboutToStartHandler handler;
+    private RemitFromUpperTribunalAboutToStartHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -34,11 +33,11 @@ public class RemitToFirstTierAboutToStartHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new RemitToFirstTierAboutToStartHandler(true);
+        handler = new RemitFromUpperTribunalAboutToStartHandler(true);
 
         caseData = SscsCaseData.builder()
             .postHearing(PostHearing.builder()
-                .remitToFirstTier(RemitToFirstTier.builder()
+                .remitFromUpperTribunal(RemitFromUpperTribunal.builder()
                     .remittanceDocument(DocumentLink.builder().build())
                     .build())
                 .build())
@@ -48,7 +47,7 @@ public class RemitToFirstTierAboutToStartHandlerTest {
 
     @Test
     void givenAValidAboutToStartEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(REMIT_TO_FIRST_TIER);
+        when(callback.getEvent()).thenReturn(REMIT_FROM_UPPER_TRIBUNAL);
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isTrue();
     }
 
@@ -65,14 +64,14 @@ public class RemitToFirstTierAboutToStartHandlerTest {
 
     @Test
     void givenPostHearingsBEnabledFalse_thenReturnFalse() {
-        handler = new RemitToFirstTierAboutToStartHandler(false);
-        when(callback.getEvent()).thenReturn(REMIT_TO_FIRST_TIER);
+        handler = new RemitFromUpperTribunalAboutToStartHandler(false);
+        when(callback.getEvent()).thenReturn(REMIT_FROM_UPPER_TRIBUNAL);
         assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 
     @Test
     void givenCase_shouldClearPostHearingFieldsAndReturnWithoutError() {
-        when(callback.getEvent()).thenReturn(REMIT_TO_FIRST_TIER);
+        when(callback.getEvent()).thenReturn(REMIT_FROM_UPPER_TRIBUNAL);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
@@ -80,6 +79,6 @@ public class RemitToFirstTierAboutToStartHandlerTest {
                 handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        assertThat(caseData.getPostHearing().getRemitToFirstTier().getRemittanceDocument()).isNull();
+        assertThat(caseData.getPostHearing().getRemitFromUpperTribunal().getRemittanceDocument()).isNull();
     }
 }

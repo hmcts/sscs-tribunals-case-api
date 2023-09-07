@@ -111,7 +111,7 @@ public class FooterServiceTest {
         "PERMISSION_TO_APPEAL_APPLICATION, received, POST_HEARING_REQUEST, FTA",
         "UPPER_TRIBUNALS_DECISION_REMADE, received, SEND_TO_FIRST_TIER, Upper Tribunal",
         "UPPER_TRIBUNALS_DECISION_REFUSED, received, SEND_TO_FIRST_TIER, Upper Tribunal",
-        "UPPER_TRIBUNALS_DECISION_REMITTED, received, REMIT_TO_FIRST_TIER, Upper Tribunal"
+        "UPPER_TRIBUNALS_DECISION_REMITTED, received, REMIT_FROM_UPPER_TRIBUNAL, Upper Tribunal"
     })
     public void givenADocument_thenAddAFooter(DocumentType documentType, String verb, EventType eventType, String originalSender) throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));

@@ -64,7 +64,7 @@ public class FooterService extends AbstractFooterService<SscsDocument> {
             switch (eventType) {
                 case POST_HEARING_REQUEST:
                     return "FTA";
-                case SEND_TO_FIRST_TIER, REMIT_TO_FIRST_TIER:
+                case SEND_TO_FIRST_TIER, REMIT_FROM_UPPER_TRIBUNAL:
                     return "Upper Tribunal";
                 default:
                     return null;

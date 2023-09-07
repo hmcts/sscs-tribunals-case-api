@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.remittofirsttier;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.remitfromuppertribunal;
 
 import static java.util.Objects.requireNonNull;
 
@@ -10,14 +10,17 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RemitFromUpperTribunalActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class RemitToFirstTierAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class RemitFromUpperTribunalSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final CcdCallbackMapService ccdCallbackMapService;
 
     @Value("${feature.postHearingsB.enabled}")
     private final boolean isPostHearingsBEnabled;
@@ -27,8 +30,8 @@ public class RemitToFirstTierAboutToStartHandler implements PreSubmitCallbackHan
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_START)
-                && callback.getEvent() == EventType.REMIT_TO_FIRST_TIER
+        return callbackType.equals(CallbackType.SUBMITTED)
+                && callback.getEvent() == EventType.REMIT_FROM_UPPER_TRIBUNAL
                 && isPostHearingsBEnabled;
     }
 
@@ -40,10 +43,8 @@ public class RemitToFirstTierAboutToStartHandler implements PreSubmitCallbackHan
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+        caseData = ccdCallbackMapService.handleCcdCallbackMap(RemitFromUpperTribunalActions.REMITTED_FROM_UPPER_TRIBUNAL, caseData);
 
-        SscsUtil.clearPostHearingFields(caseData, isPostHearingsBEnabled);
-
-        return response;
+        return new PreSubmitCallbackResponse<>(caseData);
     }
 }
