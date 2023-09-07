@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDuration
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.ADJOURNMENT_NOTICE_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 
@@ -106,8 +107,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             sscsCaseData.setDwpState(ADJOURNMENT_NOTICE_ISSUED);
-
-            sscsCaseData.setState(isYes(sscsCaseData.getAdjournment().getCanCaseBeListedRightAway()) ? State.READY_TO_LIST : State.NOT_LISTABLE);
+            sscsCaseData.setState(isCaseListable(sscsCaseData));
         } else {
             log.info("Case is a Welsh case so Adjournment Notice requires translation for case id : {}", sscsCaseData.getCcdCaseId());
             sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
@@ -123,8 +123,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             updatePanelMembers(sscsCaseData);
             updateOverrideFields(sscsCaseData);
 
-            if (SscsUtil.isSAndLCase(sscsCaseData)
-                && (isYes(adjournment.getCanCaseBeListedRightAway()))) {
+            if (SscsUtil.isSAndLCase(sscsCaseData) && State.READY_TO_LIST.equals(sscsCaseData.getState())) {
                 adjournment.setAdjournmentInProgress(YES);
                 hearingMessageHelper.sendListAssistCreateAdjournmentHearingMessage(sscsCaseData.getCcdCaseId());
             }
@@ -135,6 +134,15 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         preSubmitCallbackResponse.getData().getSscsDocument()
                 .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
+    }
+
+    private static State isCaseListable(SscsCaseData sscsCaseData) {
+        Adjournment adjournment = sscsCaseData.getAdjournment();
+        boolean generateNotice = isYes(adjournment.getGenerateNotice());
+        boolean canCaseBeListedRightAway = isYes(adjournment.getCanCaseBeListedRightAway());
+        boolean areDirectionsNotBeingMade = isNoOrNull(adjournment.getAreDirectionsBeingMadeToParties());
+
+        return (generateNotice && canCaseBeListedRightAway) || (! generateNotice && areDirectionsNotBeingMade) ? State.READY_TO_LIST : State.NOT_LISTABLE;
     }
 
     private void clearAdjournmentTransientFields(SscsCaseData caseData) {
