@@ -866,7 +866,7 @@ wa-case-event-handler:
       AZURE_SERVICE_BUS_CONNECTION_STRING: ${SERVICE_BUS_CONNECTION_STRING}
       AZURE_SERVICE_BUS_TOPIC_NAME: ccd-case-events
       AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: ccd-case-events
-      AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME: sscs-tribunals-api-pr-3156
+      AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME: sscs-tribunals-api-pr-3425
       POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
       POSTGRES_NAME: wa-case-event-handler
       POSTGRES_USERNAME: hmcts
