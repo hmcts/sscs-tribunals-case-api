@@ -12,7 +12,7 @@ REDIRECT_URI="http://xui-webapp/oauth2/callback"
 CLIENT_ID="ccd_gateway"
 CLIENT_SECRET="OOOOOOOOOOOOOOOO"
 SCOPE="openid%20profile%20roles%20authorities"
-IDAM_URL="${IDAM_URL:-http://localhost:5000}"
+IDAM_URL="${IDAM_URL:-http://localhost:5062}"
 
 curl --silent --show-error \
   -H "Content-Type: application/x-www-form-urlencoded" \
