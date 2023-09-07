@@ -160,7 +160,7 @@ class SscsUtilTest {
 
     @Test
     void givenWrongIssueAndBenefitCode_addErrorToResponse() {
-        SscsCaseData caseData = SscsCaseData.builder().benefitCode("31231232").issueCode("XA").build();
+        SscsCaseData caseData = SscsCaseData.builder().benefitCode("002").issueCode("XA").build();
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
         validateBenefitIssueCode(caseData, response, categoryMapSerivce);
 
@@ -168,4 +168,13 @@ class SscsUtilTest {
         assertThat(response.getErrors()).contains(INVALID_BENEFIT_ISSUE_CODE);
     }
 
+    @Test
+    void givenLegacyBenefitCode_addErrorToResponse() {
+        SscsCaseData caseData = SscsCaseData.builder().benefitCode("032").issueCode("CR").build();
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+        validateBenefitIssueCode(caseData, response, categoryMapSerivce);
+
+        assertThat(response.getErrors().size()).isEqualTo(1);
+        assertThat(response.getErrors()).contains(THE_BENEFIT_CODE_IS_NOT_IN_USE);
+    }
 }
