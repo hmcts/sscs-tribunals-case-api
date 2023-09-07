@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase.CreateCaseAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
@@ -43,7 +44,7 @@ public class Sscs1PdfHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
-    private Sscs1PdfHandler sscs1PdfHandler;
+    private CreateCaseAboutToSubmitHandler sscs1PdfHandler;
 
     @Before
     public void setUp() {
@@ -55,7 +56,7 @@ public class Sscs1PdfHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
-        sscs1PdfHandler = new Sscs1PdfHandler(sscsPdfService, emailHelper);
+        sscs1PdfHandler = new CreateCaseAboutToSubmitHandler(sscsPdfService, emailHelper);
     }
 
     @Test

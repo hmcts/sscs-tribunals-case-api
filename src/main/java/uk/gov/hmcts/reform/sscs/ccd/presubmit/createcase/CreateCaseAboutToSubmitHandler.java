@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,18 +9,19 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 
 @Component
 @Slf4j
-public class Sscs1PdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final SscsPdfService sscsPdfService;
     private final EmailHelper emailHelper;
 
     @Autowired
-    public Sscs1PdfHandler(SscsPdfService sscsPdfService, EmailHelper emailHelper) {
+    public CreateCaseAboutToSubmitHandler(SscsPdfService sscsPdfService, EmailHelper emailHelper) {
         this.sscsPdfService = sscsPdfService;
         this.emailHelper = emailHelper;
     }
