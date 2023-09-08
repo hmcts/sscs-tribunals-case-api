@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 
+import static java.util.Objects.isNull;
+
 @Component
 @Slf4j
 public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -58,7 +60,27 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
             createAppealPdf(caseData);
         }
 
+        handleBenefitType(caseData);
+
         return sscsCaseDataPreSubmitCallbackResponse;
+    }
+
+    private void handleBenefitType(SscsCaseData caseData) {
+        Appeal appeal = caseData.getAppeal();
+        if (isNull(appeal)) return;
+
+        BenefitType benefitType = appeal.getBenefitType();
+        if (isNull(benefitType)) return;
+
+        DynamicList benefitTypeDescription = benefitType.getDescriptionSelection();
+        if (isNull(benefitTypeDescription)) return;
+
+        DynamicListItem selectedBenefitType = benefitTypeDescription.getValue();
+        if (isNull(selectedBenefitType)) return;
+
+        String code = selectedBenefitType.getCode();
+        benefitType.setCode(code);
+        benefitType.setDescription(Benefit.getBenefitFromBenefitCode(code).getDescription());
     }
 
     private void createAppealPdf(SscsCaseData caseData) {

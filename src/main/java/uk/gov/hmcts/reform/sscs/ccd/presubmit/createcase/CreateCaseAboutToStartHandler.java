@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import static java.util.Objects.isNull;
@@ -59,7 +60,8 @@ public class CreateCaseAboutToStartHandler implements PreSubmitCallbackHandler<S
 
     private DynamicList getBenefitDescriptions() {
         List<DynamicListItem> items = Arrays.stream(Benefit.values())
-                .map(benefit -> new DynamicListItem(benefit.getBenefitCode(), benefit.getDescription()))
+                .sorted(Comparator.comparing(Benefit::getDescription))
+                .map(benefit -> new DynamicListItem(benefit.getBenefitCode(), benefit.getDescription() + " / " + benefit.getBenefitCode()))
                 .toList();
 
         return new DynamicList(null, items);
