@@ -983,6 +983,7 @@ sscs-cron-trigger:
     kind: CronJob
     image: 'hmctspublic.azurecr.io/sscs/cron-trigger:pr-5-218a1cb-20230803170336'
     releaseNameOverride: ${SERVICE_NAME}-sscs-cron-trigger
+    name: ${SERVICE_NAME}-sscs-cron-trigger
     schedule: "0 10-17 * * *"
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
