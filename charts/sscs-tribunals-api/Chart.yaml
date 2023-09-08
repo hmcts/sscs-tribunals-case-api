@@ -30,7 +30,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-ccd-callback-orchestrator.enabled
   - name: ccd
-    version: 9.0.2-alpha
+    version: 9.0.5-alpha
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd.enabled
     tags:
