@@ -257,13 +257,13 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
     private void updateOverrideFields(SscsCaseData caseData) {
         OverrideFields fields = caseData.getSchedulingAndListingFields().getOverrideFields();
-        Adjournment adjournment = caseData.getAdjournment();
 
         if (isNull(fields)) {
             fields = OverrideFields.builder().build();
             caseData.getSchedulingAndListingFields().setOverrideFields(fields);
         }
 
+        Adjournment adjournment = caseData.getAdjournment();
         var nextHearingVenueSelected = adjournment.getNextHearingVenueSelected();
 
         if (nonNull(nextHearingVenueSelected)) {
@@ -284,11 +284,11 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             fields.setAppellantInterpreter(interpreter);
         }
 
-        Integer duration = handleHearingDuration(caseData);
-        fields.setDuration(duration);
-
         updateHearingChannelAndWantsToAttend(caseData);
         handleHearingWindow(caseData, fields);
+
+        Integer duration = handleHearingDuration(caseData);
+        fields.setDuration(duration);
     }
 
     private void updateHearingChannelAndWantsToAttend(SscsCaseData sscsCaseData) {
