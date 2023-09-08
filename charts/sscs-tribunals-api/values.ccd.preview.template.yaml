@@ -39,6 +39,7 @@ java:
     SCHEDULE_LISTING_FEATURE: true
     POST_HEARINGS_FEATURE: true
     POST_HEARINGS_B_FEATURE: true
+    JAVA_OPTS: -Xmx6G
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
