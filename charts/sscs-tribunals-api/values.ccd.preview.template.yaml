@@ -169,7 +169,7 @@ ccd:
       livenessDelay: 240
       environment:
         ROLE_ASSIGNMENT_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-        ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
+        ROLE_ASSIGNMENT_DB_NAME: "role-assignment"
         ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
         AM_ROLE_ASSIGNMENT_SERVICE_SECRET: AAAAAAAAAAAAAAAA
         IDAM_USER_URL: "https://idam-web-public.aat.platform.hmcts.net"
@@ -195,6 +195,8 @@ ccd:
           key: key
           disabled: true
         ROLE_ASSIGNMENT_DB_PASSWORD:
+          secretRef: sscs-postgres
+          key: PASSWORD
           disabled: false
   elasticsearch:
     nameOverride: ${SERVICE_NAME}-es
@@ -572,6 +574,8 @@ sscs-tya-notif:
         secretRef: sscs-sb-preview
         key: primaryKey
       JOB_SCHEDULER_DB_PASSWORD:
+        secretRef: sscs-postgres
+        key: PASSWORD
         disabled: false
     keyVaults:
       sscs:
@@ -721,6 +725,8 @@ hmc-cft-hearing-service:
         secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-to-hmi
         key: connectionString
       CFT_HEARING_SERVICE_DB_PASSWORD:
+        secretRef: sscs-postgres
+        key: PASSWORD
         disabled: false
     keyVaults:
       hmc:
@@ -757,6 +763,6 @@ postgresql:
     - name: draftstore
     - name: evidence
     - name: annotation
-    - name: role_assignment
+    - name: role-assignment
     - name: hmc-cft-hearing-service
     - name: sscsjobscheduler
