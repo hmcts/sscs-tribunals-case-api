@@ -14,23 +14,21 @@
     <packageUrl regex="true">^pkg:maven/org\.json/json@.*$</packageUrl>
     <cve>CVE-2022-45688</cve>
   </suppress>
-  <suppress until="2023-11-01">
-    <cve>CVE-2023-20863</cve>
-  </suppress>
-  <suppress until="2023-11-01">
-    <cve>CVE-2023-34411</cve>
-  </suppress>
-  <suppress until = "2023-11-01">
+  <suppress until = "2023-11-07">
     <cve>CVE-2023-35116</cve>
     <cve>CVE-2023-2976</cve>
   </suppress>
-  <suppress until = "2023-11-01">
+  <suppress until = "2023-11-07">
     <notes><![CDATA[
-   file name: spring-security-config-5.8.3.jar
+   file name: okio-jvm-3.2.0.jar
    ]]></notes>
-    <cve>CVE-2023-34035</cve>
-    <cve>CVE-2023-3782</cve>
+    <packageUrl regex="true">^pkg:maven/com\.squareup\.okio/okio\-jvm@.*$</packageUrl>
     <cve>CVE-2023-3635</cve>
+  </suppress>
+  <suppress until = "2023-11-07">
+    <notes><![CDATA[
+    file name:tomcat-embed-websocket-9.0.78.jar
+    ]]></notes>
     <cve>CVE-2023-41080</cve>
   </suppress>
 </suppressions>
