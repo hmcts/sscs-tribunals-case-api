@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
+import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @RunWith(SpringRunner.class)
@@ -43,6 +44,9 @@ public class SubscriptionEndPointsIt {
 
     @MockBean
     IdamService idamService;
+
+    @MockBean
+    PostcodeValidator postcodeValidator;
 
     CaseDetails caseDetails = CaseDataUtils.buildCaseDetails();
     SearchResult searchResult = SearchResult.builder().cases(singletonList(caseDetails)).build();

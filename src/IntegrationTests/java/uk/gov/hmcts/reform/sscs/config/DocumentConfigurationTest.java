@@ -11,11 +11,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 
 @SpringBootTest
 @RunWith(JUnitParamsRunner.class)
@@ -29,6 +31,9 @@ public class DocumentConfigurationTest {
 
     @Autowired
     private DocumentConfiguration config;
+
+    @MockBean
+    private PostcodeValidator postcodeValidator;
 
     public static Object[][] documentParameters() {
         return new Object[][] {

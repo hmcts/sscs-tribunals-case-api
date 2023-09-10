@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -48,6 +49,8 @@ public class CitizenRequestControllerIt {
     private CcdService ccdService;
     @MockBean
     private IdamService idamService;
+    @MockBean
+    PostcodeValidator postcodeValidator;
 
     @Autowired
     private MockMvc mockMvc;

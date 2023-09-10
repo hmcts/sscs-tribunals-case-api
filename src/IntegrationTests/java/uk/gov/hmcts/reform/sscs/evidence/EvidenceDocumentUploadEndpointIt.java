@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Classification;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -49,6 +50,9 @@ public class EvidenceDocumentUploadEndpointIt {
 
     @MockBean
     private DocumentUploadClientApi documentUploadClientApi;
+
+    @MockBean
+    private PostcodeValidator postcodeValidator;
 
     @Mock
     private UploadResponse uploadResponse;

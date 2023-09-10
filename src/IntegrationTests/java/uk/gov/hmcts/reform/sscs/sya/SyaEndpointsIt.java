@@ -95,9 +95,6 @@ public class SyaEndpointsIt extends AbstractEventIt {
     @MockBean
     private RefDataApi refDataApi;
 
-    @MockBean
-    PostcodeValidator postcodeValidator;
-
     @Captor
     private ArgumentCaptor<Map<String, Object>> captor;
 
