@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
@@ -25,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler;
+import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -47,6 +47,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final IdamService idamService;
     private final RefDataService refDataService;
     private final VenueService venueService;
+    private final PostcodeValidator postcodeValidator;
     private final boolean caseAccessManagementFeature;
 
     private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
@@ -59,6 +60,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     IdamService idamService,
                                     RefDataService refDataService,
                                     VenueService venueService,
+                                    PostcodeValidator postcodeValidator,
                                     @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
@@ -68,6 +70,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.refDataService = refDataService;
         this.caseAccessManagementFeature = caseAccessManagementFeature;
         this.venueService = venueService;
+        this.postcodeValidator = postcodeValidator;
     }
 
     @Override
@@ -134,9 +137,31 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             validateAppointeeCaseData(sscsCaseData, preSubmitCallbackResponse);
             validateRepresentativeNameData(sscsCaseData, preSubmitCallbackResponse);
             validateJointPartyNameData(sscsCaseData, preSubmitCallbackResponse);
+            validateAllPartiesAddressAndPostcode(sscsCaseData, preSubmitCallbackResponse);
+
         }
 
         return preSubmitCallbackResponse;
+    }
+
+    private void validateAllPartiesAddressAndPostcode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant(), "appellant");
+        validateAddressAndPostcode(response, sscsCaseData.getAppeal().getRep(), "representative");
+        validateAddressAndPostcode(response, sscsCaseData.getJointParty(), "joint party");
+        validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant().getAppointee(), "appointee");
+    }
+
+    private void validateAddressAndPostcode(PreSubmitCallbackResponse<SscsCaseData> response, Entity party, String partyName) {
+        String addressLine1 = party.getAddress().getLine1();
+        String postcode = party.getAddress().getPostcode();
+
+        if (isBlank(addressLine1)) {
+            response.addError("You must enter address line 1 for the " + partyName);
+        }
+
+        if (isBlank(postcode) || !isBlank(postcode) && !postcodeValidator.isValid(postcode, null)) {
+            response.addError("You must enter a valid UK postcode for the " + partyName);
+        }
     }
 
     private void validateAndUpdateDwpHandlingOffice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
