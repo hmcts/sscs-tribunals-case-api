@@ -52,6 +52,7 @@ import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.callback.AbstractEventIt;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 import uk.gov.hmcts.reform.sscs.client.RefDataApi;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
@@ -93,6 +94,9 @@ public class SyaEndpointsIt extends AbstractEventIt {
 
     @MockBean
     private RefDataApi refDataApi;
+
+    @MockBean
+    PostcodeValidator postcodeValidator;
 
     @Captor
     private ArgumentCaptor<Map<String, Object>> captor;
