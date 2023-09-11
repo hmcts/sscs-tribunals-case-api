@@ -144,8 +144,8 @@ xui-webapp:
           - system-user-name
           - system-user-password
 
-aac-manage-case-assignment:
-  enabled: false
+aac-manage-case-assignment:git 
+  enabled: true
   java:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
