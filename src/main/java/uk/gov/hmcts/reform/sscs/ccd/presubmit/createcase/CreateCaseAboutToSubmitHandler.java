@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
+import static java.util.Objects.isNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,8 +13,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
-
-import static java.util.Objects.isNull;
 
 @Component
 @Slf4j
@@ -67,20 +66,31 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
     private void handleBenefitType(SscsCaseData caseData) {
         Appeal appeal = caseData.getAppeal();
-        if (isNull(appeal)) return;
+        if (isNull(appeal)) {
+            return;
+        }
 
         BenefitType benefitType = appeal.getBenefitType();
-        if (isNull(benefitType)) return;
+        if (isNull(benefitType)) {
+            return;
+        }
 
         DynamicList benefitTypeDescription = benefitType.getDescriptionSelection();
-        if (isNull(benefitTypeDescription)) return;
+        if (isNull(benefitTypeDescription)) {
+            return;
+        }
 
         DynamicListItem selectedBenefitType = benefitTypeDescription.getValue();
-        if (isNull(selectedBenefitType)) return;
+        if (isNull(selectedBenefitType)) {
+            return;
+        }
 
         String code = selectedBenefitType.getCode();
-        benefitType.setCode(code);
-        benefitType.setDescription(Benefit.getBenefitFromBenefitCode(code).getDescription());
+        Benefit benefit = Benefit.getBenefitFromBenefitCode(code);
+        benefitType.setCode(benefit.getShortName());
+        benefitType.setDescription(benefit.getDescription());
+        benefitType.setDescriptionSelection(null);
+        caseData.setBenefitCode(benefit.getBenefitCode());
     }
 
     private void createAppealPdf(SscsCaseData caseData) {

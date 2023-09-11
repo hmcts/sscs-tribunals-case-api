@@ -963,8 +963,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     public void givenNewAppellantName_thenSetCaseName() {
         sscsCaseDataBefore.getCaseAccessManagementFields().setCaseNameHmctsInternal("Old Name");
         sscsCaseData.getCaseAccessManagementFields().setCaseNameHmctsInternal("Old Name");
+        BenefitType benefitType = BenefitType.builder().code("UC").description("Universal credit").build();
         sscsCaseData.setAppeal(Appeal.builder()
-                        .benefitType(new BenefitType("UC", "Universal credit"))
+                        .benefitType(benefitType)
                         .appellant(Appellant.builder()
                                 .name(Name.builder().firstName("New").lastName("Name").build())
                                 .address(Address.builder().line1("Line 1").line2("Line 2").postcode("Postcode").build())
@@ -979,8 +980,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     public void givenAppellantNameAdded_thenSetCaseName() {
+        BenefitType benefitType = BenefitType.builder().code("UC").description("Universal credit").build();
         sscsCaseData.setAppeal(Appeal.builder()
-                        .benefitType(new BenefitType("UC", "Universal credit"))
+                        .benefitType(benefitType)
                         .appellant(Appellant.builder()
                                 .name(Name.builder().firstName("New").lastName("Name").build())
                                 .address(Address.builder().line1("Line 1").line2("Line 2").postcode("Postcode").build())
@@ -1001,8 +1003,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     public void givenAppellantNameDeleted_thenUnsetCaseName() {
         sscsCaseDataBefore.getCaseAccessManagementFields().setCaseNameHmctsInternal("Old Name");
         sscsCaseData.getCaseAccessManagementFields().setCaseNameHmctsInternal("Old Name");
+        BenefitType benefitType = BenefitType.builder().code("UC").description("Universal credit").build();
         sscsCaseData.setAppeal(Appeal.builder()
-                .benefitType(new BenefitType("UC", "Universal credit"))
+                .benefitType(benefitType)
                 .appellant(Appellant.builder().build())
                 .build());
 
@@ -1020,8 +1023,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Test
     public void givenOldCaseNameExists_shouldStillSetNewCaseName() {
         sscsCaseDataBefore.getCaseAccessManagementFields().setCaseNameHmctsInternal("Harvey Specter");
+        BenefitType benefitType = BenefitType.builder().code("UC").description("Universal credit").build();
         sscsCaseData.setAppeal(Appeal.builder()
-            .benefitType(new BenefitType("UC", "Universal credit"))
+            .benefitType(benefitType)
             .appellant(Appellant.builder()
                 .name(Name.builder().firstName("Louis").lastName("Litt").build())
                     .address(Address.builder().line1("Line 1").line2("Line 2").postcode("Postcode").build())
@@ -1050,17 +1054,22 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Test
     public void givenBenefitTypeChanged_thenSetCaseCategories() {
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+
+        BenefitType benefitTypeBefore = BenefitType.builder().code("ESA").description("Employment and Support Allowance").build();
+        sscsCaseDataBefore.getAppeal().setBenefitType(benefitTypeBefore);
         sscsCaseDataBefore.getCaseAccessManagementFields().setCategories(Benefit.ESA);
-        sscsCaseData.getCaseAccessManagementFields().setCategories(Benefit.ESA);
-        sscsCaseDataBefore.getAppeal().setBenefitType(new BenefitType("ESA", "Employment and Support Allowance"));
+
+        BenefitType benefitType = BenefitType.builder().code("UC").description("Universal credit").build();
         sscsCaseData.setAppeal(Appeal.builder()
-                .benefitType(new BenefitType("UC", "Universal Credit"))
+                .benefitType(benefitType)
                 .appellant(Appellant.builder()
                         .name(Name.builder().firstName("New").lastName("Name").build())
                         .address(Address.builder().line1("Line 1").line2("Line 2").postcode("Postcode").build())
                         .identity(Identity.builder().dob("1").nino("Nino").build())
                         .build())
                 .build());
+        sscsCaseData.getCaseAccessManagementFields().setCategories(Benefit.ESA);
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals("universalCredit", response.getData().getCaseAccessManagementFields().getCaseAccessCategory());
         assertEquals("Universal Credit", response.getData().getCaseAccessManagementFields().getCaseManagementCategory().getValue().getLabel());
@@ -1078,17 +1087,18 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
 
-        sscsCaseData.getCaseAccessManagementFields().setCategories(Benefit.ESA);
+        BenefitType benefitType = BenefitType.builder().code("").description("").build();
         sscsCaseData.setAppeal(Appeal.builder()
-                .benefitType(new BenefitType("", ""))
+                .benefitType(benefitType)
                 .appellant(Appellant.builder()
                         .name(Name.builder().firstName("New").lastName("Name").build())
                         .address(Address.builder().line1("Line 1").line2("Line 2").postcode("Postcode").build())
                         .identity(Identity.builder().dob("1").nino("Nino").build())
                         .build())
                 .build());
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        sscsCaseData.getCaseAccessManagementFields().setCategories(Benefit.ESA);
 
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
     }
 
@@ -1101,8 +1111,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
 
+        BenefitType benefitType = BenefitType.builder().code("").description("").build();
         sscsCaseData.setAppeal(Appeal.builder()
-                .benefitType(new BenefitType("", ""))
+                .benefitType(benefitType)
                 .appellant(Appellant.builder()
                         .name(Name.builder().firstName("New").lastName("Name").build())
                         .address(Address.builder().line1("Line 1").line2("Line 2").postcode("Postcode").build())

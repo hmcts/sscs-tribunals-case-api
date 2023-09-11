@@ -1,21 +1,18 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNull;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.overviewproject.mime_types.App;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-
-import static java.util.Objects.isNull;
-import static java.util.Objects.requireNonNull;
-
 
 @Component
 @Slf4j
