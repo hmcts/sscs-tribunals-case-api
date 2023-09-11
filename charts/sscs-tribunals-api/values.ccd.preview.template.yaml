@@ -158,6 +158,7 @@ ccd:
     enableKeyVaults: true
     devMode: true
     postgresHostname: "sscs-flexibleserver-postgres-preview.postgres.database.azure.com"
+    postgresSecret: sscs-postgres
 
   am-role-assignment-service:
     java:
@@ -195,7 +196,7 @@ ccd:
           key: key
           disabled: true
         ROLE_ASSIGNMENT_DB_PASSWORD:
-          secretRef: sscs-postgres
+          secretRef: "{{ .Values.global.postgresSecret }}"
           key: PASSWORD
           disabled: false
   elasticsearch:
@@ -574,7 +575,7 @@ sscs-tya-notif:
         secretRef: sscs-sb-preview
         key: primaryKey
       JOB_SCHEDULER_DB_PASSWORD:
-        secretRef: sscs-postgres
+        secretRef: "{{ .Values.global.postgresSecret }}"
         key: PASSWORD
         disabled: false
     keyVaults:
@@ -725,7 +726,7 @@ hmc-cft-hearing-service:
         secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-to-hmi
         key: connectionString
       CFT_HEARING_SERVICE_DB_PASSWORD:
-        secretRef: sscs-postgres
+        secretRef: "{{ .Values.global.postgresSecret }}"
         key: PASSWORD
         disabled: false
     keyVaults:
