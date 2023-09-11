@@ -229,7 +229,6 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             writeFinalDecisionBuilder.heldOn(LocalDate.now());
         }
 
-
         writeFinalDecisionBuilder.heldAt(heldAt);
     }
 

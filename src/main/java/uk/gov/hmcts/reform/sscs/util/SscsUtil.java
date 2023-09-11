@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.util;
 
+import static io.micrometer.core.instrument.util.StringUtils.isNotBlank;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -167,7 +168,6 @@ public class SscsUtil {
     public static void setCorrectionInProgress(CaseDetails<SscsCaseData> caseDetails, boolean isPostHearingsEnabled) {
         if (isPostHearingsEnabled) {
             YesNo correctionInProgress = State.POST_HEARING.equals(caseDetails.getState()) || State.DORMANT_APPEAL_STATE.equals(caseDetails.getState()) ? YES : NO;
-
             caseDetails.getCaseData().getPostHearing().getCorrection().setCorrectionFinalDecisionInProgress(correctionInProgress);
         }
     }
@@ -182,16 +182,16 @@ public class SscsUtil {
 
     public static String buildWriteFinalDecisionHeldBefore(SscsCaseData caseData, @NonNull String signedInJudgeName) {
         List<String> names = new ArrayList<>();
-
         names.add(signedInJudgeName);
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDisabilityQualifiedPanelMemberName())) {
-            names.add(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
+        SscsFinalDecisionCaseData finalDecisionCaseData = caseData.getSscsFinalDecisionCaseData();
+        if (isNotBlank(finalDecisionCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName())) {
+            names.add(finalDecisionCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
-            names.add(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
+        if (isNotBlank(finalDecisionCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
+            names.add(finalDecisionCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
         }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionOtherPanelMemberName())) {
-            names.add(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionOtherPanelMemberName());
+        if (isNotBlank(finalDecisionCaseData.getWriteFinalDecisionOtherPanelMemberName())) {
+            names.add(finalDecisionCaseData.getWriteFinalDecisionOtherPanelMemberName());
         }
         return StringUtils.getGramaticallyJoinedStrings(names);
     }
