@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -78,9 +77,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Mock
     private VenueService venueService;
 
-    @Mock
-    private PostcodeValidator postcodeValidator;
-
     private CaseUpdatedAboutToSubmitHandler handler;
 
     private SscsCaseData sscsCaseData;
@@ -101,7 +97,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 idamService,
                 refDataService,
                 venueService,
-                postcodeValidator,
                 true);
 
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
@@ -148,8 +143,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .build());
 
         appeal = callback.getCaseDetails().getCaseData().getAppeal();
-
-        when(postcodeValidator.isValid("CM120NS", null)).thenReturn(true);
     }
 
     @Test

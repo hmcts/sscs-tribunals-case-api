@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -62,9 +61,6 @@ public class TyaEndpointsIt {
 
     @MockBean
     AuthTokenGenerator authTokenGenerator;
-
-    @MockBean
-    PostcodeValidator  postcodeValidator;
 
     IdamTokens idamTokens;
 

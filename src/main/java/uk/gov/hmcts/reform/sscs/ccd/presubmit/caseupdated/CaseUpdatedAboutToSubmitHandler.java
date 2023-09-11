@@ -47,7 +47,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final IdamService idamService;
     private final RefDataService refDataService;
     private final VenueService venueService;
-    private final PostcodeValidator postcodeValidator;
+    private final PostcodeValidator postcodeValidator = new PostcodeValidator();
     private final boolean caseAccessManagementFeature;
 
     private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
@@ -60,7 +60,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     IdamService idamService,
                                     RefDataService refDataService,
                                     VenueService venueService,
-                                    PostcodeValidator postcodeValidator,
                                     @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
@@ -70,7 +69,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.refDataService = refDataService;
         this.caseAccessManagementFeature = caseAccessManagementFeature;
         this.venueService = venueService;
-        this.postcodeValidator = postcodeValidator;
     }
 
     @Override

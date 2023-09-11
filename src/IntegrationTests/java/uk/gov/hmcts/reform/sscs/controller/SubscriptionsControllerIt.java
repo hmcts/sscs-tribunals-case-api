@@ -17,7 +17,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 import uk.gov.hmcts.reform.sscs.service.MessageAuthenticationService;
 
 @RunWith(SpringRunner.class)
@@ -31,9 +30,6 @@ public class SubscriptionsControllerIt {
 
     @MockBean
     MessageAuthenticationService macService;
-
-    @MockBean
-    private PostcodeValidator postcodeValidator;
 
     @Test
     public void shouldValidateMacToken() throws Exception {
