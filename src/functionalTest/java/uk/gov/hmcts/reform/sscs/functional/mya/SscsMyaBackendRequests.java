@@ -58,7 +58,7 @@ public class SscsMyaBackendRequests {
             getOnlineHearingResponse = getRequest(uri, email);
         }
 
-//        assertThat(getOnlineHearingResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+        assertThat(getOnlineHearingResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
 
         String responseBody = EntityUtils.toString(getOnlineHearingResponse.getEntity());
 
