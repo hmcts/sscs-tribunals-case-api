@@ -1421,4 +1421,37 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors().size(), is(1));
     }
+  
+    public void givenAnyCaseAndLanguageIsNotSelectedFromList_thenSetTheOriginalLanguageFieldToEmpty() {
+        Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
+        appeal.getBenefitType().setCode("PIP");
+        appeal.setHearingType("paper");
+        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").languagesList(null).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals("", appeal.getHearingOptions().getLanguages());
+    }
+
+    @Test
+    @Parameters({
+        "Spanish", "Chittagonain", "Czech", "Danish", "Dinka", "Maldivian", "Toura", "Douala", "Dutch", "Dioula",
+        "Efik", "Estonian", "Ewe", "Ewondo", "Farsi", "Fanti", "Fijian", "French"
+    })
+    public void givenAnyCaseAndLanguageIsSelectedFromList_thenSetTheOriginalLanguageFieldToValue(String language) {
+        Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
+        appeal.getBenefitType().setCode("PIP");
+        appeal.setHearingType("paper");
+        HearingOptions hearingOptions = HearingOptions.builder()
+                .wantsToAttend("Yes")
+                .languagesList(new DynamicList(language))
+                .build();
+        appeal.setHearingOptions(hearingOptions);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(language, appeal.getHearingOptions().getLanguages());
+    }
 }
