@@ -239,7 +239,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 return preSubmitCallbackResponse;
             }
 
-            if (!State.WITH_DWP.equals(callback.getCaseDetails().getState())) {
+            if (!State.WITH_DWP.equals(callback.getCaseDetails().getState()) && !isOriginalSenderDwp(sscsCaseData)) {
                 sscsCaseData.setDwpFurtherEvidenceStates(FURTHER_EVIDENCE_RECEIVED);
                 sscsCaseData.setDwpState(DwpState.FE_RECEIVED);
             }
