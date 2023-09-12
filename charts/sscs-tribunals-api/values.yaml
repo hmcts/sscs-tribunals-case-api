@@ -102,5 +102,7 @@ servicebus:
   enabled: false
 ccd-case-document-am-api:
   enabled: false
+aac-manage-case-assignment:
+  enabled: true
 wa:
   enabled: false

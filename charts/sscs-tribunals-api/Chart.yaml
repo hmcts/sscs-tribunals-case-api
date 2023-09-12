@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.116
+version: 0.0.117
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -63,6 +63,10 @@ dependencies:
     version: 1.0.4
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: servicebus.enabled
+  - name: aac-manage-case-assignment
+    version: ~0.2.11
+    repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    condition: aac-manage-case-assignment.enabled
 # WA
   - name: camunda-bpm
     version: 0.0.28

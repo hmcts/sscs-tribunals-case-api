@@ -3,11 +3,15 @@ tags:
   sscs-ccd-idam-pr: true
 
 java:
+  memoryRequests: 2Gi
+  cpuRequests: 2000m
+  memoryLimits: 8Gi
+  cpuLimits: 3500m
+  devmemoryRequests: 6Gi
+  devcpuRequests: 2000m
+  devmemoryLimits: 8Gi
+  devcpuLimits: 4500m
   image: ${IMAGE_NAME}
-  memoryLimits: "8Gi"
-  memoryRequests: "1Gi"
-  cpuRequests: "2"
-  cpuLimits: 2000m
   readinessDelay: 45
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
@@ -35,6 +39,7 @@ java:
     SCHEDULE_LISTING_FEATURE: true
     POST_HEARINGS_FEATURE: true
     POST_HEARINGS_B_FEATURE: true
+    JAVA_OPTS: -Xmx6G
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -81,10 +86,14 @@ ccd-case-document-am-api:
 xui-webapp:
   enabled: true
   nodejs:
-    memoryLimits: "4Gi"
-    cpuLimits: 2000m
-    memoryRequests: "1Gi"
-    cpuRequests: "1"
+    memoryRequests: 2Gi
+    cpuRequests: 2000m
+    memoryLimits: 4Gi
+    cpuLimits: 3500m
+    devmemoryRequests: 6Gi
+    devcpuRequests: 2000m
+    devmemoryLimits: 8Gi
+    devcpuLimits: 4500m
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
@@ -97,7 +106,7 @@ xui-webapp:
       SERVICES_EM_ANNO_API: http://${SERVICE_NAME}-ccd-api-gw
       SERVICES_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw
       SERVICES_CCD_DATA_STORE_API: http://${SERVICE_NAME}-ccd-data-store-api
-      SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac
+      SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac-manage-case-assignment
       SERVICES_TERMS_AND_CONDITIONS: http://${SERVICE_NAME}-xui-terms-and-conditions
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       SERVICES_S2S: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
@@ -132,6 +141,48 @@ xui-webapp:
           - mc-idam-client-secret
           - system-user-name
           - system-user-password
+
+aac-manage-case-assignment:
+  enabled: true
+  java:
+    imagePullPolicy: Always
+    releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
+    image: hmctspublic.azurecr.io/aac/manage-case-assignment:latest
+    ingressHost: aac-${SERVICE_FQDN}
+    environment:
+      IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+      IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
+      OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts
+      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      MCA_DS_PROXY_URLS_ALLOWED_LIST: /searchCases.*,/internal/searchCases.*,/internal/cases.*
+      MCA_DEF_STORE_PROXY_URLS_ALLOWED_LIST: /api/display/challenge-questions.*
+      MCA_CONDITIONAL_APIS_CASE_ASSIGNMENTS_ENABLED: "true"
+      MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp,ccd_data,ccd_gw,xui_mo_webapp,sscs
+      CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
+      CCD_DEFINITION_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-definition-store
+      PRD_HOST: http://rd-professional-api-aat.service.core-compute-aat.internal
+      CCD_DEFINITION_STORE_ALLOWED_SERVICE: xui_webapp
+      CCD_DATA_STORE_ALLOWED_SERVICE: xui_webapp
+      ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
+    autoscaling:
+      enabled: false
+    keyVaults:
+      aac:
+        secrets:
+          - name: aac-manage-case-s2s-secret
+            alias: MANAGE_CASE_S2S_KEY
+          - name: idam-mca-client-secret
+            alias: IDAM_CLIENT_SECRET
+          - name: idam-mca-system-user-username
+            alias: IDAM_CAA_USERNAME
+          - name: idam-mca-system-user-password
+            alias: IDAM_CAA_PASSWORD
+          - name: idam-noc-approver-username
+            alias: IDAM_NOC_APPROVER_USERNAME
+          - name: idam-noc-approver-password
+            alias: IDAM_NOC_APPROVER_PASSWORD
+          - name: notify-mca-api-key-secret
+            alias: NOTIFY_MCA_API_KEY
 
 ccd:
   enabled: true
@@ -514,7 +565,6 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-
     image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S11863AnonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
@@ -981,7 +1031,7 @@ ccd-message-publisher:
 sscs-cron-trigger:
   job:
     kind: CronJob
-    image: 'hmctspublic.azurecr.io/sscs/cron-trigger:pr-5-218a1cb-20230803170336'
+    image: 'hmctspublic.azurecr.io/sscs/cron-trigger:pr-5'
     releaseNameOverride: ${SERVICE_NAME}-sscs-cron-trigger
     name: ${SERVICE_NAME}-sscs-cron-trigger
     schedule: "0 10-17 * * *"
