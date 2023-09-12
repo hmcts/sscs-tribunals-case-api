@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -95,6 +96,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
 
         setCaseCode(preSubmitCallbackResponse, callback, hasSuperUserRole);
+        updateHearingOptionLanguageFromSelectedList(sscsCaseData);
         validateBenefitForCase(preSubmitCallbackResponse, callback, hasSuperUserRole);
         if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
             return preSubmitCallbackResponse;
@@ -439,5 +441,13 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         return sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
+    }
+
+    private void updateHearingOptionLanguageFromSelectedList(SscsCaseData sscsCaseData) {
+        HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+        if (hearingOptions != null) {
+            DynamicList languagesList = hearingOptions.getLanguagesList();
+            hearingOptions.setLanguages(isNull(languagesList) ? "" : languagesList.getValue().getLabel());
+        }
     }
 }
