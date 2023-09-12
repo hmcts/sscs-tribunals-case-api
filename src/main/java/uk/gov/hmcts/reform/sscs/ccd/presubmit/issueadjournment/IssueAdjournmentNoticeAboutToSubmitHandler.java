@@ -55,7 +55,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     private final HearingDurationsService hearingDurationsService;
 
     @Value("${feature.snl.adjournment.enabled}")
-    private boolean isAdjournmentEnabled; // TODO SSCS-10951
+    private boolean isAdjournmentEnabled;
 
     private static final int DURATION_SESSIONS_MULTIPLIER = 165;
     private static final int DURATION_DEFAULT = 60;

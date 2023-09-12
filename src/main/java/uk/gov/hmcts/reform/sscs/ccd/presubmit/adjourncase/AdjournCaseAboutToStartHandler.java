@@ -50,7 +50,6 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
     }
 
     private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-
         if (preSubmitCallbackResponse.getData().getSscsDocument() != null && preSubmitCallbackResponse.getData().getSscsDocument().stream()
             .noneMatch(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()))) {
 
