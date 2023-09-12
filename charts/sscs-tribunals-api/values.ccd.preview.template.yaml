@@ -26,6 +26,7 @@ java:
     IDAM_S2S-AUTH_MICROSERVICE: ${IDAM_S2S_AUTH_MICROSERVICE}
     IDAM_SSCS_SYSTEMUPDATE_USER: ${IDAM_SSCS_SYSTEMUPDATE_USER}
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
+    CCD_CALLBACK_ORCHESTRATOR_API_URL: http://${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     CORE_CASE_DATA_JURISDICTION_ID: SSCS
     CORE_CASE_DATA_CASE_TYPE_ID: Benefit
     TEST_URL: http://${SERVICE_NAME}
@@ -36,6 +37,8 @@ java:
     POST_HEARINGS_FEATURE: true
     POST_HEARINGS_B_FEATURE: true
     ADJOURNMENT_FEATURE: true
+    GAPS_SWITCHOVER_FEATURE: true
+    DUMMY: true
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -594,6 +597,7 @@ sscs-tya-notif:
       TEST_RECIPIENTS_POSTCODE: "*"
       POST_HEARINGS_FEATURE: true
       POST_HEARINGS_B_FEATURE: true
+      DUMMY: true
     secrets:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
