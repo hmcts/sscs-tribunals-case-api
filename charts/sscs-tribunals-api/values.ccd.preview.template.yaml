@@ -170,7 +170,7 @@ ccd:
       livenessDelay: 240
       environment:
         ROLE_ASSIGNMENT_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-        ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
+        ROLE_ASSIGNMENT_DB_NAME: "role-assignment"
         ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
         AM_ROLE_ASSIGNMENT_SERVICE_SECRET: AAAAAAAAAAAAAAAA
         IDAM_USER_URL: "https://idam-web-public.aat.platform.hmcts.net"
@@ -760,6 +760,6 @@ postgresql:
     - name: draftstore
     - name: evidence
     - name: annotation
-    - name: role_assignment
+    - name: role-assignment
     - name: hmc-cft-hearing-service
     - name: sscsjobscheduler
