@@ -58,9 +58,16 @@ public class CreateCaseAboutToStartHandler implements PreSubmitCallbackHandler<S
     private DynamicList getBenefitDescriptions() {
         List<DynamicListItem> items = Arrays.stream(Benefit.values())
                 .sorted(Comparator.comparing(Benefit::getDescription))
-                .map(benefit -> new DynamicListItem(benefit.getBenefitCode(), benefit.getDescription() + " / " + benefit.getBenefitCode()))
+                .map(CreateCaseAboutToStartHandler::getBenefitDescriptionList)
+                .flatMap(List::stream)
                 .toList();
 
         return new DynamicList(null, items);
+    }
+
+    private static List<DynamicListItem> getBenefitDescriptionList(Benefit benefit) {
+        return benefit.getCaseLoaderKeyId().stream()
+                .map(code -> new DynamicListItem(code, benefit.getDescription() + " / " + code))
+                .toList();
     }
 }
