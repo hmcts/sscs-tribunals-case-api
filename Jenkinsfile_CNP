@@ -120,6 +120,6 @@ withPipeline(type, product, component) {
                         //Disabling due to IDAM OIDC issue. To be investigated under SSCS-10377
                       //AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK])
     }
-
+    disableCleanupOfHelmReleaseOnFailure()
 }
 
