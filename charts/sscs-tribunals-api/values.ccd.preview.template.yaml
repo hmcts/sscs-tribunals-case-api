@@ -199,6 +199,8 @@ ccd:
           secretRef: "{{ .Values.global.postgresSecret }}"
           key: PASSWORD
           disabled: false
+      postgresql:
+        enabled: false 
   elasticsearch:
     nameOverride: ${SERVICE_NAME}-es
     clusterName: "es"
