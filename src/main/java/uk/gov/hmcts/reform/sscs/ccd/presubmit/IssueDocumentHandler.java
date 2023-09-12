@@ -43,7 +43,6 @@ public class IssueDocumentHandler {
         caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(null);
         caseData.setSscsInterlocDirectionDocument(null);
         caseData.setSscsInterlocDecisionDocument(null);
-        caseData.getAdjournment().setPreviewDocument(null);
     }
 
     protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response,
