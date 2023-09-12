@@ -36,6 +36,7 @@ public class AdminActionCorrectionAboutToStartHandler implements PreSubmitCallba
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
+        sscsCaseData.getPostHearing().getCorrection().setAdminCorrectionType(null);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(null);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);

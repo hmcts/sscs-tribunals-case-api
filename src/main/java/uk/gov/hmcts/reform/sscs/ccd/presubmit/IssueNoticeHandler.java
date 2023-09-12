@@ -50,7 +50,9 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
             String templateIdString = templateId.apply(sscsCaseData.getLanguagePreference());
 
             if (isPostHearingsEnabled
-                    && (DocumentType.CORRECTION_GRANTED.equals(documentType) || DocumentType.DRAFT_CORRECTED_NOTICE.equals(documentType))) {
+                    && (DocumentType.CORRECTION_GRANTED.equals(documentType)
+                    || DocumentType.DRAFT_CORRECTED_NOTICE.equals(documentType)
+                    || DocumentType.CORRECTED_DECISION_NOTICE.equals(documentType))) {
                 templateIdString = documentConfiguration.getDocuments().get(sscsCaseData.getLanguagePreference()).get(EventType.CORRECTION_GRANTED);
             }
 
