@@ -3,11 +3,15 @@ tags:
   sscs-ccd-idam-pr: true
 
 java:
+  memoryRequests: 2Gi
+  cpuRequests: 2000m
+  memoryLimits: 8Gi
+  cpuLimits: 3500m
+  devmemoryRequests: 6Gi
+  devcpuRequests: 2000m
+  devmemoryLimits: 8Gi
+  devcpuLimits: 4500m
   image: ${IMAGE_NAME}
-  memoryLimits: "8Gi"
-  memoryRequests: "1Gi"
-  cpuRequests: "2"
-  cpuLimits: 2000m
   readinessDelay: 45
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
@@ -35,6 +39,7 @@ java:
     SCHEDULE_LISTING_FEATURE: true
     POST_HEARINGS_FEATURE: true
     POST_HEARINGS_B_FEATURE: true
+    JAVA_OPTS: -Xmx6G
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -81,10 +86,14 @@ ccd-case-document-am-api:
 xui-webapp:
   enabled: true
   nodejs:
-    memoryLimits: "4Gi"
-    cpuLimits: 2000m
-    memoryRequests: "1Gi"
-    cpuRequests: "1"
+    memoryRequests: 2Gi
+    cpuRequests: 2000m
+    memoryLimits: 4Gi
+    cpuLimits: 3500m
+    devmemoryRequests: 6Gi
+    devcpuRequests: 2000m
+    devmemoryLimits: 8Gi
+    devcpuLimits: 4500m
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
