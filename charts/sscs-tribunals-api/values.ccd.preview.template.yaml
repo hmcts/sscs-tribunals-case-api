@@ -195,12 +195,6 @@ ccd:
           secretRef: role-assignment-service-IDAM-ADMIN-SECRET
           key: key
           disabled: true
-        ROLE_ASSIGNMENT_DB_PASSWORD:
-          secretRef: "{{ .Values.global.postgresSecret }}"
-          key: PASSWORD
-          disabled: false
-      postgresql:
-        enabled: false 
   elasticsearch:
     nameOverride: ${SERVICE_NAME}-es
     clusterName: "es"
