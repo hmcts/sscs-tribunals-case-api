@@ -194,7 +194,6 @@ ccd:
         ROLE_ASSIGNMENT_DB_PASSWORD:
           secretRef: sscs-postgres
           key: PASSWORD
-          disabled: false
         LD_SDK_KEY:
           secretRef: role-assignment-service-LD-SDK-KEY
           key: key
