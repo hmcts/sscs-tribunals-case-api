@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.ADJOURN_CREATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.CANCEL_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.CREATE_HEARING;
 
@@ -22,6 +23,10 @@ public class ListAssistHearingMessageHelper {
 
     public void sendListAssistCancelHearingMessage(final String ccdCaseId, CancellationReason cancellationReason) {
         sendHearingMessage(ccdCaseId, LIST_ASSIST, CANCEL_HEARING, cancellationReason);
+    }
+
+    public void sendListAssistCreateAdjournmentHearingMessage(final String ccdCaseId) {
+        sendHearingMessage(ccdCaseId, LIST_ASSIST, ADJOURN_CREATE_HEARING, null);
     }
 
     public void sendListAssistCreateHearingMessage(final String ccdCaseId) {
