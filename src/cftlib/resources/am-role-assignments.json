@@ -18,5 +18,27 @@
       }
     ],
     "overrideAll": true
+  },
+  {
+    "email": "ctsc-administrator@hmcts.net",
+    "id": "3f63b6ec-4e3a-3d18-8ce3-7867407d3972",
+    "roleAssignments": [
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "CTSC-Administrator",
+        "grantType": "STANDARD",
+        "roleCategory": "LEGAL_OPERATIONS",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "Benefit",
+          "jurisdiction": "SSCS"
+        },
+        "authorisations": []
+      }
+    ],
+    "overrideAll": true
   }
 ]
+
+
