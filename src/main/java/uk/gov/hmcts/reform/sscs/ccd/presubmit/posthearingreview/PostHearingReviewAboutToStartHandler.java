@@ -45,6 +45,8 @@ public class PostHearingReviewAboutToStartHandler implements PreSubmitCallbackHa
             return response;
         }
 
+        SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
+
         return response;
     }
 }

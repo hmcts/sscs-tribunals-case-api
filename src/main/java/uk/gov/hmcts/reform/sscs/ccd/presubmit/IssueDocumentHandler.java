@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 
 @Slf4j
 public class IssueDocumentHandler {
-
     private static final String GLASGOW = "GLASGOW";
 
     // Fields used for a short period in case progression are transient,
@@ -129,7 +128,6 @@ public class IssueDocumentHandler {
     }
 
     protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation, boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
-
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         if ((ADJOURNMENT_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType))
@@ -141,9 +139,9 @@ public class IssueDocumentHandler {
 
         LocalDate dateAdded = Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now());
 
-        String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
+        String documentTypeLabel = getDocumentTypeLabel(caseData, documentType, isPostHearingsEnabled);
 
-        String embeddedDocumentTypeLabel = getDocumentTypeLabel(caseData, documentType, documentTypeLabel, isPostHearingsEnabled);
+        String embeddedDocumentTypeLabel = getEmbeddedDocumentTypeLabel(caseData, documentType, documentTypeLabel, isPostHearingsEnabled);
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
@@ -180,7 +178,21 @@ public class IssueDocumentHandler {
         return response;
     }
 
-    protected String getDocumentTypeLabel(SscsCaseData caseData, DocumentType documentType, String documentTypeLabel, boolean isPostHearingsEnabled) {
+    private String getDocumentTypeLabel(SscsCaseData caseData, DocumentType documentType, boolean isPostHearingsEnabled) {
+        String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
+
+        if (isPostHearingsEnabled) {
+            PostHearingReviewType reviewType = caseData.getPostHearing().getReviewType();
+
+            if (nonNull(reviewType)) {
+                documentTypeLabel = documentTypeLabel.replace(reviewType.getDescriptionEn(), reviewType.getShortDescriptionEn());
+            }
+        }
+
+        return documentTypeLabel;
+    }
+
+    protected String getEmbeddedDocumentTypeLabel(SscsCaseData caseData, DocumentType documentType, String documentTypeLabel, boolean isPostHearingsEnabled) {
         String embeddedDocumentTypeLabel = (FINAL_DECISION_NOTICE.equals(documentType) || CORRECTION_GRANTED.equals(documentType) ? "Decision Notice" : documentTypeLabel);
 
         if (isPostHearingsEnabled) {
