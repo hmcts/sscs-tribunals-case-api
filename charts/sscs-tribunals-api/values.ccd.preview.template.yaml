@@ -597,7 +597,7 @@ sscs-tya-notif:
       TEST_RECIPIENTS_POSTCODE: "*"
       POST_HEARINGS_FEATURE: true
       POST_HEARINGS_B_FEATURE: true
-      DUMMY: false
+      DUMMY: true
     secrets:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
