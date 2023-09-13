@@ -98,6 +98,7 @@ tasks.withType(Test) {
 task integration(type: Test) {
     setTestClassesDirs(sourceSets.integrationTest.output.classesDirs)
     setClasspath(sourceSets.integrationTest.runtimeClasspath)
+    finalizedBy jacocoTestReport
 }
 
 task functional(type: Test) {
@@ -139,8 +140,10 @@ jacocoTestReport {
     executionData(test, integration)
     reports {
         xml.required = true
+        html.required = true
         csv.required = false
         xml.destination file("${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+        html.outputLocation = layout.buildDirectory.dir("${project.buildDir}/reports/jacoco/test/jacocoTestReport.html")
     }
 }
 
