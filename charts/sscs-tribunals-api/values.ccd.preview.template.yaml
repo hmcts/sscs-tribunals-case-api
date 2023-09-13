@@ -222,17 +222,14 @@ ccd:
     persistence:
       enabled: false
     extraEnvs:
+      - name: DATA_STORE_PASS
+        value: hmcts
       - name: DATA_STORE_URL
         value: "jdbc:postgresql://sscs-flexibleserver-postgres-preview.postgres.database.azure.com:5432/data-store?sslmode=require&stringtype=unspecified"
       - name: DATA_STORE_USER
         value: hmcts
       - name: ES_HOSTS
         value: "${SERVICE_NAME}-es-master"
-    secrets:
-      DATA_STORE_PASS:
-        secretRef: "{{ .Values.global.postgresSecret }}"
-        key: PASSWORD
-        disabled: false
     extraInitContainers: |
       - name: download-postgres-jdbc
         image: hmctspublic.azurecr.io/curl:7.70.0
@@ -264,7 +261,7 @@ ccd:
           jdbc {
             jdbc_connection_string => "jdbc:postgresql://sscs-flexibleserver-postgres-preview.postgres.database.azure.com:5432/data-store?sslmode=require&stringtype=unspecified"
             jdbc_user => "hmcts"
-            jdbc_password => "test"
+            jdbc_password => "${sscs-postgres}"
             jdbc_validate_connection => true
             jdbc_validation_timeout => "1"
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
