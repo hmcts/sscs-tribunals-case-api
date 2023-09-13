@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static io.micrometer.core.instrument.util.StringUtils.isNotBlank;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
@@ -9,13 +11,16 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
@@ -42,6 +47,12 @@ public class SscsUtil {
         return allowedStates.contains(state);
     }
 
+    public static void clearAdjournmentTransientFields(SscsCaseData caseData) {
+        log.info("Clearing transient adjournment case fields for caseId {}", caseData.getCcdCaseId());
+
+        caseData.setAdjournment(Adjournment.builder().build());
+    }
+
     public static void clearPostHearingFields(SscsCaseData caseData, boolean isPostHearingsEnabled) {
         if (isPostHearingsEnabled) {
             caseData.setPostHearing(PostHearing.builder().build());
@@ -52,6 +63,58 @@ public class SscsUtil {
     public static void clearDocumentTransientFields(SscsCaseData caseData) {
         caseData.setDocumentGeneration(DocumentGeneration.builder().build());
         caseData.setDocumentStaging(DocumentStaging.builder().build());
+    }
+
+    public static void setAdjournmentPanelMembersExclusions(PanelMemberExclusions exclusions,
+                                           List<JudicialUserBase> adjournmentPanelMembers,
+                                           AdjournCasePanelMembersExcluded panelMemberExcluded) {
+        if (nonNull(adjournmentPanelMembers)) {
+            List<CollectionItem<JudicialUserBase>> panelMembersList = getPanelMembersList(exclusions, panelMemberExcluded);
+
+
+            if (isNull(panelMembersList)) {
+                panelMembersList = new LinkedList<>();
+            }
+
+            panelMembersList.addAll(adjournmentPanelMembers.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .map(panelMember -> new CollectionItem<>(panelMember.getIdamId(), panelMember))
+                .filter(not(panelMembersList::contains))
+                .toList());
+
+            if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
+                log.info("Excluding {} panel members with Personal Codes {}", adjournmentPanelMembers.size(),
+                    adjournmentPanelMembers.stream()
+                            .filter(Objects::nonNull)
+                            .map(JudicialUserBase::getPersonalCode)
+                            .toList());
+
+                exclusions.setExcludedPanelMembers(panelMembersList);
+                exclusions.setArePanelMembersExcluded(YES);
+            } else if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.RESERVED)) {
+                log.info("Reserving {} panel members with Personal Codes {}", adjournmentPanelMembers.size(),
+                    adjournmentPanelMembers.stream()
+                            .filter(Objects::nonNull)
+                            .map(JudicialUserBase::getPersonalCode)
+                            .toList());
+
+                exclusions.setReservedPanelMembers(panelMembersList);
+                exclusions.setArePanelMembersReserved(YES);
+            }
+        }
+    }
+
+    private static List<CollectionItem<JudicialUserBase>> getPanelMembersList(PanelMemberExclusions exclusions,
+                                                                        AdjournCasePanelMembersExcluded panelMemberExcluded) {
+        if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
+            return exclusions.getExcludedPanelMembers();
+        }
+        if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.RESERVED)) {
+            return exclusions.getReservedPanelMembers();
+        }
+
+        return new LinkedList<>();
     }
 
     public static void addDocumentToDocumentTabAndBundle(FooterService footerService,
