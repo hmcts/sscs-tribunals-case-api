@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static io.micrometer.core.instrument.util.StringUtils.isNotBlank;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
@@ -8,14 +9,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase.CreateCaseAboutToStartHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
@@ -106,31 +107,31 @@ public class SscsUtil {
     private static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing) {
         PostHearingReviewType postHearingReviewType = postHearing.getReviewType();
         switch (postHearingReviewType) {
-            case SET_ASIDE:
+            case SET_ASIDE -> {
                 if (SetAsideActions.REFUSE.equals(postHearing.getSetAside().getAction())) {
                     return DocumentType.SET_ASIDE_REFUSED;
                 }
                 return DocumentType.SET_ASIDE_GRANTED;
-            case CORRECTION:
+            }
+            case CORRECTION -> {
                 if (CorrectionActions.REFUSE.equals(postHearing.getCorrection().getAction())) {
                     return DocumentType.CORRECTION_REFUSED;
                 }
-                break;
-            case STATEMENT_OF_REASONS:
+            }
+            case STATEMENT_OF_REASONS -> {
                 if (StatementOfReasonsActions.REFUSE.equals(postHearing.getStatementOfReasons().getAction())) {
                     return DocumentType.STATEMENT_OF_REASONS_REFUSED;
                 }
-
                 return DocumentType.STATEMENT_OF_REASONS_GRANTED;
-            case LIBERTY_TO_APPLY:
+            }
+            case LIBERTY_TO_APPLY -> {
                 if (LibertyToApplyActions.REFUSE.equals(postHearing.getLibertyToApply().getAction())) {
                     return DocumentType.LIBERTY_TO_APPLY_REFUSED;
                 }
-
                 return DocumentType.LIBERTY_TO_APPLY_GRANTED;
-            case PERMISSION_TO_APPEAL:
-            default:
-                break;
+            }
+            default -> {
+            }
         }
 
         throw new IllegalArgumentException("getting the document type has an unexpected postHearingReviewType and action");
@@ -225,4 +226,50 @@ public class SscsUtil {
         }
         return null;
     }
+
+    public static DynamicList getBenefitDescriptions() {
+        List<DynamicListItem> items = Arrays.stream(Benefit.values())
+                .sorted(Comparator.comparing(Benefit::getDescription))
+                .map(SscsUtil::getBenefitDescriptionList)
+                .flatMap(List::stream)
+                .toList();
+
+        return new DynamicList(null, items);
+    }
+
+    private static List<DynamicListItem> getBenefitDescriptionList(Benefit benefit) {
+        return benefit.getCaseLoaderKeyId().stream()
+                .map(code -> new DynamicListItem(code, benefit.getDescription() + " / " + code))
+                .toList();
+    }
+
+    public static void handleBenefitType(SscsCaseData caseData) {
+        Appeal appeal = caseData.getAppeal();
+        if (isNull(appeal)) {
+            return;
+        }
+
+        BenefitType benefitType = appeal.getBenefitType();
+        if (isNull(benefitType)) {
+            return;
+        }
+
+        DynamicList benefitTypeDescription = benefitType.getDescriptionSelection();
+        if (isNull(benefitTypeDescription)) {
+            return;
+        }
+
+        DynamicListItem selectedBenefitType = benefitTypeDescription.getValue();
+        if (isNull(selectedBenefitType)) {
+            return;
+        }
+
+        String code = selectedBenefitType.getCode();
+        Benefit benefit = Benefit.getBenefitFromBenefitCode(code);
+        benefitType.setCode(benefit.getShortName());
+        benefitType.setDescription(benefit.getDescription());
+        benefitType.setDescriptionSelection(null);
+        caseData.setBenefitCode(benefit.getBenefitCode());
+    }
 }
+

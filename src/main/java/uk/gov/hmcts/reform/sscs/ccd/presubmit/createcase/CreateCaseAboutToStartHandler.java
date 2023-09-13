@@ -3,9 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -13,6 +10,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
@@ -50,24 +48,8 @@ public class CreateCaseAboutToStartHandler implements PreSubmitCallbackHandler<S
                     .build();
             caseData.setAppeal(appeal);
         }
-        appeal.getBenefitType().setDescriptionSelection(getBenefitDescriptions());
+        appeal.getBenefitType().setDescriptionSelection(SscsUtil.getBenefitDescriptions());
 
         return new PreSubmitCallbackResponse<>(caseData);
-    }
-
-    private DynamicList getBenefitDescriptions() {
-        List<DynamicListItem> items = Arrays.stream(Benefit.values())
-                .sorted(Comparator.comparing(Benefit::getDescription))
-                .map(CreateCaseAboutToStartHandler::getBenefitDescriptionList)
-                .flatMap(List::stream)
-                .toList();
-
-        return new DynamicList(null, items);
-    }
-
-    private static List<DynamicListItem> getBenefitDescriptionList(Benefit benefit) {
-        return benefit.getCaseLoaderKeyId().stream()
-                .map(code -> new DynamicListItem(code, benefit.getDescription() + " / " + code))
-                .toList();
     }
 }

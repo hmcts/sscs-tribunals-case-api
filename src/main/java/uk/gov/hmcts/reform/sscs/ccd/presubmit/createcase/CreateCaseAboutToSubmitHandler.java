@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
 import static java.util.Objects.isNull;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,7 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        boolean canHandle = callbackType == CallbackType.ABOUT_TO_SUBMIT
+        return callbackType == CallbackType.ABOUT_TO_SUBMIT
                 && (!"Paper".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getReceivedVia())
                 && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
                 || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED
@@ -39,7 +41,6 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
                 || callback.getEvent() == EventType.INCOMPLETE_APPLICATION_RECEIVED
                 || callback.getEvent() == EventType.DRAFT_TO_INCOMPLETE_APPLICATION)
                 || callback.getEvent() == EventType.CREATE_APPEAL_PDF);
-        return canHandle;
     }
 
     @Override
@@ -59,39 +60,9 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         } else {
             createAppealPdf(caseData);
         }
-
         handleBenefitType(caseData);
 
         return sscsCaseDataPreSubmitCallbackResponse;
-    }
-
-    private void handleBenefitType(SscsCaseData caseData) {
-        Appeal appeal = caseData.getAppeal();
-        if (isNull(appeal)) {
-            return;
-        }
-
-        BenefitType benefitType = appeal.getBenefitType();
-        if (isNull(benefitType)) {
-            return;
-        }
-
-        DynamicList benefitTypeDescription = benefitType.getDescriptionSelection();
-        if (isNull(benefitTypeDescription)) {
-            return;
-        }
-
-        DynamicListItem selectedBenefitType = benefitTypeDescription.getValue();
-        if (isNull(selectedBenefitType)) {
-            return;
-        }
-
-        String code = selectedBenefitType.getCode();
-        Benefit benefit = Benefit.getBenefitFromBenefitCode(code);
-        benefitType.setCode(benefit.getShortName());
-        benefitType.setDescription(benefit.getDescription());
-        benefitType.setDescriptionSelection(null);
-        caseData.setBenefitCode(benefit.getBenefitCode());
     }
 
     private void createAppealPdf(SscsCaseData caseData) {

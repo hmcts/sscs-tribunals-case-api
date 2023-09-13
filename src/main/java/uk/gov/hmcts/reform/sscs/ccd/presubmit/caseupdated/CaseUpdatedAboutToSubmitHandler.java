@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,6 +95,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
 
+        handleBenefitType(sscsCaseData);
         setCaseCode(preSubmitCallbackResponse, callback, hasSuperUserRole);
         validateBenefitForCase(preSubmitCallbackResponse, callback, hasSuperUserRole);
         if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
@@ -434,6 +436,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             return Optional.ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
                 .map(Appointee::getAddress)
                 .map(Address::getPostcode)
+                .map(String::trim)
                 .filter(StringUtils::isNotEmpty)
                 .orElse(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
         }
