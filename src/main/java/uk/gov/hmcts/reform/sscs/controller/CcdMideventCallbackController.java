@@ -8,6 +8,7 @@ import com.opencsv.CSVReader;
 import java.io.InputStreamReader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
@@ -28,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService2;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesStatus;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @RestController
 @Slf4j
@@ -39,6 +42,10 @@ public class CcdMideventCallbackController {
     private final AdjournCasePreviewService adjournCasePreviewService;
     private final AdjournCaseCcdService adjournCaseCcdService;
     private final RestoreCasesService2 restoreCasesService2;
+    @Value("${feature.postHearings.enabled}")
+    private boolean isPostHearingsEnabled;
+    @Value("${feature.postHearingsB.enabled}")
+    private boolean isPostHearingsBEnabled;
 
     @Autowired
     public CcdMideventCallbackController(AuthorisationService authorisationService, SscsCaseCallbackDeserializer deserializer,
@@ -80,12 +87,12 @@ public class CcdMideventCallbackController {
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
         @RequestBody String message) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
+        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         log.info("About to start ccdMidEventPreviewFinalDecision callback `{}` received for Case ID `{}`", callback.getEvent(),
-            callback.getCaseDetails().getId());
+            caseDetails.getId());
 
         authorisationService.authorise(serviceAuthHeader);
-
-        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(sscsCaseData);
 
@@ -95,9 +102,12 @@ public class CcdMideventCallbackController {
             return ok(preSubmitCallbackResponse);
         }
 
-        WriteFinalDecisionPreviewDecisionServiceBase writeFinalDecisionPreviewDecisionService = decisionNoticeService.getPreviewService(benefitType);
+        SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);
 
-        return ok(writeFinalDecisionPreviewDecisionService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, userAuthorisation, false));
+        WriteFinalDecisionPreviewDecisionServiceBase writeFinalDecisionPreviewDecisionService = decisionNoticeService.getPreviewService(benefitType);
+        DocumentType docType = SscsUtil.getWriteFinalDecisionDocumentType(sscsCaseData, isPostHearingsEnabled);
+
+        return ok(writeFinalDecisionPreviewDecisionService.preview(callback, docType, userAuthorisation, false, isPostHearingsEnabled, isPostHearingsBEnabled));
     }
 
     @PostMapping(path = "/ccdMidEventPreviewAdjournCase", produces = MediaType.APPLICATION_JSON_VALUE)

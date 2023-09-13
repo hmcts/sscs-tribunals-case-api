@@ -141,7 +141,7 @@ class PdfRequestUtilTest {
         assertThatThrownBy(() -> PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(sscsCaseData,
                 NoticeIssuedTemplateBody.builder().build(), true, false))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageStartingWith("isPostHearingsBEnabled is false - Liberty to Apply is not available");
+            .isEqualTo(PdfRequestUtil.POST_HEARINGS_B_EXCEPTION);
     }
 
     @Test
@@ -150,7 +150,7 @@ class PdfRequestUtilTest {
         assertThatThrownBy(() -> PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(sscsCaseData,
                 NoticeIssuedTemplateBody.builder().build(), true, false))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageStartingWith("isPostHearingsBEnabled is false - Permission to Appeal is not available");
+            .isEqualTo(PdfRequestUtil.POST_HEARINGS_B_EXCEPTION);
     }
 
     @ParameterizedTest
@@ -168,7 +168,7 @@ class PdfRequestUtilTest {
         assertThatThrownBy(() -> PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(sscsCaseData,
                 NoticeIssuedTemplateBody.builder().build(), true, false))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageStartingWith(String.format("isPostHearingsBEnabled is false - %s is not available", postHearingReviewType.getDescriptionEn()));
+            .isEqualTo(PdfRequestUtil.POST_HEARINGS_B_EXCEPTION);
     }
   
     @Test
@@ -246,7 +246,7 @@ class PdfRequestUtilTest {
         sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
         assertThatThrownBy(() -> PdfRequestUtil.getGenerateNotice(sscsCaseData, true, false))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("isPostHearingsBEnabled is false - Liberty to Apply is not available");
+            .isEqualTo(PdfRequestUtil.POST_HEARINGS_B_EXCEPTION);
     }
 
     @Test
@@ -254,7 +254,7 @@ class PdfRequestUtilTest {
         sscsCaseData.getPostHearing().setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
         assertThatThrownBy(() -> PdfRequestUtil.getGenerateNotice(sscsCaseData, true, false))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("isPostHearingsBEnabled is false - Permission to Appeal is not available");
+            .isEqualTo(PdfRequestUtil.POST_HEARINGS_B_EXCEPTION);
     }
 
     @Test
