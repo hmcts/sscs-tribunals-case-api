@@ -74,6 +74,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void givenInvalidEventType_thenReturnFalse() {
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getEvent()).willReturn(EventType.ADD_HEARING);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
@@ -230,5 +231,4 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         JudicialUserBase result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge();
         assertThat(result).isNull();
     }
-
 }

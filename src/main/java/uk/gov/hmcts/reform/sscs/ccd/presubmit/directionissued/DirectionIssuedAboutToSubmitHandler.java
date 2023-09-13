@@ -44,6 +44,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private final DwpAddressLookupService dwpAddressLookupService;
     private final int dwpResponseDueDays;
     private final int dwpResponseDueDaysChildSupport;
+    @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
     @Autowired
@@ -342,6 +343,11 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             }
             log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
         }
+
+        if (isPostHearingsEnabled) {
+            caseData.setPrePostHearing(null);
+        }
+
         return sscsCaseDataPreSubmitCallbackResponse;
     }
 

@@ -57,6 +57,7 @@ public class CitizenLoginService {
         List<SscsCaseDetails> sscsCaseDetails = caseDetails.stream()
                 .map(sscsCcdConvertService::getCaseDetails)
                 .filter(AppealNumberGenerator::filterCaseNotDraftOrArchivedDraft)
+                .peek(this::attachOtherPartyDetails)
                 .toList();
         if (!isBlank(tya)) {
             log.info(format("Find case: Filtering for case with tya [%s] for user [%s]", tya, idamTokens.getUserId()));
@@ -75,6 +76,15 @@ public class CitizenLoginService {
         List<OnlineHearing> convert = convert(sscsCaseDetails, idamTokens.getEmail());
         log.info(format("Found [%s] cases without tya for user [%s]", convert.size(), idamTokens.getUserId()));
         return convert;
+    }
+
+    private void attachOtherPartyDetails(SscsCaseDetails sscsCaseDetailsItem) {
+        if (sscsCaseDetailsItem.getData().getOtherParties() == null) {
+            SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(sscsCaseDetailsItem.getId(), idamService.getIdamTokens());
+            if (sscsCaseDetails != null) {
+                sscsCaseDetailsItem.getData().setOtherParties(sscsCaseDetails.getData().getOtherParties());
+            }
+        }
     }
 
     public List<OnlineHearing> findActiveCasesForCitizen(IdamTokens idamTokens) {

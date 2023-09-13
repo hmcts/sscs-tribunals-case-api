@@ -178,6 +178,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenDirectionNoticeAlreadyExistsAndThenManuallyUploadANewNotice_thenIssueTheNewDocumentWithFooter() {
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService, 35, 42, true);
+        sscsCaseData.setPrePostHearing(PrePostHearing.PRE);
         sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
         List<SscsDocument> sscsDocuments = new ArrayList<>();
@@ -201,6 +203,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(footerService).createFooterAndAddDocToCase(eq(theDocument.getDocumentLink()), any(), eq(DocumentType.DIRECTION_NOTICE), any(), eq(theDocument.getDocumentDateAdded()), eq(null), eq(null));
+        assertNull(sscsCaseData.getPrePostHearing());
     }
 
     public void willSetTheWithDwpStateToDirectionActionRequired() {
