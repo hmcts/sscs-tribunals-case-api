@@ -41,7 +41,8 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
         State state = callback.getCaseDetails().getState();
-      
+
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
         if (isPostHearingsEnabled
                 && (State.DORMANT_APPEAL_STATE.equals(state) || State.POST_HEARING.equals(state))) {
             List<String> userRoles = userDetailsService.getUserRoles(userAuthorisation);
@@ -59,7 +60,7 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
             clearTransientFields(sscsCaseData);
         }
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        return preSubmitCallbackResponse;
     }
 
     private void clearTransientFields(SscsCaseData sscsCaseData) {

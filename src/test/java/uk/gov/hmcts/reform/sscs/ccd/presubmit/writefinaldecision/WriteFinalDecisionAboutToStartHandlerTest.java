@@ -93,7 +93,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("");
 
-        handler = new WriteFinalDecisionAboutToStartHandler(false);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, false);
     }
 
     @Test
@@ -151,6 +151,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
 
     @Test
     public void givenStateIsDormantAndIsntSalariedJudge_thenThrowError() {
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
         when(userDetailsService.getUserRoles(USER_AUTHORISATION)).thenReturn(List.of(UserRole.JUDGE.getValue()));
 
@@ -163,7 +164,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     @Test
     @Parameters({"POST_HEARING", "DORMANT_APPEAL_STATE"})
     public void givenAWriteFinalDecisionEventForCorrectionWithPostHearingsEnabled_thenKeepData(State state) {
-        handler = new WriteFinalDecisionAboutToStartHandler(true);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         when(caseDetails.getState()).thenReturn(state);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -173,7 +174,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
 
     @Test
     public void givenAWriteFinalDecisionEventNotForCorrectionWithPostHearingsEnabled_thenDeleteData() {
-        handler = new WriteFinalDecisionAboutToStartHandler(true);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService,  true);
         when(caseDetails.getState()).thenReturn(State.VALID_APPEAL);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
