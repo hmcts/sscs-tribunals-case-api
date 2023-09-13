@@ -29,9 +29,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -62,18 +62,13 @@ import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     public static final List<String> ACTIONS_THAT_REQUIRES_NOTICE = asList(ISSUE_DIRECTIONS_NOTICE.getCode(), EXCLUDE_EVIDENCE.getCode(), ADMIT_EVIDENCE.getCode());
 
     private final FooterService footerService;
     protected final UserDetailsService userDetailsService;
-
-    @Autowired
-    public ProcessAudioVideoEvidenceAboutToSubmitHandler(FooterService footerService, UserDetailsService userDetailsService) {
-        this.footerService = footerService;
-        this.userDetailsService = userDetailsService;
-    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
