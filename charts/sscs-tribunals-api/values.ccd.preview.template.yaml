@@ -2,6 +2,7 @@
 tags:
   sscs-ccd-idam-pr: true
 
+
 java:
   image: ${IMAGE_NAME}
   memoryLimits: "8Gi"
@@ -147,6 +148,8 @@ ccd:
       enabled: false
     elastic:
       enabled: true
+    ras:
+      enabled: false
 
 
   global:
@@ -186,13 +189,6 @@ ccd:
         BYPASS_ORG_DROOL_RULE: true
         LAUNCH_DARKLY_ENV: pr
         ENABLE_DB_MIGRATE: true
-      keyVaults:
-        sscs:
-          secrets:
-            - name: preview-ccd-db-username
-              alias: ROLE_ASSIGNMENT_DB_USERNAME
-            - name: preview-ccd-db-password
-              alias: ROLE_ASSIGNMENT_DB_PASSWORD
       secrets:
         LD_SDK_KEY:
           secretRef: role-assignment-service-LD-SDK-KEY
@@ -224,7 +220,7 @@ ccd:
       - name: DATA_STORE_URL
         value: "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?sslmode=require&stringtype=unspecified"
       - name: DATA_STORE_USER
-        value: hmcts
+        value: hmctslogstash
       - name: ES_HOSTS
         value: "${SERVICE_NAME}-es-master"
     extraInitContainers: |
@@ -257,7 +253,7 @@ ccd:
         input  {
           jdbc {
             jdbc_connection_string => "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?sslmode=require&stringtype=unspecified"
-            jdbc_user => "hmcts"
+            jdbc_user => "hmctslogstash"
             jdbc_password => "hmcts"
             jdbc_validate_connection => true
             jdbc_validation_timeout => "1"
