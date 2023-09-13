@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @Component
 @Slf4j
@@ -26,7 +25,6 @@ public class WriteStatementOfReasonsMidEventHandler extends IssueDocumentHandler
     public static final String PAGE_ID_GENERATE_DOCUMENT = "generateDocument";
     private final DocumentConfiguration documentConfiguration;
     private final GenerateFile generateFile;
-    private final UserDetailsService userDetailsService;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
