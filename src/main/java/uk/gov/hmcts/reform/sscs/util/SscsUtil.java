@@ -173,6 +173,7 @@ public class SscsUtil {
                 if (SetAsideActions.REFUSE.equals(postHearing.getSetAside().getAction())) {
                     return DocumentType.SET_ASIDE_REFUSED;
                 }
+
                 return DocumentType.SET_ASIDE_GRANTED;
             }
             case CORRECTION -> {

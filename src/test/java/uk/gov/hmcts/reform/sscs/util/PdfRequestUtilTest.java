@@ -107,12 +107,7 @@ class PdfRequestUtilTest {
 
     @EnabledIf("postHearingRequestTypeHasMoreThan5Values")
     @ParameterizedTest
-    @EnumSource(
-        value = PostHearingReviewType.class,
-        names = { // TODO add unimplemented post hearings B types
-        },
-        mode = EXCLUDE
-    )
+    @EnumSource(value = PostHearingReviewType.class)
     void getNoticeBody_doesNotThrowExceptionForImplementedTypes(PostHearingReviewType postHearingReviewType) {
         sscsCaseData.getPostHearing().setReviewType(postHearingReviewType);
         assertDoesNotThrow(() -> PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(sscsCaseData,
