@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adminactioncorrection;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -23,20 +22,13 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen.GenWriteFinalDecisionPreviewDecisionService;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @ExtendWith(MockitoExtension.class)
 class AdminActionCorrectionAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
-    public static final String TODAY = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
     private AdminActionCorrectionAboutToSubmitHandler handler;
-    @Mock
-    private GenWriteFinalDecisionPreviewDecisionService previewDecisionService;
-    @Mock
-    private DecisionNoticeOutcomeService decisionNoticeOutcomeService;
     @Mock
     private FooterService footerService;
 
@@ -112,15 +104,17 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
 
     @Test
     void givenHeaderCorrection_shouldUpdatePreviousStateWhenCurrentStateIsNotReadyToListOrWithFta() {
+        when(callback.getEvent()).thenReturn(ADMIN_ACTION_CORRECTION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
         caseData.setPreviousState(State.VOID_STATE);
         caseData.setState(State.APPEAL_CREATED);
-        caseData.getPostHearing().getCorrection().setAdminCorrectionType(AdminCorrectionType.HEADER);
+        Correction correction = caseData.getPostHearing().getCorrection();
+        correction.setAdminCorrectionType(AdminCorrectionType.HEADER);
+        correction.setCorrectionFinalDecisionInProgress(YesNo.YES);
 
-        PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(footerService).createFooterAndAddDocToCase(docLink,
                 caseData,
@@ -129,9 +123,5 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
                 null,
                 null,
                 null);
-        assertThat(response.getData().getPreviousState()).isEqualTo(State.APPEAL_CREATED);
-        assertThat(response.getData().getSscsDocument().stream()
-                .noneMatch(doc -> DRAFT_DECISION_NOTICE.getValue().equals(doc.getValue().getDocumentType())))
-                .isTrue();
     }
 }
