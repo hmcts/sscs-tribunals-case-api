@@ -63,6 +63,7 @@ public class PdfRequestUtil {
                     response.addError("Post hearings is not currently enabled");
                     return response;
                 }
+
                 String postHearingDocumentTypeLabel = getPostHearingDocumentType(sscsCaseData.getPostHearing().getRequestType()).getLabel();
                 pdfUrlBuilder.append(postHearingDocumentTypeLabel)
                         .append(" from FTA");
@@ -168,6 +169,7 @@ public class PdfRequestUtil {
     public static NoticeIssuedTemplateBody populateNoticeBodySignedByAndSignedRole(SscsCaseData caseData, NoticeIssuedTemplateBody formPayload, boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
         NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder formPayloadBuilder = formPayload.toBuilder();
         DocumentGeneration documentGeneration = caseData.getDocumentGeneration();
+      
         if (isPostHearingsEnabled) {
             PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
           
@@ -202,7 +204,9 @@ public class PdfRequestUtil {
                     }
                     case PERMISSION_TO_APPEAL -> {
                         if (isPostHearingsBEnabled) {
-                            formPayloadBuilder.noticeBody(documentGeneration.getPermissionToAppealBodyContent());
+                            formPayloadBuilder.noticeBody(caseData.getDocumentGeneration().getPermissionToAppealBodyContent());
+                            formPayloadBuilder.userName(documentGeneration.getPermissionToAppealSignedBy());
+                            formPayloadBuilder.userRole(documentGeneration.getPermissionToAppealSignedRole());
                             return formPayloadBuilder.build();
                         }
                         throw POST_HEARINGS_B_EXCEPTION;
