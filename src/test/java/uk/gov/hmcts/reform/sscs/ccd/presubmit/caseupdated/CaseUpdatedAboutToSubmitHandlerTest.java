@@ -23,8 +23,6 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -45,13 +43,13 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
 
-@Slf4j
 public class CaseUpdatedAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -94,6 +92,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @BeforeEach
     void setUp() {
         openMocks(this);
+        SessionCategoryMapService categoryMapService = new SessionCategoryMapService();
         AssociatedCaseLinkHelper associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService);
         handler = new CaseUpdatedAboutToSubmitHandler(
             regionalProcessingCenterService,
@@ -103,6 +102,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             idamService,
             refDataService,
             venueService,
+            categoryMapService,
             true);
 
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
@@ -284,8 +284,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         matchedByNinoCases.add(matchingCase2);
 
         when(ccdService.findCaseBy(anyString(), anyString(), any())).thenReturn(matchedByNinoCases);
-        callback.getCaseDetails().getCaseData().setBenefitCode(null);
-        callback.getCaseDetails().getCaseData().setIssueCode(null);
         callback.getCaseDetails().getCaseData().setCaseCode("002DD");
         callback.getCaseDetails().getCaseData().getAppeal().setAppellant(appellant);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -702,7 +700,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @ParameterizedTest
-    @CsvSource(delimiter = ',', textBlock= """
+    @CsvSource(delimiter = ',', textBlock = """
         ESA,'DWP issuing office is invalid, should one of: Balham DRT, Birkenhead LM DRT, Chesterfield DRT, Coatbridge Benefit Centre, Inverness DRT, Lowestoft DRT, Milton Keynes DRT, Norwich DRT, Sheffield DRT, Springburn DRT, Watford DRT, Wellingborough DRT, Worthing DRT, Recovery from Estates'
         PIP,'DWP issuing office is invalid, should one of: 1, 2, 3, 4, 5, 6, 7, 8, 9, AE, Recovery from Estates'
         DLA,'DWP issuing office is invalid, should one of: Disability Benefit Centre 4, The Pension Service 11, Recovery from Estates'
@@ -720,7 +718,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         pensionCredit,'DWP issuing office is invalid, should one of: Pensions Dispute Resolution Team, Recovery from Estates'
         retirementPension,'DWP issuing office is invalid, should one of: Pensions Dispute Resolution Team, Recovery from Estates'
         childSupport,'DWP issuing office is invalid, should one of: Child Maintenance Service Group'
-    """)
+        """)
     void givenValidBenefitTypeAndInvalidDwpIssuingOffice_thenAddWarningMessages(String benefitCode, String warning) {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code(benefitCode).build());
         callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice("Test").build());
@@ -999,6 +997,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                                 .identity(Identity.builder().dob("1").nino("Nino").build())
                                 .build())
                         .build());
+        sscsCaseData.setBenefitCode("001");
+        sscsCaseData.setIssueCode("DD");
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -1373,12 +1373,12 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "guaranteedMinimumPension,Guaranteed Minimum Pension,054,0",
-        "nationalInsuranceCredits,Bereavement Benefit,test,2",
+        "nationalInsuranceCredits,Bereavement Benefit,test,4",
         "socialFund,30 Hours Free Childcare,002,1",
         "childSupport,Child Support,002,0"
     })
     void givenSscs5CaseBenefitCodeAndDescription_thenErrorIsShownForInvalidSet(String code, String description,
-                                                                                      String benefitCode, int error) {
+                                                                               String benefitCode, int error) {
         when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(CTSC_CLERK.getValue())).build());
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(code).description(description).build());
@@ -1397,12 +1397,12 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "guaranteedMinimumPension,Guaranteed Minimum Pension,054,0,0",
-        "nationalInsuranceCredits,Bereavement Benefit,test,0,2",
+        "nationalInsuranceCredits,Bereavement Benefit,test,2,2",
         "socialFund,30 Hours Free Childcare,002,0,1",
         "childSupport,Child Support,002,0,0"
     })
     void givenSscs5CaseBenefitCodeAndDescriptionSuperUser_thenErrorIsShownForInvalidSet(String code, String description,
-                                                                                      String benefitCode, int error, int warnings) {
+                                                                                        String benefitCode, int error, int warnings) {
         when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder().roles(List.of(SUPER_USER.getValue())).build());
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(code).description(description).build());
@@ -1413,22 +1413,34 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors().size(), is(error));
         assertThat(response.getWarnings().size(), is(warnings));
-        if (error > 0) {
-            assertTrue(response.getErrors().stream().anyMatch(e -> e.equals("Benefit type cannot be changed to the selected type")));
+        if (warnings > 0) {
+            assertTrue(response.getWarnings().stream().anyMatch(e -> e.equals("Benefit type cannot be changed to the selected type")));
         }
     }
 
 
     @Test
-    void test() {
+    void givenNewBenefitTypeAndCodeIsSelected_thenCaseCodeShouldChange() {
         DynamicListItem item = new DynamicListItem("088", "");
         DynamicList selection = new DynamicList(item, null);
         sscsCaseData.getAppeal().getBenefitType().setDescriptionSelection(selection);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertTrue(response.getErrors().isEmpty());
-        assertEquals("088", response.getData().getBenefitCode());
-        assertEquals("DD", response.getData().getIssueCode());
-        assertEquals("088DD", response.getData().getCaseCode());
+        SscsCaseData caseData = response.getData();
+        assertEquals("088", caseData.getBenefitCode());
+        assertEquals("DD", caseData.getIssueCode());
+        assertEquals("088DD", caseData.getCaseCode());
+    }
+
+    @Test
+    void givenIncorrectIssueCodeIsSelected_thenShouldShowAnError() {
+        DynamicListItem item = new DynamicListItem("088", "");
+        DynamicList selection = new DynamicList(item, null);
+        sscsCaseData.getAppeal().getBenefitType().setDescriptionSelection(selection);
+        sscsCaseData.setIssueCode("XA");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors().size(), is(1));
     }
 }

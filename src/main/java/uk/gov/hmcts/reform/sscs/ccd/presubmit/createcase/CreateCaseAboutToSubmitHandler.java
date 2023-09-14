@@ -4,7 +4,6 @@ import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -61,6 +60,10 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
             createAppealPdf(caseData);
         }
         handleBenefitType(caseData);
+
+        if (isNull(caseData.getIssueCode())) {
+            caseData.setIssueCode("DD");
+        }
 
         return sscsCaseDataPreSubmitCallbackResponse;
     }

@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNull;
+
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -8,11 +12,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
-
-import java.util.List;
-
-import static java.util.Objects.isNull;
-import static java.util.Objects.requireNonNull;
 
 @Component
 @Slf4j
@@ -41,9 +40,6 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
         DynamicListItem selectedBenefit = getSelectedBenefit(benefitDescriptions.getListItems(), caseData.getBenefitCode());
         benefitDescriptions.setValue(selectedBenefit);
         benefitType.setDescriptionSelection(benefitDescriptions);
-
-        log.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA {}", appeal);
-
         caseData.setAppeal(appeal);
 
         return new PreSubmitCallbackResponse<>(caseData);
