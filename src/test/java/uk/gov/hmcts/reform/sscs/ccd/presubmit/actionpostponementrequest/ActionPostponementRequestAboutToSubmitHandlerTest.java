@@ -207,11 +207,19 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     @Test
     public void givenARefuseOnTheDayPostponement_thatIsNotDoneByDwp_thenLeaveFields() {
-        SscsDocument postponementDocument = buildSscsDocument("postponementRequest", UploadParty.JOINT_PARTY);
+        SscsDocument postponementDocumentJP = buildSscsDocument("postponementRequest", UploadParty.JOINT_PARTY);
+        SscsDocument postponementDocumentR = buildSscsDocument("postponementRequest", UploadParty.REP);
+        SscsDocument postponementDocumentOP = buildSscsDocument("postponementRequest", UploadParty.OTHER_PARTY);
+        SscsDocument postponementDocumentOpa = buildSscsDocument("postponementRequest", UploadParty.OTHER_PARTY_APPOINTEE);
+        SscsDocument postponementDocumentOpr = buildSscsDocument("postponementRequest", UploadParty.OTHER_PARTY_REP);
+        SscsDocument postponementDocumentApl = buildSscsDocument("postponementRequest", UploadParty.APPELLANT);
+        SscsDocument postponementDocumentApo = buildSscsDocument("postponementRequest", UploadParty.APPOINTEE);
+        SscsDocument postponementDocumentC = buildSscsDocument("postponementRequest", UploadParty.CTSC);
         sscsCaseData.setPostponementRequest(PostponementRequest.builder()
                 .actionPostponementRequestSelected("refuseOnTheDay")
                 .build());
-        sscsCaseData.setSscsDocument(Arrays.asList(postponementDocument));
+        sscsCaseData.setSscsDocument(Arrays.asList(postponementDocumentJP,postponementDocumentR,postponementDocumentOP,
+                postponementDocumentOpa,postponementDocumentOpr,postponementDocumentApl,postponementDocumentApo,postponementDocumentC));
         sscsCaseData.setDwpState(DwpState.IN_PROGRESS);
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
         sscsCaseData.setState(State.READY_TO_LIST);
