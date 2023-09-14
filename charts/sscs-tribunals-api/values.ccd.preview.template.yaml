@@ -235,7 +235,7 @@ ccd:
           secretKeyRef:
             name: sscs-postgres
             key: PASSWORD
-    # envFrom:
+    # envFrom: 
     #   - secretRef:
     #       name: sscs-postgres
     extraInitContainers: |
