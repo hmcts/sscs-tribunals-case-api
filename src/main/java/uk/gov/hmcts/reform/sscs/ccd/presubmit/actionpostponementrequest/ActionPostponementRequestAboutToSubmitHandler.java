@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
@@ -8,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE_ON
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.SEND_TO_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.idam.UserRole.DWP;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
@@ -81,7 +80,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         } else if (GRANT.getValue().equals(actionRequested)) {
             grantPostponement(sscsCaseData, response);
         } else if (REFUSE_ON_THE_DAY.getValue().equals(actionRequested)) {
-            refuseOnTheDay(userAuthorisation, sscsCaseData);
+            refuseOnTheDay(sscsCaseData);
         } else {
             log.info("Action postponement request: unhandled requested action {} for case {}", actionRequested,
                 caseId);
@@ -124,14 +123,13 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(NO);
     }
 
-    private void refuseOnTheDay(String userAuthorisation, SscsCaseData sscsCaseData) {
-        final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
-        final boolean hasDwpUserRole = userDetails.hasRole(DWP);
+    private void refuseOnTheDay(SscsCaseData sscsCaseData) {
+        final UploadParty uploadParty = sscsCaseData.getLatestDocumentForDocumentType(POSTPONEMENT_REQUEST).getValue().getPartyUploaded();
+        final boolean hasDwpUserRole = uploadParty.getLabel() == "DWP";
 
         if (!hasDwpUserRole) {
             return;
         }
-
         sscsCaseData.setDwpState(null);
         sscsCaseData.setInterlocReviewState(null);
         sscsCaseData.setState(State.HEARING);

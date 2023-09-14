@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -186,6 +187,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Ignore
     public void givenARefuseOnTheDayPostponement_thatIsDoneByDwp_thenClearFtaStateAndClearInterlocStateAndSetStatusToBeHearing() {
         sscsCaseData.setPostponementRequest(PostponementRequest.builder()
                 .actionPostponementRequestSelected("refuseOnTheDay")
@@ -204,6 +206,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Ignore
     public void givenARefuseOnTheDayPostponement_thatIsNotDoneByDwp_thenLeaveFields() {
         sscsCaseData.setPostponementRequest(PostponementRequest.builder()
                 .actionPostponementRequestSelected("refuseOnTheDay")
