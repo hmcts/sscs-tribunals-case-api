@@ -205,6 +205,24 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(sscsCaseData.getState()).isEqualTo(State.HEARING);
     }
 
+    @Test
+    public void givenARefuseOnTheDayPostponement_thatIsNotDoneByDwp_thenLeaveFields() {
+        SscsDocument postponementDocument = buildSscsDocument("postponementRequest", UploadParty.JOINT_PARTY);
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder()
+                .actionPostponementRequestSelected("refuseOnTheDay")
+                .build());
+        sscsCaseData.setSscsDocument(Arrays.asList(postponementDocument));
+        sscsCaseData.setDwpState(DwpState.IN_PROGRESS);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
+        sscsCaseData.setState(State.READY_TO_LIST);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getDwpState()).isEqualTo(DwpState.IN_PROGRESS);
+        assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
+        assertThat(sscsCaseData.getState()).isEqualTo(State.READY_TO_LIST);
+    }
+
 
     @Test
     public void givenAGrantedPostponement_shouldSendCancellation() {
