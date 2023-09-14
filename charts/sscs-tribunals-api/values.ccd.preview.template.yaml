@@ -216,7 +216,7 @@ ccd:
     
   logstash:
     image: hmctspublic.azurecr.io/imported/logstash/logstash
-    imageTag: "7.16.1-probateman"
+    imageTag: "7.16.1"
     imagePullPolicy: "IfNotPresent"
     logstashJavaOpts: -Xmx1g -Xms512M
     persistence:
@@ -258,17 +258,13 @@ ccd:
           pipeline.workers: 4
           pipeline.batch.size: 500
           queue.type: persisted
-        - pipeline.id: index-dead-letter-to-es
-          path.config: "/usr/share/logstash/pipeline/dead_letter_indexing_pipeline.conf"
-          pipeline.workers: 1
-          dead_letter_queue.enable: false
     logstashPipeline:
       01_input.conf: |
         input  {
           jdbc {
             jdbc_connection_string => "jdbc:postgresql://sscs-flexibleserver-postgres-preview.postgres.database.azure.com:5432/data-store?sslmode=require&stringtype=unspecified"
             jdbc_user => "hmcts"
-            jdbc_password => "${PASSWORD}"
+            jdbc_password => '${PASSWORD}'
             jdbc_validate_connection => true
             jdbc_validation_timeout => "1"
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
