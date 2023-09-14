@@ -174,7 +174,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
 
     @Test
     public void givenAWriteFinalDecisionEventNotForCorrectionWithPostHearingsEnabled_thenDeleteData() {
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService,  true);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         when(caseDetails.getState()).thenReturn(State.VALID_APPEAL);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
