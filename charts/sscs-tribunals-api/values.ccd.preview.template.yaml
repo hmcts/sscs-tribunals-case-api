@@ -263,7 +263,7 @@ ccd:
         input  {
           jdbc {
             jdbc_connection_string => "jdbc:postgresql://sscs-flexibleserver-postgres-preview.postgres.database.azure.com:5432/data-store?sslmode=require&stringtype=unspecified"
-            jdbc_user => "hmcts"
+            jdbc_user => "hmcts@sscs-flexibleserver-postgres-preview"
             jdbc_password => "${PASSWORD}"
             jdbc_validate_connection => true
             jdbc_validation_timeout => "1"
