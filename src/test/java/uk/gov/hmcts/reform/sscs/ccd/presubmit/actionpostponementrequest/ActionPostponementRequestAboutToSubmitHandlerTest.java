@@ -198,11 +198,12 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
         sscsCaseData.setState(State.READY_TO_LIST);
 
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(sscsCaseData.getDwpState()).isNull();
-        assertThat(sscsCaseData.getInterlocReviewState()).isNull();
-        assertThat(sscsCaseData.getState()).isEqualTo(State.HEARING);
+        assertThat(response.getData().getDwpState()).isNull();
+        assertThat(response.getData().getInterlocReviewState()).isNull();
+        assertThat(response.getData().getState()).isEqualTo(State.HEARING);
     }
 
     @Test
@@ -221,11 +222,12 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
             sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
             sscsCaseData.setState(State.READY_TO_LIST);
 
-            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+            PreSubmitCallbackResponse<SscsCaseData> response =
+                    handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            assertThat(sscsCaseData.getDwpState()).isEqualTo(DwpState.IN_PROGRESS);
-            assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
-            assertThat(sscsCaseData.getState()).isEqualTo(State.READY_TO_LIST);
+            assertThat(response.getData().getDwpState()).isEqualTo(DwpState.IN_PROGRESS);
+            assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
+            assertThat(response.getData().getState()).isEqualTo(State.READY_TO_LIST);
 
         }
     }
