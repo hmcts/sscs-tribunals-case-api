@@ -207,28 +207,27 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     @Test
     public void givenARefuseOnTheDayPostponement_thatIsNotDoneByDwp_thenLeaveFields() {
-        SscsDocument postponementDocumentJP = buildSscsDocument("postponementRequest", UploadParty.JOINT_PARTY);
-        SscsDocument postponementDocumentR = buildSscsDocument("postponementRequest", UploadParty.REP);
-        SscsDocument postponementDocumentOP = buildSscsDocument("postponementRequest", UploadParty.OTHER_PARTY);
-        SscsDocument postponementDocumentOpa = buildSscsDocument("postponementRequest", UploadParty.OTHER_PARTY_APPOINTEE);
-        SscsDocument postponementDocumentOpr = buildSscsDocument("postponementRequest", UploadParty.OTHER_PARTY_REP);
-        SscsDocument postponementDocumentApl = buildSscsDocument("postponementRequest", UploadParty.APPELLANT);
-        SscsDocument postponementDocumentApo = buildSscsDocument("postponementRequest", UploadParty.APPOINTEE);
-        SscsDocument postponementDocumentC = buildSscsDocument("postponementRequest", UploadParty.CTSC);
-        sscsCaseData.setPostponementRequest(PostponementRequest.builder()
-                .actionPostponementRequestSelected("refuseOnTheDay")
-                .build());
-        sscsCaseData.setSscsDocument(Arrays.asList(postponementDocumentJP,postponementDocumentR,postponementDocumentOP,
-                postponementDocumentOpa,postponementDocumentOpr,postponementDocumentApl,postponementDocumentApo,postponementDocumentC));
-        sscsCaseData.setDwpState(DwpState.IN_PROGRESS);
-        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
-        sscsCaseData.setState(State.READY_TO_LIST);
+        List<UploadParty> uploadParties = List.of(UploadParty.JOINT_PARTY, UploadParty.REP, UploadParty.OTHER_PARTY,
+                UploadParty.OTHER_PARTY_APPOINTEE, UploadParty.OTHER_PARTY_REP, UploadParty.APPELLANT, UploadParty.APPOINTEE,
+                UploadParty.CTSC);
 
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        for (UploadParty uploadParty : uploadParties) {
+            SscsDocument postponementDocument = buildSscsDocument("postponementRequest", uploadParty);
+            sscsCaseData.setPostponementRequest(PostponementRequest.builder()
+                    .actionPostponementRequestSelected("refuseOnTheDay")
+                    .build());
+            sscsCaseData.setSscsDocument(Arrays.asList(postponementDocument));
+            sscsCaseData.setDwpState(DwpState.IN_PROGRESS);
+            sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
+            sscsCaseData.setState(State.READY_TO_LIST);
 
-        assertThat(sscsCaseData.getDwpState()).isEqualTo(DwpState.IN_PROGRESS);
-        assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
-        assertThat(sscsCaseData.getState()).isEqualTo(State.READY_TO_LIST);
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            assertThat(sscsCaseData.getDwpState()).isEqualTo(DwpState.IN_PROGRESS);
+            assertThat(sscsCaseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
+            assertThat(sscsCaseData.getState()).isEqualTo(State.READY_TO_LIST);
+
+        }
     }
 
 
