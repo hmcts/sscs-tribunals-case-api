@@ -23,7 +23,7 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
 
     public static final String APPENDIX_12_DOC_NOT_FOR_SSCS5_CONFIDENTIALITY = "An Appendix 12 document cannot be uploaded with Confidentiality documents";
 
-    protected final SessionCategoryMapService categoryMapSerivce;
+    protected final SessionCategoryMapService categoryMapService;
 
 
     @Override
@@ -47,7 +47,7 @@ public class DwpUploadResponseMidEventHandler implements PreSubmitCallbackHandle
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        validateBenefitIssueCode(sscsCaseData, response, categoryMapSerivce);
+        validateBenefitIssueCode(sscsCaseData, response, categoryMapService);
         validatePostponementRequests(sscsCaseData, response);
         forceToAddOtherPartyOnSscs2Case(sscsCaseData, response);
 

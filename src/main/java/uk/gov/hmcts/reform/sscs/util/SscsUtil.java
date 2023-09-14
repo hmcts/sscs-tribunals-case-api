@@ -260,7 +260,7 @@ public class SscsUtil {
 
     public static void validateBenefitIssueCode(SscsCaseData caseData,
                                                 PreSubmitCallbackResponse<SscsCaseData> response,
-                                                SessionCategoryMapService categoryMapSerivce) {
+                                                SessionCategoryMapService categoryMapService) {
         boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
         boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
 
@@ -270,7 +270,7 @@ public class SscsUtil {
         }
 
 
-        if (isNull(categoryMapSerivce.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
+        if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
                 isSecondDoctorPresent, fqpmRequired))) {
             response.addError(INVALID_BENEFIT_ISSUE_CODE);
         }

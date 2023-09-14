@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService
 class SscsUtilTest {
     public static final String UNEXPECTED_POST_HEARING_REVIEW_TYPE_AND_ACTION = "getting the document type has an unexpected postHearingReviewType and action";
   
-    private SessionCategoryMapService categoryMapSerivce = new SessionCategoryMapService();
+    private SessionCategoryMapService categoryMapService = new SessionCategoryMapService();
     private PostHearing postHearing;
     private SscsCaseData caseData;
 
@@ -217,7 +217,7 @@ class SscsUtilTest {
     void givenCorrectIssueAndBenefitCode_dontAddErrorToResponse() {
         SscsCaseData caseData = SscsCaseData.builder().benefitCode("002").issueCode("DD").build();
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-        validateBenefitIssueCode(caseData, response, categoryMapSerivce);
+        validateBenefitIssueCode(caseData, response, categoryMapService);
 
         assertThat(response.getErrors()).isEmpty();
     }
@@ -226,7 +226,7 @@ class SscsUtilTest {
     void givenWrongIssueAndBenefitCode_addErrorToResponse() {
         SscsCaseData caseData = SscsCaseData.builder().benefitCode("002").issueCode("XA").build();
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-        validateBenefitIssueCode(caseData, response, categoryMapSerivce);
+        validateBenefitIssueCode(caseData, response, categoryMapService);
 
         assertThat(response.getErrors().size()).isEqualTo(1);
         assertThat(response.getErrors()).contains(INVALID_BENEFIT_ISSUE_CODE);
@@ -236,7 +236,7 @@ class SscsUtilTest {
     void givenLegacyBenefitCode_addErrorToResponse() {
         SscsCaseData caseData = SscsCaseData.builder().benefitCode("032").issueCode("CR").build();
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-        validateBenefitIssueCode(caseData, response, categoryMapSerivce);
+        validateBenefitIssueCode(caseData, response, categoryMapService);
 
         assertThat(response.getErrors().size()).isEqualTo(1);
         assertThat(response.getErrors()).contains(BENEFIT_CODE_NOT_IN_USE);
