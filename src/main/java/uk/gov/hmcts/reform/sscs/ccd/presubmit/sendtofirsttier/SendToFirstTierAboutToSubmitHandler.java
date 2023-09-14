@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.sendtofirsttier;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.LIBERTY_TO_APPLY;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +59,14 @@ public class SendToFirstTierAboutToSubmitHandler implements PreSubmitCallbackHan
                 caseData.getPostHearing().getSendToFirstTier().getDecisionDocument(),
                 getSendToFirstTierDocumentType(caseData.getPostHearing().getSendToFirstTier().getAction()),
                 callback.getEvent());
+
+            if (SendToFirstTierActions.DECISION_REMITTED.equals(caseData.getPostHearing().getSendToFirstTier().getAction())) {
+                SscsUtil.setAdjournmentPanelMembersExclusions(caseData.getSchedulingAndListingFields().getPanelMemberExclusions(),
+                        caseData.getJudicialUserPanel().getPanelMembers(),
+                        AdjournCasePanelMembersExcluded.YES);
+            }
         }
+
         return response;
     }
 
@@ -73,13 +83,10 @@ public class SendToFirstTierAboutToSubmitHandler implements PreSubmitCallbackHan
     }
 
     private DocumentType getSendToFirstTierDocumentType(@NonNull SendToFirstTierActions action) {
-        switch (action) {
-            case DECISION_REMADE:
-                return DocumentType.UPPER_TRIBUNALS_DECISION_REMADE;
-            case DECISION_REFUSED:
-                return DocumentType.UPPER_TRIBUNALS_DECISION_REFUSED;
-            default:
-                throw new IllegalArgumentException("Unexpected decision action: " + action);
-        }
+        return switch (action) {
+            case DECISION_REMADE -> DocumentType.UPPER_TRIBUNALS_DECISION_REMADE;
+            case DECISION_REFUSED -> DocumentType.UPPER_TRIBUNALS_DECISION_REFUSED;
+            case DECISION_REMITTED -> DocumentType.UPPER_TRIBUNALS_DECISION_REMITTED;
+        };
     }
 }

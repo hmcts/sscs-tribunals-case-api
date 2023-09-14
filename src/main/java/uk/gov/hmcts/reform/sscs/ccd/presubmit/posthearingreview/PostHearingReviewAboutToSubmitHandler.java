@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.LIBERTY_TO_APPLY;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,8 +49,28 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
             SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData,
                 caseData.getDocumentStaging().getPostHearingPreviewDocument(),
                 SscsUtil.getPostHearingReviewDocumentType(postHearing, isPostHearingsEnabled));
+
+            updatePanelMemberList(caseData);
         }
 
         return response;
+    }
+
+    private void updatePanelMemberList(SscsCaseData caseData) {
+        AdjournCasePanelMembersExcluded panelMembersExcluded = null;
+        PostHearing postHearing = caseData.getPostHearing();
+
+        PostHearingReviewType reviewType = postHearing.getReviewType();
+        if (SET_ASIDE.equals(reviewType) && SetAsideActions.GRANT.equals(postHearing.getSetAside().getAction())) {
+            panelMembersExcluded = AdjournCasePanelMembersExcluded.YES;
+        } else if (LIBERTY_TO_APPLY.equals(reviewType) && LibertyToApplyActions.GRANT.equals(postHearing.getLibertyToApply().getAction())) {
+            panelMembersExcluded = AdjournCasePanelMembersExcluded.RESERVED;
+        }
+
+        if (nonNull(panelMembersExcluded)) {
+            SscsUtil.setAdjournmentPanelMembersExclusions(caseData.getSchedulingAndListingFields().getPanelMemberExclusions(),
+                    caseData.getJudicialUserPanel().getPanelMembers(),
+                    panelMembersExcluded);
+        }
     }
 }
