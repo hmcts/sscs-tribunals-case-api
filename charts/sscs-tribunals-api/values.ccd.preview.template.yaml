@@ -230,6 +230,9 @@ ccd:
         value: hmcts
       - name: ES_HOSTS
         value: "${SERVICE_NAME}-es-master"
+    envFrom:
+      - secretRef:
+          name: "{{ .Values.global.postgresSecret }}"
     extraInitContainers: |
       - name: download-postgres-jdbc
         image: hmctspublic.azurecr.io/curl:7.70.0
@@ -261,7 +264,7 @@ ccd:
           jdbc {
             jdbc_connection_string => "jdbc:postgresql://sscs-flexibleserver-postgres-preview.postgres.database.azure.com:5432/data-store?sslmode=require&stringtype=unspecified"
             jdbc_user => "hmcts"
-            jdbc_password => "${sscs-postgres}"
+            jdbc_password => "${PASSWORD}"
             jdbc_validate_connection => true
             jdbc_validation_timeout => "1"
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
