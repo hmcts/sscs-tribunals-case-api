@@ -232,7 +232,7 @@ ccd:
         value: "${SERVICE_NAME}-es-master"
     envFrom:
       - secretRef:
-          name: "{{ .Values.global.postgresSecret }}"
+          name: sscs-postgres
     extraInitContainers: |
       - name: download-postgres-jdbc
         image: hmctspublic.azurecr.io/curl:7.70.0
