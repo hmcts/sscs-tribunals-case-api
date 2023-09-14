@@ -230,15 +230,9 @@ ccd:
         value: hmcts
       - name: ES_HOSTS
         value: "${SERVICE_NAME}-es-master"
-      - name: "PASSWORD"
-        valueFrom:
-          secretKeyRef:
-            name: sscs-postgres
-            key: PASSWORD
-    # values:
-    #   envFrom:
-    #     - secretRef:
-    #         name: sscs-postgres
+    envFrom:
+      - secretRef:
+          name: sscs-postgres
     extraInitContainers: |
       - name: download-postgres-jdbc
         image: hmctspublic.azurecr.io/curl:7.70.0
