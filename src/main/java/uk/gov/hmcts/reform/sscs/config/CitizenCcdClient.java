@@ -1,18 +1,15 @@
 package uk.gov.hmcts.reform.sscs.config;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessApi;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.ccd.client.model.UserId;
+import uk.gov.hmcts.reform.ccd.client.model.*;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -59,31 +56,27 @@ public class CitizenCcdClient {
     @Retryable
     public List<CaseDetails> searchForCitizen(IdamTokens idamTokens) {
         log.info("Searching cases for citizen");
-        Map<String, String> searchCriteria = new HashMap<>();
-        searchCriteria.put("state", State.DRAFT.getId());
-        searchCriteria.put("sortDirection", "desc");
-        return coreCaseDataApi.searchForCitizen(
-            idamTokens.getIdamOauth2Token(),
-            idamTokens.getServiceAuthorization(),
-            idamTokens.getUserId(),
-            ccdRequestDetails.getJurisdictionId(),
-            ccdRequestDetails.getCaseTypeId(),
-            searchCriteria
-        );
+        String searchCriteria;
+        searchCriteria = buildQuery("state", State.DRAFT.getId());
+        SearchResult searchResult = coreCaseDataApi.searchCases(
+                idamTokens.getIdamOauth2Token(),
+                idamTokens.getServiceAuthorization(),
+                ccdRequestDetails.getCaseTypeId(),
+                searchCriteria);
+        return Optional.ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
 
     }
 
     public List<CaseDetails> searchForCitizenAllCases(IdamTokens idamTokens) {
-        Map<String, String> searchCriteria = new HashMap<>();
-        searchCriteria.put("sortDirection", "desc");
-        return coreCaseDataApi.searchForCitizen(
+        String searchCriteria = "\"query\" : {\n"
+                + "        \"match_all\" : {}\n"
+                + "    }";
+        SearchResult searchResult = coreCaseDataApi.searchCases(
                 idamTokens.getIdamOauth2Token(),
                 idamTokens.getServiceAuthorization(),
-                idamTokens.getUserId(),
-                ccdRequestDetails.getJurisdictionId(),
                 ccdRequestDetails.getCaseTypeId(),
-                searchCriteria
-        );
+                searchCriteria);
+        return Optional.ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
 
     }
 
@@ -134,6 +127,12 @@ public class CitizenCcdClient {
                 caseId.toString(),
                 userIdToRemove
         );
+    }
+
+    public String buildQuery(String searchValue, String searchField) {
+        return "{\"query\":{\"term\":{ \""
+                + searchValue
+                + "\":\"" + searchField + "\"}}}";
     }
 }
 
