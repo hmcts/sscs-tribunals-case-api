@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest.ActionPostponementRequestAboutToSubmitHandler.POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
@@ -184,6 +185,27 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
                 eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null), eq(null));
     }
 
+
+    @Test
+    public void givenARefuseOnTheDayPostponement_thatIsDoneByDwp_thenClearFtaStateAndClearInterlocStateAndSetStatusToBeHearing() {
+        SscsDocument postponementDocument = buildSscsDocument("postponementRequest", UploadParty.DWP);
+
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder()
+                .actionPostponementRequestSelected("refuseOnTheDay")
+                .build());
+        sscsCaseData.setSscsDocument(Arrays.asList(postponementDocument));
+        sscsCaseData.setDwpState(DwpState.IN_PROGRESS);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
+        sscsCaseData.setState(State.READY_TO_LIST);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getDwpState()).isNull();
+        assertThat(sscsCaseData.getInterlocReviewState()).isNull();
+        assertThat(sscsCaseData.getState()).isEqualTo(State.HEARING);
+    }
+
+
     @Test
     public void givenAGrantedPostponement_shouldSendCancellation() {
         sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
@@ -290,5 +312,14 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
             .contains("Cannot process Action postponement request on non Scheduling & Listing Case");
 
         verifyNoInteractions(hearingMessageHelper);
+    }
+
+
+    private SscsDocument buildSscsDocument(String documentType, UploadParty uploadParty) {
+        SscsDocumentDetails docDetails = SscsDocumentDetails.builder()
+                .documentType(documentType)
+                .partyUploaded(uploadParty)
+                .build();
+        return SscsDocument.builder().value(docDetails).build();
     }
 }
