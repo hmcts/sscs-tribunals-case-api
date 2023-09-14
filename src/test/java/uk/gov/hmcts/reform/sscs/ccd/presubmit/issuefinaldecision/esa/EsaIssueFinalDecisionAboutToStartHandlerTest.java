@@ -104,7 +104,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
             new DecisionNoticeService(Arrays.asList(),
                 Arrays.asList(esaDecisionNoticeOutcomeService), Arrays.asList(previewDecisionService));
 
-        handler = new IssueFinalDecisionAboutToStartHandler(decisionNoticeService);
+        handler = new IssueFinalDecisionAboutToStartHandler(decisionNoticeService, false, false);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -118,7 +118,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
             .ccdCaseId("ccdId")
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionGeneratedDate("2018-01-01")
-                .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
+                .writeFinalDecisionPreviewDocument(DocumentLink.builder().documentFilename("filename").build())
                 .build())
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("ESA").build())
@@ -168,7 +168,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         when(previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true)).thenReturn(response);
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        verify(previewDecisionService).preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
+        verify(previewDecisionService).preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true, false, false);
 
     }
 
