@@ -4,6 +4,10 @@ tags:
 
 java:
   image: ${IMAGE_NAME}
+  memoryLimits: "8Gi"
+  memoryRequests: "1Gi"
+  cpuRequests: "2"
+  cpuLimits: 2000m
   readinessDelay: 45
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
@@ -22,6 +26,7 @@ java:
     IDAM_S2S-AUTH_MICROSERVICE: ${IDAM_S2S_AUTH_MICROSERVICE}
     IDAM_SSCS_SYSTEMUPDATE_USER: ${IDAM_SSCS_SYSTEMUPDATE_USER}
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
+    CCD_CALLBACK_ORCHESTRATOR_API_URL: http://${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     CORE_CASE_DATA_JURISDICTION_ID: SSCS
     CORE_CASE_DATA_CASE_TYPE_ID: Benefit
     TEST_URL: http://${SERVICE_NAME}
@@ -32,6 +37,8 @@ java:
     POST_HEARINGS_FEATURE: true
     POST_HEARINGS_B_FEATURE: true
     ADJOURNMENT_FEATURE: true
+    GAPS_SWITCHOVER_FEATURE: true
+    DUMMY: true
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -78,12 +85,14 @@ ccd-case-document-am-api:
 xui-webapp:
   enabled: true
   nodejs:
+    memoryLimits: "4Gi"
+    cpuLimits: 2000m
+    memoryRequests: "1Gi"
+    cpuRequests: "1"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
     ingressHost: xui-${SERVICE_FQDN}
-    memoryLimits: 1836Mi
-    cpuLimits: 1900m
     environment:
       HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
       HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
@@ -475,6 +484,7 @@ ccd:
         IDAM_OAUTH2_CLIENT_SECRET: ${CCD_API_GATEWAY_IDAM_CLIENT_SECRET}
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
       ingressIP: ${INGRESS_IP}
+      ingressHost: gateway-${SERVICE_FQDN}
       disableKeyVaults: true
 
   ccd-user-profile-importer:
@@ -489,7 +499,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-10526nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-137-3nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -508,7 +518,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S-10526nonProd
+      CCD_DEF_VERSION: S-137-3nonProd
     secrets: []
     userRoles:
       - citizen
@@ -518,6 +528,7 @@ ccd:
       - caseworker-sscs-anonymouscitizen
       - caseworker-sscs-callagent
       - caseworker-sscs-judge
+      - caseworker-sscs-judge-salaried
       - caseworker-sscs-clerk
       - caseworker-sscs-dwpresponsewriter
       - caseworker-sscs-registrar
@@ -587,6 +598,7 @@ sscs-tya-notif:
       TEST_RECIPIENTS_POSTCODE: "*"
       POST_HEARINGS_FEATURE: true
       POST_HEARINGS_B_FEATURE: true
+      DUMMY: true
     secrets:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
@@ -629,6 +641,8 @@ sscs-ccd-callback-orchestrator:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
+    memoryLimits: "2Gi"
+    cpuLimits: 2000m
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
     environment:
