@@ -69,7 +69,7 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
 
         if (nonNull(panelMembersExcluded)) {
             SscsUtil.setAdjournmentPanelMembersExclusions(caseData.getSchedulingAndListingFields().getPanelMemberExclusions(),
-                    caseData.getJudicialUserPanel().getPanelMembers(),
+                    caseData.getLatestHearing().getValue().getPanel().getPanelMembers(),
                     panelMembersExcluded);
         }
     }

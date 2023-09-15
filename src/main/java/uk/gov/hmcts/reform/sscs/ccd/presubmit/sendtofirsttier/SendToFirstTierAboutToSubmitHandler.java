@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.sendtofirsttier;
 
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.LIBERTY_TO_APPLY;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +59,7 @@ public class SendToFirstTierAboutToSubmitHandler implements PreSubmitCallbackHan
 
             if (SendToFirstTierActions.DECISION_REMITTED.equals(caseData.getPostHearing().getSendToFirstTier().getAction())) {
                 SscsUtil.setAdjournmentPanelMembersExclusions(caseData.getSchedulingAndListingFields().getPanelMemberExclusions(),
-                        caseData.getJudicialUserPanel().getPanelMembers(),
+                        caseData.getLatestHearing().getValue().getPanel().getPanelMembers(),
                         AdjournCasePanelMembersExcluded.YES);
             }
         }
