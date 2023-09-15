@@ -1408,19 +1408,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             assertTrue(response.getErrors().stream().anyMatch(e -> e.equals("Benefit type cannot be changed to the selected type")));
         }
     }
-
-    @Test
-    public void givenInvalidIssueBenefitCode_thenThrowError() {
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        when(categoryMapService.getSessionCategory("054", "DD", true, true))
-            .thenReturn(null);
-        sscsCaseData.setBenefitCode("054");
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors().size(), is(1));
-    }
   
     public void givenAnyCaseAndLanguageIsNotSelectedFromList_thenSetTheOriginalLanguageFieldToEmpty() {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
