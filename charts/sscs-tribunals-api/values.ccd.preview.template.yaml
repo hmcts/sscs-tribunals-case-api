@@ -270,7 +270,7 @@ ccd:
           jdbc {
             jdbc_connection_string => "jdbc:postgresql://sscs-flexibleserver-postgres-preview.postgres.database.azure.com:5432/data-store?sslmode=require&stringtype=unspecified"
             jdbc_user => "hmcts"
-            jdbc_password => "hmcts"
+            jdbc_password => "%{MY_PASSWORD}"
             jdbc_validate_connection => true
             jdbc_validation_timeout => "1"
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
@@ -522,7 +522,6 @@ ccd:
       - caseworker-sscs-anonymouscitizen
       - caseworker-sscs-callagent
       - caseworker-sscs-judge
-      - caseworker-sscs-judge-salaried
       - caseworker-sscs-clerk
       - caseworker-sscs-dwpresponsewriter
       - caseworker-sscs-registrar
