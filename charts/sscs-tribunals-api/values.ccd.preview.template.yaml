@@ -216,7 +216,6 @@ ccd:
     
   logstash:
     image: hmctspublic.azurecr.io/imported/logstash/logstash
-    
     imageTag: "7.16.1"
     imagePullPolicy: "IfNotPresent"
     logstashJavaOpts: -Xmx1g -Xms512M
@@ -231,14 +230,6 @@ ccd:
         value: hmcts
       - name: ES_HOSTS
         value: "${SERVICE_NAME}-es-master"
-      - name: MY_PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: sscs-postgres
-            key: PASSWORD
-    # envFrom: 
-    #   - secretRef:
-    #       name: sscs-postgres
     extraInitContainers: |
       - name: download-postgres-jdbc
         image: hmctspublic.azurecr.io/curl:7.70.0
