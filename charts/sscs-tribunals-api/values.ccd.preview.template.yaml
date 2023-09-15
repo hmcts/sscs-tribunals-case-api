@@ -522,6 +522,7 @@ ccd:
       - caseworker-sscs-anonymouscitizen
       - caseworker-sscs-callagent
       - caseworker-sscs-judge
+      - caseworker-sscs-judge-salaried
       - caseworker-sscs-clerk
       - caseworker-sscs-dwpresponsewriter
       - caseworker-sscs-registrar
