@@ -11,6 +11,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -19,14 +21,13 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
+@Slf4j
 public class SscsUtil {
 
     private SscsUtil() {
@@ -342,25 +343,6 @@ public class SscsUtil {
         benefitType.setDescription(benefit.getDescription());
         benefitType.setDescriptionSelection(null);
         caseData.setBenefitCode(benefit.getBenefitCode());
-    }
-
-    public static final String INVALID_BENEFIT_ISSUE_CODE = "Incorrect benefit/issue code combination";
-    public static final String BENEFIT_CODE_NOT_IN_USE = "The benefit code selected is not in use";
-
-    public static void validateBenefitIssueCode(SscsCaseData caseData,
-                                                PreSubmitCallbackResponse<SscsCaseData> response,
-                                                SessionCategoryMapService categoryMapService) {
-        boolean isSecondDoctorPresent = org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
-        boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
-
-        if (isNull(Benefit.getBenefitFromBenefitCode(caseData.getBenefitCode()))) {
-            response.addError(BENEFIT_CODE_NOT_IN_USE);
-        }
-
-        if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
-                isSecondDoctorPresent, fqpmRequired))) {
-            response.addError(INVALID_BENEFIT_ISSUE_CODE);
-        }
     }
 }
 

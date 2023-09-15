@@ -7,7 +7,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -44,9 +43,7 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         String caseId = sscsCaseData.getCcdCaseId();
-      
-        SscsCaseData sscsCaseData = caseDetails.getCaseData();
-      
+
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
         if (hearingOptions != null) {
             DynamicList interpreterLanguages = utils.generateInterpreterLanguageFields(null);
@@ -69,7 +66,7 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
         DynamicListItem selectedBenefit = getSelectedBenefit(benefitDescriptions.getListItems(), sscsCaseData.getBenefitCode());
         benefitDescriptions.setValue(selectedBenefit);
         benefitType.setDescriptionSelection(benefitDescriptions);
-        caseData.setAppeal(appeal);
+        sscsCaseData.setAppeal(appeal);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }

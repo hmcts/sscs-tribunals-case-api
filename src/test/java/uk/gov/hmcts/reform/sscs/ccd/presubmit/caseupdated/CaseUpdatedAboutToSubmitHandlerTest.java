@@ -9,11 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.PIP_NEW_CLAIM;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Issue.AT;
@@ -25,15 +25,19 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -53,6 +57,8 @@ import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
 
+@Slf4j
+@ExtendWith(MockitoExtension.class)
 public class CaseUpdatedAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -97,8 +103,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
-        openMocks(this);
-        SessionCategoryMapService categoryMapService = new SessionCategoryMapService();
         AssociatedCaseLinkHelper associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService);
         handler = new CaseUpdatedAboutToSubmitHandler(
             regionalProcessingCenterService,
@@ -128,8 +132,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .build())
             .benefitCode("002")
             .issueCode("DD")
-            .isFqpmRequired(YES)
-            .sscsIndustrialInjuriesData(SscsIndustrialInjuriesData.builder().secondPanelDoctorSpecialism("feet").build())
+            .isFqpmRequired(NO)
             .build();
 
 
@@ -152,9 +155,10 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             .roles(List.of(SUPER_USER.getValue()))
             .build());
 
-        when(categoryMapService.getSessionCategory(any(String.class), any(String.class), any(boolean.class),
-            any(boolean.class))).thenReturn(new SessionCategoryMap(PIP_NEW_CLAIM, AT, true, true));
         appeal = callback.getCaseDetails().getCaseData().getAppeal();
+
+        when(categoryMapService.getSessionCategory(any(String.class), any(String.class), any(boolean.class),
+                any(boolean.class))).thenReturn(new SessionCategoryMap(PIP_NEW_CLAIM, AT, true, true));
     }
 
     @Test
@@ -313,7 +317,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @ParameterizedTest
     @CsvSource({"Birmingham,Glasgow,Yes", "Glasgow,Birmingham,No"})
     void givenChangeInRpcChangeIsScottish(String oldRpcName, String newRpcName, String expected) {
-
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setIsScottishCase("No");
         RegionalProcessingCenter oldRpc = RegionalProcessingCenter.builder().name(oldRpcName).build();
@@ -1055,6 +1058,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        log.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA  {} {}", response.getErrors(), response.getWarnings());
+
         assertThat(response.getData()
             .getCaseAccessManagementFields()
             .getCaseNameHmctsInternal(), is("Louis Litt"));
@@ -1383,7 +1388,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "guaranteedMinimumPension,Guaranteed Minimum Pension,054,0",
-        "nationalInsuranceCredits,Bereavement Benefit,test,4",
+        "nationalInsuranceCredits,Bereavement Benefit,test,3",
         "socialFund,30 Hours Free Childcare,002,1",
         "childSupport,Child Support,002,0"
     })
@@ -1407,7 +1412,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "guaranteedMinimumPension,Guaranteed Minimum Pension,054,0,0",
-        "nationalInsuranceCredits,Bereavement Benefit,test,2,2",
+        "nationalInsuranceCredits,Bereavement Benefit,test,1,2",
         "socialFund,30 Hours Free Childcare,002,0,1",
         "childSupport,Child Support,002,0,0"
     })
@@ -1427,6 +1432,40 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             assertTrue(response.getWarnings().stream().anyMatch(e -> e.equals("Benefit type cannot be changed to the selected type")));
         }
     }
+    @Test
+    public void givenAnyCaseAndLanguageIsNotSelectedFromList_thenSetTheOriginalLanguageFieldToEmpty() {
+        Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
+        appeal.getBenefitType().setCode("PIP");
+        appeal.setHearingType("paper");
+        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").languagesList(null).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals("", appeal.getHearingOptions().getLanguages());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "Spanish", "Chittagonain", "Czech", "Danish", "Dinka", "Maldivian", "Toura", "Douala", "Dutch", "Dioula",
+        "Efik", "Estonian", "Ewe", "Ewondo", "Farsi", "Fanti", "Fijian", "French"
+    })
+    public void givenAnyCaseAndLanguageIsSelectedFromList_thenSetTheOriginalLanguageFieldToValue(String language) {
+        Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
+        appeal.getBenefitType().setCode("PIP");
+        appeal.setHearingType("paper");
+        HearingOptions hearingOptions = HearingOptions.builder()
+                .wantsToAttend("Yes")
+                .languagesList(new DynamicList(language))
+                .build();
+        appeal.setHearingOptions(hearingOptions);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(language, appeal.getHearingOptions().getLanguages());
+    }
+
     @Test
     void givenNewBenefitTypeAndCodeIsSelected_thenCaseCodeShouldChange() {
         DynamicListItem item = new DynamicListItem("088", "");
@@ -1450,50 +1489,17 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
+    }
 
     @Test
     public void givenInvalidIssueBenefitCode_thenThrowError() {
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        when(categoryMapService.getSessionCategory("054", "DD", true, true))
+        when(categoryMapService.getSessionCategory(anyString(), anyString(), anyBoolean(), anyBoolean()))
             .thenReturn(null);
-        sscsCaseData.setBenefitCode("054");
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
-    }
-  
-    public void givenAnyCaseAndLanguageIsNotSelectedFromList_thenSetTheOriginalLanguageFieldToEmpty() {
-        Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
-        appeal.getBenefitType().setCode("PIP");
-        appeal.setHearingType("paper");
-        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").languagesList(null).build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(0, response.getWarnings().size());
-        assertEquals("", appeal.getHearingOptions().getLanguages());
-    }
-
-    @Test
-    @Parameters({
-        "Spanish", "Chittagonain", "Czech", "Danish", "Dinka", "Maldivian", "Toura", "Douala", "Dutch", "Dioula",
-        "Efik", "Estonian", "Ewe", "Ewondo", "Farsi", "Fanti", "Fijian", "French"
-    })
-    public void givenAnyCaseAndLanguageIsSelectedFromList_thenSetTheOriginalLanguageFieldToValue(String language) {
-        Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
-        appeal.getBenefitType().setCode("PIP");
-        appeal.setHearingType("paper");
-        HearingOptions hearingOptions = HearingOptions.builder()
-                .wantsToAttend("Yes")
-                .languagesList(new DynamicList(language))
-                .build();
-        appeal.setHearingOptions(hearingOptions);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(0, response.getWarnings().size());
-        assertEquals(language, appeal.getHearingOptions().getLanguages());
     }
 }

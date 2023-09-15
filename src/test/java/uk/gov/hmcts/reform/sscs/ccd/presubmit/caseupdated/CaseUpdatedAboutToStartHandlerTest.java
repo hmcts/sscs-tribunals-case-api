@@ -1,19 +1,28 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
+import java.util.List;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
+import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
+import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
 public class CaseUpdatedAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
-    private CaseUpdatedAboutToStartHandler handler;
 
     private SscsCaseData sscsCaseData;
 
@@ -23,11 +32,18 @@ public class CaseUpdatedAboutToStartHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private DynamicListLanguageUtil dynamicListLanguageUtil;
+
+    @Mock
+    private VerbalLanguagesService verbalLanguagesService;
+
+    @InjectMocks
+    private CaseUpdatedAboutToStartHandler handler;
+
     @BeforeEach
     public void setUp() {
         openMocks(this);
-
-        handler = new CaseUpdatedAboutToStartHandler();
 
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -60,7 +76,6 @@ public class CaseUpdatedAboutToStartHandlerTest {
         assertThat(benefitSelection.getValue()).isNotNull();
         assertThat(benefitSelection.getValue().getCode()).isEqualTo("002");
     }
-}
 
     @Test
     public void givenThatOriginalLanguageFieldIsEmpty_thenSetDynamicListInitialValueToNull() {
@@ -76,9 +91,9 @@ public class CaseUpdatedAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
 
-        assertEquals(0, response.getErrors().size());
-        assertNotNull(hearingOptions.getLanguagesList());
-        assertNull(hearingOptions.getLanguagesList().getValue());
+        Assertions.assertEquals(0, response.getErrors().size());
+        Assertions.assertNotNull(hearingOptions.getLanguagesList());
+        Assertions.assertNull(hearingOptions.getLanguagesList().getValue());
     }
 
     @Test
@@ -97,8 +112,8 @@ public class CaseUpdatedAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
 
-        assertEquals(0, response.getErrors().size());
-        assertNotNull(hearingOptions.getLanguagesList());
-        assertEquals("Welsh", hearingOptions.getLanguagesList().getValue().getLabel());
+        Assertions.assertEquals(0, response.getErrors().size());
+        Assertions.assertNotNull(hearingOptions.getLanguagesList());
+        Assertions.assertEquals("Welsh", hearingOptions.getLanguagesList().getValue().getLabel());
     }
 }

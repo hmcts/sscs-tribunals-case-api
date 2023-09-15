@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.validateBenefitIssueCode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,12 +103,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         handleBenefitType(sscsCaseData);
 
         if (isNotEmpty(sscsCaseData.getBenefitCode())) {
-            validateBenefitIssueCode(sscsCaseData, preSubmitCallbackResponse, categoryMapService);
+            validateBenefitIssueCode(sscsCaseData, preSubmitCallbackResponse);
         }
         setCaseCode(preSubmitCallbackResponse, callback, hasSuperUserRole);
         updateHearingOptionLanguageFromSelectedList(sscsCaseData);
         validateBenefitForCase(preSubmitCallbackResponse, callback, hasSuperUserRole);
-        validateBenefitIssueCode(sscsCaseData, preSubmitCallbackResponse);
 
         if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
             return preSubmitCallbackResponse;
@@ -159,6 +157,14 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
         boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
 
+        log.info("BBBBBBBBBBBBBBBBBBBBBBBBBB D: {} F: {} code: {} issue: {}", isSecondDoctorPresent, fqpmRequired,
+                caseData.getBenefitCode(), caseData.getIssueCode());
+
+        log.info("cm: {}", categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
+                isSecondDoctorPresent, fqpmRequired));
+
+//        "issueCode": "DD
+//        "benefitCode": "022",
         if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
             isSecondDoctorPresent, fqpmRequired))) {
             response.addError("Incorrect benefit/issue code combination");
