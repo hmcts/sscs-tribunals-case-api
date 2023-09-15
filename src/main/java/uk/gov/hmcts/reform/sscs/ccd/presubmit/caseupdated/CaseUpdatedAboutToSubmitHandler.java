@@ -103,7 +103,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         setCaseCode(preSubmitCallbackResponse, callback, hasSuperUserRole);
         updateHearingOptionLanguageFromSelectedList(sscsCaseData);
         validateBenefitForCase(preSubmitCallbackResponse, callback, hasSuperUserRole);
-        validateBenefitIssueCode(sscsCaseData, preSubmitCallbackResponse);
 
         if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
             return preSubmitCallbackResponse;
@@ -146,17 +145,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         return preSubmitCallbackResponse;
-    }
-
-    private void validateBenefitIssueCode(SscsCaseData caseData,
-                                          PreSubmitCallbackResponse<SscsCaseData> response) {
-        boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
-        boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
-
-        if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
-            isSecondDoctorPresent, fqpmRequired))) {
-            response.addError("Incorrect benefit/issue code combination");
-        }
     }
 
     private void validateAndUpdateDwpHandlingOffice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
