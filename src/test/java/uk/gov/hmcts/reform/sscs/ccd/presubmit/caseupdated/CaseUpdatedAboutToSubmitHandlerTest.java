@@ -15,6 +15,8 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.PIP_NEW_CLAIM;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Issue.AT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.CTSC_CLERK;
@@ -43,6 +45,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
+import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
@@ -80,6 +83,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Mock
     private VenueService venueService;
+
+    @Mock
+    private SessionCategoryMapService categoryMapService;
 
     private CaseUpdatedAboutToSubmitHandler handler;
 
@@ -122,6 +128,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .build())
             .benefitCode("002")
             .issueCode("DD")
+            .isFqpmRequired(YES)
+            .sscsIndustrialInjuriesData(SscsIndustrialInjuriesData.builder().secondPanelDoctorSpecialism("feet").build())
             .build();
 
 
@@ -144,6 +152,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             .roles(List.of(SUPER_USER.getValue()))
             .build());
 
+        when(categoryMapService.getSessionCategory(any(String.class), any(String.class), any(boolean.class),
+            any(boolean.class))).thenReturn(new SessionCategoryMap(PIP_NEW_CLAIM, AT, true, true));
         appeal = callback.getCaseDetails().getCaseData().getAppeal();
     }
 
@@ -1417,8 +1427,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             assertTrue(response.getWarnings().stream().anyMatch(e -> e.equals("Benefit type cannot be changed to the selected type")));
         }
     }
-
-
     @Test
     void givenNewBenefitTypeAndCodeIsSelected_thenCaseCodeShouldChange() {
         DynamicListItem item = new DynamicListItem("088", "");
@@ -1442,5 +1450,50 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(1));
+
+    @Test
+    public void givenInvalidIssueBenefitCode_thenThrowError() {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        when(categoryMapService.getSessionCategory("054", "DD", true, true))
+            .thenReturn(null);
+        sscsCaseData.setBenefitCode("054");
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+    }
+  
+    public void givenAnyCaseAndLanguageIsNotSelectedFromList_thenSetTheOriginalLanguageFieldToEmpty() {
+        Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
+        appeal.getBenefitType().setCode("PIP");
+        appeal.setHearingType("paper");
+        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").languagesList(null).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals("", appeal.getHearingOptions().getLanguages());
+    }
+
+    @Test
+    @Parameters({
+        "Spanish", "Chittagonain", "Czech", "Danish", "Dinka", "Maldivian", "Toura", "Douala", "Dutch", "Dioula",
+        "Efik", "Estonian", "Ewe", "Ewondo", "Farsi", "Fanti", "Fijian", "French"
+    })
+    public void givenAnyCaseAndLanguageIsSelectedFromList_thenSetTheOriginalLanguageFieldToValue(String language) {
+        Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
+        appeal.getBenefitType().setCode("PIP");
+        appeal.setHearingType("paper");
+        HearingOptions hearingOptions = HearingOptions.builder()
+                .wantsToAttend("Yes")
+                .languagesList(new DynamicList(language))
+                .build();
+        appeal.setHearingOptions(hearingOptions);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(language, appeal.getHearingOptions().getLanguages());
     }
 }

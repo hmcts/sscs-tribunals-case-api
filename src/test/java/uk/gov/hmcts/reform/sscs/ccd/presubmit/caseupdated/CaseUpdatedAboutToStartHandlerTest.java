@@ -61,3 +61,44 @@ public class CaseUpdatedAboutToStartHandlerTest {
         assertThat(benefitSelection.getValue().getCode()).isEqualTo("002");
     }
 }
+
+    @Test
+    public void givenThatOriginalLanguageFieldIsEmpty_thenSetDynamicListInitialValueToNull() {
+        sscsCaseData = CaseDataUtils.buildCaseData();
+        sscsCaseData.getAppeal().getHearingOptions().setLanguages(null);
+
+        DynamicListItem item = new DynamicListItem("abcd", "Abcd Abcd");
+        DynamicList list = new DynamicList(null, List.of(item));
+
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(dynamicListLanguageUtil.generateInterpreterLanguageFields(any())).willReturn(list);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+
+        assertEquals(0, response.getErrors().size());
+        assertNotNull(hearingOptions.getLanguagesList());
+        assertNull(hearingOptions.getLanguagesList().getValue());
+    }
+
+    @Test
+    public void givenThatOriginalLanguageFieldIsNonEmpty_thenSetDynamicListInitialValue() {
+        sscsCaseData = CaseDataUtils.buildCaseData();
+        sscsCaseData.getAppeal().getHearingOptions().setLanguages("Welsh");
+
+        DynamicListItem item = new DynamicListItem("wel", "Welsh");
+        DynamicList list = new DynamicList(null, List.of(item));
+
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(dynamicListLanguageUtil.generateInterpreterLanguageFields(any())).willReturn(list);
+        given(dynamicListLanguageUtil.getLanguageDynamicListItem(any())).willReturn(item);
+        given(verbalLanguagesService.getVerbalLanguage(any())).willReturn(new Language("wel", "Welsh"));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+
+        assertEquals(0, response.getErrors().size());
+        assertNotNull(hearingOptions.getLanguagesList());
+        assertEquals("Welsh", hearingOptions.getLanguagesList().getValue().getLabel());
+    }
+}

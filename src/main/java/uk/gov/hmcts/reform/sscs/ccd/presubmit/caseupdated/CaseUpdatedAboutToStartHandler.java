@@ -4,18 +4,29 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
+import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
-@Component
+@Service
 @Slf4j
+@RequiredArgsConstructor
 public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private final DynamicListLanguageUtil utils;
+
+    private final VerbalLanguagesService verbalLanguagesService;
+  
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -31,18 +42,36 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        SscsCaseData caseData = caseDetails.getCaseData();
+        final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        String caseId = sscsCaseData.getCcdCaseId();
+      
+        SscsCaseData sscsCaseData = caseDetails.getCaseData();
+      
+        HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+        if (hearingOptions != null) {
+            DynamicList interpreterLanguages = utils.generateInterpreterLanguageFields(null);
+            String existingLanguage = hearingOptions.getLanguages();
 
-        Appeal appeal = getAppeal(caseData);
+            if (!StringUtils.isEmpty(existingLanguage)) {
+                Language language = verbalLanguagesService.getVerbalLanguage(existingLanguage);
+                DynamicListItem dynamicListItem = utils.getLanguageDynamicListItem(language);
+                interpreterLanguages.setValue(dynamicListItem);
+            }
+
+            hearingOptions.setLanguagesList(interpreterLanguages);
+            log.info("Populated {} Languages in DynamicList for caseId {} for update to case data event",
+                    interpreterLanguages.getListItems().size(), caseId);
+        }
+
+        Appeal appeal = getAppeal(sscsCaseData);
         BenefitType benefitType = appeal.getBenefitType();
         DynamicList benefitDescriptions = SscsUtil.getBenefitDescriptions();
-        DynamicListItem selectedBenefit = getSelectedBenefit(benefitDescriptions.getListItems(), caseData.getBenefitCode());
+        DynamicListItem selectedBenefit = getSelectedBenefit(benefitDescriptions.getListItems(), sscsCaseData.getBenefitCode());
         benefitDescriptions.setValue(selectedBenefit);
         benefitType.setDescriptionSelection(benefitDescriptions);
         caseData.setAppeal(appeal);
 
-        return new PreSubmitCallbackResponse<>(caseData);
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
     private static DynamicListItem getSelectedBenefit(List<DynamicListItem> listItems, String benefitCode) {
