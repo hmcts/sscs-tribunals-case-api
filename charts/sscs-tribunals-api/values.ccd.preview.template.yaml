@@ -249,9 +249,15 @@ ccd:
     extraVolumes: |
       - name: logstash-lib
         emptyDir: {}
+      - name: database-secret-volume
+        secret:
+          secretName: sscs-postgres
     extraVolumeMounts: |
       - name: logstash-lib
         mountPath: /usr/share/logstash/ccd
+      - name: database-secret-volume
+        mountPath: /etc/logstash/secrets
+        readOnly: true
     logstashConfig:
       logstash.yml: |
         http.host: 0.0.0.0
@@ -270,7 +276,7 @@ ccd:
           jdbc {
             jdbc_connection_string => "jdbc:postgresql://sscs-flexibleserver-postgres-preview.postgres.database.azure.com:5432/data-store?sslmode=require&stringtype=unspecified"
             jdbc_user => "hmcts"
-            jdbc_password => ["${MY_PASSWORD}"]
+            jdbc_password_filepath => "/etc/logstash/secrets/PASSWORD"
             jdbc_validate_connection => true
             jdbc_validation_timeout => "1"
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
