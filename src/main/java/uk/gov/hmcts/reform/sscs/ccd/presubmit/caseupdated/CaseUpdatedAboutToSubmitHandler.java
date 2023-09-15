@@ -157,14 +157,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
         boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
 
-        log.info("BBBBBBBBBBBBBBBBBBBBBBBBBB D: {} F: {} code: {} issue: {}", isSecondDoctorPresent, fqpmRequired,
-                caseData.getBenefitCode(), caseData.getIssueCode());
-
-        log.info("cm: {}", categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
-                isSecondDoctorPresent, fqpmRequired));
-
-//        "issueCode": "DD
-//        "benefitCode": "022",
         if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
             isSecondDoctorPresent, fqpmRequired))) {
             response.addError("Incorrect benefit/issue code combination");

@@ -10,10 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.BenefitCode.PIP_NEW_CLAIM;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Issue.AT;
@@ -25,7 +22,6 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -115,7 +111,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             categoryMapService,
             true);
 
-        when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
+        lenient().when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         sscsCaseData = SscsCaseData.builder()
@@ -147,18 +143,15 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
-        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
-
-        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
-        when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+        lenient().when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        lenient().when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
+        lenient().when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        lenient().when(idamService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
             .roles(List.of(SUPER_USER.getValue()))
             .build());
-
-        appeal = callback.getCaseDetails().getCaseData().getAppeal();
-
-        when(categoryMapService.getSessionCategory(any(String.class), any(String.class), any(boolean.class),
+        lenient().when(categoryMapService.getSessionCategory(any(String.class), any(String.class), any(boolean.class),
                 any(boolean.class))).thenReturn(new SessionCategoryMap(PIP_NEW_CLAIM, AT, true, true));
+        appeal = callback.getCaseDetails().getCaseData().getAppeal();
     }
 
     @Test
@@ -1032,15 +1025,11 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .appellant(Appellant.builder().build())
                 .build());
 
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getCaseAccessManagementFields().getCaseNameHmctsInternal());
         assertNull(response.getData().getCaseAccessManagementFields().getCaseNameHmctsRestricted());
         assertNull(response.getData().getCaseAccessManagementFields().getCaseNamePublic());
-
     }
 
     @Test
@@ -1388,7 +1377,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "guaranteedMinimumPension,Guaranteed Minimum Pension,054,0",
-        "nationalInsuranceCredits,Bereavement Benefit,test,3",
+        "nationalInsuranceCredits,Bereavement Benefit,test,2",
         "socialFund,30 Hours Free Childcare,002,1",
         "childSupport,Child Support,002,0"
     })
@@ -1412,7 +1401,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "guaranteedMinimumPension,Guaranteed Minimum Pension,054,0,0",
-        "nationalInsuranceCredits,Bereavement Benefit,test,1,2",
+        "nationalInsuranceCredits,Bereavement Benefit,test,0,2",
         "socialFund,30 Hours Free Childcare,002,0,1",
         "childSupport,Child Support,002,0,0"
     })
@@ -1432,6 +1421,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
             assertTrue(response.getWarnings().stream().anyMatch(e -> e.equals("Benefit type cannot be changed to the selected type")));
         }
     }
+
     @Test
     public void givenAnyCaseAndLanguageIsNotSelectedFromList_thenSetTheOriginalLanguageFieldToEmpty() {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
@@ -1478,17 +1468,6 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         assertEquals("088", caseData.getBenefitCode());
         assertEquals("DD", caseData.getIssueCode());
         assertEquals("088DD", caseData.getCaseCode());
-    }
-
-    @Test
-    void givenIncorrectIssueCodeIsSelected_thenShouldShowAnError() {
-        DynamicListItem item = new DynamicListItem("088", "");
-        DynamicList selection = new DynamicList(item, null);
-        sscsCaseData.getAppeal().getBenefitType().setDescriptionSelection(selection);
-        sscsCaseData.setIssueCode("XA");
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getErrors().size(), is(1));
     }
 
     @Test

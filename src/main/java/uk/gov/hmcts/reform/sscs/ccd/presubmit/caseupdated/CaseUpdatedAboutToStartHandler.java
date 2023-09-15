@@ -72,6 +72,10 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
     }
 
     private static DynamicListItem getSelectedBenefit(List<DynamicListItem> listItems, String benefitCode) {
+        if (isNull(benefitCode)) {
+            return null;
+        }
+
         return listItems.stream().filter(item -> benefitCode.equals(item.getCode())).findFirst().orElse(null);
     }
 
