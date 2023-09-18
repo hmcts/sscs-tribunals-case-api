@@ -39,8 +39,6 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
                                                           String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-
         PostHearing postHearing = caseData.getPostHearing();
         log.info("Review Post Hearing App: handling action {} for case {}", postHearing.getReviewType(), caseData.getCcdCaseId());
 
@@ -50,7 +48,7 @@ public class PostHearingReviewAboutToSubmitHandler implements PreSubmitCallbackH
 
         updatePanelMemberList(caseData);
 
-        return response;
+        return new PreSubmitCallbackResponse<>(caseData);
     }
 
     private void updatePanelMemberList(SscsCaseData caseData) {
