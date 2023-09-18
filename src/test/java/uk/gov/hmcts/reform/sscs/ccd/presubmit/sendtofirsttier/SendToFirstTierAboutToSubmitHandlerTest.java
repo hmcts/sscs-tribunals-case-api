@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_FIRST_TIER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPPER_TRIBUNAL_DECISION;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -84,6 +85,7 @@ public class SendToFirstTierAboutToSubmitHandlerTest {
     @ParameterizedTest
     @EnumSource(SendToFirstTierActions.class)
     void shouldReturnWithoutError(SendToFirstTierActions action) {
+        caseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder().build()).build()));
         caseData.getPostHearing().getSendToFirstTier().setAction(action);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);

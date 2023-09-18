@@ -65,6 +65,12 @@ public class SscsUtil {
         caseData.setDocumentStaging(DocumentStaging.builder().build());
     }
 
+    public static void addPanelMembersToExclusions(SscsCaseData caseData, boolean arePanelMembersReserved) {
+        setAdjournmentPanelMembersExclusions(caseData.getSchedulingAndListingFields().getPanelMemberExclusions(),
+                caseData.getLatestHearing().getValue().getPanel().getAllPanelMembers(),
+                arePanelMembersReserved ? AdjournCasePanelMembersExcluded.RESERVED : AdjournCasePanelMembersExcluded.YES);
+    }
+
     public static void setAdjournmentPanelMembersExclusions(PanelMemberExclusions exclusions,
                                            List<JudicialUserBase> adjournmentPanelMembers,
                                            AdjournCasePanelMembersExcluded panelMemberExcluded) {
