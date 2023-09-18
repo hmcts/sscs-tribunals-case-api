@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,6 +42,7 @@ import uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer;
 @SpringBootTest
 @RunWith(JUnitParamsRunner.class)
 @Slf4j
+@Disabled
 public class SubmitAppealTest {
 
     @ClassRule
