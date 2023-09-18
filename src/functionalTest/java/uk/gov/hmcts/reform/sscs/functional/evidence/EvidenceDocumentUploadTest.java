@@ -20,7 +20,6 @@ import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,7 +55,6 @@ public class EvidenceDocumentUploadTest {
     }
 
     @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
-    @Disabled
     public void shouldCreateAppealCaseWithEvidenceDocumentLinkIntoCcd() throws IOException {
         Response response = uploadAndVerifyEvidenceDocumentUpload();
 

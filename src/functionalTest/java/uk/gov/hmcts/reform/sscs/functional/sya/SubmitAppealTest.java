@@ -24,7 +24,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,31 +72,26 @@ public class SubmitAppealTest {
     }
 
     @Test
-    @Disabled
     public void givenValidAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateValidAppeal() {
         assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
 
     @Test
-    @Disabled
     public void givenValidChildSupportAppealIsSubmitted_thenCreateValidAppeal() {
         assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN_CHILD_SUPPORT);
     }
 
     @Test
-    @Disabled
     public void givenValidSscs5AppealIsSubmitted_thenCreateValidAppeal() {
         assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_SSCS5.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN_SSCS5);
     }
 
     @Test
-    @Disabled
     public void givenIncompleteAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateIncompleteAppeal() {
         assertSscsCaseIsExpectedResult("incompleteApplication", ALL_DETAILS_NON_SAVE_AND_RETURN_NO_MRN_DATE_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
 
     @Test
-    @Disabled
     public void givenNonCompliantAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateNonCompliantAppeal() {
         assertSscsCaseIsExpectedResult("interlocutoryReviewState", ALL_DETAILS_NON_SAVE_AND_RETURN_WITH_INTERLOC_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
@@ -183,7 +177,6 @@ public class SubmitAppealTest {
     }
 
     @Test
-    @Disabled
     public void appealShouldCreateDuplicateAndLinked() throws InterruptedException {
         SyaJsonMessageSerializer syaJsonMessageSerializer = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
         String body = syaJsonMessageSerializer.getSerializedMessage();

@@ -30,7 +30,6 @@ import org.apache.http.HttpStatus;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -141,19 +140,16 @@ public class SubmitDraftTest {
     }
 
     @Test
-    @Disabled
     public void givenValidDraftAppealIsSubmittedFromSaveAndReturn_thenCreateValidAppeal() throws InterruptedException {
         assertDraftCaseToSscsCaseResults("validAppeal", ALL_DETAILS_FROM_DRAFT_CCD.getSerializedMessage());
     }
 
     @Test
-    @Disabled
     public void givenIncompleteDraftAppealIsSubmittedFromSaveAndReturn_thenCreateIncompleteAppeal() throws InterruptedException {
         assertDraftCaseToSscsCaseResults("incompleteApplication", ALL_DETAILS_FROM_DRAFT_NO_MRN_DATE_CCD.getSerializedMessage());
     }
 
     @Test
-    @Disabled
     public void givenNonCompliantDraftAppealIsSubmittedFromSaveAndReturn_thenCreateNonCompliantAppeal() throws InterruptedException {
         assertDraftCaseToSscsCaseResults("interlocutoryReviewState", ALL_DETAILS_FROM_DRAFT_WITH_INTERLOC_CCD.getSerializedMessage());
     }
@@ -237,7 +233,6 @@ public class SubmitDraftTest {
     }
 
     @Test
-    @Disabled
     public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() {
         Response response = saveDraft(draftAppeal);
 
