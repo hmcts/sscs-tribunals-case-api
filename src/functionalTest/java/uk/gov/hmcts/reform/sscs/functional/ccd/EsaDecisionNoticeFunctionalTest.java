@@ -345,29 +345,6 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
         }
     }
 
-//    @Test
-//    public void scenario12_allowed_notSupportGroup_moreThan15Points_noSch3_Reg35Applies() throws IOException {
-//        String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedNonSupportGroupNoSch3Reg35AppliesCallback.json");
-//        byte[] bytes = callPreviewFinalDecision(json);
-//        try (PDDocument document = PDDocument.load(bytes)) {
-//            String pdfText = new PDFTextStripper().getText(document);
-//            String pdfTextWithoutNewLines = replaceNewLines(pdfText);
-//            assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
-//            assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
-//            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work and is to be treated as having limited capability for work-related activity."));
-//            assertThat(pdfTextWithoutNewLines, containsString("4. In applying the Work Capability Assessment 30 points were scored from the activities and descriptors in Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 made up as follows:"));
-//            assertThat(pdfTextWithoutNewLines, containsString("5. No activity or descriptor from Schedule 3 of the ESA Regulations was satisfied but regulation 35 of the ESA Regulations applied."));
-//            assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work-related activity."));
-//            assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
-//            assertThat(pdfTextWithoutNewLines, containsString("2. Standing and sitting."));
-//            assertThat(pdfTextWithoutNewLines, containsString("15 points"));
-//            assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
-//            assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
-//            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs the appellant attended and the Tribunal considered the appeal bundle to page B7. First Tier Agency representative did not attend."));
-//            assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs."));
-//            assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
-//        }
-//    }
 
     private String replaceNewLines(String pdfText) {
         return pdfText.replaceAll("-\n", "-").replaceAll("[\\n\\t]", " ").replaceAll("\\s{2,}", " ");
