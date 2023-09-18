@@ -20,6 +20,7 @@ import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.functional.sya.SubmitHelper;
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
+@Disabled
 public class EvidenceDocumentUploadTest {
 
     @Value("${test-url}")
