@@ -15,7 +15,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewAboutToSubmitHandlerTest {
@@ -82,5 +85,51 @@ class PostHearingReviewAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void givenSetAsideGranted_thenExcludePanelMembers() {
+        JudicialUserBase judge = new JudicialUserBase("678", "1234");
+        caseData.getPostHearing().setReviewType(PostHearingReviewType.SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setAction(SetAsideActions.GRANT);
+        caseData.setHearings(List.of(Hearing.builder()
+            .value(HearingDetails.builder()
+                .panel(JudicialUserPanel.builder()
+                    .assignedTo(judge)
+                    .build())
+                .build())
+            .build()));
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getSchedulingAndListingFields().getPanelMemberExclusions().getExcludedPanelMembers().contains(new CollectionItem<>("", judge))).isTrue();
+    }
+
+    @Test
+    void givenLtaGranted_thenReservedPanelMembers() {
+        JudicialUserBase judge = new JudicialUserBase("678", "1234");
+        caseData.getPostHearing().setReviewType(PostHearingReviewType.LIBERTY_TO_APPLY);
+        caseData.getPostHearing().getLibertyToApply().setAction(LibertyToApplyActions.GRANT);
+        caseData.setHearings(List.of(Hearing.builder()
+            .value(HearingDetails.builder()
+                .panel(JudicialUserPanel.builder()
+                    .assignedTo(judge)
+                    .build())
+                .build())
+            .build()));
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getSchedulingAndListingFields().getPanelMemberExclusions().getReservedPanelMembers().contains(new CollectionItem<>("", judge))).isTrue();
     }
 }
