@@ -1,21 +1,20 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientException;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -25,7 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CreateCaseAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final Long CCD_CASE_ID = 1234567890L;
@@ -45,10 +44,8 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
     private CreateCaseAboutToSubmitHandler createCaseAboutToSubmitHandler;
 
-    @Before
-    public void setUp() {
-        openMocks(this);
-
+    @BeforeEach
+    void setUp() {
         when(callback.getEvent()).thenReturn(EventType.CREATE_APPEAL_PDF);
         SscsCaseData caseData = buildCaseDataWithoutPdf();
 
@@ -58,8 +55,8 @@ public class CreateCaseAboutToSubmitHandlerTest {
         createCaseAboutToSubmitHandler = new CreateCaseAboutToSubmitHandler(sscsPdfService, emailHelper);
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
         "CREATE_APPEAL_PDF",
         "VALID_APPEAL_CREATED",
         "DRAFT_TO_VALID_APPEAL_CREATED",
@@ -68,14 +65,14 @@ public class CreateCaseAboutToSubmitHandlerTest {
         "INCOMPLETE_APPLICATION_RECEIVED",
         "DRAFT_TO_INCOMPLETE_APPLICATION",
     })
-    public void givenASscs1PdfHandlerEventForSyaCases_thenReturnTrue(EventType eventType) {
+    void givenASscs1PdfHandlerEventForSyaCases_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
         assertTrue(createCaseAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
-    @Test
-    @Parameters({
+    @ParameterizedTest
+    @CsvSource({
         "CREATE_APPEAL_PDF, true",
         "VALID_APPEAL_CREATED, false",
         "DRAFT_TO_VALID_APPEAL_CREATED, false",
@@ -84,7 +81,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
         "INCOMPLETE_APPLICATION_RECEIVED, false",
         "DRAFT_TO_INCOMPLETE_APPLICATION, false",
     })
-    public void givenASscs1PdfHandlerEventForBulkScanCases_thenReturnAllowableValue(EventType eventType, boolean allowable) {
+    void givenASscs1PdfHandlerEventForBulkScanCases_thenReturnAllowableValue(EventType eventType, boolean allowable) {
         caseDetails.getCaseData().getAppeal().setReceivedVia("Paper");
         when(callback.getEvent()).thenReturn(eventType);
 
@@ -92,14 +89,14 @@ public class CreateCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenANonSscs1PdfHandlerEvent_thenReturnFalse() {
+    void givenANonSscs1PdfHandlerEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
         assertFalse(createCaseAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
-    public void shouldCallPdfService() throws CcdException {
+    void shouldCallPdfService() throws CcdException {
 
         when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
 
@@ -110,7 +107,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void shouldCallPdfServiceWhenNoAppointee() throws CcdException {
+    void shouldCallPdfServiceWhenNoAppointee() throws CcdException {
 
         when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
 
@@ -125,7 +122,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void shouldCallPdfServiceWhenSscsDocumentIsNull() {
+    void shouldCallPdfServiceWhenSscsDocumentIsNull() {
         SscsCaseData caseDataWithNullSscsDocument = buildCaseDataWithNullSscsDocument();
 
         when(caseDetails.getCaseData()).thenReturn(caseDataWithNullSscsDocument);
@@ -157,7 +154,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenPdfAlreadyExists_shouldNotCallPdfService() throws CcdException {
+    void givenPdfAlreadyExists_shouldNotCallPdfService() throws CcdException {
 
         SscsCaseData caseDataWithPdf = buildCaseDataWithPdf();
 
@@ -174,7 +171,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenPdfServiceExceptionThrown_thenCarryOnWithCaseCreation() {
+    void givenPdfServiceExceptionThrown_thenCarryOnWithCaseCreation() {
         when(sscsPdfService.generatePdf(eq(caseDetails.getCaseData()), any(), any(), any())).thenThrow(new PDFServiceClientException(new Exception("Error")));
 
         PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -182,18 +179,16 @@ public class CreateCaseAboutToSubmitHandlerTest {
         assertEquals("1234567890", response.getData().getCcdCaseId());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void throwsExceptionIfItCannotHandleTheAppeal() {
+    @Test
+    void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () ->
+                createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
 
     @Test
-    public void shouldReturnErrorIfNullCreatedDate() throws CcdException {
-        when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
-
+    void shouldReturnErrorIfNullCreatedDate() throws CcdException {
         callback.getCaseDetails().getCaseData().setCaseCreated(null);
-
         PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());

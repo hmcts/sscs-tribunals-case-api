@@ -68,7 +68,7 @@ public class CaseUpdatedAboutToStartHandlerTest {
     }
 
     @Test
-    void test() {
+    void givenBenefitType_shouldHaveCorrectBenefitSelection() {
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var benefitSelection = result.getData().getAppeal().getBenefitType().getDescriptionSelection();
 

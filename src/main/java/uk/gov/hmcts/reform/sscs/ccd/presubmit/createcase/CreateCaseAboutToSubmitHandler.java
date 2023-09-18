@@ -52,10 +52,10 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         SscsCaseData caseData = caseDetails.getCaseData();
         log.info("Handling create appeal pdf event for case [" + caseData.getCcdCaseId() + "]");
 
-        PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
         if (caseData.getCaseCreated() == null) {
-            sscsCaseDataPreSubmitCallbackResponse.addError("The Case Created Date must be set to generate the SSCS1");
+            preSubmitCallbackResponse.addError("The Case Created Date must be set to generate the SSCS1");
         } else {
             createAppealPdf(caseData);
         }
@@ -65,7 +65,9 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
             caseData.setIssueCode("DD");
         }
 
-        return sscsCaseDataPreSubmitCallbackResponse;
+        caseData.setCaseCode(caseData.getBenefitCode() + caseData.getIssueCode());
+
+        return preSubmitCallbackResponse;
     }
 
     private void createAppealPdf(SscsCaseData caseData) {
