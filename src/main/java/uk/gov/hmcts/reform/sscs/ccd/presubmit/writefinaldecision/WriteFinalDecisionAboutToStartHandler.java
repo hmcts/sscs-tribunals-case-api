@@ -12,14 +12,17 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.idam.UserRole;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
 @AllArgsConstructor
 public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private final UserDetailsService userDetailsService;
     @Value("${feature.postHearings.enabled}")
-    private boolean isPostHearingsEnabled;
+    private final boolean isPostHearingsEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -37,6 +40,18 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
 
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
+        State state = callback.getCaseDetails().getState();
+
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        if (isPostHearingsEnabled
+                && (State.DORMANT_APPEAL_STATE.equals(state) || State.POST_HEARING.equals(state))) {
+            List<String> userRoles = userDetailsService.getUserRoles(userAuthorisation);
+
+            if (userRoles.contains(UserRole.JUDGE.getValue())
+                    && !userRoles.contains(UserRole.SALARIED_JUDGE.getValue())) {
+                preSubmitCallbackResponse.addError("You do not have access to proceed");
+            }
+        }
 
         SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);
 
@@ -45,7 +60,7 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
             clearTransientFields(sscsCaseData);
         }
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        return preSubmitCallbackResponse;
     }
 
     private void clearTransientFields(SscsCaseData sscsCaseData) {
