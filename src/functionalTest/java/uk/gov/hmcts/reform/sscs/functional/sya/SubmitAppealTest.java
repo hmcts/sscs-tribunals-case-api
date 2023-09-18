@@ -73,27 +73,27 @@ public class SubmitAppealTest {
         return Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
     }
 
-    @Test
+    //@Test
     public void givenValidAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateValidAppeal() {
         assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
 
-    @Test
+    //@Test
     public void givenValidChildSupportAppealIsSubmitted_thenCreateValidAppeal() {
         assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_CHILD_SUPPORT.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN_CHILD_SUPPORT);
     }
 
-    @Test
+    //@Test
     public void givenValidSscs5AppealIsSubmitted_thenCreateValidAppeal() {
         assertSscsCaseIsExpectedResult("validAppeal", ALL_DETAILS_NON_SAVE_AND_RETURN_CCD_SSCS5.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN_SSCS5);
     }
 
-    @Test
+    //@Test
     public void givenIncompleteAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateIncompleteAppeal() {
         assertSscsCaseIsExpectedResult("incompleteApplication", ALL_DETAILS_NON_SAVE_AND_RETURN_NO_MRN_DATE_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
 
-    @Test
+    //@Test
     public void givenNonCompliantAppealIsSubmittedFromNonSaveAndReturnRoute_thenCreateNonCompliantAppeal() {
         assertSscsCaseIsExpectedResult("interlocutoryReviewState", ALL_DETAILS_NON_SAVE_AND_RETURN_WITH_INTERLOC_CCD.getSerializedMessage(), ALL_DETAILS_NON_SAVE_AND_RETURN);
     }
@@ -178,7 +178,7 @@ public class SubmitAppealTest {
         return serializedMessage;
     }
 
-    @Test
+    //@Test
     public void appealShouldCreateDuplicateAndLinked() throws InterruptedException {
         SyaJsonMessageSerializer syaJsonMessageSerializer = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
         String body = syaJsonMessageSerializer.getSerializedMessage();

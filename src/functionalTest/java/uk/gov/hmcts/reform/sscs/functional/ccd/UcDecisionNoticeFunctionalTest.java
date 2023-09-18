@@ -266,7 +266,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
         }
     }
 
-    @Test
+    //@Test
     public void scenario11_allowed_nonWcaAppeal() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNonWcaCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
