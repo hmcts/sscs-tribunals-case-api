@@ -43,8 +43,9 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
 
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         String caseId = sscsCaseData.getCcdCaseId();
+        Appeal appeal = sscsCaseData.getAppeal();
+        HearingOptions hearingOptions = appeal.getHearingOptions();
 
-        HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
         if (hearingOptions != null) {
             DynamicList interpreterLanguages = utils.generateInterpreterLanguageFields(null);
             String existingLanguage = hearingOptions.getLanguages();
@@ -60,13 +61,11 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
                     interpreterLanguages.getListItems().size(), caseId);
         }
 
-        Appeal appeal = getAppeal(sscsCaseData);
         BenefitType benefitType = appeal.getBenefitType();
         DynamicList benefitDescriptions = SscsUtil.getBenefitDescriptions();
         DynamicListItem selectedBenefit = getSelectedBenefit(benefitDescriptions.getListItems(), sscsCaseData.getBenefitCode());
         benefitDescriptions.setValue(selectedBenefit);
         benefitType.setDescriptionSelection(benefitDescriptions);
-        sscsCaseData.setAppeal(appeal);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
@@ -77,17 +76,5 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
         }
 
         return listItems.stream().filter(item -> benefitCode.equals(item.getCode())).findFirst().orElse(null);
-    }
-
-    private Appeal getAppeal(SscsCaseData caseData) {
-        Appeal appeal = caseData.getAppeal();
-        if (isNull(appeal)) {
-            BenefitType type = BenefitType.builder().build();
-            appeal = Appeal.builder()
-                    .benefitType(type)
-                    .build();
-            caseData.setAppeal(appeal);
-        }
-        return appeal;
     }
 }
