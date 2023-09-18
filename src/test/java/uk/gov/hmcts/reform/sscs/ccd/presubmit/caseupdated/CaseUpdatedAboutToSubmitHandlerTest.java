@@ -878,7 +878,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @CsvSource({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
         "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
         "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
-        "guaranteedMinimumPension,Guaranteed Minimum Pension","nationalInsuranceCredits,National Insurance Credits"})
+        "guaranteedMinimumPension,Guaranteed Minimum Pension (COEG)","nationalInsuranceCredits,National Insurance Credits"})
     void givenACaseAppellantConfidentialityYes_thenCaseConfidentialYes(String shortName, String benefitDescription) {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(YES);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
@@ -892,7 +892,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @CsvSource({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
         "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
         "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare",
-        "guaranteedMinimumPension,Guaranteed Minimum Pension","nationalInsuranceCredits,National Insurance Credits"})
+        "guaranteedMinimumPension,Guaranteed Minimum Pension (COEG)","nationalInsuranceCredits,National Insurance Credits"})
     void givenACaseAppellantConfidentialityNo_thenCaseConfidentialNull(String shortName, String benefitDescription) {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setConfidentialityRequired(NO);
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
@@ -1199,7 +1199,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @ParameterizedTest
     @CsvSource({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
         "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
-        "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare","guaranteedMinimumPension,Guaranteed Minimum Pension",
+        "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare","guaranteedMinimumPension,Guaranteed Minimum Pension (COEG)",
         "nationalInsuranceCredits,National Insurance Credits"})
     void givenNonSscs1PaperCaseAppellantWantsToAttendYes_thenCaseIsOralAndWarningShown(String shortName, String description) {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
@@ -1244,7 +1244,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @ParameterizedTest
     @CsvSource({"childSupport,Child Support", "taxCredit,Tax Credit", "guardiansAllowance,Guardians Allowance",
         "taxFreeChildcare,Tax-Free Childcare", "homeResponsibilitiesProtection,Home Responsibilities Protection",
-        "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare","guaranteedMinimumPension,Guaranteed Minimum Pension",
+        "childBenefit,Child Benefit","thirtyHoursFreeChildcare,30 Hours Free Childcare","guaranteedMinimumPension,Guaranteed Minimum Pension (COEG)",
         "nationalInsuranceCredits,National Insurance Credits"})
     void givenNonSscs1PaperCaseAppelllantWantsToAttendNo_thenCaseIsNotChangedAndNoWarningShown(String shortName, String description) {
         callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().setCode(shortName);
@@ -1376,7 +1376,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "guaranteedMinimumPension,Guaranteed Minimum Pension,054,0",
+        "guaranteedMinimumPension,Guaranteed Minimum Pension (COEG),054,0",
         "nationalInsuranceCredits,Bereavement Benefit,test,2",
         "socialFund,30 Hours Free Childcare,002,1",
         "childSupport,Child Support,002,0"
@@ -1400,7 +1400,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @ParameterizedTest
     @CsvSource({
-        "guaranteedMinimumPension,Guaranteed Minimum Pension,054,0,0",
+        "guaranteedMinimumPension,Guaranteed Minimum Pension (COEG),054,0,0",
         "nationalInsuranceCredits,Bereavement Benefit,test,0,2",
         "socialFund,30 Hours Free Childcare,002,0,1",
         "childSupport,Child Support,002,0,0"
