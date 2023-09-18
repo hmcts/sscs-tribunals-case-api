@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static junit.framework.TestCase.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -12,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -89,6 +91,14 @@ public class Sscs1PdfHandlerTest {
         when(callback.getEvent()).thenReturn(eventType);
 
         assertEquals(allowable, sscs1PdfHandler.canHandle(ABOUT_TO_SUBMIT, callback));
+    }
+
+    @Test
+    @Parameters({"null", "LIST_ASSIST", "GAPS"})
+    public void shouldSetHearingRouteInSchedulingAndListingFieldsFromSelectedValue(@Nullable HearingRoute hearingRoute) {
+        caseDetails.getCaseData().getAppeal().getHearingOptions().setHearingRoute(hearingRoute);
+        sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(caseDetails.getCaseData().getSchedulingAndListingFields().getHearingRoute()).isEqualTo(hearingRoute);
     }
 
     @Test
@@ -193,6 +203,7 @@ public class Sscs1PdfHandlerTest {
         when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
 
         callback.getCaseDetails().getCaseData().setCaseCreated(null);
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().hearingRoute(HearingRoute.GAPS).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
