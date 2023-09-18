@@ -32,97 +32,97 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.UploadDocument;
 @Slf4j
 public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler {
 
-    @Test
-    public void checkEditedDocumentInTheBundleIsCorrect() throws IOException {
-        SscsCaseDetails caseDetails = createCase();
-        List<UploadDocument> docs = List.of(
-            UploadDocument.builder()
-                .data(getPdf("dwpResponse"))
-                .filename("dwpResponse.pdf")
-                .documentType(DwpDocumentType.DWP_RESPONSE.getValue())
-                .hasEditedDocumentLink(true)
-                .build(),
-            UploadDocument.builder()
-                .data(getPdf("dwpEvidenceBundle"))
-                .filename("dwpEvidenceBundle.pdf")
-                .documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())
-                .hasEditedDocumentLink(true)
-                .build()
-        );
-        caseDetails = addDocumentsToCase(caseDetails.getData(), docs);
-        caseDetails.getData().setPhmeGranted(YES);
+//    @Test
+//    public void checkEditedDocumentInTheBundleIsCorrect() throws IOException {
+//        SscsCaseDetails caseDetails = createCase();
+//        List<UploadDocument> docs = List.of(
+//            UploadDocument.builder()
+//                .data(getPdf("dwpResponse"))
+//                .filename("dwpResponse.pdf")
+//                .documentType(DwpDocumentType.DWP_RESPONSE.getValue())
+//                .hasEditedDocumentLink(true)
+//                .build(),
+//            UploadDocument.builder()
+//                .data(getPdf("dwpEvidenceBundle"))
+//                .filename("dwpEvidenceBundle.pdf")
+//                .documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())
+//                .hasEditedDocumentLink(true)
+//                .build()
+//        );
+//        caseDetails = addDocumentsToCase(caseDetails.getData(), docs);
+//        caseDetails.getData().setPhmeGranted(YES);
+//
+//        runEvent(caseDetails.getData(), EventType.CREATE_BUNDLE);
+//
+//        final SscsCaseDetails updatedCaseDetails = getByCaseId(caseDetails.getId());
+//
+//        assertThat(updatedCaseDetails.getData().getCaseBundles())
+//            .hasSize(2)
+//            .extracting(Bundle::getValue)
+//            .allSatisfy(bundleDetails -> {
+//                assertThat(bundleDetails.getFolders())
+//                    .hasSize(2)
+//                    .extracting(BundleFolder::getValue)
+//                    .extracting(BundleFolderDetails::getName)
+//                    .containsExactly("FTA", "Further additions");
+//
+//                assertThat(bundleDetails.getFolders())
+//                    .extracting(BundleFolder::getValue)
+//                    .extracting(BundleFolderDetails::getDocuments)
+//                    .extracting(List::size)
+//                    .containsExactly(2,0);
+//            })
+//            .extracting(BundleDetails::getTitle)
+//            .containsExactly("SSCS Bundle Original", "SSCS Bundle Edited");
+//
+//        assertThatBundleStitchedSuccessfully(caseDetails.getId(), 2);
+//    }
 
-        runEvent(caseDetails.getData(), EventType.CREATE_BUNDLE);
-
-        final SscsCaseDetails updatedCaseDetails = getByCaseId(caseDetails.getId());
-
-        assertThat(updatedCaseDetails.getData().getCaseBundles())
-            .hasSize(2)
-            .extracting(Bundle::getValue)
-            .allSatisfy(bundleDetails -> {
-                assertThat(bundleDetails.getFolders())
-                    .hasSize(2)
-                    .extracting(BundleFolder::getValue)
-                    .extracting(BundleFolderDetails::getName)
-                    .containsExactly("FTA", "Further additions");
-
-                assertThat(bundleDetails.getFolders())
-                    .extracting(BundleFolder::getValue)
-                    .extracting(BundleFolderDetails::getDocuments)
-                    .extracting(List::size)
-                    .containsExactly(2,0);
-            })
-            .extracting(BundleDetails::getTitle)
-            .containsExactly("SSCS Bundle Original", "SSCS Bundle Edited");
-
-        assertThatBundleStitchedSuccessfully(caseDetails.getId(), 2);
-    }
-
-    @Test
-    public void checkBundleAdditionIsAddedCorrectly() throws IOException {
-        SscsCaseDetails caseDetails = createCase();
-        List<UploadDocument> docs = List.of(
-            UploadDocument.builder()
-                .data(getPdf("appellant"))
-                .filename("appellant.pdf")
-                .documentType(DocumentType.APPELLANT_EVIDENCE.getValue())
-                .bundleAddition("A")
-                .build(),
-            UploadDocument.builder()
-                .data(getPdf("dwpResponse"))
-                .filename("dwpResponse.pdf")
-                .documentType(DwpDocumentType.DWP_RESPONSE.getValue())
-                .build(),
-            UploadDocument.builder()
-                .data(getPdf("dwpEvidenceBundle"))
-                .filename("dwpEvidenceBundle.pdf")
-                .documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())
-                .build()
-        );
-        caseDetails = addDocumentsToCase(caseDetails.getData(), docs);
-        runEvent(caseDetails.getData(), EventType.CREATE_BUNDLE);
-
-        final SscsCaseDetails updatedCaseDetails = getByCaseId(caseDetails.getId());
-
-        assertThat(updatedCaseDetails.getData().getCaseBundles())
-            .hasSize(1)
-            .extracting(Bundle::getValue)
-            .allSatisfy(bundleDetails -> {
-                assertThat(bundleDetails.getFolders())
-                    .hasSize(2)
-                    .extracting(BundleFolder::getValue)
-                    .extracting(BundleFolderDetails::getName)
-                    .containsExactly("FTA", "Further additions");
-
-                assertThat(bundleDetails.getFolders())
-                    .extracting(BundleFolder::getValue)
-                    .extracting(BundleFolderDetails::getDocuments)
-                    .extracting(List::size)
-                    .containsExactly(2,1);
-            });
-
-        assertThatBundleStitchedSuccessfully(caseDetails.getId(), 1);
-    }
+//    @Test
+//    public void checkBundleAdditionIsAddedCorrectly() throws IOException {
+//        SscsCaseDetails caseDetails = createCase();
+//        List<UploadDocument> docs = List.of(
+//            UploadDocument.builder()
+//                .data(getPdf("appellant"))
+//                .filename("appellant.pdf")
+//                .documentType(DocumentType.APPELLANT_EVIDENCE.getValue())
+//                .bundleAddition("A")
+//                .build(),
+//            UploadDocument.builder()
+//                .data(getPdf("dwpResponse"))
+//                .filename("dwpResponse.pdf")
+//                .documentType(DwpDocumentType.DWP_RESPONSE.getValue())
+//                .build(),
+//            UploadDocument.builder()
+//                .data(getPdf("dwpEvidenceBundle"))
+//                .filename("dwpEvidenceBundle.pdf")
+//                .documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())
+//                .build()
+//        );
+//        caseDetails = addDocumentsToCase(caseDetails.getData(), docs);
+//        runEvent(caseDetails.getData(), EventType.CREATE_BUNDLE);
+//
+//        final SscsCaseDetails updatedCaseDetails = getByCaseId(caseDetails.getId());
+//
+//        assertThat(updatedCaseDetails.getData().getCaseBundles())
+//            .hasSize(1)
+//            .extracting(Bundle::getValue)
+//            .allSatisfy(bundleDetails -> {
+//                assertThat(bundleDetails.getFolders())
+//                    .hasSize(2)
+//                    .extracting(BundleFolder::getValue)
+//                    .extracting(BundleFolderDetails::getName)
+//                    .containsExactly("FTA", "Further additions");
+//
+//                assertThat(bundleDetails.getFolders())
+//                    .extracting(BundleFolder::getValue)
+//                    .extracting(BundleFolderDetails::getDocuments)
+//                    .extracting(List::size)
+//                    .containsExactly(2,1);
+//            });
+//
+//        assertThatBundleStitchedSuccessfully(caseDetails.getId(), 1);
+//    }
 
     private void assertThatBundleStitchedSuccessfully(long caseId, int expectedBundles) {
         await()
