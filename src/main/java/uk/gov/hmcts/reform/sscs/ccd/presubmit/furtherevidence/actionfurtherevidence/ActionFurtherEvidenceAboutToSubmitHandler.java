@@ -186,7 +186,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             ScannedDocumentType.SET_ASIDE_APPLICATION.getValue().equals(scannedDocumentType)
             || ScannedDocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue().equals(scannedDocumentType)
             || ScannedDocumentType.LIBERTY_TO_APPLY_APPLICATION.getValue().equals(scannedDocumentType)
-            || ScannedDocumentType.PERMISSION_TO_APPEAL_APPLICATION.getValue().equals(scannedDocumentType);
+            || ScannedDocumentType.PERMISSION_TO_APPEAL_APPLICATION.getValue().equals(scannedDocumentType)
+            || ScannedDocumentType.POST_HEARING_OTHER.getValue().equals(scannedDocumentType);
         boolean isNotInterlocReviewByJudge = !SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(actionCode);
         return isDocTypeRequiresReviewByJudge && isNotInterlocReviewByJudge;
     }
@@ -261,6 +262,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
 
         if (isPostHearingsEnabled) {
+            sscsCaseData.getPostHearing().setRequestType(null);
+
             if (isSetAsideApplication(sscsCaseData)) {
                 sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.SET_ASIDE);
                 if (isOriginalSenderDwp(sscsCaseData)) {
@@ -282,17 +285,19 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 }
             }
 
-            if (isPostHearingsBEnabled && isLibertyToApplyApplication(sscsCaseData)) {
-                sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.LIBERTY_TO_APPLY);
-                if (isOriginalSenderDwp(sscsCaseData)) {
-                    sscsCaseData.setDwpState(DwpState.LIBERTY_TO_APPLY_REQUESTED);
+            if (isPostHearingsBEnabled) {
+                if (isLibertyToApplyApplication(sscsCaseData)) {
+                    sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.LIBERTY_TO_APPLY);
+                    if (isOriginalSenderDwp(sscsCaseData)) {
+                        sscsCaseData.setDwpState(DwpState.LIBERTY_TO_APPLY_REQUESTED);
+                    }
                 }
-            }
 
-            if (isPostHearingsBEnabled && isPermissionToAppealApplication(sscsCaseData)) {
-                sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.PERMISSION_TO_APPEAL);
-                if (isOriginalSenderDwp(sscsCaseData)) {
-                    sscsCaseData.setDwpState(DwpState.PERMISSION_TO_APPEAL_REQUESTED);
+                if (isPermissionToAppealApplication(sscsCaseData)) {
+                    sscsCaseData.getPostHearing().setRequestType(PostHearingRequestType.PERMISSION_TO_APPEAL);
+                    if (isOriginalSenderDwp(sscsCaseData)) {
+                        sscsCaseData.setDwpState(DwpState.PERMISSION_TO_APPEAL_REQUESTED);
+                    }
                 }
             }
         }
@@ -314,7 +319,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private static boolean isPostHearingRequest(SscsCaseData sscsCaseData, boolean isPostHearingsBEnabled) {
         boolean isPostHearingsBRequest = isPostHearingsBEnabled
-            && (isLibertyToApplyApplication(sscsCaseData) || isPermissionToAppealApplication(sscsCaseData));
+            && (isLibertyToApplyApplication(sscsCaseData)
+                || isPermissionToAppealApplication(sscsCaseData)
+                || isPostHearingOther(sscsCaseData));
 
         return isSetAsideApplication(sscsCaseData)
             || isCorrectionApplication(sscsCaseData)
@@ -344,6 +351,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
   
     private static boolean isPermissionToAppealApplication(SscsCaseData sscsCaseData) {
         return isDocumentType(PERMISSION_TO_APPEAL_APPLICATION, sscsCaseData);
+    }
+
+    private static boolean isPostHearingOther(SscsCaseData sscsCaseData) {
+        return isDocumentType(POST_HEARING_OTHER, sscsCaseData);
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {
@@ -713,6 +724,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
         if (ScannedDocumentType.PERMISSION_TO_APPEAL_APPLICATION.getValue().equals(docType)) {
             return PERMISSION_TO_APPEAL_APPLICATION;
+        }
+        if (ScannedDocumentType.POST_HEARING_OTHER.getValue().equals(docType)) {
+            return POST_HEARING_OTHER;
         }
 
         final Optional<DocumentType> optionalDocumentType = stream(PartyItemList.values())
