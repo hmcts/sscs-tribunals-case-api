@@ -18,7 +18,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService.IN_CHAMBERS;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -129,7 +128,7 @@ class AdjournCasePreviewServiceTest {
     private DocumentConfiguration documentConfiguration;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         service = new AdjournCasePreviewService(generateFile, userDetailsService, venueDataLoader, TEMPLATE_ID,
             signLanguagesService, judicialRefDataService, documentConfiguration);
         ReflectionTestUtils.setField(service, "adjournmentFeature", true);
@@ -144,6 +143,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
             .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
+            .processingVenue(GAP_VENUE_NAME)
             .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("PIP").build())
