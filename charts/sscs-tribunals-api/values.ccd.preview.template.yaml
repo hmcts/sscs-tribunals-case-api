@@ -144,7 +144,7 @@ xui-webapp:
           - mc-idam-client-secret
           - system-user-name
           - system-user-password
-          -
+
 am-org-role-mapping-service:
   enabled: true
   java:
