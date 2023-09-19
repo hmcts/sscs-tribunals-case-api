@@ -15,6 +15,7 @@ import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -360,6 +361,33 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         then(ccdService).should(times(1))
                 .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(eventType),
                         eq(ActionFurtherEvidenceSubmittedCallbackHandler.TCW_REVIEW_SEND_TO_JUDGE),
+                        anyString(), any(IdamTokens.class));
+    }
+
+    @Test
+    public void givenPostHearingOtherAndFurtherEvidenceActionIsReviewByJudge_shouldTriggerEventAndUpdateCaseCorrectly() {
+        Callback<SscsCaseData> callback = buildCallback(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(), ACTION_FURTHER_EVIDENCE);
+        callback.getCaseDetails().getCaseData().setSscsDocument(List.of(SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType(DocumentType.POST_HEARING_OTHER.getValue())
+                .build())
+            .build()));
+
+        given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
+
+        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
+
+        given(ccdService.updateCase(captor.capture(), anyLong(), eq(POST_HEARING_OTHER.getCcdType()), anyString(), anyString(),
+                any(IdamTokens.class)))
+                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, true);
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, captor.getValue().getInterlocReviewState());
+
+        then(ccdService).should(times(1))
+                .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(POST_HEARING_OTHER.getCcdType()), anyString(),
                         anyString(), any(IdamTokens.class));
     }
 }
