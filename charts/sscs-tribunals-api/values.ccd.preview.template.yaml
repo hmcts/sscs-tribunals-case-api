@@ -144,6 +144,15 @@ xui-webapp:
           - mc-idam-client-secret
           - system-user-name
           - system-user-password
+          -
+am-org-role-mapping-service:
+  enabled: true
+  java:
+    image: 'hmctspublic.azurecr.io/am/am-org-role-mapping-service:pr-1540'
+    releaseNameOverride: ${SERVICE_NAME}-am-org-role-mapping-service
+    environment:
+      ROLE_ASSIGNMENT_APP_URL: ${SERVICE_NAME}-am-role-assignment-service
+      AMQP_ENABLED: false
 
 aac-manage-case-assignment:
   enabled: true
@@ -241,14 +250,6 @@ ccd:
       auth:
         postgresUsername: hmcts
         postgresPassword: hmcts
-
-  am-org-role-mapping-service:
-    java:
-      image: 'hmctspublic.azurecr.io/am/am-org-role-mapping-service:pr-1540'
-      releaseNameOverride: ${SERVICE_NAME}-am-org-role-mapping-service
-      environment:
-        ROLE_ASSIGNMENT_APP_URL: ${SERVICE_NAME}-am-role-assignment-service
-        AMQP_ENABLED: false
 
   am-role-assignment-service:
     java:
