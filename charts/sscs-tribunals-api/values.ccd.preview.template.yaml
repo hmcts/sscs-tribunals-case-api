@@ -148,15 +148,15 @@ xui-webapp:
 am-org-role-mapping-service:
   enabled: true
   java:
-    image: 'hmctspublic.azurecr.io/am/am-org-role-mapping-service:pr-1540'
+    image: 'hmctspublic.azurecr.io/am/am-org-role-mapping-service:latest'
     ingressHost: orm-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-am-org-role-mapping-service
     secrets:
       SB_ACCESS_KEY:
-        secretRef: et-sb-preview
+        secretRef: sscs-sb-preview
         key: primaryKey
       SB_CONNECTION_STRING:
-        secretRef: et-sb-preview
+        secretRef: sscs-sb-preview
         key: connectionString
       keyVaults:
         am:
@@ -168,14 +168,28 @@ am-org-role-mapping-service:
             - orm-IDAM-CLIENT-SECRET
             - orm-IDAM-ADMIN-SECRET
     environment:
+      IDAM_S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+      S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+      CASE_WORKER_REF_APP_URL: http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal
+      JUDICIAL_REF_APP_URL: http://rd-judicial-api-aat.service.core-compute-aat.internal
       ROLE_ASSIGNMENT_APP_URL: ${SERVICE_NAME}-am-role-assignment-service
+      JUDICIAL_BOOKING_APP_URL: http://am-judicial-booking-service-aat.service.core-compute-aat.internal
+      LAUNCH_DARKLY_ENV: pr
+      AMQP_SHARED_ACCESS_KEY_NAME: RootManageSharedAccessKey
+      AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
+      CRD_SUBSCRIPTION_NAME: "{{ .Release.Name}}-crd-topic"
+      JRD_SUBSCRIPTION_NAME: "{{ .Release.Name}}-jrd-topic"
+      CRD_TOPIC_NAME: "{{ .Release.Name}}-crd-topic"
+      JRD_TOPIC_NAME: "{{ .Release.Name}}-jrd-topic"
+      AMQP_CRD_SHARED_ACCESS_KEY_VALUE: "$(SB_ACCESS_KEY)"
+      AMQP_JRD_SHARED_ACCESS_KEY_VALUE: "$(SB_ACCESS_KEY)"
       ORG_ROLE_MAPPING_DB_HOST: ${SERVICE_NAME}-postgresql
       ORG_ROLE_MAPPING_DB_NAME: org_role_mapping
       ORG_ROLE_MAPPING_DB_USERNAME: hmcts
       ORG_ROLE_MAPPING_DB_PASSWORD: hmcts
       ORG_ROLE_MAPPING_DB_PORT: 5432
       ORG_ROLE_MAPPING_DB_OPTIONS: "?stringtype=unspecified"
-      AMQP_ENABLED: false
+      RUN_LD_ON_STARTUP: true
 
 aac-manage-case-assignment:
   enabled: true
@@ -874,6 +888,10 @@ servicebus:
   setup:
     topics:
       - name: main-topic
+        subscriptionNeeded: yes
+      - name: crd-topic
+        subscriptionNeeded: yes
+      - name: jrd-topic
         subscriptionNeeded: yes
     queues:
       - name: sscs-orchestrator-queue-preview
