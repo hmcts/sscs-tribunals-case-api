@@ -148,7 +148,7 @@ xui-webapp:
 am-org-role-mapping-service:
   enabled: true
   java:
-    image: 'hmctspublic.azurecr.io/am/am-org-role-mapping-service:latest'
+    image: 'hmctspublic.azurecr.io/am/org-role-mapping-service:latest'
     ingressHost: orm-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-am-org-role-mapping-service
     secrets:
