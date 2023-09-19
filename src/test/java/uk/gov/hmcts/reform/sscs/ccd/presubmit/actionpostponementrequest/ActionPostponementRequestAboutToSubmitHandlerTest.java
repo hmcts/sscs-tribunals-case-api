@@ -183,7 +183,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     @Test
     public void givenARefuseOnTheDayPostponement_thatIsDoneByDwp_thenClearFtaStateAndClearInterlocStateAndSetStatusToBeHearing() {
-        SscsDocument postponementDocument = buildSscsDocument("postponementRequest", UploadParty.DWP);
+        SscsDocument postponementDocument = buildSscsDocument("postponementRequest", "dwp");
 
         sscsCaseData.setPostponementRequest(PostponementRequest.builder()
                 .actionPostponementRequestSelected("refuseOnTheDay")
@@ -203,11 +203,9 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     @Test
     public void givenARefuseOnTheDayPostponement_thatIsNotDoneByDwp_thenLeaveFields() {
-        List<UploadParty> uploadParties = List.of(UploadParty.JOINT_PARTY, UploadParty.REP, UploadParty.OTHER_PARTY,
-                UploadParty.OTHER_PARTY_APPOINTEE, UploadParty.OTHER_PARTY_REP, UploadParty.APPELLANT, UploadParty.APPOINTEE,
-                UploadParty.CTSC);
+        List<String> uploadParties = List.of("jointParty", "appellant");
 
-        for (UploadParty uploadParty : uploadParties) {
+        for (String uploadParty : uploadParties) {
             SscsDocument postponementDocument = buildSscsDocument("postponementRequest", uploadParty);
             sscsCaseData.setPostponementRequest(PostponementRequest.builder()
                     .actionPostponementRequestSelected("refuseOnTheDay")
@@ -335,10 +333,10 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         verifyNoInteractions(hearingMessageHelper);
     }
 
-    private SscsDocument buildSscsDocument(String documentType, UploadParty uploadParty) {
+    private SscsDocument buildSscsDocument(String documentType, String orignalPartySender) {
         SscsDocumentDetails docDetails = SscsDocumentDetails.builder()
                 .documentType(documentType)
-                .partyUploaded(uploadParty)
+                .originalPartySender(orignalPartySender)
                 .build();
         return SscsDocument.builder().value(docDetails).build();
     }

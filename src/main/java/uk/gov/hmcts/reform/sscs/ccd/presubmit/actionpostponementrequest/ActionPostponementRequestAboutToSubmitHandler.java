@@ -122,9 +122,9 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     }
 
     private void refuseOnTheDay(SscsCaseData sscsCaseData) {
-        final UploadParty uploadParty = sscsCaseData.getLatestDocumentForDocumentType(POSTPONEMENT_REQUEST).getValue().getPartyUploaded();
+        final String originalPartySender = sscsCaseData.getLatestDocumentForDocumentType(POSTPONEMENT_REQUEST).getValue().getOriginalPartySender();
 
-        if (!"DWP".equals(uploadParty.getLabel())) {
+        if (!"dwp".equals(originalPartySender)) {
             return;
         }
         sscsCaseData.setDwpState(null);
