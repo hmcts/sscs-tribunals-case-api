@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
@@ -39,6 +40,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     private final PostponementRequestService postponementRequestService;
     private final FooterService footerService;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
+    private final IdamService idamService;
     @Value("${feature.snl.enabled}")
     private boolean isScheduleListingEnabled;
 
@@ -124,7 +126,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     private void refuseOnTheDay(SscsCaseData sscsCaseData) {
         final String originalPartySender = sscsCaseData.getLatestDocumentForDocumentType(POSTPONEMENT_REQUEST).getValue().getOriginalPartySender();
 
-        if (!"dwp".equals(originalPartySender)) {
+        if (!"DWP".equals(originalPartySender)) {
             return;
         }
         sscsCaseData.setDwpState(null);

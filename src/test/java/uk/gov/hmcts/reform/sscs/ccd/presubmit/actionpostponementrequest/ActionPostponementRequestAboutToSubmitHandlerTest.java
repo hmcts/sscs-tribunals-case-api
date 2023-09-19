@@ -183,7 +183,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     @Test
     public void givenARefuseOnTheDayPostponement_thatIsDoneByDwp_thenClearFtaStateAndClearInterlocStateAndSetStatusToBeHearing() {
-        SscsDocument postponementDocument = buildSscsDocument("postponementRequest", "dwp");
+        SscsDocument postponementDocument = buildSscsDocument("postponementRequest", "DWP");
 
         sscsCaseData.setPostponementRequest(PostponementRequest.builder()
                 .actionPostponementRequestSelected("refuseOnTheDay")
