@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE_ON_THE_DAY;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.SEND_TO_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -17,21 +19,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Note;
-import uk.gov.hmcts.reform.sscs.ccd.domain.NoteDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.NotePad;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
@@ -89,6 +77,8 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             refusePostponement(sscsCaseData);
         } else if (GRANT.getValue().equals(actionRequested)) {
             grantPostponement(sscsCaseData, response);
+        } else if (REFUSE_ON_THE_DAY.getValue().equals(actionRequested)) {
+            refuseOnTheDay(sscsCaseData);
         } else {
             log.info("Action postponement request: unhandled requested action {} for case {}", actionRequested,
                 caseId);
@@ -129,6 +119,17 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             .build());
 
         sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(NO);
+    }
+
+    private void refuseOnTheDay(SscsCaseData sscsCaseData) {
+        final UploadParty uploadParty = sscsCaseData.getLatestDocumentForDocumentType(POSTPONEMENT_REQUEST).getValue().getPartyUploaded();
+
+        if (!"DWP".equals(uploadParty.getLabel())) {
+            return;
+        }
+        sscsCaseData.setDwpState(null);
+        sscsCaseData.setInterlocReviewState(null);
+        sscsCaseData.setState(State.HEARING);
     }
 
     private void cancelHearing(SscsCaseData sscsCaseData) {
