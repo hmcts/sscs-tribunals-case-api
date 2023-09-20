@@ -7,6 +7,8 @@ import static java.util.function.Predicate.not;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,6 +23,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
@@ -296,5 +299,27 @@ public class SscsUtil {
             }
         }
         return null;
+    }
+
+    public static void updateHearingChannel(SscsCaseData caseData, HearingChannel hearingChannel) {
+        String wantsToAttend = YES.toString();
+        HearingType hearingType = HearingType.ORAL;
+
+        if (NOT_ATTENDING.equals(hearingChannel) || PAPER.equals(hearingChannel)) {
+            wantsToAttend = NO.toString();
+            hearingType = HearingType.PAPER;
+        }
+
+        log.info("Updating hearing type to {} and wants to attend to {}", hearingType, wantsToAttend);
+
+        Appeal appeal = caseData.getAppeal();
+        appeal.getHearingOptions().setWantsToAttend(wantsToAttend);
+        appeal.setHearingType(hearingType.getValue());
+        HearingSubtype hearingSubtype = appeal.getHearingSubtype();
+        hearingSubtype.setWantsHearingTypeFaceToFace(wantsToAttend);
+        hearingSubtype.setWantsHearingTypeTelephone(wantsToAttend);
+        hearingSubtype.setWantsHearingTypeVideo(wantsToAttend);
+
+        caseData.getSchedulingAndListingFields().getOverrideFields().setAppellantHearingChannel(hearingChannel);
     }
 }
