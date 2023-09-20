@@ -893,6 +893,9 @@ servicebus:
         subscriptionNeeded: yes
       - name: jrd-topic
         subscriptionNeeded: yes
+      - name: ccd-events
+        subscriptionNeeded: yes
+        requiresSession: true
     queues:
       - name: sscs-orchestrator-queue-preview
 
@@ -961,6 +964,10 @@ wa-case-event-handler:
     ingressHost: wa-case-event-handler-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-wa-case-event-handler
     readinessDelay: 90
+    secrets:
+      AZURE_SERVICE_BUS_CONNECTION_STRING:
+        secretRef: sscs-sb-preview
+        key: connectionString
     environment:
       CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
       CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
@@ -968,10 +975,9 @@ wa-case-event-handler:
       ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
       WA_WORKFLOW_API_URL: http://{{ .Release.Name }}-wa-workflow-api
       WA_TASK_MANAGEMENT_API_URL: http://{{ .Release.Name }}-wa-task-management-api
-      AZURE_SERVICE_BUS_CONNECTION_STRING: ${SERVICE_BUS_CONNECTION_STRING}
-      AZURE_SERVICE_BUS_TOPIC_NAME: ccd-case-events
-      AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: ccd-case-events
-      AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME: ccd-case-events
+      AZURE_SERVICE_BUS_TOPIC_NAME: "${SERVICE_NAME}-servicebus-ccd-events"
+      AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-ccd-events"
+      AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-ccd-events"
       POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
       POSTGRES_NAME: wa-case-event-handler
       POSTGRES_USERNAME: hmcts
@@ -1071,17 +1077,19 @@ wa-reconfiguration-batch:
 ccd-message-publisher:
   java:
     ingressHost: ccd-message-publisher-${SERVICE_FQDN}
-
     releaseNameOverride: ${SERVICE_NAME}-ccd-message-publisher
     readinessDelay: 90
+    secrets:
+      AZURE_SERVICE_BUS_CONNECTION_STRING:
+        secretRef: sscs-sb-preview
+        key: connectionString
     environment:
       DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
       DATA_STORE_DB_NAME: data-store
       DATA_STORE_DB_USERNAME: hmcts
       DATA_STORE_DB_PASSWORD: hmcts
       DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
-      SERVICE_BUS_CONNECTION_STRING: ${SERVICE_BUS_CONNECTION_STRING}
-      CCD_CASE_EVENTS_DESTINATION: ccd-case-events
+      CCD_CASE_EVENTS_DESTINATION: "${SERVICE_NAME}-servicebus-ccd-events"
 
 sscs-cron-trigger:
   job:
