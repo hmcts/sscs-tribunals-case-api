@@ -85,7 +85,8 @@ public class SendToFirstTierAboutToSubmitHandlerTest {
     @ParameterizedTest
     @EnumSource(SendToFirstTierActions.class)
     void shouldReturnWithoutError(SendToFirstTierActions action) {
-        caseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder().build()).build()));
+        List<Hearing> hearings = List.of(Hearing.builder().value(HearingDetails.builder().build()).build());
+        caseData.setHearings(hearings);
         caseData.getPostHearing().getSendToFirstTier().setAction(action);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);

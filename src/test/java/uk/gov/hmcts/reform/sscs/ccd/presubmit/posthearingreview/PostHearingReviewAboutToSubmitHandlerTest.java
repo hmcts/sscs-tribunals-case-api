@@ -106,7 +106,9 @@ class PostHearingReviewAboutToSubmitHandlerTest {
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getSchedulingAndListingFields().getPanelMemberExclusions().getExcludedPanelMembers().contains(new CollectionItem<>("", judge))).isTrue();
+        assertThat(response.getData().getSchedulingAndListingFields()
+            .getPanelMemberExclusions().getExcludedPanelMembers()
+            .contains(new CollectionItem<>("", judge))).isTrue();
     }
 
     @Test
