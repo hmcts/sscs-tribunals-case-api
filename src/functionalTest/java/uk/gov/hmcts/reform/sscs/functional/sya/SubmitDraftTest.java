@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
+import static java.lang.Thread.sleep;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
@@ -233,13 +234,15 @@ public class SubmitDraftTest {
     }
 
     @Test
-    public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() {
+    public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() throws InterruptedException {
         Response response = saveDraft(draftAppeal);
 
         response.then()
             .statusCode(anyOf(is(HttpStatus.SC_OK), is(HttpStatus.SC_CREATED)))
             .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
         String responseHeader = response.getHeader(LOCATION_HEADER_NAME);
+
+        Thread.sleep(1500); //weight is added to give time for ES to update with ccd database
 
         Response response2 = saveDraft(draftAppeal);
 
@@ -287,7 +290,7 @@ public class SubmitDraftTest {
     private List<SscsCaseData> findCase(IdamTokens idamTokens) throws InterruptedException {
         List<SscsCaseData> savedDrafts = citizenCcdService.findCase(idamTokens);
         if (CollectionUtils.isEmpty(savedDrafts)) {
-            Thread.sleep(5000);
+            sleep(5000);
             savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
         }
         return savedDrafts;
