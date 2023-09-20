@@ -95,6 +95,8 @@ ccd:
   enabled: false
 em-ccdorc:
   enabled: false
+em-stitching:
+  enabled: false
 sscs-hearings-api:
   enabled: false
 hmc-cft-hearing-service:
@@ -103,3 +105,4 @@ servicebus:
   enabled: false
 ccd-case-document-am-api:
   enabled: false
+
