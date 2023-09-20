@@ -655,6 +655,7 @@ ccd:
       - caseworker-sscs-pcqextractor
       - caseworker-sscs-hmrcresponsewriter
       - caseworker-wa-task-configuration
+      - caseworker-ras-validation
 elastic:
   enabled: true
 
