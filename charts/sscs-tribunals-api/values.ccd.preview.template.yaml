@@ -158,15 +158,15 @@ am-org-role-mapping-service:
       SB_CONNECTION_STRING:
         secretRef: sscs-sb-preview
         key: connectionString
-      keyVaults:
-        am:
-          secrets:
-            - app-insights-connection-string
-            - am-org-role-mapping-service-s2s-secret
-            - role-assignment-service-LD-SDK-KEY
-            - orm-IDAM-CLIENT-ID
-            - orm-IDAM-CLIENT-SECRET
-            - orm-IDAM-ADMIN-SECRET
+    keyVaults:
+      am:
+        secrets:
+          - app-insights-connection-string
+          - am-org-role-mapping-service-s2s-secret
+          - role-assignment-service-LD-SDK-KEY
+          - orm-IDAM-CLIENT-ID
+          - orm-IDAM-CLIENT-SECRET
+          - orm-IDAM-ADMIN-SECRET
     environment:
       IDAM_S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
       S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
