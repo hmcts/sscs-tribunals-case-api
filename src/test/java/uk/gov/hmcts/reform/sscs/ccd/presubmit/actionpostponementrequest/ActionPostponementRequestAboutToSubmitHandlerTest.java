@@ -183,7 +183,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     @Test
     public void givenARefuseOnTheDayPostponement_thatIsDoneByDwp_thenClearFtaStateAndClearInterlocStateAndSetStatusToBeHearing() {
-        SscsDocument postponementDocument = buildSscsDocument("postponementRequest", UploadParty.DWP);
+        SscsDocument postponementDocument = buildSscsDocument("postponementRequest", UploadParty.DWP, "dwp");
 
         sscsCaseData.setPostponementRequest(PostponementRequest.builder()
                 .actionPostponementRequestSelected("refuseOnTheDay")
@@ -208,7 +208,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
                 UploadParty.CTSC);
 
         for (UploadParty uploadParty : uploadParties) {
-            SscsDocument postponementDocument = buildSscsDocument("postponementRequest", uploadParty);
+            SscsDocument postponementDocument = buildSscsDocument("postponementRequest", uploadParty, "dwp");
             sscsCaseData.setPostponementRequest(PostponementRequest.builder()
                     .actionPostponementRequestSelected("refuseOnTheDay")
                     .build());
@@ -223,8 +223,27 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
             assertThat(response.getData().getDwpState()).isEqualTo(DwpState.IN_PROGRESS);
             assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
             assertThat(response.getData().getState()).isEqualTo(State.READY_TO_LIST);
-
         }
+    }
+
+    @Test
+    public void givenARefuseOnTheDayPostponement_thatHasNoOriginalSender_thenLeaveFields() {
+        SscsDocument postponementDocument = buildSscsDocument("postponementRequest", UploadParty.DWP, null);
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder()
+                .actionPostponementRequestSelected("refuseOnTheDay")
+                .build());
+        sscsCaseData.setSscsDocument(Arrays.asList(postponementDocument));
+        sscsCaseData.setDwpState(DwpState.IN_PROGRESS);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
+        sscsCaseData.setState(State.READY_TO_LIST);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getDwpState()).isEqualTo(DwpState.IN_PROGRESS);
+        assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
+        assertThat(response.getData().getState()).isEqualTo(State.READY_TO_LIST);
+
     }
 
     @Test
@@ -335,10 +354,11 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         verifyNoInteractions(hearingMessageHelper);
     }
 
-    private SscsDocument buildSscsDocument(String documentType, UploadParty uploadParty) {
+    private SscsDocument buildSscsDocument(String documentType, UploadParty uploadParty, String originalPartySender) {
         SscsDocumentDetails docDetails = SscsDocumentDetails.builder()
                 .documentType(documentType)
                 .partyUploaded(uploadParty)
+                .originalPartySender(originalPartySender)
                 .build();
         return SscsDocument.builder().value(docDetails).build();
     }

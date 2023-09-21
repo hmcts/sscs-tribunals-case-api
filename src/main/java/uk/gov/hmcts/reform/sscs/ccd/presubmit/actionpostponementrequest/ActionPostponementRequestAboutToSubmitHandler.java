@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
@@ -129,26 +128,16 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     }
 
     private void refuseOnTheDay(SscsCaseData sscsCaseData) {
-        final UploadParty uploadParty = sscsCaseData.getLatestDocumentForDocumentType(POSTPONEMENT_REQUEST).getValue().getPartyUploaded();
 
-        List<SscsDocument> doc = sscsCaseData.getSscsDocument();
+        SscsDocument postponementDocument = getLatestPostponementDocumentForDwpType(sscsCaseData.getSscsDocument());
 
-
-        System.out.println("======================================================Upload party is"
-                + "===================================================================="
-                + getLatestPostponementDocumentForDwpType(sscsCaseData.getSscsDocument()));
-
-        if (!isNull(getLatestPostponementDocumentForDwpType(sscsCaseData.getSscsDocument()))) {
+        if (!isNull(postponementDocument)
+                && UploadParty.DWP.equals(postponementDocument.getValue().getPartyUploaded())) {
             sscsCaseData.setDwpState(null);
             sscsCaseData.setInterlocReviewState(null);
             sscsCaseData.setState(State.HEARING);
         }
-
-        if (UploadParty.DWP.equals(uploadParty)) {
-            sscsCaseData.setDwpState(null);
-            sscsCaseData.setInterlocReviewState(null);
-            sscsCaseData.setState(State.HEARING);
-        }
+        sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(NO);
     }
 
     private void cancelHearing(SscsCaseData sscsCaseData) {
@@ -203,8 +192,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         if (doc != null && doc.size() > 0) {
             Stream<SscsDocument> filteredStream = doc.stream()
                     .filter(f -> DocumentType.POSTPONEMENT_REQUEST.getValue().equals(f.getValue().getDocumentType())
-                            && UploadParty.DWP.equals(f.getValue().getPartyUploaded())
-                    );
+                            && !isNull(f.getValue().getOriginalPartySender()));
 
             List<SscsDocument> filteredList = filteredStream.sorted((one, two) -> {
                 if (two.getValue().getDocumentDateAdded() == null) {
