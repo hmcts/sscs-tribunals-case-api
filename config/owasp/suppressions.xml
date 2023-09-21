@@ -22,7 +22,7 @@
     <cve>CVE-2023-35116</cve>
     <cve>CVE-2023-2976</cve>
   </suppress>
-  <suppress until = "2023-10-07">
+  <suppress until = "2023-11-07">
     <notes><![CDATA[
    file name: okio-jvm-3.2.0.jar
    ]]></notes>

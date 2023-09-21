@@ -4,13 +4,10 @@ import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Predicate;
 import javax.validation.ConstraintViolation;
@@ -21,7 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -102,8 +98,8 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             }
         }
 
-        createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
-        clearTransientFields(preSubmitCallbackResponse);
+        SscsUtil.createFinalDecisionNoticeFromPreviewDraft(callback, footerService, isPostHearingsEnabled);
+        clearTransientFields(sscsCaseData);
 
         if ((!(State.READY_TO_LIST.equals(sscsCaseData.getState())
             || State.WITH_DWP.equals(sscsCaseData.getState())))
@@ -179,35 +175,10 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
     }
 
-    private void createFinalDecisionNoticeFromPreviewDraft(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-
-        SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
-
-        DocumentLink docLink = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument();
-
-        DocumentLink documentLink = DocumentLink.builder()
-            .documentUrl(docLink.getDocumentUrl())
-            .documentFilename(docLink.getDocumentFilename())
-            .documentBinaryUrl(docLink.getDocumentBinaryUrl())
-            .build();
-
-        String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        DocumentType docType = SscsUtil.getIssueFinalDecisionDocumentType(sscsCaseData, isPostHearingsEnabled);
-
-        final SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelsh() ? TRANSLATION_REQUIRED : null;
-        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, docType, now, null, null, documentTranslationStatus);
-
-        if (documentTranslationStatus != null) {
-            sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
-            log.info("Set the InterlocReviewState to {},  for case id : {}", sscsCaseData.getInterlocReviewState(), sscsCaseData.getCcdCaseId());
-            sscsCaseData.setTranslationWorkOutstanding(YES.getValue());
-        }
-    }
-
-    private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        preSubmitCallbackResponse.getData().getSscsDocument()
+    private void clearTransientFields(SscsCaseData sscsCaseData) {
+        sscsCaseData.getSscsDocument()
                 .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
-        preSubmitCallbackResponse.getData().getSscsDocument()
+        sscsCaseData.getSscsDocument()
                 .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_CORRECTED_NOTICE.getValue()));
     }
 }
