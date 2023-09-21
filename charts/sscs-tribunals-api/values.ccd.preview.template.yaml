@@ -1081,7 +1081,7 @@ ccd-message-publisher:
     releaseNameOverride: ${SERVICE_NAME}-ccd-message-publisher
     readinessDelay: 90
     secrets:
-      AZURE_SERVICE_BUS_CONNECTION_STRING:
+      SERVICE_BUS_CONNECTION_STRING:
         secretRef: sscs-sb-preview
         key: connectionString
     environment:
