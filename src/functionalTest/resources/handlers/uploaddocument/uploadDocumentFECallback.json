@@ -166,7 +166,6 @@
             },
             "googleMapLink": "https://www.google.com/maps/place/2-10+Topping+Street+Blackpool+FY1+3AB/@53.820175,-3.050717"
           },
-          "panel": null,
           "adjourned": "No",
           "eventDate": null,
           "hearingId": "3698764",
@@ -439,7 +438,6 @@
                 "googleMapLink": "PUBLIC"
               }
             },
-            "panel": "PUBLIC",
             "adjourned": "PUBLIC",
             "eventDate": "PUBLIC",
             "hearingId": "PUBLIC",
@@ -726,7 +724,6 @@
                 "googleMapLink": "PUBLIC"
               }
             },
-            "panel": "PUBLIC",
             "adjourned": "PUBLIC",
             "eventDate": "PUBLIC",
             "hearingId": "PUBLIC",
@@ -943,7 +940,6 @@
             },
             "googleMapLink": "https://www.google.com/maps/place/2-10+Topping+Street+Blackpool+FY1+3AB/@53.820175,-3.050717"
           },
-          "panel": null,
           "adjourned": "No",
           "eventDate": null,
           "hearingId": "3698764",
@@ -1215,7 +1211,6 @@
               },
               "classification": "PUBLIC"
             },
-            "panel": "PUBLIC",
             "adjourned": "PUBLIC",
             "eventDate": "PUBLIC",
             "hearingId": "PUBLIC",
@@ -1502,7 +1497,6 @@
               },
               "classification": "PUBLIC"
             },
-            "panel": "PUBLIC",
             "adjourned": "PUBLIC",
             "eventDate": "PUBLIC",
             "hearingId": "PUBLIC",
