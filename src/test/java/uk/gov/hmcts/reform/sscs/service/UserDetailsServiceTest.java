@@ -96,7 +96,7 @@ class UserDetailsServiceTest {
         String idamId = "123";
         UserInfo userDetails = UserInfo.builder().uid(idamId).build();
         when(idamClient.getUserInfo(USER_AUTHORISATION)).thenReturn(userDetails);
-        when(judicialRefDataService.getJudicialUser(idamId)).thenReturn(new JudicialUserBase(idamId, "456"));
+        when(judicialRefDataService.getJudicialUserFromIdamId(idamId)).thenReturn(new JudicialUserBase(idamId, "456"));
 
         assertThat(userDetailsService.getLoggedInUserAsJudicialUser(USER_AUTHORISATION)).isEqualTo(new JudicialUserBase(idamId, "456"));
     }
