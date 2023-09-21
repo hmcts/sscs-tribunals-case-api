@@ -56,33 +56,18 @@ idam-pr:
 em-ccdorc:
   enabled: true
   java:
-    imagePullPolicy: Always
-    releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
     image: hmctspublic.azurecr.io/em/ccdorc:latest
+    releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
     ingressHost: em-ccdorc-${SERVICE_FQDN}
     environment:
       IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
       OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
       S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-      EM_STITCHING_API_URL: https://em-stitching-${SERVICE_FQDN}
+      EM_STITCHING_API_URL: http://em-stitching-aat.service.core-compute-aat.internal
       DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
-      CCD_DATA_API_URL: https://ccd-data-store-api-${SERVICE_FQDN}
-      CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
+      CCD_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
       CALLBACK_HTTP_SCHEME: https
-
-em-stitching:
-  enabled: true
-  java:
-    imagePullPolicy: Always
-    releaseNameOverride: ${SERVICE_NAME}-em-stitching
-    image: hmctspublic.azurecr.io/em/stitching:latest
-    ingressHost: em-stitching-${SERVICE_FQDN}
-    environment:
-      IDAM_API_BASE_URI: https://idam-api.aat.platform.hmcts.net
-      OPEN_ID_API_BASE_URI: https://idam-web-public.aat.platform.hmcts.net/o
-      S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-      DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
-      CDAM_URL: http://${SERVICE_NAME}-ccd-case-document-am-api
+      CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
 
 ccd-case-document-am-api:
   enabled: true
@@ -128,7 +113,7 @@ xui-webapp:
       JURISDICTIONS: SSCS
       LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
       FEATURE_REDIS_ENABLED: false
-      FEATURE_APP_INSIGHTS_ENABLED: true
+      FEATURE_APP_INSIGHTS_ENABLED: false
       FEATURE_SECURE_COOKIE_ENABLED: false
       FEATURE_PROXY_ENABLED: false
       FEATURE_TERMS_AND_CONDITIONS_ENABLED: false
@@ -448,7 +433,7 @@ ccd:
         DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
-        DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator,ccd_case_document_am_api,em_ccd_orchestrator
+        DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator,ccd_case_document_am_api
         OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
@@ -470,8 +455,6 @@ ccd:
         IDAM_API_BASE_URL: https://idam-api.aat.platform.hmcts.net
         IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
         IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-        EM_BUNDLER_URL: https://em-ccdorc-${SERVICE_FQDN}
-        EM_BUNDLER_STITCH_URI: /api/stitch-ccd-bundles
         CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
@@ -792,4 +775,3 @@ servicebus:
         subscriptionNeeded: yes
     queues:
       - name: sscs-orchestrator-queue-preview
-
