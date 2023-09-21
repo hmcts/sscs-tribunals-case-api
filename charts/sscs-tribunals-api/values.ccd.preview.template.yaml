@@ -151,6 +151,10 @@ am-org-role-mapping-service:
     image: 'hmctspublic.azurecr.io/am/org-role-mapping-service:pr-1583'
     ingressHost: orm-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-am-org-role-mapping-service
+    devmemoryRequests: 1024Mi
+    devcpuRequests: 250m
+    devmemoryLimits: 2048Mi
+    devcpuLimits: 1500m
     secrets:
       SB_ACCESS_KEY:
         secretRef: sscs-sb-preview
