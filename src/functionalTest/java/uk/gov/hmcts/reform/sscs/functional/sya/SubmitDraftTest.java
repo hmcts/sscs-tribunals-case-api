@@ -284,6 +284,8 @@ public class SubmitDraftTest {
 
         archiveDraft(caseData);
 
+        Thread.sleep(1500);
+
         assertEquals(0, citizenCcdService.findCase(citizenIdamTokens).size());
     }
 
