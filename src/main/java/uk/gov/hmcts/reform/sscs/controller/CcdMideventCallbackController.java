@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
+import static java.util.Objects.isNull;
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
@@ -87,8 +89,9 @@ public class CcdMideventCallbackController {
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
         @RequestBody String message) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
+        EventType event = callback.getEvent();
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        log.info("About to start ccdMidEventPreviewFinalDecision callback `{}` received for Case ID `{}`", callback.getEvent(),
+        log.info("About to start ccdMidEventPreviewFinalDecision callback `{}` received for Case ID `{}`", event,
             caseDetails.getId());
 
         authorisationService.authorise(serviceAuthHeader);
@@ -96,7 +99,7 @@ public class CcdMideventCallbackController {
 
         String benefitType = WriteFinalDecisionBenefitTypeHelper.getBenefitType(sscsCaseData);
 
-        if (benefitType == null) {
+        if (isNull(benefitType)) {
             PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
             preSubmitCallbackResponse.addError("Unexpected error - benefit type is null");
             return ok(preSubmitCallbackResponse);
@@ -105,9 +108,11 @@ public class CcdMideventCallbackController {
         SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);
 
         WriteFinalDecisionPreviewDecisionServiceBase writeFinalDecisionPreviewDecisionService = decisionNoticeService.getPreviewService(benefitType);
-        DocumentType docType = SscsUtil.getWriteFinalDecisionDocumentType(sscsCaseData, isPostHearingsEnabled);
+        DocumentType docType = SscsUtil.getWriteFinalDecisionDocumentType(sscsCaseData, event, isPostHearingsEnabled);
 
-        return ok(writeFinalDecisionPreviewDecisionService.preview(callback, docType, userAuthorisation, false, isPostHearingsEnabled, isPostHearingsBEnabled));
+        boolean showIssueDate = EventType.ADMIN_ACTION_CORRECTION.equals(event);
+
+        return ok(writeFinalDecisionPreviewDecisionService.preview(callback, docType, userAuthorisation, showIssueDate, isPostHearingsEnabled, isPostHearingsBEnabled));
     }
 
     @PostMapping(path = "/ccdMidEventPreviewAdjournCase", produces = MediaType.APPLICATION_JSON_VALUE)
