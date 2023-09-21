@@ -58,7 +58,7 @@ public class SendToFirstTierAboutToSubmitHandler implements PreSubmitCallbackHan
                 callback.getEvent());
 
             if (SendToFirstTierActions.DECISION_REMITTED.equals(caseData.getPostHearing().getSendToFirstTier().getAction())) {
-                SscsUtil.addPanelMembersToExclusions(caseData, false);
+                //SscsUtil.addPanelMembersToExclusions(caseData, false);
                 caseData.setState(State.NOT_LISTABLE);
             } else {
                 caseData.setState(State.DORMANT_APPEAL_STATE);
