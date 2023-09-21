@@ -65,8 +65,12 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                 }
             }
 
-            HearingChannel hearingChannel = caseDataSnlFields.getOverrideFields().getAppellantHearingChannel();
-            SscsUtil.updateHearingChannel(sscsCaseData, hearingChannel);
+            OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
+
+            if (nonNull(overrideFields)) {
+                HearingChannel hearingChannel = overrideFields.getAppellantHearingChannel();
+                SscsUtil.updateHearingChannel(sscsCaseData, hearingChannel);
+            }
         }
 
         State state = callback.getCaseDetails().getState();

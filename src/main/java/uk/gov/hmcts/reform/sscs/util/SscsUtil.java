@@ -315,7 +315,12 @@ public class SscsUtil {
         Appeal appeal = caseData.getAppeal();
         appeal.getHearingOptions().setWantsToAttend(wantsToAttend);
         appeal.setHearingType(hearingType.getValue());
+
         HearingSubtype hearingSubtype = appeal.getHearingSubtype();
+        if (isNull(hearingSubtype)) {
+            hearingSubtype = HearingSubtype.builder().build();
+            appeal.setHearingSubtype(hearingSubtype);
+        }
         hearingSubtype.setWantsHearingTypeFaceToFace(wantsToAttend);
         hearingSubtype.setWantsHearingTypeTelephone(wantsToAttend);
         hearingSubtype.setWantsHearingTypeVideo(wantsToAttend);
