@@ -7,6 +7,7 @@ import static java.util.function.Predicate.not;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -227,17 +229,36 @@ public class SscsUtil {
     }
 
     public static DocumentType getWriteFinalDecisionDocumentType(SscsCaseData caseData, boolean isPostHearingsEnabled) {
-        if (isPostHearingsEnabled
-            && isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
-            return DocumentType.DRAFT_CORRECTED_NOTICE;
+        return getWriteFinalDecisionDocumentType(caseData, null, isPostHearingsEnabled);
+    }
+
+    public static DocumentType getWriteFinalDecisionDocumentType(SscsCaseData caseData, EventType event, boolean isPostHearingsEnabled) {
+        if (isPostHearingsEnabled) {
+            if (EventType.ADMIN_ACTION_CORRECTION.equals(event)) {
+                return DocumentType.CORRECTED_DECISION_NOTICE;
+            }
+
+            if (isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
+                return DocumentType.DRAFT_CORRECTED_NOTICE;
+            }
         }
 
         return DocumentType.DRAFT_DECISION_NOTICE;
     }
 
     public static DocumentType getIssueFinalDecisionDocumentType(SscsCaseData caseData, boolean isPostHearingsEnabled) {
-        if (isCorrectionInProgress(caseData, isPostHearingsEnabled)) {
-            return DocumentType.CORRECTION_GRANTED;
+        return getIssueFinalDecisionDocumentType(caseData, null, isPostHearingsEnabled);
+    }
+
+    public static DocumentType getIssueFinalDecisionDocumentType(SscsCaseData caseData, EventType event, boolean isPostHearingsEnabled) {
+        if (isPostHearingsEnabled) {
+            if (EventType.ADMIN_ACTION_CORRECTION.equals(event)) {
+                return DocumentType.CORRECTED_DECISION_NOTICE;
+            }
+
+            if (isCorrectionInProgress(caseData, true)) {
+                return DocumentType.CORRECTION_GRANTED;
+            }
         }
 
         return DocumentType.FINAL_DECISION_NOTICE;
@@ -320,5 +341,30 @@ public class SscsUtil {
             }
         }
         return null;
+    }
+
+    public static void createFinalDecisionNoticeFromPreviewDraft(Callback<SscsCaseData> callback,
+                                                                 FooterService footerService,
+                                                                 boolean isPostHearingsEnabled) {
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        DocumentLink docLink = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument();
+
+        DocumentLink documentLink = DocumentLink.builder()
+                .documentUrl(docLink.getDocumentUrl())
+                .documentFilename(docLink.getDocumentFilename())
+                .documentBinaryUrl(docLink.getDocumentBinaryUrl())
+                .build();
+
+        String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        DocumentType docType = SscsUtil.getIssueFinalDecisionDocumentType(sscsCaseData, callback.getEvent(), isPostHearingsEnabled);
+
+        final SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelsh() ? TRANSLATION_REQUIRED : null;
+        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, docType, now, null, null, documentTranslationStatus);
+
+        if (nonNull(documentTranslationStatus)) {
+            sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
+            log.info("Set the InterlocReviewState to {},  for case id : {}", sscsCaseData.getInterlocReviewState(), sscsCaseData.getCcdCaseId());
+            sscsCaseData.setTranslationWorkOutstanding(YES.getValue());
+        }
     }
 }
