@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
@@ -12,12 +13,16 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -126,12 +131,24 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     private void refuseOnTheDay(SscsCaseData sscsCaseData) {
         final UploadParty uploadParty = sscsCaseData.getLatestDocumentForDocumentType(POSTPONEMENT_REQUEST).getValue().getPartyUploaded();
 
-        if (!((UploadParty.DWP).equals(uploadParty))) {
-            return;
+        List<SscsDocument> doc = sscsCaseData.getSscsDocument();
+
+
+        System.out.println("======================================================Upload party is"
+                + "===================================================================="
+                + getLatestPostponementDocumentForDwpType(sscsCaseData.getSscsDocument()));
+
+        if (!isNull(getLatestPostponementDocumentForDwpType(sscsCaseData.getSscsDocument()))) {
+            sscsCaseData.setDwpState(null);
+            sscsCaseData.setInterlocReviewState(null);
+            sscsCaseData.setState(State.HEARING);
         }
-        sscsCaseData.setDwpState(null);
-        sscsCaseData.setInterlocReviewState(null);
-        sscsCaseData.setState(State.HEARING);
+
+        if (UploadParty.DWP.equals(uploadParty)) {
+            sscsCaseData.setDwpState(null);
+            sscsCaseData.setInterlocReviewState(null);
+            sscsCaseData.setState(State.HEARING);
+        }
     }
 
     private void cancelHearing(SscsCaseData sscsCaseData) {
@@ -180,5 +197,32 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         caseData.setPostponementRequest(PostponementRequest.builder()
             .unprocessedPostponementRequest(unprocessedPostponementRequest)
             .build());
+    }
+
+    public SscsDocument getLatestPostponementDocumentForDwpType(List<SscsDocument> doc) {
+        if (doc != null && doc.size() > 0) {
+            Stream<SscsDocument> filteredStream = doc.stream()
+                    .filter(f -> DocumentType.POSTPONEMENT_REQUEST.getValue().equals(f.getValue().getDocumentType())
+                            && UploadParty.DWP.equals(f.getValue().getPartyUploaded())
+                    );
+
+            List<SscsDocument> filteredList = filteredStream.sorted((one, two) -> {
+                if (two.getValue().getDocumentDateAdded() == null) {
+                    return -1;
+                }
+                if (one.getValue().getDocumentDateAdded() == null) {
+                    return 0;
+                }
+                if (one.getValue().getDocumentDateAdded().equals(two.getValue().getDocumentDateAdded())) {
+                    return -1;
+                }
+                return -1 * one.getValue().getDocumentDateAdded().compareTo(two.getValue().getDocumentDateAdded());
+            }).collect(Collectors.toList());
+
+            if (!filteredList.isEmpty()) {
+                return filteredList.get(0);
+            }
+        }
+        return null;
     }
 }

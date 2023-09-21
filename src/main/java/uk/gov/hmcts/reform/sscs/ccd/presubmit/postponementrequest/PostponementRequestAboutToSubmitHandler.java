@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.postponementrequest;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.DWP;
 
 import java.util.List;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
@@ -23,11 +27,13 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
 
     private final PostponementRequestService postponementRequestService;
     private final FooterService footerService;
+    private final IdamService idamService;
 
     @Autowired
-    public PostponementRequestAboutToSubmitHandler(PostponementRequestService postponementRequestService, FooterService footerService) {
+    public PostponementRequestAboutToSubmitHandler(PostponementRequestService postponementRequestService, FooterService footerService, IdamService idamService) {
         this.postponementRequestService = postponementRequestService;
         this.footerService = footerService;
+        this.idamService = idamService;
     }
 
     @Override
@@ -45,11 +51,19 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         final PreSubmitCallbackResponse<SscsCaseData> response = validatePostponementRequest(sscsCaseData);
-
         if (response.getErrors().isEmpty()) {
-            postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.DWP);
+
+            UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
+            Optional<UploadParty> uploadParty = Optional.empty();
+
+            if (userDetails.hasRole(DWP)) {
+                uploadParty = Optional.of(UploadParty.DWP);
+            }
+
+            postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.DWP, uploadParty);
             List<SscsDocument> documents = sscsCaseData.getSscsDocument();
             SscsUtil.addDocumentToBundle(footerService, sscsCaseData, documents.get(documents.size() - 1));
+
         }
 
         return response;

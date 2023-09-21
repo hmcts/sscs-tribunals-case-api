@@ -81,7 +81,7 @@ public class PostponementRequestAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new PostponementRequestAboutToSubmitHandler(new PostponementRequestService(), footerService);
+        handler = new PostponementRequestAboutToSubmitHandler(new PostponementRequestService(), footerService, idamService);
 
         Hearing hearing = Hearing.builder().value(HearingDetails.builder()
             .hearingDate(LocalDate.now().plusDays(1).toString())
