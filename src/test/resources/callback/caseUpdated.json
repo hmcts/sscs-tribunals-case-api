@@ -24,6 +24,8 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "benefitCode" : "002",
+      "issueCode" : "DD",
       "processingVenue": "myVenue",
       "dwpTimeExtension": [
       ],
