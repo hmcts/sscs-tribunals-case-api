@@ -79,11 +79,11 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
     protected SscsCaseData sscsCaseData;
 
     protected static Validator validator = Validation
-            .byDefaultProvider()
-            .configure()
-            .messageInterpolator(new ParameterMessageInterpolator())
-            .buildValidatorFactory()
-            .getValidator();
+        .byDefaultProvider()
+        .configure()
+        .messageInterpolator(new ParameterMessageInterpolator())
+        .buildValidatorFactory()
+        .getValidator();
 
     @BeforeEach
     protected void setUp() {
@@ -126,8 +126,8 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
                 .adjournmentInProgress(YES)
                 .build())
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
-                .defaultListingValues(OverrideFields.builder().build()).build())
-        .build();
+                .defaultListingValues(OverrideFields.builder().duration(45).build()).build())
+            .build();
     }
 
     protected PreSubmitCallbackResponse<SscsCaseData> cannotBeListedAndNoDirectionsGiven() {
