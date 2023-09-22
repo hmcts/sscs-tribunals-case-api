@@ -13,7 +13,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -188,8 +187,8 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             .build());
     }
 
-    public SscsDocument getLatestPostponementDocumentForDwpType(List<SscsDocument> doc) {
-        if (doc != null && doc.size() > 0) {
+    private SscsDocument getLatestPostponementDocumentForDwpType(List<SscsDocument> doc) {
+        if (doc != null && !doc.isEmpty()) {
             Stream<SscsDocument> filteredStream = doc.stream()
                     .filter(f -> DocumentType.POSTPONEMENT_REQUEST.getValue().equals(f.getValue().getDocumentType())
                             && !isNull(f.getValue().getOriginalPartySender()));
@@ -205,7 +204,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                     return -1;
                 }
                 return -1 * one.getValue().getDocumentDateAdded().compareTo(two.getValue().getDocumentDateAdded());
-            }).collect(Collectors.toList());
+            }).toList();
 
             if (!filteredList.isEmpty()) {
                 return filteredList.get(0);

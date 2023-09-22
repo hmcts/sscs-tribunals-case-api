@@ -6,8 +6,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -162,6 +161,7 @@ public class PostponementRequestAboutToSubmitHandlerTest {
         assertThat(document.getValue().getDocumentType(), is(POSTPONEMENT_REQUEST.getValue()));
         assertThat(document.getValue().getDocumentLink().getDocumentFilename(), is("example.pdf"));
         assertThat(document.getValue().getOriginalPartySender(), is(UploadParty.DWP.getValue()));
+        assertThat(document.getValue().getPartyUploaded(), is(nullValue()));
         assertThat(sscsCaseData.getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_TCW));
         assertThat(sscsCaseData.getInterlocReferralReason(), is(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST));
         assertThat(sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest(), is(YES));
