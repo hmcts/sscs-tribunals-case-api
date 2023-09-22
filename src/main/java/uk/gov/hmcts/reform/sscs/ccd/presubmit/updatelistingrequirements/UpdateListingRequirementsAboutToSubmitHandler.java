@@ -54,17 +54,17 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
         ReserveTo callbackReserveTo = callbackResponse.getData().getSchedulingAndListingFields().getReserveTo();
         SchedulingAndListingFields caseDataSnlFields = sscsCaseData.getSchedulingAndListingFields();
 
-        if (isAdjournmentEnabled) {
-            if (nonNull(callbackReserveTo)) {
-                YesNo callbackReservedDtj = callbackReserveTo.getReservedDistrictTribunalJudge();
-                ReserveTo caseDataReserveTo = caseDataSnlFields.getReserveTo();
-                caseDataReserveTo.setReservedDistrictTribunalJudge(callbackReservedDtj);
+        if (nonNull(callbackReserveTo)) {
+            YesNo callbackReservedDtj = callbackReserveTo.getReservedDistrictTribunalJudge();
+            ReserveTo caseDataReserveTo = caseDataSnlFields.getReserveTo();
+            caseDataReserveTo.setReservedDistrictTribunalJudge(callbackReservedDtj);
 
-                if (isYes(callbackReservedDtj)) {
-                    caseDataReserveTo.setReservedJudge(null);
-                }
+            if (isYes(callbackReservedDtj)) {
+                caseDataReserveTo.setReservedJudge(null);
             }
+        }
 
+        if (isAdjournmentEnabled) {
             OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
 
             if (nonNull(overrideFields)) {

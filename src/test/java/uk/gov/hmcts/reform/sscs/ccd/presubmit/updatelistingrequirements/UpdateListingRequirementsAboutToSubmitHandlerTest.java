@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 
 @ExtendWith(MockitoExtension.class)
 class UpdateListingRequirementsAboutToSubmitHandlerTest {
@@ -231,5 +232,24 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
         JudicialUserBase result = response.getData().getSchedulingAndListingFields().getReserveTo().getReservedJudge();
         assertThat(result).isNull();
+    }
+
+    @Test
+    void givenAdjournmentFlagIsOff_thenDontUpdateHearingChannel() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", false);
+
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantHearingChannel(HearingChannel.FACE_TO_FACE).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingSubtype()).isNull();
     }
 }
