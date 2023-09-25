@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 
 import java.util.*;
@@ -28,8 +31,8 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_START
                 && callback.getEvent() == EventType.WRITE_FINAL_DECISION
-                && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData());
+                && nonNull(callback.getCaseDetails())
+                && nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
@@ -55,15 +58,21 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
 
         SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);
 
-        if (!isPostHearingsEnabled
-                || isNoOrNull(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
-            clearTransientFields(sscsCaseData);
-        }
+        clearTransientFields(sscsCaseData);
 
         return preSubmitCallbackResponse;
     }
 
     private void clearTransientFields(SscsCaseData sscsCaseData) {
+        if (isNull(sscsCaseData.getSscsDocument())
+                || (!isPostHearingsEnabled || isNoOrNull(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress()))
+                && sscsCaseData.getSscsDocument().stream()
+                .noneMatch(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()))) {
+            clearFinalDecsionTransientFields(sscsCaseData);
+        }
+    }
+
+    private void clearFinalDecsionTransientFields(SscsCaseData sscsCaseData) {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(null);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionTypeOfHearing(null);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPresentingOfficerAttendedQuestion(null);
