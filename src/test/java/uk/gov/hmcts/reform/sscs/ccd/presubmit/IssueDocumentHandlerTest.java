@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.PIP;
 
 import java.time.LocalDate;
@@ -166,7 +166,7 @@ class IssueDocumentHandlerTest {
                 .build();
 
         boolean isPostHearingsEnabled = true;
-        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, originalLabel, isPostHearingsEnabled);
+        String documentTypeLabel = new IssueDocumentHandler().getEmbeddedDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, originalLabel, isPostHearingsEnabled);
 
         String expectedLabel = "Set Aside Decision Notice";
         assertThat(documentTypeLabel).isEqualTo(expectedLabel);
@@ -183,7 +183,7 @@ class IssueDocumentHandlerTest {
             .build();
 
         boolean isPostHearingsEnabled = false;
-        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, originalLabel, isPostHearingsEnabled);
+        String documentTypeLabel = new IssueDocumentHandler().getEmbeddedDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, originalLabel, isPostHearingsEnabled);
 
         assertThat(documentTypeLabel).isEqualTo(originalLabel);
     }
@@ -200,7 +200,7 @@ class IssueDocumentHandlerTest {
                .build())
             .build();
 
-        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel, false);
+        String documentTypeLabel = new IssueDocumentHandler().getEmbeddedDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel, false);
         assertThat(documentTypeLabel).isEqualTo(expectedDefaultDocumentLabel);
     }
 
@@ -211,7 +211,7 @@ class IssueDocumentHandlerTest {
             .ccdCaseId("1")
             .build();
 
-        String documentTypeLabel = new IssueDocumentHandler().getDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel, false);
+        String documentTypeLabel = new IssueDocumentHandler().getEmbeddedDocumentTypeLabel(sscsCaseData, DocumentType.DECISION_NOTICE, expectedDefaultDocumentLabel, false);
         assertThat(documentTypeLabel).isEqualTo(expectedDefaultDocumentLabel);
     }
 
