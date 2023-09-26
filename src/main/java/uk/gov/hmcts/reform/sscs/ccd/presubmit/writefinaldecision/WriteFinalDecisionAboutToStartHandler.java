@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.*;
 import lombok.AllArgsConstructor;
@@ -64,12 +64,16 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
     }
 
     private void clearTransientFields(SscsCaseData sscsCaseData) {
-        if (isNull(sscsCaseData.getSscsDocument())
-                || (!isPostHearingsEnabled || isNoOrNull(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress()))
-                && sscsCaseData.getSscsDocument().stream()
-                .noneMatch(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()))) {
+        if (!isCorrectionInProgress(sscsCaseData)
+                && (isNull(sscsCaseData.getSscsDocument())
+                || sscsCaseData.getSscsDocument().stream()
+                .noneMatch(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue())))) {
             clearFinalDecsionTransientFields(sscsCaseData);
         }
+    }
+
+    private boolean isCorrectionInProgress(SscsCaseData caseData) {
+        return isPostHearingsEnabled && isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
     }
 
     private void clearFinalDecsionTransientFields(SscsCaseData sscsCaseData) {
