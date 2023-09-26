@@ -225,7 +225,7 @@ ccd:
       - name: DATA_STORE_PASS
         value: hmcts
       - name: DATA_STORE_URL
-        value: "jdbc:postgresql://sscs-flexibleserver-postgres-preview.postgres.database.azure.com:5432/data-store?sslmode=require&stringtype=unspecified"
+        value: "jdbc:postgresql://sscs-preview.postgres.database.azure.com:5432/data-store?sslmode=require&stringtype=unspecified"
       - name: DATA_STORE_USER
         value: hmcts
       - name: ES_HOSTS
@@ -242,7 +242,7 @@ ccd:
         emptyDir: {}
       - name: database-secret-volume
         secret:
-          secretName: sscs-postgres
+          secretName: postgres
     extraVolumeMounts: |
       - name: logstash-lib
         mountPath: /usr/share/logstash/ccd
