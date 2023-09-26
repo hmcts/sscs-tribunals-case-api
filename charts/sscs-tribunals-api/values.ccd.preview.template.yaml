@@ -773,7 +773,7 @@ servicebus:
 
 postgresql:
   enabled: true
-  flexibleserver: sscs-flexibleserver-postgres-preview
+  flexibleserver: sscs-preview
   setup:
     databases:
     - name: data-store
