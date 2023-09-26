@@ -165,7 +165,7 @@ ccd:
     enableKeyVaults: true
     devMode: true
     postgresHostname: "sscs-preview.postgres.database.azure.com"
-    postgresSecret: sscs-postgres
+    postgresSecret: postgres
 
   am-role-assignment-service:
     java:
