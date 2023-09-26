@@ -164,7 +164,7 @@ ccd:
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     enableKeyVaults: true
     devMode: true
-    postgresHostname: "sscs-flexibleserver-postgres-preview.postgres.database.azure.com"
+    postgresHostname: "sscs-preview.postgres.database.azure.com"
     postgresSecret: sscs-postgres
 
   am-role-assignment-service:
