@@ -1019,6 +1019,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        assertNull(updated.getData().getDwpState());
         assertNull(updated.getData().getDwpFurtherEvidenceStates());
     }
 
@@ -2043,5 +2044,36 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         org.assertj.core.api.Assertions.assertThat(response.getData().getWorkAllocationFields().getAddedDocuments())
             .as("Only a coversheet has been attached - this should be ignored.")
             .isNull();
+    }
+
+    public void givenAValidPostHearingOtherRequest_andReviewByJudgeIsSelected_thenDontThrowError() {
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, userDetailsService, new AddedDocumentsUtil(false), true, true);
+
+        DynamicListItem sendToInterlocListItem = new DynamicListItem(
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
+
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
+        sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
+
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+                .type(POST_HEARING_OTHER.getLabel())
+                .fileName("Test.pdf")
+                .url(DOC_LINK)
+                .build();
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+                .value(scannedDocDetails)
+                .build();
+
+        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
+                ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getDwpState(), is(nullValue()));
+        SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
+        assertThat(sscsDocumentDetail.getDocumentType(), is(POST_HEARING_OTHER.getLabel()));
     }
 }

@@ -32,7 +32,6 @@ import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
-import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @ExtendWith(MockitoExtension.class)
 class WriteStatementOfReasonsMidEventHandlerTest {
@@ -56,16 +55,13 @@ class WriteStatementOfReasonsMidEventHandlerTest {
     @Mock
     private DocumentConfiguration documentConfiguration;
 
-    @Mock
-    private UserDetailsService userDetailsService;
-
     private SscsCaseData caseData;
 
     private WriteStatementOfReasonsMidEventHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new WriteStatementOfReasonsMidEventHandler(documentConfiguration, generateFile, userDetailsService, true, true);
+        handler = new WriteStatementOfReasonsMidEventHandler(documentConfiguration, generateFile, true, true);
 
         caseData = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
@@ -102,7 +98,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new WriteStatementOfReasonsMidEventHandler(documentConfiguration, generateFile, userDetailsService, false, false);
+        handler = new WriteStatementOfReasonsMidEventHandler(documentConfiguration, generateFile, false, false);
         when(callback.getEvent()).thenReturn(SOR_WRITE);
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
