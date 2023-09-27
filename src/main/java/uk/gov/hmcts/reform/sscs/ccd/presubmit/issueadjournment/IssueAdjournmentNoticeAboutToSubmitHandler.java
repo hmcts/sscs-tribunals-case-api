@@ -194,11 +194,11 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         }
 
         Adjournment adjournment = sscsCaseData.getAdjournment();
-
-        if (nonNull(adjournment.getInterpreterRequired())) {
+        var interpreterRequired = adjournment.getInterpreterRequired();
+        if (nonNull(interpreterRequired) && isYes(interpreterRequired)) {
             DynamicList interpreterLanguage = adjournment.getInterpreterLanguage();
             hearingOptions.setLanguages(nonNull(interpreterLanguage.getValue()) ? interpreterLanguage.getValue().getLabel() : NO.getValue());
-            hearingOptions.setLanguageInterpreter(adjournment.getInterpreterRequired().getValue());
+            hearingOptions.setLanguageInterpreter(interpreterRequired.getValue());
         } else {
             hearingOptions.setLanguages(null);
             hearingOptions.setLanguageInterpreter(NO.getValue());
