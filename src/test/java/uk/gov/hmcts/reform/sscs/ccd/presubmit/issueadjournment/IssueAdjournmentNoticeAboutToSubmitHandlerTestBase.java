@@ -65,9 +65,6 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
     protected ListAssistHearingMessageHelper hearingMessageHelper;
 
     @Mock
-    protected VenueDataLoader venueDataLoader;
-
-    @Mock
     protected AirLookupService airLookupService;
 
     @Mock
@@ -75,6 +72,9 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
 
     @Mock
     protected RegionalProcessingCenterService regionalProcessingCenterService;
+
+    @Mock
+    protected VenueService venueService;
 
     protected SscsCaseData sscsCaseData;
 
@@ -87,7 +87,7 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
 
     @BeforeEach
     protected void setUp() {
-        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, validator, hearingMessageHelper, venueDataLoader, airLookupService, regionalProcessingCenterService, hearingDurationsService, true);
+        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, validator, hearingMessageHelper, airLookupService, regionalProcessingCenterService, hearingDurationsService, venueService,true);
 
         List<SscsDocument> documentList = new ArrayList<>();
 

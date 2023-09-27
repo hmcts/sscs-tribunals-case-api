@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.PAPER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
@@ -53,6 +54,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 
@@ -356,7 +358,9 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         HearingDetails hearingDetails = new HearingDetails();
         hearingDetails.setHearingChannel(HearingChannel.FACE_TO_FACE);
         sscsCaseData.setHearings(List.of(new Hearing(hearingDetails)));
-        sscsCaseData.getAdjournment().setTypeOfNextHearing(AdjournCaseTypeOfHearing.PAPER);
+        sscsCaseData.getAdjournment().setTypeOfNextHearing(PAPER);
+        when(regionalProcessingCenterService.getByVenueId("")).thenReturn(RegionalProcessingCenter.builder().epimsId("1111").build());
+        when(venueService.getActiveRegionalEpimsIdsForRpc("1111")).thenReturn(List.of(VenueDetails.builder().epimsId("3456").build()));
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(sscsCaseData.getLatestHearing().getValue().getHearingChannel()).isEqualTo(HearingChannel.PAPER);
@@ -369,6 +373,11 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         HearingDetails hearingDetails = new HearingDetails();
         sscsCaseData.setHearings(List.of(new Hearing(hearingDetails)));
         sscsCaseData.getAdjournment().setTypeOfNextHearing(adjournCaseTypeOfHearing);
+
+        if (PAPER.equals(adjournCaseTypeOfHearing)) {
+            when(regionalProcessingCenterService.getByVenueId("")).thenReturn(RegionalProcessingCenter.builder().epimsId("1111").build());
+            when(venueService.getActiveRegionalEpimsIdsForRpc("1111")).thenReturn(List.of(VenueDetails.builder().epimsId("3456").build()));
+        }
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
