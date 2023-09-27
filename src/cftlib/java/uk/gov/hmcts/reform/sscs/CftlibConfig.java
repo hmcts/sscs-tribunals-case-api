@@ -70,7 +70,8 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "ccd-import", "manage-user", "caseworker");
         lib.createIdamUser("wa-system-user@fake.hmcts.net",
              "caseworker-wa",
-             "caseworker-wa-configuration"
+            "caseworker-wa-configuration",
+            "caseworker-wa-task-configuration"
         );
         lib.createIdamUser("judge-feepaid@example.com",
                 "caseworker",
@@ -94,7 +95,8 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-sscs-pcqextractor",
                 "citizen",
                 "caseworker-sscs",
-                "caseworker"
+                "caseworker",
+                "caseworker-wa-task-configuration"
         );
         var def = Files.readAllBytes(Path.of("../sscs-ccd-definitions/releases/CCD_SSCSDefinition_vdev_LOCAL.xlsx"));
         lib.importDefinition(def);
