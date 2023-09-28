@@ -57,6 +57,10 @@ public class Sscs1PdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
             createAppealPdf(caseData);
         }
 
+        if (caseData.getIsConfidentialCase() == null) {
+            caseData.setIsConfidentialCase(YesNo.NO);
+        }
+
         return sscsCaseDataPreSubmitCallbackResponse;
     }
 
