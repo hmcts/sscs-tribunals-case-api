@@ -9,12 +9,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.NON_STANDARD;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType.STANDARD;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.ADJOURNMENT_NOTICE_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
+import static uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil.isInterpreterRequired;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -313,18 +315,32 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     }
 
     private Integer handleHearingDuration(SscsCaseData caseData) {
-        Integer duration = caseData.getAdjournment().getNextHearingListingDuration();
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
 
-        if (nonNull(duration) && NON_STANDARD.equals(durationType)) {
-            AdjournCaseNextHearingDurationUnits units = caseData.getAdjournment().getNextHearingListingDurationUnits();
-            if (units == AdjournCaseNextHearingDurationUnits.SESSIONS && duration >= MIN_HEARING_SESSION_DURATION) {
-                return duration * DURATION_SESSIONS_MULTIPLIER;
-            } else if (units == AdjournCaseNextHearingDurationUnits.MINUTES && duration >= MIN_HEARING_DURATION) {
-                return duration;
+        if (STANDARD.equals(durationType)) {
+            Integer existingDuration = caseData.getSchedulingAndListingFields().getDefaultListingValues().getDuration();
+            if (nonNull(existingDuration)) {
+                if (isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
+                    && isInterpreterRequired(caseData)) {
+                    return existingDuration + MIN_HEARING_DURATION;
+                } else {
+                    return existingDuration;
+                }
             }
+        }
 
-            return DURATION_DEFAULT;
+        if (NON_STANDARD.equals(durationType)) {
+            Integer nextDuration = caseData.getAdjournment().getNextHearingListingDuration();
+            if (nonNull(nextDuration)) {
+                AdjournCaseNextHearingDurationUnits units = caseData.getAdjournment().getNextHearingListingDurationUnits();
+                if (units == AdjournCaseNextHearingDurationUnits.SESSIONS && nextDuration >= MIN_HEARING_SESSION_DURATION) {
+                    return nextDuration * DURATION_SESSIONS_MULTIPLIER;
+                } else if (units == AdjournCaseNextHearingDurationUnits.MINUTES && nextDuration >= MIN_HEARING_DURATION) {
+                    return nextDuration;
+                }
+
+                return DURATION_DEFAULT;
+            }
         }
 
         return hearingDurationsService.getHearingDurationBenefitIssueCodes(caseData);

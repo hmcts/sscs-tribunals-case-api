@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,8 +86,6 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
     }
 
-    /*
-    @Disabled
     @Test
     void givenSetAsideGranted_thenExcludePanelMembers() {
         JudicialUserBase judge = new JudicialUserBase("678", "1234");
@@ -93,9 +93,9 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         caseData.getPostHearing().getSetAside().setAction(SetAsideActions.GRANT);
         caseData.setHearings(List.of(Hearing.builder()
             .value(HearingDetails.builder()
-                //.panel(JudicialUserPanel.builder()
-                //    .assignedTo(judge)
-                //    .build())
+                .panel(JudicialUserPanel.builder()
+                    .assignedTo(judge)
+                    .build())
                 .build())
             .build()));
 
@@ -111,7 +111,6 @@ class PostHearingReviewAboutToSubmitHandlerTest {
             .contains(new CollectionItem<>("", judge))).isTrue();
     }
 
-    @Disabled
     @Test
     void givenLtaGranted_thenReservedPanelMembers() {
         JudicialUserBase judge = new JudicialUserBase("678", "1234");
@@ -119,9 +118,9 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         caseData.getPostHearing().getLibertyToApply().setAction(LibertyToApplyActions.GRANT);
         caseData.setHearings(List.of(Hearing.builder()
             .value(HearingDetails.builder()
-                //.panel(JudicialUserPanel.builder()
-                //    .assignedTo(judge)
-                //    .build())
+                .panel(JudicialUserPanel.builder()
+                    .assignedTo(judge)
+                    .build())
                 .build())
             .build()));
 
@@ -134,5 +133,4 @@ class PostHearingReviewAboutToSubmitHandlerTest {
         assertThat(response.getErrors()).isEmpty();
         assertThat(response.getData().getSchedulingAndListingFields().getPanelMemberExclusions().getReservedPanelMembers().contains(new CollectionItem<>("", judge))).isTrue();
     }
-*/
 }
