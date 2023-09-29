@@ -3,7 +3,7 @@ java:
   ingressHost: ${SERVICE_FQDN}
   readinessDelay: 45
   autoscaling:
-    enabled: true
+    enabled: false
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
