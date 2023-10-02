@@ -249,12 +249,12 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenARefuseOnTheDayPostponementWithMultiplePostponementDocuments_thenSelectTheLatestDocumentWithDwpUploadPartyAndOriginalSender() {
+    public void givenARefuseOnTheDayPostponementWithMultiplePostponementDocuments_thenSelectTheLatestDocumentWithOriginalSender() {
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(buildSscsDocument("postponementRequest", now.minusDays(2).toString(), UploadParty.DWP, "dwp"));
         documents.add(buildSscsDocument("postponementRequest", now.toString(), UploadParty.DWP, null));
+        documents.add(buildSscsDocument("postponementRequest", now.toString(), UploadParty.DWP, null));
         documents.add(buildSscsDocument("postponementRequest", now.minusDays(1).toString(), UploadParty.DWP, "dwp"));
-        documents.add(buildSscsDocument("postponementRequest", now.minusDays(3).toString(), UploadParty.DWP, "dwp2"));
 
         sscsCaseData.setPostponementRequest(PostponementRequest.builder()
                 .actionPostponementRequestSelected("refuseOnTheDay")
