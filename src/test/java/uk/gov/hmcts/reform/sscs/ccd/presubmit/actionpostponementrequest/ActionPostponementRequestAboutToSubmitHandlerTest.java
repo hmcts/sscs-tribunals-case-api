@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest.ActionPostponementRequestAboutToSubmitHandler.POSTPONEMENT_DETAILS_SENT_TO_JUDGE_PREFIX;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -42,6 +43,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     private static final String DOCUMENT_URL = "dm-store/documents/123";
 
     private static final String USER_AUTHORISATION = "Bearer token";
+    private LocalDate now = LocalDate.now();
 
     @InjectMocks
     ActionPostponementRequestAboutToSubmitHandler handler;
@@ -183,7 +185,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     @Test
     public void givenARefuseOnTheDayPostponement_thatIsDoneByDwp_thenClearFtaStateAndClearInterlocStateAndSetStatusToBeHearing() {
-        SscsDocument postponementDocument = buildSscsDocument("postponementRequest", UploadParty.DWP, "dwp");
+        SscsDocument postponementDocument = buildSscsDocument("postponementRequest", now.toString(), UploadParty.DWP, "dwp");
 
         sscsCaseData.setPostponementRequest(PostponementRequest.builder()
                 .actionPostponementRequestSelected("refuseOnTheDay")
@@ -208,7 +210,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
                 UploadParty.CTSC);
 
         for (UploadParty uploadParty : uploadParties) {
-            SscsDocument postponementDocument = buildSscsDocument("postponementRequest", uploadParty, "dwp");
+            SscsDocument postponementDocument = buildSscsDocument("postponementRequest", now.toString(), uploadParty, "dwp");
             sscsCaseData.setPostponementRequest(PostponementRequest.builder()
                     .actionPostponementRequestSelected("refuseOnTheDay")
                     .build());
@@ -228,7 +230,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
     @Test
     public void givenARefuseOnTheDayPostponement_thatHasNoOriginalSender_thenLeaveFields() {
-        SscsDocument postponementDocument = buildSscsDocument("postponementRequest", UploadParty.DWP, null);
+        SscsDocument postponementDocument = buildSscsDocument("postponementRequest", now.toString(), UploadParty.DWP, null);
         sscsCaseData.setPostponementRequest(PostponementRequest.builder()
                 .actionPostponementRequestSelected("refuseOnTheDay")
                 .build());
@@ -244,6 +246,31 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
         assertThat(response.getData().getState()).isEqualTo(State.READY_TO_LIST);
 
+    }
+
+    @Test
+    public void givenARefuseOnTheDayPostponementWithMultiplePostponementDocuments_thenSelectTheLatestDocumentWithDwpUploadPartyAndOriginalSender() {
+        List<SscsDocument> documents = new ArrayList<>();
+        documents.add(buildSscsDocument("postponementRequest", now.minusDays(2).toString(), UploadParty.DWP, "dwp"));
+        documents.add(buildSscsDocument("postponementRequest", now.toString(), UploadParty.DWP, null));
+        documents.add(buildSscsDocument("postponementRequest", now.minusDays(1).toString(), UploadParty.DWP, "dwp"));
+        documents.add(buildSscsDocument("postponementRequest", now.minusDays(3).toString(), UploadParty.DWP, "dwp2"));
+
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder()
+                .actionPostponementRequestSelected("refuseOnTheDay")
+                .build());
+        sscsCaseData.setSscsDocument(documents);
+        sscsCaseData.setDwpState(DwpState.IN_PROGRESS);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
+        sscsCaseData.setState(State.READY_TO_LIST);
+
+        SscsCaseData sscsCaseData = SscsCaseData.builder().sscsDocument(documents).build();
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getDwpState()).isNull();
+        assertThat(response.getData().getInterlocReviewState()).isNull();
+        assertThat(response.getData().getState()).isEqualTo(State.HEARING);
     }
 
     @Test
@@ -354,9 +381,10 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         verifyNoInteractions(hearingMessageHelper);
     }
 
-    private SscsDocument buildSscsDocument(String documentType, UploadParty uploadParty, String originalPartySender) {
+    private SscsDocument buildSscsDocument(String documentType,String date, UploadParty uploadParty, String originalPartySender) {
         SscsDocumentDetails docDetails = SscsDocumentDetails.builder()
                 .documentType(documentType)
+                .documentDateAdded(date)
                 .partyUploaded(uploadParty)
                 .originalPartySender(originalPartySender)
                 .build();
