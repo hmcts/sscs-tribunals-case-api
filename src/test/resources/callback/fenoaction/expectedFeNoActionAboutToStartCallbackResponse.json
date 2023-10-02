@@ -131,9 +131,7 @@
           },
           "hearingDate": "2017-05-24",
           "time": "10:45",
-          "adjourned": "Yes",
-          "eventDate": null,
-          "hearingId": null
+          "adjourned": "Yes"
         }
       }
     ],
