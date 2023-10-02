@@ -7,7 +7,7 @@
     <packageUrl regex="true">^pkg:maven/commons\-fileupload/commons\-fileupload@.*$</packageUrl>
     <cve>CVE-2023-24998</cve>
   </suppress>
-  <suppress until="2023-10-01">
+  <suppress until="2023-10-07">
     <notes><![CDATA[
    file name: json-20230227.jar
    ]]></notes>
@@ -17,7 +17,6 @@
   <suppress until = "2023-10-07">
     <cve>CVE-2023-35116</cve>
     <cve>CVE-2023-2976</cve>
-    <cve>CVE-2022-45688</cve>
   </suppress>
   <suppress until = "2023-10-07">
     <cve>CVE-2023-35116</cve>
