@@ -168,6 +168,8 @@ public class SubmitDraftTest {
                 .body(updateDraftCaseJsonWithMrnDateAndNino(mrnDate, nino))
                 .put("/drafts");
 
+        Thread.sleep(1500); //weight is added to give time for ES to update with ccd database
+
         SscsCaseData draft = findCase(citizenIdamTokens).get(0);
 
         String body = updateDraftCaseJsonWithMrnDateAndNino(mrnDate, nino).replace("CCD_CASE_ID", draft.getCcdCaseId());
@@ -178,8 +180,6 @@ public class SubmitDraftTest {
                 .post("/appeals");
 
         response.then().statusCode(HttpStatus.SC_CREATED);
-
-        Thread.sleep(1500); //weight is added to give time for ES to update with ccd database
 
         final Long id = getCcdIdFromLocationHeader(response.getHeader("Location"));
 
