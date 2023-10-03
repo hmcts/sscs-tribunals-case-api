@@ -179,6 +179,8 @@ public class SubmitDraftTest {
 
         response.then().statusCode(HttpStatus.SC_CREATED);
 
+        Thread.sleep(1500); //weight is added to give time for ES to update with ccd database
+
         final Long id = getCcdIdFromLocationHeader(response.getHeader("Location"));
 
         SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, userIdamTokens);
