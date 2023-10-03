@@ -253,8 +253,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(buildSscsDocument("postponementRequest", now.minusDays(2).toString(), UploadParty.DWP, "dwp"));
         documents.add(buildSscsDocument("postponementRequest", now.toString(), UploadParty.DWP, null));
-        documents.add(buildSscsDocument("postponementRequest", now.toString(), UploadParty.DWP, null));
-        documents.add(buildSscsDocument("postponementRequest", now.minusDays(1).toString(), UploadParty.DWP, "dwp"));
+        documents.add(buildSscsDocument("postponementRequest", now.minusDays(1).toString(), UploadParty.CTSC, "dwp"));
 
         sscsCaseData.setPostponementRequest(PostponementRequest.builder()
                 .actionPostponementRequestSelected("refuseOnTheDay")
@@ -268,9 +267,9 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getDwpState()).isNull();
-        assertThat(response.getData().getInterlocReviewState()).isNull();
-        assertThat(response.getData().getState()).isEqualTo(State.HEARING);
+        assertThat(response.getData().getDwpState()).isEqualTo(DwpState.IN_PROGRESS);
+        assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
+        assertThat(response.getData().getState()).isEqualTo(State.READY_TO_LIST);
     }
 
     @Test

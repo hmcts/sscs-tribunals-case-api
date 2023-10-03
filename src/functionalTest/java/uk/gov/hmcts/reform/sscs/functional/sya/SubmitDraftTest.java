@@ -168,7 +168,7 @@ public class SubmitDraftTest {
                 .body(updateDraftCaseJsonWithMrnDateAndNino(mrnDate, nino))
                 .put("/drafts");
 
-        Thread.sleep(1500); //weight is added to give time for ES to update with ccd database
+        Thread.sleep(1500); //wait is added to give time for ES to update with ccd database
 
         SscsCaseData draft = findCase(citizenIdamTokens).get(0);
 

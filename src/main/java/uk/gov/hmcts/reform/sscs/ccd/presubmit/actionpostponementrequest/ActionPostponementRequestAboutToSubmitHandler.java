@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -193,21 +194,11 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                     .filter(f -> DocumentType.POSTPONEMENT_REQUEST.getValue().equals(f.getValue().getDocumentType())
                             && !isNull(f.getValue().getOriginalPartySender()));
 
-            List<SscsDocument> filteredList = filteredStream.sorted((one, two) -> {
-                if (two.getValue().getDocumentDateAdded() == null) {
-                    return -1;
-                }
-                if (one.getValue().getDocumentDateAdded() == null) {
-                    return 0;
-                }
-                if (one.getValue().getDocumentDateAdded().equals(two.getValue().getDocumentDateAdded())) {
-                    return -1;
-                }
-                return -1 * one.getValue().getDocumentDateAdded().compareTo(two.getValue().getDocumentDateAdded());
-            }).toList();
+            List<SscsDocument> sortedList = filteredStream.sorted(Comparator.comparing(o -> o.getValue().getDocumentDateAdded()))
+                    .toList();
 
-            if (!filteredList.isEmpty()) {
-                return filteredList.get(0);
+            if (!sortedList.isEmpty()) {
+                return sortedList.get(sortedList.size() - 1);
             }
         }
         return null;
