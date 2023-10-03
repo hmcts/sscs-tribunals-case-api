@@ -103,16 +103,7 @@
           "time": "11:40:00",
           "panel": null,
           "adjourned": "No",
-          "eventDate": null,
-          "hearingId": "3698764",
-          "venueId": null,
-          "hearingRequested": null,
-          "hearingStatus": null,
-          "start": null,
-          "end": null,
-          "versionNumber": null,
-          "epimsId": null,
-          "hearingChannel": null
+          "hearingId": "3698764"
         }
       }
     ],
