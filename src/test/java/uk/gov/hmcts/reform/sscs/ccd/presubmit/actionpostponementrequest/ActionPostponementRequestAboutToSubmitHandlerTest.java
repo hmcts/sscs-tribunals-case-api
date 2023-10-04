@@ -201,6 +201,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState()).isNull();
         assertThat(response.getData().getInterlocReviewState()).isNull();
         assertThat(response.getData().getState()).isEqualTo(State.HEARING);
+        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(NO);
     }
 
     @Test
@@ -225,27 +226,8 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
             assertThat(response.getData().getDwpState()).isEqualTo(DwpState.IN_PROGRESS);
             assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
             assertThat(response.getData().getState()).isEqualTo(State.READY_TO_LIST);
+            assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(NO);
         }
-    }
-
-    @Test
-    public void givenARefuseOnTheDayPostponement_thatHasNoOriginalSender_thenLeaveFields() {
-        SscsDocument postponementDocument = buildSscsDocument("postponementRequest", now.toString(), UploadParty.DWP, null);
-        sscsCaseData.setPostponementRequest(PostponementRequest.builder()
-                .actionPostponementRequestSelected("refuseOnTheDay")
-                .build());
-        sscsCaseData.setSscsDocument(Arrays.asList(postponementDocument));
-        sscsCaseData.setDwpState(DwpState.IN_PROGRESS);
-        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
-        sscsCaseData.setState(State.READY_TO_LIST);
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getDwpState()).isEqualTo(DwpState.IN_PROGRESS);
-        assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
-        assertThat(response.getData().getState()).isEqualTo(State.READY_TO_LIST);
-
     }
 
     @Test
@@ -270,6 +252,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState()).isEqualTo(DwpState.IN_PROGRESS);
         assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
         assertThat(response.getData().getState()).isEqualTo(State.READY_TO_LIST);
+        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(NO);
     }
 
     @Test

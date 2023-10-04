@@ -131,11 +131,11 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
         SscsDocument postponementDocument = getLatestPostponementDocumentForDwpType(sscsCaseData.getSscsDocument());
 
-        if (!isNull(postponementDocument)
-                && UploadParty.DWP.equals(postponementDocument.getValue().getPartyUploaded())) {
+        if (UploadParty.DWP.equals(postponementDocument.getValue().getPartyUploaded())) {
             sscsCaseData.setDwpState(null);
             sscsCaseData.setInterlocReviewState(null);
             sscsCaseData.setState(State.HEARING);
+            sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(NO);
         }
         sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(NO);
     }
@@ -188,19 +188,15 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             .build());
     }
 
-    private SscsDocument getLatestPostponementDocumentForDwpType(List<SscsDocument> doc) {
-        if (doc != null && !doc.isEmpty()) {
-            Stream<SscsDocument> filteredStream = doc.stream()
-                    .filter(f -> DocumentType.POSTPONEMENT_REQUEST.getValue().equals(f.getValue().getDocumentType())
-                            && !isNull(f.getValue().getOriginalPartySender()));
+    private SscsDocument getLatestPostponementDocumentForDwpType(List<SscsDocument> postponementDocuments) {
+        Stream<SscsDocument> filteredStream = postponementDocuments.stream()
+                .filter(f -> DocumentType.POSTPONEMENT_REQUEST.getValue().equals(f.getValue().getDocumentType())
+                        && !isNull(f.getValue().getOriginalPartySender()));
 
-            List<SscsDocument> sortedList = filteredStream.sorted(Comparator.comparing(o -> o.getValue().getDocumentDateAdded()))
-                    .toList();
+        List<SscsDocument> sortedList = filteredStream.sorted(Comparator.comparing(o -> o.getValue().getDocumentDateAdded()))
+                .toList();
 
-            if (!sortedList.isEmpty()) {
-                return sortedList.get(sortedList.size() - 1);
-            }
-        }
-        return null;
+        return sortedList.get(sortedList.size() - 1);
+
     }
 }
