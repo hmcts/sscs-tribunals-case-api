@@ -156,7 +156,7 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         expectedDocument.getValue().setDocumentType(documentType.getValue());
         expectedDocument.getValue().setDocumentLink(postHearingDoc);
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
-            eq(documentType), any(), any(), eq(null), eq(null), eq(POST_HEARING_REQUEST));
+                eq(documentType), any(), any(), eq(null), eq(null), eq(POST_HEARING_REQUEST), eq(true));
     }
 
     @ParameterizedTest
