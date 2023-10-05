@@ -32,7 +32,6 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 class PostHearingRequestAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     public static final String SET_ASIDE_APPLICATION_FROM_FTA_PDF = "Set Aside Application from FTA.pdf";
-    public static final String CORRECTION_APPLICATION_FROM_FTA_PDF = "Correction Application from FTA.pdf";
 
     private PostHearingRequestAboutToSubmitHandler handler;
 
