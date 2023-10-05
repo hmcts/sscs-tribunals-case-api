@@ -166,6 +166,7 @@ ccd:
     devMode: true
     postgresHostname: "sscs-preview.postgres.database.azure.com"
     postgresSecret: postgres
+    databaseNamePrefix: "${CHANGE_ID}-"
 
   am-role-assignment-service:
     java:
@@ -177,7 +178,7 @@ ccd:
       livenessDelay: 240
       environment:
         ROLE_ASSIGNMENT_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-        ROLE_ASSIGNMENT_DB_NAME: "role-assignment"
+        ROLE_ASSIGNMENT_DB_NAME: "{{ .Values.global.databaseNamePrefix }}role-assignment"
         ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
         AM_ROLE_ASSIGNMENT_SERVICE_SECRET: AAAAAAAAAAAAAAAA
         IDAM_USER_URL: "https://idam-web-public.aat.platform.hmcts.net"
@@ -225,7 +226,7 @@ ccd:
       - name: DATA_STORE_PASS
         value: hmcts
       - name: DATA_STORE_URL
-        value: "jdbc:postgresql://sscs-preview.postgres.database.azure.com:5432/data-store?sslmode=require&stringtype=unspecified"
+        value: "jdbc:postgresql://sscs-preview.postgres.database.azure.com:5432/{{ .Values.global.databaseNamePrefix }}data-store?sslmode=require&stringtype=unspecified"
       - name: DATA_STORE_USER
         value: hmcts
       - name: ES_HOSTS
@@ -265,7 +266,7 @@ ccd:
       01_input.conf: |
         input  {
           jdbc {
-            jdbc_connection_string => "jdbc:postgresql://sscs-flexibleserver-postgres-preview.postgres.database.azure.com:5432/data-store?sslmode=require&stringtype=unspecified"
+            jdbc_connection_string => "jdbc:postgresql://sscs-flexibleserver-postgres-preview.postgres.database.azure.com:5432/{{ .Values.global.databaseNamePrefix }}data-store?sslmode=require&stringtype=unspecified"
             jdbc_user => "hmcts"
             jdbc_password_filepath => "/etc/logstash/secrets/PASSWORD"
             jdbc_validate_connection => true
@@ -577,7 +578,7 @@ sscs-tya-notif:
       AMQP_USERNAME: "RootManageSharedAccessKey"
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
-      JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
+      JOB_SCHEDULER_DB_NAME: "{{ .Values.global.databaseNamePrefix }}sscsjobscheduler"
       JOB_SCHEDULER_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       JOB_SCHEDULER_DB_USERNAME: hmcts
@@ -727,7 +728,7 @@ hmc-cft-hearing-service:
       HMC_SERVICE_BUS_QUEUE: hmc-from-hmi
       HMC_OUTBOUND_SERVICE_BUS_QUEUE: hmc-to-hmi
       CFT_HEARING_SERVICE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-      CFT_HEARING_SERVICE_DB_NAME: "hmc-cft-hearing-service"
+      CFT_HEARING_SERVICE_DB_NAME: "{{ .Values.global.databaseNamePrefix }}hmc-cft-hearing-service"
       CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       CFT_HEARING_SERVICE_DB_PORT: 5432
       HMC_ACCESS_CONTROL_ENABLED: false
@@ -776,12 +777,12 @@ postgresql:
   flexibleserver: sscs-preview
   setup:
     databases:
-    - name: data-store
-    - name: definition-store
-    - name: user-profile
-    - name: draftstore
-    - name: evidence
-    - name: annotation
-    - name: role-assignment
-    - name: hmc-cft-hearing-service
-    - name: sscsjobscheduler
+    - name: "{{ .Values.global.databaseNamePrefix }}data-store"
+    - name: "{{ .Values.global.databaseNamePrefix }}definition-store"
+    - name: "{{ .Values.global.databaseNamePrefix }}user-profile"
+    - name: "{{ .Values.global.databaseNamePrefix }}draftstore"
+    - name: "{{ .Values.global.databaseNamePrefix }}evidence"
+    - name: "{{ .Values.global.databaseNamePrefix }}annotation"
+    - name: "{{ .Values.global.databaseNamePrefix }}role-assignment"
+    - name: "{{ .Values.global.databaseNamePrefix }}hmc-cft-hearing-service"
+    - name: "{{ .Values.global.databaseNamePrefix }}sscsjobscheduler"
