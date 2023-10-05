@@ -255,8 +255,11 @@ public class SubmitDraftTest {
     }
 
     @Test
-    public void givenADraftExistsAndTheGetIsCalled_shouldReturn200AndTheDraft() {
+    public void givenADraftExistsAndTheGetIsCalled_shouldReturn200AndTheDraft() throws InterruptedException {
         saveDraft(draftAppeal);
+
+        Thread.sleep(1500);
+
         RestAssured.given()
             .header(new Header(AUTHORIZATION, citizenToken))
             .get("/drafts")
