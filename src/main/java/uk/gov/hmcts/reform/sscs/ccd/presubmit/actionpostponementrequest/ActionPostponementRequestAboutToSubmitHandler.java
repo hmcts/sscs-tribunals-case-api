@@ -14,7 +14,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,10 +22,25 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Note;
+import uk.gov.hmcts.reform.sscs.ccd.domain.NoteDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.NotePad;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
@@ -44,7 +58,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     private final PostponementRequestService postponementRequestService;
     private final FooterService footerService;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
-    private final IdamService idamService;
+
     @Value("${feature.snl.enabled}")
     private boolean isScheduleListingEnabled;
 
@@ -189,14 +203,13 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     }
 
     private SscsDocument getLatestPostponementDocumentForDwpType(List<SscsDocument> postponementDocuments) {
-        Stream<SscsDocument> filteredStream = postponementDocuments.stream()
+        List<SscsDocument> filteredList = postponementDocuments.stream()
                 .filter(f -> DocumentType.POSTPONEMENT_REQUEST.getValue().equals(f.getValue().getDocumentType())
-                        && !isNull(f.getValue().getOriginalPartySender()));
-
-        List<SscsDocument> sortedList = filteredStream.sorted(Comparator.comparing(o -> o.getValue().getDocumentDateAdded()))
+                        && !isNull(f.getValue().getOriginalPartySender()))
+                .sorted(Comparator.comparing(o -> o.getValue().getDocumentDateAdded()))
                 .toList();
 
-        return sortedList.get(sortedList.size() - 1);
+        return filteredList.get(filteredList.size() - 1);
 
     }
 }

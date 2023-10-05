@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -24,6 +25,9 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -71,6 +75,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
     private SscsDocument expectedDocument;
 
     @Before
+    @BeforeEach
     public void setUp() {
         openMocks(this);
         ReflectionTestUtils.setField(handler, "isScheduleListingEnabled", true);
@@ -204,30 +209,26 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(NO);
     }
 
-    @Test
-    public void givenARefuseOnTheDayPostponement_thatIsNotDoneByDwp_thenLeaveFields() {
-        List<UploadParty> uploadParties = List.of(UploadParty.JOINT_PARTY, UploadParty.REP, UploadParty.OTHER_PARTY,
-                UploadParty.OTHER_PARTY_APPOINTEE, UploadParty.OTHER_PARTY_REP, UploadParty.APPELLANT, UploadParty.APPOINTEE,
-                UploadParty.CTSC);
+    @ParameterizedTest
+    @ValueSource(strings = {"ctsc", "appellant", "appointee", "rep", "jointParty", "otherParty", "otherPartyRep", "otherPartyAppointee"})
+    public void givenARefuseOnTheDayPostponement_thatIsNotDoneByDwp_thenLeaveFields(String uploadPartyValue) {
+        SscsDocument postponementDocument = buildSscsDocument("postponementRequest", now.toString(), UploadParty.fromValue(uploadPartyValue), "dwp");
 
-        for (UploadParty uploadParty : uploadParties) {
-            SscsDocument postponementDocument = buildSscsDocument("postponementRequest", now.toString(), uploadParty, "dwp");
-            sscsCaseData.setPostponementRequest(PostponementRequest.builder()
-                    .actionPostponementRequestSelected("refuseOnTheDay")
-                    .build());
-            sscsCaseData.setSscsDocument(Arrays.asList(postponementDocument));
-            sscsCaseData.setDwpState(DwpState.IN_PROGRESS);
-            sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
-            sscsCaseData.setState(State.READY_TO_LIST);
+        sscsCaseData.setPostponementRequest(PostponementRequest.builder()
+                .actionPostponementRequestSelected("refuseOnTheDay")
+                .build());
+        sscsCaseData.setSscsDocument(Arrays.asList(postponementDocument));
+        sscsCaseData.setDwpState(DwpState.IN_PROGRESS);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
+        sscsCaseData.setState(State.READY_TO_LIST);
 
-            PreSubmitCallbackResponse<SscsCaseData> response =
-                    handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-            assertThat(response.getData().getDwpState()).isEqualTo(DwpState.IN_PROGRESS);
-            assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
-            assertThat(response.getData().getState()).isEqualTo(State.READY_TO_LIST);
-            assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(NO);
-        }
+        assertThat(response.getData().getDwpState()).isEqualTo(DwpState.IN_PROGRESS);
+        assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
+        assertThat(response.getData().getState()).isEqualTo(State.READY_TO_LIST);
+        assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(NO);
     }
 
     @Test
@@ -245,7 +246,6 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
         sscsCaseData.setState(State.READY_TO_LIST);
 
-        SscsCaseData sscsCaseData = SscsCaseData.builder().sscsDocument(documents).build();
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
