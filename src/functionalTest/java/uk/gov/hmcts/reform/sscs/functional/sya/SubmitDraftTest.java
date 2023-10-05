@@ -137,6 +137,8 @@ public class SubmitDraftTest {
             .put("/drafts");
 
         SscsCaseData draft = findCase(citizenIdamTokens).get(0);
+
+        Thread.sleep(1500);
         assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
     }
 
