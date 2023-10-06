@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -8,7 +9,9 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
@@ -45,7 +49,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final IdamService idamService;
     private final RefDataService refDataService;
     private final VenueService venueService;
+    private final SessionCategoryMapService categoryMapService;
     private final boolean caseAccessManagementFeature;
+
+    private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
 
     @SuppressWarnings("squid:S107")
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
@@ -55,6 +62,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                                     IdamService idamService,
                                     RefDataService refDataService,
                                     VenueService venueService,
+                                    SessionCategoryMapService categoryMapService,
                                     @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
@@ -64,6 +72,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         this.refDataService = refDataService;
         this.caseAccessManagementFeature = caseAccessManagementFeature;
         this.venueService = venueService;
+        this.categoryMapService = categoryMapService;
     }
 
     @Override
@@ -91,7 +100,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
 
         setCaseCode(preSubmitCallbackResponse, callback, hasSuperUserRole);
+        updateHearingOptionLanguageFromSelectedList(sscsCaseData);
         validateBenefitForCase(preSubmitCallbackResponse, callback, hasSuperUserRole);
+
         if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
             return preSubmitCallbackResponse;
         }
@@ -126,6 +137,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (!hasSystemUserRole) {
             validateAndUpdateDwpHandlingOffice(sscsCaseData, preSubmitCallbackResponse);
             validateHearingOptions(sscsCaseData, preSubmitCallbackResponse);
+            validateAppellantCaseData(sscsCaseData, preSubmitCallbackResponse);
+            validateAppointeeCaseData(sscsCaseData, preSubmitCallbackResponse);
+            validateRepresentativeNameData(sscsCaseData, preSubmitCallbackResponse);
+            validateJointPartyNameData(sscsCaseData, preSubmitCallbackResponse);
         }
 
         return preSubmitCallbackResponse;
@@ -254,6 +269,104 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
+    private List<String> validatePartyCaseData(Entity entity, String partyType) {
+        List<String> listOfWarnings = new ArrayList<>();
+
+        if (entity != null) {
+
+            if (entity.getName() != null) {
+                if (StringUtils.isBlank(entity.getName().getFirstName())) {
+                    listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", partyType));
+                }
+                if (StringUtils.isBlank(entity.getName().getLastName())) {
+                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", partyType));
+                }
+            }
+            if (entity.getAddress() != null) {
+                if (StringUtils.isBlank(entity.getAddress().getLine1())) {
+                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 1", partyType));
+                }
+                if (StringUtils.isBlank(entity.getAddress().getLine2())) {
+                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 2", partyType));
+                }
+                if (StringUtils.isBlank(entity.getAddress().getPostcode())) {
+                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Postcode", partyType));
+                }
+            }
+            if (entity.getIdentity() != null) {
+                if (StringUtils.isBlank(entity.getIdentity().getDob())) {
+                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Date of Birth", partyType));
+                }
+                if (StringUtils.isBlank(entity.getIdentity().getNino())) {
+                    listOfWarnings.add(String.format(WARNING_MESSAGE, "National Insurance Number", partyType));
+                }
+            }
+        }
+        return listOfWarnings;
+    }
+
+
+    private void validateAppellantCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        Appellant appellantInfo = sscsCaseData.getAppeal().getAppellant();
+
+        List<String> warnings = validatePartyCaseData(appellantInfo, "Appellant");
+
+        if (!warnings.isEmpty()) {
+            response.addWarnings(warnings);
+        }
+    }
+
+    private void validateAppointeeCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
+        Appointee appointeeInfo = sscsCaseData.getAppeal().getAppellant().getAppointee();
+        String isAppointee = sscsCaseData.getAppeal().getAppellant().getIsAppointee();
+
+        if (isAppointee != null && isAppointee.equals("Yes") && appointeeInfo != null) {
+            List<String> warnings = validatePartyCaseData(appointeeInfo, "Appointee");
+
+            if (!warnings.isEmpty()) {
+                response.addWarnings(warnings);
+            }
+        }
+    }
+
+    private List<String> validateRepAndJointPartyCaseData(Entity entity, String entityType) {
+        List<String> listOfWarnings = new ArrayList<>();
+
+        if (entity != null) {
+            if (StringUtils.isBlank(entity.getName().getFirstName())) {
+                listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", entityType));
+            }
+            if (StringUtils.isBlank(entity.getName().getLastName())) {
+                listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", entityType));
+            }
+        }
+        return listOfWarnings;
+    }
+
+    private void validateRepresentativeNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
+        final boolean hasRepresentative = sscsCaseData.isThereARepresentative();
+
+        if (hasRepresentative) {
+            Representative representativeInfo = sscsCaseData.getAppeal().getRep();
+            List<String> warnings = validateRepAndJointPartyCaseData(representativeInfo, "Representative");
+            if (!warnings.isEmpty()) {
+                response.addWarnings(warnings);
+            }
+        }
+    }
+
+    private void validateJointPartyNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
+        JointParty jointPartyInfo = sscsCaseData.getJointParty();
+        final boolean hasJointParty = sscsCaseData.isThereAJointParty();
+
+        if (hasJointParty) {
+            List<String> warnings = validateRepAndJointPartyCaseData(jointPartyInfo, "Joint Party");
+            if (!warnings.isEmpty()) {
+                response.addWarnings(warnings);
+            }
+        }
+    }
+
     private void updateCaseName(Callback<SscsCaseData> callback, SscsCaseData caseData) {
         if (!caseAccessManagementFeature) {
             return;
@@ -333,5 +446,13 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         return sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
+    }
+
+    private void updateHearingOptionLanguageFromSelectedList(SscsCaseData sscsCaseData) {
+        HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+        if (hearingOptions != null) {
+            DynamicList languagesList = hearingOptions.getLanguagesList();
+            hearingOptions.setLanguages(isNull(languagesList) ? "" : languagesList.getValue().getLabel());
+        }
     }
 }

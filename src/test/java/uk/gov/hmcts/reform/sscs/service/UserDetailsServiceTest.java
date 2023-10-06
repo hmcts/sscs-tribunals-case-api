@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 
 @ExtendWith(MockitoExtension.class)
 class UserDetailsServiceTest {
@@ -25,11 +26,14 @@ class UserDetailsServiceTest {
     @Mock
     private IdamClient idamClient;
 
+    @Mock
+    private JudicialRefDataService judicialRefDataService;
+
     private UserDetailsService userDetailsService;
 
     @BeforeEach
     void setUp() {
-        userDetailsService = new UserDetailsService(idamClient);
+        userDetailsService = new UserDetailsService(idamClient, judicialRefDataService);
     }
 
     @Test
@@ -43,8 +47,8 @@ class UserDetailsServiceTest {
     @Test
     void givenUserNotFound_thenThrowAnException() {
         assertThatThrownBy(() -> userDetailsService.buildLoggedInUserName(USER_AUTHORISATION))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessageStartingWith("Unable to obtain signed in user details");
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageStartingWith("Unable to obtain signed in user details");
     }
 
     @Test
@@ -66,8 +70,8 @@ class UserDetailsServiceTest {
     @Test
     void givenUserInfoIsNull_thenThrowAnException() {
         assertThatThrownBy(() -> userDetailsService.getUserInfo(USER_AUTHORISATION))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessageStartingWith("Unable to obtain signed in user info");
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageStartingWith("Unable to obtain signed in user info");
     }
 
     @ParameterizedTest
@@ -87,5 +91,13 @@ class UserDetailsServiceTest {
         assertThat(userDetailsService.getUserRole(USER_AUTHORISATION)).isNull();
     }
 
+    @Test
+    void givenUserAuthorisation_thenReturnLoggedInUser() {
+        String idamId = "123";
+        UserInfo userDetails = UserInfo.builder().uid(idamId).build();
+        when(idamClient.getUserInfo(USER_AUTHORISATION)).thenReturn(userDetails);
+        when(judicialRefDataService.getJudicialUserFromIdamId(idamId)).thenReturn(new JudicialUserBase(idamId, "456"));
 
+        assertThat(userDetailsService.getLoggedInUserAsJudicialUser(USER_AUTHORISATION)).isEqualTo(new JudicialUserBase(idamId, "456"));
+    }
 }

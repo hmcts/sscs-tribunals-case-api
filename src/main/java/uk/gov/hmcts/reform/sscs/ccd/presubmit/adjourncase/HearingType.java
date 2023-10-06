@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public enum HearingType {
 
     FACE_TO_FACE("faceToFace", "face to face hearing", true),
@@ -10,12 +13,6 @@ public enum HearingType {
     final String key;
     final String value;
     final boolean isOralHearingType;
-
-    HearingType(String key, String value, boolean isOralHearingType) {
-        this.key = key;
-        this.value = value;
-        this.isOralHearingType = isOralHearingType;
-    }
 
     public static HearingType getByKey(String key) {
         for (HearingType mapping : HearingType.values()) {
