@@ -154,6 +154,7 @@ public class SubmitDraftTest {
         assertDraftCaseToSscsCaseResults("interlocutoryReviewState", ALL_DETAILS_FROM_DRAFT_WITH_INTERLOC_CCD.getSerializedMessage());
     }
 
+
     private void assertDraftCaseToSscsCaseResults(String expectedState, String expectedResponse) throws InterruptedException {
         LocalDate now = LocalDate.now();
         LocalDate interlocutoryReviewDate = now.minusMonths(13).minusDays(1);
