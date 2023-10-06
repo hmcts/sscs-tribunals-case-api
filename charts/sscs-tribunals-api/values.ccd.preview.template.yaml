@@ -166,7 +166,7 @@ ccd:
     devMode: true
     postgresHostname: "sscs-preview.postgres.database.azure.com"
     postgresSecret: postgres
-    databaseNamePrefix: "${CHANGE_ID}-"
+    databaseNamePrefix: "${CHANGE_ID}"
 
   am-role-assignment-service:
     java:
@@ -777,12 +777,12 @@ postgresql:
   flexibleserver: sscs-preview
   setup:
     databases:
-    - name: "${CHANGE_ID}-data-store"
-    - name: "${CHANGE_ID}-definition-store"
-    - name: "${CHANGE_ID}-user-profile"
-    - name: "${CHANGE_ID}-draftstore"
-    - name: "${CHANGE_ID}-evidence"
-    - name: "${CHANGE_ID}-annotation"
-    - name: "${CHANGE_ID}-role-assignment"
-    - name: "${CHANGE_ID}-hmc-cft-hearing-service"
-    - name: "${CHANGE_ID}-sscsjobscheduler"
+    - name: "${CHANGE_ID}data-store"
+    - name: "${CHANGE_ID}definition-store"
+    - name: "${CHANGE_ID}user-profile"
+    - name: "${CHANGE_ID}draftstore"
+    - name: "${CHANGE_ID}evidence"
+    - name: "${CHANGE_ID}annotation"
+    - name: "${CHANGE_ID}role-assignment"
+    - name: "${CHANGE_ID}hmc-cft-hearing-service"
+    - name: "${CHANGE_ID}sscsjobscheduler"
