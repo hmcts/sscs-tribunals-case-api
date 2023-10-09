@@ -266,7 +266,7 @@ ccd:
       01_input.conf: |
         input  {
           jdbc {
-            jdbc_connection_string => "jdbc:postgresql://sscs-flexibleserver-postgres-preview.postgres.database.azure.com:5432/{{ .Values.global.databaseNamePrefix }}data-store?sslmode=require&stringtype=unspecified"
+            jdbc_connection_string => "jdbc:postgresql://sscs-flexibleserver-postgres-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-data-store?sslmode=require&stringtype=unspecified"
             jdbc_user => "hmcts"
             jdbc_password_filepath => "/etc/logstash/secrets/PASSWORD"
             jdbc_validate_connection => true
