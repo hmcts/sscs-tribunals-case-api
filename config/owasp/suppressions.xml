@@ -10,7 +10,7 @@
   <suppress until="2023-12-01">
     <cve>CVE-2022-45688</cve>
   </suppress>
-  <suppress until = "2023-10-07">
+  <suppress until = "2023-12-07">
     <cve>CVE-2023-35116</cve>
     <cve>CVE-2023-2976</cve>
   </suppress>
@@ -25,7 +25,7 @@
     <packageUrl regex="true">^pkg:maven/com\.squareup\.okio/okio\-jvm@.*$</packageUrl>
     <cve>CVE-2023-3635</cve>
   </suppress>
-  <suppress until = "2023-10-07">
+  <suppress until = "2023-12-07">
     <notes><![CDATA[
     file name:tomcat-embed-websocket-9.0.78.jar
     ]]></notes>
