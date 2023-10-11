@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
 version: 0.0.117
@@ -65,6 +65,6 @@ dependencies:
     condition: servicebus.enabled
   - name: postgresql
     version: 1.0.2
-    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    repository: 'https://hmctspublic.azurecr.io/helm/v2/repo/'
     condition: postgresql.enabled
 
