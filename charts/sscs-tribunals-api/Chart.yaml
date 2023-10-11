@@ -65,6 +65,6 @@ dependencies:
     condition: servicebus.enabled
   - name: postgresql
     version: 1.0.2
-    repository: 'https://hmctspublic.azurecr.io/helm/v2/repo/'
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: postgresql.enabled
 
