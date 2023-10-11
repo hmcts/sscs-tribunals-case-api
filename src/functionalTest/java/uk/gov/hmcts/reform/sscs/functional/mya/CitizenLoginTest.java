@@ -29,14 +29,14 @@ public class CitizenLoginTest extends BaseFunctionTest {
         assertThat(onlineHearingForTya.length(), is(0));
 
         // Give ES time to index
-        Thread.sleep(3000L);
+        Thread.sleep(5000L);
 
         JSONObject jsonObject = sscsMyaBackendRequests.assignCaseToUser(appellantTya, userEmail, "TN32 6PL");
         Long expectedCaseId = Long.valueOf(ccdCase.getCaseId());
         assertThat(jsonObject.getLong("case_id"), is(expectedCaseId));
 
         // Wait for above request to finish
-        Thread.sleep(3000L);
+        Thread.sleep(5000L);
 
         onlineHearingForTya = sscsMyaBackendRequests.getOnlineHearingForCitizen("", userEmail);
         assertThat(onlineHearingForTya.length(), is(1));
@@ -52,14 +52,14 @@ public class CitizenLoginTest extends BaseFunctionTest {
         assertThat(onlineHearingForTya.length(), is(0));
 
         // Give ES time to index
-        Thread.sleep(3000L);
+        Thread.sleep(5000L);
 
         JSONObject jsonObject = sscsMyaBackendRequests.assignCaseToUser(jointPartyTya, userEmail, "TN32 6PL");
         Long expectedCaseId = Long.valueOf(ccdCase.getCaseId());
         assertThat(jsonObject.getLong("case_id"), is(expectedCaseId));
 
         // Wait for above request to finish
-        Thread.sleep(3000L);
+        Thread.sleep(5000L);
 
 
         onlineHearingForTya = sscsMyaBackendRequests.getOnlineHearingForCitizen("", userEmail);
@@ -71,12 +71,12 @@ public class CitizenLoginTest extends BaseFunctionTest {
     public void logUserWithCase_returnsNoContent() throws IOException, InterruptedException {
 
         // Give ES time to index
-        Thread.sleep(3000L);
+        Thread.sleep(5000L);
 
         sscsMyaBackendRequests.assignCaseToUser(ccdCase.getAppellantTya(), userEmail, "TN32 6PL");
 
         // Wait for above request to finish
-        Thread.sleep(3000L);
+        Thread.sleep(5000L);
 
         Long caseId = Long.valueOf(ccdCase.getCaseId());
         sscsMyaBackendRequests.logUserWithCase(caseId);
