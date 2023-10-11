@@ -240,6 +240,8 @@ public class SubmitDraftTest {
     public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() throws InterruptedException {
         Response response = saveDraft(draftAppeal);
 
+        Thread.sleep(1500);
+
         response.then()
             .statusCode(anyOf(is(HttpStatus.SC_OK), is(HttpStatus.SC_CREATED)))
             .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
