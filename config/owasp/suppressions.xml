@@ -41,4 +41,7 @@
    ]]></notes>
    <cve>CVE-2023-41080</cve>
   </suppress>
+  <suppress>
+    <cve>CVE-2023-4586</cve>
+  </suppress>
 </suppressions>
