@@ -373,11 +373,14 @@ dependencies {
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.8.0'
     implementation group: 'org.apache.tika', name: 'tika-parsers', version: '2.8.0'
 
-    implementation group: 'org.json', name: 'json', version: '20230227'
+    implementation group: 'org.json', name: 'json', version: '20230618'
 
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.7.1'
 
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.81"
+    
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.80'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.80'
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.13.0'
 
