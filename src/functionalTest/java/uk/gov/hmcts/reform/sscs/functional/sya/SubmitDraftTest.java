@@ -168,6 +168,8 @@ public class SubmitDraftTest {
                 .body(updateDraftCaseJsonWithMrnDateAndNino(mrnDate, nino))
                 .put("/drafts");
 
+        Thread.sleep(1500); //wait is added to give time for ES to update with ccd database
+
         SscsCaseData draft = findCase(citizenIdamTokens).get(0);
 
         String body = updateDraftCaseJsonWithMrnDateAndNino(mrnDate, nino).replace("CCD_CASE_ID", draft.getCcdCaseId());
@@ -233,13 +235,15 @@ public class SubmitDraftTest {
     }
 
     @Test
-    public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() {
+    public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() throws InterruptedException {
         Response response = saveDraft(draftAppeal);
 
         response.then()
             .statusCode(anyOf(is(HttpStatus.SC_OK), is(HttpStatus.SC_CREATED)))
             .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
         String responseHeader = response.getHeader(LOCATION_HEADER_NAME);
+
+        Thread.sleep(1500); //wait is added to give time for ES to update with ccd database
 
         Response response2 = saveDraft(draftAppeal);
 
