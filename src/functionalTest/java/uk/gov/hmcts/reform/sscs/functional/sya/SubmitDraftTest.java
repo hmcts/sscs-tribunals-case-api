@@ -237,7 +237,7 @@ public class SubmitDraftTest {
     }
 
     @Test
-    public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() throws InterruptedException{
+    public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() throws InterruptedException {
         Response response = saveDraft(draftAppeal);
 
         response.then()
