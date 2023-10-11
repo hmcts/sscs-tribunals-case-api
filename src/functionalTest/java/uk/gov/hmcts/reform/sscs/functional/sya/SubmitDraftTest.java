@@ -136,6 +136,9 @@ public class SubmitDraftTest {
             .put("/drafts");
 
         SscsCaseData draft = findCase(citizenIdamTokens).get(0);
+
+        Thread.sleep(1500);
+
         assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
     }
 
@@ -234,7 +237,7 @@ public class SubmitDraftTest {
     }
 
     @Test
-    public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() {
+    public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() throws InterruptedException{
         Response response = saveDraft(draftAppeal);
 
         response.then()
@@ -243,6 +246,8 @@ public class SubmitDraftTest {
         String responseHeader = response.getHeader(LOCATION_HEADER_NAME);
 
         Response response2 = saveDraft(draftAppeal);
+
+        Thread.sleep(1500); //wait is added to give time for ES to update with ccd database
 
         response2.then()
             .statusCode(HttpStatus.SC_OK)
@@ -278,6 +283,8 @@ public class SubmitDraftTest {
     @Test
     public void onceADraftIsArchived_itCannotBeRetrievedByTheCitizenUser() throws InterruptedException {
         saveDraft(draftAppeal);
+
+        Thread.sleep(1500);
 
         List<SscsCaseData> savedDrafts = findCase(citizenIdamTokens);
         assertTrue(CollectionUtils.isNotEmpty(savedDrafts));
