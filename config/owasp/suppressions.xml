@@ -32,7 +32,7 @@
     ]]></notes>
     <cve>CVE-2023-41080</cve>
   </suppress>
-  <suppress until = "2023-12-01">
+  <suppress until = "2023-10-01">
     <notes><![CDATA[
    file name: tomcat-embed-core-9.0.78.jar
    ]]></notes>
