@@ -135,9 +135,9 @@ public class SubmitDraftTest {
             .body(getAllDetailsDwpRegionalCentre("PIP", "DWP PIP (1)"))
             .put("/drafts");
 
-        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
-
         Thread.sleep(1500);
+
+        SscsCaseData draft = findCase(citizenIdamTokens).get(0);
 
         assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
     }
