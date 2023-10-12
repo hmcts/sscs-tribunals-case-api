@@ -578,11 +578,10 @@ sscs-tya-notif:
       AMQP_USERNAME: "RootManageSharedAccessKey"
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
-      JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
+      JOB_SCHEDULER_DB_NAME: "{{ .Values.global.databaseNamePrefix }}sscsjobscheduler"
       JOB_SCHEDULER_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       JOB_SCHEDULER_DB_USERNAME: hmcts
-      JOB_SCHEDULER_DB_PASSWORD: hmcts
       HOURS_START_TIME: 0
       HOURS_END_TIME: 23
       RUN_DB_MIGRATION_ON_STARTUP: true
@@ -594,6 +593,10 @@ sscs-tya-notif:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
         key: primaryKey
+      JOB_SCHEDULER_DB_PASSWORD:
+        secretRef: "{{ .Values.global.postgresSecret }}"
+        key: PASSWORD
+        disabled: false
     keyVaults:
       sscs:
         secrets:
