@@ -195,7 +195,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         }
 
         Adjournment adjournment = sscsCaseData.getAdjournment();
-        var interpreterRequired = adjournment.getInterpreterRequired();
+        YesNo interpreterRequired = adjournment.getInterpreterRequired();
         if (nonNull(interpreterRequired) && isYes(interpreterRequired)) {
             DynamicList interpreterLanguage = adjournment.getInterpreterLanguage();
             hearingOptions.setLanguages(nonNull(interpreterLanguage.getValue()) ? interpreterLanguage.getValue().getLabel() : NO.getValue());
@@ -345,21 +345,18 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
 
         if (STANDARD.equals(durationType)) {
-            OverrideFields defaultListingValues = caseData.getSchedulingAndListingFields().getDefaultListingValues();
-
-            if (nonNull(defaultListingValues)) {
-                Integer existingDuration = caseData.getSchedulingAndListingFields().getDefaultListingValues().getDuration();
-
-                if (nonNull(existingDuration)) {
-                    if (isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
-                            && isInterpreterRequired(caseData)) {
-                        return existingDuration + MIN_HEARING_DURATION;
-                    } else {
-                        return existingDuration;
-                    }
+            Integer existingDuration = caseData.getSchedulingAndListingFields().getDefaultListingValues().getDuration();
+            if (nonNull(existingDuration)) {
+                if (isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
+                    && isInterpreterRequired(caseData)) {
+                    return existingDuration + MIN_HEARING_DURATION;
+                } else {
+                    return existingDuration;
                 }
             }
-        } else if (NON_STANDARD.equals(durationType)) {
+        }
+
+        if (NON_STANDARD.equals(durationType)) {
             Integer nextDuration = caseData.getAdjournment().getNextHearingListingDuration();
             if (nonNull(nextDuration)) {
                 AdjournCaseNextHearingDurationUnits units = caseData.getAdjournment().getNextHearingListingDurationUnits();

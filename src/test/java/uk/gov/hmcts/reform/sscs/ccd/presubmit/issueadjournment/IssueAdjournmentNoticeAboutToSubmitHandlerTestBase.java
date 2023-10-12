@@ -127,7 +127,7 @@ abstract class IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
                 .build())
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .defaultListingValues(OverrideFields.builder().duration(45).build()).build())
-            .build();
+        .build();
     }
 
     protected PreSubmitCallbackResponse<SscsCaseData> cannotBeListedAndNoDirectionsGiven() {
