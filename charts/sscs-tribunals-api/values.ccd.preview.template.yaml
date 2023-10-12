@@ -2,7 +2,6 @@
 tags:
   sscs-ccd-idam-pr: true
 
-
 java:
   image: ${IMAGE_NAME}
   memoryLimits: "8Gi"
@@ -144,13 +143,27 @@ ccd:
       enabled: true
     apiGatewayWeb:
       enabled: true
+    postgresql:
+      enabled: true
     s2s:
       enabled: false
     elastic:
       enabled: true
-    ras:
-      enabled: true
 
+  postgresql:
+    primary:
+      initdb:
+        scripts:
+          init.sql: |
+            CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "draftstore" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "evidence" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "annotation" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "sscsjobscheduler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
 
   global:
     ccdApiGatewayIngress: ${SERVICE_NAME}-ccd-api-gw
@@ -164,9 +177,10 @@ ccd:
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     enableKeyVaults: true
     devMode: true
-    postgresHostname: "sscs-preview.postgres.database.azure.com"
-    postgresSecret: postgres
-    databaseNamePrefix: "pr-${CHANGE_ID}-"
+    postgresql:
+      auth:
+        postgresUsername: hmcts
+        postgresPassword: hmcts
 
   am-role-assignment-service:
     java:
@@ -177,9 +191,9 @@ ccd:
       readinessDelay: 240
       livenessDelay: 240
       environment:
-        ROLE_ASSIGNMENT_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-        ROLE_ASSIGNMENT_DB_NAME: "{{ .Values.global.databaseNamePrefix }}role-assignment"
-        ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
+        ROLE_ASSIGNMENT_DB_HOST: ${SERVICE_NAME}-postgresql
+        ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
+        ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
         AM_ROLE_ASSIGNMENT_SERVICE_SECRET: AAAAAAAAAAAAAAAA
         IDAM_USER_URL: "https://idam-web-public.aat.platform.hmcts.net"
         IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
@@ -195,7 +209,7 @@ ccd:
           secrets:
             - name: preview-ccd-db-username
               alias: ROLE_ASSIGNMENT_DB_USERNAME
-            - name: preview-ccd-db-password-2
+            - name: preview-ccd-db-password
               alias: ROLE_ASSIGNMENT_DB_PASSWORD
       secrets:
         LD_SDK_KEY:
@@ -226,7 +240,7 @@ ccd:
       - name: DATA_STORE_PASS
         value: hmcts
       - name: DATA_STORE_URL
-        value: "jdbc:postgresql://sscs-preview.postgres.database.azure.com:5432/{{ .Values.global.databaseNamePrefix }}data-store?sslmode=require&stringtype=unspecified"
+        value: "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified"
       - name: DATA_STORE_USER
         value: hmcts
       - name: ES_HOSTS
@@ -241,15 +255,9 @@ ccd:
     extraVolumes: |
       - name: logstash-lib
         emptyDir: {}
-      - name: database-secret-volume
-        secret:
-          secretName: postgres
     extraVolumeMounts: |
       - name: logstash-lib
         mountPath: /usr/share/logstash/ccd
-      - name: database-secret-volume
-        mountPath: /etc/logstash/secrets
-        readOnly: true
     logstashConfig:
       logstash.yml: |
         http.host: 0.0.0.0
@@ -266,9 +274,9 @@ ccd:
       01_input.conf: |
         input  {
           jdbc {
-            jdbc_connection_string => "jdbc:postgresql://sscs-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-data-store?sslmode=require&stringtype=unspecified"
+            jdbc_connection_string => "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified"
             jdbc_user => "hmcts"
-            jdbc_password_filepath => "/etc/logstash/secrets/PASSWORD"
+            jdbc_password => "hmcts"
             jdbc_validate_connection => true
             jdbc_validation_timeout => "1"
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
@@ -412,7 +420,7 @@ ccd:
       image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
       imagePullPolicy: Always
       enviroment:
-        USER_PROFILE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
+        USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
         USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
         USER_PROFILE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_definition,ccd_admin,sscs
       keyVaults: [ ]
@@ -422,7 +430,7 @@ ccd:
       image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
       imagePullPolicy: Always
       environment:
-        DEFINITION_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
+        DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator,ccd_case_document_am_api
@@ -440,7 +448,7 @@ ccd:
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
       environment:
-        DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
+        DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
         DEFINITION_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
@@ -457,7 +465,7 @@ ccd:
         DATA_STORE_DB_MAX_POOL_SIZE: 80
         CCD_DOCUMENT_URL_PATTERN: 'http://dm-store.*'
         CASE_DOCUMENT_AM_URL: http://${SERVICE_NAME}-ccd-case-document-am-api
-        DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
+        DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
         IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
         IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
@@ -520,6 +528,7 @@ ccd:
       - caseworker-sscs-anonymouscitizen
       - caseworker-sscs-callagent
       - caseworker-sscs-judge
+      - caseworker-sscs-judge-salaried
       - caseworker-sscs-clerk
       - caseworker-sscs-dwpresponsewriter
       - caseworker-sscs-registrar
@@ -578,10 +587,11 @@ sscs-tya-notif:
       AMQP_USERNAME: "RootManageSharedAccessKey"
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
-      JOB_SCHEDULER_DB_NAME: "{{ .Values.global.databaseNamePrefix }}sscsjobscheduler"
-      JOB_SCHEDULER_DB_HOST: "{{ tpl .Values.global.postgresHostname $}}"
-      JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
+      JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
+      JOB_SCHEDULER_DB_HOST: ${SERVICE_NAME}-postgresql
+      JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
       JOB_SCHEDULER_DB_USERNAME: hmcts
+      JOB_SCHEDULER_DB_PASSWORD: hmcts
       HOURS_START_TIME: 0
       HOURS_END_TIME: 23
       RUN_DB_MIGRATION_ON_STARTUP: true
@@ -593,10 +603,6 @@ sscs-tya-notif:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
         key: primaryKey
-      JOB_SCHEDULER_DB_PASSWORD:
-        secretRef: "{{ .Values.global.postgresSecret }}"
-        key: PASSWORD
-        disabled: false
     keyVaults:
       sscs:
         secrets:
@@ -727,9 +733,9 @@ hmc-cft-hearing-service:
       HMC_SERVICE_BUS_SUBSCRIPTION: "hmc-to-sscs-subscription"
       HMC_SERVICE_BUS_QUEUE: hmc-from-hmi
       HMC_OUTBOUND_SERVICE_BUS_QUEUE: hmc-to-hmi
-      CFT_HEARING_SERVICE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-      CFT_HEARING_SERVICE_DB_NAME: "{{ .Values.global.databaseNamePrefix }}hmc-cft-hearing-service"
-      CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
+      CFT_HEARING_SERVICE_DB_HOST: "${SERVICE_NAME}-postgresql"
+      CFT_HEARING_SERVICE_DB_NAME: "hmc-cft-hearing-service"
+      CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
       CFT_HEARING_SERVICE_DB_PORT: 5432
       HMC_ACCESS_CONTROL_ENABLED: false
       ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
@@ -744,10 +750,6 @@ hmc-cft-hearing-service:
       HMC_OUTBOUND_QUEUE_CONNECTION_STRING:
         secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-to-hmi
         key: connectionString
-      CFT_HEARING_SERVICE_DB_PASSWORD:
-        secretRef: "{{ .Values.global.postgresSecret }}"
-        key: PASSWORD
-        disabled: false
     keyVaults:
       hmc:
         resourceGroup: hmc-shared
@@ -757,6 +759,8 @@ hmc-cft-hearing-service:
         secrets:
           - name: preview-ccd-db-username
             alias: CFT_HEARING_SERVICE_DB_USERNAME
+          - name: preview-ccd-db-password
+            alias: CFT_HEARING_SERVICE_DB_PASSWORD
 
 #Enable for queues/topics
 #If you need a subscription for a topic, topic name should be not longer than 10 characters
@@ -771,18 +775,3 @@ servicebus:
         subscriptionNeeded: yes
     queues:
       - name: sscs-orchestrator-queue-preview
-
-postgresql:
-  enabled: true
-  flexibleserver: sscs-preview
-  setup:
-    databases:
-    - name: "pr-${CHANGE_ID}-data-store"
-    - name: "pr-${CHANGE_ID}-definition-store"
-    - name: "pr-${CHANGE_ID}-user-profile"
-    - name: "pr-${CHANGE_ID}-draftstore"
-    - name: "pr-${CHANGE_ID}-evidence"
-    - name: "pr-${CHANGE_ID}-annotation"
-    - name: "pr-${CHANGE_ID}-role-assignment"
-    - name: "pr-${CHANGE_ID}-hmc-cft-hearing-service"
-    - name: "pr-${CHANGE_ID}-sscsjobscheduler"
