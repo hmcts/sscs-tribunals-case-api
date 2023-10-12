@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.managewelshdocuments;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,15 +15,20 @@ import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 
 @RunWith(JUnitParamsRunner.class)
-public class ManageWelshDocumentsAboutToSubmitHandlerTest {
+public class UploadDocumentWorkAllocationHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private ManageWelshDocumentsAboutToSubmitHandler handler = new ManageWelshDocumentsAboutToSubmitHandler(
+    private UploadDocumentWorkAllocationHandler handler = new UploadDocumentWorkAllocationHandler(
             new AddedDocumentsUtil(true), true);
 
     @Before
@@ -42,67 +47,67 @@ public class ManageWelshDocumentsAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenNewDocumentAddedNoPreviousCaseData_thenSetUploadedWelshDocumentTypes() {
+    public void givenNewDocumentAddedNoPreviousCaseData_thenSetScannedDocumentTypes() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
-                .sscsWelshDocuments(Arrays.asList(
-                        SscsWelshDocument.builder().id("111-111").value(SscsWelshDocumentDetails.builder().documentType("confidentialityRequest").build()).build()
+                .sscsDocument(Arrays.asList(
+                        SscsDocument.builder().id("111-111").value(SscsDocumentDetails.builder().documentType("confidentialityRequest").build()).build()
                 )).build();
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, createCallBack(null, sscsCaseData), USER_AUTHORISATION);
 
-        assertEquals(Arrays.asList("confidentialityRequest"), response.getData().getWorkAllocationFields().getUploadedWelshDocumentTypes());
+        assertEquals(Arrays.asList("confidentialityRequest"), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
     }
 
     @Test
-    public void givenCaseHasNoExistingDocumentsNewDocumentAdded_thenSetUploadedWelshDocumentTypes() {
+    public void givenCaseHasNoExistingDocumentsNewDocumentAdded_thenSetScannedDocumentTypes() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
-                .sscsWelshDocuments(Arrays.asList(
-                        SscsWelshDocument.builder().id("111-111").value(SscsWelshDocumentDetails.builder().documentType("confidentialityRequest").build()).build()
+                .sscsDocument(Arrays.asList(
+                        SscsDocument.builder().id("111-111").value(SscsDocumentDetails.builder().documentType("confidentialityRequest").build()).build()
                 )).build();
 
         SscsCaseData sscsCaseDataBefore = SscsCaseData.builder().build();
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, createCallBack(sscsCaseDataBefore, sscsCaseData), USER_AUTHORISATION);
 
-        assertEquals(Arrays.asList("confidentialityRequest"), response.getData().getWorkAllocationFields().getUploadedWelshDocumentTypes());
+        assertEquals(Arrays.asList("confidentialityRequest"), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
     }
 
     @Test
-    public void givenCaseHasExistingDocumentsNewDocumentAdded_thenSetUploadedWelshDocumentTypes() {
+    public void givenCaseHasExistingDocumentsNewDocumentAdded_thenSetScannedDocumentTypes() {
         SscsCaseData sscsCaseDataBefore =  SscsCaseData.builder()
-                .sscsWelshDocuments(Arrays.asList(
-                        SscsWelshDocument.builder().id("111-111").value(SscsWelshDocumentDetails.builder().documentType("other").build()).build()
+                .sscsDocument(Arrays.asList(
+                        SscsDocument.builder().id("111-111").value(SscsDocumentDetails.builder().documentType("other").build()).build()
                 )).build();
         SscsCaseData sscsCaseData = SscsCaseData.builder()
-                .sscsWelshDocuments(Arrays.asList(
-                        SscsWelshDocument.builder().id("111-111").value(SscsWelshDocumentDetails.builder().documentType("other").build()).build(),
-                        SscsWelshDocument.builder().id("222-222").value(SscsWelshDocumentDetails.builder().documentType("confidentialityRequest").build()).build()
+                .sscsDocument(Arrays.asList(
+                        SscsDocument.builder().id("111-111").value(SscsDocumentDetails.builder().documentType("other").build()).build(),
+                        SscsDocument.builder().id("222-222").value(SscsDocumentDetails.builder().documentType("confidentialityRequest").build()).build()
                 )).build();
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, createCallBack(sscsCaseDataBefore, sscsCaseData), USER_AUTHORISATION);
 
-        assertEquals(Arrays.asList("confidentialityRequest"), response.getData().getWorkAllocationFields().getUploadedWelshDocumentTypes());
+        assertEquals(Arrays.asList("confidentialityRequest"), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
     }
 
     @Test
-    public void givenExistingDocumentChangedType_thenSetUploadedWelshDocumentTypes() {
+    public void givenExistingDocumentChangedType_thenSetScannedDocumentTypes() {
         SscsCaseData sscsCaseDataBefore = SscsCaseData.builder()
-            .sscsWelshDocuments(Arrays.asList(
-                SscsWelshDocument.builder().id("111-111").value(SscsWelshDocumentDetails.builder().documentType("other").build()).build()
-            )).build();
+                .sscsDocument(Arrays.asList(
+                        SscsDocument.builder().id("111-111").value(SscsDocumentDetails.builder().documentType("other").build()).build()
+                )).build();
 
         SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .sscsWelshDocuments(Arrays.asList(
-                SscsWelshDocument.builder().id("111-111").value(SscsWelshDocumentDetails.builder().documentType("confidentialityRequest").build()).build()
-            )).build();
+                .sscsDocument(Arrays.asList(
+                        SscsDocument.builder().id("111-111").value(SscsDocumentDetails.builder().documentType("confidentialityRequest").build()).build()
+                )).build();
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, createCallBack(sscsCaseDataBefore, sscsCaseData), USER_AUTHORISATION);
 
-        assertEquals(Arrays.asList("confidentialityRequest"), response.getData().getWorkAllocationFields().getUploadedWelshDocumentTypes());
+        assertEquals(Arrays.asList("confidentialityRequest"), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
     }
 
     private Callback<SscsCaseData> createCallBack(SscsCaseData sscsCaseDataBefore, SscsCaseData sscsCaseData) {
-        return createCallBack(EventType.MANAGE_WELSH_DOCUMENTS, sscsCaseDataBefore, sscsCaseData);
+        return createCallBack(EventType.UPLOAD_DOCUMENT, sscsCaseDataBefore, sscsCaseData);
     }
 
     private Callback<SscsCaseData> createCallBack(EventType event, SscsCaseData sscsCaseDataBefore, SscsCaseData sscsCaseData) {
