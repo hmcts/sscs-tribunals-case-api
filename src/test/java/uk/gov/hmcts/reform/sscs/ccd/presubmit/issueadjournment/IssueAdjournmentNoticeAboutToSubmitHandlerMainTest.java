@@ -11,6 +11,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
@@ -82,6 +83,25 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
 
         var hearingEpimsIds = overrideFields.getHearingVenueEpimsIds();
         assertThat(hearingEpimsIds).isNotNull().hasSize(1).allMatch(b -> b.getValue().getValue().equals(epimsId));
+    }
+
+    @DisplayName("Duration is set as existing duration when standard timeslot selected during adjournment")
+    @Test
+    void givenStandardDurationSelectedShouldSetExistingDuration() {
+        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+
+        var adjournment = sscsCaseData.getAdjournment();
+        adjournment.setNextHearingListingDuration(60);
+        adjournment.setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.STANDARD);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        var schedulingAndListingFields = response.getData().getSchedulingAndListingFields();
+        assertThat(schedulingAndListingFields).isNotNull();
+
+        var overrideFields = schedulingAndListingFields.getDefaultListingValues();
+        assertThat(overrideFields).isNotNull();
+        assertThat(overrideFields.getDuration()).isEqualTo(45);
     }
 
     @DisplayName("Duration in sessions should be correctly converted in minutes in override duration field")
