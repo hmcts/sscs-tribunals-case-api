@@ -7,7 +7,6 @@
     <packageUrl regex="true">^pkg:maven/commons\-fileupload/commons\-fileupload@.*$</packageUrl>
     <cve>CVE-2023-24998</cve>
   </suppress>
-  <suppress until="2023-12-01">
   <suppress until="2023-12-07">
     <notes><![CDATA[
    file name: json-20230227.jar
