@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -77,6 +78,7 @@ public class AddedDocumentsUtil {
             return documents.stream()
                     .filter(d -> isNewDocumentOrTypeChanged(existingDocumentTypes, d))
                     .map(d -> d.getValue().getDocumentType())
+                    .filter(Objects::nonNull)
                     .distinct()
                     .collect(Collectors.toList());
         }

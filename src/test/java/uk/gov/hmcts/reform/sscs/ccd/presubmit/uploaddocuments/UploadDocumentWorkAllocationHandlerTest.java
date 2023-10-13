@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
@@ -104,6 +105,20 @@ public class UploadDocumentWorkAllocationHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, createCallBack(sscsCaseDataBefore, sscsCaseData), USER_AUTHORISATION);
 
         assertEquals(Arrays.asList("confidentialityRequest"), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
+    }
+
+    @Test
+    public void givenDocumentWithNullTypeAdded_thenSetScannedDocumentTypes() {
+        SscsCaseData sscsCaseDataBefore = SscsCaseData.builder().build();
+
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+                .sscsDocument(Arrays.asList(
+                        SscsDocument.builder().id("111-111").value(SscsDocumentDetails.builder().build()).build()
+                )).build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, createCallBack(sscsCaseDataBefore, sscsCaseData), USER_AUTHORISATION);
+
+        assertEquals(new ArrayList<String>(), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
     }
 
     private Callback<SscsCaseData> createCallBack(SscsCaseData sscsCaseDataBefore, SscsCaseData sscsCaseData) {
