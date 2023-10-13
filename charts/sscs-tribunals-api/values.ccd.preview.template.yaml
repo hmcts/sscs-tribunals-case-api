@@ -668,6 +668,43 @@ sscs-tribunals-frontend:
           - sscs-redis-access-key
           - sscs-redis-connection-string
 
+#Enable for MYA
+sscs-cor-frontend:
+  enabled: true
+  nodejs:
+    memoryLimits: "2Gi"
+    cpuLimits: 2000m
+    image: hmctspublic.azurecr.io/sscs-cor/frontend:latest
+    ingressHost: mya-${SERVICE_FQDN}
+    environment:
+      IDAM_ENABLE_STUB: false
+      REDIS_HOST: ${SERVICE_NAME}-redis-master
+      REDIS_PORT: 6380
+      SSCS_API_URL: http://${SERVICE_NAME}-java
+      IDAM_URL: https://idam-web-public.aat.platform.hmcts.net
+      IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+      TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
+      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      NODE_ENV: preview
+      HTTP_PROTOCOL: http
+      UV_THREADPOOL_SIZE: 64
+      MYA_FEATURE_FLAG: true
+      MEDIA_FILES_ALLOWED_ENABLED: true
+      POST_BULK_SCAN: true
+      HEARING_OUTCOME_TAB_ENABLED: false
+      REQUEST_TAB_ENABLED: true
+      FT_WELSH: true
+    keyVaults:
+      sscs:
+        secrets:
+          - sscs-cor-idam-client-secret
+          - sscs-s2s-secret
+          - sscs-cor-redis-access-key
+          - sscs-cor-redis-connection-string
+          - tyacookiesecret
+          - idam-sscs-oauth2-client-secret
+          - AppInsightsInstrumentationKey
+
 redis:
   enabled: true
   replica:
