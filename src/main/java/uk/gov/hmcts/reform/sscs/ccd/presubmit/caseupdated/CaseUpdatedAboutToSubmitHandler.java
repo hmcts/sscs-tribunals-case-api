@@ -312,17 +312,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", partyType));
                 }
             }
-            if (entity.getAddress() != null) {
-                if (StringUtils.isBlank(entity.getAddress().getLine1())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 1", partyType));
-                }
-                if (StringUtils.isBlank(entity.getAddress().getLine2())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 2", partyType));
-                }
-                if (StringUtils.isBlank(entity.getAddress().getPostcode())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Postcode", partyType));
-                }
-            }
             if (entity.getIdentity() != null) {
                 if (StringUtils.isBlank(entity.getIdentity().getDob())) {
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "Date of Birth", partyType));
