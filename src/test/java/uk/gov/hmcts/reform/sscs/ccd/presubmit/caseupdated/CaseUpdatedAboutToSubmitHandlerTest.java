@@ -348,7 +348,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         caseData.getAppellant().setIdentity(new Identity("", ""));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getWarnings().size(), is(7));
+        assertThat(response.getWarnings().size(), is(4));
     }
 
     @Test
@@ -364,7 +364,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setHasOtherPartyAppointee(YES);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getWarnings().size(), is(7));
+        assertThat(response.getWarnings().size(), is(4));
     }
 
     @Test
