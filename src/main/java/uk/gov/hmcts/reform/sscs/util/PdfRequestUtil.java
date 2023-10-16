@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -27,6 +26,10 @@ public class PdfRequestUtil {
     private static String requestDetails;
     private static String title;
     private static StringBuilder additionalRequestDetails;
+
+    private PdfRequestUtil() {
+        //
+    }
 
     @AllArgsConstructor
     public enum PdfType {
