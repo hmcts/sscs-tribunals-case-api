@@ -55,7 +55,6 @@
         }
       ],
       "dynamicDwpState" : {
-
         "value" : {
           "code": "withdrawalReceived",
           "label": "Withdrawal received"
