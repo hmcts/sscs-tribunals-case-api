@@ -4,6 +4,8 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
+import java.util.Arrays;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -12,9 +14,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Component
 @Slf4j
@@ -25,8 +24,7 @@ public class DwpUploadResponseAboutToStartHandler extends ResponseEventsAboutToS
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbackType must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_START)
-                && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE;
+        return callbackType.equals(CallbackType.ABOUT_TO_START) && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE;
     }
 
     @Override

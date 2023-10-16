@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
@@ -36,7 +37,10 @@ public class DwpUploadResponseAboutToStartHandlerTest {
     public void setUp() {
         openMocks(this);
         dwpUploadResponseAboutToStartHandler = new DwpUploadResponseAboutToStartHandler();
-        SscsCaseData sscsCaseData = SscsCaseData.builder().createdInGapsFrom(READY_TO_LIST.getId()).build();
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+                .createdInGapsFrom(READY_TO_LIST.getId())
+                .dynamicDwpState(new DynamicList(""))
+                .build();
         when(callback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
