@@ -55,9 +55,8 @@
         }
       ],
       "dynamicDwpState" : {
-        "value" : "",
-        "listItems" : [
-
+        "value" : "withdrawalReceived",
+        "list_items" : [
         ]
       },
       "dwpTimeExtension": [
