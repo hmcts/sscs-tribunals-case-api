@@ -29,7 +29,7 @@ class SscsUtilTest {
     void setUp() {
         postHearing = PostHearing.builder()
             .correction(Correction.builder()
-                .correctionFinalDecisionInProgress(YesNo.NO)
+                .isCorrectionFinalDecisionInProgress(YesNo.NO)
                 .build())
             .build();
 
@@ -143,19 +143,19 @@ class SscsUtilTest {
 
     @Test
     void givenPostHearingsFlagIsTrueAndCorrectionInProgress_shouldReturnDraftCorrectedDecisionNotice() {
-        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
+        postHearing.getCorrection().setIsCorrectionFinalDecisionInProgress(YesNo.YES);
         assertThat(getWriteFinalDecisionDocumentType(caseData, true)).isEqualTo(DRAFT_CORRECTED_NOTICE);
     }
 
     @Test
     void givenPostHearingsFlagIsFalseAndCorrectionInProgress_shouldReturnDraftDecisionNotice() {
-        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
+        postHearing.getCorrection().setIsCorrectionFinalDecisionInProgress(YesNo.YES);
         assertThat(getWriteFinalDecisionDocumentType(caseData, false)).isEqualTo(DRAFT_DECISION_NOTICE);
     }
 
     @Test
     void givenPostHearingsFlagIsTrueAndCorrectionInProgress_shouldReturnCorrectionGranted() {
-        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
+        postHearing.getCorrection().setIsCorrectionFinalDecisionInProgress(YesNo.YES);
         assertThat(getIssueFinalDecisionDocumentType(caseData, true)).isEqualTo(CORRECTION_GRANTED);
     }
 
@@ -166,7 +166,7 @@ class SscsUtilTest {
 
     @Test
     void givenPostHearingsFlagIsFalseAndCorrectionInProgress_shouldReturnFinalDecisionNotice() {
-        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
+        postHearing.getCorrection().setIsCorrectionFinalDecisionInProgress(YesNo.YES);
         assertThat(getIssueFinalDecisionDocumentType(caseData, false)).isEqualTo(FINAL_DECISION_NOTICE);
     }
   

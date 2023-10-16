@@ -358,7 +358,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     @Test
     public void givenAnIssueFinalDecisionEventWithPostHearingsTrueAndCorrectionInProgress_dontUpdateState() {
         ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", true);
-        sscsCaseData.getPostHearing().getCorrection().setCorrectionFinalDecisionInProgress(YES);
+        sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(YES);
         SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
         sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
         sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");

@@ -56,7 +56,7 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
         SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);
 
         if (!isPostHearingsEnabled
-                || isNoOrNull(sscsCaseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
+                || isNoOrNull(sscsCaseData.getPostHearing().getCorrection().getIsCorrectionFinalDecisionInProgress())) {
             clearTransientFields(sscsCaseData);
         }
 
