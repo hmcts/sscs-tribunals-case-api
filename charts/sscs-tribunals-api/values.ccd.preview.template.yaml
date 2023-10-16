@@ -675,6 +675,7 @@ sscs-cor-frontend:
     memoryLimits: "2Gi"
     cpuLimits: 2000m
     image: hmctspublic.azurecr.io/sscs-cor/frontend:latest
+    releaseNameOverride: ${SERVICE_NAME}-sscs-cor-frontend
     ingressHost: mya-${SERVICE_FQDN}
     environment:
       IDAM_ENABLE_STUB: false
