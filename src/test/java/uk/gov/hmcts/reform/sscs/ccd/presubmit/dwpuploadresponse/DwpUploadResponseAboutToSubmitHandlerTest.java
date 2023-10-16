@@ -123,6 +123,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             .benefitCode("002")
             .issueCode("CC")
             .dwpFurtherInfo("Yes")
+            .dynamicDwpState(new DynamicList(""))
             .dwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build()).build())
             .dwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build()).build())
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
