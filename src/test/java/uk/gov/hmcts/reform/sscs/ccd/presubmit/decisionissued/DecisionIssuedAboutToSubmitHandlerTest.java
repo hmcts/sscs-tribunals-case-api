@@ -156,7 +156,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         sscsCaseData.setDecisionType(decisionType);
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        DwpStates currentDwpState = response.getData().getDwpState();
+        DwpState currentDwpState = response.getData().getDwpState();
         String assertionMsg = "dwpState value (%s) is not as expected (%s)";
         assertEquals(String.format(assertionMsg, currentDwpState, expectedDwpState), expectedDwpState, currentDwpState);
         assertEquals(expectedInterlocReviewState, response.getData().getInterlocReviewState());
