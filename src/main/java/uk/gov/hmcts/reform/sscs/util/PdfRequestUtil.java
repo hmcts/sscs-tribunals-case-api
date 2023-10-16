@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.PdfRequestTemplateBody;
 
 @Slf4j
-@NoArgsConstructor
 public class PdfRequestUtil {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     public static final String POST_HEARING_REQUEST_FILE_SUFFIX = " Application from FTA.pdf";
