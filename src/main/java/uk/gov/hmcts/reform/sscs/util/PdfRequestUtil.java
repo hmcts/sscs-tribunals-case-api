@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.PdfRequestTemplateBody;
 
 @Slf4j
+@NoArgsConstructor
 public class PdfRequestUtil {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     public static final String POST_HEARING_REQUEST_FILE_SUFFIX = " Application from FTA.pdf";
@@ -26,10 +28,6 @@ public class PdfRequestUtil {
     private static String requestDetails;
     private static String title;
     private static StringBuilder additionalRequestDetails;
-
-    private PdfRequestUtil() {
-        //
-    }
 
     @AllArgsConstructor
     public enum PdfType {
