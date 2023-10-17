@@ -126,11 +126,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         writeFinalDecisionBuilder.isSetAside(isSetAside(caseData, outcome));
 
-        if (caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision() != null) {
-            writeFinalDecisionBuilder.dateOfDecision(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision());
-        } else {
-            writeFinalDecisionBuilder.dateOfDecision(null);
-        }
+        writeFinalDecisionBuilder.dateOfDecision(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision());
 
         writeFinalDecisionBuilder.appellantName(buildName(caseData, false));
         if ("na".equals(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType())) {
