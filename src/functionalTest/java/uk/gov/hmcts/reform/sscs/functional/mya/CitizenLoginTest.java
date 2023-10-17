@@ -15,6 +15,7 @@ public class CitizenLoginTest extends BaseFunctionTest {
 
     CreatedCcdCase ccdCase;
     String userEmail;
+
     @Before
     public void setup() throws IOException {
         userEmail = createRandomEmail();
