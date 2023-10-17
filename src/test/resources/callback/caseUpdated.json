@@ -130,6 +130,18 @@
         "postcode": "B16 6FR",
         "city": "BIRMINGHAM"
       },
+      "jointPartyName": {
+          "title": "Mr",
+          "lastName": "Will",
+          "firstName": "Harris"
+        },
+        "jointPartyAddress": {
+          "town": "Town",
+          "line1": "123 Add Lane",
+          "line2": "Testing Park",
+          "county": "County",
+          "postcode": "FS3 3ST"
+        },
       "appeal": {
         "mrnDetails": {},
         "appellant": {
@@ -154,7 +166,20 @@
             "dob": "1900-01-01",
             "nino": "JT 12 34 56 D"
           },
-          "appointee": null,
+          "appointee": {
+            "name": {
+              "title": "Miss",
+              "firstName": "Anne",
+              "lastName": "Test"
+            },
+            "address": {
+              "line1": "4 Park Close",
+              "line2": "Hutton",
+              "town": "Brentwood",
+              "county": "Essex",
+              "postcode": "CM13 1AQ"
+            }
+          },
           "isAddressSameAsAppointee": null
         },
         "benefitType": {

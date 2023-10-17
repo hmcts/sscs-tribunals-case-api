@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
@@ -14,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.validation.ConstraintValidatorContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler;
+import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -51,8 +52,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final VenueService venueService;
     private final SessionCategoryMapService categoryMapService;
     private final boolean caseAccessManagementFeature;
+    private PostcodeValidator postcodeValidator = new PostcodeValidator();
+    private static ConstraintValidatorContext context;
+
 
     private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
+
 
     @SuppressWarnings("squid:S107")
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
@@ -137,6 +142,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (!hasSystemUserRole) {
             validateAndUpdateDwpHandlingOffice(sscsCaseData, preSubmitCallbackResponse);
             validateHearingOptions(sscsCaseData, preSubmitCallbackResponse);
+            validatingPartyAddresses(sscsCaseData, preSubmitCallbackResponse);
             validateAppellantCaseData(sscsCaseData, preSubmitCallbackResponse);
             validateAppointeeCaseData(sscsCaseData, preSubmitCallbackResponse);
             validateRepresentativeNameData(sscsCaseData, preSubmitCallbackResponse);
@@ -144,6 +150,30 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         return preSubmitCallbackResponse;
+    }
+
+    private void validateAddressAndPostcode(PreSubmitCallbackResponse<SscsCaseData> response, Entity party, String partyName) {
+        String addressLine1 = party.getAddress().getLine1();
+        String postcode = party.getAddress().getPostcode();
+
+        if (isBlank(addressLine1)) {
+            response.addError("You must enter address line 1 for the " + partyName);
+        }
+
+        if (isBlank(postcode) || !isBlank(postcode) && !postcodeValidator.isValid(postcode, context)) {
+            response.addError("You must enter a valid UK postcode for the " + partyName);
+        }
+    }
+
+    private void validatingPartyAddresses(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant(), "appellant");
+        validateAddressAndPostcode(response, sscsCaseData.getAppeal().getRep(), "representative");
+        validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant().getAppointee(), "appointee");
+
+        final boolean hasJointParty = sscsCaseData.isThereAJointParty();
+        if (hasJointParty) {
+            validateAddressAndPostcode(response, sscsCaseData.getJointParty(), "joint party");
+        }
     }
 
     private void validateAndUpdateDwpHandlingOffice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
@@ -280,17 +310,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                 }
                 if (StringUtils.isBlank(entity.getName().getLastName())) {
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", partyType));
-                }
-            }
-            if (entity.getAddress() != null) {
-                if (StringUtils.isBlank(entity.getAddress().getLine1())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 1", partyType));
-                }
-                if (StringUtils.isBlank(entity.getAddress().getLine2())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 2", partyType));
-                }
-                if (StringUtils.isBlank(entity.getAddress().getPostcode())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Postcode", partyType));
                 }
             }
             if (entity.getIdentity() != null) {
