@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.config;
 
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.isNull;
@@ -68,8 +69,19 @@ public class CitizenCcdClientTest {
     }
 
     @Test
-    public void shouldInvokeCoreCaseDataApiWhenSearchingForADraft() {
+    public void shouldInvokeCoreCaseDataApiWhenSearchingForADraftWhenElasticSearchDisabled() {
         citizenCcdClient.searchForCitizen(idamTokens);
+
+        verify(coreCaseDataApi)
+                .searchForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit"), anyMap());
+
+    }
+
+    @Test
+    public void shouldInvokeCoreCaseDataApiWhenSearchingForADraftWhenElasticSearchEnabled() {
+        citizenCcdClient = new CitizenCcdClient(ccdRequestDetails, coreCaseDataApi, caseAccessApi, true);
+        citizenCcdClient.searchForCitizen(idamTokens);
+
 
         verify(coreCaseDataApi)
                 .searchCases(eq("token"), eq("s2s"), eq("Benefit"), anyString());

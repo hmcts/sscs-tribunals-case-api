@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.config;
 
 import java.util.*;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,14 +24,13 @@ public class CitizenCcdClient {
     private final CcdRequestDetails ccdRequestDetails;
     private final CoreCaseDataApi coreCaseDataApi;
     private final CaseAccessApi caseAccessApi;
-
-    @Value("${feature.elasticsearch.enabled}")
     private final boolean elasticSearchEnabled;
 
     @Autowired
     CitizenCcdClient(CcdRequestDetails ccdRequestDetails,
                      CoreCaseDataApi coreCaseDataApi,
-                     CaseAccessApi caseAccessApi, boolean elasticSearchEnabled) {
+                     CaseAccessApi caseAccessApi,
+                     @Value("${feature.elasticsearch.enabled}") boolean elasticSearchEnabled) {
         this.ccdRequestDetails = ccdRequestDetails;
         this.coreCaseDataApi = coreCaseDataApi;
         this.caseAccessApi = caseAccessApi;
@@ -64,7 +62,7 @@ public class CitizenCcdClient {
     @Retryable
     public List<CaseDetails> searchForCitizen(IdamTokens idamTokens) {
         log.info("Searching cases for citizen");
-        if(elasticSearchEnabled) {
+        if (elasticSearchEnabled) {
             String searchCriteria = buildQuery("state", State.DRAFT.getId());
             SearchResult searchResult = coreCaseDataApi.searchCases(
                     idamTokens.getIdamOauth2Token(),
@@ -72,8 +70,7 @@ public class CitizenCcdClient {
                     ccdRequestDetails.getCaseTypeId(),
                     searchCriteria);
             return Optional.ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
-        }
-        else {
+        } else {
             Map<String, String> searchCriteria = new HashMap<>();
             searchCriteria.put("state", State.DRAFT.getId());
             searchCriteria.put("sortDirection", "desc");
@@ -91,7 +88,7 @@ public class CitizenCcdClient {
     }
 
     public List<CaseDetails> searchForCitizenAllCases(IdamTokens idamTokens) {
-        if(elasticSearchEnabled) {
+        if (elasticSearchEnabled) {
             String searchCriteria = "{"
                     + "       \"query\" : {\n"
                     + "        \"match_all\" : {}\n"
@@ -102,8 +99,7 @@ public class CitizenCcdClient {
                     ccdRequestDetails.getCaseTypeId(),
                     searchCriteria);
             return Optional.ofNullable(searchResult).isEmpty() ? new ArrayList<>() : searchResult.getCases();
-        }
-        else{
+        } else {
             Map<String, String> searchCriteria = new HashMap<>();
             searchCriteria.put("sortDirection", "desc");
             return coreCaseDataApi.searchForCitizen(
