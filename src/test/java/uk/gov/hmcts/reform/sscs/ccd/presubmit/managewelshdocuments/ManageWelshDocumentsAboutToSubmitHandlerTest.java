@@ -16,13 +16,15 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 
 @RunWith(JUnitParamsRunner.class)
 public class ManageWelshDocumentsAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private ManageWelshDocumentsAboutToSubmitHandler handler = new ManageWelshDocumentsAboutToSubmitHandler();
+    private ManageWelshDocumentsAboutToSubmitHandler handler = new ManageWelshDocumentsAboutToSubmitHandler(
+            new AddedDocumentsUtil(true), true);
 
     @Before
     public void setUp() {
