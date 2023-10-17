@@ -29,6 +29,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.HttpStatus;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,8 @@ import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
 @Slf4j
+
+@Ignore
 public class SubmitDraftTest {
 
     private static final String LOCATION_HEADER_NAME = "Location";

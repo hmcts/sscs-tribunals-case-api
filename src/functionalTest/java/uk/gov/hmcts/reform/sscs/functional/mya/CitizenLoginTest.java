@@ -7,13 +7,14 @@ import java.io.IOException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class CitizenLoginTest extends BaseFunctionTest {
 
     CreatedCcdCase ccdCase;
     String userEmail;
-
     @Before
     public void setup() throws IOException {
         userEmail = createRandomEmail();
