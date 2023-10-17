@@ -34,7 +34,7 @@ public class CitizenCcdClientTest {
     @Before
     public void setup() {
         openMocks(this);
-        citizenCcdClient = new CitizenCcdClient(ccdRequestDetails, coreCaseDataApi, caseAccessApi);
+        citizenCcdClient = new CitizenCcdClient(ccdRequestDetails, coreCaseDataApi, caseAccessApi, false);
         when(idamTokens.getIdamOauth2Token()).thenReturn("token");
         when(idamTokens.getServiceAuthorization()).thenReturn("s2s");
         when(idamTokens.getUserId()).thenReturn("1");
