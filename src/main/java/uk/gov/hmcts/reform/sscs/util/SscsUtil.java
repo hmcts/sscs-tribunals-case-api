@@ -284,6 +284,10 @@ public class SscsUtil {
     public static boolean isCorrectionInProgress(SscsCaseData caseData, boolean isPostHearingsEnabled) {
         return isPostHearingsEnabled && isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
     }
+
+    public static boolean isOriginalDecisionNoticeUploaded(SscsCaseData sscsCaseData) {
+        return isNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision());
+    }
       
     public static boolean isGapsCase(SscsCaseData sscsCaseData) {
         return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());

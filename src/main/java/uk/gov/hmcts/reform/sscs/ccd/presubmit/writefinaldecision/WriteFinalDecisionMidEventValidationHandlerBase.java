@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Slf4j
 public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -62,6 +63,11 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
         Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
         for (ConstraintViolation<SscsCaseData> violation : violations) {
             preSubmitCallbackResponse.addError(violation.getMessage());
+        }
+
+        if (SscsUtil.isCorrectionInProgress(sscsCaseData, true)
+                && SscsUtil.isOriginalDecisionNoticeUploaded(sscsCaseData)) {
+            preSubmitCallbackResponse.addError("Unable to generate the corrected decision notice due to the original being uploaded");
         }
 
         if (isDecisionNoticeDatesInvalid(sscsCaseData)) {
