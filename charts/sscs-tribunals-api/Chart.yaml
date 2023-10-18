@@ -1,13 +1,13 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.116
+version: 0.0.118
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
 dependencies:
   - name: java
-    version: 4.0.13
+    version: 4.2.0
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
   - name: idam-pr
     version: 2.3.0
@@ -30,7 +30,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-ccd-callback-orchestrator.enabled
   - name: ccd
-    version: 9.0.20
+    version: 8.0.29
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd.enabled
     tags:
@@ -63,8 +63,3 @@ dependencies:
     version: 1.0.4
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: servicebus.enabled
-  - name: postgresql
-    version: 1.0.2
-    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-    condition: postgresql.enabled
-
