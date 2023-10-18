@@ -356,6 +356,58 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenPartyTypeIsSetToFalse_thenGiveNoValidation() {
+        Representative representative = Representative.builder()
+                .name(Name.builder().firstName("").lastName("").build())
+                .address(Address.builder().line1(null).postcode(null).build())
+                .hasRepresentative(NO.getValue())
+                .build();
+
+        JointParty jointParty = JointParty.builder()
+                .name(Name.builder().firstName("").lastName("").build())
+                .address(Address.builder().line1(null).postcode(null).build())
+                .hasJointParty(NO)
+                .build();
+
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("No");
+        callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
+        callback.getCaseDetails().getCaseData().setJointParty(jointParty);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+
+    }
+
+    @Test
+    public void givenPartyTypeIsSetToTrueAndAddressIsEmpty_thenGiveValidation() {
+        Representative representative = Representative.builder()
+                .name(Name.builder().firstName("").lastName("").build())
+                .address(Address.builder().line1(null).postcode(null).build())
+                .hasRepresentative(YES.getValue())
+                .build();
+
+        JointParty jointParty = JointParty.builder()
+                .name(Name.builder().firstName("").lastName("").build())
+                .address(Address.builder().line1(null).postcode(null).build())
+                .hasJointParty(YES)
+                .build();
+
+        var caseData = callback.getCaseDetails().getCaseData();
+
+        caseData.setJointParty(jointParty);
+        caseData.getAppeal().setRep(representative);
+        caseData.getAppeal().getAppellant().setIsAppointee("Yes");
+        caseData.getAppeal().getAppellant().getAppointee().getAddress().setLine1(null);
+        caseData.getAppeal().getAppellant().getAppointee().getAddress().setPostcode(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(6));
+
+    }
+
+    @Test
     public void givenACaseUpdatedEventWithEmptyAppellantDetails_thenProvideAnError() {
         var caseData = callback.getCaseDetails().getCaseData().getAppeal();
 
