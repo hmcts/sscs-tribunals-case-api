@@ -166,6 +166,7 @@
             "dob": "1900-01-01",
             "nino": "JT 12 34 56 D"
           },
+          "isAppointee": "Yes",
           "appointee": {
             "name": {
               "title": "Miss",

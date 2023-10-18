@@ -167,8 +167,16 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validatingPartyAddresses(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant(), "appellant");
-        validateAddressAndPostcode(response, sscsCaseData.getAppeal().getRep(), "representative");
-        validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant().getAppointee(), "appointee");
+
+        String isAppointee = sscsCaseData.getAppeal().getAppellant().getIsAppointee();
+        if (isAppointee.equals("Yes")) {
+            validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant().getAppointee(), "appointee");
+        }
+
+        final boolean hasRepresentative = sscsCaseData.isThereARepresentative();
+        if (hasRepresentative) {
+            validateAddressAndPostcode(response, sscsCaseData.getAppeal().getRep(), "representative");
+        }
 
         final boolean hasJointParty = sscsCaseData.isThereAJointParty();
         if (hasJointParty) {

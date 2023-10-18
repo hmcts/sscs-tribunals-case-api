@@ -120,6 +120,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                         .name(Name.builder().firstName("First").lastName("Last").build())
                         .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
                         .identity(Identity.builder().nino("AB223344B").dob("1995-12-20").build())
+                        .isAppointee("Yes")
                         .appointee(
                                 Appointee.builder()
                                         .address(Address.builder()
@@ -260,18 +261,24 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     public void givenPartyTypeHasFirstLineOfAddressAndNoPostcode_thenProvideAnError() {
+        Representative representative = Representative.builder()
+                .name(Name.builder().firstName("").lastName("").build())
+                .address(Address.builder().line1("123 Lane").postcode(null).build())
+                .hasRepresentative(YES.getValue())
+                .build();
+
         JointParty jointParty = JointParty.builder()
                 .name(Name.builder().firstName("").lastName("").build())
                 .address(Address.builder().line1("123 Lane").postcode(null).build())
                 .hasJointParty(YES)
                 .build();
 
+        callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
         callback.getCaseDetails().getCaseData().setJointParty(jointParty);
 
         var caseData = callback.getCaseDetails().getCaseData();
 
         caseData.getAppeal().getAppellant().getAddress().setPostcode(null);
-        caseData.getAppeal().getRep().getAddress().setPostcode(null);
         caseData.getAppeal().getAppellant().getAppointee().getAddress().setPostcode(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -286,20 +293,25 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     public void givenPartyTypeHasFirstLineOfAddressAndInvalidPostcode_thenProvideAnError() {
+        Representative representative = Representative.builder()
+                .name(Name.builder().firstName("").lastName("").build())
+                .address(Address.builder().line1("123 Lane").postcode("73GH Y7U").build())
+                .hasRepresentative(YES.getValue())
+                .build();
+
         JointParty jointParty = JointParty.builder()
                 .name(Name.builder().firstName("").lastName("").build())
                 .address(Address.builder().line1("123 Lane").postcode("73GH Y7U").build())
                 .hasJointParty(YES)
                 .build();
 
+        callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
         callback.getCaseDetails().getCaseData().setJointParty(jointParty);
 
         var caseData = callback.getCaseDetails().getCaseData();
 
         caseData.getAppeal().getAppellant().getAddress().setPostcode("73GH Y7U");
-        caseData.getAppeal().getRep().getAddress().setPostcode("73GH Y7U");
         caseData.getAppeal().getAppellant().getAppointee().getAddress().setPostcode("73GH Y7U");
-
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -313,20 +325,25 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     public void givenPartyTypeHasNoFirstLineOfAddressAndValidPostcode_thenProvideAnError() {
+        Representative representative = Representative.builder()
+                .name(Name.builder().firstName("").lastName("").build())
+                .address(Address.builder().line1(null).postcode("CM120NS").build())
+                .hasRepresentative(YES.getValue())
+                .build();
+
         JointParty jointParty = JointParty.builder()
                 .name(Name.builder().firstName("").lastName("").build())
                 .address(Address.builder().line1(null).postcode("CM120NS").build())
                 .hasJointParty(YES)
                 .build();
 
+        callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
         callback.getCaseDetails().getCaseData().setJointParty(jointParty);
 
         var caseData = callback.getCaseDetails().getCaseData();
 
         caseData.getAppeal().getAppellant().getAddress().setLine1(null);
-        caseData.getAppeal().getRep().getAddress().setLine1(null);
         caseData.getAppeal().getAppellant().getAppointee().getAddress().setLine1(null);
-
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -416,6 +433,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .name(Name.builder().firstName("First").lastName("Last").build())
                 .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
                 .identity(Identity.builder().nino("AB223344B").dob("1995-12-20").build())
+                .isAppointee("Yes")
                 .appointee(
                         Appointee.builder()
                                 .address(Address.builder()
@@ -492,6 +510,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnAppealWithNewAppellantPostcodeAndNoAppointee_thenUpdateProcessingVenue() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("No");
+
         when(regionalProcessingCenterService.getByPostcode("AB12 00B")).thenReturn(
             RegionalProcessingCenter.builder()
                 .name("rpcName")
