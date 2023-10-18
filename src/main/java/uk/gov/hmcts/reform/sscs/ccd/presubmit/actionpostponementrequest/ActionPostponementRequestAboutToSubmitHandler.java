@@ -196,8 +196,9 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
         YesNo unprocessedPostponementRequest = caseData.getPostponementRequest().getUnprocessedPostponementRequest();
         caseData.setPostponementRequest(PostponementRequest.builder()
-            .unprocessedPostponementRequest(unprocessedPostponementRequest)
-            .build());
+                .unprocessedPostponementRequest(unprocessedPostponementRequest)
+                .actionPostponementRequestSelected(caseData.getPostponementRequest().getActionPostponementRequestSelected())
+                .build());
     }
 
     private SscsDocument getLatestPostponementDocumentForDwpType(List<SscsDocument> postponementDocuments) {
