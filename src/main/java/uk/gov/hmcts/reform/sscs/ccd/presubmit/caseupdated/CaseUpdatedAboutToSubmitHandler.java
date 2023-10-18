@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
@@ -52,7 +54,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final VenueService venueService;
     private final SessionCategoryMapService categoryMapService;
     private final boolean caseAccessManagementFeature;
-    private PostcodeValidator postcodeValidator = new PostcodeValidator();
+    private final PostcodeValidator postcodeValidator = new PostcodeValidator();
     private static ConstraintValidatorContext context;
 
 
@@ -152,19 +154,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         return preSubmitCallbackResponse;
     }
 
-    private void validateAddressAndPostcode(PreSubmitCallbackResponse<SscsCaseData> response, Entity party, String partyName) {
-        String addressLine1 = party.getAddress().getLine1();
-        String postcode = party.getAddress().getPostcode();
-
-        if (isBlank(addressLine1)) {
-            response.addError("You must enter address line 1 for the " + partyName);
-        }
-
-        if (isBlank(postcode) || !isBlank(postcode) && !postcodeValidator.isValid(postcode, context)) {
-            response.addError("You must enter a valid UK postcode for the " + partyName);
-        }
-    }
-
     private void validatingPartyAddresses(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant(), "appellant");
 
@@ -173,14 +162,25 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant().getAppointee(), "appointee");
         }
 
-        final boolean hasRepresentative = sscsCaseData.isThereARepresentative();
-        if (hasRepresentative) {
+        if (sscsCaseData.isThereARepresentative()) {
             validateAddressAndPostcode(response, sscsCaseData.getAppeal().getRep(), "representative");
         }
 
-        final boolean hasJointParty = sscsCaseData.isThereAJointParty();
-        if (hasJointParty) {
+        if (sscsCaseData.isThereAJointParty()) {
             validateAddressAndPostcode(response, sscsCaseData.getJointParty(), "joint party");
+        }
+    }
+
+    private void validateAddressAndPostcode(PreSubmitCallbackResponse<SscsCaseData> response, Entity party, String partyName) {
+        String addressLine1 = party.getAddress().getLine1();
+        String postcode = party.getAddress().getPostcode();
+
+        if (isBlank(addressLine1)) {
+            response.addError("You must enter address line 1 for the " + partyName);
+        }
+
+        if (isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
+            response.addError("You must enter a valid UK postcode for the " + partyName);
         }
     }
 
