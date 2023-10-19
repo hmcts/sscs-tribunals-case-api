@@ -1,26 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:jackson-databind-2.14.3.jar]]></notes><cve>CVE-2023-35116</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:json-20230618.jar]]></notes><cve>CVE-2022-45688</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-buffer-4.1.95.Final.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-codec-4.1.95.Final.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-codec-dns-4.1.95.Final.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-codec-http-4.1.95.Final.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-codec-http2-4.1.95.Final.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-codec-socks-4.1.95.Final.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-common-4.1.95.Final.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-handler-4.1.95.Final.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-handler-proxy-4.1.95.Final.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-resolver-4.1.95.Final.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-resolver-dns-4.1.95.Final.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-resolver-dns-classes-macos-4.1.95.Final.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-resolver-dns-native-macos-4.1.95.Final-osx-x86_64.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-transport-4.1.95.Final.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-transport-classes-epoll-4.1.95.Final.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-transport-classes-kqueue-4.1.95.Final.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-transport-native-epoll-4.1.95.Final-linux-x86_64.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-transport-native-kqueue-4.1.95.Final-osx-x86_64.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:netty-transport-native-unix-common-4.1.95.Final.jar]]></notes><cve>CVE-2023-4586</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:tomcat-embed-core-9.0.80.jar]]></notes><cve>CVE-2023-42794</cve><cve>CVE-2023-42795</cve><cve>CVE-2023-45648</cve></suppress>
-  <suppress until = "2023-12-19"><notes><![CDATA[file name:tomcat-embed-websocket-9.0.80.jar]]></notes><cve>CVE-2023-42794</cve><cve>CVE-2023-42795</cve><cve>CVE-2023-45648</cve></suppress>
+  <suppress until = "2023-12-19">
+    <cve>CVE-2023-5072</cve>
+    <cve>CVE-2023-4487</cve>
+  </suppress>
 </suppressions>
