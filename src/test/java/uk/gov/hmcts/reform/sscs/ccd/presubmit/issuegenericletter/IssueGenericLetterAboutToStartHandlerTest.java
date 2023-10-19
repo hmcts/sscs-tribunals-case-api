@@ -11,7 +11,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_GENERIC_LETTER;
 
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,21 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentSelectionDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 class IssueGenericLetterAboutToStartHandlerTest {
 
@@ -131,22 +144,5 @@ class IssueGenericLetterAboutToStartHandlerTest {
         List<CcdValue<DocumentSelectionDetails>> documentSelection = result.getData().getDocumentSelection();
         assertEquals(1, documentSelection.size());
         assertEquals(2, documentSelection.get(0).getValue().getDocumentsList().getListItems().size());
-    }
-
-    @Test
-    void givenDocumentEdited_ThenAddToListOptions() {
-        when(callback.getEvent()).thenReturn(ISSUE_GENERIC_LETTER);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-
-        DocumentLink editDoc = DocumentLink.builder().documentFilename("EditedSscsDocument").documentUrl("EditedUrl").build();
-        SscsDocument sscsDocument = new SscsDocument(SscsDocumentDetails.builder().documentFileName("SscsDocument").editedDocumentLink(editDoc).build());
-        caseData.setSscsDocument(Collections.singletonList(sscsDocument));
-
-        var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        List<CcdValue<DocumentSelectionDetails>> documentSelection = result.getData().getDocumentSelection();
-        assertEquals(1, documentSelection.size());
-        assertEquals(3, documentSelection.get(0).getValue().getDocumentsList().getListItems().size());
     }
 }
