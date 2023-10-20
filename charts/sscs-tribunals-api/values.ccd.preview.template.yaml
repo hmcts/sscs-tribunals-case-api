@@ -2,7 +2,6 @@
 tags:
   sscs-ccd-idam-pr: true
 
-
 java:
   image: ${IMAGE_NAME}
   memoryLimits: "8Gi"
