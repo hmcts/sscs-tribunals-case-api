@@ -11,9 +11,11 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
@@ -28,10 +30,15 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
     private final Validator validator;
 
     protected final DecisionNoticeService decisionNoticeService;
+    @Value("${feature.postHearings.enabled}")
+    private final boolean isPostHearingsEnabled;
 
-    protected WriteFinalDecisionMidEventValidationHandlerBase(Validator validator, DecisionNoticeService decisionNoticeService) {
+    protected WriteFinalDecisionMidEventValidationHandlerBase(Validator validator,
+                                                              DecisionNoticeService decisionNoticeService,
+                                                              @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
         this.validator = validator;
         this.decisionNoticeService = decisionNoticeService;
+        this.isPostHearingsEnabled = isPostHearingsEnabled;
     }
 
     protected abstract String getBenefitType();
@@ -55,8 +62,8 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
-
-        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
+        SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
@@ -64,9 +71,12 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
         for (ConstraintViolation<SscsCaseData> violation : violations) {
             preSubmitCallbackResponse.addError(violation.getMessage());
         }
+        
+        SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);
 
-        if (SscsUtil.isCorrectionInProgress(sscsCaseData, true)
-                && SscsUtil.isOriginalDecisionNoticeUploaded(sscsCaseData)) {
+        if (SscsUtil.isCorrectionInProgress(sscsCaseData, isPostHearingsEnabled)
+                && SscsUtil.isOriginalDecisionNoticeUploaded(sscsCaseData)
+                && isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             preSubmitCallbackResponse.addError("Unable to generate the corrected decision notice due to the original being uploaded");
         }
 

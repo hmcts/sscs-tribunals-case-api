@@ -4,6 +4,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -15,8 +16,10 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 @Component
 public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
-    public UcWriteFinalDecisionMidEventValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService) {
-        super(validator, decisionNoticeService);
+    public UcWriteFinalDecisionMidEventValidationHandler(Validator validator,
+                                                         DecisionNoticeService decisionNoticeService,
+                                                         @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
+        super(validator, decisionNoticeService, isPostHearingsEnabled);
     }
 
     @Override

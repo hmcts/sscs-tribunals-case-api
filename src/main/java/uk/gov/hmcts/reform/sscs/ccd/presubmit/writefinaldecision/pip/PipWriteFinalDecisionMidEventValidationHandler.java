@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -17,8 +18,9 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
     public PipWriteFinalDecisionMidEventValidationHandler(Validator validator,
-                                                          DecisionNoticeService decisionNoticeService) {
-        super(validator, decisionNoticeService);
+                                                          DecisionNoticeService decisionNoticeService,
+                                                          @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
+        super(validator, decisionNoticeService, isPostHearingsEnabled);
     }
 
     @Override

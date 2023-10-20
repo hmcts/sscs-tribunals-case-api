@@ -93,7 +93,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
             if (isNull(finalDecisionCaseData.getFinalDecisionIssuedDate())) {
                 finalDecisionCaseData.setFinalDecisionIssuedDate(LocalDate.now());
-                finalDecisionCaseData.setFinalDecisionHeldBefore(SscsUtil.buildWriteFinalDecisionHeldBefore(sscsCaseData, userDetailsService.buildLoggedInUserName(userAuthorisation)));
+                finalDecisionCaseData.setFinalDecisionJudge(SscsUtil.buildWriteFinalDecisionHeldBefore(sscsCaseData, userDetailsService.buildLoggedInUserName(userAuthorisation)));
                 finalDecisionCaseData.setFinalDecisionHeldAt(SscsUtil.buildWriteFinalDecisionHeldAt(sscsCaseData, venueDataLoader));
             }
         }

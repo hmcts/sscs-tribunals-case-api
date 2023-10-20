@@ -43,7 +43,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Override
     protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService) {
-        return new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService);
+        return new EsaWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, false);
     }
 
     @Override

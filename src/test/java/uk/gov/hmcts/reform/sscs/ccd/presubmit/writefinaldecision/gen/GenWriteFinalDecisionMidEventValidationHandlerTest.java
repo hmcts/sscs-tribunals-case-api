@@ -23,7 +23,7 @@ public class GenWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Override
     protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService) {
-        return new GenWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService);
+        return new GenWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, false);
     }
 
     @Override

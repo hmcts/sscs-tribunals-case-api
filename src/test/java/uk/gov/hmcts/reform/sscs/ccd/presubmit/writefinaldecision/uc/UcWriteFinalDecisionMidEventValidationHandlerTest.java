@@ -43,7 +43,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
 
     @Override
     protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService) {
-        return new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService);
+        return new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, false);
     }
 
     @Override

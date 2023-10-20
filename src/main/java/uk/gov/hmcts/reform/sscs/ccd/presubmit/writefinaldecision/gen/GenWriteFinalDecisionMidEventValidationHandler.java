@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -17,8 +18,10 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 @Component
 public class GenWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
-    public GenWriteFinalDecisionMidEventValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService) {
-        super(validator, decisionNoticeService);
+    public GenWriteFinalDecisionMidEventValidationHandler(Validator validator,
+                                                          DecisionNoticeService decisionNoticeService,
+                                                          @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
+        super(validator, decisionNoticeService, isPostHearingsEnabled);
     }
 
     @Override
