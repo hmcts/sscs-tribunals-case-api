@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_GENERIC_LETTER
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -146,7 +147,10 @@ class IssueGenericLetterAboutToStartHandlerTest {
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         List<CcdValue<DocumentSelectionDetails>> documentSelection = result.getData().getDocumentSelection();
+        List<DynamicListItem> items = documentSelection.get(0).getValue().getDocumentsList().getListItems();
         assertEquals(1, documentSelection.size());
-        assertEquals(3, documentSelection.get(0).getValue().getDocumentsList().getListItems().size());
+        assertEquals(3, items.size());
+        List<DynamicListItem> itemEdited = items.stream().filter(item -> Objects.equals(item.getCode(), "EditedSscsDocument")).toList();
+        assertFalse(itemEdited.isEmpty());
     }
 }
