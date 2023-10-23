@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.handlers.actionfurtherevidence;
 
+import static org.hamcrest.Matchers.*;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
@@ -15,7 +17,6 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
-import static org.hamcrest.Matchers.*;
 
 @RunWith(JUnitParamsRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
@@ -50,7 +51,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest extends BaseHandler {
                 .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "informationReceivedForInterlocTcw")))
                 .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "sendToInterlocReviewByJudge")))
                 .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "sendToInterlocReviewByTcw")))
-                .assertThat().body("data.furtherEvidenceAction.list_items.size()" , greaterThanOrEqualTo(6));
+                .assertThat().body("data.furtherEvidenceAction.list_items.size()", greaterThanOrEqualTo(6));
 
     }
 }
