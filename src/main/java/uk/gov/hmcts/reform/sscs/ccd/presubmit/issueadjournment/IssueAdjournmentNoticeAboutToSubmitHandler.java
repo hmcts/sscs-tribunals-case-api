@@ -299,21 +299,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             Appeal appeal = sscsCaseData.getAppeal();
             HearingChannel hearingChannel = getNextHearingChannel(sscsCaseData);
 
-            if (isAdjournmentEnabled) {
-                String wantsToAttend = YES.toString();
-                String hearingType = uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue();
-
-                if (PAPER.equals(nextHearingType.getHearingChannel())) {
-                    wantsToAttend = NO.toString();
-                    hearingType = uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.PAPER.getValue();
-                }
-
-                log.info("Updating hearing type to {} and wants to attend to {}", hearingType, wantsToAttend);
-                appeal.getHearingOptions().setWantsToAttend(wantsToAttend);
-                appeal.setHearingType(hearingType);
-
-                sscsCaseData.getSchedulingAndListingFields().getOverrideFields().setAppellantHearingChannel(hearingChannel);
-            }
+            SscsUtil.updateHearingChannel(sscsCaseData, hearingChannel);
 
             Hearing latestHearing = sscsCaseData.getLatestHearing();
             if (nonNull(latestHearing) && nonNull(latestHearing.getValue())) {
