@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.functional.handlers.actionfurtherevidence;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -16,7 +19,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
-
 
 @RunWith(JUnitParamsRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
