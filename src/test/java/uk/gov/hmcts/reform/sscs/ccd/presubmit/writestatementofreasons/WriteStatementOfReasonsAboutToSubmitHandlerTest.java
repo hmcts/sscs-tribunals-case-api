@@ -137,7 +137,7 @@ class WriteStatementOfReasonsAboutToSubmitHandlerTest {
         expectedDocument.getValue().setDocumentType(STATEMENT_OF_REASONS.getValue());
         expectedDocument.getValue().setDocumentLink(sorDoc);
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
-                eq(STATEMENT_OF_REASONS), any(), eq(null), eq(null), eq(null), eq(null), eq(true));
+                eq(STATEMENT_OF_REASONS), any(), eq(null), eq(null), eq(null), eq(null));
     }
 
 }

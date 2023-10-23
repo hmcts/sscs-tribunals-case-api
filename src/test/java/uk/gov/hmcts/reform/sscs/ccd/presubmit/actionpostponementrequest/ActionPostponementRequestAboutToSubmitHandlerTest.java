@@ -157,7 +157,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
-                eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null), eq(null), eq(true));
+                eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null), eq(null));
 
         verifyNoInteractions(hearingMessageHelper);
         assertThat(response.getData().getInterlocReviewState()).isNull();
@@ -178,7 +178,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getDwpState()).isEqualTo(DwpState.HEARING_POSTPONED);
         assertThat(response.getData().getDocumentGeneration().getDirectionNoticeContent()).isNull();
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
-                eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null), eq(null), eq(true));
+                eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null), eq(null));
     }
 
     @Test
@@ -266,7 +266,7 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
-                eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(TRANSLATION_REQUIRED), eq(null), eq(true));
+                eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(TRANSLATION_REQUIRED), eq(null));
 
         assertThat(response.getData().getInterlocReviewState()).isEqualTo(WELSH_TRANSLATION);
         assertThat(response.getData().getTranslationWorkOutstanding()).isEqualTo(YES.getValue());
