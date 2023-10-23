@@ -288,7 +288,7 @@ public class SscsUtil {
     }
 
     public static boolean isOriginalDecisionNoticeUploaded(SscsCaseData sscsCaseData) {
-        return isNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision());
+        return isNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecisionCopy());
     }
       
     public static boolean isGapsCase(SscsCaseData sscsCaseData) {
