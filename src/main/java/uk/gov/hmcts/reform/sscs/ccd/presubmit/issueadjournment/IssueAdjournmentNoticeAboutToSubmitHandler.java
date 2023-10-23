@@ -312,21 +312,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             Appeal appeal = sscsCaseData.getAppeal();
             HearingChannel hearingChannel = getNextHearingChannel(sscsCaseData);
 
-            if (isAdjournmentEnabled) {
-                String wantsToAttend = YES.toString();
-                String hearingType = uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue();
-
-                if (PAPER.equals(nextHearingType.getHearingChannel())) {
-                    wantsToAttend = NO.toString();
-                    hearingType = uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.PAPER.getValue();
-                }
-
-                log.info("Updating hearing type to {} and wants to attend to {}", hearingType, wantsToAttend);
-                appeal.getHearingOptions().setWantsToAttend(wantsToAttend);
-                appeal.setHearingType(hearingType);
-
-                sscsCaseData.getSchedulingAndListingFields().getOverrideFields().setAppellantHearingChannel(hearingChannel);
-            }
+            SscsUtil.updateHearingChannel(sscsCaseData, hearingChannel);
 
             Hearing latestHearing = sscsCaseData.getLatestHearing();
             if (nonNull(latestHearing) && nonNull(latestHearing.getValue())) {
@@ -345,13 +331,17 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
 
         if (STANDARD.equals(durationType)) {
-            Integer existingDuration = caseData.getSchedulingAndListingFields().getDefaultListingValues().getDuration();
-            if (nonNull(existingDuration)) {
-                if (isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
-                    && isInterpreterRequired(caseData)) {
-                    return existingDuration + MIN_HEARING_DURATION;
-                } else {
-                    return existingDuration;
+            OverrideFields defaultListingValues = caseData.getSchedulingAndListingFields().getDefaultListingValues();
+
+            if (nonNull(defaultListingValues)) {
+                Integer existingDuration = caseData.getSchedulingAndListingFields().getDefaultListingValues().getDuration();
+                if (nonNull(existingDuration)) {
+                    if (isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
+                            && isInterpreterRequired(caseData)) {
+                        return existingDuration + MIN_HEARING_DURATION;
+                    } else {
+                        return existingDuration;
+                    }
                 }
             }
         }
