@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.functional.handlers.actionfurtherevidence;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.hasItem;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
