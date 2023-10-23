@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -49,7 +48,8 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
         if (response.getErrors().isEmpty()) {
             postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.DWP);
             List<SscsDocument> documents = sscsCaseData.getSscsDocument();
-            SscsUtil.addDocumentToBundle(footerService, sscsCaseData, documents.get(documents.size() - 1));
+            String bundleAddition = footerService.getNextBundleAddition(documents);
+            documents.get(documents.size() - 1).getValue().setBundleAddition(bundleAddition);
         }
 
         return response;
