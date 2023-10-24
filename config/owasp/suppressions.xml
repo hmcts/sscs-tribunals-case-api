@@ -18,6 +18,8 @@
     <cve>CVE-2023-35116</cve>
     <cve>CVE-2023-2976</cve>
     <cve>CVE-2023-4586</cve>
+    <cve>CVE-2023-5072</cve>
+    <cve>CVE-2023-44487</cve>
   </suppress>
   <suppress until = "2023-11-07">
     <notes><![CDATA[
