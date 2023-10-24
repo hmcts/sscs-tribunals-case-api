@@ -13,7 +13,7 @@ import uk.gov.hmcts.contino.GradleBuilder
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
-def dmnBranch = "SSCS-11864-work-allocation-tcw-tasks"
+def dmnBranch = "SSCS-12107-reviewPostponementRequestTCW"
 def waStandaloneBranch = "master"
 
 def gradleBuilder = new GradleBuilder(this, product)
