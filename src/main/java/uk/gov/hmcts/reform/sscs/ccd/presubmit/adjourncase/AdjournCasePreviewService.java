@@ -97,7 +97,8 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         adjournCaseBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
-        String venueName = setHearings(adjournCaseBuilder, caseData);
+        setHearings(adjournCaseBuilder, caseData);
+        String venueName = caseData.getProcessingVenue();
         adjournCaseBuilder.appellantName(buildName(caseData, false));
 
         if (adjournment.getReasons() != null && !adjournment.getReasons().isEmpty()) {
@@ -304,8 +305,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         }
     }
 
-    protected String setHearings(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
-        String venue = IN_CHAMBERS;
+    protected void setHearings(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
         if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
             HearingDetails finalHearing = getLastValidHearing(caseData);
             if (finalHearing != null) {
@@ -316,7 +316,6 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                     String venueName = venueDataLoader.getGapVenueName(finalHearing.getVenue(), finalHearing.getVenueId());
                     if (venueName != null) {
                         adjournCaseBuilder.heldAt(venueName);
-                        venue = venueName;
                     }
                 }
             } else {
@@ -325,7 +324,6 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         } else {
             setInChambers(adjournCaseBuilder);
         }
-        return venue;
     }
 
     private void setInChambers(AdjournCaseTemplateBodyBuilder adjournCaseBuilder) {

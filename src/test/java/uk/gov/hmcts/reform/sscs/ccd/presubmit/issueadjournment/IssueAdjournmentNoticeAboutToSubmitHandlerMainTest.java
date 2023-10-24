@@ -7,14 +7,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 
 public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdjournmentNoticeAboutToSubmitHandlerTestBase {
@@ -61,16 +59,14 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
     void givenVenueReturnCorrectEpimsInOverrideFields() {
         String epimsId = "epimsId";
         String code = "venueCode";
-        VenueDetails details = VenueDetails.builder()
-            .epimsId(epimsId)
-            .build();
+
+        when(venueService.getEpimsIdForVenueId(code)).thenReturn(epimsId);
 
         var item = new DynamicListItem(code, code);
         var list = new DynamicList(item, null);
 
         sscsCaseData.getAdjournment().setNextHearingVenueSelected(list);
 
-        when(venueDataLoader.getVenueDetailsMap()).thenReturn(Map.of(code, details));
         when(regionalProcessingCenterService.getByVenueId(code)).thenReturn(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

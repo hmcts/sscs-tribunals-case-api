@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
@@ -335,6 +337,45 @@ public class SscsUtil {
         return null;
     }
 
+    public static void updateHearingChannel(SscsCaseData caseData, HearingChannel hearingChannel) {
+        String wantsToAttend = YES.toString();
+        HearingType hearingType = HearingType.ORAL;
+
+        if (NOT_ATTENDING.equals(hearingChannel) || PAPER.equals(hearingChannel)) {
+            wantsToAttend = NO.toString();
+            hearingType = HearingType.PAPER;
+        }
+
+        log.info("Updating hearing type to {} and wants to attend to {}", hearingType, wantsToAttend);
+
+        Appeal appeal = caseData.getAppeal();
+
+        HearingOptions hearingOptions = appeal.getHearingOptions();
+        if (isNull(hearingOptions)) {
+            hearingOptions = HearingOptions.builder().build();
+            appeal.setHearingOptions(hearingOptions);
+        }
+
+        appeal.getHearingOptions().setWantsToAttend(wantsToAttend);
+        appeal.setHearingType(hearingType.getValue());
+
+        HearingSubtype hearingSubtype = appeal.getHearingSubtype();
+        if (isNull(hearingSubtype)) {
+            hearingSubtype = HearingSubtype.builder().build();
+            appeal.setHearingSubtype(hearingSubtype);
+        }
+
+        hearingSubtype.setWantsHearingTypeFaceToFace(hearingChannelToYesNoString(FACE_TO_FACE, hearingChannel));
+        hearingSubtype.setWantsHearingTypeTelephone(hearingChannelToYesNoString(TELEPHONE, hearingChannel));
+        hearingSubtype.setWantsHearingTypeVideo(hearingChannelToYesNoString(VIDEO, hearingChannel));
+
+        caseData.getSchedulingAndListingFields().getOverrideFields().setAppellantHearingChannel(hearingChannel);
+    }
+
+    private static String hearingChannelToYesNoString(HearingChannel expectedHearingChannel, HearingChannel hearingChannel) {
+        return expectedHearingChannel.equals(hearingChannel) ? YES.toString() : NO.toString();
+    }
+  
     public static void createFinalDecisionNoticeFromPreviewDraft(Callback<SscsCaseData> callback,
                                                                  FooterService footerService,
                                                                  boolean isPostHearingsEnabled) {
