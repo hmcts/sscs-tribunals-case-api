@@ -48,8 +48,7 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
         if (response.getErrors().isEmpty()) {
             postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.DWP);
             List<SscsDocument> documents = sscsCaseData.getSscsDocument();
-            String bundleAddition = footerService.getNextBundleAddition(documents);
-            documents.get(documents.size() - 1).getValue().setBundleAddition(bundleAddition);
+            documents.get(documents.size() - 1).getValue().setBundleAddition(footerService.getNextBundleAddition(documents));
         }
 
         return response;
