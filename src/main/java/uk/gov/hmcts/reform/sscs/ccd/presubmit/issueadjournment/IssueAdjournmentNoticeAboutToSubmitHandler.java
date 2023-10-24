@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
@@ -51,10 +52,10 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     private final FooterService footerService;
     private final Validator validator;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
-    private final VenueDataLoader venueDataLoader;
     private final AirLookupService airLookupService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final HearingDurationsService hearingDurationsService;
+    private final VenueService venueService;
 
     @Value("${feature.snl.adjournment.enabled}")
     private boolean isAdjournmentEnabled;
@@ -104,7 +105,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     }
 
     private void processResponse(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
-        SscsDocumentTranslationStatus documentTranslationStatus) {
+                                 SscsDocumentTranslationStatus documentTranslationStatus) {
         createAdjournmentNoticeFromPreviewDraft(preSubmitCallbackResponse, documentTranslationStatus);
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
@@ -266,13 +267,25 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         }
 
         Adjournment adjournment = caseData.getAdjournment();
-        var nextHearingVenueSelected = adjournment.getNextHearingVenueSelected();
 
-        if (nonNull(nextHearingVenueSelected)) {
-            var venueDetails = venueDataLoader.getVenueDetailsMap().get(nextHearingVenueSelected.getValue().getCode());
+        if (AdjournCaseTypeOfHearing.PAPER.equals(adjournment.getTypeOfNextHearing())) {
+            List<VenueDetails> paperVenues = venueService.getActiveRegionalEpimsIdsForRpc(caseData.getRegionalProcessingCenter().getEpimsId());
 
-            if (nonNull(venueDetails)) {
-                CcdValue<String> venueDetailsValue = new CcdValue<>(venueDetails.getEpimsId());
+            List<CcdValue<CcdValue<String>>> venueEpimsIds = paperVenues.stream().map(VenueDetails::getEpimsId)
+                    .map(CcdValue::new)
+                    .map(CcdValue::new)
+                    .toList();
+
+            fields.setHearingVenueEpimsIds(venueEpimsIds);
+        } else {
+            var nextHearingVenueSelected = adjournment.getNextHearingVenueSelected();
+
+            String epimsId = nonNull(nextHearingVenueSelected)
+                    ? venueService.getEpimsIdForVenueId(nextHearingVenueSelected.getValue().getCode())
+                    : venueService.getEpimsIdForVenue(caseData.getProcessingVenue());
+
+            if (nonNull(epimsId)) {
+                CcdValue<String> venueDetailsValue = new CcdValue<>(epimsId);
                 CcdValue<CcdValue<String>> ccdValue = new CcdValue<>(venueDetailsValue);
                 fields.setHearingVenueEpimsIds(List.of(ccdValue));
             }
