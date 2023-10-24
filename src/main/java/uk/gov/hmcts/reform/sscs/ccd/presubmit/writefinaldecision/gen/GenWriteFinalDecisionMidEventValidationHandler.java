@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ public class GenWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData, String pageId) {
-        if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice() != null && sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice().equalsIgnoreCase(YesNo.YES.getValue())) {
+        if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES);
             return;
         }

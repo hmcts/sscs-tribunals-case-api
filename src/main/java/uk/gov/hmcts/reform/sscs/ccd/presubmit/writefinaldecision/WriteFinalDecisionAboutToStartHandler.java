@@ -47,21 +47,15 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (isPostHearingsEnabled) {
-            if ((State.DORMANT_APPEAL_STATE.equals(state) || State.POST_HEARING.equals(state))) {
-                List<String> userRoles = userDetailsService.getUserRoles(userAuthorisation);
+        if (isPostHearingsEnabled && (State.DORMANT_APPEAL_STATE.equals(state) || State.POST_HEARING.equals(state))) {
+            List<String> userRoles = userDetailsService.getUserRoles(userAuthorisation);
 
-                if (userRoles.contains(UserRole.JUDGE.getValue())
-                        && !userRoles.contains(UserRole.SALARIED_JUDGE.getValue())) {
-                    preSubmitCallbackResponse.addError("You do not have access to proceed");
+            if (userRoles.contains(UserRole.JUDGE.getValue())
+                    && !userRoles.contains(UserRole.SALARIED_JUDGE.getValue())) {
+                preSubmitCallbackResponse.addError("You do not have access to proceed");
 
-                    return preSubmitCallbackResponse;
-                }
+                return preSubmitCallbackResponse;
             }
-
-            SscsFinalDecisionCaseData finalDecisionCaseData = sscsCaseData.getSscsFinalDecisionCaseData();
-
-            copyOverDecisionDate(finalDecisionCaseData);
         }
 
         SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);
@@ -69,10 +63,6 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
         clearTransientFields(sscsCaseData);
 
         return preSubmitCallbackResponse;
-    }
-
-    private void copyOverDecisionDate(SscsFinalDecisionCaseData finalDecisionCaseData) {
-        finalDecisionCaseData.setWriteFinalDecisionDateOfDecisionCopy(finalDecisionCaseData.getWriteFinalDecisionDateOfDecision());
     }
 
     private void clearTransientFields(SscsCaseData caseData) {

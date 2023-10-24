@@ -119,6 +119,8 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());
         }
 
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionWasOriginalDecisionUploaded(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice());
+
         return preSubmitCallbackResponse;
     }
 

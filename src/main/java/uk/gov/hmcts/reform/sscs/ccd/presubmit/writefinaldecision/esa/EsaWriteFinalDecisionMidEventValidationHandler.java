@@ -57,7 +57,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if ("Yes".equalsIgnoreCase(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply())) {
+        if (isYes(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply())) {
             if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesQuestion() == null
                 || sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesQuestion().isEmpty()) {
                 preSubmitCallbackResponse.addError("Please select the Schedule 3 Activities that apply, or indicate that none apply");
@@ -83,17 +83,13 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setShowWorkCapabilityAssessmentPage(SscsCaseData sscsCaseData) {
-        if (YES.getValue().equals(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
-            sscsCaseData.setShowWorkCapabilityAssessmentPage(YES);
-        } else if (NO.getValue().equals(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
-            sscsCaseData.setShowWorkCapabilityAssessmentPage(NO);
-        }
+        sscsCaseData.setShowWorkCapabilityAssessmentPage(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice());
     }
 
     @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
         if (pageId != null && pageId.equals("workCapabilityAssessment")) {
-            if (YesNo.YES.getValue().equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())
+            if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())
                     && sscsCaseData.isWcaAppeal()
                     && "allowed".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused())) {
                 sscsCaseData.setShowDwpReassessAwardPage(YesNo.YES);

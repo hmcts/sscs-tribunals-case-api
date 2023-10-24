@@ -75,7 +75,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
         SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);
 
         if (SscsUtil.isCorrectionInProgress(sscsCaseData, isPostHearingsEnabled)
-                && SscsUtil.isOriginalDecisionNoticeUploaded(sscsCaseData)
+                && isYes(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionWasOriginalDecisionUploaded())
                 && isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             preSubmitCallbackResponse.addError("Unable to generate the corrected decision notice due to the original being uploaded");
         }

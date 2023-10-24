@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
@@ -121,9 +122,7 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
         if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow() != null
             && sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow()
                 .equalsIgnoreCase(YesNo.NO.getValue())
-            && sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice() != null
-            && sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice()
-                .equalsIgnoreCase(YesNo.YES.getValue())) {
+            && isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES);
             return;
         }
