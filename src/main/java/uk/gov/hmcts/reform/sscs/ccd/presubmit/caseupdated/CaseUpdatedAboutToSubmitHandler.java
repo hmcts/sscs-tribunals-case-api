@@ -10,10 +10,7 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.validation.ConstraintValidatorContext;
 import lombok.extern.slf4j.Slf4j;
@@ -140,6 +137,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         updateHearingTypeForNonSscs1Case(sscsCaseData, preSubmitCallbackResponse, hasSystemUserRole);
 
+        YesNo isJointPartyAddressSameAsAppellant = sscsCaseData.getJointParty().getJointPartyAddressSameAsAppellant();
+        if (sscsCaseData.isThereAJointParty() && !Objects.isNull(isJointPartyAddressSameAsAppellant) && isJointPartyAddressSameAsAppellant.toBoolean()) {
+            sscsCaseData.getJointParty().setAddress(sscsCaseData.getAppeal().getAppellant().getAddress());
+        }
+
         //validate benefit type and dwp issuing office for updateCaseData event triggered by user, which is not by CaseLoader
         if (!hasSystemUserRole) {
             validateAndUpdateDwpHandlingOffice(sscsCaseData, preSubmitCallbackResponse);
@@ -157,6 +159,13 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void validatingPartyAddresses(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant(), "appellant");
 
+        if (sscsCaseData.isThereAJointParty()) {
+            YesNo isJointPartyAddressSameAsAppellant = sscsCaseData.getJointParty().getJointPartyAddressSameAsAppellant();
+            if (Objects.isNull(isJointPartyAddressSameAsAppellant) || !isJointPartyAddressSameAsAppellant.toBoolean()) {
+                validateAddressAndPostcode(response, sscsCaseData.getJointParty(), "joint party");
+            }
+        }
+
         String isAppointee = sscsCaseData.getAppeal().getAppellant().getIsAppointee();
         if (isAppointee.equals("Yes")) {
             validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant().getAppointee(), "appointee");
@@ -166,9 +175,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             validateAddressAndPostcode(response, sscsCaseData.getAppeal().getRep(), "representative");
         }
 
-        if (sscsCaseData.isThereAJointParty()) {
-            validateAddressAndPostcode(response, sscsCaseData.getJointParty(), "joint party");
-        }
     }
 
     private void validateAddressAndPostcode(PreSubmitCallbackResponse<SscsCaseData> response, Entity party, String partyName) {

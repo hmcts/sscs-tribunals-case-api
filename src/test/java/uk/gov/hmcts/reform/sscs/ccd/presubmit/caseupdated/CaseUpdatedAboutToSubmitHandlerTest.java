@@ -140,6 +140,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                     )
                 .build())
                 .jointParty(JointParty.builder()
+                        .jointPartyAddressSameAsAppellant(NO)
                         .address(Address.builder()
                                 .line1("123 the street")
                                 .postcode("CM120NS")
@@ -269,6 +270,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         JointParty jointParty = JointParty.builder()
                 .name(Name.builder().firstName("").lastName("").build())
+                .jointPartyAddressSameAsAppellant(NO)
                 .address(Address.builder().line1("123 Lane").postcode(null).build())
                 .hasJointParty(YES)
                 .build();
@@ -301,6 +303,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         JointParty jointParty = JointParty.builder()
                 .name(Name.builder().firstName("").lastName("").build())
+                .jointPartyAddressSameAsAppellant(NO)
                 .address(Address.builder().line1("123 Lane").postcode("73GH Y7U").build())
                 .hasJointParty(YES)
                 .build();
@@ -333,6 +336,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         JointParty jointParty = JointParty.builder()
                 .name(Name.builder().firstName("").lastName("").build())
+                .jointPartyAddressSameAsAppellant(NO)
                 .address(Address.builder().line1(null).postcode("CM120NS").build())
                 .hasJointParty(YES)
                 .build();
@@ -365,6 +369,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         JointParty jointParty = JointParty.builder()
                 .name(Name.builder().firstName("").lastName("").build())
+                .jointPartyAddressSameAsAppellant(NO)
                 .address(Address.builder().line1(null).postcode(null).build())
                 .hasJointParty(NO)
                 .build();
@@ -389,6 +394,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         JointParty jointParty = JointParty.builder()
                 .name(Name.builder().firstName("").lastName("").build())
+                .jointPartyAddressSameAsAppellant(NO)
                 .address(Address.builder().line1(null).postcode(null).build())
                 .hasJointParty(YES)
                 .build();
@@ -404,6 +410,48 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(6));
+
+    }
+
+    @Test
+    public void givenJointPartySameAddressAsAppeallantIsSetToYes_validateAppeallantAddressNotJointParty() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1(null);
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("73GH Y7U");
+
+        JointParty jointParty = JointParty.builder()
+                .name(Name.builder().firstName("").lastName("").build())
+                .jointPartyAddressSameAsAppellant(YES)
+                .address(Address.builder().line1("123 The Street").postcode("CM120NS").build())
+                .hasJointParty(YES)
+                .build();
+
+        callback.getCaseDetails().getCaseData().setJointParty(jointParty);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Set<String> expectedErrorMessages = Set.of("You must enter address line 1 for the appellant",
+                "You must enter a valid UK postcode for the appellant");
+
+        assertThat(response.getErrors(), is(expectedErrorMessages));
+    }
+
+    @Test
+    public void givenJointSameAddressAsAppeallantIsSetToNo_validateJointPartyAddress() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1("123 The Street");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("CM120NS");
+
+        JointParty jointParty = JointParty.builder()
+                .name(Name.builder().firstName("").lastName("").build())
+                .jointPartyAddressSameAsAppellant(YES)
+                .address(Address.builder().line1(null).postcode(null).build())
+                .hasJointParty(YES)
+                .build();
+
+        callback.getCaseDetails().getCaseData().setJointParty(jointParty);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
 
     }
 
@@ -453,6 +501,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     public void givenACaseUpdatedEventWithEmptyJointPartyDetails_thenProvideAnError() {
         JointParty jointParty = JointParty.builder()
                 .name(Name.builder().firstName("").lastName("").build())
+                .jointPartyAddressSameAsAppellant(NO)
                 .address(Address.builder().line1("123 Lane").postcode("73GH Y7U").build())
                 .hasJointParty(YES)
                 .build();
