@@ -144,6 +144,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
             .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
+            .processingVenue(GAP_VENUE_NAME)
             .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("PIP").build())
