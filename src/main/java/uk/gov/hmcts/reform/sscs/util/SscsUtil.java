@@ -42,9 +42,9 @@ public class SscsUtil {
 
     public static boolean isSAndLCase(SscsCaseData sscsCaseData) {
         return LIST_ASSIST == Optional.of(sscsCaseData)
-                .map(SscsCaseData::getSchedulingAndListingFields)
-                .map(SchedulingAndListingFields::getHearingRoute)
-                .orElse(null);
+            .map(SscsCaseData::getSchedulingAndListingFields)
+            .map(SchedulingAndListingFields::getHearingRoute)
+            .orElse(null);
     }
 
     public static boolean isValidCaseState(State state, List<State> allowedStates) {
@@ -86,8 +86,8 @@ public class SscsUtil {
     }
 
     public static void setAdjournmentPanelMembersExclusions(PanelMemberExclusions exclusions,
-                                                            List<JudicialUserBase> adjournmentPanelMembers,
-                                                            AdjournCasePanelMembersExcluded panelMemberExcluded) {
+                                           List<JudicialUserBase> adjournmentPanelMembers,
+                                           AdjournCasePanelMembersExcluded panelMemberExcluded) {
         if (nonNull(adjournmentPanelMembers)) {
             List<CollectionItem<JudicialUserBase>> panelMembersList = getPanelMembersList(exclusions, panelMemberExcluded);
 
@@ -97,27 +97,27 @@ public class SscsUtil {
             }
 
             panelMembersList.addAll(adjournmentPanelMembers.stream()
-                    .filter(Objects::nonNull)
-                    .distinct()
-                    .map(panelMember -> new CollectionItem<>(panelMember.getIdamId(), panelMember))
-                    .filter(not(panelMembersList::contains))
-                    .toList());
+                .filter(Objects::nonNull)
+                .distinct()
+                .map(panelMember -> new CollectionItem<>(panelMember.getIdamId(), panelMember))
+                .filter(not(panelMembersList::contains))
+                .toList());
 
             if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
                 log.info("Excluding {} panel members with Personal Codes {}", adjournmentPanelMembers.size(),
-                        adjournmentPanelMembers.stream()
-                                .filter(Objects::nonNull)
-                                .map(JudicialUserBase::getPersonalCode)
-                                .toList());
+                    adjournmentPanelMembers.stream()
+                            .filter(Objects::nonNull)
+                            .map(JudicialUserBase::getPersonalCode)
+                            .toList());
 
                 exclusions.setExcludedPanelMembers(panelMembersList);
                 exclusions.setArePanelMembersExcluded(YES);
             } else if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.RESERVED)) {
                 log.info("Reserving {} panel members with Personal Codes {}", adjournmentPanelMembers.size(),
-                        adjournmentPanelMembers.stream()
-                                .filter(Objects::nonNull)
-                                .map(JudicialUserBase::getPersonalCode)
-                                .toList());
+                    adjournmentPanelMembers.stream()
+                            .filter(Objects::nonNull)
+                            .map(JudicialUserBase::getPersonalCode)
+                            .toList());
 
                 exclusions.setReservedPanelMembers(panelMembersList);
                 exclusions.setArePanelMembersReserved(YES);
@@ -126,7 +126,7 @@ public class SscsUtil {
     }
 
     private static List<CollectionItem<JudicialUserBase>> getPanelMembersList(PanelMemberExclusions exclusions,
-                                                                              AdjournCasePanelMembersExcluded panelMemberExcluded) {
+                                                                        AdjournCasePanelMembersExcluded panelMemberExcluded) {
         if (panelMemberExcluded.equals(AdjournCasePanelMembersExcluded.YES)) {
             return exclusions.getExcludedPanelMembers();
         }
@@ -286,7 +286,7 @@ public class SscsUtil {
     public static boolean isCorrectionInProgress(SscsCaseData caseData, boolean isPostHearingsEnabled) {
         return isPostHearingsEnabled && isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
     }
-
+      
     public static boolean isGapsCase(SscsCaseData sscsCaseData) {
         return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
     }
@@ -375,7 +375,7 @@ public class SscsUtil {
     private static String hearingChannelToYesNoString(HearingChannel expectedHearingChannel, HearingChannel hearingChannel) {
         return expectedHearingChannel.equals(hearingChannel) ? YES.toString() : NO.toString();
     }
-
+  
     public static void createFinalDecisionNoticeFromPreviewDraft(Callback<SscsCaseData> callback,
                                                                  FooterService footerService,
                                                                  boolean isPostHearingsEnabled) {
