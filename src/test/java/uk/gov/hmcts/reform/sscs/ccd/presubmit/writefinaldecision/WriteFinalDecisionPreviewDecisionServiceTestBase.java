@@ -41,7 +41,7 @@ import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @RunWith(JUnitParamsRunner.class)
 public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
-
+    protected static final String TEST_JUDGE_NAME = "test judge name";
     protected static final String USER_AUTHORISATION = "Bearer token";
     protected static final String URL = "http://dm-store/documents/123";
     protected WriteFinalDecisionPreviewDecisionServiceBase service;
@@ -922,6 +922,24 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
+    }
+
+    @Test
+    public void givenPostHearingIsEnabledAndFinalDecisionJudgeHasBeenSet_thenDontUpdateFinalDecisionJudgeName() {
+        when(caseDetails.getState()).thenReturn(State.POST_HEARING);
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionJudge(TEST_JUDGE_NAME);
+        PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION, false, true, true);
+
+        assertEquals(TEST_JUDGE_NAME, response.getData().getSscsFinalDecisionCaseData().getFinalDecisionJudge());
+    }
+
+    @Test
+    public void givenPostHearingIsEnabledAndFinalDecisionJudgeHasNotBeenSet_thenUpdateFinalDecisionJudgeName() {
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionJudge(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, false, true, true);
+
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getFinalDecisionJudge());
+        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getFinalDecisionHeldAt());
     }
 
     @Test
