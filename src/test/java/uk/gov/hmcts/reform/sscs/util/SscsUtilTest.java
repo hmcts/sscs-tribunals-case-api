@@ -6,9 +6,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_GRAN
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getIssueFinalDecisionDocumentType;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPostHearingReviewDocumentType;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getWriteFinalDecisionDocumentType;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.*;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
@@ -208,5 +207,23 @@ class SscsUtilTest {
         assertThat(caseData.getPostHearing().getRequestType()).isNull();
         assertThat(caseData.getDocumentGeneration().getGenerateNotice()).isNull();
         assertThat(caseData.getDocumentStaging().getDateAdded()).isNull();
+    }
+
+    @Test
+    void givenHearingChannelOfNotAttending_UpdateWantsToAttendToNoAndUpdateHearingSubtype() {
+        caseData.setAppeal(Appeal.builder().build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+
+        updateHearingChannel(caseData, NOT_ATTENDING);
+
+        assertThat(caseData.getSchedulingAndListingFields().getOverrideFields().getAppellantHearingChannel()).isEqualTo(NOT_ATTENDING);
+        Appeal appeal = caseData.getAppeal();
+        assertThat(appeal.getHearingType()).isEqualTo(HearingType.PAPER.getValue());
+        assertThat(appeal.getHearingOptions().getWantsToAttend()).isEqualTo(YesNo.NO.getValue());
+
+        HearingSubtype hearingSubtype = appeal.getHearingSubtype();
+        assertThat(hearingSubtype.isWantsHearingTypeTelephone()).isFalse();
+        assertThat(hearingSubtype.isWantsHearingTypeFaceToFace()).isFalse();
+        assertThat(hearingSubtype.isWantsHearingTypeVideo()).isFalse();
     }
 }
