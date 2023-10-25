@@ -156,7 +156,7 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
     @NotNull
     private LocalDateTime parseHearingDateTime(HearingDetails hearingDetails) {
         String hearingTime = (hearingDetails.getTime().length() == 5) ? (hearingDetails.getTime() + ":00") : hearingDetails.getTime();
-        DateTimeFormatter dateTimeFormatter = hearingTime.length() ==  12 ? HEARING_TIME_EXTENDED_FORMATTER : HEARING_TIME_FORMATTER;
+        DateTimeFormatter dateTimeFormatter = hearingTime.contains(".000") ? HEARING_TIME_EXTENDED_FORMATTER : HEARING_TIME_FORMATTER;
         return LocalDateTime.parse(hearingTime + " " + hearingDetails.getHearingDate(), dateTimeFormatter);
     }
 
