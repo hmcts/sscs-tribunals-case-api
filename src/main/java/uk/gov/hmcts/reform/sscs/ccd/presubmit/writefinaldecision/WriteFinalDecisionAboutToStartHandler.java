@@ -58,6 +58,8 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
 
         SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);
 
+        clearTransientFields(sscsCaseData);
+
         return preSubmitCallbackResponse;
     }
 
@@ -74,7 +76,7 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
     }
 
     private boolean isCorrectionInProgress(SscsCaseData caseData) {
-        return isPostHearingsEnabled && isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
+        return isPostHearingsEnabled && isYes(caseData.getPostHearing().getCorrection().getIsCorrectionFinalDecisionInProgress());
     }
 
     private void clearFinalDecsionTransientFields(SscsCaseData sscsCaseData) {
