@@ -40,8 +40,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Override
-    protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService) {
-        return new PipWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, false);
+    protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled) {
+        return new PipWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled);
     }
 
     @Test

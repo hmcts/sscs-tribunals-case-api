@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Slf4j
 public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
+    public static final String CANT_UPLOAD_ERROR_MESSAGE = "Unable to generate the corrected decision notice due to the original being uploaded";
     private static final List<String> DEATH_OF_APPELLANT_WARNING_PAGES = Arrays.asList("typeOfAppeal", "previewDecisionNotice");
     private final Validator validator;
 
@@ -77,7 +77,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
         if (SscsUtil.isCorrectionInProgress(sscsCaseData, isPostHearingsEnabled)
                 && isYes(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionWasOriginalDecisionUploaded())
                 && isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
-            preSubmitCallbackResponse.addError("Unable to generate the corrected decision notice due to the original being uploaded");
+            preSubmitCallbackResponse.addError(CANT_UPLOAD_ERROR_MESSAGE);
         }
 
         if (isDecisionNoticeDatesInvalid(sscsCaseData)) {
