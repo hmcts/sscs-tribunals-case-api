@@ -351,8 +351,10 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         Adjournment adjournment = caseData.getAdjournment();
 
-        log.info("panel member 1's idam id {} and personal code {}", adjournment.getPanelMember1().getIdamId(),
-                adjournment.getPanelMember1().getPersonalCode());
+        if (nonNull(adjournment.getPanelMember1())) {
+            log.info("panel member 1's idam id {} and personal code {}", adjournment.getPanelMember1().getIdamId(),
+                    adjournment.getPanelMember1().getPersonalCode());
+        }
 
         if (adjournmentFeature) {
             List<JudicialUserBase> panelMembers = adjournment.getPanelMembers();
