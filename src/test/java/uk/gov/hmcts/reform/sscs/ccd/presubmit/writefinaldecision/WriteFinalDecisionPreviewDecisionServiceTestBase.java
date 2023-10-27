@@ -6,9 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -42,6 +40,7 @@ import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 @RunWith(JUnitParamsRunner.class)
 public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     protected static final String ORIGINAL_HELD_AT = "held at testtest";
+    protected static final String ORIGINAL_JUDGE_NAME = "test judge name name";
     protected static final String USER_AUTHORISATION = "Bearer token";
     protected static final String URL = "http://dm-store/documents/123";
     protected WriteFinalDecisionPreviewDecisionServiceBase service;
@@ -925,12 +924,31 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     }
 
     @Test
+    public void givenPostHearingIsEnabledAndFinalHeldAtHasNotBeenSet_thenDontUpdateHeldAt() {
+        when(caseDetails.getState()).thenReturn(State.POST_HEARING);
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionHeldAt(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION, false, true, true);
+
+        assertNull(response.getData().getSscsFinalDecisionCaseData().getFinalDecisionHeldAt());
+    }
+
+    @Test
     public void givenPostHearingIsEnabledAndFinalHeldAtHasBeenSet_thenDontUpdateFinalDecisionHeldAt() {
         when(caseDetails.getState()).thenReturn(State.POST_HEARING);
         sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionHeldAt(ORIGINAL_HELD_AT);
         PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION, false, true, true);
 
         assertEquals(ORIGINAL_HELD_AT, response.getData().getSscsFinalDecisionCaseData().getFinalDecisionHeldAt());
+    }
+
+    @Test
+    public void givenFinalDecisionJudgeIsSet_thenDontGetSignedInJudgeName() {
+        when(caseDetails.getState()).thenReturn(State.POST_HEARING);
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionJudge(ORIGINAL_JUDGE_NAME);
+        PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION, false, true, true);
+
+        verify(userDetailsService, atMostOnce()).buildLoggedInUserName(USER_AUTHORISATION);
+        assertEquals(ORIGINAL_JUDGE_NAME, response.getData().getSscsFinalDecisionCaseData().getFinalDecisionJudge());
     }
 
     @Test
