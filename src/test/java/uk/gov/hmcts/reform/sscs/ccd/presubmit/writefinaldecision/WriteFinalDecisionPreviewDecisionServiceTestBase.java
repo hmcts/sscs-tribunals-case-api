@@ -41,7 +41,7 @@ import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @RunWith(JUnitParamsRunner.class)
 public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
-    protected static final String TEST_JUDGE_NAME = "test judge name";
+    protected static final String ORIGINAL_HELD_AT = "held at testtest";
     protected static final String USER_AUTHORISATION = "Bearer token";
     protected static final String URL = "http://dm-store/documents/123";
     protected WriteFinalDecisionPreviewDecisionServiceBase service;
@@ -922,6 +922,15 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
+    }
+
+    @Test
+    public void givenPostHearingIsEnabledAndFinalHeldAtHasBeenSet_thenDontUpdateFinalDecisionHeldAt() {
+        when(caseDetails.getState()).thenReturn(State.POST_HEARING);
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionHeldAt(ORIGINAL_HELD_AT);
+        PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION, false, true, true);
+
+        assertEquals(ORIGINAL_HELD_AT, response.getData().getSscsFinalDecisionCaseData().getFinalDecisionHeldAt());
     }
 
     @Test
