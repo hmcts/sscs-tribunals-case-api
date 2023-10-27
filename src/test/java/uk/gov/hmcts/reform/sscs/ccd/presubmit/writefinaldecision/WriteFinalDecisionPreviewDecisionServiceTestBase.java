@@ -925,24 +925,6 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     }
 
     @Test
-    public void givenPostHearingIsEnabledAndFinalDecisionJudgeHasBeenSet_thenDontUpdateFinalDecisionJudgeName() {
-        when(caseDetails.getState()).thenReturn(State.POST_HEARING);
-        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionJudge(TEST_JUDGE_NAME);
-        PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION, false, true, true);
-
-        assertEquals(TEST_JUDGE_NAME, response.getData().getSscsFinalDecisionCaseData().getFinalDecisionJudge());
-    }
-
-    @Test
-    public void givenPostHearingIsEnabledAndFinalDecisionJudgeHasNotBeenSet_thenUpdateFinalDecisionJudgeName() {
-        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionJudge(null);
-        PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, false, true, true);
-
-        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getFinalDecisionJudge());
-        assertNotNull(response.getData().getSscsFinalDecisionCaseData().getFinalDecisionHeldAt());
-    }
-
-    @Test
     public abstract void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate();
 
     @Test

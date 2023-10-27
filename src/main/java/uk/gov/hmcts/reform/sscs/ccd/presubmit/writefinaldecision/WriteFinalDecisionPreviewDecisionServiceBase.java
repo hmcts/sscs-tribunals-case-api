@@ -102,13 +102,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         String heldAt = writeFinalDecisionBuilder.build().getHeldAt();
         String heldBefore = buildHeldBefore(caseData, userAuthorisation);
 
-        if (isPostHearingsEnabled) {
-            if (isNull(finalDecisionCaseData.getFinalDecisionJudge())) {
-                finalDecisionCaseData.setFinalDecisionJudge(heldBefore);
-                finalDecisionCaseData.setFinalDecisionHeldAt(heldAt);
-            }
-
-            heldBefore = finalDecisionCaseData.getFinalDecisionJudge();
+        if (isPostHearingsEnabled && nonNull(finalDecisionCaseData.getFinalDecisionHeldAt())) {
             heldAt = finalDecisionCaseData.getFinalDecisionHeldAt();
         }
 
