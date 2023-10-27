@@ -46,13 +46,15 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
         State state = callback.getCaseDetails().getState();
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-        if (isPostHearingsEnabled
-                && (State.DORMANT_APPEAL_STATE.equals(state) || State.POST_HEARING.equals(state))) {
+
+        if (isPostHearingsEnabled && (State.DORMANT_APPEAL_STATE.equals(state) || State.POST_HEARING.equals(state))) {
             List<String> userRoles = userDetailsService.getUserRoles(userAuthorisation);
 
             if (userRoles.contains(UserRole.JUDGE.getValue())
                     && !userRoles.contains(UserRole.SALARIED_JUDGE.getValue())) {
                 preSubmitCallbackResponse.addError("You do not have access to proceed");
+
+                return preSubmitCallbackResponse;
             }
         }
 
@@ -65,7 +67,7 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
 
     private void clearTransientFields(SscsCaseData caseData) {
         if (isDraftDecisionNotOnCase(caseData) && !isCorrectionInProgress(caseData)) {
-            clearFinalDecsionTransientFields(caseData);
+            clearFinalDecisionTransientFields(caseData);
         }
     }
 
@@ -79,108 +81,113 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
         return isPostHearingsEnabled && isYes(caseData.getPostHearing().getCorrection().getIsCorrectionFinalDecisionInProgress());
     }
 
-    private void clearFinalDecsionTransientFields(SscsCaseData sscsCaseData) {
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionTypeOfHearing(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPresentingOfficerAttendedQuestion(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppellantAttendedQuestion(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppointeeAttendedQuestion(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDisabilityQualifiedPanelMemberName(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionMedicallyQualifiedPanelMemberName(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDate(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision(null);
+    private void clearFinalDecisionTransientFields(SscsCaseData sscsCaseData) {
+        SscsFinalDecisionCaseData finalDecisionCaseData = sscsCaseData.getSscsFinalDecisionCaseData();
+        finalDecisionCaseData.setWriteFinalDecisionGenerateNotice(null);
+        finalDecisionCaseData.setWriteFinalDecisionTypeOfHearing(null);
+        finalDecisionCaseData.setWriteFinalDecisionPresentingOfficerAttendedQuestion(null);
+        finalDecisionCaseData.setWriteFinalDecisionAppellantAttendedQuestion(null);
+        finalDecisionCaseData.setWriteFinalDecisionAppointeeAttendedQuestion(null);
+        finalDecisionCaseData.setWriteFinalDecisionDisabilityQualifiedPanelMemberName(null);
+        finalDecisionCaseData.setWriteFinalDecisionMedicallyQualifiedPanelMemberName(null);
+        finalDecisionCaseData.setWriteFinalDecisionStartDate(null);
+        finalDecisionCaseData.setWriteFinalDecisionEndDateType(null);
+        finalDecisionCaseData.setWriteFinalDecisionEndDate(null);
+        finalDecisionCaseData.setWriteFinalDecisionDateOfDecision(null);
+
         sscsCaseData.setWcaAppeal(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setOtherPartyAttendedQuestions(new ArrayList<>());
+        finalDecisionCaseData.setOtherPartyAttendedQuestions(new ArrayList<>());
 
         //PIP
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPreparingFoodQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionTakingNutritionQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionManagingTherapyQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionWashAndBatheQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionManagingToiletNeedsQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDressingAndUndressingQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionCommunicatingQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionReadingUnderstandingQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionEngagingWithOthersQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionBudgetingDecisionsQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionPlanningAndFollowingQuestion(null);
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMovingAroundQuestion(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionReasons(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPageSectionReference(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAnythingElse(null);
+        SscsPipCaseData sscsPipCaseData = sscsCaseData.getSscsPipCaseData();
+        sscsPipCaseData.setPipWriteFinalDecisionDailyLivingQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionMobilityQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionPreparingFoodQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionTakingNutritionQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionManagingTherapyQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionWashAndBatheQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionManagingToiletNeedsQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionDressingAndUndressingQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionCommunicatingQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionReadingUnderstandingQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionEngagingWithOthersQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionBudgetingDecisionsQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionPlanningAndFollowingQuestion(null);
+        sscsPipCaseData.setPipWriteFinalDecisionMovingAroundQuestion(null);
+        finalDecisionCaseData.setWriteFinalDecisionReasons(null);
+        finalDecisionCaseData.setWriteFinalDecisionPageSectionReference(null);
+        finalDecisionCaseData.setWriteFinalDecisionPreviewDocument(null);
+        finalDecisionCaseData.setWriteFinalDecisionGeneratedDate(null);
+        finalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow(null);
+        finalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused(null);
+        finalDecisionCaseData.setWriteFinalDecisionAnythingElse(null);
 
         //ESA
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMentalAssessmentQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionStandingAndSittingQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionReachingQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPickingUpQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionManualDexterityQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMakingSelfUnderstoodQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionCommunicationQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionNavigationQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionLossOfControlQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionConsciousnessQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionLearningTasksQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionAwarenessOfHazardsQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPersonalActionQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionCopingWithChangeQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionGettingAboutQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSocialEngagementQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionAppropriatenessOfBehaviourQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(null);
+        SscsEsaCaseData sscsEsaCaseData = sscsCaseData.getSscsEsaCaseData();
+        sscsEsaCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionMentalAssessmentQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionStandingAndSittingQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionReachingQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionPickingUpQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionManualDexterityQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionMakingSelfUnderstoodQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionCommunicationQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionNavigationQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionLossOfControlQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionConsciousnessQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionLearningTasksQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionAwarenessOfHazardsQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionPersonalActionQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionCopingWithChangeQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionGettingAboutQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionSocialEngagementQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionAppropriatenessOfBehaviourQuestion(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
+        sscsEsaCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(null);
         sscsCaseData.setDwpReassessTheAward(null);
-        sscsCaseData.getSscsEsaCaseData().setShowRegulation29Page(null);
-        sscsCaseData.getSscsEsaCaseData().setShowSchedule3ActivitiesPage(null);
+        sscsEsaCaseData.setShowRegulation29Page(null);
+        sscsEsaCaseData.setShowSchedule3ActivitiesPage(null);
         sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDetailsOfDecision(null);
+        finalDecisionCaseData.setWriteFinalDecisionDetailsOfDecision(null);
         sscsCaseData.setSupportGroupOnlyAppeal(null);
-        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(null);
-        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(null);
+        sscsEsaCaseData.setDoesRegulation29Apply(null);
+        sscsEsaCaseData.setDoesRegulation35Apply(null);
 
         //UC
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMentalAssessmentQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMobilisingUnaidedQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionStandingAndSittingQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionReachingQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPickingUpQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionManualDexterityQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMakingSelfUnderstoodQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionCommunicationQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionNavigationQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionLossOfControlQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionConsciousnessQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionLearningTasksQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionAwarenessOfHazardsQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPersonalActionQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionCopingWithChangeQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionGettingAboutQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSocialEngagementQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionAppropriatenessOfBehaviourQuestion(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(null);
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(null);
+        SscsUcCaseData sscsUcCaseData = sscsCaseData.getSscsUcCaseData();
+        sscsUcCaseData.setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionMentalAssessmentQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionMobilisingUnaidedQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionStandingAndSittingQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionReachingQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionPickingUpQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionManualDexterityQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionMakingSelfUnderstoodQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionCommunicationQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionNavigationQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionLossOfControlQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionConsciousnessQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionLearningTasksQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionAwarenessOfHazardsQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionPersonalActionQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionCopingWithChangeQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionGettingAboutQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionSocialEngagementQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionAppropriatenessOfBehaviourQuestion(null);
+        sscsUcCaseData.setUcWriteFinalDecisionSchedule7ActivitiesApply(null);
+        sscsUcCaseData.setUcWriteFinalDecisionSchedule7ActivitiesQuestion(null);
         sscsCaseData.setDwpReassessTheAward(null);
-        sscsCaseData.getSscsUcCaseData().setShowSchedule8Paragraph4Page(null);
-        sscsCaseData.getSscsUcCaseData().setShowSchedule7ActivitiesPage(null);
+        sscsUcCaseData.setShowSchedule8Paragraph4Page(null);
+        sscsUcCaseData.setShowSchedule7ActivitiesPage(null);
         sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(null);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDetailsOfDecision(null);
+        finalDecisionCaseData.setWriteFinalDecisionDetailsOfDecision(null);
         sscsCaseData.setSupportGroupOnlyAppeal(null);
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(null);
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(null);
+        sscsUcCaseData.setDoesSchedule8Paragraph4Apply(null);
+        sscsUcCaseData.setDoesSchedule9Paragraph4Apply(null);
     }
 }

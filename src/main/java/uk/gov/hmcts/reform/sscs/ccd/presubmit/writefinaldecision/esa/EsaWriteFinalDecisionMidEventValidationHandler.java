@@ -4,6 +4,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -15,8 +16,10 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 @Component
 public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
-    public EsaWriteFinalDecisionMidEventValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService) {
-        super(validator, decisionNoticeService);
+    public EsaWriteFinalDecisionMidEventValidationHandler(Validator validator,
+                                                          DecisionNoticeService decisionNoticeService,
+                                                          @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
+        super(validator, decisionNoticeService, isPostHearingsEnabled);
     }
 
     @Override
@@ -54,7 +57,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if ("Yes".equalsIgnoreCase(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply())) {
+        if (isYes(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply())) {
             if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesQuestion() == null
                 || sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesQuestion().isEmpty()) {
                 preSubmitCallbackResponse.addError("Please select the Schedule 3 Activities that apply, or indicate that none apply");
@@ -80,17 +83,13 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
 
     @Override
     protected void setShowWorkCapabilityAssessmentPage(SscsCaseData sscsCaseData) {
-        if (YES.getValue().equals(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
-            sscsCaseData.setShowWorkCapabilityAssessmentPage(YES);
-        } else if (NO.getValue().equals(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
-            sscsCaseData.setShowWorkCapabilityAssessmentPage(NO);
-        }
+        sscsCaseData.setShowWorkCapabilityAssessmentPage(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice());
     }
 
     @Override
     protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData, String pageId) {
         if (pageId != null && pageId.equals("workCapabilityAssessment")) {
-            if (YesNo.YES.getValue().equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())
+            if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())
                     && sscsCaseData.isWcaAppeal()
                     && "allowed".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused())) {
                 sscsCaseData.setShowDwpReassessAwardPage(YesNo.YES);
