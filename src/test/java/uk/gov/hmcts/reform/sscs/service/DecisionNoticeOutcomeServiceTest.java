@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import junitparams.JUnitParamsRunner;
@@ -42,7 +44,7 @@ public class DecisionNoticeOutcomeServiceTest {
             .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
                 .build())
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
-                .writeFinalDecisionGenerateNotice("yes")
+                .writeFinalDecisionGenerateNotice(YES)
                 .writeFinalDecisionIsDescriptorFlow("yes")
                 .build())
             .build();
@@ -72,7 +74,7 @@ public class DecisionNoticeOutcomeServiceTest {
             .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
                 .build())
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
-                .writeFinalDecisionGenerateNotice("yes")
+                .writeFinalDecisionGenerateNotice(YES)
                 .writeFinalDecisionAllowedOrRefused("refused")
                 .writeFinalDecisionIsDescriptorFlow("yes")
                 .build())
@@ -93,7 +95,7 @@ public class DecisionNoticeOutcomeServiceTest {
             .pipWriteFinalDecisionComparedToDwpMobilityQuestion("something")
                 .build())
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
-                .writeFinalDecisionGenerateNotice("yes")
+                .writeFinalDecisionGenerateNotice(YES)
                 .writeFinalDecisionIsDescriptorFlow("yes")
                 .build())
             .build();
@@ -111,7 +113,7 @@ public class DecisionNoticeOutcomeServiceTest {
                 .build())
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionAllowedOrRefused("refused")
-                .writeFinalDecisionGenerateNotice("yes")
+                .writeFinalDecisionGenerateNotice(YES)
                 .writeFinalDecisionIsDescriptorFlow("yes")
                 .build())
             .build();
@@ -127,7 +129,7 @@ public class DecisionNoticeOutcomeServiceTest {
         SscsCaseData caseData = SscsCaseData.builder()
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionIsDescriptorFlow("yes")
-                .writeFinalDecisionGenerateNotice("yes")
+                .writeFinalDecisionGenerateNotice(YES)
                 .build())
             .pipSscsCaseData(SscsPipCaseData.builder()
             .pipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher")
@@ -158,7 +160,7 @@ public class DecisionNoticeOutcomeServiceTest {
             .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
                 .build())
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
-                .writeFinalDecisionGenerateNotice("yes")
+                .writeFinalDecisionGenerateNotice(YES)
                 .writeFinalDecisionAllowedOrRefused("refused")
                 .build())
             .build();
@@ -175,7 +177,7 @@ public class DecisionNoticeOutcomeServiceTest {
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionIsDescriptorFlow("yes")
                 .writeFinalDecisionAllowedOrRefused("refused")
-                .writeFinalDecisionGenerateNotice("yes")
+                .writeFinalDecisionGenerateNotice(YES)
                 .build())
             .pipSscsCaseData(SscsPipCaseData.builder()
                 .pipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher")
@@ -207,7 +209,7 @@ public class DecisionNoticeOutcomeServiceTest {
                 .build())
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionIsDescriptorFlow("no")
-                .writeFinalDecisionGenerateNotice("yes")
+                .writeFinalDecisionGenerateNotice(YES)
                 .writeFinalDecisionAllowedOrRefused("refused")
                 .build())
             .build();
@@ -238,7 +240,7 @@ public class DecisionNoticeOutcomeServiceTest {
                 .build())
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionIsDescriptorFlow("no")
-                .writeFinalDecisionGenerateNotice("yes")
+                .writeFinalDecisionGenerateNotice(YES)
                 .writeFinalDecisionAllowedOrRefused("allowed")
                 .build())
             .build();
@@ -267,7 +269,7 @@ public class DecisionNoticeOutcomeServiceTest {
             .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
                 .build())
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
-                .writeFinalDecisionGenerateNotice("yes")
+                .writeFinalDecisionGenerateNotice(YES)
                 .writeFinalDecisionIsDescriptorFlow("no")
                 .build())
             .build();
@@ -296,7 +298,7 @@ public class DecisionNoticeOutcomeServiceTest {
                 .build())
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionIsDescriptorFlow("no")
-                .writeFinalDecisionGenerateNotice("no")
+                .writeFinalDecisionGenerateNotice(NO)
                 .writeFinalDecisionAllowedOrRefused("refused")
                 .build())
             .build();
@@ -327,7 +329,7 @@ public class DecisionNoticeOutcomeServiceTest {
                 .build())
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionIsDescriptorFlow("no")
-                .writeFinalDecisionGenerateNotice("no")
+                .writeFinalDecisionGenerateNotice(NO)
                 .writeFinalDecisionAllowedOrRefused("allowed")
                 .build())
             .build();
@@ -356,7 +358,7 @@ public class DecisionNoticeOutcomeServiceTest {
             .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
                 .build())
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
-                .writeFinalDecisionGenerateNotice("no")
+                .writeFinalDecisionGenerateNotice(NO)
                 .writeFinalDecisionIsDescriptorFlow("no")
                 .build())
             .build();
@@ -386,7 +388,7 @@ public class DecisionNoticeOutcomeServiceTest {
                 .build())
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionIsDescriptorFlow("yes")
-                .writeFinalDecisionGenerateNotice("no")
+                .writeFinalDecisionGenerateNotice(NO)
                 .writeFinalDecisionAllowedOrRefused("refused")
                 .build())
             .build();
@@ -417,7 +419,7 @@ public class DecisionNoticeOutcomeServiceTest {
                 .build())
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionIsDescriptorFlow("yes")
-                .writeFinalDecisionGenerateNotice("no")
+                .writeFinalDecisionGenerateNotice(NO)
                 .writeFinalDecisionAllowedOrRefused("allowed")
                 .build())
             .build();
@@ -445,7 +447,7 @@ public class DecisionNoticeOutcomeServiceTest {
         SscsCaseData caseData = SscsCaseData.builder().pipSscsCaseData(SscsPipCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving)
             .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility).build())
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
-                .writeFinalDecisionGenerateNotice("no")
+                .writeFinalDecisionGenerateNotice(NO)
                 .writeFinalDecisionIsDescriptorFlow("yes")
                 .build())
             .build();

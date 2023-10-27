@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_IN_FAVOUR_OF_APPELLANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_UPHELD;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -27,7 +28,7 @@ public class PipDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
             return null;
         } else {
             if (sscsCaseData.getSscsFinalDecisionCaseData().isDailyLivingAndOrMobilityDecision()) {
-                if ("yes".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
+                if (isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
                     // If we are generating the notice we use the daily living/mobility descriptors
                     // to determine outcome
                     return determineGenerateNoticeDailyLivingOrMobilityFlowOutcome(sscsCaseData);
