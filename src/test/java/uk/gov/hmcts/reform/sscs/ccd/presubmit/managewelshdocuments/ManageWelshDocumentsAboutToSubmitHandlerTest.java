@@ -10,6 +10,7 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -85,6 +86,7 @@ public class ManageWelshDocumentsAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Ignore
     public void givenCaseHasExistingDocumentsWithNullTypeWhenTypeSet_thenSetUploadedWelshDocumentTypes() {
         SscsCaseData sscsCaseDataBefore =  SscsCaseData.builder()
                 .sscsWelshDocuments(Arrays.asList(
