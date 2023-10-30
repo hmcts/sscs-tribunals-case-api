@@ -102,13 +102,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         String heldAt = writeFinalDecisionBuilder.build().getHeldAt();
         String heldBefore = buildHeldBefore(caseData, userAuthorisation);
 
-        if (isPostHearingsEnabled) {
-            if (isNull(finalDecisionCaseData.getFinalDecisionHeldBefore())) {
-                finalDecisionCaseData.setFinalDecisionHeldBefore(heldBefore);
-                finalDecisionCaseData.setFinalDecisionHeldAt(heldAt);
-            }
-
-            heldBefore = finalDecisionCaseData.getFinalDecisionHeldBefore();
+        if (isPostHearingsEnabled && nonNull(finalDecisionCaseData.getFinalDecisionHeldAt())) {
             heldAt = finalDecisionCaseData.getFinalDecisionHeldAt();
         }
 
@@ -126,11 +120,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         writeFinalDecisionBuilder.isSetAside(isSetAside(caseData, outcome));
 
-        if (caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision() != null) {
-            writeFinalDecisionBuilder.dateOfDecision(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision());
-        } else {
-            writeFinalDecisionBuilder.dateOfDecision(null);
-        }
+        writeFinalDecisionBuilder.dateOfDecision(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision());
 
         writeFinalDecisionBuilder.appellantName(buildName(caseData, false));
         if ("na".equals(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType())) {
@@ -272,7 +262,13 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
     }
 
     protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
-        return SscsUtil.buildWriteFinalDecisionHeldBefore(caseData, buildSignedInJudgeName(userAuthorisation));
+        String judgeName = caseData.getSscsFinalDecisionCaseData().getFinalDecisionJudge();
+
+        if (isNull(judgeName)) {
+            judgeName = buildSignedInJudgeName(userAuthorisation);
+        }
+
+        return SscsUtil.buildWriteFinalDecisionHeldBefore(caseData, judgeName);
     }
 
     @Override

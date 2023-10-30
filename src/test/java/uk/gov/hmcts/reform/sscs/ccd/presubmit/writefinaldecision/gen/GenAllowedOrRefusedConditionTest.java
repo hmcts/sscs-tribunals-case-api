@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFinalDecisionCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -52,7 +53,7 @@ public class GenAllowedOrRefusedConditionTest {
 
         SscsCaseData caseData = SscsCaseData.builder()
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
-                .writeFinalDecisionGenerateNotice("Yes")
+                .writeFinalDecisionGenerateNotice(YesNo.YES)
                 .writeFinalDecisionAllowedOrRefused(allowedOrRefused)
                 .build())
             .dwpReassessTheAward(null).build();
