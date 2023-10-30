@@ -85,6 +85,22 @@ public class ManageWelshDocumentsAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenCaseHasExistingDocumentsWithNullTypeWhenTypeSet_thenSetUploadedWelshDocumentTypes() {
+        SscsCaseData sscsCaseDataBefore =  SscsCaseData.builder()
+                .sscsWelshDocuments(Arrays.asList(
+                        SscsWelshDocument.builder().id("111-111").value(SscsWelshDocumentDetails.builder().build()).build()
+                )).build();
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+                .sscsWelshDocuments(Arrays.asList(
+                        SscsWelshDocument.builder().id("111-111").value(SscsWelshDocumentDetails.builder().documentType("confidentialityRequest").build()).build()
+                )).build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, createCallBack(sscsCaseDataBefore, sscsCaseData), USER_AUTHORISATION);
+
+        assertEquals(Arrays.asList("confidentialityRequest"), response.getData().getWorkAllocationFields().getUploadedWelshDocumentTypes());
+    }
+
+    @Test
     public void givenExistingDocumentChangedType_thenSetUploadedWelshDocumentTypes() {
         SscsCaseData sscsCaseDataBefore = SscsCaseData.builder()
             .sscsWelshDocuments(Arrays.asList(

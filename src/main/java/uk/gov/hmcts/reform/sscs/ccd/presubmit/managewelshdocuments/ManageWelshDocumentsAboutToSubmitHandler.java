@@ -3,7 +3,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.managewelshdocuments;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -57,7 +60,37 @@ public class ManageWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         return preSubmitCallbackResponse;
     }
 
+
     private List<? extends AbstractDocument> previousWelshDocuments(Optional<CaseDetails<SscsCaseData>> caseData) {
         return caseData.isPresent() ? caseData.get().getCaseData().getSscsWelshDocuments() : null;
+    }
+
+    private List<SscsWelshDocument> uploadDocuments(List<SscsWelshDocument> welshDocumentsBefore, List<SscsWelshDocument> welshDocuments) {
+        Map<String, Optional<String>> existingDocumentTypes = null;
+        if (welshDocumentsBefore != null) {
+            existingDocumentTypes = welshDocumentsBefore.stream().collect(
+                    Collectors.toMap(d -> d.getId(), d -> Optional.ofNullable(d.getValue().getDocumentType())));
+        }
+
+        return uploadDocuments(existingDocumentTypes, welshDocuments);
+    }
+
+    public List<SscsWelshDocument> uploadDocuments(final Map<String, Optional<String>> existingDocumentTypes, List<SscsWelshDocument> welshDocuments) {
+        if (welshDocuments != null) {
+            return welshDocuments.stream()
+                    .filter(d -> isNewDocumentOrTypeChanged(existingDocumentTypes, d))
+                    .collect(Collectors.toList());
+        }
+        return null;
+    }
+
+    private boolean isNewDocumentOrTypeChanged(Map<String, Optional<String>> existingDocumentTypes, SscsWelshDocument welshDocument) {
+        if (existingDocumentTypes != null) {
+            if (existingDocumentTypes.containsKey(welshDocument.getId())) {
+                return !StringUtils.equals(welshDocument.getValue().getDocumentType(),
+                        existingDocumentTypes.get(welshDocument.getId()).orElse(null));
+            }
+        }
+        return true;
     }
 }
