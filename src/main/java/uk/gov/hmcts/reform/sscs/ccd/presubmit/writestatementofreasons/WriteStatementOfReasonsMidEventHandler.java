@@ -59,6 +59,8 @@ public class WriteStatementOfReasonsMidEventHandler extends IssueDocumentHandler
             String templateId = documentConfiguration.getDocuments()
                 .get(caseData.getLanguagePreference()).get(EventType.DECISION_ISSUED);
 
+            caseData.getPostHearing().setReviewType(null);
+
             response = issueDocument(callback, STATEMENT_OF_REASONS, templateId, generateFile, userAuthorisation, isPostHearingsEnabled, isPostHearingsBEnabled);
         }
 
