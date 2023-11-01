@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.reference.data.service.HearingDurationsService;
@@ -51,10 +52,10 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     private final FooterService footerService;
     private final Validator validator;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
-    private final VenueDataLoader venueDataLoader;
     private final AirLookupService airLookupService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final HearingDurationsService hearingDurationsService;
+    private final VenueService venueService;
 
     @Value("${feature.snl.adjournment.enabled}")
     private boolean isAdjournmentEnabled;
@@ -104,7 +105,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     }
 
     private void processResponse(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
-        SscsDocumentTranslationStatus documentTranslationStatus) {
+                                 SscsDocumentTranslationStatus documentTranslationStatus) {
         createAdjournmentNoticeFromPreviewDraft(preSubmitCallbackResponse, documentTranslationStatus);
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
@@ -194,11 +195,11 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         }
 
         Adjournment adjournment = sscsCaseData.getAdjournment();
-
-        if (nonNull(adjournment.getInterpreterRequired())) {
+        YesNo interpreterRequired = adjournment.getInterpreterRequired();
+        if (nonNull(interpreterRequired) && isYes(interpreterRequired)) {
             DynamicList interpreterLanguage = adjournment.getInterpreterLanguage();
             hearingOptions.setLanguages(nonNull(interpreterLanguage.getValue()) ? interpreterLanguage.getValue().getLabel() : NO.getValue());
-            hearingOptions.setLanguageInterpreter(adjournment.getInterpreterRequired().getValue());
+            hearingOptions.setLanguageInterpreter(interpreterRequired.getValue());
         } else {
             hearingOptions.setLanguages(null);
             hearingOptions.setLanguageInterpreter(NO.getValue());
@@ -266,13 +267,25 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         }
 
         Adjournment adjournment = caseData.getAdjournment();
-        var nextHearingVenueSelected = adjournment.getNextHearingVenueSelected();
 
-        if (nonNull(nextHearingVenueSelected)) {
-            var venueDetails = venueDataLoader.getVenueDetailsMap().get(nextHearingVenueSelected.getValue().getCode());
+        if (AdjournCaseTypeOfHearing.PAPER.equals(adjournment.getTypeOfNextHearing())) {
+            List<VenueDetails> paperVenues = venueService.getActiveRegionalEpimsIdsForRpc(caseData.getRegionalProcessingCenter().getEpimsId());
 
-            if (nonNull(venueDetails)) {
-                CcdValue<String> venueDetailsValue = new CcdValue<>(venueDetails.getEpimsId());
+            List<CcdValue<CcdValue<String>>> venueEpimsIds = paperVenues.stream().map(VenueDetails::getEpimsId)
+                    .map(CcdValue::new)
+                    .map(CcdValue::new)
+                    .toList();
+
+            fields.setHearingVenueEpimsIds(venueEpimsIds);
+        } else {
+            var nextHearingVenueSelected = adjournment.getNextHearingVenueSelected();
+
+            String epimsId = nonNull(nextHearingVenueSelected)
+                    ? venueService.getEpimsIdForVenueId(nextHearingVenueSelected.getValue().getCode())
+                    : venueService.getEpimsIdForVenue(caseData.getProcessingVenue());
+
+            if (nonNull(epimsId)) {
+                CcdValue<String> venueDetailsValue = new CcdValue<>(epimsId);
                 CcdValue<CcdValue<String>> ccdValue = new CcdValue<>(venueDetailsValue);
                 fields.setHearingVenueEpimsIds(List.of(ccdValue));
             }
@@ -299,21 +312,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             Appeal appeal = sscsCaseData.getAppeal();
             HearingChannel hearingChannel = getNextHearingChannel(sscsCaseData);
 
-            if (isAdjournmentEnabled) {
-                String wantsToAttend = YES.toString();
-                String hearingType = uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.ORAL.getValue();
-
-                if (PAPER.equals(nextHearingType.getHearingChannel())) {
-                    wantsToAttend = NO.toString();
-                    hearingType = uk.gov.hmcts.reform.sscs.ccd.domain.HearingType.PAPER.getValue();
-                }
-
-                log.info("Updating hearing type to {} and wants to attend to {}", hearingType, wantsToAttend);
-                appeal.getHearingOptions().setWantsToAttend(wantsToAttend);
-                appeal.setHearingType(hearingType);
-
-                sscsCaseData.getSchedulingAndListingFields().getOverrideFields().setAppellantHearingChannel(hearingChannel);
-            }
+            SscsUtil.updateHearingChannel(sscsCaseData, hearingChannel);
 
             Hearing latestHearing = sscsCaseData.getLatestHearing();
             if (nonNull(latestHearing) && nonNull(latestHearing.getValue())) {
@@ -332,13 +331,17 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
         AdjournCaseNextHearingDurationType durationType = caseData.getAdjournment().getNextHearingListingDurationType();
 
         if (STANDARD.equals(durationType)) {
-            Integer existingDuration = caseData.getSchedulingAndListingFields().getDefaultListingValues().getDuration();
-            if (nonNull(existingDuration)) {
-                if (isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
-                    && isInterpreterRequired(caseData)) {
-                    return existingDuration + MIN_HEARING_DURATION;
-                } else {
-                    return existingDuration;
+            OverrideFields defaultListingValues = caseData.getSchedulingAndListingFields().getDefaultListingValues();
+
+            if (nonNull(defaultListingValues)) {
+                Integer existingDuration = caseData.getSchedulingAndListingFields().getDefaultListingValues().getDuration();
+                if (nonNull(existingDuration)) {
+                    if (isYes(caseData.getAppeal().getHearingOptions().getWantsToAttend())
+                            && isInterpreterRequired(caseData)) {
+                        return existingDuration + MIN_HEARING_DURATION;
+                    } else {
+                        return existingDuration;
+                    }
                 }
             }
         }
