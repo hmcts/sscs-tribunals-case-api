@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -64,16 +65,16 @@ public class AddedDocumentsUtil {
     }
 
     public List<String> addedDocumentTypes(List<? extends AbstractDocument> previousDocuments, List<? extends AbstractDocument> documents) {
-        Map<String, String> existingDocumentTypes = null;
+        Map<String, Optional<String>> existingDocumentTypes = null;
         if (previousDocuments != null) {
             existingDocumentTypes = previousDocuments.stream().collect(
-                    Collectors.toMap(d -> d.getId(), d -> d.getValue().getDocumentType()));
+                    Collectors.toMap(d -> d.getId(), d -> Optional.ofNullable(d.getValue().getDocumentType())));
         }
 
         return addedDocumentTypes(existingDocumentTypes, documents);
     }
 
-    public List<String> addedDocumentTypes(Map<String, String> existingDocumentTypes, List<? extends AbstractDocument> documents) {
+    public List<String> addedDocumentTypes(Map<String, Optional<String>> existingDocumentTypes, List<? extends AbstractDocument> documents) {
         if (documents != null) {
             return documents.stream()
                     .filter(d -> isNewDocumentOrTypeChanged(existingDocumentTypes, d))
@@ -85,11 +86,11 @@ public class AddedDocumentsUtil {
         return null;
     }
 
-    private boolean isNewDocumentOrTypeChanged(Map<String, String> existingDocumentTypes, AbstractDocument document) {
+    private boolean isNewDocumentOrTypeChanged(Map<String, Optional<String>> existingDocumentTypes, AbstractDocument document) {
         if (existingDocumentTypes != null) {
             if (existingDocumentTypes.containsKey(document.getId())) {
                 return !StringUtils.equals(document.getValue().getDocumentType(),
-                        existingDocumentTypes.get(document.getId()));
+                        existingDocumentTypes.get(document.getId()).orElse(null));
             }
         }
         return true;
