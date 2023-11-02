@@ -4,9 +4,12 @@ import static io.micrometer.core.instrument.util.StringUtils.isNotBlank;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -19,10 +22,11 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
@@ -65,6 +69,22 @@ public class SscsUtil {
     public static void clearDocumentTransientFields(SscsCaseData caseData) {
         caseData.setDocumentGeneration(DocumentGeneration.builder().build());
         caseData.setDocumentStaging(DocumentStaging.builder().build());
+    }
+
+    public static void addPanelMembersToExclusions(SscsCaseData caseData, boolean arePanelMembersReserved) {
+        PanelMemberExclusions panelMemberExclusions = caseData.getSchedulingAndListingFields().getPanelMemberExclusions();
+
+        if (isNull(panelMemberExclusions)) {
+            panelMemberExclusions = PanelMemberExclusions.builder().build();
+            caseData.getSchedulingAndListingFields().setPanelMemberExclusions(panelMemberExclusions);
+        }
+        JudicialUserPanel panel = caseData.getLatestHearing().getValue().getPanel();
+
+        if (nonNull(panel)) {
+            setAdjournmentPanelMembersExclusions(panelMemberExclusions,
+                    panel.getAllPanelMembers(),
+                    arePanelMembersReserved ? AdjournCasePanelMembersExcluded.RESERVED : AdjournCasePanelMembersExcluded.YES);
+        }
     }
 
     public static void setAdjournmentPanelMembersExclusions(PanelMemberExclusions exclusions,
@@ -223,17 +243,36 @@ public class SscsUtil {
     }
 
     public static DocumentType getWriteFinalDecisionDocumentType(SscsCaseData caseData, boolean isPostHearingsEnabled) {
-        if (isPostHearingsEnabled
-            && isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
-            return DocumentType.DRAFT_CORRECTED_NOTICE;
+        return getWriteFinalDecisionDocumentType(caseData, null, isPostHearingsEnabled);
+    }
+
+    public static DocumentType getWriteFinalDecisionDocumentType(SscsCaseData caseData, EventType event, boolean isPostHearingsEnabled) {
+        if (isPostHearingsEnabled) {
+            if (EventType.ADMIN_ACTION_CORRECTION.equals(event)) {
+                return DocumentType.CORRECTED_DECISION_NOTICE;
+            }
+
+            if (isYes(caseData.getPostHearing().getCorrection().getIsCorrectionFinalDecisionInProgress())) {
+                return DocumentType.DRAFT_CORRECTED_NOTICE;
+            }
         }
 
         return DocumentType.DRAFT_DECISION_NOTICE;
     }
 
     public static DocumentType getIssueFinalDecisionDocumentType(SscsCaseData caseData, boolean isPostHearingsEnabled) {
-        if (isCorrectionInProgress(caseData, isPostHearingsEnabled)) {
-            return DocumentType.CORRECTION_GRANTED;
+        return getIssueFinalDecisionDocumentType(caseData, null, isPostHearingsEnabled);
+    }
+
+    public static DocumentType getIssueFinalDecisionDocumentType(SscsCaseData caseData, EventType event, boolean isPostHearingsEnabled) {
+        if (isPostHearingsEnabled) {
+            if (EventType.ADMIN_ACTION_CORRECTION.equals(event)) {
+                return DocumentType.CORRECTED_DECISION_NOTICE;
+            }
+
+            if (isCorrectionInProgress(caseData, true)) {
+                return DocumentType.CORRECTION_GRANTED;
+            }
         }
 
         return DocumentType.FINAL_DECISION_NOTICE;
@@ -242,12 +281,16 @@ public class SscsUtil {
     public static void setCorrectionInProgress(CaseDetails<SscsCaseData> caseDetails, boolean isPostHearingsEnabled) {
         if (isPostHearingsEnabled) {
             YesNo correctionInProgress = State.POST_HEARING.equals(caseDetails.getState()) || State.DORMANT_APPEAL_STATE.equals(caseDetails.getState()) ? YES : NO;
-            caseDetails.getCaseData().getPostHearing().getCorrection().setCorrectionFinalDecisionInProgress(correctionInProgress);
+            caseDetails.getCaseData().getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(correctionInProgress);
         }
     }
 
     public static boolean isCorrectionInProgress(SscsCaseData caseData, boolean isPostHearingsEnabled) {
-        return isPostHearingsEnabled && isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
+        return isPostHearingsEnabled && isYes(caseData.getPostHearing().getCorrection().getIsCorrectionFinalDecisionInProgress());
+    }
+
+    public static boolean isOriginalDecisionNoticeUploaded(SscsCaseData sscsCaseData) {
+        return isNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision());
     }
       
     public static boolean isGapsCase(SscsCaseData sscsCaseData) {
@@ -271,7 +314,7 @@ public class SscsUtil {
     }
 
     public static String buildWriteFinalDecisionHeldAt(SscsCaseData caseData, VenueDataLoader venueDataLoader) {
-        if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
+        if (isNotEmpty(caseData.getHearings())) {
             HearingDetails finalHearing = getLastValidHearing(caseData);
             if (nonNull(finalHearing)) {
                 if (nonNull(finalHearing.getVenue())) {
@@ -343,6 +386,69 @@ public class SscsUtil {
         benefitType.setDescription(benefit.getDescription());
         benefitType.setDescriptionSelection(null);
         caseData.setBenefitCode(benefit.getBenefitCode());
+
+    public static void updateHearingChannel(SscsCaseData caseData, HearingChannel hearingChannel) {
+        String wantsToAttend = YES.toString();
+        HearingType hearingType = HearingType.ORAL;
+
+        if (NOT_ATTENDING.equals(hearingChannel) || PAPER.equals(hearingChannel)) {
+            wantsToAttend = NO.toString();
+            hearingType = HearingType.PAPER;
+        }
+
+        log.info("Updating hearing type to {} and wants to attend to {}", hearingType, wantsToAttend);
+
+        Appeal appeal = caseData.getAppeal();
+
+        HearingOptions hearingOptions = appeal.getHearingOptions();
+        if (isNull(hearingOptions)) {
+            hearingOptions = HearingOptions.builder().build();
+            appeal.setHearingOptions(hearingOptions);
+        }
+
+        appeal.getHearingOptions().setWantsToAttend(wantsToAttend);
+        appeal.setHearingType(hearingType.getValue());
+
+        HearingSubtype hearingSubtype = appeal.getHearingSubtype();
+        if (isNull(hearingSubtype)) {
+            hearingSubtype = HearingSubtype.builder().build();
+            appeal.setHearingSubtype(hearingSubtype);
+        }
+
+        hearingSubtype.setWantsHearingTypeFaceToFace(hearingChannelToYesNoString(FACE_TO_FACE, hearingChannel));
+        hearingSubtype.setWantsHearingTypeTelephone(hearingChannelToYesNoString(TELEPHONE, hearingChannel));
+        hearingSubtype.setWantsHearingTypeVideo(hearingChannelToYesNoString(VIDEO, hearingChannel));
+
+        caseData.getSchedulingAndListingFields().getOverrideFields().setAppellantHearingChannel(hearingChannel);
+    }
+
+    private static String hearingChannelToYesNoString(HearingChannel expectedHearingChannel, HearingChannel hearingChannel) {
+        return expectedHearingChannel.equals(hearingChannel) ? YES.toString() : NO.toString();
+    }
+  
+    public static void createFinalDecisionNoticeFromPreviewDraft(Callback<SscsCaseData> callback,
+                                                                 FooterService footerService,
+                                                                 boolean isPostHearingsEnabled) {
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        DocumentLink docLink = sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument();
+
+        DocumentLink documentLink = DocumentLink.builder()
+                .documentUrl(docLink.getDocumentUrl())
+                .documentFilename(docLink.getDocumentFilename())
+                .documentBinaryUrl(docLink.getDocumentBinaryUrl())
+                .build();
+
+        String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        DocumentType docType = SscsUtil.getIssueFinalDecisionDocumentType(sscsCaseData, callback.getEvent(), isPostHearingsEnabled);
+
+        final SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelsh() ? TRANSLATION_REQUIRED : null;
+        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, docType, now, null, null, documentTranslationStatus);
+
+        if (nonNull(documentTranslationStatus)) {
+            sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
+            log.info("Set the InterlocReviewState to {},  for case id : {}", sscsCaseData.getInterlocReviewState(), sscsCaseData.getCcdCaseId());
+            sscsCaseData.setTranslationWorkOutstanding(YES.getValue());
+        }
     }
 }
 
