@@ -385,7 +385,7 @@ public class SscsUtil {
         benefitType.setCode(benefit.getShortName());
         benefitType.setDescription(benefit.getDescription());
         benefitType.setDescriptionSelection(null);
-        caseData.setBenefitCode(benefit.getBenefitCode());
+        caseData.setBenefitCode(code);
     }
 
     public static void updateHearingChannel(SscsCaseData caseData, HearingChannel hearingChannel) {
