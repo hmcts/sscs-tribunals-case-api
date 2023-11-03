@@ -23,9 +23,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 @Service
 public class PostponementRequestService {
 
-    public void processPostponementRequest(SscsCaseData sscsCaseData, UploadParty uploadParty, Optional<UploadParty> docUploadParty) {
+    public void processPostponementRequest(SscsCaseData sscsCaseData, UploadParty originalSender, Optional<UploadParty> uploadParty) {
         ensureSscsDocumentsIsNotNull(sscsCaseData);
-        final SscsDocument sscsDocument = buildNewSscsDocumentFromPostponementRequest(sscsCaseData, uploadParty, docUploadParty);
+        final SscsDocument sscsDocument = buildNewSscsDocumentFromPostponementRequest(sscsCaseData, originalSender, uploadParty);
         addToSscsDocuments(sscsCaseData, sscsDocument);
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
