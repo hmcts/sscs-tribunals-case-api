@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_GRAN
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.*;
 
 import java.time.LocalDate;
@@ -32,7 +33,7 @@ class SscsUtilTest {
     void setUp() {
         postHearing = PostHearing.builder()
             .correction(Correction.builder()
-                .correctionFinalDecisionInProgress(YesNo.NO)
+                .isCorrectionFinalDecisionInProgress(YesNo.NO)
                 .build())
             .build();
 
@@ -146,19 +147,19 @@ class SscsUtilTest {
 
     @Test
     void givenPostHearingsFlagIsTrueAndCorrectionInProgress_shouldReturnDraftCorrectedDecisionNotice() {
-        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
+        postHearing.getCorrection().setIsCorrectionFinalDecisionInProgress(YesNo.YES);
         assertThat(getWriteFinalDecisionDocumentType(caseData, true)).isEqualTo(DRAFT_CORRECTED_NOTICE);
     }
 
     @Test
     void givenPostHearingsFlagIsFalseAndCorrectionInProgress_shouldReturnDraftDecisionNotice() {
-        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
+        postHearing.getCorrection().setIsCorrectionFinalDecisionInProgress(YesNo.YES);
         assertThat(getWriteFinalDecisionDocumentType(caseData, false)).isEqualTo(DRAFT_DECISION_NOTICE);
     }
 
     @Test
     void givenPostHearingsFlagIsTrueAndCorrectionInProgress_shouldReturnCorrectionGranted() {
-        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
+        postHearing.getCorrection().setIsCorrectionFinalDecisionInProgress(YesNo.YES);
         assertThat(getIssueFinalDecisionDocumentType(caseData, true)).isEqualTo(CORRECTION_GRANTED);
     }
 
@@ -169,7 +170,7 @@ class SscsUtilTest {
 
     @Test
     void givenPostHearingsFlagIsFalseAndCorrectionInProgress_shouldReturnFinalDecisionNotice() {
-        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
+        postHearing.getCorrection().setIsCorrectionFinalDecisionInProgress(YesNo.YES);
         assertThat(getIssueFinalDecisionDocumentType(caseData, false)).isEqualTo(FINAL_DECISION_NOTICE);
     }
   
@@ -240,5 +241,23 @@ class SscsUtilTest {
 
         assertThat(response.getErrors().size()).isEqualTo(1);
         assertThat(response.getErrors()).contains(BENEFIT_CODE_NOT_IN_USE);
+    }
+
+    @Test
+    void givenHearingChannelOfNotAttending_UpdateWantsToAttendToNoAndUpdateHearingSubtype() {
+        caseData.setAppeal(Appeal.builder().build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+
+        updateHearingChannel(caseData, NOT_ATTENDING);
+
+        assertThat(caseData.getSchedulingAndListingFields().getOverrideFields().getAppellantHearingChannel()).isEqualTo(NOT_ATTENDING);
+        Appeal appeal = caseData.getAppeal();
+        assertThat(appeal.getHearingType()).isEqualTo(HearingType.PAPER.getValue());
+        assertThat(appeal.getHearingOptions().getWantsToAttend()).isEqualTo(YesNo.NO.getValue());
+
+        HearingSubtype hearingSubtype = appeal.getHearingSubtype();
+        assertThat(hearingSubtype.isWantsHearingTypeTelephone()).isFalse();
+        assertThat(hearingSubtype.isWantsHearingTypeFaceToFace()).isFalse();
+        assertThat(hearingSubtype.isWantsHearingTypeVideo()).isFalse();
     }
 }

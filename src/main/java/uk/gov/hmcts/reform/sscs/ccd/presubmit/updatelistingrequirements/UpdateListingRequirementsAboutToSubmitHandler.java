@@ -4,7 +4,7 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 @Slf4j
@@ -23,6 +25,8 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMess
 public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Value("${feature.gaps-switchover.enabled}")
     private boolean gapsSwitchOverFeature;
+    @Value("${feature.snl.adjournment.enabled}")
+    private boolean isAdjournmentEnabled;
 
     private final ListAssistHearingMessageHelper listAssistHearingMessageHelper;
 
@@ -38,8 +42,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType,
         Callback<SscsCaseData> callback,
-        String userAuthorisation
-    ) {
+        String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -55,8 +58,18 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             YesNo callbackReservedDtj = callbackReserveTo.getReservedDistrictTribunalJudge();
             ReserveTo caseDataReserveTo = caseDataSnlFields.getReserveTo();
             caseDataReserveTo.setReservedDistrictTribunalJudge(callbackReservedDtj);
-            if (!isNoOrNull(callbackReservedDtj)) {
+
+            if (isYes(callbackReservedDtj)) {
                 caseDataReserveTo.setReservedJudge(null);
+            }
+        }
+
+        if (isAdjournmentEnabled) {
+            OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
+
+            if (nonNull(overrideFields)) {
+                HearingChannel hearingChannel = overrideFields.getAppellantHearingChannel();
+                SscsUtil.updateHearingChannel(sscsCaseData, hearingChannel);
             }
         }
 
@@ -65,8 +78,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
         if (gapsSwitchOverFeature
             && state == State.READY_TO_LIST
             && hearingRoute == LIST_ASSIST
-            && nonNull(caseDataSnlFields.getOverrideFields())
-        ) {
+            && nonNull(caseDataSnlFields.getOverrideFields())) {
             String caseId = sscsCaseData.getCcdCaseId();
             log.info("UpdateListingRequirements List Assist request, Update Hearing,"
                     + "amend reasons: {}, for case ID: {}",

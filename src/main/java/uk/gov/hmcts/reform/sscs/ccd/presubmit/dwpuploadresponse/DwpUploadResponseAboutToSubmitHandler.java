@@ -82,6 +82,8 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             return preSubmitCallbackResponse;
         }
 
+        updateDwpState(sscsCaseData);
+
         addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
         setCaseCode(preSubmitCallbackResponse, callback);
 
@@ -111,6 +113,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         return preSubmitCallbackResponse;
     }
 
+
     private void updateBenefitType(SscsCaseData caseData) {
         String benefitCode = caseData.getBenefitCode();
         if (nonNull(benefitCode)) {
@@ -118,6 +121,16 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             BenefitType benefitType = new BenefitType(benefit.getShortName(), benefit.getDescription());
 
             caseData.getAppeal().setBenefitType(benefitType);
+        }
+    }
+
+    private void updateDwpState(SscsCaseData sscsCaseData) {
+        DynamicList dynamicDwpState = sscsCaseData.getDynamicDwpState();
+
+        if (nonNull(dynamicDwpState)) {
+            DynamicListItem selectedState = dynamicDwpState.getValue();
+            sscsCaseData.setDwpState(DwpState.fromValue(selectedState.getCode()));
+            sscsCaseData.setDynamicDwpState(null);
         }
     }
 

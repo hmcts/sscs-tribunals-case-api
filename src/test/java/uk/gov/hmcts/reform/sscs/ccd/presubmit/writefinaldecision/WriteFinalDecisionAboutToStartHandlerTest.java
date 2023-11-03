@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
@@ -45,11 +46,16 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
 
+        sscsCaseData.setSscsDocument(List.of(SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType("doctype")
+                .build())
+            .build()));
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")))).build();
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionTypeOfHearing("");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPresentingOfficerAttendedQuestion("yes");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAppellantAttendedQuestion("");
@@ -189,10 +195,21 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
         assertDataDeleted(response);
     }
 
+    @Test
+    public void givenAWriteFinalDecisionEventWithDraftDocumentOnWithPostHearingsNotEnabled_thenDeleteData() {
+        sscsCaseData.setSscsDocument(List.of(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                        .documentType(DRAFT_DECISION_NOTICE.getValue())
+                        .build())
+                .build()));
+        sscsCaseData.setState(State.VALID_APPEAL);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertDataRetained(response);
+    }
+
     private void assertDataRetained(PreSubmitCallbackResponse<SscsCaseData> response) {
         assertEquals(0, response.getErrors().size());
-
-        System.out.println(sscsCaseData.getSscsFinalDecisionCaseData());
 
         assertNotNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionTypeOfHearing());
         assertNotNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPresentingOfficerAttendedQuestion());

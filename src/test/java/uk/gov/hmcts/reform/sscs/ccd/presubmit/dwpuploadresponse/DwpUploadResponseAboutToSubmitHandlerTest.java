@@ -123,6 +123,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             .benefitCode("022")
             .issueCode("CC")
             .dwpFurtherInfo("Yes")
+            .dynamicDwpState(new DynamicList(""))
             .dwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build()).build())
             .dwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build()).build())
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
@@ -1463,5 +1464,15 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getWarnings().size(), is(0));
         assertEquals("Benefit code cannot be changed to the selected code", response.getErrors().stream().findFirst().get());
+    }
+
+    @Test
+    public void givenDynamicDwpStateHasBeenChosen_thenSetDwpState() {
+        sscsCaseData.setDynamicDwpState(new DynamicList("Withdrawn"));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getDwpState(), is(DwpState.WITHDRAWN));
+        assertNull(response.getData().getDynamicDwpState());
     }
 }
