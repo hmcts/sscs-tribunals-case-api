@@ -427,7 +427,7 @@ ccd:
 
   ccd-definition-store-api:
     java:
-      image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
+      image: hmctspublic.azurecr.io/ccd/definition-store-api:6.2.4nonProd
       imagePullPolicy: Always
       environment:
         DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
