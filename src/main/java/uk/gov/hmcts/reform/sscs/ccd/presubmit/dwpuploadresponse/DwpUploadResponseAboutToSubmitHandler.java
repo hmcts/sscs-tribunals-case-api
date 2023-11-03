@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
 import static java.lang.String.format;
 import static java.util.Collections.sort;
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
@@ -112,13 +111,9 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     }
 
     private void updateDwpState(SscsCaseData sscsCaseData) {
-        DynamicList dynamicDwpState = sscsCaseData.getDynamicDwpState();
-
-        if (nonNull(dynamicDwpState)) {
-            DynamicListItem selectedState = dynamicDwpState.getValue();
-            sscsCaseData.setDwpState(DwpState.fromValue(selectedState.getCode()));
-            sscsCaseData.setDynamicDwpState(null);
-        }
+        DynamicListItem selectedState = sscsCaseData.getDynamicDwpState().getValue();
+        sscsCaseData.setDwpState(DwpState.fromValue(selectedState.getCode()));
+        sscsCaseData.setDynamicDwpState(null);
     }
 
     private void checkSscs2AndSscs5Confidentiality(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsCaseData sscsCaseData) {
