@@ -249,6 +249,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         if (isPostponementRequest(sscsCaseData)) {
             String details = sscsCaseData.getPostponementRequest().getPostponementRequestDetails();
+            log.info("POSTPONEMENT Request {} {}", sscsCaseData.getPostponementRequest(), details);
             if (StringUtils.isBlank(details)) {
                 preSubmitCallbackResponse.addError(POSTPONEMENT_DETAILS_IS_MANDATORY);
             } else {
