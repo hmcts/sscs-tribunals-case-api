@@ -11,34 +11,26 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Slf4j
 public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-    public static final String CANT_UPLOAD_ERROR_MESSAGE = "Unable to generate the corrected decision notice due to the original being uploaded";
+
     private static final List<String> DEATH_OF_APPELLANT_WARNING_PAGES = Arrays.asList("typeOfAppeal", "previewDecisionNotice");
     private final Validator validator;
 
     protected final DecisionNoticeService decisionNoticeService;
-    @Value("${feature.postHearings.enabled}")
-    private final boolean isPostHearingsEnabled;
 
-    protected WriteFinalDecisionMidEventValidationHandlerBase(Validator validator,
-                                                              DecisionNoticeService decisionNoticeService,
-                                                              @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
+    protected WriteFinalDecisionMidEventValidationHandlerBase(Validator validator, DecisionNoticeService decisionNoticeService) {
         this.validator = validator;
         this.decisionNoticeService = decisionNoticeService;
-        this.isPostHearingsEnabled = isPostHearingsEnabled;
     }
 
     protected abstract String getBenefitType();
@@ -62,22 +54,14 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
-        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        SscsCaseData sscsCaseData = caseDetails.getCaseData();
+
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
         for (ConstraintViolation<SscsCaseData> violation : violations) {
             preSubmitCallbackResponse.addError(violation.getMessage());
-        }
-        
-        SscsUtil.setCorrectionInProgress(caseDetails, isPostHearingsEnabled);
-
-        if (SscsUtil.isCorrectionInProgress(sscsCaseData, isPostHearingsEnabled)
-                && isYes(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionWasOriginalDecisionUploaded())
-                && isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
-            preSubmitCallbackResponse.addError(CANT_UPLOAD_ERROR_MESSAGE);
         }
 
         if (isDecisionNoticeDatesInvalid(sscsCaseData)) {
