@@ -76,8 +76,11 @@ public class ActionPostponementRequestAboutToStartHandlerTest {
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertThat(sscsCaseData.getPostponementRequest().getActionPostponementRequestSelected()).isNull();
     }
+
     @Test
-    public void givenValidCallback_thenReturnTrue() {assertTrue(handler.canHandle(ABOUT_TO_START, callback));}
+    public void givenValidCallback_thenReturnTrue() {
+        assertTrue(handler.canHandle(ABOUT_TO_START, callback));
+    }
 
     @Test
     @Parameters({"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
