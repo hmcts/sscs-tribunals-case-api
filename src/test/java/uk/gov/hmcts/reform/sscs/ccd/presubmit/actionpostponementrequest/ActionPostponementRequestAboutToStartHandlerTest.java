@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
 import java.time.LocalDate;
 import java.util.List;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -78,9 +77,7 @@ public class ActionPostponementRequestAboutToStartHandlerTest {
         assertThat(sscsCaseData.getPostponementRequest().getActionPostponementRequestSelected()).isNull();
     }
     @Test
-    public void givenValidCallback_thenReturnTrue() {
-        assertTrue(handler.canHandle(ABOUT_TO_START, callback));
-    }
+    public void givenValidCallback_thenReturnTrue() {assertTrue(handler.canHandle(ABOUT_TO_START, callback));}
 
     @Test
     @Parameters({"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
