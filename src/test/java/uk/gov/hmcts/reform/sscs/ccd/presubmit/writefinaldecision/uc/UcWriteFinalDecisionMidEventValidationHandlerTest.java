@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,8 +42,8 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     }
 
     @Override
-    protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled) {
-        return new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled);
+    protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService) {
+        return new UcWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService);
     }
 
     @Override
@@ -155,7 +154,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     @Test
     public void givenUcCaseWithWcaAppealFlowAndNotOnWorkCapabilityAssessmentPage_thenDoNotSetShowSummaryOfOutcomePageOrShowShowDwpReassessAwardPage() {
 
-        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YesNo.YES);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getPageId()).thenReturn("somethingElse");
@@ -178,7 +177,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     public void givenUcCaseWithWcaAppealFlowAndAllowedFlow_thenSetShowDwpReassessAwardPage(
             @Nullable YesNo wcaFlow, @Nullable String allowedFlow, YesNo expectedShowResult) {
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("Yes");
         sscsCaseData.setWcaAppeal(wcaFlow);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(allowedFlow);
 
@@ -193,7 +192,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     @Test
     public void givenUcCaseWithWcaAppealFlowAndNotOnWorkCapabilityAssessmentPage_thenDoNotSetShowDwpReassessAwardPage() {
 
-        sscsCaseData.setWcaAppeal(YES);
+        sscsCaseData.setWcaAppeal(YesNo.YES);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(callback.getPageId()).thenReturn("somethingElse");
@@ -265,8 +264,8 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     }
 
     @Test
-    @Parameters({"YES, YES", "NO, NO"})
-    public void givenGenerateNoticeValueAndCaseIsUc_thenShouldSetShowWorkCapabilityAssessment(YesNo isGenerateNotice, @Nullable YesNo showWorkCapabilityPage) {
+    @Parameters({"Yes, YES", "No, NO"})
+    public void givenGenerateNoticeValueAndCaseIsUc_thenShouldSetShowWorkCapabilityAssessment(String isGenerateNotice, @Nullable YesNo showWorkCapabilityPage) {
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(isGenerateNotice);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);

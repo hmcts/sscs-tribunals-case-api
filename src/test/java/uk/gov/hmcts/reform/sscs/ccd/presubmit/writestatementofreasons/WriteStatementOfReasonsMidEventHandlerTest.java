@@ -133,7 +133,6 @@ class WriteStatementOfReasonsMidEventHandlerTest {
         caseData.getDocumentGeneration().setBodyContent("Something");
         caseData.getDocumentGeneration().setSignedBy("A name");
         caseData.getDocumentGeneration().setSignedRole("A role");
-        caseData.getPostHearing().setReviewType(PostHearingReviewType.SET_ASIDE);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -161,7 +160,6 @@ class WriteStatementOfReasonsMidEventHandlerTest {
         assertThat(payload.getUserName()).isEqualTo("A name");
         assertThat(payload.getUserRole()).isEqualTo("A role");
         assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
-        assertThat(caseData.getPostHearing().getReviewType()).isNull();
     }
 
     @Test
@@ -174,4 +172,5 @@ class WriteStatementOfReasonsMidEventHandlerTest {
 
         assertThat(response.getErrors()).isEmpty();
     }
+
 }

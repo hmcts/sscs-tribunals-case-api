@@ -45,8 +45,8 @@ public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
         if (isPostHearingsEnabled) {
             Correction correction = caseData.getPostHearing().getCorrection();
 
-            if (isYes(correction.getIsCorrectionFinalDecisionInProgress())) {
-                correction.setIsCorrectionFinalDecisionInProgress(NO);
+            if (isYes(correction.getCorrectionFinalDecisionInProgress())) {
+                correction.setCorrectionFinalDecisionInProgress(NO);
                 caseData = ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, caseData);
 
                 return new PreSubmitCallbackResponse<>(caseData);

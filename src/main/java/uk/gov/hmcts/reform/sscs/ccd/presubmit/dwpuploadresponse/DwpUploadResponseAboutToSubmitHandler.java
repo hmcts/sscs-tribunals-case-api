@@ -28,7 +28,17 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
@@ -81,8 +91,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             return preSubmitCallbackResponse;
         }
 
-        updateDwpState(sscsCaseData);
-
         addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
         setCaseCode(preSubmitCallbackResponse, callback);
 
@@ -110,12 +118,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         return preSubmitCallbackResponse;
     }
 
-    private void updateDwpState(SscsCaseData sscsCaseData) {
-        DynamicListItem selectedState = sscsCaseData.getDynamicDwpState().getValue();
-        sscsCaseData.setDwpState(DwpState.fromValue(selectedState.getCode()));
-        sscsCaseData.setDynamicDwpState(null);
-    }
-
     private void checkSscs2AndSscs5Confidentiality(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsCaseData sscsCaseData) {
         if (isValidBenefitTypeForConfidentiality(sscsCaseData)) {
             if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
@@ -140,8 +142,10 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getOtherParties() != null) {
-            Optional<CcdValue<OtherParty>> otherParty = sscsCaseData.getOtherParties().stream().filter(op -> YesNo.isYes(op.getValue().getConfidentialityRequired())).findAny();
-            return otherParty.isPresent();
+            Optional otherParty = sscsCaseData.getOtherParties().stream().filter(op -> YesNo.isYes(op.getValue().getConfidentialityRequired())).findAny();
+            if (otherParty.isPresent()) {
+                return true;
+            }
         }
         return false;
     }
