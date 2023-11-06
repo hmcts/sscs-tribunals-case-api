@@ -57,7 +57,7 @@ public class WriteStatementOfReasonsMidEventHandler extends IssueDocumentHandler
             log.info("Write Statement of Reasons: Generating notice for caseId {}", caseId);
 
             String templateId = documentConfiguration.getDocuments()
-                .get(caseData.getLanguagePreference()).get(EventType.DECISION_ISSUED);
+                .get(caseData.getLanguagePreference()).get(EventType.SOR_WRITE);
 
             caseData.getPostHearing().setReviewType(null);
 
