@@ -69,9 +69,9 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
-                && callback.getEvent() == EventType.ISSUE_ADJOURNMENT_NOTICE
-                && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData());
+            && callback.getEvent() == EventType.ISSUE_ADJOURNMENT_NOTICE
+            && Objects.nonNull(callback.getCaseDetails())
+            && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
@@ -163,24 +163,24 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             sscsCaseData.setDirectionDueDate(sscsCaseData.getAdjournment().getDirectionsDueDate().toString());
         } else if (sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset() != null) {
             sscsCaseData.setDirectionDueDate(LocalDate.now()
-                    .plusDays(sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset().getCcdDefinition())
-                    .toString());
+                .plusDays(sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset().getCcdDefinition())
+                .toString());
         }
     }
 
     private void createAdjournmentNoticeFromPreviewDraft(
-            PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
-            SscsDocumentTranslationStatus documentTranslationStatus) {
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
+        SscsDocumentTranslationStatus documentTranslationStatus) {
 
         SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
 
         DocumentLink docLink = sscsCaseData.getAdjournment().getPreviewDocument();
 
         DocumentLink documentLink = DocumentLink.builder()
-                .documentUrl(docLink.getDocumentUrl())
-                .documentFilename(docLink.getDocumentFilename())
-                .documentBinaryUrl(docLink.getDocumentBinaryUrl())
-                .build();
+            .documentUrl(docLink.getDocumentUrl())
+            .documentFilename(docLink.getDocumentFilename())
+            .documentBinaryUrl(docLink.getDocumentBinaryUrl())
+            .build();
 
         String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
@@ -224,8 +224,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
                 sscsCaseData.setRegion(rpc.getName());
 
                 String processingVenue = airLookupService.lookupAirVenueNameByPostCode(
-                        rpc.getPostcode(),
-                        sscsCaseData.getAppeal().getBenefitType());
+                    rpc.getPostcode(),
+                    sscsCaseData.getAppeal().getBenefitType());
 
                 sscsCaseData.setProcessingVenue(processingVenue);
             }
@@ -234,9 +234,9 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
     private HearingChannel getNextHearingChannel(SscsCaseData caseData) {
         return Arrays.stream(HearingChannel.values())
-                .filter(hearingChannel -> caseData.getAdjournment().getTypeOfNextHearing().getHearingChannel().getValueTribunals().equalsIgnoreCase(
-                        hearingChannel.getValueTribunals()))
-                .findFirst().orElse(HearingChannel.PAPER);
+            .filter(hearingChannel -> caseData.getAdjournment().getTypeOfNextHearing().getHearingChannel().getValueTribunals().equalsIgnoreCase(
+                hearingChannel.getValueTribunals()))
+            .findFirst().orElse(HearingChannel.PAPER);
     }
 
     private void updatePanelMembers(SscsCaseData caseData) {
@@ -293,9 +293,9 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         if (isYes(adjournment.getInterpreterRequired())) {
             HearingInterpreter interpreter = HearingInterpreter.builder()
-                    .interpreterLanguage(adjournment.getInterpreterLanguage())
-                    .isInterpreterWanted(adjournment.getInterpreterRequired())
-                    .build();
+                .interpreterLanguage(adjournment.getInterpreterLanguage())
+                .isInterpreterWanted(adjournment.getInterpreterRequired())
+                .build();
             fields.setAppellantInterpreter(interpreter);
         }
 
