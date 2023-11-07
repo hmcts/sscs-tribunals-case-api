@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,6 +91,12 @@ class WriteStatementOfReasonsMidEventHandlerTest {
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .hearingRoute(LIST_ASSIST)
                 .build())
+                .hearings(List.of(Hearing.builder()
+                        .value(HearingDetails.builder()
+                                .hearingDate(LocalDate.now().toString())
+                                .venue(Venue.builder().name("venue name").build())
+                                .build())
+                        .build()))
             .build();
 
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);

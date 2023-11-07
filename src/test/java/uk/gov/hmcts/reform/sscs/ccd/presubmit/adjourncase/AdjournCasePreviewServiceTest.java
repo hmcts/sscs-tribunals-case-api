@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue.SO
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.FACE_TO_FACE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService.IN_CHAMBERS;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -627,7 +627,7 @@ class AdjournCasePreviewServiceTest {
         assertThat(body).isNotNull();
 
         assertThat(body.getHeldOn()).hasToString(LocalDate.now().toString());
-        assertThat(body.getHeldAt()).isEqualTo("In chambers");
+        assertThat(body.getHeldAt()).isEqualTo(IN_CHAMBERS);
 
         assertThat(response.getData().getAdjournment().getPreviewDocument()).isNotNull();
     }

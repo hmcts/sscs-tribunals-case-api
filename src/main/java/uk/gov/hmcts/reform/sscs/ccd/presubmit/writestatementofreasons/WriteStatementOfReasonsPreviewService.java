@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writestatementofreasons;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService.IN_CHAMBERS;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getLastValidHearing;
 
 import java.time.LocalDate;
@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
@@ -69,27 +68,26 @@ public class WriteStatementOfReasonsPreviewService extends IssueNoticeHandler {
     }
 
     protected void setHearings(NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder noticeBuilder, SscsCaseData caseData) {
-        if (isNotEmpty(caseData.getHearings())) {
-            HearingDetails finalHearing = getLastValidHearing(caseData);
-            if (nonNull(finalHearing)) {
-                if (nonNull(finalHearing.getHearingDate())) {
-                    noticeBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
-                }
-                if (nonNull(finalHearing.getVenue())) {
-                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getVenue(), finalHearing.getVenueId());
-                    if (nonNull(venueName)) {
-                        noticeBuilder.heldAt(venueName);
-                    }
-                }
+        HearingDetails finalHearing = getLastValidHearing(caseData);
+        if (nonNull(finalHearing)) {
+            if (nonNull(finalHearing.getHearingDate())) {
+                noticeBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
+            }
 
-                List<JudicialUserBase> panelMembers = finalHearing.getPanel().getAllPanelMembers();
-                List<String> panelMemberNames = judicialRefDataService.getAllJudicialUsersFullNames(panelMembers);
+            if (nonNull(finalHearing.getVenue())) {
+                String venueName = venueDataLoader.getGapVenueName(finalHearing.getVenue(), finalHearing.getVenueId());
+                if (nonNull(venueName)) {
+                    noticeBuilder.heldAt(venueName);
+                }
+            }
+
+            JudicialUserPanel panelMembers = finalHearing.getPanel();
+            if (nonNull(panelMembers)) {
+                List<String> panelMemberNames = judicialRefDataService.getAllJudicialUsersFullNames(panelMembers.getAllPanelMembers());
 
                 if (isNotEmpty(panelMemberNames)) {
                     noticeBuilder.heldBefore(StringUtils.getGramaticallyJoinedStrings(panelMemberNames));
                 }
-            } else {
-                setInChambers(noticeBuilder);
             }
         } else {
             setInChambers(noticeBuilder);
@@ -103,6 +101,6 @@ public class WriteStatementOfReasonsPreviewService extends IssueNoticeHandler {
 
     @Override
     protected void setGeneratedDateIfRequired(SscsCaseData caseData, EventType eventType) {
-
+        //Don't need to set anything for the generated date
     }
 }

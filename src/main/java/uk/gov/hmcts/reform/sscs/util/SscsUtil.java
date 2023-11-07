@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Slf4j
 public class SscsUtil {
+    public static final String IN_CHAMBERS = "In chambers";
 
     private SscsUtil() {
         //
@@ -323,22 +324,32 @@ public class SscsUtil {
             }
         }
 
-        return "In chambers";
+        return IN_CHAMBERS;
     }
 
     public static HearingDetails getLastValidHearing(SscsCaseData caseData) {
-        for (Hearing hearing : caseData.getHearings()) {
-            if (hearing != null) {
-                HearingDetails hearingDetails = hearing.getValue();
-                if (hearingDetails != null
-                        && org.apache.commons.lang3.StringUtils.isNotBlank(hearingDetails.getHearingDate())
-                        && hearingDetails.getVenue() != null
-                        && org.apache.commons.lang3.StringUtils.isNotBlank(hearingDetails.getVenue().getName())) {
-                    return hearingDetails;
+        List<Hearing> hearings = caseData.getHearings();
+        if (nonNull(hearings)) {
+            for (Hearing hearing : hearings) {
+                if (isHearingValid(hearing)) {
+                    return hearing.getValue();
                 }
             }
         }
+
         return null;
+    }
+
+    private static boolean isHearingValid(Hearing hearing) {
+        if (nonNull(hearing)) {
+            HearingDetails hearingDetails = hearing.getValue();
+            return nonNull(hearingDetails)
+                    && isNotBlank(hearingDetails.getHearingDate())
+                    && nonNull(hearingDetails.getVenue())
+                    && isNotBlank(hearingDetails.getVenue().getName());
+        }
+
+        return false;
     }
 
     public static void updateHearingChannel(SscsCaseData caseData, HearingChannel hearingChannel) {
