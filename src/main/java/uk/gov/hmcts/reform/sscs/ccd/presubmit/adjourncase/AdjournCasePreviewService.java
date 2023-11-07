@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getLastValidHearing;
@@ -10,7 +9,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -353,13 +351,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         if (adjournmentFeature) {
             List<JudicialUserBase> panelMembers = adjournment.getPanelMembers();
-
-            names.addAll(panelMembers.stream()
-                .filter(panelMember -> isNotBlank(panelMember.getPersonalCode()))
-                .map(panelMember ->
-                    judicialRefDataService.getJudicialUserFullName(panelMember.getPersonalCode()))
-                .filter(Objects::nonNull)
-                .toList());
+            names.addAll(judicialRefDataService.getAllJudicialUsersFullNames(panelMembers));
         } else {
             List<String> panelMembers = Stream.of(adjournment.getDisabilityQualifiedPanelMemberName(),
                 adjournment.getMedicallyQualifiedPanelMemberName(), adjournment.getOtherPanelMemberName())

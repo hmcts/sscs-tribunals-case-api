@@ -15,16 +15,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
-import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 
 @Component
 @Slf4j
 @AllArgsConstructor
 public class WriteStatementOfReasonsMidEventHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     public static final String PAGE_ID_GENERATE_DOCUMENT = "generateDocument";
-    private final DocumentConfiguration documentConfiguration;
-    private final GenerateFile generateFile;
+    private final WriteStatementOfReasonsPreviewService writeStatementOfReasonsPreviewService;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
@@ -56,12 +53,8 @@ public class WriteStatementOfReasonsMidEventHandler extends IssueDocumentHandler
         if (PAGE_ID_GENERATE_DOCUMENT.equals(pageId) && isYes(caseData.getDocumentGeneration().getGenerateNotice())) {
             log.info("Write Statement of Reasons: Generating notice for caseId {}", caseId);
 
-            String templateId = documentConfiguration.getDocuments()
-                .get(caseData.getLanguagePreference()).get(EventType.SOR_WRITE);
-
             caseData.getPostHearing().setReviewType(null);
-
-            response = issueDocument(callback, STATEMENT_OF_REASONS, templateId, generateFile, userAuthorisation, isPostHearingsEnabled, isPostHearingsBEnabled);
+            response = writeStatementOfReasonsPreviewService.preview(callback, STATEMENT_OF_REASONS, userAuthorisation, false, isPostHearingsEnabled, isPostHearingsBEnabled);
         }
 
         return response;

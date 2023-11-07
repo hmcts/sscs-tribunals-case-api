@@ -32,6 +32,9 @@ import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
 @ExtendWith(MockitoExtension.class)
 class WriteStatementOfReasonsMidEventHandlerTest {
@@ -55,13 +58,26 @@ class WriteStatementOfReasonsMidEventHandlerTest {
     @Mock
     private DocumentConfiguration documentConfiguration;
 
+    @Mock
+    private JudicialRefDataService judicialRefDataService;
+
+    @Mock
+    private UserDetailsService userDetailsService;
+
+    @Mock
+    private VenueDataLoader venueDataLoader;
+
+    private WriteStatementOfReasonsPreviewService service;
+
     private SscsCaseData caseData;
 
     private WriteStatementOfReasonsMidEventHandler handler;
 
     @BeforeEach
     void setUp() {
-        handler = new WriteStatementOfReasonsMidEventHandler(documentConfiguration, generateFile, true, true);
+        service = new WriteStatementOfReasonsPreviewService(generateFile, userDetailsService, TEMPLATE_ID,
+                documentConfiguration, venueDataLoader, judicialRefDataService);
+        handler = new WriteStatementOfReasonsMidEventHandler(service, true, true);
 
         caseData = SscsCaseData.builder()
             .ccdCaseId(CASE_ID)
@@ -98,7 +114,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new WriteStatementOfReasonsMidEventHandler(documentConfiguration, generateFile, false, false);
+        handler = new WriteStatementOfReasonsMidEventHandler(service, false, false);
         when(callback.getEvent()).thenReturn(SOR_WRITE);
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
