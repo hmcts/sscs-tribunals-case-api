@@ -57,8 +57,6 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
                         || DocumentType.DRAFT_CORRECTED_NOTICE.equals(documentType)
                         || DocumentType.CORRECTED_DECISION_NOTICE.equals(documentType)) {
                     templateIdString = documents.get(EventType.CORRECTION_GRANTED);
-                } else if (EventType.SOR_WRITE.equals(callback.getEvent())) {
-                    templateIdString = documents.get(EventType.SOR_WRITE);
                 }
             }
 

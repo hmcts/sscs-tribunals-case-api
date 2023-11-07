@@ -58,11 +58,7 @@ public class WriteStatementOfReasonsPreviewService extends IssueNoticeHandler {
 
         setHearings(builder, caseData);
 
-        if (showIssueDate) {
-            builder.dateIssued(LocalDate.now());
-        } else {
-            builder.dateIssued(null);
-        }
+        builder.dateIssued(LocalDate.now());
 
         return builder.build();
     }
