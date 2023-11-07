@@ -45,6 +45,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
     public static final String CASE_ID = "123123";
     public static final String GENERATE_DOCUMENT = "generateDocument";
     public static final String TEMPLATE_ID = "template.docx";
+    private static final Venue VENUE = Venue.builder().name("venue name").build();
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -95,7 +96,8 @@ class WriteStatementOfReasonsMidEventHandlerTest {
                 .hearings(List.of(Hearing.builder()
                         .value(HearingDetails.builder()
                                 .hearingDate(LocalDate.now().toString())
-                                .venue(Venue.builder().name("venue name").build())
+                                .venue(VENUE)
+                                .venueId("123")
                                 .build())
                         .build()))
             .build();
@@ -243,5 +245,21 @@ class WriteStatementOfReasonsMidEventHandlerTest {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         assertThat(payload.getHeldBefore()).isEqualTo(getGramaticallyJoinedStrings(listOfNames));
+    }
+
+    @Test
+    void givenVenueName_thenUpdateHeldAt() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(venueDataLoader.getGapVenueName(VENUE, "123")).thenReturn(VENUE.getName());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        verify(generateFile, atLeastOnce()).assemble(capture.capture());
+        NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        assertThat(payload.getHeldAt()).isEqualTo(VENUE.getName());
     }
 }
