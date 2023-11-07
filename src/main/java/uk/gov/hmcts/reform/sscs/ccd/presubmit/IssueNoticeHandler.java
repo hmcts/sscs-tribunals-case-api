@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import java.util.Map;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.WordUtils;
@@ -50,14 +49,11 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
         try {
             String templateIdString = templateId.apply(sscsCaseData.getLanguagePreference());
 
-            Map<EventType, String> documents = documentConfiguration.getDocuments().get(sscsCaseData.getLanguagePreference());
-
-            if (isPostHearingsEnabled) {
-                if (DocumentType.CORRECTION_GRANTED.equals(documentType)
-                        || DocumentType.DRAFT_CORRECTED_NOTICE.equals(documentType)
-                        || DocumentType.CORRECTED_DECISION_NOTICE.equals(documentType)) {
-                    templateIdString = documents.get(EventType.CORRECTION_GRANTED);
-                }
+            if (isPostHearingsEnabled
+                    && (DocumentType.CORRECTION_GRANTED.equals(documentType)
+                    || DocumentType.DRAFT_CORRECTED_NOTICE.equals(documentType)
+                    || DocumentType.CORRECTED_DECISION_NOTICE.equals(documentType))) {
+                templateIdString = documentConfiguration.getDocuments().get(sscsCaseData.getLanguagePreference()).get(EventType.CORRECTION_GRANTED);
             }
 
             return issueDocument(callback, documentType, templateIdString, generateFile, userAuthorisation, isPostHearingsEnabled, isPostHearingsBEnabled);

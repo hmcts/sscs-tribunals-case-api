@@ -11,12 +11,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
+import static uk.gov.hmcts.reform.sscs.utility.StringUtils.getGramaticallyJoinedStrings;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
@@ -147,11 +148,6 @@ class WriteStatementOfReasonsMidEventHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
-        when(documentConfiguration.getDocuments()).thenReturn(new HashMap<>(Map.of(
-            LanguagePreference.ENGLISH,  new HashMap<>(Map.of(
-                DECISION_ISSUED, TEMPLATE_ID)
-            ))
-        ));
 
         caseData.getDocumentGeneration().setBodyContent("Something");
         caseData.getDocumentGeneration().setSignedBy("A name");
@@ -192,10 +188,60 @@ class WriteStatementOfReasonsMidEventHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(callback.getPageId()).thenReturn("something else");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void givenNoValidHearingsOnCase_thenSetToInChambers() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
         caseData.setHearings(null);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
+
+        verify(generateFile, atLeastOnce()).assemble(capture.capture());
+        NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        assertThat(payload.getHeldAt()).isEqualTo(IN_CHAMBERS);
+    }
+
+    @Test
+    void givenPanelIsEmpty_thenDontUpdateHeldBefore() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        caseData.getLatestHearing().getValue().setPanel(new JudicialUserPanel());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        verify(generateFile, atLeastOnce()).assemble(capture.capture());
+        NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        assertThat(payload.getHeldBefore()).isNull();
+    }
+
+    @Test
+    void givenPanelIsSet_thenUpdateHeldBefore() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        List<String> listOfNames = List.of("panel member 1", "panel member 2");
+        caseData.getLatestHearing().getValue().setPanel(new JudicialUserPanel(new JudicialUserBase("1234", "1234"), List.of(new CollectionItem<>("", new JudicialUserBase("12345", "12345")))));
+        when(judicialRefDataService.getAllJudicialUsersFullNames(caseData.getLatestHearing().getValue().getPanel().getAllPanelMembers())).thenReturn(listOfNames);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        verify(generateFile, atLeastOnce()).assemble(capture.capture());
+        NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        assertThat(payload.getHeldBefore()).isEqualTo(getGramaticallyJoinedStrings(listOfNames));
     }
 }
