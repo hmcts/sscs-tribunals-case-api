@@ -89,8 +89,6 @@ sscs-ccd-callback-orchestrator:
   enabled: false
 sscs-tribunals-frontend:
   enabled: false
-sscs-cor-frontend:
-  enabled: false
 redis:
   enabled: false
 ccd:

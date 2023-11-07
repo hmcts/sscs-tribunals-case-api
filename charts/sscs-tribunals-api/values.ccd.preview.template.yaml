@@ -228,7 +228,7 @@ ccd:
     nameOverride: ${SERVICE_NAME}-es
     clusterName: "es"
     replicas: 1
-
+    
   logstash:
     image: hmctspublic.azurecr.io/imported/logstash/logstash
     imageTag: "7.16.1"
@@ -404,7 +404,7 @@ ccd:
                 timeout => 60
             }
         }
-
+        
   ccd-admin-web:
     nodejs:
       image: hmctspublic.azurecr.io/ccd/admin-web:latest
@@ -499,7 +499,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:6.2.4nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-SCI-6nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -577,9 +577,9 @@ sscs-evidence-share:
 # click create
 # azure steps should be repeated every time PR is undeployed from preview
 sscs-tya-notif:
-  enabled: true
+  enabled: false
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2421
+    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
@@ -668,44 +668,6 @@ sscs-tribunals-frontend:
           - pcq-token-key
           - sscs-redis-access-key
           - sscs-redis-connection-string
-
-#Enable for MYA
-sscs-cor-frontend:
-  enabled: true
-  nodejs:
-    memoryLimits: "2Gi"
-    cpuLimits: 2000m
-    image: hmctspublic.azurecr.io/sscs-cor/frontend:latest
-    releaseNameOverride: ${SERVICE_NAME}-sscs-cor-frontend
-    ingressHost: mya-${SERVICE_FQDN}
-    environment:
-      IDAM_ENABLE_STUB: false
-      REDIS_HOST: ${SERVICE_NAME}-redis-master
-      REDIS_PORT: 6380
-      SSCS_API_URL: http://${SERVICE_NAME}-java
-      IDAM_URL: https://idam-web-public.aat.platform.hmcts.net
-      IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
-      TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
-      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-      NODE_ENV: preview
-      HTTP_PROTOCOL: http
-      UV_THREADPOOL_SIZE: 64
-      MYA_FEATURE_FLAG: true
-      MEDIA_FILES_ALLOWED_ENABLED: true
-      POST_BULK_SCAN: true
-      HEARING_OUTCOME_TAB_ENABLED: false
-      REQUEST_TAB_ENABLED: true
-      FT_WELSH: true
-    keyVaults:
-      sscs:
-        secrets:
-          - sscs-cor-idam-client-secret
-          - sscs-s2s-secret
-          - sscs-cor-redis-access-key
-          - sscs-cor-redis-connection-string
-          - tyacookiesecret
-          - idam-sscs-oauth2-client-secret
-          - AppInsightsInstrumentationKey
 
 redis:
   enabled: true
