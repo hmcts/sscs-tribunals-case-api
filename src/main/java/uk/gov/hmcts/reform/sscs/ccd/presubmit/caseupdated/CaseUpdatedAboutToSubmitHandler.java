@@ -332,7 +332,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private List<String> validateRepAndJointPartyCaseData(Entity entity, String entityType) {
         List<String> listOfWarnings = new ArrayList<>();
 
-        if (entity != null) {
+        if (entity != null && entity.getName() != null) {
             if (StringUtils.isBlank(entity.getName().getFirstName())) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", entityType));
             }
@@ -345,12 +345,13 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateRepresentativeNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
         final boolean hasRepresentative = sscsCaseData.isThereARepresentative();
-
         if (hasRepresentative) {
             Representative representativeInfo = sscsCaseData.getAppeal().getRep();
-            List<String> warnings = validateRepAndJointPartyCaseData(representativeInfo, "Representative");
-            if (!warnings.isEmpty()) {
-                response.addWarnings(warnings);
+            if (representativeInfo.getOrganisation() == null) {
+                List<String> warnings = validateRepAndJointPartyCaseData(representativeInfo, "Representative");
+                if (!warnings.isEmpty()) {
+                    response.addWarnings(warnings);
+                }
             }
         }
     }
