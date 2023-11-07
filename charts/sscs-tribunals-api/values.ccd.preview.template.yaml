@@ -499,7 +499,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:6.2.4nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-SCI-6nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -544,7 +544,7 @@ elastic:
 sscs-evidence-share:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/evidence-share:pr-1585
+    image: hmctspublic.azurecr.io/sscs/evidence-share:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
     environment:
       SEND_LETTER_SERVICE_ENABLED: "true"
@@ -577,7 +577,7 @@ sscs-evidence-share:
 # click create
 # azure steps should be repeated every time PR is undeployed from preview
 sscs-tya-notif:
-  enabled: true
+  enabled: false
   java:
     image: hmctspublic.azurecr.io/sscs/tya-notif:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
