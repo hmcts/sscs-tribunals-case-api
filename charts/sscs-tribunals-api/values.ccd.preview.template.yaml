@@ -320,7 +320,6 @@ ccd:
         ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
         ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
         CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
-        AM_ROLE_ASSIGNMENT_SERVICE_SECRET: AAAAAAAAAAAAAAAA
         IDAM_USER_URL: "https://idam-web-public.aat.platform.hmcts.net"
         IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
         OPEN_ID_API_BASE_URI: "https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o"
