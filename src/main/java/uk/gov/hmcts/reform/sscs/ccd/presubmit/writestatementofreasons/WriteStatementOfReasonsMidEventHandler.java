@@ -53,6 +53,69 @@ public class WriteStatementOfReasonsMidEventHandler extends IssueDocumentHandler
         if (PAGE_ID_GENERATE_DOCUMENT.equals(pageId) && isYes(caseData.getDocumentGeneration().getGenerateNotice())) {
             log.info("Write Statement of Reasons: Generating notice for caseId {}", caseId);
 
+            log.info("");
+            log.info("");log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");
+            log.info("");log.info("");
+            log.info("");
+            log.info("");
+            log.info("");log.info("");
+            log.info("");log.info("");
+            log.info("");
+
+
+
+
+
             caseData.getPostHearing().setReviewType(null);
             response = writeStatementOfReasonsPreviewService.preview(callback, STATEMENT_OF_REASONS, userAuthorisation, false, isPostHearingsEnabled, isPostHearingsBEnabled);
         }
