@@ -347,9 +347,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         final boolean hasRepresentative = sscsCaseData.isThereARepresentative();
         if (hasRepresentative) {
             Representative representativeInfo = sscsCaseData.getAppeal().getRep();
-            if (representativeInfo.getOrganisation() == null
-                    || representativeInfo.getOrganisation() != null
-                    && representativeInfo.getOrganisation().isEmpty()) {
+            if (representativeInfo.getOrganisation() == null) {
                 List<String> warnings = validateRepAndJointPartyCaseData(representativeInfo, "Representative");
                 if (!warnings.isEmpty()) {
                     response.addWarnings(warnings);
