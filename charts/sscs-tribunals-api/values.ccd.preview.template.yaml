@@ -561,6 +561,7 @@ sscs-evidence-share:
       ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
       ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
       CASE_ACCESS_MANAGEMENT_FEATURE: true
+      ISSUE_GENERIC_LETTER: true
     secrets:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
