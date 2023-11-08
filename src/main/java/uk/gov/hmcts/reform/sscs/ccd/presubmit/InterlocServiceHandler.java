@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
@@ -23,8 +24,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler {
 
     @Autowired
-    public InterlocServiceHandler() {
-        super(createMappings());
+    public InterlocServiceHandler(@Value("${feature.postHearingsB.enabled}")  boolean postHearingsB) {
+        super(createMappings(), postHearingsB);
     }
 
     private static Map<EventType, String> createMappings() {

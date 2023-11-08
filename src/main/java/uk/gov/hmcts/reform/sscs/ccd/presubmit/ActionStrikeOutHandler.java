@@ -16,7 +16,7 @@ public class ActionStrikeOutHandler extends EventToFieldPreSubmitCallbackHandler
 
     @Autowired
     ActionStrikeOutHandler() {
-        super(createMappings());
+        super(createMappings(), false);
     }
 
     private static Map<EventType, String> createMappings() {

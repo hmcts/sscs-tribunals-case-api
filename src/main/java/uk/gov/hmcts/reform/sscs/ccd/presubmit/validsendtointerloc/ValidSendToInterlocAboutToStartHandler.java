@@ -20,9 +20,12 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final boolean postponementsFeature;
+    private final boolean postHearingsB;
 
-    public ValidSendToInterlocAboutToStartHandler(@Value("${feature.postponements.enabled}")  boolean postponementsFeature) {
+    public ValidSendToInterlocAboutToStartHandler(@Value("${feature.postponements.enabled}")  boolean postponementsFeature,
+                                                  @Value("${feature.postHearingsB.enabled}")  boolean postHearingsB) {
         this.postponementsFeature = postponementsFeature;
+        this.postHearingsB = postHearingsB;
     }
 
     @Override
@@ -47,6 +50,10 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
         setSelectWhoReviewsCase(sscsCaseData);
         setOriginalSenderDropdown(sscsCaseData);
 
+        if (postHearingsB) {
+            sscsCaseData.setPrePostHearing(null);
+        }
+
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
@@ -67,5 +74,4 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
 
         sscsCaseData.setOriginalSender(new DynamicList(listOptions.get(0), listOptions));
     }
-
 }
