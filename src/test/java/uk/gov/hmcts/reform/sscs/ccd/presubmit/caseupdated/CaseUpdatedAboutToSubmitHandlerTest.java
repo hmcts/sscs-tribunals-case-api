@@ -502,6 +502,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         Representative representative = Representative.builder()
                 .name(Name.builder().firstName("").lastName("").build())
                 .hasRepresentative(YES.getValue())
+                .address(Address.builder().line1("123 Lane").postcode("CM120NS").build())
                 .organisation("Test Organisation")
                 .build();
         callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
