@@ -8,6 +8,7 @@ java:
   memoryRequests: "1Gi"
   cpuRequests: "2"
   cpuLimits: 2000m
+  ingressHost: sscs-tribunals-api-pr-3514.service.core-compute-pr-3514.internal
   readinessDelay: 45
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
