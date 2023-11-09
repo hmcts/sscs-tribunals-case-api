@@ -56,11 +56,11 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
         handleBenefitType(caseData);
 
-        if (isNull(caseData.getIssueCode())) {
-            caseData.setIssueCode("DD");
-        }
-
         if (!isNull(caseData.getBenefitCode())) {
+            if (isNull(caseData.getIssueCode())) {
+                caseData.setIssueCode("DD");
+            }
+
             caseData.setCaseCode(caseData.getBenefitCode() + caseData.getIssueCode());
         }
 
@@ -69,6 +69,8 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         } else {
             createAppealPdf(caseData);
         }
+
+        log.info("Case Code {} {} {}", caseData.getBenefitCode(), caseData.getIssueCode(), caseData.getCaseCode());
 
         return preSubmitCallbackResponse;
     }
