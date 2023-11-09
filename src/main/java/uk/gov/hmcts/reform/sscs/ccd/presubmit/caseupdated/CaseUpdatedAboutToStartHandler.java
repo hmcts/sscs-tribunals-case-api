@@ -60,18 +60,24 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
             log.info("Populated {} Languages in DynamicList for caseId {} for update to case data event",
                     interpreterLanguages.getListItems().size(), caseId);
         }
-
-        BenefitType benefitType = appeal.getBenefitType();
-        DynamicList benefitDescriptions = SscsUtil.getBenefitDescriptions();
-        DynamicListItem selectedBenefit = getSelectedBenefit(benefitDescriptions.getListItems(), sscsCaseData.getBenefitCode());
-        benefitDescriptions.setValue(selectedBenefit);
-        benefitType.setDescriptionSelection(benefitDescriptions);
+        setupBenefitSelection(sscsCaseData);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
+    private static void setupBenefitSelection(SscsCaseData sscsCaseData) {
+        BenefitType benefitType = sscsCaseData.getAppeal().getBenefitType();
+
+        if (!isNull(benefitType)) {
+            DynamicList benefitDescriptions = SscsUtil.getBenefitDescriptions();
+            DynamicListItem selectedBenefit = getSelectedBenefit(benefitDescriptions.getListItems(), sscsCaseData.getBenefitCode());
+            benefitDescriptions.setValue(selectedBenefit);
+            benefitType.setDescriptionSelection(benefitDescriptions);
+        }
+    }
+
     private static DynamicListItem getSelectedBenefit(List<DynamicListItem> listItems, String benefitCode) {
-        if (isNull(benefitCode)) {
+        if (isNull(benefitCode) || isNull(listItems)) {
             return null;
         }
 
