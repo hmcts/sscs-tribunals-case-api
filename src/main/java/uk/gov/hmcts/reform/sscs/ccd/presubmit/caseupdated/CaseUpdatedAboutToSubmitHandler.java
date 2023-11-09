@@ -167,8 +167,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
 
         if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
-            isSecondDoctorPresent, fqpmRequired))) {
+                isSecondDoctorPresent, fqpmRequired))) {
             response.addError("Incorrect benefit/issue code combination");
+        }
+    }
 
     private void validatingPartyAddresses(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant(), "appellant");
@@ -181,7 +183,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         String isAppointee = sscsCaseData.getAppeal().getAppellant().getIsAppointee();
-        if (isAppointee.equals("Yes")) {
+        if (isYes(isAppointee)) {
             validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant().getAppointee(), "appointee");
         }
 
@@ -330,7 +332,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         List<String> listOfWarnings = new ArrayList<>();
 
         if (entity != null) {
-
             if (entity.getName() != null) {
                 if (StringUtils.isBlank(entity.getName().getFirstName())) {
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", partyType));
