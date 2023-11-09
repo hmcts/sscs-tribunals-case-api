@@ -54,11 +54,6 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
-        if (caseData.getCaseCreated() == null) {
-            preSubmitCallbackResponse.addError("The Case Created Date must be set to generate the SSCS1");
-        } else {
-            createAppealPdf(caseData);
-        }
         handleBenefitType(caseData);
 
         if (isNull(caseData.getIssueCode())) {
@@ -66,6 +61,12 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         }
 
         caseData.setCaseCode(caseData.getBenefitCode() + caseData.getIssueCode());
+
+        if (caseData.getCaseCreated() == null) {
+            preSubmitCallbackResponse.addError("The Case Created Date must be set to generate the SSCS1");
+        } else {
+            createAppealPdf(caseData);
+        }
 
         return preSubmitCallbackResponse;
     }
