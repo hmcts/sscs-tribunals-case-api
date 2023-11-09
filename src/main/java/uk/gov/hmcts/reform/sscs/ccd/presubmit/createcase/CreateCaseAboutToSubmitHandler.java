@@ -70,8 +70,6 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
             createAppealPdf(caseData);
         }
 
-        log.info("Case Code {} {} {}", caseData.getBenefitCode(), caseData.getIssueCode(), caseData.getCaseCode());
-
         return preSubmitCallbackResponse;
     }
 

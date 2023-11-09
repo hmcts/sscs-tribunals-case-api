@@ -15,9 +15,9 @@ import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpStatus;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -39,7 +39,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest extends BaseHandl
     public final SpringMethodRule smr = new SpringMethodRule();
 
     @Test
-    @Disabled
+    @Ignore
     @Parameters({
         "NON_COMPLIANT, informationReceivedForInterlocJudge, interlocutoryReviewState, reviewByJudge",
         "CREATE_WITH_DWP_TEST_CASE, sendToInterlocReviewByJudge, withDwp, reviewByJudge",
