@@ -60,7 +60,9 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
             caseData.setIssueCode("DD");
         }
 
-        caseData.setCaseCode(caseData.getBenefitCode() + caseData.getIssueCode());
+        if (!isNull(caseData.getBenefitCode())) {
+            caseData.setCaseCode(caseData.getBenefitCode() + caseData.getIssueCode());
+        }
 
         if (caseData.getCaseCreated() == null) {
             preSubmitCallbackResponse.addError("The Case Created Date must be set to generate the SSCS1");
