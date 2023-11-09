@@ -1,4 +1,7 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
+
+import static java.util.Objects.isNull;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,25 +12,26 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 
 @Component
 @Slf4j
-public class Sscs1PdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final SscsPdfService sscsPdfService;
     private final EmailHelper emailHelper;
 
     @Autowired
-    public Sscs1PdfHandler(SscsPdfService sscsPdfService, EmailHelper emailHelper) {
+    public CreateCaseAboutToSubmitHandler(SscsPdfService sscsPdfService, EmailHelper emailHelper) {
         this.sscsPdfService = sscsPdfService;
         this.emailHelper = emailHelper;
     }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        boolean canHandle = callbackType == CallbackType.ABOUT_TO_SUBMIT
+        return callbackType == CallbackType.ABOUT_TO_SUBMIT
                 && (!"Paper".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getReceivedVia())
                 && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
                 || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED
@@ -36,7 +40,6 @@ public class Sscs1PdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
                 || callback.getEvent() == EventType.INCOMPLETE_APPLICATION_RECEIVED
                 || callback.getEvent() == EventType.DRAFT_TO_INCOMPLETE_APPLICATION)
                 || callback.getEvent() == EventType.CREATE_APPEAL_PDF);
-        return canHandle;
     }
 
     @Override
@@ -49,15 +52,22 @@ public class Sscs1PdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
         SscsCaseData caseData = caseDetails.getCaseData();
         log.info("Handling create appeal pdf event for case [" + caseData.getCcdCaseId() + "]");
 
-        PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
         if (caseData.getCaseCreated() == null) {
-            sscsCaseDataPreSubmitCallbackResponse.addError("The Case Created Date must be set to generate the SSCS1");
+            preSubmitCallbackResponse.addError("The Case Created Date must be set to generate the SSCS1");
         } else {
             createAppealPdf(caseData);
         }
+        handleBenefitType(caseData);
 
-        return sscsCaseDataPreSubmitCallbackResponse;
+        if (isNull(caseData.getIssueCode())) {
+            caseData.setIssueCode("DD");
+        }
+
+        caseData.setCaseCode(caseData.getBenefitCode() + caseData.getIssueCode());
+
+        return preSubmitCallbackResponse;
     }
 
     private void createAppealPdf(SscsCaseData caseData) {
