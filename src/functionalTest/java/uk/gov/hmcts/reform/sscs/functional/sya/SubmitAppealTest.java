@@ -244,7 +244,7 @@ public class SubmitAppealTest {
                 .header("Content-Type", "application/json");
 
         // Give ES time to index
-        Thread.sleep(2000L);
+        Thread.sleep(5000L);
 
         response = httpRequest.post("/appeals");
 

@@ -2,18 +2,17 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import javax.validation.ConstraintValidatorContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler;
+import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -51,8 +51,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private final VenueService venueService;
     private final SessionCategoryMapService categoryMapService;
     private final boolean caseAccessManagementFeature;
+    private final PostcodeValidator postcodeValidator = new PostcodeValidator();
+    private static ConstraintValidatorContext context;
+
 
     private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
+
 
     @SuppressWarnings("squid:S107")
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
@@ -99,6 +103,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
 
+        handleBenefitType(sscsCaseData);
+
+        if (isNotEmpty(sscsCaseData.getBenefitCode())) {
+            validateBenefitIssueCode(sscsCaseData, preSubmitCallbackResponse);
+        }
         setCaseCode(preSubmitCallbackResponse, callback, hasSuperUserRole);
         updateHearingOptionLanguageFromSelectedList(sscsCaseData);
         validateBenefitForCase(preSubmitCallbackResponse, callback, hasSuperUserRole);
@@ -133,10 +142,16 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         updateHearingTypeForNonSscs1Case(sscsCaseData, preSubmitCallbackResponse, hasSystemUserRole);
 
+        YesNo isJointPartyAddressSameAsAppellant = sscsCaseData.getJointParty().getJointPartyAddressSameAsAppellant();
+        if (sscsCaseData.isThereAJointParty() && !Objects.isNull(isJointPartyAddressSameAsAppellant) && isJointPartyAddressSameAsAppellant.toBoolean()) {
+            sscsCaseData.getJointParty().setAddress(sscsCaseData.getAppeal().getAppellant().getAddress());
+        }
+
         //validate benefit type and dwp issuing office for updateCaseData event triggered by user, which is not by CaseLoader
         if (!hasSystemUserRole) {
             validateAndUpdateDwpHandlingOffice(sscsCaseData, preSubmitCallbackResponse);
             validateHearingOptions(sscsCaseData, preSubmitCallbackResponse);
+            validatingPartyAddresses(sscsCaseData, preSubmitCallbackResponse);
             validateAppellantCaseData(sscsCaseData, preSubmitCallbackResponse);
             validateAppointeeCaseData(sscsCaseData, preSubmitCallbackResponse);
             validateRepresentativeNameData(sscsCaseData, preSubmitCallbackResponse);
@@ -144,6 +159,50 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         return preSubmitCallbackResponse;
+    }
+
+    private void validateBenefitIssueCode(SscsCaseData caseData,
+                                          PreSubmitCallbackResponse<SscsCaseData> response) {
+        boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
+        boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
+
+        if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
+                isSecondDoctorPresent, fqpmRequired))) {
+            response.addError("Incorrect benefit/issue code combination");
+        }
+    }
+
+    private void validatingPartyAddresses(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant(), "appellant");
+
+        if (sscsCaseData.isThereAJointParty()) {
+            YesNo isJointPartyAddressSameAsAppellant = sscsCaseData.getJointParty().getJointPartyAddressSameAsAppellant();
+            if (Objects.isNull(isJointPartyAddressSameAsAppellant) || !isJointPartyAddressSameAsAppellant.toBoolean()) {
+                validateAddressAndPostcode(response, sscsCaseData.getJointParty(), "joint party");
+            }
+        }
+
+        String isAppointee = sscsCaseData.getAppeal().getAppellant().getIsAppointee();
+        if (isYes(isAppointee)) {
+            validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant().getAppointee(), "appointee");
+        }
+
+        if (sscsCaseData.isThereARepresentative()) {
+            validateAddressAndPostcode(response, sscsCaseData.getAppeal().getRep(), "representative");
+        }
+    }
+
+    private void validateAddressAndPostcode(PreSubmitCallbackResponse<SscsCaseData> response, Entity party, String partyName) {
+        String addressLine1 = party.getAddress().getLine1();
+        String postcode = party.getAddress().getPostcode();
+
+        if (isBlank(addressLine1)) {
+            response.addError("You must enter address line 1 for the " + partyName);
+        }
+
+        if (isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
+            response.addError("You must enter a valid UK postcode for the " + partyName);
+        }
     }
 
     private void validateAndUpdateDwpHandlingOffice(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
@@ -160,8 +219,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private boolean hasValidHearingOptionsAndWantsToExcludeDates(HearingOptions hearingOptions) {
         return hearingOptions != null
-            && YesNo.isYes(hearingOptions.getWantsToAttend())
-            && YesNo.isYes(hearingOptions.getScheduleHearing());
+            && isYes(hearingOptions.getWantsToAttend())
+            && isYes(hearingOptions.getScheduleHearing());
     }
 
     private void validateHearingOptions(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
@@ -273,24 +332,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         List<String> listOfWarnings = new ArrayList<>();
 
         if (entity != null) {
-
             if (entity.getName() != null) {
                 if (StringUtils.isBlank(entity.getName().getFirstName())) {
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", partyType));
                 }
                 if (StringUtils.isBlank(entity.getName().getLastName())) {
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", partyType));
-                }
-            }
-            if (entity.getAddress() != null) {
-                if (StringUtils.isBlank(entity.getAddress().getLine1())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 1", partyType));
-                }
-                if (StringUtils.isBlank(entity.getAddress().getLine2())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Address Line 2", partyType));
-                }
-                if (StringUtils.isBlank(entity.getAddress().getPostcode())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Postcode", partyType));
                 }
             }
             if (entity.getIdentity() != null) {
@@ -441,6 +488,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             return Optional.ofNullable(sscsCaseData.getAppeal().getAppellant().getAppointee())
                 .map(Appointee::getAddress)
                 .map(Address::getPostcode)
+                .map(String::trim)
                 .filter(StringUtils::isNotEmpty)
                 .orElse(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
         }
