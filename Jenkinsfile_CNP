@@ -86,6 +86,9 @@ def secretsForPR = [
                 secret('wa-idam-client-secret', 'WA_IDAM_CLIENT_SECRET'),
                 secret('wa-system-username', 'WA_SYSTEM_USERNAME'),
                 secret('wa-system-password', 'WA_SYSTEM_PASSWORD')
+        ],
+        'am-${env}'      : [
+                secret('am-role-assignment-service-s2s-secret', 'AM_ROLE_ASSIGNMENT_SERVICE_SECRET')
         ]
 ]
 
