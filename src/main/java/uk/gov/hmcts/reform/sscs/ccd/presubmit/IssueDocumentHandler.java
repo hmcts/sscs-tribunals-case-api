@@ -196,13 +196,19 @@ public class IssueDocumentHandler {
         String embeddedDocumentTypeLabel = (FINAL_DECISION_NOTICE.equals(documentType) || CORRECTION_GRANTED.equals(documentType) ? "Decision Notice" : documentTypeLabel);
 
         if (isPostHearingsEnabled) {
-            PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
+            PostHearing postHearing = caseData.getPostHearing();
+            PostHearingReviewType postHearingReviewType = postHearing.getReviewType();
 
             if (nonNull(postHearingReviewType)) {
+                if (PostHearingReviewType.PERMISSION_TO_APPEAL.equals(postHearingReviewType)
+                        && PermissionToAppealActions.REVIEW.equals(postHearing.getPermissionToAppeal().getAction())) {
+                    return "Review Decision Notice";
+                }
+
                 return postHearingReviewType.getDescriptionEn() + " Decision Notice";
             }
 
-            if (isYes(caseData.getPostHearing().getCorrection().getIsCorrectionFinalDecisionInProgress())) {
+            if (isYes(postHearing.getCorrection().getIsCorrectionFinalDecisionInProgress())) {
                 return documentTypeLabel;
             }
         }
