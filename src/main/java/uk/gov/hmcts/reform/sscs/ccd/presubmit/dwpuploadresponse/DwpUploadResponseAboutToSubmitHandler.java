@@ -118,7 +118,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         String benefitCode = caseData.getBenefitCode();
         if (nonNull(benefitCode)) {
             Benefit benefit = Benefit.getBenefitFromBenefitCode(benefitCode);
-            BenefitType benefitType = new BenefitType(benefit.getShortName(), benefit.getDescription());
+            BenefitType benefitType = new BenefitType(benefit.getShortName(), benefit.getDescription(), null);
 
             caseData.getAppeal().setBenefitType(benefitType);
         }
