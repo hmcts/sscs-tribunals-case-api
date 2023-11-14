@@ -1,44 +1,36 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
 
-@RunWith(MockitoJUnitRunner.class)
 public class CaseUpdatedAboutToStartHandlerTest {
-
     private static final String USER_AUTHORISATION = "Bearer token";
+
+    private SscsCaseData sscsCaseData;
 
     @Mock
     private Callback<SscsCaseData> callback;
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-
-    @Mock
-    private SscsCaseData sscsCaseData;
 
     @Mock
     private DynamicListLanguageUtil dynamicListLanguageUtil;
@@ -49,13 +41,40 @@ public class CaseUpdatedAboutToStartHandlerTest {
     @InjectMocks
     private CaseUpdatedAboutToStartHandler handler;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        Appeal appeal = Appeal.builder().build();
-        sscsCaseData = SscsCaseData.builder().appeal(appeal).build();
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(callback.getEvent()).willReturn(EventType.CASE_UPDATED);
+        openMocks(this);
+
+        when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+
+        sscsCaseData = SscsCaseData.builder()
+                .ccdCaseId("ccdId")
+                .appeal(Appeal.builder()
+                        .benefitType(BenefitType.builder()
+                                .code("PIP")
+                                .build())
+                        .appellant(Appellant.builder()
+                                .name(Name.builder().firstName("First").lastName("Last").build())
+                                .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
+                                .identity(Identity.builder().nino("AB223344B").dob("1995-12-20").build())
+                                .build())
+                        .build())
+                .benefitCode("002")
+                .issueCode("DD")
+                .build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+    }
+
+    @Test
+    void givenBenefitType_shouldHaveCorrectBenefitSelection() {
+        var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        var benefitSelection = result.getData().getAppeal().getBenefitType().getDescriptionSelection();
+
+        assertThat(benefitSelection).isNotNull();
+        assertThat(benefitSelection.getValue()).isNotNull();
+        assertThat(benefitSelection.getValue().getCode()).isEqualTo("002");
     }
 
     @Test
@@ -72,9 +91,9 @@ public class CaseUpdatedAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
 
-        assertEquals(0, response.getErrors().size());
-        assertNotNull(hearingOptions.getLanguagesList());
-        assertNull(hearingOptions.getLanguagesList().getValue());
+        Assertions.assertEquals(0, response.getErrors().size());
+        Assertions.assertNotNull(hearingOptions.getLanguagesList());
+        Assertions.assertNull(hearingOptions.getLanguagesList().getValue());
     }
 
     @Test
@@ -93,8 +112,8 @@ public class CaseUpdatedAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
 
-        assertEquals(0, response.getErrors().size());
-        assertNotNull(hearingOptions.getLanguagesList());
-        assertEquals("Welsh", hearingOptions.getLanguagesList().getValue().getLabel());
+        Assertions.assertEquals(0, response.getErrors().size());
+        Assertions.assertNotNull(hearingOptions.getLanguagesList());
+        Assertions.assertEquals("Welsh", hearingOptions.getLanguagesList().getValue().getLabel());
     }
 }

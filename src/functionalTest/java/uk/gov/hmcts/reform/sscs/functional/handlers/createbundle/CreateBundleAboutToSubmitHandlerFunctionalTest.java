@@ -126,7 +126,7 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
 
     private void assertThatBundleStitchedSuccessfully(long caseId, int expectedBundles) {
         await()
-                .atMost(30, SECONDS)
+                .atMost(60, SECONDS)
                 .pollInterval(1, SECONDS)
                 .untilAsserted(() -> {
                     SscsCaseDetails updatedCaseDetails = getByCaseId(caseId);

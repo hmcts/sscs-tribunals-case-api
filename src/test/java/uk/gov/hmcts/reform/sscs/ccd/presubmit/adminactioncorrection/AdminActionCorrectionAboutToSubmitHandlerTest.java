@@ -112,7 +112,7 @@ class AdminActionCorrectionAboutToSubmitHandlerTest {
         caseData.setState(State.APPEAL_CREATED);
         Correction correction = caseData.getPostHearing().getCorrection();
         correction.setAdminCorrectionType(AdminCorrectionType.HEADER);
-        correction.setCorrectionFinalDecisionInProgress(YesNo.YES);
+        correction.setIsCorrectionFinalDecisionInProgress(YesNo.YES);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
