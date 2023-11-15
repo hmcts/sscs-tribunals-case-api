@@ -16,12 +16,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 public abstract class EventToFieldPreSubmitCallbackHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final Map<EventType, String> eventFieldMappings;
 
-    private final boolean postHearingsB;
-
-    EventToFieldPreSubmitCallbackHandler(Map<EventType, String> eventFieldMappings,
-                                         boolean postHearingsB) {
+    EventToFieldPreSubmitCallbackHandler(Map<EventType, String> eventFieldMappings) {
         this.eventFieldMappings = eventFieldMappings;
-        this.postHearingsB = postHearingsB;
     }
 
     @Override
@@ -44,10 +40,6 @@ public abstract class EventToFieldPreSubmitCallbackHandler implements PreSubmitC
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-
-        if (postHearingsB) {
-            sscsCaseData.setPrePostHearing(null);
-        }
 
         return new PreSubmitCallbackResponse<>(setField(sscsCaseData, eventFieldMappings.get(callback.getEvent()),
             callback.getEvent()));

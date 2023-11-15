@@ -31,7 +31,7 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        requireNonNull(callbackType, "callbacktype must not be null");
+        requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
             && (callback.getEvent() == EventType.VALID_SEND_TO_INTERLOC

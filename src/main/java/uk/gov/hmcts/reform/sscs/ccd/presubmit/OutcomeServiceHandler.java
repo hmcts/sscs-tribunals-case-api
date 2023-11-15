@@ -12,7 +12,7 @@ public class OutcomeServiceHandler extends EventToFieldPreSubmitCallbackHandler 
 
     @Autowired
     public OutcomeServiceHandler() {
-        super(createMappings(), false);
+        super(createMappings());
     }
 
     private static Map<EventType, String> createMappings() {

@@ -41,7 +41,7 @@ public class InterlocServiceHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new InterlocServiceHandler(false);
+        handler = new InterlocServiceHandler();
 
         sscsCaseData = SscsCaseData.builder().directionDueDate("01/02/2020").build();
 
