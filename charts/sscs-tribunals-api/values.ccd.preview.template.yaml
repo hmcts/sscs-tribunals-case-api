@@ -316,6 +316,7 @@ ccd:
       readinessDelay: 240
       livenessDelay: 240
       environment:
+        AM_ROLE_ASSIGNMENT_SERVICE_SECRET: ${AM_ROLE_ASSIGNMENT_SERVICE_SECRET}
         ROLE_ASSIGNMENT_DB_HOST: ${SERVICE_NAME}-postgresql
         ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
         ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
