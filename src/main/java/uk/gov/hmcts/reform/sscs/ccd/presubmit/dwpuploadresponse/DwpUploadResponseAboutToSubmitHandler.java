@@ -108,7 +108,20 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             }
         }
         SscsHelper.updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
+
+        updateBenefitType(sscsCaseData);
         return preSubmitCallbackResponse;
+    }
+
+
+    private void updateBenefitType(SscsCaseData caseData) {
+        String benefitCode = caseData.getBenefitCode();
+        if (nonNull(benefitCode)) {
+            Benefit benefit = Benefit.getBenefitFromBenefitCode(benefitCode);
+            BenefitType benefitType = new BenefitType(benefit.getShortName(), benefit.getDescription(), null);
+
+            caseData.getAppeal().setBenefitType(benefitType);
+        }
     }
 
     private void updateDwpState(SscsCaseData sscsCaseData) {
