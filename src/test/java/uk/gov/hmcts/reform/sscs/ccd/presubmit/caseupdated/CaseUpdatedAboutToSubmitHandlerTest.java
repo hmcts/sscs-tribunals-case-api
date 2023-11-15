@@ -486,6 +486,19 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
+    void givenACaseUpdatedEventWithEmptyRepresentativeNameButOrganisation_ThenReturnNoWarnings() {
+        Representative representative = Representative.builder()
+                .hasRepresentative(YES.getValue())
+                .address(Address.builder().line1("123 Lane").postcode("CM120NS").build())
+                .organisation("Test Organisation")
+                .build();
+        callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getWarnings().size(), is(0));
+    }
+
+    @Test
     void givenACaseUpdatedEventWithEmptyJointPartyDetails_thenProvideAnError() {
         JointParty jointParty = JointParty.builder()
                 .name(Name.builder().firstName("").lastName("").build())

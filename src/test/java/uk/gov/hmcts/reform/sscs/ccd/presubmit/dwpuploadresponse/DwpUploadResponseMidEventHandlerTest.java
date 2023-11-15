@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.service.AddNoteService;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 
@@ -38,7 +38,6 @@ public class DwpUploadResponseMidEventHandlerTest {
     @Mock
     private Callback<SscsCaseData> callback;
 
-
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
@@ -50,16 +49,12 @@ public class DwpUploadResponseMidEventHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    private SscsCaseData sscsCaseDataBefore;
-
     @Before
     public void setUp() {
-        handler = new DwpUploadResponseMidEventHandler();
+        SessionCategoryMapService categoryMapService = new SessionCategoryMapService();
+        handler = new DwpUploadResponseMidEventHandler(categoryMapService);
 
         openMocks(this);
-
-        AddNoteService addNoteService = new AddNoteService(userDetailsService);
-
 
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
                 .forename("Chris").surname("Davis").build().getFullName());
@@ -76,7 +71,7 @@ public class DwpUploadResponseMidEventHandlerTest {
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("taxCredit").build()).build())
                 .build();
 
-        sscsCaseDataBefore = SscsCaseData.builder().build();
+        SscsCaseData sscsCaseDataBefore = SscsCaseData.builder().build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
@@ -106,7 +101,6 @@ public class DwpUploadResponseMidEventHandlerTest {
 
     @Test
     public void testCaseTaxCreditWithEditedEvidenceReasonIsConfidentialityAppendix12DocHaveDocumentThenReject() {
-
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("childSupportConfidentiality");
         callback.getCaseDetails().getCaseData().setAppendix12Doc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build()).build());
         callback.getCaseDetails().getCaseData().getAppendix12Doc().setDocumentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build());
