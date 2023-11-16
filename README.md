@@ -1,7 +1,7 @@
 # SSCS - Tribunals Case API
 
 ## Purpose 
-Tribunals case api is a spring boot based application to create new appeals for the SSCS Appellants
+Tribunals case api is a spring boot based application to create new appeals for the SSCS Appellants.
 
 
 ### Prerequisites
