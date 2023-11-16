@@ -37,7 +37,6 @@ public class SendToJudgeAboutToStartHandler implements PreSubmitCallbackHandler<
         }
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-
         if (postHearingsB) {
             sscsCaseData.setPrePostHearing(null);
         }
