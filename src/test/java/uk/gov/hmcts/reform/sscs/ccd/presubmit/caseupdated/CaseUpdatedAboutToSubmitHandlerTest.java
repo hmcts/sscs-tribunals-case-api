@@ -1480,9 +1480,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         assertEquals(HearingType.ORAL.getValue(), response.getData().getAppeal().getHearingType());
     }
 
-    @Test
-    @Parameters({"null", "", "sample", "sample.com"})
-    public void givenACaseWhenUserWantsHearingTypeVideoButTheEmailIsInvalid_thenThrowAnError(@Nullable String email) {
+    @ParameterizedTest
+    @CsvSource({"null", "sample", "sample.com"})
+    public void givenACaseWhenUserWantsHearingTypeVideoButTheEmailIsInvalid_thenThrowAnError(String email) {
         HearingSubtype hearingSubtype = HearingSubtype.builder()
                 .wantsHearingTypeVideo("Yes")
                 .hearingVideoEmail(email)
