@@ -112,16 +112,7 @@
         "hearingDate": "2018-06-01",
         "time": "11:40:00",
         "adjourned": "No",
-        "eventDate": null,
-        "hearingId": "3698764",
-        "venueId": null,
-        "hearingRequested": null,
-        "hearingStatus": null,
-        "start": null,
-        "end": null,
-        "versionNumber": null,
-        "epimsId": null,
-        "hearingChannel": null
+        "hearingId": "3698764"
       }
     }
   ],
@@ -242,5 +233,25 @@
     ]
   },
   "workBasketHearingDate": null,
-  "workBasketHearingEpimsId": null
+  "workBasketHearingEpimsId": null,
+  "postHearingRequestType": null,
+  "postHearingReviewType": null,
+  "setAside": null,
+  "correction": null,
+  "statementOfReasons": null,
+  "libertyToApply": null,
+  "permissionToAppeal": null,
+  "dateAdded": null,
+  "previewDocument": null,
+  "generateNotice": null,
+  "correctionGenerateNotice": null,
+  "statementOfReasonsGenerateNotice": null,
+  "libertyToApplyGenerateNotice": null,
+  "bodyContent": null,
+  "correctionBodyContent": null,
+  "statementOfReasonsBodyContent": null,
+  "libertyToApplyBodyContent": null,
+  "directionNoticeContent": null,
+  "signedBy": null,
+  "signedRole": null
 }

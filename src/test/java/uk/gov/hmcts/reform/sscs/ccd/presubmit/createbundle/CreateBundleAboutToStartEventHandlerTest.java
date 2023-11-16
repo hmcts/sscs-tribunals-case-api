@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType.DWP_EVIDENCE_BUNDLE;
@@ -69,14 +70,14 @@ public class CreateBundleAboutToStartEventHandlerTest {
 
     @Test
     public void givenAValidEvent_thenReturnTrue() {
-        assertTrue(handler.canHandle(ABOUT_TO_START, callback));
+        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isTrue();
     }
 
     @Test
     public void givenANonCreateBundleEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
-        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
+        assertThat(handler.canHandle(ABOUT_TO_START, callback)).isFalse();
     }
 
     @Test
@@ -91,7 +92,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
         String error = response.getErrors().stream()
                 .findFirst()
                 .orElse("");
-        assertEquals("The bundle cannot be created as mandatory FTA documents are missing", error);
+        assertThat(error).isEqualTo("The bundle cannot be created as mandatory FTA documents are missing");
         verifyNoInteractions(serviceRequestExecutor);
 
     }
@@ -106,7 +107,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
         String error = response.getErrors().stream()
                 .findFirst()
                 .orElse("");
-        assertEquals("The bundle cannot be created as mandatory FTA documents are missing", error);
+        assertThat(error).isEqualTo("The bundle cannot be created as mandatory FTA documents are missing");
         verifyNoInteractions(serviceRequestExecutor);
     }
 
@@ -117,8 +118,8 @@ public class CreateBundleAboutToStartEventHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(0, response.getErrors().size());
-        assertEquals(0, response.getWarnings().size());
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
         verifyNoInteractions(serviceRequestExecutor);
     }
 
@@ -134,7 +135,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
         String error = response.getErrors().stream()
                 .findFirst()
                 .orElse("");
-        assertEquals("The bundle cannot be created as mandatory FTA documents are missing", error);
+        assertThat(error).isEqualTo("The bundle cannot be created as mandatory FTA documents are missing");
         verifyNoInteractions(serviceRequestExecutor);
     }
 
@@ -148,7 +149,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
         String error = response.getErrors().stream()
                 .findFirst()
                 .orElse("");
-        assertEquals("The bundle cannot be created as mandatory FTA documents are missing", error);
+        assertThat(error).isEqualTo("The bundle cannot be created as mandatory FTA documents are missing");
         verifyNoInteractions(serviceRequestExecutor);
     }
 
@@ -169,7 +170,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
                 .findFirst()
                 .orElse("");
 
-        assertEquals("The bundle cannot be created as mandatory FTA documents are missing, do you want to proceed?", warning);
+        assertThat(warning).isEqualTo("The bundle cannot be created as mandatory FTA documents are missing, do you want to proceed?");
         verifyNoInteractions(serviceRequestExecutor);
 
     }
@@ -188,7 +189,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
                 .findFirst()
                 .orElse("");
 
-        assertEquals("The bundle cannot be created as mandatory FTA documents are missing, do you want to proceed?", warning);
+        assertThat(warning).isEqualTo("The bundle cannot be created as mandatory FTA documents are missing, do you want to proceed?");
         verifyNoInteractions(serviceRequestExecutor);
     }
 
@@ -207,7 +208,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
                 .findFirst()
                 .orElse("");
 
-        assertEquals("The bundle cannot be created as mandatory FTA documents are missing, do you want to proceed?", warning);
+        assertThat(warning).isEqualTo("The bundle cannot be created as mandatory FTA documents are missing, do you want to proceed?");
         verifyNoInteractions(serviceRequestExecutor);
     }
 
@@ -224,7 +225,7 @@ public class CreateBundleAboutToStartEventHandlerTest {
                 .findFirst()
                 .orElse("");
 
-        assertEquals("The bundle cannot be created as mandatory FTA documents are missing, do you want to proceed?", warning);
+        assertThat(warning).isEqualTo("The bundle cannot be created as mandatory FTA documents are missing, do you want to proceed?");
         verifyNoInteractions(serviceRequestExecutor);
     }
 }

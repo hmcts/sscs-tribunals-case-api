@@ -59,6 +59,8 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         clearOtherPartyIfEmpty(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
+        verifyHearingUnavailableDates(response, otherParties);
+
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
         updateHearingTypeForNonSscs1Case(sscsCaseData, response, hasSystemUserRole);
@@ -124,5 +126,21 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
     private boolean isBenefitTypeValidForHearingTypeValidation(Optional<Benefit> benefitType) {
         return benefitType.filter(benefit -> SscsType.SSCS2.equals(benefit.getSscsType())
             || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
+    }
+
+    private boolean hasValidHearingOptionsAndWantsToExcludeDates(OtherParty otherParty) {
+        return otherParty.getHearingOptions() != null
+            && YesNo.isYes(otherParty.getHearingOptions().getWantsToAttend())
+            && YesNo.isYes(otherParty.getHearingOptions().getScheduleHearing());
+    }
+
+    private void verifyHearingUnavailableDates(PreSubmitCallbackResponse<SscsCaseData> response, List<CcdValue<OtherParty>> otherParties) {
+        for (CcdValue<OtherParty> ccdOtherParty : otherParties) {
+            OtherParty otherParty = ccdOtherParty.getValue();
+
+            if (hasValidHearingOptionsAndWantsToExcludeDates(otherParty)) {
+                SscsHelper.validateHearingOptionsAndExcludeDates(response, otherParty.getHearingOptions());
+            }
+        }
     }
 }

@@ -61,7 +61,6 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private IssueFinalDecisionAboutToStartHandler handler;
     private static final String URL = "http://dm-store/documents/123";
-    private static final String TEMPLATE_ID = "nuts.docx";
     private static final String UC_TEMPLATE_ID = "esanuts.docx";
 
     @Mock
@@ -105,7 +104,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
             new DecisionNoticeService(Arrays.asList(),
                 Arrays.asList(ucDecisionNoticeOutcomeService), Arrays.asList(previewDecisionService));
 
-        handler = new IssueFinalDecisionAboutToStartHandler(decisionNoticeService);
+        handler = new IssueFinalDecisionAboutToStartHandler(decisionNoticeService, false, false);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -119,7 +118,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
             .ccdCaseId("ccdId")
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionGeneratedDate("2018-01-01")
-                .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
+                .writeFinalDecisionPreviewDocument(DocumentLink.builder().documentFilename("filename").build())
                 .build())
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("UC").build())
@@ -161,7 +160,6 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
 
     @Test
     public void givenAboutToStartRequest_willGeneratePreviewFile() {
-
         when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
 
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(sscsCaseData);
@@ -169,7 +167,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
         when(previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true)).thenReturn(response);
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        verify(previewDecisionService).preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
+        verify(previewDecisionService).preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true, false, false);
 
     }
 
@@ -191,7 +189,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         when(ucDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
@@ -228,7 +226,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
         when(generateFile.assemble(any())).thenReturn(URL);
         sscsCaseData.setWcaAppeal(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         when(ucDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
