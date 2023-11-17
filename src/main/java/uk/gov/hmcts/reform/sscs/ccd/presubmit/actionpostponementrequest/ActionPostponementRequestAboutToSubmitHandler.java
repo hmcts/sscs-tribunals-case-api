@@ -1,21 +1,26 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.GRANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.REFUSE_ON_THE_DAY;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.SEND_TO_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
@@ -30,7 +35,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.NotePad;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
@@ -89,6 +96,8 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             refusePostponement(sscsCaseData);
         } else if (GRANT.getValue().equals(actionRequested)) {
             grantPostponement(sscsCaseData, response);
+        } else if (REFUSE_ON_THE_DAY.getValue().equals(actionRequested)) {
+            refuseOnTheDay(sscsCaseData);
         } else {
             log.info("Action postponement request: unhandled requested action {} for case {}", actionRequested,
                 caseId);
@@ -128,6 +137,19 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             .postponementEvent(postponementEventType)
             .build());
 
+        sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(NO);
+    }
+
+    private void refuseOnTheDay(SscsCaseData sscsCaseData) {
+
+        SscsDocument postponementDocument = getLatestPostponementDocumentForDwpType(sscsCaseData.getSscsDocument());
+
+        if (UploadParty.DWP.equals(postponementDocument.getValue().getPartyUploaded())) {
+            sscsCaseData.setDwpState(null);
+            sscsCaseData.setInterlocReviewState(null);
+            sscsCaseData.setState(State.HEARING);
+            sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(NO);
+        }
         sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(NO);
     }
 
@@ -174,7 +196,18 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
 
         YesNo unprocessedPostponementRequest = caseData.getPostponementRequest().getUnprocessedPostponementRequest();
         caseData.setPostponementRequest(PostponementRequest.builder()
-            .unprocessedPostponementRequest(unprocessedPostponementRequest)
-            .build());
+                .unprocessedPostponementRequest(unprocessedPostponementRequest)
+                .actionPostponementRequestSelected(caseData.getPostponementRequest().getActionPostponementRequestSelected())
+                .build());
+    }
+
+    private SscsDocument getLatestPostponementDocumentForDwpType(List<SscsDocument> postponementDocuments) {
+        List<SscsDocument> filteredList = postponementDocuments.stream()
+                .filter(f -> DocumentType.POSTPONEMENT_REQUEST.getValue().equals(f.getValue().getDocumentType())
+                        && !isNull(f.getValue().getOriginalPartySender()))
+                .sorted(Comparator.comparing(o -> o.getValue().getDocumentDateAdded()))
+                .toList();
+
+        return filteredList.get(filteredList.size() - 1);
     }
 }
