@@ -119,6 +119,7 @@ xui-webapp:
       FEATURE_TERMS_AND_CONDITIONS_ENABLED: false
       FEATURE_HELMET_ENABLED: false
       FEATURE_OIDC_ENABLED: false
+      ALLOW_CONFIG_MUTATIONS: true
       NOW: false
       REDISCLOUD_URL: http://dummyrediscloudurl
       UV_THREADPOOL_SIZE: 128
@@ -412,6 +413,7 @@ ccd:
       environment:
         IDAM_ADMIN_WEB_SERVICE_KEY: ${ADMIN_S2S_KEY}
         IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
+        ALLOW_CONFIG_MUTATIONS: true
       keyVaults: [ ]
 
 
@@ -655,6 +657,7 @@ sscs-tribunals-frontend:
       FT_WELSH: true
       PCQ_ENABLED: true
       MULTIPLE_DRAFTS_ENABLED: true
+      ALLOW_CONFIG_MUTATIONS: true
       TRIBUNALS_CASE_API_URL: http://${SERVICE_NAME}-java
       UPLOAD_EVIDENCE_URL: http://${SERVICE_NAME}/evidence/upload
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
