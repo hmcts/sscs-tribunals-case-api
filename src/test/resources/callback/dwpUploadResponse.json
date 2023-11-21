@@ -54,6 +54,18 @@
           }
         }
       ],
+      "dynamicDwpState" : {
+        "value" : {
+          "code": "withdrawalReceived",
+          "label": "Withdrawal received"
+        },
+        "list_items" : [
+          {
+            "code": "withdrawalReceived",
+            "label": "Withdrawal received"
+          }
+        ]
+      },
       "dwpTimeExtension": [
       ],
       "hearings": [
