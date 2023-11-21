@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
 import static java.util.Objects.isNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +57,10 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
         handleBenefitType(caseData);
+
+        if (isNull(caseData.getDwpIsOfficerAttending())) {
+            caseData.setDwpIsOfficerAttending(NO.toString());
+        }
 
         if (!isNull(caseData.getBenefitCode())) {
             if (isNull(caseData.getIssueCode())) {
@@ -123,10 +129,10 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         if (caseData.getSscsDocument() != null) {
             for (SscsDocument document : caseData.getSscsDocument()) {
                 if (!fileName.equals(document.getValue().getDocumentFileName())) {
-                    return "Yes";
+                    return YES.getValue();
                 }
             }
         }
-        return "No";
+        return NO.getValue();
     }
 }

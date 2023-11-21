@@ -138,7 +138,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void shouldCallPdfServiceWhenSscsDocumentIsPopulated() {
+    void shouldCallPdfServiceWhenSscsDocumentIsPopulated() {
         SscsCaseData caseDataWithSscsDocument = buildCaseDataWithPdf();
 
         when(caseDetails.getCaseData()).thenReturn(caseDataWithSscsDocument);
@@ -193,6 +193,32 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
         assertEquals(1, response.getErrors().size());
     }
+
+    @Test
+    void shouldPreserveDwpIsOfficerAttendingValue() {
+        caseDetails.getCaseData().setDwpIsOfficerAttending(YesNo.YES.toString());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertTrue(YesNo.isYes(response.getData().getDwpIsOfficerAttending()));
+    }
+
+    @Test
+    void whenBenefitCodeIsNotNull_shouldSetCorrectCaseCode() {
+        caseDetails.getCaseData().setBenefitCode("001");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals("001DD", response.getData().getCaseCode());
+    }
+
+    @Test
+    void whenBenefitAndIssueCodeIsNotNull_shouldSetCorrectCaseCode() {
+        caseDetails.getCaseData().setBenefitCode("001");
+        caseDetails.getCaseData().setIssueCode("US");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals("001US", response.getData().getCaseCode());
+    }
+
 
     private SscsCaseData buildCaseDataWithoutPdf() {
         SscsCaseData caseData = CaseDataUtils.buildCaseData();
