@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,7 @@ public class AddedDocumentsUtil {
                                                List<String> documentsAddedThisEvent,
                                                Enum<EventType> eventType) {
         if (workAllocationFeature) {
+            updateScannedDocumentTypes(sscsCaseData, documentsAddedThisEvent);
             Map<String, Integer> documentsAddedThisEventCounts = new HashMap<>();
             for (String type : documentsAddedThisEvent) {
                 if (documentsAddedThisEventCounts.containsKey(type)) {
@@ -52,6 +54,10 @@ public class AddedDocumentsUtil {
                 sscsCaseData.getWorkAllocationFields().setAddedDocuments(null);
             }
         }
+    }
+
+    public void updateScannedDocumentTypes(SscsCaseData sscsCaseData, List<String> documentsAddedThisEvent) {
+        sscsCaseData.getWorkAllocationFields().setScannedDocumentTypes(documentsAddedThisEvent.stream().distinct().collect(Collectors.toList()));
     }
 
     private void logMessage(SscsCaseData sscsCaseData, Enum<EventType> eventType) {

@@ -88,4 +88,22 @@ public class AddedDocumentsUtilTest {
             .isNull();
     }
 
+    @Test
+    public void givenACaseWithNoScannedDocuments_shouldSetScannedDocumentTypesToEmptyList() {
+        addedDocumentsUtil.updateScannedDocumentTypes(sscsCaseData, new ArrayList<>());
+
+        org.assertj.core.api.Assertions.assertThat(sscsCaseData.getWorkAllocationFields().getScannedDocumentTypes())
+                .as("No documents have been attached - scannedDocumentTypes list should be empty.")
+                .isEmpty();
+    }
+
+    @Test
+    public void givenACaseWithMultipleScannedDocuments_shouldSetScannedDocumentTypesList() {
+        addedDocumentsUtil.updateScannedDocumentTypes(sscsCaseData, Arrays.asList("reinstatementRequest",
+                "reinstatementRequest", "appellantEvidence", "confidentialityRequest"));
+
+        org.assertj.core.api.Assertions.assertThat(sscsCaseData.getWorkAllocationFields().getScannedDocumentTypes())
+                .as("Documents have been attached - scannedDocumentTypes list should be a distinct list of types")
+                .isEqualTo(Arrays.asList("reinstatementRequest", "appellantEvidence", "confidentialityRequest"));
+    }
 }

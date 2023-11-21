@@ -3,11 +3,15 @@ tags:
   sscs-ccd-idam-pr: true
 
 java:
+  memoryRequests: 2Gi
+  cpuRequests: 2000m
+  memoryLimits: 8Gi
+  cpuLimits: 3500m
+  devmemoryRequests: 6Gi
+  devcpuRequests: 2000m
+  devmemoryLimits: 8Gi
+  devcpuLimits: 4500m
   image: ${IMAGE_NAME}
-  memoryLimits: "8Gi"
-  memoryRequests: "1Gi"
-  cpuRequests: "2"
-  cpuLimits: 2000m
   readinessDelay: 45
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
@@ -36,9 +40,8 @@ java:
     SCHEDULE_LISTING_FEATURE: true
     POST_HEARINGS_FEATURE: true
     POST_HEARINGS_B_FEATURE: true
-    ADJOURNMENT_FEATURE: true
-    GAPS_SWITCHOVER_FEATURE: true
-    DUMMY: true
+
+    JAVA_OPTS: -Xmx6G
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -85,10 +88,14 @@ ccd-case-document-am-api:
 xui-webapp:
   enabled: true
   nodejs:
-    memoryLimits: "4Gi"
-    cpuLimits: 2000m
-    memoryRequests: "1Gi"
-    cpuRequests: "1"
+    memoryRequests: 2Gi
+    cpuRequests: 2000m
+    memoryLimits: 4Gi
+    cpuLimits: 3500m
+    devmemoryRequests: 6Gi
+    devcpuRequests: 2000m
+    devmemoryLimits: 8Gi
+    devcpuLimits: 4500m
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
@@ -97,10 +104,11 @@ xui-webapp:
       HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
       HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
       HEALTH_TERMS_AND_CONDITIONS_API: http://${SERVICE_NAME}-xui-terms-and-conditions/health
+      HEALTH_WORK_ALLOCATION_TASK_API: http://{{ .Release.Name }}-wa-task-management-api/health
       SERVICES_EM_ANNO_API: http://${SERVICE_NAME}-ccd-api-gw
       SERVICES_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw
       SERVICES_CCD_DATA_STORE_API: http://${SERVICE_NAME}-ccd-data-store-api
-      SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac
+      SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac-manage-case-assignment
       SERVICES_TERMS_AND_CONDITIONS: http://${SERVICE_NAME}-xui-terms-and-conditions
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       SERVICES_S2S: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
@@ -110,8 +118,16 @@ xui-webapp:
       SERVICES_PRD_JUDICIAL_API: http://rd-judicial-api-aat.service.core-compute-aat.internal
       SERVICES_PRD_COMMONDATA_API: http://rd-commondata-api-aat.service.core-compute-aat.internal
       SERVICES_DOCUMENTS_API_V2: http://${SERVICE_NAME}-ccd-case-document-am-api
+      SERVICES_WA_WORKFLOW_API_URL: http://{{ .Release.Name }}-wa-workflow-api
+      SERVICES_WORK_ALLOCATION_TASK_API: http://{{ .Release.Name }}-wa-task-management-api
+      SERVICES_ROLE_ASSIGNMENT_API: http://${SERVICE_NAME}-am-role-assignment-service
+      HEALTH_ROLE_ASSIGNMENT_API: http://${SERVICE_NAME}-am-role-assignment-service/health
+      SERVICES_ROLE_ASSIGNMENT_MAPPING_API: http://${SERVICE_NAME}-am-org-role-mapping-service
       JURISDICTIONS: SSCS
+      WA_SUPPORTED_JURISDICTIONS: SSCS
+      GLOBAL_SEARCH_SERVICES: IA,CIVIL,PRIVATELAW,PUBLICLAW,SSCS,ST_CIC,EMPLOYMENT
       LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
+      FEATURE_WORKALLOCATION_ENABLED: true
       FEATURE_REDIS_ENABLED: false
       FEATURE_APP_INSIGHTS_ENABLED: false
       FEATURE_SECURE_COOKIE_ENABLED: false
@@ -131,6 +147,98 @@ xui-webapp:
           - mc-idam-client-secret
           - system-user-name
           - system-user-password
+
+am-org-role-mapping-service:
+  enabled: true
+  java:
+    image: 'hmctspublic.azurecr.io/am/org-role-mapping-service:pr-1583'
+    ingressHost: orm-${SERVICE_FQDN}
+    releaseNameOverride: ${SERVICE_NAME}-am-org-role-mapping-service
+    devmemoryRequests: 1024Mi
+    devcpuRequests: 250m
+    devmemoryLimits: 2048Mi
+    devcpuLimits: 1500m
+    secrets:
+      SB_ACCESS_KEY:
+        secretRef: sscs-sb-preview
+        key: primaryKey
+      SB_CONNECTION_STRING:
+        secretRef: sscs-sb-preview
+        key: connectionString
+    keyVaults:
+      am:
+        secrets:
+          - app-insights-connection-string
+          - am-org-role-mapping-service-s2s-secret
+          - role-assignment-service-LD-SDK-KEY
+          - orm-IDAM-CLIENT-ID
+          - orm-IDAM-CLIENT-SECRET
+          - orm-IDAM-ADMIN-SECRET
+    environment:
+      IDAM_S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+      S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+      CASE_WORKER_REF_APP_URL: http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal
+      JUDICIAL_REF_APP_URL: http://rd-judicial-api-aat.service.core-compute-aat.internal
+      ROLE_ASSIGNMENT_APP_URL: ${SERVICE_NAME}-am-role-assignment-service
+      JUDICIAL_BOOKING_APP_URL: http://am-judicial-booking-service-aat.service.core-compute-aat.internal
+      LAUNCH_DARKLY_ENV: pr
+      AMQP_SHARED_ACCESS_KEY_NAME: RootManageSharedAccessKey
+      AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
+      CRD_SUBSCRIPTION_NAME: "{{ .Release.Name}}-servicebus-crd-topic"
+      JRD_SUBSCRIPTION_NAME: "{{ .Release.Name}}-servicebus-jrd-topic"
+      CRD_TOPIC_NAME: "{{ .Release.Name}}-servicebus-crd-topic"
+      JRD_TOPIC_NAME: "{{ .Release.Name}}-servicebus-jrd-topic"
+      AMQP_CRD_SHARED_ACCESS_KEY_VALUE: "$(SB_ACCESS_KEY)"
+      AMQP_JRD_SHARED_ACCESS_KEY_VALUE: "$(SB_ACCESS_KEY)"
+      ORG_ROLE_MAPPING_DB_HOST: ${SERVICE_NAME}-postgresql
+      ORG_ROLE_MAPPING_DB_NAME: org_role_mapping
+      ORG_ROLE_MAPPING_DB_USERNAME: hmcts
+      ORG_ROLE_MAPPING_DB_PASSWORD: hmcts
+      ORG_ROLE_MAPPING_DB_PORT: 5432
+      ORG_ROLE_MAPPING_DB_OPTIONS: "?stringtype=unspecified"
+      RUN_LD_ON_STARTUP: true
+
+aac-manage-case-assignment:
+  enabled: true
+  java:
+    imagePullPolicy: Always
+    releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
+    image: hmctspublic.azurecr.io/aac/manage-case-assignment:latest
+    ingressHost: aac-${SERVICE_FQDN}
+    environment:
+      IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+      IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
+      OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts
+      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      MCA_DS_PROXY_URLS_ALLOWED_LIST: /searchCases.*,/internal/searchCases.*,/internal/cases.*
+      MCA_DEF_STORE_PROXY_URLS_ALLOWED_LIST: /api/display/challenge-questions.*
+      MCA_CONDITIONAL_APIS_CASE_ASSIGNMENTS_ENABLED: "true"
+      MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp,ccd_data,ccd_gw,xui_mo_webapp,sscs
+      CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
+      CCD_DEFINITION_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-definition-store
+      PRD_HOST: http://rd-professional-api-aat.service.core-compute-aat.internal
+      CCD_DEFINITION_STORE_ALLOWED_SERVICE: xui_webapp
+      CCD_DATA_STORE_ALLOWED_SERVICE: xui_webapp
+      ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
+    autoscaling:
+      enabled: false
+    keyVaults:
+      aac:
+        secrets:
+          - name: aac-manage-case-s2s-secret
+            alias: MANAGE_CASE_S2S_KEY
+          - name: idam-mca-client-secret
+            alias: IDAM_CLIENT_SECRET
+          - name: idam-mca-system-user-username
+            alias: IDAM_CAA_USERNAME
+          - name: idam-mca-system-user-password
+            alias: IDAM_CAA_PASSWORD
+          - name: idam-noc-approver-username
+            alias: IDAM_NOC_APPROVER_USERNAME
+          - name: idam-noc-approver-password
+            alias: IDAM_NOC_APPROVER_PASSWORD
+          - name: notify-mca-api-key-secret
+            alias: NOTIFY_MCA_API_KEY
 
 ccd:
   enabled: true
@@ -164,6 +272,12 @@ ccd:
             CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
             CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
             CREATE DATABASE "sscsjobscheduler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "camunda" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "wa-task-management-api" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "wa-case-event-handler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "wa_workflow_api" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "cft_task_db" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "org_role_mapping" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
 
   global:
     ccdApiGatewayIngress: ${SERVICE_NAME}-ccd-api-gw
@@ -186,7 +300,7 @@ ccd:
     java:
       image: 'hmctspublic.azurecr.io/am/role-assignment-service:latest'
       imagePullPolicy: Always
-      ingressHost: ""
+      ingressHost: ras-${SERVICE_FQDN}
       releaseNameOverride: ${SERVICE_NAME}-am-role-assignment-service
       readinessDelay: 240
       livenessDelay: 240
@@ -194,6 +308,7 @@ ccd:
         ROLE_ASSIGNMENT_DB_HOST: ${SERVICE_NAME}-postgresql
         ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
         ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+        CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
         AM_ROLE_ASSIGNMENT_SERVICE_SECRET: AAAAAAAAAAAAAAAA
         IDAM_USER_URL: "https://idam-web-public.aat.platform.hmcts.net"
         IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
@@ -211,19 +326,28 @@ ccd:
               alias: ROLE_ASSIGNMENT_DB_USERNAME
             - name: preview-ccd-db-password
               alias: ROLE_ASSIGNMENT_DB_PASSWORD
-      secrets:
-        LD_SDK_KEY:
-          secretRef: role-assignment-service-LD-SDK-KEY
-          key: key
-          disabled: true
-        ROLE_ASSIGNMENT_IDAM_CLIENT_SECRET:
-          secretRef: role-assignment-service-IDAM-CLIENT-SECRET
-          key: key
-          disabled: true
-        ROLE_ASSIGNMENT_IDAM_ADMIN_PASSWORD:
-          secretRef: role-assignment-service-IDAM-ADMIN-SECRET
-          key: key
-          disabled: true
+        am:
+          secrets:
+            - am-role-assignment-service-s2s-secret
+            - app-insights-connection-string
+            - role-assignment-service-IDAM-CLIENT-SECRET
+            - role-assignment-service-IDAM-ADMIN-SECRET
+            - role-assignment-service-LD-SDK-KEY
+#      secrets:
+#        - name: app-insights-connection-string
+#        LD_SDK_KEY:
+#          secretRef: role-assignment-service-LD-SDK-KEY
+#          key: key
+#          disabled: true
+#        ROLE_ASSIGNMENT_IDAM_CLIENT_SECRET:
+#          secretRef: role-assignment-service-IDAM-CLIENT-SECRET
+#          key: key
+#          disabled: true
+#        ROLE_ASSIGNMENT_IDAM_ADMIN_PASSWORD:
+#          secretRef: role-assignment-service-IDAM-ADMIN-SECRET
+#          key: key
+#          disabled: true
+
   elasticsearch:
     nameOverride: ${SERVICE_NAME}-es
     clusterName: "es"
@@ -456,6 +580,7 @@ ccd:
         IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
         IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
         CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator
+        DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,cmc_claim_external_api,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator,finrem_case_orchestration,employment_tribunals,ethos_repl_service,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,bulk_scan_payment_processor,pcq_consolidation_service,em_npa_app,ecm_consumer,aac_manage_case_assignment,unspec_service,divorce_frontend,wa_task_configuration_api,wa_task_monitor,ccd_case_document_am_api,hmc_cft_hearing_service,prl_citizen_frontend,prl_cos_api,et_cos,et_msg_handler,ccd_next_hearing_date_updater,et_sya_api,sptribs_dss_backend,civil_general_applications,wa_task_management_api,am_role_assignment_service
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
         ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
@@ -469,7 +594,7 @@ ccd:
         IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
         IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
-        ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
+        ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
       keyVaults: [ ]
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
       autoscaling:
@@ -499,7 +624,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-10526nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S11863HnonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -518,7 +643,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S-10526nonProd
+      CCD_DEF_VERSION: S11863HnonProd
     secrets: []
     userRoles:
       - citizen
@@ -538,6 +663,8 @@ ccd:
       - caseworker-sscs-bulkscan
       - caseworker-sscs-pcqextractor
       - caseworker-sscs-hmrcresponsewriter
+      - caseworker-wa-task-configuration
+      - caseworker-ras-validation
 elastic:
   enabled: true
 
@@ -648,6 +775,7 @@ sscs-tribunals-frontend:
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
+      REDIS_PORT: 6379
       APPINSIGHTS_ROLE_NAME: ${SERVICE_NAME}
       PCQ_URL: "https://pcq.aat.platform.hmcts.net"
       FT_ANTENNA_WEBCHAT: false
@@ -656,7 +784,7 @@ sscs-tribunals-frontend:
       MULTIPLE_DRAFTS_ENABLED: true
       ALLOW_CONFIG_MUTATIONS: true
       TRIBUNALS_CASE_API_URL: http://${SERVICE_NAME}-java
-      UPLOAD_EVIDENCE_URL: http://${SERVICE_NAME}/evidence/upload
+      UPLOAD_EVIDENCE_URL: http://${SERVICE_NAME}-java/evidence/upload
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       UV_THREADPOOL_SIZE: 64
@@ -667,8 +795,6 @@ sscs-tribunals-frontend:
           - postcode-lookup-token
           - AppInsightsInstrumentationKey
           - pcq-token-key
-          - sscs-redis-access-key
-          - sscs-redis-connection-string
 
 redis:
   enabled: true
@@ -677,7 +803,8 @@ redis:
   cluster:
     enabled: false
     slaveCount: 0
-  usePassword: false
+  auth:
+    enabled: false
   master:
     persistence:
       enabled: false
@@ -740,7 +867,7 @@ hmc-cft-hearing-service:
       CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
       CFT_HEARING_SERVICE_DB_PORT: 5432
       HMC_ACCESS_CONTROL_ENABLED: false
-      ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
+      ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
       SPRING_CONFIG_IMPORT : "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
     secrets:
       HMC_SERVICE_BUS_CONNECTION_STRING:
@@ -775,5 +902,223 @@ servicebus:
     topics:
       - name: main-topic
         subscriptionNeeded: yes
+      - name: crd-topic
+        subscriptionNeeded: yes
+      - name: jrd-topic
+        subscriptionNeeded: yes
+      - name: ccd-events
+        subscriptionNeeded: yes
+        requiresSession: true
     queues:
       - name: sscs-orchestrator-queue-preview
+
+camunda-bpm:
+  enabled: true
+  java:
+    imagePullPolicy: Always
+    disableKeyVaults: true
+    ingressHost: camunda-${SERVICE_FQDN}
+    releaseNameOverride: ${SERVICE_NAME}-camunda
+    devcpuRequests: 500m
+    devmemoryRequests: 512Mi
+    devcpuLimits: 1
+    devmemoryLimits: 1Gi
+    readinessDelay: 90
+    environment:
+      CAMUNDA_API_AUTH_ENABLED: false
+      CAMUNDA_DB_HOST: ${SERVICE_NAME}-postgresql
+      CAMUNDA_DB_NAME: camunda
+      CAMUNDA_DB_USER_NAME: hmcts
+      CAMUNDA_DB_PASSWORD: hmcts
+      CAMUNDA_BPM_DATABASE_SCHEMA_UPDATE: true
+      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      CAMUNDA_DB_CONN_OPTIONS: ""
+      RELEASE_REVISION: "{{ .Release.Revision }}"
+
+wa-task-management-api:
+  java:
+    releaseNameOverride: ${SERVICE_NAME}-wa-task-management-api
+    ingressHost: wa-task-management-api-${SERVICE_FQDN}
+    readinessDelay: 90
+    environment:
+      CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
+      ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
+      POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
+      POSTGRES_NAME: cft_task_db
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: hmcts
+      POSTGRES_CONNECTION_OPTIONS: ""
+      CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
+      S2S_SECRET_TASK_MANAGEMENT_API: ${S2S_SECRET_TASK_MANAGEMENT_API}
+      WA_IDAM_CLIENT_SECRET: ${WA_IDAM_CLIENT_SECRET}
+      WA_SYSTEM_USERNAME: ${WA_SYSTEM_USERNAME}
+      WA_SYSTEM_PASSWORD: ${WA_SYSTEM_PASSWORD}
+      ALLOWED_CASE_TYPES: "benefit"
+
+wa-task-monitor:
+  java:
+    ingressHost: wa-task-monitor-${SERVICE_FQDN}
+    releaseNameOverride: ${SERVICE_NAME}-wa-task-monitor
+    readinessDelay: 90
+    environment:
+      CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
+      WA_TASK_MANAGEMENT_API_URL: http://{{ .Release.Name }}-wa-task-management-api
+      CASE_EVENT_HANDLER_SERVICE_URL: http://{{ .Release.Name }}-wa-case-event-handler
+      CCD_SEARCH_URL: http://{{ .Release.Name }}-ccd-data-store-api
+      CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
+      ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
+      S2S_SECRET_TASK_MONITOR: ${S2S_SECRET_TASK_MONITOR}
+      WA_IDAM_CLIENT_SECRET: ${WA_IDAM_CLIENT_SECRET}
+      WA_SYSTEM_USERNAME: ${WA_SYSTEM_USERNAME}
+      WA_SYSTEM_PASSWORD: ${WA_SYSTEM_PASSWORD}
+
+wa-case-event-handler:
+  java:
+    ingressHost: wa-case-event-handler-${SERVICE_FQDN}
+    releaseNameOverride: ${SERVICE_NAME}-wa-case-event-handler
+    readinessDelay: 90
+    secrets:
+      AZURE_SERVICE_BUS_CONNECTION_STRING:
+        secretRef: sscs-sb-preview
+        key: connectionString
+    environment:
+      CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
+      CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
+      CCD_SEARCH_URL: http://{{ .Release.Name }}-ccd-data-store-api
+      ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
+      WA_WORKFLOW_API_URL: http://{{ .Release.Name }}-wa-workflow-api
+      WA_TASK_MANAGEMENT_API_URL: http://{{ .Release.Name }}-wa-task-management-api
+      AZURE_SERVICE_BUS_TOPIC_NAME: "${SERVICE_NAME}-servicebus-ccd-events"
+      AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-ccd-events"
+      AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-ccd-events"
+      POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
+      POSTGRES_NAME: wa-case-event-handler
+      POSTGRES_USERNAME: hmcts
+      POSTGRES_PASSWORD: hmcts
+      POSTGRES_CONNECTION_OPTIONS: ""
+      WA_IDAM_CLIENT_SECRET: ${WA_IDAM_CLIENT_SECRET}
+      S2S_SECRET_CASE_EVENT_HANDLER: ${S2S_SECRET_CASE_EVENT_HANDLER}
+      LAUNCH_DARKLY_SDK_KEY: ${WA_LAUNCH_DARKLY_SDK_KEY}
+
+wa-workflow-api:
+  java:
+    ingressHost: wa-workflow-api-${SERVICE_FQDN}
+    releaseNameOverride: ${SERVICE_NAME}-wa-workflow-api
+    readinessDelay: 90
+    environment:
+      CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
+      POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
+      POSTGRES_NAME: wa_workflow_api
+      POSTGRES_USERNAME: hmcts
+      POSTGRES_PASSWORD: hmcts
+      POSTGRES_CONNECTION_OPTIONS: ""
+      S2S_SECRET_WORKFLOW_API: ${S2S_SECRET_WORKFLOW_API}
+      TASK_MANAGEMENT_URL: http://{{ .Release.Name }}-wa-task-management-api
+      LAUNCH_DARKLY_SDK_KEY: ${WA_LAUNCH_DARKLY_SDK_KEY}
+
+wa-message-cron-service:
+  job:
+    releaseNameOverride: ${SERVICE_NAME}-wa-message-cron-service
+    environment:
+      WA_CASE_EVENT_HANDLER_SERVICE_URL: http://{{ .Release.Name }}-wa-case-event-handler
+
+
+wa:
+  enabled: true
+  taskBatchCron:
+    enabled: true
+  reconfigurationBatchCron:
+    enabled: true
+  terminationBatchCron:
+    enabled: true
+
+wa-initiation-batch:
+  job:
+    kind: CronJob
+    releaseNameOverride: ${SERVICE_NAME}-wa-initiation-batch
+    name: ${SERVICE_NAME}-wa-initiation-batch
+    schedule: "*/5 * * * *"
+    aadIdentityName: wa
+    keyVaults:
+      wa:
+        secrets:
+          - s2s-secret-task-monitor
+    environment:
+      S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+      S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
+      WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
+      JOB_NAME: "INITIATION"
+      ALLOW_CONFIG_MUTATIONS: true
+
+wa-termination-batch:
+  job:
+    kind: CronJob
+    releaseNameOverride: ${SERVICE_NAME}-wa-termination-batch
+    name: ${SERVICE_NAME}-wa-termination-batch
+    schedule: "*/5 * * * *"
+    aadIdentityName: wa
+    keyVaults:
+      wa:
+        secrets:
+          - s2s-secret-task-monitor
+    environment:
+      S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+      S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
+      WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
+      JOB_NAME: "TERMINATION"
+      ALLOW_CONFIG_MUTATIONS: true
+
+wa-reconfiguration-batch:
+  job:
+    kind: CronJob
+    releaseNameOverride: ${SERVICE_NAME}-wa-job-reconfiguration
+    name: ${SERVICE_NAME}-wa-job-reconfiguration
+    schedule: "*/5 * * * *"
+    aadIdentityName: wa
+    keyVaults:
+      wa:
+        secrets:
+          - s2s-secret-task-monitor
+    environment:
+      S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+      S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
+      WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
+      JOB_NAME: "RECONFIGURATION"
+      ALLOW_CONFIG_MUTATIONS: true
+
+
+ccd-message-publisher:
+  java:
+    ingressHost: ccd-message-publisher-${SERVICE_FQDN}
+    releaseNameOverride: ${SERVICE_NAME}-ccd-message-publisher
+    readinessDelay: 90
+    secrets:
+      SERVICE_BUS_CONNECTION_STRING:
+        secretRef: sscs-sb-preview
+        key: connectionString
+    environment:
+      DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
+      DATA_STORE_DB_NAME: data-store
+      DATA_STORE_DB_USERNAME: hmcts
+      DATA_STORE_DB_PASSWORD: hmcts
+      DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
+      CCD_CASE_EVENTS_DESTINATION: "${SERVICE_NAME}-servicebus-ccd-events"
+
+sscs-cron-trigger:
+  job:
+    kind: CronJob
+    image: 'hmctspublic.azurecr.io/sscs/cron-trigger:pr-5'
+    releaseNameOverride: ${SERVICE_NAME}-sscs-cron-trigger
+    name: ${SERVICE_NAME}-sscs-cron-trigger
+    schedule: "0 10-17 * * *"
+    environment:
+      IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+      IDAM_OAUTH2_CLIENT_ID: ${IDAM_OAUTH2_CLIENT_ID}
+      IDAM_OAUTH2_CLIENT_SECRET: ${IDAM_OAUTH2_CLIENT_SECRET}
+      IDAM_OAUTH2_REDIRECT_URL: ${IDAM_OAUTH2_REDIRECT_URL}
+      IDAM_S2S_AUTH: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+      IDAM_S2S_AUTH_TOTP_SECRET: ${IDAM_S2S_AUTH_TOTP_SECRET}
+      IDAM_S2S_AUTH_MICROSERVICE: ${IDAM_S2S_AUTH_MICROSERVICE}
+      IDAM_SSCS_SYSTEMUPDATE_USER: ${IDAM_SSCS_SYSTEMUPDATE_USER}
+      IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
+      CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
