@@ -117,7 +117,7 @@ public class ResponseEventsAboutToSubmit {
                     .equalsIgnoreCase(response.getData().getAppeal().getBenefitType().getCode())
                     && !Benefit.CHILD_SUPPORT.getCaseLoaderKeyId().contains(response.getData().getBenefitCode())) {
                     if (response.getData().getOtherParties() != null
-                        && response.getData().getOtherParties().size() > 0) {
+                        && !response.getData().getOtherParties().isEmpty()) {
                         response.addError("Benefit code cannot be changed on cases with registered 'Other Party'");
                     } else if (!hasErrors) {
                         response.addWarning("The benefit code will be changed to a non-child support benefit code");
