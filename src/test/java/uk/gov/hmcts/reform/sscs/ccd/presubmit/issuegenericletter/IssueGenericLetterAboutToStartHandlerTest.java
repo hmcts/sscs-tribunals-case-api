@@ -11,7 +11,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_GENERIC_LETTER;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentSelectionDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocumentDetails;
@@ -144,5 +147,25 @@ class IssueGenericLetterAboutToStartHandlerTest {
         List<CcdValue<DocumentSelectionDetails>> documentSelection = result.getData().getDocumentSelection();
         assertEquals(1, documentSelection.size());
         assertEquals(2, documentSelection.get(0).getValue().getDocumentsList().getListItems().size());
+    }
+
+    @Test
+    void givenDocumentEdited_ThenAddToListOptions() {
+        when(callback.getEvent()).thenReturn(ISSUE_GENERIC_LETTER);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        DocumentLink editDoc = DocumentLink.builder().documentFilename("EditedSscsDocument").documentUrl("EditedUrl").build();
+        SscsDocument sscsDocument = new SscsDocument(SscsDocumentDetails.builder().documentFileName("SscsDocument").editedDocumentLink(editDoc).build());
+        caseData.setSscsDocument(Collections.singletonList(sscsDocument));
+
+        var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        List<CcdValue<DocumentSelectionDetails>> documentSelection = result.getData().getDocumentSelection();
+        List<DynamicListItem> items = documentSelection.get(0).getValue().getDocumentsList().getListItems();
+        assertEquals(1, documentSelection.size());
+        assertEquals(3, items.size());
+        List<DynamicListItem> itemEdited = items.stream().filter(item -> Objects.equals(item.getCode(), "EditedSscsDocument")).toList();
+        assertFalse(itemEdited.isEmpty());
     }
 }
