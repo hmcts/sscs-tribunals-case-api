@@ -1,4 +1,9 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.reserveToInterlocJudge;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.reservetointerlocjudge;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,11 +14,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(MockitoExtension.class)
 public class ReserveToInterlocJudgeAboutToSubmitHandlerTest {
@@ -53,10 +53,11 @@ public class ReserveToInterlocJudgeAboutToSubmitHandlerTest {
 
     @Test
     void handReserveToInterlocJudgeWhenIsSet() {
-        JudicialUserBase reservedJudge = new JudicialUserBase("idamId", "personalCode");
         given(callback.getEvent()).willReturn(EventType.RESERVE_TO_INTERLOC_JUDGE);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+
+        JudicialUserBase reservedJudge = new JudicialUserBase("idamId", "personalCode");
         sscsCaseData.setReservedToJudgeInterloc(reservedJudge);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
                 ABOUT_TO_SUBMIT,

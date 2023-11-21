@@ -1,4 +1,6 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.reserveToInterlocJudge;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.reservetointerlocjudge;
+
+import static java.util.Objects.requireNonNull;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,14 +14,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
-import static java.util.Objects.requireNonNull;
-
 @Service
 @AllArgsConstructor
 @Slf4j
 public class ReserveToInterlocJudgeAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Value("${feature.postHearings.enabled}")
     private boolean isPostHearingsEnabled;
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
