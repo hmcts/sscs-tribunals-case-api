@@ -52,7 +52,7 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
 
             if (userRoles.contains(UserRole.JUDGE.getValue())
                     && !userRoles.contains(UserRole.SALARIED_JUDGE.getValue())) {
-                preSubmitCallbackResponse.addError("You do not have access to proceed");
+                preSubmitCallbackResponse.addError("You have already issued a final decision, only a salaried Judge can correct it");
 
                 return preSubmitCallbackResponse;
             }
