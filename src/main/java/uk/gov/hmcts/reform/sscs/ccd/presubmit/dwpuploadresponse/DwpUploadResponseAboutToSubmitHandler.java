@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -191,7 +192,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, dwpAudioVideoEvidence.stream()
             .map(evidence -> evidence.getValue().getDocumentType())
                 .filter(Objects::nonNull)
-            .toList(), EVENT_TYPE);
+                .collect(Collectors.toList()), EVENT_TYPE);
 
         sort(sscsCaseData.getAudioVideoEvidence());
 

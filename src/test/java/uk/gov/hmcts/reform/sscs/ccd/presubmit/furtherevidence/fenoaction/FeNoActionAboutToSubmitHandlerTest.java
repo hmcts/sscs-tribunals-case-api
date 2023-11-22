@@ -55,7 +55,9 @@ public class FeNoActionAboutToSubmitHandlerTest extends BaseHandlerTest {
                 "data.jointPartyId",
                 "data.appeal.appellant.appointee.id",
                 "data.appeal.appellant.id",
-                "data.appeal.rep.id")
+                "data.appeal.rep.id",
+                "data.sscsDocument[0].id",
+                "data.sscsDocument[1].id")
             .when(Option.TREATING_NULL_AS_ABSENT)
             .isEqualTo(expectedCaseData);
         assertEquals(FE_ACTIONED_NR, actualCaseData.getData().getDwpState());

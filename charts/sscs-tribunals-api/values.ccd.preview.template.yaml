@@ -40,7 +40,6 @@ java:
     SCHEDULE_LISTING_FEATURE: true
     POST_HEARINGS_FEATURE: true
     POST_HEARINGS_B_FEATURE: true
-
     JAVA_OPTS: -Xmx6G
 
 idam-pr:
@@ -151,7 +150,7 @@ xui-webapp:
 am-org-role-mapping-service:
   enabled: true
   java:
-    image: 'hmctspublic.azurecr.io/am/org-role-mapping-service:pr-1583'
+    image: 'hmctspublic.azurecr.io/am/org-role-mapping-service:latest'
     ingressHost: orm-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-am-org-role-mapping-service
     devmemoryRequests: 1024Mi
@@ -168,12 +167,24 @@ am-org-role-mapping-service:
     keyVaults:
       am:
         secrets:
-          - app-insights-connection-string
-          - am-org-role-mapping-service-s2s-secret
-          - role-assignment-service-LD-SDK-KEY
-          - orm-IDAM-CLIENT-ID
-          - orm-IDAM-CLIENT-SECRET
-          - orm-IDAM-ADMIN-SECRET
+          - name: app-insights-connection-string
+            alias: app-insights-connection-string
+          - name: am-org-role-mapping-service-s2s-secret
+            alias: AM_ORG_ROLE_MAPPING_SERVICE_SECRET
+          - name: role-assignment-service-LD-SDK-KEY
+            alias: LD_SDK_KEY
+          - name: orm-IDAM-CLIENT-ID
+            alias: ORM_IDAM_CLIENT_ID
+          - name: orm-IDAM-CLIENT-SECRET
+            alias: ORG_ROLE_MAPPING_IDAM_CLIENT_SECRET
+          - name: orm-IDAM-ADMIN-SECRET
+            alias: ORG_ROLE_MAPPING_IDAM_ADMIN_PASSWORD
+          - name: caseworker-topic-primary-send-listen-shared-access-key
+            alias: AMQP_CRD_SHARED_ACCESS_KEY_VALUE
+          - name: org-role-mapping-service-POSTGRES-PASS
+            alias: ORG_ROLE_MAPPING_DB_PASSWORD
+          - name: judicial-topic-primary-send-listen-shared-access-key
+            alias: AMQP_JRD_SHARED_ACCESS_KEY_VALUE
     environment:
       IDAM_S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
       S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
@@ -305,11 +316,11 @@ ccd:
       readinessDelay: 240
       livenessDelay: 240
       environment:
+        AM_ROLE_ASSIGNMENT_SERVICE_SECRET: ${AM_ROLE_ASSIGNMENT_SERVICE_SECRET}
         ROLE_ASSIGNMENT_DB_HOST: ${SERVICE_NAME}-postgresql
         ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
         ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
         CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
-        AM_ROLE_ASSIGNMENT_SERVICE_SECRET: AAAAAAAAAAAAAAAA
         IDAM_USER_URL: "https://idam-web-public.aat.platform.hmcts.net"
         IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
         OPEN_ID_API_BASE_URI: "https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o"
@@ -328,25 +339,16 @@ ccd:
               alias: ROLE_ASSIGNMENT_DB_PASSWORD
         am:
           secrets:
-            - am-role-assignment-service-s2s-secret
-            - app-insights-connection-string
-            - role-assignment-service-IDAM-CLIENT-SECRET
-            - role-assignment-service-IDAM-ADMIN-SECRET
-            - role-assignment-service-LD-SDK-KEY
-#      secrets:
-#        - name: app-insights-connection-string
-#        LD_SDK_KEY:
-#          secretRef: role-assignment-service-LD-SDK-KEY
-#          key: key
-#          disabled: true
-#        ROLE_ASSIGNMENT_IDAM_CLIENT_SECRET:
-#          secretRef: role-assignment-service-IDAM-CLIENT-SECRET
-#          key: key
-#          disabled: true
-#        ROLE_ASSIGNMENT_IDAM_ADMIN_PASSWORD:
-#          secretRef: role-assignment-service-IDAM-ADMIN-SECRET
-#          key: key
-#          disabled: true
+            - name: am-role-assignment-service-s2s-secret
+              alias: AM_ROLE_ASSIGNMENT_SERVICE_SECRET
+            - name: app-insights-connection-string
+              alias: app-insights-connection-string
+            - name: role-assignment-service-IDAM-CLIENT-SECRET
+              alias: ROLE_ASSIGNMENT_IDAM_CLIENT_SECRET
+            - name: role-assignment-service-IDAM-ADMIN-SECRET
+              alias: ROLE_ASSIGNMENT_IDAM_ADMIN_PASSWORD
+            - name: role-assignment-service-LD-SDK-KEY
+              alias: LD_SDK_KEY
 
   elasticsearch:
     nameOverride: ${SERVICE_NAME}-es
@@ -624,7 +626,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S11863HnonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S11864GnonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -643,7 +645,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S11863HnonProd
+      CCD_DEF_VERSION: S11864GnonProd
     secrets: []
     userRoles:
       - citizen
@@ -977,6 +979,8 @@ wa-case-event-handler:
     ingressHost: wa-case-event-handler-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-wa-case-event-handler
     readinessDelay: 90
+    autoscaling:
+      enabled: false
     secrets:
       AZURE_SERVICE_BUS_CONNECTION_STRING:
         secretRef: sscs-sb-preview

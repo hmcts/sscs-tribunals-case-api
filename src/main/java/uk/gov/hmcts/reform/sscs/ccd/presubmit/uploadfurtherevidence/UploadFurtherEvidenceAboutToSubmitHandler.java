@@ -21,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -162,7 +163,7 @@ public class UploadFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, newAudioVideoEvidence.stream()
             .map(audioVideoEvidence -> audioVideoEvidence.getValue().getDocumentType())
                 .filter(Objects::nonNull)
-            .toList(), EVENT_TYPE);
+                .collect(Collectors.toList()), EVENT_TYPE);
 
         if (!newAudioVideoEvidence.isEmpty()) {
             List<AudioVideoEvidence> audioVideoEvidence = new ArrayList<>(ofNullable(sscsCaseData.getAudioVideoEvidence()).orElse(emptyList()));
