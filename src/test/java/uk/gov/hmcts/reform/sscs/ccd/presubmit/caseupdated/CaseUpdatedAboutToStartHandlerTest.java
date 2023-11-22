@@ -116,4 +116,25 @@ public class CaseUpdatedAboutToStartHandlerTest {
         Assertions.assertNotNull(hearingOptions.getLanguagesList());
         Assertions.assertEquals("Welsh", hearingOptions.getLanguagesList().getValue().getLabel());
     }
+
+    @Test
+    public void givenThatOriginalLanguageFieldIsNonEmptyandInvalid_thenSetDynamicListInitialValue() {
+        sscsCaseData = CaseDataUtils.buildCaseData();
+        sscsCaseData.getAppeal().getHearingOptions().setLanguages("Wales");
+
+        DynamicListItem item = new DynamicListItem("Wales", "Wales");
+        DynamicList list = new DynamicList(null, List.of(item));
+
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(dynamicListLanguageUtil.generateInterpreterLanguageFields(any())).willReturn(list);
+        given(dynamicListLanguageUtil.getLanguageDynamicListItem(any())).willReturn(item);
+        given(verbalLanguagesService.getVerbalLanguage(any())).willReturn(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+
+        Assertions.assertEquals(0, response.getErrors().size());
+        Assertions.assertNotNull(hearingOptions.getLanguagesList());
+        Assertions.assertNull(hearingOptions.getLanguagesList().getValue());
+    }
 }
