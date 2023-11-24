@@ -941,7 +941,7 @@ camunda-bpm:
       CAMUNDA_DB_USER_NAME: hmcts
       CAMUNDA_BPM_DATABASE_SCHEMA_UPDATE: true
       S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-      CAMUNDA_DB_CONN_OPTIONS: ""
+      CAMUNDA_DB_CONN_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       RELEASE_REVISION: "{{ .Release.Revision }}"
     secrets:
       CAMUNDA_DB_PASSWORD:
@@ -954,13 +954,17 @@ wa-task-management-api:
     releaseNameOverride: ${SERVICE_NAME}-wa-task-management-api
     ingressHost: wa-task-management-api-${SERVICE_FQDN}
     readinessDelay: 90
+    secrets:
+      POSTGRES_PASSWORD:
+        secretRef: postgres
+        key: PASSWORD
+        disabled: false
     environment:
       CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
       ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
-      POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
-      POSTGRES_NAME: cft_task_db
-      POSTGRES_USERNAME: postgres
-      POSTGRES_PASSWORD: hmcts
+      POSTGRES_HOST: sscs-preview.postgres.database.azure.com
+      POSTGRES_NAME: "pr-${CHANGE_ID}-cft_task_db"
+      POSTGRES_USERNAME: hmcts
       POSTGRES_CONNECTION_OPTIONS: ""
       CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
       S2S_SECRET_TASK_MANAGEMENT_API: ${S2S_SECRET_TASK_MANAGEMENT_API}
@@ -997,6 +1001,10 @@ wa-case-event-handler:
       AZURE_SERVICE_BUS_CONNECTION_STRING:
         secretRef: sscs-sb-preview
         key: connectionString
+      POSTGRES_PASSWORD:
+        secretRef: postgres
+        key: PASSWORD
+        disabled: false
     environment:
       CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
       CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
@@ -1007,10 +1015,9 @@ wa-case-event-handler:
       AZURE_SERVICE_BUS_TOPIC_NAME: "${SERVICE_NAME}-servicebus-ccd-events"
       AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-ccd-events"
       AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-ccd-events"
-      POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
-      POSTGRES_NAME: wa-case-event-handler
+      POSTGRES_HOST: sscs-preview.postgres.database.azure.com
+      POSTGRES_NAME: "pr-${CHANGE_ID}-wa-case-event-handler"
       POSTGRES_USERNAME: hmcts
-      POSTGRES_PASSWORD: hmcts
       POSTGRES_CONNECTION_OPTIONS: ""
       WA_IDAM_CLIENT_SECRET: ${WA_IDAM_CLIENT_SECRET}
       S2S_SECRET_CASE_EVENT_HANDLER: ${S2S_SECRET_CASE_EVENT_HANDLER}
@@ -1021,12 +1028,16 @@ wa-workflow-api:
     ingressHost: wa-workflow-api-${SERVICE_FQDN}
     releaseNameOverride: ${SERVICE_NAME}-wa-workflow-api
     readinessDelay: 90
+    secrets:
+      POSTGRES_PASSWORD:
+        secretRef: postgres
+        key: PASSWORD
+        disabled: false
     environment:
       CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
-      POSTGRES_HOST: "{{ .Release.Name }}-postgresql"
-      POSTGRES_NAME: wa_workflow_api
+      POSTGRES_HOST: sscs-preview.postgres.database.azure.com
+      POSTGRES_NAME: "pr-${CHANGE_ID}-wa_workflow_api"
       POSTGRES_USERNAME: hmcts
-      POSTGRES_PASSWORD: hmcts
       POSTGRES_CONNECTION_OPTIONS: ""
       S2S_SECRET_WORKFLOW_API: ${S2S_SECRET_WORKFLOW_API}
       TASK_MANAGEMENT_URL: http://{{ .Release.Name }}-wa-task-management-api
