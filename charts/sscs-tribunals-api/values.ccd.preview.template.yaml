@@ -362,8 +362,8 @@ ccd:
       - name: logstash-lib
         emptyDir: {}
       - name: database-secret-volume
-          secret:
-            secretName: postgres
+        secret:
+          secretName: postgres
     extraVolumeMounts: |
       - name: logstash-lib
         mountPath: /usr/share/logstash/ccd
