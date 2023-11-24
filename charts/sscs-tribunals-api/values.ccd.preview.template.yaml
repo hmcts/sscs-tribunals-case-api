@@ -944,7 +944,7 @@ camunda-bpm:
       CAMUNDA_DB_CONN_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       RELEASE_REVISION: "{{ .Release.Revision }}"
     secrets:
-      CAMUNDA_DB_PASSWORD:
+      spring.datasource.password:
         secretRef: postgres
         key: PASSWORD
         disabled: false
@@ -972,6 +972,8 @@ wa-task-management-api:
       WA_SYSTEM_USERNAME: ${WA_SYSTEM_USERNAME}
       WA_SYSTEM_PASSWORD: ${WA_SYSTEM_PASSWORD}
       ALLOWED_CASE_TYPES: "benefit"
+    postgresql:
+      enabled: false
 
 wa-task-monitor:
   java:
