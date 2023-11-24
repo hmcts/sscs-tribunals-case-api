@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Service
 public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -63,7 +62,7 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
 
             postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.DWP, uploadParty);
             List<SscsDocument> documents = sscsCaseData.getSscsDocument();
-            SscsUtil.addDocumentToBundle(footerService, sscsCaseData, documents.get(documents.size() - 1));
+            documents.get(documents.size() - 1).getValue().setBundleAddition(footerService.getNextBundleAddition(documents));
         }
 
         return response;
