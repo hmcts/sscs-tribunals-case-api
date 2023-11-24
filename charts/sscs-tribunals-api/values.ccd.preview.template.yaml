@@ -206,8 +206,8 @@ am-org-role-mapping-service:
       JRD_TOPIC_NAME: "{{ .Release.Name}}-servicebus-jrd-topic"
       AMQP_CRD_SHARED_ACCESS_KEY_VALUE: "$(SB_ACCESS_KEY)"
       AMQP_JRD_SHARED_ACCESS_KEY_VALUE: "$(SB_ACCESS_KEY)"
-      ORG_ROLE_MAPPING_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-      ORG_ROLE_MAPPING_DB_NAME: "{{ .Values.global.databaseNamePrefix }}org_role_mapping"
+      ORG_ROLE_MAPPING_DB_HOST: sscs-preview.postgres.database.azure.com
+      ORG_ROLE_MAPPING_DB_NAME: "pr-${CHANGE_ID}-org_role_mapping"
       ORG_ROLE_MAPPING_DB_USERNAME: hmcts
       ORG_ROLE_MAPPING_DB_PORT: 5432
       ORG_ROLE_MAPPING_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
@@ -297,8 +297,8 @@ ccd:
       livenessDelay: 240
       environment:
         AM_ROLE_ASSIGNMENT_SERVICE_SECRET: ${AM_ROLE_ASSIGNMENT_SERVICE_SECRET}
-        ROLE_ASSIGNMENT_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-        ROLE_ASSIGNMENT_DB_NAME: "{{ .Values.global.databaseNamePrefix }}role-assignment"
+        ROLE_ASSIGNMENT_DB_HOST: sscs-preview.postgres.database.azure.com
+        ROLE_ASSIGNMENT_DB_NAME: "pr-${CHANGE_ID}-role-assignment"
         ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
         ROLE_ASSIGNMENT_DB_USERNAME: hmcts
         CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
@@ -541,7 +541,6 @@ ccd:
       image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
       imagePullPolicy: Always
       environment:
-        DEFINITION_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator,ccd_case_document_am_api
@@ -700,8 +699,8 @@ sscs-tya-notif:
       AMQP_USERNAME: "RootManageSharedAccessKey"
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
-      JOB_SCHEDULER_DB_NAME: "{{ .Values.global.databaseNamePrefix }}sscsjobscheduler"
-      JOB_SCHEDULER_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
+      JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscsjobscheduler"
+      JOB_SCHEDULER_DB_HOST: sscs-preview.postgres.database.azure.com
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       JOB_SCHEDULER_DB_USERNAME: hmcts
       HOURS_START_TIME: 0
@@ -850,8 +849,8 @@ hmc-cft-hearing-service:
       HMC_SERVICE_BUS_SUBSCRIPTION: "hmc-to-sscs-subscription"
       HMC_SERVICE_BUS_QUEUE: hmc-from-hmi
       HMC_OUTBOUND_SERVICE_BUS_QUEUE: hmc-to-hmi
-      CFT_HEARING_SERVICE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-      CFT_HEARING_SERVICE_DB_NAME: "{{ .Values.global.databaseNamePrefix }}hmc-cft-hearing-service"
+      CFT_HEARING_SERVICE_DB_HOST: sscs-preview.postgres.database.azure.com
+      CFT_HEARING_SERVICE_DB_NAME: "pr-${CHANGE_ID}-hmc-cft-hearing-service"
       CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       CFT_HEARING_SERVICE_DB_PORT: 5432
       HMC_ACCESS_CONTROL_ENABLED: false
@@ -937,8 +936,8 @@ camunda-bpm:
     readinessDelay: 90
     environment:
       CAMUNDA_API_AUTH_ENABLED: false
-      CAMUNDA_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-      CAMUNDA_DB_NAME: "{{ .Values.global.databaseNamePrefix }}camunda"
+      CAMUNDA_DB_HOST: sscs-preview.postgres.database.azure.com
+      CAMUNDA_DB_NAME: "pr-${CHANGE_ID}-camunda"
       CAMUNDA_DB_USER_NAME: hmcts
       CAMUNDA_BPM_DATABASE_SCHEMA_UPDATE: true
       S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
@@ -1118,8 +1117,8 @@ ccd-message-publisher:
         key: PASSWORD
         disabled: false
     environment:
-      DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-      DATA_STORE_DB_NAME: "{{ .Values.global.databaseNamePrefix }}data-store"
+      DATA_STORE_DB_HOST: sscs-preview.postgres.database.azure.com
+      DATA_STORE_DB_NAME: "pr-${CHANGE_ID}-data-store"
       DATA_STORE_DB_USERNAME: hmcts
       DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       CCD_CASE_EVENTS_DESTINATION: "${SERVICE_NAME}-servicebus-ccd-events"
