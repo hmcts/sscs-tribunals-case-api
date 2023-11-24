@@ -965,7 +965,7 @@ wa-task-management-api:
       POSTGRES_HOST: sscs-preview.postgres.database.azure.com
       POSTGRES_NAME: "pr-${CHANGE_ID}-cft_task_db"
       POSTGRES_USERNAME: hmcts
-      POSTGRES_CONNECTION_OPTIONS: ""
+      POSTGRES_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
       S2S_SECRET_TASK_MANAGEMENT_API: ${S2S_SECRET_TASK_MANAGEMENT_API}
       WA_IDAM_CLIENT_SECRET: ${WA_IDAM_CLIENT_SECRET}
