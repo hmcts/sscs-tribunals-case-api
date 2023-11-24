@@ -58,6 +58,8 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
                 callback.getEvent());
         }
 
+        SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
+
         return response;
     }
 
