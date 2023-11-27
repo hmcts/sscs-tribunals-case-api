@@ -81,7 +81,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wa.enabled
   - name: wa-task-management-api
-    version: ~0.0.37
+    version: 0.0.48
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wa.enabled
   - name: wa-task-monitor
