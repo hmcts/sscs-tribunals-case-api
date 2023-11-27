@@ -967,8 +967,11 @@ wa-task-management-api:
       POSTGRES_HOST: sscs-preview.postgres.database.azure.com
       POSTGRES_NAME: "pr-${CHANGE_ID}-cft_task_db"
       POSTGRES_USERNAME: hmcts
-      POSTGRES_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
+      POSTGRES_CONNECTION_OPTIONS: "?currentSchema=cft_task_db&stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       SPRING_PROFILES_ACTIVE: "preview"
+      SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: cft_task_db
+      SPRING_FLYWAY_DEFAULT_SCHEMA: cft_task_db
+      SPRING_FLYWAY_SCHEMAS: cft_task_db
       CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
       S2S_SECRET_TASK_MANAGEMENT_API: ${S2S_SECRET_TASK_MANAGEMENT_API}
       WA_IDAM_CLIENT_SECRET: ${WA_IDAM_CLIENT_SECRET}
