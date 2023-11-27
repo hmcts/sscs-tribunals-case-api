@@ -968,7 +968,6 @@ wa-task-management-api:
       POSTGRES_NAME: "pr-${CHANGE_ID}-cft_task_db"
       POSTGRES_USERNAME: hmcts
       POSTGRES_CONNECTION_OPTIONS: "?currentSchema=cft_task_db&stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
-      SPRING_PROFILES_ACTIVE: "preview"
       SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: cft_task_db
       SPRING_FLYWAY_DEFAULT_SCHEMA: cft_task_db
       SPRING_FLYWAY_SCHEMAS: cft_task_db
@@ -978,8 +977,6 @@ wa-task-management-api:
       WA_SYSTEM_USERNAME: ${WA_SYSTEM_USERNAME}
       WA_SYSTEM_PASSWORD: ${WA_SYSTEM_PASSWORD}
       ALLOWED_CASE_TYPES: "benefit"
-    postgresql:
-      enabled: false
 
 wa-task-monitor:
   java:
