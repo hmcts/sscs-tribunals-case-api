@@ -9,8 +9,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
@@ -45,8 +44,39 @@ public class PostHearingRequestAboutToStartHandler implements PreSubmitCallbackH
             return response;
         }
 
+        clearPostHearingRequestFormatAndContentFields(caseData, caseData.getPostHearing().getRequestType());
         caseData.getPostHearing().setRequestType(null);
 
         return response;
+    }
+
+    private static void clearPostHearingRequestFormatAndContentFields(SscsCaseData caseData, PostHearingRequestType requestType) {
+        PostHearing postHearing = caseData.getPostHearing();
+        DocumentGeneration docGen = caseData.getDocumentGeneration();
+
+        switch (requestType) {
+            case SET_ASIDE -> {
+                postHearing.getSetAside().setRequestFormat(null);
+                docGen.setBodyContent(null);
+            }
+            case CORRECTION -> {
+                postHearing.getCorrection().setRequestFormat(null);
+                docGen.setCorrectionBodyContent(null);
+            }
+            case STATEMENT_OF_REASONS -> {
+                postHearing.getStatementOfReasons().setRequestFormat(null);
+                docGen.setStatementOfReasonsBodyContent(null);
+            }
+            case LIBERTY_TO_APPLY -> {
+                postHearing.getLibertyToApply().setRequestFormat(null);
+                docGen.setLibertyToApplyBodyContent(null);
+            }
+            case PERMISSION_TO_APPEAL -> {
+                postHearing.getPermissionToAppeal().setRequestFormat(null);
+                docGen.setPermissionToAppealBodyContent(null);
+            }
+            default -> {
+            }
+        }
     }
 }
