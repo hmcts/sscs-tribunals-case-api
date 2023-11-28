@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
@@ -62,7 +63,10 @@ public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
             DocumentType docType = SscsUtil.getIssueFinalDecisionDocumentType(sscsCaseData, isPostHearingsEnabled);
 
             WriteFinalDecisionPreviewDecisionServiceBase previewDecisionService = decisionNoticeService.getPreviewService(benefitType);
-            previewDecisionService.preview(callback, docType, userAuthorisation, true, isPostHearingsEnabled, isPostHearingsBEnabled);
+
+            if (YesNo.isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
+                previewDecisionService.preview(callback, docType, userAuthorisation, true, isPostHearingsEnabled, isPostHearingsBEnabled);
+            }
         } else {
             response.addError("No draft final decision notice found on case. Please use 'Write final decision' event before trying to issue.");
         }
