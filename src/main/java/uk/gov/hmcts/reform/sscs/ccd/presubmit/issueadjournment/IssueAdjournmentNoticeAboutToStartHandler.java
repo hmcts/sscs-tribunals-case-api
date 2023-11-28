@@ -48,18 +48,14 @@ public class IssueAdjournmentNoticeAboutToStartHandler implements PreSubmitCallb
         // Given the user selects No to generate notice option and has uploaded their custom adjournment notice document.
         // Then don't generate the system default adjournment notice document.
         if (YesNo.isYes(sscsCaseData.getAdjournment().getGenerateNotice())) {
-
             if (sscsCaseData.getAdjournment().getGeneratedDate() == null) {
                 response.addError("Adjourn case generated date not found. Please use 'Adjourn case' event or upload your adjourn case document.");
             } else {
                 previewService.preview(callback, DocumentType.ADJOURNMENT_NOTICE, userAuthorisation, true);
             }
-
         } else if (sscsCaseData.getAdjournment().getPreviewDocument() == null) {
             response.addError("No draft adjournment notice found on case. Please use 'Adjourn case' event or upload your adjourn case document.");
         }
-
         return response;
     }
-
 }
