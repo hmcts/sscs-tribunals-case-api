@@ -1671,13 +1671,13 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getWarnings().size());
-        assertNull( appeal.getHearingOptions().getLanguages());
+        assertNull(appeal.getHearingOptions().getLanguages());
     }
 
     @ParameterizedTest
     @CsvSource({
-            "Spanish", "Chittagonain", "Czech", "Danish", "Dinka", "Maldivian", "Toura", "Douala", "Dutch", "Dioula",
-            "Efik", "Estonian", "Ewe", "Ewondo", "Farsi", "Fanti", "Fijian", "French"
+        "Spanish", "Chittagonain", "Czech", "Danish", "Dinka", "Maldivian", "Toura", "Douala", "Dutch", "Dioula",
+        "Efik", "Estonian", "Ewe", "Ewondo", "Farsi", "Fanti", "Fijian", "French"
     })
     public void givenAnyCaseAndLanguageIsSet_thenSetTheLanguageValue(String language) {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
