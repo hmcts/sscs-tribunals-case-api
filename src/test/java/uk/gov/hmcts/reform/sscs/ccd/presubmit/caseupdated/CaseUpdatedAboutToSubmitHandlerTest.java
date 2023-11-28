@@ -1662,30 +1662,30 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAnyCaseAndLanguageIsNotSelectedFromList_thenSetTheOriginalLanguageFieldToEmpty() {
+    public void givenAnyCaseAndLanguageIsNotSet_thenSetTheLanguageFieldToEmpty() {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
         appeal.getBenefitType().setCode("PIP");
         appeal.setHearingType("paper");
-        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").languagesList(null).build());
+        appeal.setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").languages(null).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getWarnings().size());
-        assertEquals("", appeal.getHearingOptions().getLanguages());
+        assertNull( appeal.getHearingOptions().getLanguages());
     }
 
     @ParameterizedTest
     @CsvSource({
-        "Spanish", "Chittagonain", "Czech", "Danish", "Dinka", "Maldivian", "Toura", "Douala", "Dutch", "Dioula",
-        "Efik", "Estonian", "Ewe", "Ewondo", "Farsi", "Fanti", "Fijian", "French"
+            "Spanish", "Chittagonain", "Czech", "Danish", "Dinka", "Maldivian", "Toura", "Douala", "Dutch", "Dioula",
+            "Efik", "Estonian", "Ewe", "Ewondo", "Farsi", "Fanti", "Fijian", "French"
     })
-    public void givenAnyCaseAndLanguageIsSelectedFromList_thenSetTheOriginalLanguageFieldToValue(String language) {
+    public void givenAnyCaseAndLanguageIsSet_thenSetTheLanguageValue(String language) {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
         appeal.getBenefitType().setCode("PIP");
         appeal.setHearingType("paper");
         HearingOptions hearingOptions = HearingOptions.builder()
                 .wantsToAttend("Yes")
-                .languagesList(new DynamicList(language))
+                .languages(language)
                 .build();
         appeal.setHearingOptions(hearingOptions);
 
