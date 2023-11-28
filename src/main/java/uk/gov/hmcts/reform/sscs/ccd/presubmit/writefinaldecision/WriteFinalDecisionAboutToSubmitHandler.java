@@ -70,8 +70,7 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
             outcomeService.validate(preSubmitCallbackResponse, sscsCaseData);
 
-            if (!(State.READY_TO_LIST.equals(state)
-                || State.WITH_DWP.equals(sscsCaseData.getState()))) {
+            if (!(State.READY_TO_LIST.equals(state) || State.WITH_DWP.equals(sscsCaseData.getState()))) {
                 sscsCaseData.setPreviousState(state);
             }
             
