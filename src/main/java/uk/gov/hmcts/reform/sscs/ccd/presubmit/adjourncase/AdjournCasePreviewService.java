@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
@@ -40,6 +41,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
@@ -53,6 +55,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     private static final String DOCUMENT_DATE_PATTERN = "dd/MM/yyyy";
     public static final String IN_CHAMBERS = "In chambers";
     private final SignLanguagesService signLanguagesService;
+    private final AirLookupService airLookupService;
     @Value("${feature.snl.adjournment.enabled}")
     private boolean adjournmentFeature;
 
@@ -61,11 +64,13 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                                      UserDetailsService userDetailsService,
                                      VenueDataLoader venueDataLoader,
                                      @Value("${doc_assembly.adjourn_case}") String templateId,
+                                     AirLookupService airLookupService,
                                      SignLanguagesService signLanguagesService,
                                      JudicialRefDataService judicialRefDataService,
                                      DocumentConfiguration documentConfiguration) {
         super(generateFile, userDetailsService, languagePreference -> templateId, documentConfiguration);
         this.venueDataLoader = venueDataLoader;
+        this.airLookupService = airLookupService;
         this.signLanguagesService = signLanguagesService;
         this.judicialRefDataService = judicialRefDataService;
     }
@@ -172,11 +177,10 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         if (adjournment.getNextHearingVenue() == AdjournCaseNextHearingVenue.SOMEWHERE_ELSE) {
             if (adjournment.getNextHearingVenueSelected() != null
                 && adjournment.getNextHearingVenueSelected().getValue() != null
-                && adjournment.getNextHearingVenueSelected().getValue().getCode() != null
-            ) {
+                && adjournment.getNextHearingVenueSelected().getValue().getCode() != null) {
                 VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(
                     adjournment.getNextHearingVenueSelected().getValue().getCode());
-                if (venueDetails == null) {
+                if (isNull(venueDetails)) {
                     throw new IllegalStateException("Unable to load venue details for id:"
                         + adjournment.getNextHearingVenueSelected().getValue().getCode());
                 }
@@ -186,8 +190,21 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                 throw new IllegalStateException("A next hearing venue of somewhere else has been specified but no venue has been selected");
             }
         } else {
-            adjournCaseBuilder.nextHearingAtVenue(!IN_CHAMBERS.equals(venueName));
+            Integer venueId = airLookupService.lookupVenueIdByAirVenueName(venueName);
+
+            if (nonNull(venueId)) {
+                VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(venueId.toString());
+
+                if (nonNull(venueDetails)) {
+                    adjournCaseBuilder.nextHearingVenue(venueDetails.getGapsVenName());
+                    adjournCaseBuilder.nextHearingAtVenue(true);
+
+                    return;
+                }
+            }
+
             adjournCaseBuilder.nextHearingVenue(venueName);
+            adjournCaseBuilder.nextHearingAtVenue(!IN_CHAMBERS.equals(venueName));
         }
     }
 

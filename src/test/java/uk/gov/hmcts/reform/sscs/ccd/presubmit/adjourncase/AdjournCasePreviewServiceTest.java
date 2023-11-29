@@ -18,7 +18,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService.IN_CHAMBERS;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -70,6 +69,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
@@ -123,15 +123,18 @@ class AdjournCasePreviewServiceTest {
     Map<String, VenueDetails> venueDetailsMap;
 
     @Mock
+    private AirLookupService airLookupService;
+
+    @Mock
     private SignLanguagesService signLanguagesService;
 
     @Mock
     private DocumentConfiguration documentConfiguration;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         service = new AdjournCasePreviewService(generateFile, userDetailsService, venueDataLoader, TEMPLATE_ID,
-            signLanguagesService, judicialRefDataService, documentConfiguration);
+                airLookupService, signLanguagesService, judicialRefDataService, documentConfiguration);
         ReflectionTestUtils.setField(service, "adjournmentFeature", true);
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
