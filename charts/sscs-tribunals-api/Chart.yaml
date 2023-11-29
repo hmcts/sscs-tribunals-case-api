@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.123
+version: 0.0.124
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -30,7 +30,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-ccd-callback-orchestrator.enabled
   - name: ccd
-    version: 8.0.29
+    version: 9.0.20
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd.enabled
     tags:
@@ -63,6 +63,10 @@ dependencies:
     version: 1.0.4
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: servicebus.enabled
+  - name: postgresql
+    version: 1.0.2
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: postgresql.enabled
   - name: aac-manage-case-assignment
     version: ~0.2.11
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
@@ -73,11 +77,11 @@ dependencies:
     condition: am-org-role-mapping-service.enabled
 # WA
   - name: camunda-bpm
-    version: 0.0.28
+    version: 0.0.43
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wa.enabled
   - name: wa-task-management-api
-    version: ~0.0.37
+    version: 0.0.48
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wa.enabled
   - name: wa-task-monitor
