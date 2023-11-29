@@ -175,11 +175,11 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
     private void handleFaceToFaceHearing(Adjournment adjournment, AdjournCaseTemplateBodyBuilder adjournCaseBuilder, String venueName) {
         if (adjournment.getNextHearingVenue() == AdjournCaseNextHearingVenue.SOMEWHERE_ELSE) {
-            if (adjournment.getNextHearingVenueSelected() != null
-                && adjournment.getNextHearingVenueSelected().getValue() != null
-                && adjournment.getNextHearingVenueSelected().getValue().getCode() != null) {
+            if (nonNull(adjournment.getNextHearingVenueSelected())
+                && nonNull(adjournment.getNextHearingVenueSelected().getValue())
+                && nonNull(adjournment.getNextHearingVenueSelected().getValue().getCode())) {
                 VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(
-                    adjournment.getNextHearingVenueSelected().getValue().getCode());
+                        adjournment.getNextHearingVenueSelected().getValue().getCode());
                 if (isNull(venueDetails)) {
                     throw new IllegalStateException("Unable to load venue details for id:"
                         + adjournment.getNextHearingVenueSelected().getValue().getCode());

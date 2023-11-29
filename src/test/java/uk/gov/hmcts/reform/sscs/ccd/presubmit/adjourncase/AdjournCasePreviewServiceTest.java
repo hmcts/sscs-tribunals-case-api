@@ -142,7 +142,7 @@ class AdjournCasePreviewServiceTest {
 
         venueDetailsMap = new HashMap<>();
         VenueDetails venueDetails = VenueDetails.builder().venName("Venue Name").gapsVenName(GAP_VENUE_NAME).build();
-        venueDetailsMap.put("someVenueId", venueDetails);
+        venueDetailsMap.put("123", venueDetails);
 
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
@@ -1403,7 +1403,7 @@ class AdjournCasePreviewServiceTest {
 
         adjournment.setTypeOfNextHearing(nextHearingType);
 
-        DynamicListItem item = new DynamicListItem("someVenueId", "");
+        DynamicListItem item = new DynamicListItem("123", "");
         DynamicList list = new DynamicList(item, List.of());
 
         adjournment.setNextHearingVenue(SAME_VENUE);
@@ -1426,7 +1426,7 @@ class AdjournCasePreviewServiceTest {
 
         adjournment.setTypeOfNextHearing(nextHearingType);
 
-        DynamicListItem item = new DynamicListItem("someVenueId", "");
+        DynamicListItem item = new DynamicListItem("123", "");
         DynamicList list = new DynamicList(item, List.of());
 
         adjournment.setNextHearingVenue(SOMEWHERE_ELSE);
@@ -1447,7 +1447,7 @@ class AdjournCasePreviewServiceTest {
 
         adjournment.setTypeOfNextHearing(nextHearingType);
 
-        DynamicListItem item = new DynamicListItem("someVenueId", "");
+        DynamicListItem item = new DynamicListItem("123", "");
         DynamicList list = new DynamicList(item, List.of());
 
         adjournment.setNextHearingVenue(SOMEWHERE_ELSE);
@@ -1657,5 +1657,32 @@ class AdjournCasePreviewServiceTest {
         assertThat(venueName.equals(templateBody.getNextHearingVenue()));
         assertThat(faceToFaceValue.equals(templateBody.getHearingType()));
         assertThat(faceToFaceValue.equals(templateBody.getNextHearingType()));
+    }
+
+    @Test
+    void givenSameVenueSelectedAndGetVenueDetails_thenPayloadContainsUpdatedHearingLocations() {
+        when(venueDataLoader.getVenueDetailsMap()).thenReturn(venueDetailsMap);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
+        when(airLookupService.lookupVenueIdByAirVenueName(any())).thenReturn(123);
+        when(generateFile.assemble(any())).thenReturn(URL);
+
+        adjournment.setTypeOfNextHearing(FACE_TO_FACE);
+
+        DynamicListItem item = new DynamicListItem("123", "");
+        DynamicList list = new DynamicList(item, List.of());
+
+        adjournment.setNextHearingVenue(SAME_VENUE);
+        adjournment.setNextHearingVenueSelected(list);
+
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+
+        verify(generateFile, atLeastOnce()).assemble(capture.capture());
+        String nextHearingTypeText = HearingType.getByKey(FACE_TO_FACE.getCcdDefinition()).getValue();
+        NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        assertThat(payload.getAdjournCaseTemplateBody().getNextHearingVenue()).isEqualTo(GAP_VENUE_NAME);
+        assertThat(payload.getAdjournCaseTemplateBody().isNextHearingAtVenue()).isTrue();
+        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_FULL_NAME, nextHearingTypeText);
+        assertThat(templateBody.getAdjournCaseTemplateBody().getNextHearingVenue()).isEqualTo(GAP_VENUE_NAME);
     }
 }
