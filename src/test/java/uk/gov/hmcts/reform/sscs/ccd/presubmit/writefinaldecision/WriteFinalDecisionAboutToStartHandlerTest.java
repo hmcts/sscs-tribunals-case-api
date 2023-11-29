@@ -164,7 +164,7 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("You do not have access to proceed", error);
+        assertEquals("You have already issued a final decision, only a salaried Judge can correct it", error);
     }
 
     @Test
