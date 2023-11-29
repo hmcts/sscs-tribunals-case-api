@@ -123,11 +123,14 @@ public class IssueDocumentHandler {
                 || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
     }
 
-    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
+    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType,
+                                                                    String templateId, GenerateFile generateFile, String userAuthorisation) {
         return issueDocument(callback, documentType, templateId, generateFile, userAuthorisation, false, false);
     }
 
-    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation, boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
+    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType,
+                                                                    String templateId, GenerateFile generateFile, String userAuthorisation,
+                                                                    boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         if ((ADJOURNMENT_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType))
@@ -136,16 +139,12 @@ public class IssueDocumentHandler {
         }
 
         String documentUrl = Optional.ofNullable(getDocumentFromCaseData(caseData)).map(DocumentLink::getDocumentUrl).orElse(null);
-
         LocalDate dateAdded = Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now());
-
         String documentTypeLabel = getDocumentTypeLabel(caseData, documentType, isPostHearingsEnabled);
-
         String embeddedDocumentTypeLabel = getEmbeddedDocumentTypeLabel(caseData, documentType, documentTypeLabel, isPostHearingsEnabled);
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-
         FormPayload formPayload = createPayload(response, caseData, embeddedDocumentTypeLabel, dateAdded, LocalDate.now(), isScottish, isPostHearingsEnabled, isPostHearingsBEnabled, userAuthorisation);
 
         if (!response.getErrors().isEmpty()) {
@@ -160,11 +159,8 @@ public class IssueDocumentHandler {
                 .build();
 
         log.info(String.format("Generating %s document isScottish = %s", documentTypeLabel, isScottish));
-
         final String generatedFileUrl = generateFile.assemble(params);
-
         documentTypeLabel = documentTypeLabel + ((DRAFT_CORRECTED_NOTICE.equals(documentType) || DRAFT_DECISION_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType)) ? " generated" : " issued");
-
         final String filename = String.format("%s on %s.pdf", documentTypeLabel, dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         DocumentLink previewFile = DocumentLink.builder()
