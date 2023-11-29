@@ -4,6 +4,7 @@ import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 
 import java.time.LocalDate;
@@ -93,7 +94,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
             if (isNull(finalDecisionCaseData.getFinalDecisionIssuedDate())) {
                 finalDecisionCaseData.setFinalDecisionIssuedDate(LocalDate.now());
-                finalDecisionCaseData.setFinalDecisionHeldBefore(SscsUtil.buildWriteFinalDecisionHeldBefore(sscsCaseData, userDetailsService.buildLoggedInUserName(userAuthorisation)));
+                finalDecisionCaseData.setFinalDecisionJudge(userDetailsService.buildLoggedInUserName(userAuthorisation));
                 finalDecisionCaseData.setFinalDecisionHeldAt(SscsUtil.buildWriteFinalDecisionHeldAt(sscsCaseData, venueDataLoader));
             }
         }
@@ -118,6 +119,8 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         if (isAdjournmentEnabled) {
             sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());
         }
+
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionWasOriginalDecisionUploaded(isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice()) ? NO : YES);
 
         return preSubmitCallbackResponse;
     }
