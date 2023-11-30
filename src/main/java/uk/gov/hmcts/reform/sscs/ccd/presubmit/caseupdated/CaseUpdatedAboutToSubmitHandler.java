@@ -109,7 +109,6 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             validateBenefitIssueCode(sscsCaseData, preSubmitCallbackResponse);
         }
         setCaseCode(preSubmitCallbackResponse, callback, hasSuperUserRole);
-        updateHearingOptionLanguageFromSelectedList(sscsCaseData);
         validateBenefitForCase(preSubmitCallbackResponse, callback, hasSuperUserRole);
 
         if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
@@ -497,11 +496,4 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         return sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
     }
 
-    private void updateHearingOptionLanguageFromSelectedList(SscsCaseData sscsCaseData) {
-        HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
-        if (hearingOptions != null) {
-            DynamicList languagesList = hearingOptions.getLanguagesList();
-            hearingOptions.setLanguages(isNull(languagesList) ? "" : languagesList.getValue().getLabel());
-        }
-    }
 }
