@@ -612,7 +612,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S12006InonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S11142nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -631,7 +631,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S12006InonProd
+      CCD_DEF_VERSION: S11142nonProd
     secrets: []
     userRoles:
       - citizen
@@ -653,6 +653,7 @@ ccd:
       - caseworker-sscs-hmrcresponsewriter
       - caseworker-wa-task-configuration
       - caseworker-ras-validation
+      - GS_profile
 elastic:
   enabled: true
 
