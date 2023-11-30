@@ -467,5 +467,35 @@ public class SscsUtil {
             sscsCaseData.setTranslationWorkOutstanding(YES.getValue());
         }
     }
+
+    public static void clearPostHearingRequestFormatAndContentFields(SscsCaseData caseData, PostHearingRequestType requestType) {
+        PostHearing postHearing = caseData.getPostHearing();
+        DocumentGeneration docGen = caseData.getDocumentGeneration();
+
+        switch (requestType) {
+            case SET_ASIDE -> {
+                postHearing.getSetAside().setRequestFormat(null);
+                docGen.setBodyContent(null);
+            }
+            case CORRECTION -> {
+                postHearing.getCorrection().setRequestFormat(null);
+                docGen.setCorrectionBodyContent(null);
+            }
+            case STATEMENT_OF_REASONS -> {
+                postHearing.getStatementOfReasons().setRequestFormat(null);
+                docGen.setStatementOfReasonsBodyContent(null);
+            }
+            case LIBERTY_TO_APPLY -> {
+                postHearing.getLibertyToApply().setRequestFormat(null);
+                docGen.setLibertyToApplyBodyContent(null);
+            }
+            case PERMISSION_TO_APPEAL -> {
+                postHearing.getPermissionToAppeal().setRequestFormat(null);
+                docGen.setPermissionToAppealBodyContent(null);
+            }
+            default -> {
+            }
+        }
+    }
 }
 
