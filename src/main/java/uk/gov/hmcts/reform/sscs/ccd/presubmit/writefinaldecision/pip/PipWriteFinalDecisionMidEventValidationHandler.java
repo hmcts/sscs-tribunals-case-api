@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -19,9 +17,8 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDecisionMidEventValidationHandlerBase {
 
     public PipWriteFinalDecisionMidEventValidationHandler(Validator validator,
-                                                          DecisionNoticeService decisionNoticeService,
-                                                          @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
-        super(validator, decisionNoticeService, isPostHearingsEnabled);
+                                                          DecisionNoticeService decisionNoticeService) {
+        super(validator, decisionNoticeService);
     }
 
     @Override
@@ -122,7 +119,9 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
         if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow() != null
             && sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow()
                 .equalsIgnoreCase(YesNo.NO.getValue())
-            && isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
+            && sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice() != null
+            && sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice()
+                .equalsIgnoreCase(YesNo.YES.getValue())) {
             sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES);
             return;
         }

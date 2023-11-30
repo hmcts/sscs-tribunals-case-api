@@ -4,7 +4,6 @@ import static io.micrometer.core.instrument.util.StringUtils.isNotBlank;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
@@ -14,30 +13,24 @@ import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Slf4j
 public class SscsUtil {
-
-    public static final String INVALID_BENEFIT_ISSUE_CODE = "Incorrect benefit/issue code combination";
-    public static final String BENEFIT_CODE_NOT_IN_USE = "The benefit code selected is not in use";
 
     private SscsUtil() {
         //
@@ -257,7 +250,7 @@ public class SscsUtil {
                 return DocumentType.CORRECTED_DECISION_NOTICE;
             }
 
-            if (isYes(caseData.getPostHearing().getCorrection().getIsCorrectionFinalDecisionInProgress())) {
+            if (isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
                 return DocumentType.DRAFT_CORRECTED_NOTICE;
             }
         }
@@ -286,40 +279,18 @@ public class SscsUtil {
     public static void setCorrectionInProgress(CaseDetails<SscsCaseData> caseDetails, boolean isPostHearingsEnabled) {
         if (isPostHearingsEnabled) {
             YesNo correctionInProgress = State.POST_HEARING.equals(caseDetails.getState()) || State.DORMANT_APPEAL_STATE.equals(caseDetails.getState()) ? YES : NO;
-            caseDetails.getCaseData().getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(correctionInProgress);
+            caseDetails.getCaseData().getPostHearing().getCorrection().setCorrectionFinalDecisionInProgress(correctionInProgress);
         }
     }
 
     public static boolean isCorrectionInProgress(SscsCaseData caseData, boolean isPostHearingsEnabled) {
-        return isPostHearingsEnabled && isYes(caseData.getPostHearing().getCorrection().getIsCorrectionFinalDecisionInProgress());
-    }
-
-    public static boolean isOriginalDecisionNoticeUploaded(SscsCaseData sscsCaseData) {
-        return isNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision());
+        return isPostHearingsEnabled && isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress());
     }
       
     public static boolean isGapsCase(SscsCaseData sscsCaseData) {
         return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
     }
 
-    public static void validateBenefitIssueCode(SscsCaseData caseData,
-                                                PreSubmitCallbackResponse<SscsCaseData> response,
-                                                SessionCategoryMapService categoryMapService) {
-        boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
-        boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
-
-
-        if (isNull(Benefit.getBenefitFromBenefitCode(caseData.getBenefitCode()))) {
-            response.addError(BENEFIT_CODE_NOT_IN_USE);
-        }
-
-
-        if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
-                isSecondDoctorPresent, fqpmRequired))) {
-            response.addError(INVALID_BENEFIT_ISSUE_CODE);
-        }
-    }
-  
     public static String buildWriteFinalDecisionHeldBefore(SscsCaseData caseData, @NonNull String signedInJudgeName) {
         List<String> names = new ArrayList<>();
         names.add(signedInJudgeName);
@@ -337,7 +308,7 @@ public class SscsUtil {
     }
 
     public static String buildWriteFinalDecisionHeldAt(SscsCaseData caseData, VenueDataLoader venueDataLoader) {
-        if (isNotEmpty(caseData.getHearings())) {
+        if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
             HearingDetails finalHearing = getLastValidHearing(caseData);
             if (nonNull(finalHearing)) {
                 if (nonNull(finalHearing.getVenue())) {
@@ -364,51 +335,6 @@ public class SscsUtil {
             }
         }
         return null;
-    }
-
-    public static DynamicList getBenefitDescriptions() {
-        List<DynamicListItem> items = Arrays.stream(Benefit.values())
-                .sorted(Comparator.comparing(Benefit::getDescription))
-                .map(SscsUtil::getBenefitDescriptionList)
-                .flatMap(List::stream)
-                .toList();
-
-        return new DynamicList(null, items);
-    }
-
-    private static List<DynamicListItem> getBenefitDescriptionList(Benefit benefit) {
-        return benefit.getCaseLoaderKeyId().stream()
-                .map(code -> new DynamicListItem(code, benefit.getDescription() + " / " + code))
-                .toList();
-    }
-
-    public static void handleBenefitType(SscsCaseData caseData) {
-        Appeal appeal = caseData.getAppeal();
-        if (isNull(appeal)) {
-            return;
-        }
-
-        BenefitType benefitType = appeal.getBenefitType();
-        if (isNull(benefitType)) {
-            return;
-        }
-
-        DynamicList benefitTypeDescription = benefitType.getDescriptionSelection();
-        if (isNull(benefitTypeDescription)) {
-            return;
-        }
-
-        DynamicListItem selectedBenefitType = benefitTypeDescription.getValue();
-        if (isNull(selectedBenefitType)) {
-            return;
-        }
-
-        String code = selectedBenefitType.getCode();
-        Benefit benefit = Benefit.getBenefitFromBenefitCode(code);
-        benefitType.setCode(benefit.getShortName());
-        benefitType.setDescription(benefit.getDescription());
-        benefitType.setDescriptionSelection(null);
-        caseData.setBenefitCode(code);
     }
 
     public static void updateHearingChannel(SscsCaseData caseData, HearingChannel hearingChannel) {
@@ -475,4 +401,3 @@ public class SscsUtil {
         }
     }
 }
-

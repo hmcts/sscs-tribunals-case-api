@@ -66,7 +66,7 @@ public class IssueDocumentHandler {
         if (isPostHearingsEnabled) {
             SscsFinalDecisionCaseData finalDecisionCaseData = caseData.getSscsFinalDecisionCaseData();
 
-            if (isYes(caseData.getPostHearing().getCorrection().getIsCorrectionFinalDecisionInProgress())) {
+            if (isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
                 formPayload = formPayload.toBuilder()
                         .generatedDate(finalDecisionCaseData.getFinalDecisionGeneratedDate())
                         .idamSurname(finalDecisionCaseData.getFinalDecisionIdamSurname())
@@ -202,7 +202,7 @@ public class IssueDocumentHandler {
                 return postHearingReviewType.getDescriptionEn() + " Decision Notice";
             }
 
-            if (isYes(caseData.getPostHearing().getCorrection().getIsCorrectionFinalDecisionInProgress())) {
+            if (isYes(caseData.getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress())) {
                 return documentTypeLabel;
             }
         }

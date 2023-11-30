@@ -14,8 +14,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -107,7 +105,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
             .sscsDocument(documentList)
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
-                .writeFinalDecisionGenerateNotice(null)
+                .writeFinalDecisionGenerateNotice("")
                 .writeFinalDecisionTypeOfHearing("")
                 .writeFinalDecisionPresentingOfficerAttendedQuestion("")
                 .writeFinalDecisionAppellantAttendedQuestion("")
@@ -144,11 +142,11 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
                     .pipWriteFinalDecisionMovingAroundQuestion("")
                     .build())
             .wcaAppeal(null)
-            .sscsEsaCaseData(SscsEsaCaseData.builder().showRegulation29Page(YES)
-                .showSchedule3ActivitiesPage(YES).doesRegulation29Apply(YES)
-                .doesRegulation35Apply(YES).build())
+            .sscsEsaCaseData(SscsEsaCaseData.builder().showRegulation29Page(YesNo.YES)
+                .showSchedule3ActivitiesPage(YesNo.YES).doesRegulation29Apply(YesNo.YES)
+                .doesRegulation35Apply(YesNo.YES).build())
             .dwpReassessTheAward("")
-            .showFinalDecisionNoticeSummaryOfOutcomePage(YES)
+            .showFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES)
             .supportGroupOnlyAppeal("")
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
                     .hearingRoute(HearingRoute.LIST_ASSIST)
@@ -172,7 +170,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         SscsFinalDecisionCaseData finalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
         finalDecisionCaseData.setWriteFinalDecisionPreviewDocument(docLink);
         finalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        finalDecisionCaseData.setWriteFinalDecisionGenerateNotice(NO);
+        finalDecisionCaseData.setWriteFinalDecisionGenerateNotice("no");
         finalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("no");
 
         SscsDocument document1 = buildSscsDocumentWithDocumentType(DRAFT_DECISION_NOTICE.getValue());
@@ -192,7 +190,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         SscsFinalDecisionCaseData finalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
         finalDecisionCaseData.setWriteFinalDecisionPreviewDocument(docLink);
         finalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        finalDecisionCaseData.setWriteFinalDecisionGenerateNotice(NO);
+        finalDecisionCaseData.setWriteFinalDecisionGenerateNotice("no");
         finalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("no");
 
         SscsDocument document1 = buildSscsDocumentWithDocumentType(FINAL_DECISION_NOTICE.getValue());
@@ -213,7 +211,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(null);
 
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
 
@@ -272,7 +270,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("no");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(null);
 
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
 
@@ -327,7 +325,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(null);
 
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(NO);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
 
@@ -377,11 +375,11 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenIssueFinalDecisionEventWithWelshAppeal_thenTranslationIsRequired() {
-        sscsCaseData.setLanguagePreferenceWelsh(YES.getValue());
+        sscsCaseData.setLanguagePreferenceWelsh(YesNo.YES.getValue());
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("same");
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("same");
 
@@ -393,7 +391,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
         assertThat(response.getWarnings().size(), is(0));
         assertThat(response.getErrors().size(), is(0));
-        assertThat(response.getData().getTranslationWorkOutstanding(), is(YES.getValue()));
+        assertThat(response.getData().getTranslationWorkOutstanding(), is(YesNo.YES.getValue()));
         assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.WELSH_TRANSLATION));
     }
 
@@ -401,7 +399,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     public void givenAnIssueFinalDecisionEventAndNoDraftDecisionOnCase_thenDisplayAnError() {
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(null);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
 
@@ -415,7 +413,7 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
     public void givenANonPdfDecisionNotice_thenDisplayAnError() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("test.doc").build();
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");

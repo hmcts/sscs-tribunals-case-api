@@ -9,7 +9,6 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
@@ -164,7 +163,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
         SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
         sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(docLink);
         sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice(NO);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("no");
 
         SscsDocument document1 = buildSscsDocumentWithDocumentType(DRAFT_DECISION_NOTICE.getValue());
         SscsDocument document2 = buildSscsDocumentWithDocumentType(FINAL_DECISION_NOTICE.getValue());
@@ -183,7 +182,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
         SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
         sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(docLink);
         sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice(NO);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("no");
 
         SscsDocument document1 = buildSscsDocumentWithDocumentType(FINAL_DECISION_NOTICE.getValue());
         SscsDocument document3 = buildSscsDocumentWithDocumentType(DRAFT_DECISION_NOTICE.getValue());
@@ -203,7 +202,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setWcaAppeal(YES);
         callback.getCaseDetails().getCaseData().setSupportGroupOnlyAppeal("Yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(null);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -267,7 +266,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(null);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -279,7 +278,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
     public void givenANonPdfDecisionNotice_thenDisplayAnError() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("test.doc").build();
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
