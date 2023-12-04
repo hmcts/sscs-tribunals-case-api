@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -20,11 +21,16 @@ import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
 
 @Service
 public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private final boolean isPostHearingsEnabled;
+
+    public DirectionIssuedAboutToStartHandler(@Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
+        this.isPostHearingsEnabled = isPostHearingsEnabled;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        requireNonNull(callbackType, "callbacktype must not be null");
+        requireNonNull(callbackType, "callbackType must not be null");
 
         return (callbackType.equals(CallbackType.ABOUT_TO_START)
                 || callbackType.equals(CallbackType.MID_EVENT))
@@ -42,6 +48,10 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
         setDirectionTypeDropDown(sscsCaseData);
         setExtensionNextEventDropdown(callback.getCaseDetails().getState(), sscsCaseData);
+
+        if (isPostHearingsEnabled) {
+            sscsCaseData.setPrePostHearing(null);
+        }
 
         clearFields(sscsCaseData);
         setPartiesToSendLetter(sscsCaseData);
