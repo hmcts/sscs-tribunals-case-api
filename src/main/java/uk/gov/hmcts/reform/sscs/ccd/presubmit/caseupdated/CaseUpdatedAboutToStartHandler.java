@@ -52,10 +52,11 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
 
             if (!StringUtils.isEmpty(existingLanguage)) {
                 Language language = verbalLanguagesService.getVerbalLanguage(existingLanguage);
-                DynamicListItem dynamicListItem = utils.getLanguageDynamicListItem(language);
-                interpreterLanguages.setValue(dynamicListItem);
+                if (null != language) {
+                    DynamicListItem dynamicListItem = utils.getLanguageDynamicListItem(language);
+                    interpreterLanguages.setValue(dynamicListItem);
+                }
             }
-
             hearingOptions.setLanguagesList(interpreterLanguages);
             log.info("Populated {} Languages in DynamicList for caseId {} for update to case data event",
                     interpreterLanguages.getListItems().size(), caseId);
