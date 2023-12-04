@@ -93,10 +93,6 @@ public class IssueGenericLetterAboutToStartHandler implements PreSubmitCallbackH
             for (var document : documents) {
                 String documentFileName = document.getValue().getDocumentFileName();
                 listOptions.add(new DynamicListItem(documentFileName, documentFileName));
-                if (document.getValue().getEditedDocumentLink() != null) {
-                    String editedDocumentFileName = document.getValue().getEditedDocumentLink().getDocumentFilename();
-                    listOptions.add(new DynamicListItem(editedDocumentFileName, editedDocumentFileName));
-                }
             }
         }
 

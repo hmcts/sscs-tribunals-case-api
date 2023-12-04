@@ -34,10 +34,10 @@ public class HttpClientConfiguration {
                 .build();
 
         return HttpClientBuilder
-            .create()
-            .useSystemProperties()
-            .setDefaultRequestConfig(config)
-            .build();
+                .create()
+                .useSystemProperties()
+                .setDefaultRequestConfig(config)
+                .build();
     }
 
 }

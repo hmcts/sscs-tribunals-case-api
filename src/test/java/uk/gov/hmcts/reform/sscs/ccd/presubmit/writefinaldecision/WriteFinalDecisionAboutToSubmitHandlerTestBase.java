@@ -86,7 +86,7 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
     public void givenValidSubmissionWithGeneratedDateNotSet_thenSetGeneratedDateAsNowAndDoNotDisplayAnError() {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
 
@@ -109,7 +109,7 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
     public void givenValidSubmissionWithGeneratedDateSet_thenSetUpdateGeneratedDateAndDoNotDisplayAnError() {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-01-01");
 
@@ -140,7 +140,7 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
     public void givenEndDateTypeOfSetEndDate_thenDoNotSetEndDateTypeToNull() {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
 
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
@@ -158,7 +158,7 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
     public void givenEndDateTypeOfNA_thenSetEndDateTypeToNull() {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("na");
 
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +48,9 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
         NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData,
         WriteFinalDecisionTemplateBody payload) {
 
-        if (isYes(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
+
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
+
             // Validate here for UC instead of only validating on submit.
             // This ensures that we know we can obtain a valid allowed or refused condition below
             outcomeService.validate(response, caseData);
@@ -74,7 +75,7 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
     @Override
     protected void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
 
-        if (isYes(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             builder.ucIsEntited(false);
             builder.ucAwardRate(null);
             Optional<AwardType> ucAwardTypeOptional = caseData.isWcaAppeal() ? UcPointsRegulationsAndSchedule7ActivitiesCondition

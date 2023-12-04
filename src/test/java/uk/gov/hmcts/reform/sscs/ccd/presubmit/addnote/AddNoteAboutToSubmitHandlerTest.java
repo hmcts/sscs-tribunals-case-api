@@ -6,15 +6,12 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.HMCTS_RESPONSE_REVIEWED;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -77,16 +74,10 @@ public class AddNoteAboutToSubmitHandlerTest {
 
     @Test
     public void testTempNoteFilledIsNullAndResponseReviewedEvent_thenNoteIsAdded() {
-        List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
-        listOptions.add(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()));
-
-        DynamicList dynamicList = new DynamicList(new DynamicListItem("reviewByJudge", "Review by Judge"), listOptions);
-
         when(callback.getEvent()).thenReturn(HMCTS_RESPONSE_REVIEWED);
         sscsCaseData.setTempNoteDetail(null);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.OVER_300_PAGES);
-        sscsCaseData.setSelectWhoReviewsCase(getWhoReviewsCaseDynamicList());
+        sscsCaseData.setSelectWhoReviewsCase(new DynamicList("Review by Judge"));
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -115,7 +106,7 @@ public class AddNoteAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(HMCTS_RESPONSE_REVIEWED);
         sscsCaseData.setTempNoteDetail(null);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE);
-        sscsCaseData.setSelectWhoReviewsCase(getWhoReviewsCaseDynamicList());
+        sscsCaseData.setSelectWhoReviewsCase(new DynamicList("Review by Judge"));
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -166,16 +157,10 @@ public class AddNoteAboutToSubmitHandlerTest {
         "NO_RESPONSE_TO_DIRECTION"
     })
     public void ifEventIsResponseReviewed_AddInterlocReferralReasonToNote(InterlocReferralReason value) {
-        List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
-        listOptions.add(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()));
-
-        DynamicList selectWhoReviewsCaseDynamicList = new DynamicList(new DynamicListItem("reviewByJudge", "Review by Judge"), listOptions);
-
         when(callback.getEvent()).thenReturn(HMCTS_RESPONSE_REVIEWED);
         sscsCaseData.setTempNoteDetail("Here is my note");
         sscsCaseData.setInterlocReferralReason(value);
-        sscsCaseData.setSelectWhoReviewsCase(getWhoReviewsCaseDynamicList());
+        sscsCaseData.setSelectWhoReviewsCase(new DynamicList("Review by Judge"));
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -247,13 +232,4 @@ public class AddNoteAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
-
-    @NotNull
-    private static DynamicList getWhoReviewsCaseDynamicList() {
-        List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
-        listOptions.add(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()));
-        return new DynamicList(new DynamicListItem("reviewByJudge",null), listOptions);
-    }
-
 }

@@ -17,15 +17,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 
 @ExtendWith(MockitoExtension.class)
 class SscsUtilTest {
-    public static final String UNEXPECTED_POST_HEARING_REVIEW_TYPE_AND_ACTION = "getting the document type has an unexpected postHearingReviewType and action";
-  
-    private SessionCategoryMapService categoryMapService = new SessionCategoryMapService();
     private PostHearing postHearing;
     private SscsCaseData caseData;
 
@@ -33,7 +28,7 @@ class SscsUtilTest {
     void setUp() {
         postHearing = PostHearing.builder()
             .correction(Correction.builder()
-                .isCorrectionFinalDecisionInProgress(YesNo.NO)
+                .correctionFinalDecisionInProgress(YesNo.NO)
                 .build())
             .build();
 
@@ -147,19 +142,19 @@ class SscsUtilTest {
 
     @Test
     void givenPostHearingsFlagIsTrueAndCorrectionInProgress_shouldReturnDraftCorrectedDecisionNotice() {
-        postHearing.getCorrection().setIsCorrectionFinalDecisionInProgress(YesNo.YES);
+        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
         assertThat(getWriteFinalDecisionDocumentType(caseData, true)).isEqualTo(DRAFT_CORRECTED_NOTICE);
     }
 
     @Test
     void givenPostHearingsFlagIsFalseAndCorrectionInProgress_shouldReturnDraftDecisionNotice() {
-        postHearing.getCorrection().setIsCorrectionFinalDecisionInProgress(YesNo.YES);
+        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
         assertThat(getWriteFinalDecisionDocumentType(caseData, false)).isEqualTo(DRAFT_DECISION_NOTICE);
     }
 
     @Test
     void givenPostHearingsFlagIsTrueAndCorrectionInProgress_shouldReturnCorrectionGranted() {
-        postHearing.getCorrection().setIsCorrectionFinalDecisionInProgress(YesNo.YES);
+        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
         assertThat(getIssueFinalDecisionDocumentType(caseData, true)).isEqualTo(CORRECTION_GRANTED);
     }
 
@@ -170,7 +165,7 @@ class SscsUtilTest {
 
     @Test
     void givenPostHearingsFlagIsFalseAndCorrectionInProgress_shouldReturnFinalDecisionNotice() {
-        postHearing.getCorrection().setIsCorrectionFinalDecisionInProgress(YesNo.YES);
+        postHearing.getCorrection().setCorrectionFinalDecisionInProgress(YesNo.YES);
         assertThat(getIssueFinalDecisionDocumentType(caseData, false)).isEqualTo(FINAL_DECISION_NOTICE);
     }
   
@@ -212,35 +207,6 @@ class SscsUtilTest {
         assertThat(caseData.getPostHearing().getRequestType()).isNull();
         assertThat(caseData.getDocumentGeneration().getGenerateNotice()).isNull();
         assertThat(caseData.getDocumentStaging().getDateAdded()).isNull();
-    }
-
-    @Test
-    void givenCorrectIssueAndBenefitCode_dontAddErrorToResponse() {
-        SscsCaseData caseData = SscsCaseData.builder().benefitCode("002").issueCode("DD").build();
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-        validateBenefitIssueCode(caseData, response, categoryMapService);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void givenWrongIssueAndBenefitCode_addErrorToResponse() {
-        SscsCaseData caseData = SscsCaseData.builder().benefitCode("002").issueCode("XA").build();
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-        validateBenefitIssueCode(caseData, response, categoryMapService);
-
-        assertThat(response.getErrors().size()).isEqualTo(1);
-        assertThat(response.getErrors()).contains(INVALID_BENEFIT_ISSUE_CODE);
-    }
-
-    @Test
-    void givenLegacyBenefitCode_addErrorToResponse() {
-        SscsCaseData caseData = SscsCaseData.builder().benefitCode("032").issueCode("CR").build();
-        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-        validateBenefitIssueCode(caseData, response, categoryMapService);
-
-        assertThat(response.getErrors().size()).isEqualTo(1);
-        assertThat(response.getErrors()).contains(BENEFIT_CODE_NOT_IN_USE);
     }
 
     @Test

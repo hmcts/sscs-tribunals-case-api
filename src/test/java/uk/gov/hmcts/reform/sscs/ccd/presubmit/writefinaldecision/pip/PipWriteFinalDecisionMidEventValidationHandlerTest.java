@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
@@ -40,8 +39,8 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Override
-    protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled) {
-        return new PipWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService, isPostHearingsEnabled);
+    protected WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService) {
+        return new PipWriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService);
     }
 
     @Test
@@ -699,15 +698,15 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Test
     @Parameters({
-        "Yes, YES, NO",
-        "Yes, NO, NO",
-        "No, YES, YES",
-        "No, NO, NO",
-        "null, NO, NO",
+        "Yes, Yes, NO",
+        "Yes, No, NO",
+        "No, Yes, YES",
+        "No, No, NO",
+        "null, No, NO",
         "No, null, NO",
     })
     public void givenPipCaseWithDescriptorFlowAndGenerateNoticeFlow_thenSetShowSummaryOfOutcomePage(
-            @Nullable String descriptorFlow, @Nullable YesNo generateNoticeFlow, YesNo expectedShowResult) {
+            @Nullable String descriptorFlow, @Nullable String generateNoticeFlow, YesNo expectedShowResult) {
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow(descriptorFlow);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(generateNoticeFlow);
@@ -722,7 +721,7 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     @Test
     public void givenPipCase_thenDoNotShowDwpReassessAwardPage() {
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("Yes");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("Yes");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);

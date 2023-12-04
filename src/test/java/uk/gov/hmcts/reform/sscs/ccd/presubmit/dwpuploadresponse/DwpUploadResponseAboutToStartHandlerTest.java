@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
@@ -14,7 +15,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @RunWith(JUnitParamsRunner.class)
 public class DwpUploadResponseAboutToStartHandlerTest {
@@ -33,10 +36,7 @@ public class DwpUploadResponseAboutToStartHandlerTest {
     public void setUp() {
         openMocks(this);
         dwpUploadResponseAboutToStartHandler = new DwpUploadResponseAboutToStartHandler();
-        sscsCaseData = SscsCaseData.builder()
-                .createdInGapsFrom(READY_TO_LIST.getId())
-                .dynamicDwpState(new DynamicList(""))
-                .build();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().createdInGapsFrom(READY_TO_LIST.getId()).build();
         when(callback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -51,22 +51,6 @@ public class DwpUploadResponseAboutToStartHandlerTest {
     public void givenSetToReadyForList_NoError() {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToStartHandler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
-    }
-
-    @Test
-    public void givenDwpStateIsPostHearing_thenSetDynamicDwpStateValueToNull() {
-        sscsCaseData.setDwpState(DwpState.CORRECTION_REFUSED);
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToStartHandler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertNull(response.getData().getDynamicDwpState().getValue());
-    }
-
-    @Test
-    public void givenDwpStateIsWithdrawn_thenSetDynamicDwpStateValueToWithdrawn() {
-        sscsCaseData.setDwpState(DwpState.WITHDRAWN);
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToStartHandler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertEquals(response.getData().getDynamicDwpState().getValue().getCode(), DwpState.WITHDRAWN.getCcdDefinition());
     }
 
     @Test

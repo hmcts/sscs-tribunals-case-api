@@ -242,7 +242,7 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
 
                         caseData = SscsCaseData.builder()
                             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
-                                .writeFinalDecisionGenerateNotice(YES)
+                                .writeFinalDecisionGenerateNotice("Yes")
                                 .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                                 .build())
                             .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
@@ -256,7 +256,7 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                     } else {
                         caseData = SscsCaseData.builder()
                             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
-                                .writeFinalDecisionGenerateNotice(YES)
+                                .writeFinalDecisionGenerateNotice("Yes")
                                 .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                                 .build())
                             .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")

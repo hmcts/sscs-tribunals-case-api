@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +55,7 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData,
         WriteFinalDecisionTemplateBody payload) {
 
-        if (isYes(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
+        if ("Yes".equalsIgnoreCase(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             Optional<PipAllowedOrRefusedCondition> condition = PipAllowedOrRefusedCondition.getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
             if (condition.isPresent()) {
                 PipAllowedOrRefusedCondition allowedOrRefusedCondition = condition.get();
@@ -152,8 +151,8 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     @Override
     protected boolean isSetAside(SscsCaseData sscsCaseData, Outcome outcome) {
-        if (isYes((sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow()))
-            && isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
+        if ("yes".equalsIgnoreCase((sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow()))
+            && "yes".equalsIgnoreCase(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             return getConsideredComparisonsWithDwp(sscsCaseData).stream().anyMatch(comparission -> !"same".equalsIgnoreCase(comparission));
         } else {
             return super.isSetAside(sscsCaseData, outcome);

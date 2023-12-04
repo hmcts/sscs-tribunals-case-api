@@ -87,13 +87,13 @@ public class IssueFinalDecisionSubmittedHandlerTest {
 
     @Test
     public void givenPostHearingsFlagIsTrueAndCorrectionInProgress_thenHandleCallbackMap() {
-        sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(YES);
+        sscsCaseData.getPostHearing().getCorrection().setCorrectionFinalDecisionInProgress(YES);
 
         SscsCaseData newCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
             .postHearing(PostHearing.builder()
                 .correction(Correction.builder()
-                    .isCorrectionFinalDecisionInProgress(NO)
+                    .correctionFinalDecisionInProgress(NO)
                     .build())
                 .build())
             .build();
@@ -105,7 +105,7 @@ public class IssueFinalDecisionSubmittedHandlerTest {
         verify(callbackOrchestratorService, times(0)).sendMessageToCallbackOrchestrator(callback);
         verify(ccdCallbackMapService, times(1)).handleCcdCallbackMap(CorrectionActions.GRANT, sscsCaseData);
         assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getPostHearing().getCorrection().getIsCorrectionFinalDecisionInProgress()).isEqualTo(NO);
+        assertThat(response.getData().getPostHearing().getCorrection().getCorrectionFinalDecisionInProgress()).isEqualTo(NO);
     }
 
     @Test
