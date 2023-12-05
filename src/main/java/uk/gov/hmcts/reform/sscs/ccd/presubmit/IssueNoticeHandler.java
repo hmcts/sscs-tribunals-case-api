@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.text.WordUtils;
-import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
