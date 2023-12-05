@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -13,19 +12,20 @@ import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
 
 import java.util.ArrayList;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ValidSendToInterlocAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
@@ -40,35 +40,36 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        openMocks(this);
-        handler = new ValidSendToInterlocAboutToStartHandler(false);
-
+        handler = new ValidSendToInterlocAboutToStartHandler(false, false);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
-
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(callback.getEvent()).thenReturn(VALID_SEND_TO_INTERLOC);
     }
 
-    @Test
-    @Parameters({"APPEAL_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
-    public void givenANonHandleEvidenceEvent_thenReturnFalse(EventType eventType) {
+    private void setupCallback() {
+        when(callback.getEvent()).thenReturn(VALID_SEND_TO_INTERLOC);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"APPEAL_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
+    void givenANonHandleEvidenceEvent_thenReturnFalse(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
         assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
 
-    @Test
-    @Parameters({"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
-    public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
+    @ParameterizedTest
+    @EnumSource(value = CallbackType.class, names = {"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
+    void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
-    @Test
-    @Parameters({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
-    public void populatesSelectWhoReviewsCaseDropDown(EventType eventType) {
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
+    void populatesSelectWhoReviewsCaseDropDown(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
+        setupCallback();
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
@@ -80,12 +81,13 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
         assertEquals(expected, response.getData().getSelectWhoReviewsCase());
     }
 
-    @Test
-    @Parameters({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, names = {"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
     public void givenPostponementsFeatureOn_populatesSelectWhoReviewsCaseDropDown(EventType eventType) {
         ReflectionTestUtils.setField(handler, "postponementsFeature", true);
 
         when(callback.getEvent()).thenReturn(eventType);
+        setupCallback();
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
@@ -100,6 +102,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
     @Test
     public void givenAValidSendToInterlocRequestWithRep_thenPopulateDropdownWithPartiesOnCase() {
+        setupCallback();
         sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -117,6 +120,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
     @Test
     public void givenAValidSendToInterlocRequestWithJointParty_thenPopulateDropdownWithPartiesOnCase() {
+        setupCallback();
         sscsCaseData.getJointParty().setHasJointParty(YES);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -134,6 +138,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
     @Test
     public void givenAValidSendToInterlocRequestWithJointPartyAndRep_thenPopulateDropdownWithPartiesOnCase() {
+        setupCallback();
         sscsCaseData.getJointParty().setHasJointParty(YES);
         sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
 
@@ -152,5 +157,4 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
 
         assertEquals(new DynamicList(expectedListItem1, expectedList), response.getData().getOriginalSender());
     }
-
 }
