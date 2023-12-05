@@ -88,7 +88,6 @@ public class CreateAndUpdateCaseInCcdTest {
         caseData.setUrgentCase("Yes");
         caseData.setDocumentSentToDwp("Yes");
         caseData.setDirectionDueDate("2019-10-10");
-        caseData.setReservedToJudge("Judge Rinder");
 
         caseData.setIsWaiverNeeded("Yes");
         caseData.setWaiverDeclaration(Arrays.asList(new String[]{"waiverDeclarationText"}));
@@ -111,7 +110,6 @@ public class CreateAndUpdateCaseInCcdTest {
         assertEquals("Yes", updatedCaseData.getUrgentCase());
         assertEquals("Yes", updatedCaseData.getDocumentSentToDwp());
         assertEquals("2019-10-10", updatedCaseData.getDirectionDueDate());
-        assertEquals("Judge Rinder", updatedCaseData.getReservedToJudge());
         assertEquals("Yes", updatedCaseData.getIsWaiverNeeded());
         assertEquals("waiverDeclarationText", updatedCaseData.getWaiverDeclaration().get(0));
         assertEquals("nonCompliantOther", updatedCaseData.getWaiverReason().get(0));

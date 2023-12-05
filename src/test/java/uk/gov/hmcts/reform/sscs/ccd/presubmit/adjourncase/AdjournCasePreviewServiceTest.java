@@ -62,6 +62,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
@@ -124,10 +125,13 @@ class AdjournCasePreviewServiceTest {
     @Mock
     private SignLanguagesService signLanguagesService;
 
+    @Mock
+    private DocumentConfiguration documentConfiguration;
+
     @BeforeEach
     void setUp() throws IOException {
         service = new AdjournCasePreviewService(generateFile, userDetailsService, venueDataLoader, TEMPLATE_ID,
-            signLanguagesService, judicialRefDataService);
+            signLanguagesService, judicialRefDataService, documentConfiguration);
         ReflectionTestUtils.setField(service, "adjournmentFeature", true);
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
@@ -140,6 +144,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
             .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
+            .processingVenue(GAP_VENUE_NAME)
             .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("PIP").build())

@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,7 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
 
     private static final DateTimeFormatter RECORDING_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss a", Locale.UK);
     private static final DateTimeFormatter HEARING_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss yyyy-MM-dd");
+    private static final DateTimeFormatter HEARING_TIME_EXTENDED_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss.SSS yyyy-MM-dd");
     private static final DateTimeFormatter HEARING_DOCUMENT_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy");
     private final IdamService idamService;
 
@@ -156,7 +156,8 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
     @NotNull
     private LocalDateTime parseHearingDateTime(HearingDetails hearingDetails) {
         String hearingTime = (hearingDetails.getTime().length() == 5) ? (hearingDetails.getTime() + ":00") : hearingDetails.getTime();
-        return LocalDateTime.parse(hearingTime + " " + hearingDetails.getHearingDate(), HEARING_TIME_FORMATTER);
+        DateTimeFormatter dateTimeFormatter = hearingTime.contains(".000") ? HEARING_TIME_EXTENDED_FORMATTER : HEARING_TIME_FORMATTER;
+        return LocalDateTime.parse(hearingTime + " " + hearingDetails.getHearingDate(), dateTimeFormatter);
     }
 
     private Optional<SscsHearingRecording> selectSscsHearingRecording(
@@ -185,7 +186,7 @@ public class UploadHearingRecordingAboutToSubmitHandler implements PreSubmitCall
             return requests.stream()
                     .map(request -> request.getValue().getSscsHearingRecording())
                     .filter(recording -> hearingId.equalsIgnoreCase(recording.getHearingId()))
-                    .collect(Collectors.toList());
+                    .toList();
         }
         return List.of();
     }

@@ -87,18 +87,18 @@ public class UploadDocumentFurtherEvidenceMidEventHandler implements PreSubmitCa
 
         PdfState pdfState = isPdfReadable(response.getData().getDraftSscsFurtherEvidenceDocument());
         switch (pdfState) {
-            case UNKNOWN:
-            case UNREADABLE:
+            case UNKNOWN, UNREADABLE -> {
                 initDraftSscsFurtherEvidenceDocument(response.getData());
                 response.addError("Your PDF Document is not readable.");
                 return response;
-            case PASSWORD_ENCRYPTED:
+            }
+            case PASSWORD_ENCRYPTED -> {
                 initDraftSscsFurtherEvidenceDocument(response.getData());
                 response.addError("Your PDF Document cannot be password protected.");
                 return response;
-            case OK:
-            default:
-                break;
+            }
+            default -> {
+            }
         }
         return response;
     }
