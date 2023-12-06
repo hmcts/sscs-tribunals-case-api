@@ -748,13 +748,13 @@ hmc-cft-hearing-service:
       SPRING_CONFIG_IMPORT : "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
     secrets:
       HMC_SERVICE_BUS_CONNECTION_STRING:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
+        secretRef: sscs-sb-preview
         key: connectionString
       HMC_QUEUE_CONNECTION_STRING:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-from-hmi
+        secretRef: sscs-sb-preview
         key: connectionString
       HMC_OUTBOUND_QUEUE_CONNECTION_STRING:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-to-hmi
+        secretRef: sscs-sb-preview
         key: connectionString
     keyVaults:
       hmc:
