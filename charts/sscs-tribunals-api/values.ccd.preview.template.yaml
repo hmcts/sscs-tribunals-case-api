@@ -737,8 +737,8 @@ hmc-cft-hearing-service:
     environment:
       HMC_SERVICE_BUS_TOPIC: "hmc-to-cft"
       HMC_SERVICE_BUS_SUBSCRIPTION: "hmc-to-sscs-subscription"
-      HMC_SERVICE_BUS_QUEUE: hmc-from-hmi
-      HMC_OUTBOUND_SERVICE_BUS_QUEUE: hmc-to-hmi
+      HMC_SERVICE_BUS_QUEUE: ${SERVICE_NAME}-servicebus-hmc-from-hmi
+      HMC_OUTBOUND_SERVICE_BUS_QUEUE: ${SERVICE_NAME}-servicebus-hmc-to-hmi
       CFT_HEARING_SERVICE_DB_HOST: "${SERVICE_NAME}-postgresql"
       CFT_HEARING_SERVICE_DB_NAME: "hmc-cft-hearing-service"
       CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
