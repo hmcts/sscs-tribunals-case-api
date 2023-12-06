@@ -692,7 +692,7 @@ redis:
 #Turning either hearings api (with either listener on) or cft hearing service on requires
 #service bus to be turned on.
 sscs-hearings-api:
-  enabled: false
+  enabled: true
   java:
     image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
@@ -718,6 +718,7 @@ sscs-hearings-api:
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
       TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
+      #HMC_DEPLOYMENT_ID: "sscs-hearings-id-{{ .Values.global.environment }}"
     secrets:
       TRIBUNALS_EVENT_QUEUE_NAMESPACE:
         secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
@@ -733,7 +734,7 @@ sscs-hearings-api:
         key: primaryKey
 
 hmc-cft-hearing-service:
-  enabled: false
+  enabled: true
   java:
     releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
     image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
