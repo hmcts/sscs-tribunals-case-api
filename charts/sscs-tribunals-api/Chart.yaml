@@ -7,14 +7,14 @@ maintainers:
   - name: HMCTS SSCS Team
 dependencies:
   - name: java
-    version: 5.0.0
+    version: 5.0.2
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
   - name: idam-pr
     version: 2.3.0
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: idam-pr.enabled
   - name: xui-webapp
-    version: 1.0.9
+    version: 1.0.13
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: xui-webapp.enabled
   - name: sscs-evidence-share
