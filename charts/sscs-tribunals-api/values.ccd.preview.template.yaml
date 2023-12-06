@@ -718,23 +718,19 @@ sscs-hearings-api:
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
       TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
+      TRIBUNALS_EVENT_QUEUE_NAMESPACE: "sscs-servicebus-preview"
+      HMC_HEARINGS_TOPIC_NAMESPACE: "sscs-servicebus-preview"
       #HMC_DEPLOYMENT_ID: "sscs-hearings-id-{{ .Values.global.environment }}"
     secrets:
-      TRIBUNALS_EVENT_QUEUE_NAMESPACE:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
-        key: namespaceName
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
+        secretRef: sscs-sb-preview
         key: primaryKey
-      HMC_HEARINGS_TOPIC_NAMESPACE:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: namespaceName
       HMC_HEARINGS_TOPIC_ACCESS_KEY:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
+        secretRef: sscs-sb-preview
         key: primaryKey
 
 hmc-cft-hearing-service:
-  enabled: true
+  enabled: false
   java:
     releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
     image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
