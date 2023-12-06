@@ -735,7 +735,7 @@ hmc-cft-hearing-service:
     releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
     image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
     environment:
-      HMC_SERVICE_BUS_TOPIC: "hmc-to-cft"
+      HMC_SERVICE_BUS_TOPIC: ${SERVICE_NAME}-servicebus-hmc-to-cft
       HMC_SERVICE_BUS_SUBSCRIPTION: "hmc-to-sscs-subscription"
       HMC_SERVICE_BUS_QUEUE: ${SERVICE_NAME}-servicebus-hmc-from-hmi
       HMC_OUTBOUND_SERVICE_BUS_QUEUE: ${SERVICE_NAME}-servicebus-hmc-to-hmi
