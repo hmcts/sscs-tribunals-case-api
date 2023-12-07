@@ -112,6 +112,7 @@ withPipeline(type, product, component) {
     enableSlackNotifications('#sscs-tech')
     enableAksStagingDeployment()
     disableLegacyDeployment()
+    disableCleanupOfHelmReleaseOnFailure()
     syncBranchesWithMaster(branchesToSync)
 
     afterSuccess('akschartsinstall'){
