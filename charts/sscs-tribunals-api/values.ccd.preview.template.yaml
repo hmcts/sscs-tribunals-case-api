@@ -712,14 +712,14 @@ sscs-hearings-api:
       HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
       #Messaging
       HMC_HEARING_LISTENING_ENABLED: true
-      HEARINGS_TOPIC_NAME: ${SERVICE_NAME}-servicebus-hmc-to-cft
-      HEARINGS_TOPIC_SUBSCRIPTION_NAME: hmc-to-sscs-subscription
       HMC_HEARINGS_TOPIC_POLICY_NAME: RootManageSharedAccessKey
+      HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
+      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-aat"
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
       TRIBUNALS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
-      TRIBUNALS_EVENT_QUEUE_NAMESPACE: "sscs-sb-preview"
-      HMC_HEARINGS_TOPIC_NAMESPACE: "sscs-sb-preview"
+      TRIBUNALS_EVENT_QUEUE_NAMESPACE: sscs-sb-preview
+      HMC_HEARINGS_TOPIC_NAMESPACE: hmc-servicebus-aat
       #HMC_DEPLOYMENT_ID: "sscs-hearings-id-{{ .Values.global.environment }}"
     secrets:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
@@ -730,7 +730,7 @@ sscs-hearings-api:
         key: primaryKey
 
 hmc-cft-hearing-service:
-  enabled: true
+  enabled: false
   java:
     releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
     image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
@@ -779,12 +779,8 @@ servicebus:
     topics:
       - name: main-topic
         subscriptionNeeded: yes
-      - name: hmc-to-cft
-    subscriptions:
-      - name: hmc-to-sscs-subscription
     queues:
       - name: sscs-orchestrator-queue-preview
-      - name: hmc-from-hmi
-      - name: hmc-to-hmi
       - name: tribunals-to-hearing-api
+
 
