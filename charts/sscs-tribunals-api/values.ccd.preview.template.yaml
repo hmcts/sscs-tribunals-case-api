@@ -725,6 +725,10 @@ sscs-hearings-api:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: sscs-sb-preview
         key: primaryKey
+    keyVaults:
+      sscs:
+        - name: hmc-servicebus-shared-access-key-tf
+          alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
 
 hmc-cft-hearing-service:
   enabled: false
