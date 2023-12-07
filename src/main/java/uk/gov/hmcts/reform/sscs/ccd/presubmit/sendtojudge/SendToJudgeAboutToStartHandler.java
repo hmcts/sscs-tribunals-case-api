@@ -1,9 +1,10 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.interlocsendtotcw;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.sendtojudge;
 
 import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -11,18 +12,22 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
-
-@Service
+@Component
 @Slf4j
-public class InterlocSendToTcwAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class SendToJudgeAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private final boolean postHearingsB;
+
+    public SendToJudgeAboutToStartHandler(@Value("${feature.postHearingsB.enabled}")  boolean postHearingsB) {
+        this.postHearingsB = postHearingsB;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbackType must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && (callback.getEvent() == EventType.INTERLOC_SEND_TO_TCW);
+        return callbackType.equals(CallbackType.ABOUT_TO_START)
+                && (callback.getEvent() == EventType.TCW_REFER_TO_JUDGE);
     }
 
     @Override
@@ -31,12 +36,11 @@ public class InterlocSendToTcwAboutToSubmitHandler implements PreSubmitCallbackH
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        if (postHearingsB) {
+            sscsCaseData.setPrePostHearing(null);
+        }
 
-        log.info("Handling {} event for case id {}", callback.getEvent(), callback.getCaseDetails().getId());
-
-        caseData.setDirectionDueDate(null);
-
-        return new PreSubmitCallbackResponse<>(caseData);
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 }
