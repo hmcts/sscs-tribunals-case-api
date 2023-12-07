@@ -711,7 +711,7 @@ sscs-hearings-api:
       EXUI_API_URL: "https://${SERVICE_NAME}-xui"
       HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
       #Messaging
-      HMC_HEARING_LISTENING_ENABLED: true
+      HMC_HEARINGS_LISTENING_ENABLED: true
       HMC_HEARINGS_TOPIC_POLICY_NAME: RootManageSharedAccessKey
       HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
       HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-aat"
