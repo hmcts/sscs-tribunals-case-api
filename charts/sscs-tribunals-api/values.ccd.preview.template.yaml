@@ -782,5 +782,3 @@ servicebus:
     queues:
       - name: sscs-orchestrator-queue-preview
       - name: tribunals-to-hearing-api
-
-
