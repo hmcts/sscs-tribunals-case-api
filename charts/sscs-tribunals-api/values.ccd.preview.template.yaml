@@ -712,11 +712,11 @@ sscs-hearings-api:
       HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
       #Messaging
       HMC_HEARING_LISTENING_ENABLED: true
-      HEARINGS_TOPIC_NAME: "hmc-to-cft"
-      HEARINGS_TOPIC_SUBSCRIPTION_NAME: "tribunals-to-hearing-api"
+      HEARINGS_TOPIC_NAME: ${SERVICE_NAME}-servicebus-hmc-to-cft
+      HEARINGS_TOPIC_SUBSCRIPTION_NAME: hmc-to-sscs-subscription
       HMC_HEARINGS_TOPIC_POLICY_NAME: RootManageSharedAccessKey
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
-      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
+      TRIBUNALS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
       TRIBUNALS_EVENT_QUEUE_NAMESPACE: "sscs-sb-preview"
       HMC_HEARINGS_TOPIC_NAMESPACE: "sscs-sb-preview"
