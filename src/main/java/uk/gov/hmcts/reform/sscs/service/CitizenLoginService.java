@@ -127,27 +127,33 @@ public class CitizenLoginService {
         SscsCaseDetails caseByAppealNumber = ccdService.findCaseByAppealNumber(tya, idamService.getIdamTokens());
 
         if (caseByAppealNumber != null) {
-            log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
+            log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s]",
+                    caseByAppealNumber.getId(), tya, uk.gov.hmcts.reform.sscs.utility.StringUtils.getReducedEmailforLogs(email), postcode));
             String appealPostcode = caseByAppealNumber.getData().getAppeal().getAppellant().getAddress().getPostcode();
             if (appealPostcode != null && !appealPostcode.isEmpty()) {
                 if (postcodeUtil.hasAppellantOrOtherPartyPostcode(caseByAppealNumber, postcode, email)) {
-                    log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] matches postcode", caseByAppealNumber.getId(), tya, email, postcode));
+                    log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] matches postcode",
+                            caseByAppealNumber.getId(), tya, uk.gov.hmcts.reform.sscs.utility.StringUtils.getReducedEmailforLogs(email), postcode));
                     if (caseHasSubscriptionWithTyaAndEmail(caseByAppealNumber, tya, email)) {
-                        log.info(format("Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] has subscription", caseByAppealNumber.getId(), tya, email, postcode));
+                        log.info(format("Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] has subscription",
+                                caseByAppealNumber.getId(), tya, uk.gov.hmcts.reform.sscs.utility.StringUtils.getReducedEmailforLogs(email), postcode));
                         citizenCcdService.addUserToCase(idamService.getIdamTokens(), citizenIdamTokens.getUserId(), caseByAppealNumber.getId());
                         updateCaseWithLastLoggedIntoMya(email, caseByAppealNumber);
                         return onlineHearingService.loadHearing(caseByAppealNumber, tya, email);
                     } else {
-                        log.info(format("Associate case: Subscription does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
+                        log.info(format("Associate case: Subscription does not match id [%s] for tya [%s] email [%s] postcode [%s]",
+                                caseByAppealNumber.getId(), tya, uk.gov.hmcts.reform.sscs.utility.StringUtils.getReducedEmailforLogs(email), postcode));
                     }
                 } else {
-                    log.info(format("Associate case: Postcode does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
+                    log.info(format("Associate case: Postcode does not match id [%s] for tya [%s] email [%s] postcode [%s]",
+                            caseByAppealNumber.getId(), tya, uk.gov.hmcts.reform.sscs.utility.StringUtils.getReducedEmailforLogs(email), postcode));
                 }
             } else {
                 log.info(format("Associate case: Found case to assign id [%s], however no appellant post code exists", caseByAppealNumber.getId()));
             }
         } else {
-            log.info(format("Associate case: No case found for tya [%s] email [%s] postcode [%s]", tya, email, postcode));
+            log.info(format("Associate case: No case found for tya [%s] email [%s] postcode [%s]",
+                    tya, uk.gov.hmcts.reform.sscs.utility.StringUtils.getReducedEmailforLogs(email), postcode));
         }
         return Optional.empty();
     }
@@ -156,7 +162,8 @@ public class CitizenLoginService {
         if (StringUtils.isNotEmpty(caseId)) {
             SscsCaseDetails caseDetails = ccdService.getByCaseId(Long.valueOf(caseId), idamService.getIdamTokens());
             if (caseDetails != null && caseHasSubscriptionWithMatchingEmail(caseDetails, citizenIdamTokens.getEmail())) {
-                log.info("MYA log time: found matching email {} for case id {}", citizenIdamTokens.getEmail(), caseId);
+                log.info("MYA log time: found matching email {} for case id {}",
+                        uk.gov.hmcts.reform.sscs.utility.StringUtils.getReducedEmailforLogs(citizenIdamTokens.getEmail()), caseId);
                 updateCaseWithLastLoggedIntoMya(citizenIdamTokens.getEmail(), caseDetails);
             }
         }
