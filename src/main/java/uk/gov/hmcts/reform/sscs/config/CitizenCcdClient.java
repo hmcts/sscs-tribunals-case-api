@@ -93,14 +93,7 @@ public class CitizenCcdClient {
 
     public List<CaseDetails> searchForCitizenAllCases(IdamTokens idamTokens) {
         if (elasticSearchEnabled) {
-<<<<<<< HEAD
-            String searchCriteria = "{"
-                    + "       \"query\" : {\n"
-                    + "        \"match_all\" : {}\n"
-                    + "    }";
-=======
             String searchCriteria = "{\"query\":{\"match_all\":{}}}";
->>>>>>> origin/master
             SearchResult searchResult = coreCaseDataApi.searchCases(
                     idamTokens.getIdamOauth2Token(),
                     idamTokens.getServiceAuthorization(),
