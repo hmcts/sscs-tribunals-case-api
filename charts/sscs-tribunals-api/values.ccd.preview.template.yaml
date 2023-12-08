@@ -128,7 +128,7 @@ xui-webapp:
       SERVICES_ROLE_ASSIGNMENT_MAPPING_API: http://${SERVICE_NAME}-am-org-role-mapping-service
       JURISDICTIONS: SSCS
       WA_SUPPORTED_JURISDICTIONS: SSCS
-      GLOBAL_SEARCH_SERVICES: IA,CIVIL,PRIVATELAW,PUBLICLAW,SSCS,ST_CIC,EMPLOYMENT
+      GLOBAL_SEARCH_SERVICES: IA,CIVIL,PRIVATELAW,PUBLICLAW,SSCS
       LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
       FEATURE_WORKALLOCATION_ENABLED: true
       FEATURE_REDIS_ENABLED: false
@@ -530,6 +530,8 @@ ccd:
       image: hmctspublic.azurecr.io/ccd/admin-web:latest
       ingressHost: admin-web-${SERVICE_FQDN}
       environment:
+        ADMINWEB_GLOBAL_SEARCH_INDEX_URL: http://${SERVICE_NAME}-ccd-definition-store/elastic-support/global-search/index
+        ADMINWEB_ELASTIC_CASE_TYPES_URL: http://${SERVICE_NAME}-ccd-definition-store/elastic-support/case-types
         IDAM_ADMIN_WEB_SERVICE_KEY: ${ADMIN_S2S_KEY}
         IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
       keyVaults: [ ]
@@ -616,7 +618,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S12006MnonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S12006NnonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -635,7 +637,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S12006MnonProd
+      CCD_DEF_VERSION: S12006NnonProd
     secrets: []
     userRoles:
       - citizen
@@ -657,6 +659,7 @@ ccd:
       - caseworker-sscs-hmrcresponsewriter
       - caseworker-wa-task-configuration
       - caseworker-ras-validation
+      - GS_profile
 elastic:
   enabled: true
 
