@@ -392,8 +392,9 @@ public class EvidenceUploadService {
     }
 
     private void removeStatementDocFromDocumentTab(SscsCaseData sscsCaseData, List<SscsDocument> sscsDocument) {
-        sscsDocument.removeIf(doc -> doc.getValue().getDocumentFileName().startsWith(TEMP_UNIQUE_ID)
-                || doc.getValue().getDocumentLink().getDocumentFilename().startsWith(TEMP_UNIQUE_ID));
+        sscsDocument.removeIf(doc -> nonNull(doc.getValue().getDocumentFileName()) &&
+                (doc.getValue().getDocumentFileName().startsWith(TEMP_UNIQUE_ID) ||
+                        doc.getValue().getDocumentLink().getDocumentFilename().startsWith(TEMP_UNIQUE_ID)));
         sscsCaseData.setSscsDocument(sscsDocument);
     }
 
