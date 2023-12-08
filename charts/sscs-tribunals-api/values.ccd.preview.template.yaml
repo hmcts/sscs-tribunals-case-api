@@ -719,7 +719,7 @@ sscs-hearings-api:
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
       TRIBUNALS_EVENT_QUEUE_NAMESPACE: sscs-sb-preview
       HMC_HEARINGS_TOPIC_NAMESPACE: hmc-servicebus-aat
-      HMC_DEPLOYMENT_ID: "hearing-deployment-${SERVICE_NAME}"
+      HMC_DEPLOYMENT_ID: hearing-deployment-${SERVICE_NAME}
     secrets:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: sscs-sb-preview
@@ -729,6 +729,8 @@ sscs-hearings-api:
         secrets:
           - name: hmc-servicebus-shared-access-key-tf
             alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
+    terraformEnvironmentVariables:
+      TF_VAR_deploymentId: hearing-deployment-${SERVICE_NAME}
 
 hmc-cft-hearing-service:
   enabled: false
