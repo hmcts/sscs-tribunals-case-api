@@ -694,7 +694,7 @@ redis:
 sscs-hearings-api:
   enabled: true
   java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-562-85582c4-20231205153330" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     environment:
       ROOT_LOGGING_LEVEL: INFO
