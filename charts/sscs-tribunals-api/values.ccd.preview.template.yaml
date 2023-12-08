@@ -123,6 +123,7 @@ xui-webapp:
       FEATURE_HELMET_ENABLED: false
       FEATURE_OIDC_ENABLED: false
       ALLOW_CONFIG_MUTATIONS: true
+      FEATURE_JRD_E_LINKS_V2_ENABLED: true
       NOW: false
       REDISCLOUD_URL: http://dummyrediscloudurl
       UV_THREADPOOL_SIZE: 128
