@@ -199,7 +199,7 @@ class PostHearingReviewMidEventHandlerTest {
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
         assertThat(payload.getNoticeType()).isEqualTo("REVIEW DECISION NOTICE");
-        assertThat(payload.getAppellantFullName()).isEqualTo("Appellant Lastname");
+        assertThat(payload.getAppellantFullName()).isEqualTo("APPELLANT LastNamE");
         assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
     }
 
