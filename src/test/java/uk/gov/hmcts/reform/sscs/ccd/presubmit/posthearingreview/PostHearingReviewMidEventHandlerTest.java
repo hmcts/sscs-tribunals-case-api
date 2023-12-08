@@ -115,6 +115,7 @@ class PostHearingReviewMidEventHandlerTest {
     @EnumSource(
         value = PostHearingReviewType.class,
         names = {
+            "SET_ASIDE",
             "STATEMENT_OF_REASONS",
             "LIBERTY_TO_APPLY",
             "PERMISSION_TO_APPEAL"
@@ -157,6 +158,48 @@ class PostHearingReviewMidEventHandlerTest {
         assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
         assertThat(payload.getNoticeType()).isEqualTo(postHearingReviewType.getDescriptionEn().toUpperCase() + " DECISION NOTICE");
         assertThat(payload.getAppellantFullName()).isEqualTo("APPELLANT LastNamE");
+        assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
+    }
+
+    @Test
+    void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentFieldForPtaReview() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        when(generateFile.assemble(any())).thenReturn(URL);
+        when(callback.getPageId()).thenReturn(PAGE_ID_GENERATE_NOTICE);
+
+        when(documentConfiguration.getDocuments()).thenReturn(new HashMap<>(Map.of(
+                LanguagePreference.ENGLISH,  new HashMap<>(Map.of(
+                        DECISION_ISSUED, TEMPLATE_ID)
+                ))
+        ));
+
+        caseData.getPostHearing().setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
+        caseData.getPostHearing().getPermissionToAppeal().setAction(PermissionToAppealActions.REVIEW);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        DocumentLink previewDocument = response.getData().getDocumentStaging().getPostHearingPreviewDocument();
+        assertThat(previewDocument).isNotNull();
+
+        String expectedFilename = String.format("Review Granted issued on %s.pdf",
+                LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+
+        assertThat(previewDocument.getDocumentFilename()).isEqualTo(expectedFilename);
+        assertThat(previewDocument.getDocumentBinaryUrl()).isEqualTo(URL + "/binary");
+        assertThat(previewDocument.getDocumentUrl()).isEqualTo(URL);
+
+        verify(generateFile, times(1)).assemble(any());
+
+        verify(generateFile, atLeastOnce()).assemble(capture.capture());
+
+        var value = capture.getValue();
+        NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
+        assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
+        assertThat(payload.getNoticeType()).isEqualTo("REVIEW DECISION NOTICE");
+        assertThat(payload.getAppellantFullName()).isEqualTo("Appellant Lastname");
         assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
     }
 
