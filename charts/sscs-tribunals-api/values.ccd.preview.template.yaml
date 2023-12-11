@@ -1051,6 +1051,7 @@ wa-workflow-api:
       POSTGRES_NAME: "pr-${CHANGE_ID}-wa_workflow_api"
       POSTGRES_USERNAME: hmcts
       POSTGRES_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
+      DB_READER_USERNAME: hmcts
       S2S_SECRET_WORKFLOW_API: ${S2S_SECRET_WORKFLOW_API}
       TASK_MANAGEMENT_URL: http://{{ .Release.Name }}-wa-task-management-api
       LAUNCH_DARKLY_SDK_KEY: ${WA_LAUNCH_DARKLY_SDK_KEY}
