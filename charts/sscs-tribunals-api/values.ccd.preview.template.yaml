@@ -40,6 +40,15 @@ java:
     GAPS_SWITCHOVER_FEATURE: true
     ELASTIC_SEARCH_FEATURE: true
     DUMMY: true
+    JMS_NAMESPACE: sscs-sb-preview
+    JMS_USERNAME: RootManageSharedAccessKey
+    JMS_HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
+    ENABLE_JMS: true
+  secrets:
+    JMS_PASSWORD:
+      secretRef: sscs-sb-preview
+      key: primaryKey
+
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
