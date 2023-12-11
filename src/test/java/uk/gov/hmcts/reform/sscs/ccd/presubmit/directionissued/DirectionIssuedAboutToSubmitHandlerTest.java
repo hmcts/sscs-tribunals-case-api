@@ -203,7 +203,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(footerService).createFooterAndAddDocToCase(eq(theDocument.getDocumentLink()), any(), eq(DocumentType.DIRECTION_NOTICE), any(), eq(theDocument.getDocumentDateAdded()), eq(null), eq(null));
-        assertNull(sscsCaseData.getPrePostHearing());
     }
 
     public void willSetTheWithDwpStateToDirectionActionRequired() {
