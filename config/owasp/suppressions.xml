@@ -13,11 +13,9 @@
     <cve>CVE-2023-36052</cve>
     <cve>CVE-2023-46604</cve>
     <cve>CVE-2023-33202</cve>
-  </suppress>
-  <suppress until = "2023-12-07">
-    <notes><![CDATA[
-    file name:activemq-broker-5.16.6.jar, activemq-client-5.16.6.jar
-    ]]></notes>
-    <cve>CVE-2023-46604</cve>
+    <cve>CVE-2023-6481</cve>
+    <cve>CVE-2023-34055</cve>
+    <cve>CVE-2023-46589</cve>
+    <cve>CVE-2023-6378</cve>
   </suppress>
 </suppressions>
