@@ -723,7 +723,7 @@ sscs-hearings-api:
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
       TRIBUNALS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
-      TRIBUNALS_EVENT_QUEUE_NAMESPACE: sscs-sb-preview
+      TRIBUNALS_EVENT_QUEUE_NAMESPACE: sscs-servicebus-preview
       HMC_HEARINGS_TOPIC_NAMESPACE: hmc-servicebus-aat
       HMC_DEPLOYMENT_ID: hearing-deployment-${SERVICE_NAME}
     secrets:
