@@ -40,14 +40,11 @@ java:
     GAPS_SWITCHOVER_FEATURE: true
     ELASTIC_SEARCH_FEATURE: true
     DUMMY: true
-    JMS_NAMESPACE: sscs-sb-preview.servicebus.windows.net
-    JMS_USERNAME: RootManageSharedAccessKey
-    JMS_HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
-    ENABLE_JMS: true
+    HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
   secrets:
-    JMS_PASSWORD:
+    HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
       secretRef: sscs-sb-preview
-      key: primaryKey
+      key: connectionString
 
 
 idam-pr:
