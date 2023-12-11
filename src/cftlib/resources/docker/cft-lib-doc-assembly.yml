@@ -15,8 +15,8 @@ services:
       - S2S_NAMES_WHITELIST=sscs,divorce,ccd,em_gw,document-management-store,ccd_gw,idam-api,fpl_case_service,xui_webapp,ccd_case_document_am_api
       # You need to add the below two keys for this service to work on docker locally. Values can be found in docmosis key vault.
       # Requires VPN connection.
-      - DOCMOSIS_ACCESS_KEY=${DOCMOSIS_ACCESS_KEY}
-      - DOCMOSIS_TEMPLATES_ENDPOINT_AUTH=${DOCMOSIS_TEMPLATES_ENDPOINT_AUTH}
+      - DOCMOSIS_ACCESS_KEY=dyVv8pXwQ03RRyJZQIPX2RWP9LgJJGTU08kc9dA8ATJoA9EZXQEWe7L1Uwe
+      - DOCMOSIS_TEMPLATES_ENDPOINT_AUTH=ZGV2ZWxvcGVyczpPbUp4REJPbDJEMTJoNzdKbDd3cExFb041aUVrWEw=
       - SERVER_PORT=8079
     ports:
       - 4631:8079
