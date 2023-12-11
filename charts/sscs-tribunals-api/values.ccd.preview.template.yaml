@@ -40,7 +40,7 @@ java:
     GAPS_SWITCHOVER_FEATURE: true
     ELASTIC_SEARCH_FEATURE: true
     DUMMY: true
-    JMS_NAMESPACE: sscs-servicebus-preview
+    JMS_NAMESPACE: sscs-sb-preview.servicebus.windows.net
     JMS_USERNAME: RootManageSharedAccessKey
     JMS_HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
     ENABLE_JMS: true
