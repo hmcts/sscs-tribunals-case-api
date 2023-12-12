@@ -173,8 +173,10 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         caseData.setShowRip1DocPage(null);
 
         YesNo unprocessedPostponementRequest = caseData.getPostponementRequest().getUnprocessedPostponementRequest();
+        String actionPostponementRequestSelected = caseData.getPostponementRequest().getActionPostponementRequestSelected();
         caseData.setPostponementRequest(PostponementRequest.builder()
             .unprocessedPostponementRequest(unprocessedPostponementRequest)
+            .actionPostponementRequestSelected(actionPostponementRequestSelected)
             .build());
     }
 }
