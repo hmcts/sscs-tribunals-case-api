@@ -758,9 +758,6 @@ hmc-cft-hearing-service:
       SPRING_CONFIG_IMPORT : "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
       CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
     secrets:
-      HMC_SERVICE_BUS_CONNECTION_STRING:
-        secretRef: hmc-servicebus-aat
-        key: connectionString
       HMC_QUEUE_CONNECTION_STRING:
         secretRef: sscs-sb-preview
         key: connectionString
@@ -778,6 +775,8 @@ hmc-cft-hearing-service:
             alias: CFT_HEARING_SERVICE_DB_USERNAME
           - name: preview-ccd-db-password
             alias: CFT_HEARING_SERVICE_DB_PASSWORD
+          - name: hmc-servicebus-connection-string
+            alias: HMC_SERVICE_BUS_CONNECTION_STRING
 
 #Enable for queues/topics
 #If you need a subscription for a topic, topic name should be not longer than 10 characters
