@@ -704,7 +704,7 @@ sscs-hearings-api:
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     environment:
       ROOT_LOGGING_LEVEL: INFO
-      SSCS_LOG_LEVEL: INFO #Switch to debug to see requests being sent.
+      SSCS_LOG_LEVEL: DEBUG #Switch to debug to see requests being sent.
       SERVICE_BUS_LOG_LEVEL: ERROR
       LOG_OUTPUT: single
       CREATE_CCD_ENDPOINT: false
@@ -736,16 +736,6 @@ sscs-hearings-api:
         secrets:
           - name: hmc-servicebus-shared-access-key-tf
             alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
-          - name: sscs-s2s-secret
-            alias: IDAM_S2S_AUTH_TOTP_SECRET
-          - name: idam-sscs-systemupdate-user
-            alias: IDAM_SSCS_SYSTEMUPDATE_USER
-          - name: idam-sscs-systemupdate-password
-            alias: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
-          - name: idam-oauth-user
-            alias: IDAM_OAUTH2_CLIENT_ID
-          - name: idam-sscs-oauth2-client-secret
-            alias: IDAM_OAUTH2_CLIENT_SECRET
     terraformEnvironmentVariables:
       TF_VAR_deploymentId: hearing-deployment-${SERVICE_NAME}
 
