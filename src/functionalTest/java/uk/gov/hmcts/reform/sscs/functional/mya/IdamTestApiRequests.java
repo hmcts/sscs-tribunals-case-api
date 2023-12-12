@@ -42,6 +42,6 @@ public class IdamTestApiRequests {
                 .setEntity(new StringEntity(body, APPLICATION_JSON))
                 .build());
 
-        assertThat(httpResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+        assertThat(httpResponse.getStatusLine().getStatusCode(), is(HttpStatus.CREATED.value()));
     }
 }
