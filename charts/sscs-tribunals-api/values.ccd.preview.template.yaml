@@ -726,7 +726,7 @@ sscs-hearings-api:
       TRIBUNALS_EVENT_QUEUE_NAMESPACE: sscs-sb-preview
       HMC_HEARINGS_TOPIC_NAMESPACE: hmc-servicebus-aat
       HMC_DEPLOYMENT_ID: hearing-deployment-${SERVICE_NAME}
-      DUMMY: false
+      DUMMY: true
     secrets:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: sscs-sb-preview
@@ -740,7 +740,6 @@ sscs-hearings-api:
             alias: IDAM_SSCS_SYSTEMUPDATE_USER
           - name: idam-sscs-systemupdate-password
             alias: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
-
     terraformEnvironmentVariables:
       TF_VAR_deploymentId: hearing-deployment-${SERVICE_NAME}
 
