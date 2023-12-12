@@ -715,7 +715,7 @@ sscs-hearings-api:
       COMMON_REF_API_URL: "http://rd-commondata-api-aat.service.core-compute-aat.internal"
       JUDICIAL_REF_API_URL: "http://rd-judicial-api-aat.service.core-compute-aat.internal"
       EXUI_API_URL: "https://${SERVICE_NAME}-xui"
-      HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+      HMC_API_URL: "http://${SERVICE_NAME}-hmc-cft-hearing-service"
       #Messaging
       HMC_HEARINGS_LISTENING_ENABLED: true
       HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
@@ -740,15 +740,15 @@ sscs-hearings-api:
       TF_VAR_deploymentId: hearing-deployment-${SERVICE_NAME}
 
 hmc-cft-hearing-service:
-  enabled: false
+  enabled: true
   java:
     releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
     image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
     environment:
-      HMC_SERVICE_BUS_TOPIC: "hmc-to-cft"
-      HMC_SERVICE_BUS_SUBSCRIPTION: "hmc-to-sscs-subscription"
-      HMC_SERVICE_BUS_QUEUE: hmc-from-hmi
-      HMC_OUTBOUND_SERVICE_BUS_QUEUE: hmc-to-hmi
+      HMC_SERVICE_BUS_TOPIC: "hmc-to-cft-aat"
+      HMC_SERVICE_BUS_SUBSCRIPTION: "hmc-to-sscs-subscription-aat"
+      HMC_SERVICE_BUS_QUEUE: ${SERVICE_NAME}-servicebus-hmc-from-hmi
+      HMC_OUTBOUND_SERVICE_BUS_QUEUE: ${SERVICE_NAME}-servicebus-hmc-to-hmi
       CFT_HEARING_SERVICE_DB_HOST: "${SERVICE_NAME}-postgresql"
       CFT_HEARING_SERVICE_DB_NAME: "hmc-cft-hearing-service"
       CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
@@ -756,15 +756,16 @@ hmc-cft-hearing-service:
       HMC_ACCESS_CONTROL_ENABLED: false
       ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
       SPRING_CONFIG_IMPORT : "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
+      CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
     secrets:
       HMC_SERVICE_BUS_CONNECTION_STRING:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
+        secretRef: hmc-servicebus-aat
         key: connectionString
       HMC_QUEUE_CONNECTION_STRING:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-from-hmi
+        secretRef: sscs-sb-preview
         key: connectionString
       HMC_OUTBOUND_QUEUE_CONNECTION_STRING:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-to-hmi
+        secretRef: sscs-sb-preview
         key: connectionString
     keyVaults:
       hmc:
@@ -792,3 +793,5 @@ servicebus:
     queues:
       - name: sscs-orchestrator-queue-preview
       - name: tribunals-to-hearing-api
+      - name: hmc-from-hmi
+      - name: hmc-to-hmi
