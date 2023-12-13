@@ -69,7 +69,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
                 .generateNotice(YES)
                 .build())
             .appeal(Appeal.builder().appellant(Appellant.builder()
-                .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
+                .name(Name.builder().firstName("APPELLANT").lastName("Last'NamE").build())
                 .identity(Identity.builder().build()).build()).build())
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .hearingRoute(LIST_ASSIST)
@@ -156,7 +156,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
         assertThat(payload.getNoticeType()).isEqualTo("STATEMENT OF REASONS");
-        assertThat(payload.getAppellantFullName()).isEqualTo("APPELLANT LastNamE");
+        assertThat(payload.getAppellantFullName()).isEqualTo("APPELLANT Last'NamE");
         assertThat(payload.getNoticeBody()).isEqualTo("Something");
         assertThat(payload.getUserName()).isEqualTo("A name");
         assertThat(payload.getUserRole()).isEqualTo("A role");

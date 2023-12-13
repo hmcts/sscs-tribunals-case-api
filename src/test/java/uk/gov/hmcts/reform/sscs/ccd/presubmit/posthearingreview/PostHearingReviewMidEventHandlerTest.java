@@ -76,7 +76,7 @@ class PostHearingReviewMidEventHandlerTest {
                 .permissionToAppealGenerateNotice(YES)
                 .build())
             .appeal(Appeal.builder().appellant(Appellant.builder()
-                    .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
+                    .name(Name.builder().firstName("APPELLANT").lastName("Last'NamE").build())
                     .identity(Identity.builder().build()).build()).build())
             .directionDueDate(LocalDate.now().plusDays(1).toString())
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -157,7 +157,7 @@ class PostHearingReviewMidEventHandlerTest {
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
         assertThat(payload.getNoticeType()).isEqualTo(postHearingReviewType.getDescriptionEn().toUpperCase() + " DECISION NOTICE");
-        assertThat(payload.getAppellantFullName()).isEqualTo("APPELLANT LastNamE");
+        assertThat(payload.getAppellantFullName()).isEqualTo("APPELLANT Last'NamE");
         assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
     }
 
@@ -199,7 +199,7 @@ class PostHearingReviewMidEventHandlerTest {
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
         assertThat(payload.getNoticeType()).isEqualTo("REVIEW DECISION NOTICE");
-        assertThat(payload.getAppellantFullName()).isEqualTo("APPELLANT LastNamE");
+        assertThat(payload.getAppellantFullName()).isEqualTo("APPELLANT Last'NamE");
         assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
     }
 
@@ -240,7 +240,7 @@ class PostHearingReviewMidEventHandlerTest {
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
         assertThat(payload.getNoticeType()).isEqualTo("DECISION NOTICE");
-        assertThat(payload.getAppellantFullName()).isEqualTo("APPELLANT LastNamE");
+        assertThat(payload.getAppellantFullName()).isEqualTo("APPELLANT Last'NamE");
         assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
     }
 

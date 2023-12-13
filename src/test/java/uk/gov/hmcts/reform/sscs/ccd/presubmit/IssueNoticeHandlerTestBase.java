@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @RunWith(JUnitParamsRunner.class)
 public abstract class IssueNoticeHandlerTestBase {
-    public static final String APPELLANT_LAST_NAME = "APPELLANT LastNamE";
+    public static final String APPELLANT_LAST_NAME = "APPELLANT Last'NamE";
     protected IssueNoticeHandler service;
 
     protected SscsCaseData sscsCaseData;
@@ -49,11 +49,11 @@ public abstract class IssueNoticeHandlerTestBase {
                         .benefitType(BenefitType.builder().build())
                         .appellant(Appellant.builder()
                                 .name(Name.builder().firstName("APPELLANT")
-                                        .lastName("LastNamE")
+                                        .lastName("Last'NamE")
                                         .build())
                                 .identity(Identity.builder().build()).isAppointee("Yes")
                                 .appointee(Appointee.builder()
-                                        .name(Name.builder().firstName("APPOINTEE").lastName("Test").build()).build())
+                                        .name(Name.builder().firstName("APPOINTEE").lastName("T-Est").build()).build())
                                 .build())
                         .build()).build();
 
@@ -68,7 +68,7 @@ public abstract class IssueNoticeHandlerTestBase {
     @Test
     public void givenBuildNameWhenDisplayAppointeeNameIsTrue() {
         String actual = service.buildName(sscsCaseData, true);
-        assertEquals("APPOINTEE Test", actual);
+        assertEquals("APPOINTEE T-Est", actual);
     }
 
     @Test

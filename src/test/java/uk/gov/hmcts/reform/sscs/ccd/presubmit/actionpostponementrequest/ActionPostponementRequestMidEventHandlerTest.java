@@ -77,7 +77,7 @@ public class ActionPostponementRequestMidEventHandlerTest {
                 .generateNotice(YES)
                 .build())
             .appeal(Appeal.builder().appellant(Appellant.builder()
-                    .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
+                    .name(Name.builder().firstName("APPELLANT").lastName("Last'NamE").build())
                     .identity(Identity.builder().build()).build()).build())
             .directionDueDate(LocalDate.now().plusDays(1).toString())
             .postponementRequest(PostponementRequest.builder().build())
@@ -136,7 +136,7 @@ public class ActionPostponementRequestMidEventHandlerTest {
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertEquals(NoticeIssuedTemplateBody.ENGLISH_IMAGE, payload.getImage());
         assertEquals("DIRECTIONS NOTICE", payload.getNoticeType());
-        assertEquals("APPELLANT LastNamE", payload.getAppellantFullName());
+        assertEquals("APPELLANT Last'NamE", payload.getAppellantFullName());
         assertEquals(templateId, value.getTemplateId());
     }
 

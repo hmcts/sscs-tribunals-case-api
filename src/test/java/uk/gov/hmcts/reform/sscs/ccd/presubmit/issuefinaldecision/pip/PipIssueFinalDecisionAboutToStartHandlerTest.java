@@ -41,7 +41,7 @@ import uk.gov.hmcts.reform.sscs.service.*;
 public class PipIssueFinalDecisionAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    public static final String APPELLANT_LAST_NAME = "APPELLANT LastNamE";
+    public static final String APPELLANT_LAST_NAME = "APPELLANT Last'NamE";
     private IssueFinalDecisionAboutToStartHandler handler;
     private static final String URL = "http://dm-store/documents/123";
     private static final String TEMPLATE_ID = "nuts.docx";
@@ -99,7 +99,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
                 .benefitType(BenefitType.builder().code("PIP").build())
                 .appellant(Appellant.builder()
                     .name(Name.builder().firstName("APPELLANT")
-                        .lastName("LastNamE")
+                        .lastName("Last'NamE")
                         .build())
                     .identity(Identity.builder().build())
                     .build())

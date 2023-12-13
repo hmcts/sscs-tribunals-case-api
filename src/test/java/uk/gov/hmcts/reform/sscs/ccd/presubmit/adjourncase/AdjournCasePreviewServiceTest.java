@@ -78,7 +78,7 @@ import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 class AdjournCasePreviewServiceTest {
 
     private static final String ADDITIONAL_DIRECTIONS = "Something else.";
-    private static final String APPELLANT_FULL_NAME = "APPELLANT LastNamE";
+    private static final String APPELLANT_FULL_NAME = "APPELLANT Last'NamE";
     private static final String GAP_VENUE_NAME = "Gap venue name";
     private static final String HEARING_DATE = "2019-01-01";
     private static final String REASONS = "My reasons for decision";
@@ -153,7 +153,7 @@ class AdjournCasePreviewServiceTest {
                 .benefitType(BenefitType.builder().code("PIP").build())
                 .appellant(Appellant.builder()
                     .name(Name.builder().firstName("APPELLANT")
-                        .lastName("LastNamE")
+                        .lastName("Last'NamE")
                         .build())
                     .identity(Identity.builder().build())
                     .build())
@@ -1558,7 +1558,7 @@ class AdjournCasePreviewServiceTest {
         sscsCaseData.getAppeal().getAppellant().setIsAppointee("yes");
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
             .name(Name.builder().firstName("APPOINTEE")
-                .lastName("SurNamE")
+                .lastName("Sur-NamE")
                 .build())
             .identity(Identity.builder().build())
             .build());
@@ -1566,7 +1566,7 @@ class AdjournCasePreviewServiceTest {
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "APPOINTEE SurNamE, appointee for APPELLANT LastNamE", nextHearingTypeText);
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "APPOINTEE Sur-NamE, appointee for APPELLANT Last'NamE", nextHearingTypeText);
     }
 
     @ParameterizedTest

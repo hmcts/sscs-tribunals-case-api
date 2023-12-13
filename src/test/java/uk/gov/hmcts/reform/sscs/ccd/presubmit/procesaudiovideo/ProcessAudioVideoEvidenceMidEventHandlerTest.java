@@ -116,7 +116,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
             .appeal(Appeal.builder()
                 .appellant(Appellant.builder()
                     .name(Name.builder().firstName("APPELLANT")
-                        .lastName("LastNamE")
+                        .lastName("Last'NamE")
                         .build())
                     .identity(Identity.builder().build())
                     .build())
@@ -334,7 +334,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertEquals(NoticeIssuedTemplateBody.ENGLISH_IMAGE, payload.getImage());
         assertEquals("DIRECTIONS NOTICE", payload.getNoticeType());
-        assertEquals("APPELLANT LastNamE", payload.getAppellantFullName());
+        assertEquals("APPELLANT Last'NamE", payload.getAppellantFullName());
         assertEquals(sscsCaseData.getDocumentGeneration().getDirectionNoticeContent(), payload.getNoticeBody());
         assertEquals(templateId, value.getTemplateId());
     }

@@ -43,7 +43,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     protected static final String ORIGINAL_JUDGE_NAME = "test judge name name";
     protected static final String USER_AUTHORISATION = "Bearer token";
     protected static final String URL = "http://dm-store/documents/123";
-    public static final String APPELLANT_LAST_NAME = "APPELLANT LastNamE";
+    public static final String APPELLANT_LAST_NAME = "APPELLANT Last'NamE";
     protected WriteFinalDecisionPreviewDecisionServiceBase service;
     protected String benefitType;
 
@@ -114,7 +114,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
                 .benefitType(BenefitType.builder().code(benefitType).build())
                 .appellant(Appellant.builder()
                     .name(Name.builder().firstName("APPELLANT")
-                        .lastName("LastNamE")
+                        .lastName("Last'NamE")
                         .build())
                     .identity(Identity.builder().build())
                     .build())
@@ -879,7 +879,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
             .name(Name.builder().firstName("APPOINTEE")
-                .lastName("SurNamE")
+                .lastName("Sur-NamE")
                 .build())
             .identity(Identity.builder().build())
             .build());
@@ -889,7 +889,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "APPOINTEE SurNamE, appointee for APPELLANT LastNamE", "APPOINTEE SurNamE", "2018-10-10", true,
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "APPOINTEE Sur-NamE, appointee for APPELLANT Last'NamE", "APPOINTEE Sur-NamE", "2018-10-10", true,
             true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
     }
 
