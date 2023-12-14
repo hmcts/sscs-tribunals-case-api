@@ -10,6 +10,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -536,7 +537,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         assertNotNull(body);
 
         assertEquals(LocalDate.now().toString(), body.getHeldOn().toString());
-        assertEquals("In chambers", body.getHeldAt());
+        assertEquals(IN_CHAMBERS, body.getHeldAt());
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
     }
@@ -561,7 +562,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         assertNotNull(body);
 
         assertEquals(LocalDate.now().toString(), body.getHeldOn().toString());
-        assertEquals("In chambers", body.getHeldAt());
+        assertEquals(IN_CHAMBERS, body.getHeldAt());
 
         assertNotNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
     }
