@@ -12,6 +12,7 @@ java:
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     #CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
+    ROOT_LOGGING_LEVEL: DEBUG
     CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
     BUNDLE_URL: http://${SERVICE_NAME}-em-ccdorc
