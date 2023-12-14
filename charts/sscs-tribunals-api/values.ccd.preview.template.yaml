@@ -60,7 +60,7 @@ idam-pr:
     CCD:
       - https://${SERVICE_NAME}-case-management-web/oauth2redirect
     ccd_data_store_api:
-      - http://${SERVICE_NAME}-ccd-data-store-api/oauth2redirect
+      - http://ccd-data-store-api-aat.service.core-compute-aat.internal
 
 em-ccdorc:
   enabled: true
