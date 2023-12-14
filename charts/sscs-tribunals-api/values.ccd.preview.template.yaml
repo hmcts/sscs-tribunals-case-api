@@ -11,7 +11,8 @@ java:
   readinessDelay: 45
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
-    CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
+    #CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
+    CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
     BUNDLE_URL: http://${SERVICE_NAME}-em-ccdorc
     CCD_UI_BASE_URL: https://${SERVICE_NAME}-case-management-web
@@ -106,7 +107,8 @@ xui-webapp:
       HEALTH_TERMS_AND_CONDITIONS_API: http://${SERVICE_NAME}-xui-terms-and-conditions/health
       SERVICES_EM_ANNO_API: http://${SERVICE_NAME}-ccd-api-gw
       SERVICES_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw
-      SERVICES_CCD_DATA_STORE_API: http://${SERVICE_NAME}-ccd-data-store-api
+      #SERVICES_CCD_DATA_STORE_API: http://${SERVICE_NAME}-ccd-data-store-api
+      SERVICES_CCD_DATA_STORE_API: http://ccd-data-store-api-aat.service.core-compute-aat.internal
       SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac
       SERVICES_TERMS_AND_CONDITIONS: http://${SERVICE_NAME}-xui-terms-and-conditions
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
@@ -711,11 +713,12 @@ sscs-hearings-api:
       IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
       CASEWORKER_REF_API_URL: "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
       IDAM_API_URL: "https://idam-api.aat.platform.hmcts.net"
-      CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
+      #CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
+      CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
       COMMON_REF_API_URL: "http://rd-commondata-api-aat.service.core-compute-aat.internal"
       JUDICIAL_REF_API_URL: "http://rd-judicial-api-aat.service.core-compute-aat.internal"
       EXUI_API_URL: "https://${SERVICE_NAME}-xui"
-      HMC_API_URL: "http://${SERVICE_NAME}-hmc-cft-hearing-service"
+      HMC_API_URL: "http://hmc-cft-hearing-service-aat.service.core-compute-aat.internal"
       #Messaging
       HMC_HEARINGS_LISTENING_ENABLED: true
       HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
@@ -752,7 +755,7 @@ sscs-hearings-api:
       TF_VAR_deploymentId: hearing-deployment-${SERVICE_NAME}
 
 hmc-cft-hearing-service:
-  enabled: true
+  enabled: false
   java:
     releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
     image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
@@ -804,5 +807,3 @@ servicebus:
     queues:
       - name: sscs-orchestrator-queue-preview
       - name: tribunals-to-hearing-api
-      - name: hmc-from-hmi
-      - name: hmc-to-hmi
