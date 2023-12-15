@@ -76,10 +76,6 @@ java:
     CASE_ACCESS_MANAGEMENT_FEATURE: false
     ELINKS_V2_FEATURE_ENABLED: false
 
-idam-pr:
-  enabled: false
-xui-webapp:
-  enabled: false
 elastic:
   enabled: false
 sscs-evidence-share:
@@ -92,15 +88,13 @@ sscs-tribunals-frontend:
   enabled: false
 redis:
   enabled: false
-ccd:
-  enabled: false
 em-ccdorc:
   enabled: false
 sscs-hearings-api:
   enabled: false
-hmc-cft-hearing-service:
-  enabled: false
 servicebus:
   enabled: false
 ccd-case-document-am-api:
+  enabled: false
+ccd-def-cleanup:
   enabled: false
