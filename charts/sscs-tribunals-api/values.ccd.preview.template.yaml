@@ -181,7 +181,8 @@ ccd:
   global:
     ccdApiGatewayIngress: ${SERVICE_NAME}-ccd-api-gw
     ccdAdminWebIngress: ${SERVICE_NAME}-ccd-admin-web
-    ccdDataStoreUrl: http://${SERVICE_NAME}-ccd-data-store-api
+    #ccdDataStoreUrl: http://${SERVICE_NAME}-ccd-data-store-api
+    ccdDataStoreUrl: http://ccd-data-store-api-aat.service.core-compute-aat.internal
     ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
     ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
