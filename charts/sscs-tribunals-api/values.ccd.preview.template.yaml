@@ -566,9 +566,3 @@ servicebus:
         subscriptionNeeded: yes
     queues:
       - name: sscs-orchestrator-queue-preview
-
-#ccd-def-cleanup:
-#  enabled: true
-#  change_id:
-#  case_type_ids:
-#    -

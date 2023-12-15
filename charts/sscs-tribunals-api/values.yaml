@@ -96,5 +96,3 @@ servicebus:
   enabled: false
 ccd-case-document-am-api:
   enabled: false
-ccd-def-cleanup:
-  enabled: false
