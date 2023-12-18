@@ -72,7 +72,7 @@ ccd-case-document-am-api:
       DM_STORE_BASE_URL: http://dm-store-aat.service.core-compute-aat.internal
 
 xui-webapp:
-  enabled: false
+  enabled: true
   nodejs:
     memoryLimits: "4Gi"
     cpuLimits: 2000m
