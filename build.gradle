@@ -166,7 +166,7 @@ dependencyCheck {
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild', 'true') == 'true' ? 7.0 : 11
     suppressionFile = 'config/owasp/suppressions.xml'
 
-    cveValidForHours = 24
+    nvd.validForHours = 24
 
     analyzers {
         retirejs {
