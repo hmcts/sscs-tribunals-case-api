@@ -9,6 +9,10 @@ dependencies:
   - name: java
     version: 5.0.0
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+  - name: xui-webapp
+    version: 1.0.9
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: xui-webapp.enabled
   - name: sscs-evidence-share
     version: 0.0.46
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
@@ -21,6 +25,12 @@ dependencies:
     version: 0.0.31
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-ccd-callback-orchestrator.enabled
+  - name: ccd
+    version: 8.0.29
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: ccd.enabled
+    tags:
+      - sscs-ccd-idam-pr
   - name: sscs-tribunals-frontend
     version: 0.2.38
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
@@ -33,6 +43,10 @@ dependencies:
     version: 2.0.10
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: em-ccdorc.enabled
+  - name: ccd-case-document-am-api
+    version: 1.7.11
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: ccd-case-document-am-api.enabled
   - name: sscs-hearings-api
     version: 0.0.31
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'

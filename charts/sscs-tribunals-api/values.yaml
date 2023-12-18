@@ -76,6 +76,8 @@ java:
     CASE_ACCESS_MANAGEMENT_FEATURE: false
     ELINKS_V2_FEATURE_ENABLED: false
 
+xui-webapp:
+  enabled: false
 elastic:
   enabled: false
 sscs-evidence-share:
@@ -88,9 +90,13 @@ sscs-tribunals-frontend:
   enabled: false
 redis:
   enabled: false
+ccd:
+  enabled: false
 em-ccdorc:
   enabled: false
 sscs-hearings-api:
   enabled: false
 servicebus:
+  enabled: false
+ccd-case-document-am-api:
   enabled: false
