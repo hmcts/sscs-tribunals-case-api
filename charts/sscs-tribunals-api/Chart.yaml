@@ -9,14 +9,6 @@ dependencies:
   - name: java
     version: 5.0.0
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
-  - name: idam-pr
-    version: 2.3.0
-    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-    condition: idam-pr.enabled
-  - name: xui-webapp
-    version: 1.0.9
-    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-    condition: xui-webapp.enabled
   - name: sscs-evidence-share
     version: 0.0.46
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
@@ -29,12 +21,6 @@ dependencies:
     version: 0.0.31
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-ccd-callback-orchestrator.enabled
-  - name: ccd
-    version: 8.0.29
-    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-    condition: ccd.enabled
-    tags:
-      - sscs-ccd-idam-pr
   - name: sscs-tribunals-frontend
     version: 0.2.38
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
