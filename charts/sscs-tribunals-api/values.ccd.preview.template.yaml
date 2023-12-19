@@ -41,6 +41,11 @@ java:
     ELASTIC_SEARCH_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
     DUMMY: true
+    HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
+  secrets:
+    HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
+      secretRef: sscs-sb-preview
+      key: connectionString
 
 
 em-ccdorc:
@@ -295,7 +300,7 @@ sscs-hearings-api:
       TRIBUNALS_EVENT_QUEUE_NAMESPACE: sscs-sb-preview
       HMC_HEARINGS_TOPIC_NAMESPACE: hmc-servicebus-aat
       HMC_DEPLOYMENT_ID: hearing-deployment-${SERVICE_NAME}
-      DUMMY: false
+      DUMMY: true
     secrets:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: sscs-sb-preview
