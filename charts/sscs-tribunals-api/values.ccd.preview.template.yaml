@@ -300,7 +300,7 @@ sscs-hearings-api:
       TRIBUNALS_EVENT_QUEUE_NAMESPACE: sscs-sb-preview
       HMC_HEARINGS_TOPIC_NAMESPACE: hmc-servicebus-aat
       HMC_DEPLOYMENT_ID: hearing-deployment-${SERVICE_NAME}
-      DUMMY: true
+      DUMMY: false
     secrets:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: sscs-sb-preview
@@ -310,9 +310,9 @@ sscs-hearings-api:
         secrets:
           - name: hmc-servicebus-shared-access-key-tf
             alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
-          - name: idam-sscs-systemupdate-user
+          - name: sscs-hearing-manager-username
             alias: IDAM_SSCS_SYSTEMUPDATE_USER
-          - name: idam-sscs-systemupdate-password
+          - name: sscs-hearing-manager-pass
             alias: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
           - name: app-insights-connection-string
             alias: app-insights-connection-string
