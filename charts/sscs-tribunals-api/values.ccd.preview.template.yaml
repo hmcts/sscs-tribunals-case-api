@@ -4,6 +4,7 @@ tags:
 
 java:
   image: ${IMAGE_NAME}
+  ingressHost: ${SERVICE_FQDN}
   memoryLimits: "8Gi"
   memoryRequests: "1Gi"
   cpuRequests: "2"
