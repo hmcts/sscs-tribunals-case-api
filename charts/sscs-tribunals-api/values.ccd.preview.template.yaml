@@ -267,13 +267,13 @@ redis:
 #Turning either hearings api (with either listener on) or cft hearing service on requires
 #service bus to be turned on.
 sscs-hearings-api:
-  enabled: false
+  enabled: true
   java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-562-4577282-20231214104808" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     environment:
       ROOT_LOGGING_LEVEL: INFO
-      SSCS_LOG_LEVEL: INFO #Switch to debug to see requests being sent.
+      SSCS_LOG_LEVEL: DEBUG #Switch to debug to see requests being sent.
       SERVICE_BUS_LOG_LEVEL: ERROR
       LOG_OUTPUT: single
       CREATE_CCD_ENDPOINT: false
@@ -283,29 +283,42 @@ sscs-hearings-api:
       CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
       COMMON_REF_API_URL: "http://rd-commondata-api-aat.service.core-compute-aat.internal"
       JUDICIAL_REF_API_URL: "http://rd-judicial-api-aat.service.core-compute-aat.internal"
-      #EXUI_API_URL: "https://${SERVICE_NAME}-xui"
-      HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+      EXUI_API_URL: "https://${SERVICE_NAME}-xui"
+      HMC_API_URL: "http://hmc-cft-hearing-service-aat.service.core-compute-aat.internal"
       #Messaging
-      HMC_HEARING_LISTENING_ENABLED: false
-      HEARINGS_TOPIC_NAME: "hmc-to-cft"
-      HEARINGS_TOPIC_SUBSCRIPTION_NAME: "tribunals-to-hearing-api"
-      HMC_HEARINGS_TOPIC_POLICY_NAME: RootManageSharedAccessKey
-      TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
-      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
+      HMC_HEARINGS_LISTENING_ENABLED: true
+      HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
+      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-aat"
+      TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
+      TRIBUNALS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
+      TRIBUNALS_EVENT_QUEUE_NAMESPACE: sscs-sb-preview
+      HMC_HEARINGS_TOPIC_NAMESPACE: hmc-servicebus-aat
+      HMC_DEPLOYMENT_ID: hearing-deployment-${SERVICE_NAME}
+      DUMMY: false
     secrets:
-      TRIBUNALS_EVENT_QUEUE_NAMESPACE:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
-        key: namespaceName
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
+        secretRef: sscs-sb-preview
         key: primaryKey
-      HMC_HEARINGS_TOPIC_NAMESPACE:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: namespaceName
-      HMC_HEARINGS_TOPIC_ACCESS_KEY:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: primaryKey
+    keyVaults:
+      sscs:
+        secrets:
+          - name: hmc-servicebus-shared-access-key-tf
+            alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
+          - name: idam-sscs-systemupdate-user
+            alias: IDAM_SSCS_SYSTEMUPDATE_USER
+          - name: idam-sscs-systemupdate-password
+            alias: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
+          - name: app-insights-connection-string
+            alias: app-insights-connection-string
+          - name: sscs-s2s-secret
+            alias: IDAM_S2S_AUTH_TOTP_SECRET
+          - name: idam-oauth-user
+            alias: IDAM_OAUTH2_CLIENT_ID
+          - name: idam-sscs-oauth2-client-secret
+            alias: IDAM_OAUTH2_CLIENT_SECRET
+    terraformEnvironmentVariables:
+      TF_VAR_deploymentId: hearing-deployment-${SERVICE_NAME}
 
 #Enable for queues/topics
 #If you need a subscription for a topic, topic name should be not longer than 10 characters
@@ -320,3 +333,4 @@ servicebus:
         subscriptionNeeded: yes
     queues:
       - name: sscs-orchestrator-queue-preview
+      - name: tribunals-to-hearing-api
