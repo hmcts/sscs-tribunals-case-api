@@ -301,8 +301,8 @@ ccd:
       imagePullPolicy: Always
       ingressHost: ras-${SERVICE_FQDN}
       releaseNameOverride: ${SERVICE_NAME}-am-role-assignment-service
-      readinessDelay: 120
-      livenessDelay: 120
+      readinessDelay: 240
+      livenessDelay: 240
       environment:
         AM_ROLE_ASSIGNMENT_SERVICE_SECRET: ${AM_ROLE_ASSIGNMENT_SERVICE_SECRET}
         ROLE_ASSIGNMENT_DB_HOST: sscs-preview.postgres.database.azure.com
