@@ -189,7 +189,7 @@ ccd:
 
   am-role-assignment-service:
     java:
-      image: 'hmctspublic.azurecr.io/am/role-assignment-service:latest'
+      image: 'hmctspublic.azurecr.io/am/role-assignment-service:pr-2101'
       imagePullPolicy: Always
       ingressHost: ""
       releaseNameOverride: ${SERVICE_NAME}-am-role-assignment-service
