@@ -83,6 +83,10 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
             if (doc.getValue().getDocumentLink() != null) {
                 listCostOptions.add(new DynamicListItem(doc.getValue().getDocumentLink().getDocumentUrl(), label));
             }
+            if (doc.getValue().getEditedDocumentLink() != null) {
+                listCostOptions.add(new DynamicListItem(doc.getValue().getEditedDocumentLink().getDocumentUrl(),
+                        doc.getValue().getEditedDocumentLink().getDocumentFilename()));
+            }
         }
 
         sscsCaseData.getReissueArtifactUi().setReissueFurtherEvidenceDocument(new DynamicList(listCostOptions.get(0), listCostOptions));

@@ -11,6 +11,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -217,5 +219,27 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest extends ReissueArtifa
         assertEquals(new DynamicListItem("welshUrl4", "Bilingual - welshFile4.pdf -  Other party evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(8));
         assertEquals(new DynamicListItem("welshUrl5", "Bilingual - welshFile5.pdf -  Other party rep evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(9));
         assertNull(response.getData().getOriginalSender());
+    }
+
+    @Test
+    public void givenDocumentEdited_ThenAddToDropDownOptions() {
+
+        SscsDocument documentWithEditedDoc = SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentFileName("file1.pdf")
+                .documentType(APPELLANT_EVIDENCE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url1").build())
+                .editedDocumentLink(DocumentLink.builder().documentFilename("editedFile1").documentUrl("editedUrl").build())
+                .build()).build();
+
+        sscsCaseData.setSscsDocument(Arrays.asList(documentWithEditedDoc));
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals(Collections.EMPTY_SET, response.getErrors());
+        assertEquals(2, response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().size());
+        assertEquals(new DynamicListItem("url1", "file1.pdf -  Appellant evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(0));
+        assertEquals(new DynamicListItem("editedUrl", "editedFile1"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(1));
     }
 }
