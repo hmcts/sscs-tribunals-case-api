@@ -27,7 +27,7 @@ To build the project execute the following command:
 Run the application by executing:
 
 ```
-./gradlew bootRun
+./src/cftlib/resources/scripts/start.sh
 ```
 
 ### Cftlib

@@ -44,6 +44,7 @@ java:
     JAVA_OPTS: -Xmx6G
     GAPS_SWITCHOVER_FEATURE: true
     ELASTIC_SEARCH_FEATURE: true
+    ELINKS_V2_FEATURE_ENABLED: true
     DUMMY: true
 
 idam-pr:
@@ -138,6 +139,7 @@ xui-webapp:
       FEATURE_TERMS_AND_CONDITIONS_ENABLED: false
       FEATURE_HELMET_ENABLED: false
       FEATURE_OIDC_ENABLED: false
+      ALLOW_CONFIG_MUTATIONS: true
       FEATURE_JRD_E_LINKS_V2_ENABLED: true
       NOW: false
       REDISCLOUD_URL: http://dummyrediscloudurl
@@ -618,7 +620,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S12006SnonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S12273CnonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -637,7 +639,8 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S12006SnonProd
+      
+      CCD_DEF_VERSION: S12273CnonProd
     secrets: []
     userRoles:
       - citizen
@@ -660,6 +663,32 @@ ccd:
       - caseworker-wa-task-configuration
       - caseworker-ras-validation
       - GS_profile
+      - senior-tribunal-caseworker
+      - tribunal-caseworker
+      - registrar
+      - hearing-centre-team-leader
+      - hearing-centre-admin
+      - regional-centre-team-leader
+      - regional-centre-admin
+      - ctsc-team-leader
+      - ctsc
+      - dwp
+      - hmrc
+      - judge
+      - leadership-judge
+      - fee-paid-judge
+      - medical
+      - fee-paid-medical
+      - fee-paid-disability
+      - fee-paid-tribunal-member
+      - specific-access-legal-ops
+      - specific-access-ctsc
+      - specific-access-judiciary
+      - specific-access-admin
+      - challenged-access-legal-ops
+      - challenged-access-ctsc
+      - challenged-access-judiciary
+      - challenged-access-admin
 elastic:
   enabled: true
 
