@@ -12,7 +12,7 @@ java:
   devmemoryLimits: 8Gi
   devcpuLimits: 4500m
   image: ${IMAGE_NAME}
-  readinessDelay: 240
+  readinessDelay: 45
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
