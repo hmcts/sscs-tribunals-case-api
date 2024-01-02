@@ -662,6 +662,32 @@ ccd:
       - caseworker-wa-task-configuration
       - caseworker-ras-validation
       - GS_profile
+      - senior-tribunal-caseworker
+      - tribunal-caseworker
+      - registrar
+      - hearing-centre-team-leader
+      - hearing-centre-admin
+      - regional-centre-team-leader
+      - regional-centre-admin
+      - ctsc-team-leader
+      - ctsc
+      - dwp
+      - hmrc
+      - judge
+      - leadership-judge
+      - fee-paid-judge
+      - medical
+      - fee-paid-medical
+      - fee-paid-disability
+      - fee-paid-tribunal-member
+      - specific-access-legal-ops
+      - specific-access-ctsc
+      - specific-access-judiciary
+      - specific-access-admin
+      - challenged-access-legal-ops
+      - challenged-access-ctsc
+      - challenged-access-judiciary
+      - challenged-access-admin
 elastic:
   enabled: true
 
