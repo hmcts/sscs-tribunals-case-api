@@ -11,8 +11,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
