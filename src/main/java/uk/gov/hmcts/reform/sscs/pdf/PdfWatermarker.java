@@ -25,7 +25,7 @@ public class PdfWatermarker {
         String filename = null;
         try (PDDocument document = PDDocument.load(input)) {
             filename = document.getDocumentInformation().getTitle();
-            document.setAllSecurityToBeRemoved(true);
+            //document.setAllSecurityToBeRemoved(true);
             int count = 1;
             for (PDPage page : document.getPages()) {
                 scaleContent(document, page, SCALE_PERCENTAGE);
