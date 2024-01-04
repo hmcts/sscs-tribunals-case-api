@@ -39,6 +39,7 @@ java:
     ADJOURNMENT_FEATURE: true
     GAPS_SWITCHOVER_FEATURE: true
     ELASTIC_SEARCH_FEATURE: true
+    ELINKS_V2_FEATURE_ENABLED: true
     DUMMY: true
 
 idam-pr:
@@ -121,6 +122,8 @@ xui-webapp:
       FEATURE_TERMS_AND_CONDITIONS_ENABLED: false
       FEATURE_HELMET_ENABLED: false
       FEATURE_OIDC_ENABLED: false
+      ALLOW_CONFIG_MUTATIONS: true
+      FEATURE_JRD_E_LINKS_V2_ENABLED: true
       NOW: false
       REDISCLOUD_URL: http://dummyrediscloudurl
       UV_THREADPOOL_SIZE: 128
@@ -503,7 +506,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S11142nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:6.3.6nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -522,7 +525,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S11142nonProd
+      CCD_DEF_VERSION: 6.3.6nonProd
     secrets: []
     userRoles:
       - citizen
