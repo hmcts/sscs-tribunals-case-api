@@ -60,6 +60,13 @@ public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCall
                     .filter(f -> selectedDocumentUrl.get().equals(f.getValue().getDocumentLink().getDocumentUrl()))
                     .findFirst();
             if (optionalSelectedDocument.isEmpty()) {
+                optionalSelectedDocument  = Stream
+                        .of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments())
+                        .flatMap(x -> x == null ? null : x.stream())
+                        .filter(f -> selectedDocumentUrl.get().equals(f.getValue().getEditedDocumentLink().getDocumentUrl()))
+                        .findFirst();
+            }
+            if (optionalSelectedDocument.isEmpty()) {
                 errors.add(String.format("Could not find the selected document with url '%s' to re-issue further evidence in the appeal with id '%s'.", selectedDocumentUrl.get(), sscsCaseData.getCcdCaseId()));
             } else {
                 AbstractDocumentDetails documentDetails = optionalSelectedDocument.get().getValue();
