@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.WorkAllocationFields;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -112,6 +113,60 @@ public class WorkAllocationHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, null);
 
         assertEquals(Arrays.asList("tribunal-member-1", "appraiser-1"),
+                response.getData().getWorkAllocationFields().getAssignedCaseRoles());
+    }
+
+    @Test
+    public void givenCreateBundleHasRun_setAssignedCaseRolesField() {
+        when(caseAssignmentApi.getUserRoles("USER-TOKEN", "SERVICE-TOKEN",
+                Arrays.asList("1111222233334444"))).thenReturn(
+                CaseAssignmentUserRolesResource.builder()
+                        .caseAssignmentUserRoles(Arrays.asList(
+                                CaseAssignmentUserRole.builder().caseRole("tribunal-member-1").build(),
+                                CaseAssignmentUserRole.builder().caseRole("tribunal-member-2").build(),
+                                CaseAssignmentUserRole.builder().caseRole("appraiser-1").build()))
+                        .build());
+
+        when(caseDetails.getCaseData()).thenReturn(SscsCaseData.builder().workAllocationFields(
+                WorkAllocationFields.builder().assignedCaseRoles(Arrays.asList("tribunal-member-1")).build()
+        ).build());
+
+        handler = new WorkAllocationHandler(caseAssignmentApi, idamService, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, null);
+
+        assertEquals(Arrays.asList("tribunal-member-1"),
+                response.getData().getWorkAllocationFields().getPreviouslyAssignedCaseRoles());
+        assertEquals(Arrays.asList("tribunal-member-2", "appraiser-1"),
+                response.getData().getWorkAllocationFields().getAssignedCaseRoles());
+    }
+
+    @Test
+    public void canBeRunMultipleTimes_setAssignedCaseRolesField() {
+        when(caseAssignmentApi.getUserRoles("USER-TOKEN", "SERVICE-TOKEN",
+                Arrays.asList("1111222233334444"))).thenReturn(
+                CaseAssignmentUserRolesResource.builder()
+                        .caseAssignmentUserRoles(Arrays.asList(
+                                CaseAssignmentUserRole.builder().caseRole("tribunal-member-1").build(),
+                                CaseAssignmentUserRole.builder().caseRole("tribunal-member-2").build(),
+                                CaseAssignmentUserRole.builder().caseRole("appraiser-1").build(),
+                                CaseAssignmentUserRole.builder().caseRole("appraiser-2").build()))
+                        .build());
+
+        when(caseDetails.getCaseData()).thenReturn(SscsCaseData.builder().workAllocationFields(
+                WorkAllocationFields.builder()
+                        .assignedCaseRoles(Arrays.asList("tribunal-member-2"))
+                        .previouslyAssignedCaseRoles(Arrays.asList("tribunal-member-1", "appraiser-1"))
+                        .build()
+        ).build());
+
+        handler = new WorkAllocationHandler(caseAssignmentApi, idamService, true);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, null);
+
+        assertEquals(Arrays.asList("tribunal-member-1", "appraiser-1", "tribunal-member-2"),
+                response.getData().getWorkAllocationFields().getPreviouslyAssignedCaseRoles());
+        assertEquals(Arrays.asList("appraiser-2"),
                 response.getData().getWorkAllocationFields().getAssignedCaseRoles());
     }
 }
