@@ -22,9 +22,7 @@ public class PdfWatermarker {
     private static final float margin = 45f;
 
     public byte[] shrinkAndWatermarkPdf(byte[] input, String leftText, String rightText) throws Exception {
-        String filename = null;
         try (PDDocument document = PDDocument.load(input)) {
-            filename = document.getDocumentInformation().getTitle();
             document.setAllSecurityToBeRemoved(true);
             int count = 1;
             for (PDPage page : document.getPages()) {
@@ -40,9 +38,6 @@ public class PdfWatermarker {
                 return baos.toByteArray();
             }
 
-        } catch (Exception e) {
-            log.error("Failed to process pdf: {}", filename);
-            throw e;
         }
     }
 
