@@ -128,7 +128,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals(Collections.EMPTY_SET, response.getErrors());
 
 
-        Optional<? extends AbstractDocumentDetails> selectedDocumentValue = Stream.of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments()).flatMap(x -> x == null ? null : x.stream()).filter(f -> f.getValue().getDocumentLink().getDocumentUrl().equals(selectedUrl) || (f.getValue().getEditedDocumentLink()!=null && f.getValue().getEditedDocumentLink().getDocumentUrl().equals(selectedUrl))).map(f -> f.getValue()).findFirst();
+        Optional<? extends AbstractDocumentDetails> selectedDocumentValue = Stream.of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments()).flatMap(x -> x == null ? null : x.stream()).filter(f -> f.getValue().getDocumentLink().getDocumentUrl().equals(selectedUrl) || (f.getValue().getEditedDocumentLink() != null && f.getValue().getEditedDocumentLink().getDocumentUrl().equals(selectedUrl))).map(f -> f.getValue()).findFirst();
 
         assertEquals("No", selectedDocumentValue.map(AbstractDocumentDetails::getEvidenceIssued).orElse("Unknown"));
         assertEquals(newSender.getCode() + "Evidence", selectedDocumentValue.map(AbstractDocumentDetails::getDocumentType).orElse("Unknown"));
@@ -136,7 +136,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
         DocumentType expectedDocumentTypeOfUnselectedDocument = (selectedUrl.equals("url1")) ? APPELLANT_EVIDENCE : REPRESENTATIVE_EVIDENCE;
         Optional<SscsDocumentDetails> otherDocumentValue = response.getData().getSscsDocument().stream()
                 .filter(f -> !f.getValue().getDocumentLink().getDocumentUrl().equals(selectedUrl)
-                        && (f.getValue().getEditedDocumentLink()!=null && !f.getValue().getEditedDocumentLink().getDocumentUrl().equals(selectedUrl))
+                        && (f.getValue().getEditedDocumentLink() != null && !f.getValue().getEditedDocumentLink().getDocumentUrl().equals(selectedUrl))
                        )
                 .map(f -> f.getValue()).findFirst();
         assertEquals("Yes", otherDocumentValue.map(SscsDocumentDetails::getEvidenceIssued).orElse("Unknown"));

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.reissuefurtherevidence;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
@@ -64,7 +63,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCall
                 optionalSelectedDocument  = Stream
                         .of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments())
                         .flatMap(x -> x == null ? null : x.stream())
-                        .filter(f -> f.getValue().getEditedDocumentLink()!=null
+                        .filter(f -> f.getValue().getEditedDocumentLink() != null
                                 && selectedDocumentUrl.get().equals(f.getValue().getEditedDocumentLink().getDocumentUrl()))
                         .findFirst();
             }
