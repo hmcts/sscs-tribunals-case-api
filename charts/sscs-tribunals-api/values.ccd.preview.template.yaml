@@ -197,8 +197,6 @@ ccd:
       livenessDelay: 240
       devmemoryLimits: 2Gi
       devmemoryRequests: 1Gi
-      devcpuRequests: 500m
-      devcpuLimits: 2500m
       environment:
         ROLE_ASSIGNMENT_DB_HOST: ${SERVICE_NAME}-postgresql
         ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
