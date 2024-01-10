@@ -51,6 +51,7 @@ public class DecisionIssuedMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String TEMPLATE_ID = "nuts.docx";
     private static final String URL = "http://dm-store/documents/123";
+    public static final String APPELLANT_LAST_NAME = "APPELLANT Last'NamE";
 
     private DecisionIssuedMidEventHandler handler;
 
@@ -101,7 +102,7 @@ public class DecisionIssuedMidEventHandlerTest {
             .appeal(Appeal.builder()
                     .appellant(Appellant.builder()
                             .name(Name.builder().firstName("APPELLANT")
-                                    .lastName("LastNamE")
+                                    .lastName("Last'NamE")
                                     .build())
                             .identity(Identity.builder().build())
                             .build())
@@ -150,7 +151,7 @@ public class DecisionIssuedMidEventHandlerTest {
                 .documentUrl(URL)
                 .build(), response.getData().getDocumentStaging().getPreviewDocument());
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname",
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME,
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED));
     }
 
@@ -160,7 +161,7 @@ public class DecisionIssuedMidEventHandlerTest {
 
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname",
+        verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, APPELLANT_LAST_NAME,
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED));
     }
 
@@ -169,7 +170,7 @@ public class DecisionIssuedMidEventHandlerTest {
         sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
                 .name(Name.builder().firstName("APPOINTEE")
-                        .lastName("SurNamE")
+                        .lastName("Sur-NamE")
                         .build())
                 .identity(Identity.builder().build())
                 .build());
@@ -177,7 +178,7 @@ public class DecisionIssuedMidEventHandlerTest {
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE,
-                "Appointee Surname, appointee for Appellant Lastname",
+                "APPOINTEE Sur-NamE, appointee for APPELLANT Last'NamE",
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED));
     }
 
@@ -187,14 +188,14 @@ public class DecisionIssuedMidEventHandlerTest {
         sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
                 .name(Name.builder().firstName("APPOINTEE")
-                        .lastName("SurNamE")
+                        .lastName("Sur-NamE")
                         .build())
                 .identity(Identity.builder().build())
                 .build());
 
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname",
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "APPOINTEE Sur-NamE, appointee for APPELLANT Last'NamE",
                 documentConfiguration.getDocuments().get(LanguagePreference.WELSH).get(EventType.DECISION_ISSUED));
     }
 
