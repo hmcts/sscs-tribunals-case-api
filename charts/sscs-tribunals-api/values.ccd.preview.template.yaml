@@ -189,13 +189,14 @@ ccd:
 
   am-role-assignment-service:
     java:
-      image: 'hmctspublic.azurecr.io/am/role-assignment-service:latest'
+      image: 'hmctspublic.azurecr.io/am/role-assignment-service:pr-2101-261e21e-20231220135314'
       imagePullPolicy: Always
       ingressHost: ""
       releaseNameOverride: ${SERVICE_NAME}-am-role-assignment-service
       readinessDelay: 240
       livenessDelay: 240
-      memoryLimits: "2Gi"
+      devmemoryLimits: 2Gi
+      devmemoryRequests: 1Gi
       environment:
         ROLE_ASSIGNMENT_DB_HOST: ${SERVICE_NAME}-postgresql
         ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
