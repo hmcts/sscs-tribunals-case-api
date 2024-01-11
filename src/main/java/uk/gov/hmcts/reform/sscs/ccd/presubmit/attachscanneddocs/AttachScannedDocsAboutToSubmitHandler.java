@@ -8,9 +8,15 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -29,11 +35,22 @@ public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackH
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        callback.getCaseDetails().getCaseData().getScannedDocuments();
-        callback.getCaseDetailsBefore().stream().forEach(sscsCaseDataCaseDetails -> sscsCaseDataCaseDetails.getCaseData().getScannedDocuments());
-
         sscsCaseData.setEvidenceHandled(NO.getValue());
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
+
+        Map<String, DocumentLink> oldDocumentLinkWithDocNumberMap = new HashMap<>();
+        callback.getCaseDetailsBefore().ifPresent(
+                sscsCaseDataCaseDetails -> {
+                    List<ScannedDocument> scannedDocuments = sscsCaseDataCaseDetails.getCaseData().getScannedDocuments();
+                    scannedDocuments.forEach(scannedDocument ->
+                            oldDocumentLinkWithDocNumberMap.put(scannedDocument.getValue().getControlNumber(), scannedDocument.getValue().getEditedUrl())
+                    );
+
+                });
+
+        callback.getCaseDetails().getCaseData().getScannedDocuments().forEach(
+                scannedDocument -> scannedDocument.getValue().setEditedUrl(oldDocumentLinkWithDocNumberMap.get(scannedDocument.getValue().getControlNumber()))
+        );
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
