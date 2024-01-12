@@ -220,16 +220,22 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest extends ReissueArtifa
     }
 
     @Test
-    public void givenDocumentEdited_ThenAddToDropDownOptions() {
+    public void givenDocumentEditedAndCaseIsConfidential_ThenAddToDropDownOptions() {
 
         SscsDocument documentWithEditedDoc = SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentFileName("file1.pdf")
-                .documentType(APPELLANT_EVIDENCE.getValue())
-                .documentLink(DocumentLink.builder().documentUrl("url1").build())
-                .editedDocumentLink(DocumentLink.builder().documentFilename("editedFile1").documentUrl("editedUrl").build())
-                .build()).build();
+            .documentFileName("file1.pdf")
+            .documentType(APPELLANT_EVIDENCE.getValue())
+            .documentLink(DocumentLink.builder().documentUrl("url1").build())
+            .editedDocumentLink(DocumentLink.builder().documentFilename("editedFile1").documentUrl("editedUrl").build())
+            .build()).build();
+        SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentFileName("file2.pdf")
+            .documentType(APPELLANT_EVIDENCE.getValue())
+            .documentLink(DocumentLink.builder().documentUrl("url2").build())
+            .build()).build();
 
-        sscsCaseData.setSscsDocument(Arrays.asList(documentWithEditedDoc));
+        sscsCaseData.setSscsDocument(Arrays.asList(documentWithEditedDoc, document));
+        sscsCaseData.setIsConfidentialCase(YesNo.YES);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -237,7 +243,10 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest extends ReissueArtifa
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
         assertEquals(2, response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().size());
-        assertEquals(new DynamicListItem("url1", "file1.pdf -  Appellant evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(0));
-        assertEquals(new DynamicListItem("editedUrl", "editedFile1"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(1));
+        assertEquals(new DynamicListItem("editedUrl", "editedFile1"),
+            response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(0));
+        assertEquals(new DynamicListItem("url2", "file2.pdf -  Appellant evidence"),
+            response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(1));
+
     }
 }
