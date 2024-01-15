@@ -62,7 +62,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCall
             if (optionalSelectedDocument.isEmpty()) {
                 optionalSelectedDocument  = Stream
                         .of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments())
-                        .flatMap(x -> x == null ? null : x.stream())
+                        .flatMap(document -> document == null ? null : document.stream())
                         .filter(f -> f.getValue().getEditedDocumentLink() != null
                                 && selectedDocumentUrl.get().equals(f.getValue().getEditedDocumentLink().getDocumentUrl()))
                         .findFirst();
