@@ -8,15 +8,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -38,21 +33,30 @@ public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackH
         sscsCaseData.setEvidenceHandled(NO.getValue());
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
 
-        Map<String, DocumentLink> oldDocumentLinkWithDocNumberMap = new HashMap<>();
+        var scannedDocuments = callback.getCaseDetails().getCaseData().getScannedDocuments();
+
         callback.getCaseDetailsBefore().ifPresent(
-                sscsCaseDataCaseDetails -> {
-                    List<ScannedDocument> scannedDocuments = sscsCaseDataCaseDetails.getCaseData().getScannedDocuments();
-                    scannedDocuments.forEach(scannedDocument ->
-                            oldDocumentLinkWithDocNumberMap.put(scannedDocument.getValue().getControlNumber(), scannedDocument.getValue().getEditedUrl())
-                    );
+                sscsCaseDataCaseDetailsBefore -> {
+                    sscsCaseDataCaseDetailsBefore.getCaseData().getScannedDocuments()
+                            .stream()
+                            .filter(scannedDocumentBefore -> scannedDocumentBefore.getValue().getEditedUrl() != null)
+                            .forEach(scannedDocumentBefore -> {
+                                scannedDocuments
+                                        .stream()
+                                        .forEach(scannedDocument -> {
+                                            if (compare(scannedDocumentBefore, scannedDocument)) {
+                                                scannedDocument.getValue().setEditedUrl(scannedDocumentBefore.getValue().getEditedUrl());
+                                            }
+                                        });
+                            });
 
                 });
 
-        callback.getCaseDetails().getCaseData().getScannedDocuments().forEach(
-                scannedDocument -> scannedDocument.getValue().setEditedUrl(oldDocumentLinkWithDocNumberMap.get(scannedDocument.getValue().getControlNumber()))
-        );
-
         return new PreSubmitCallbackResponse<>(sscsCaseData);
+    }
+
+    private boolean compare(ScannedDocument doc1, ScannedDocument doc2) {
+        return doc1.getValue().getUrl().getDocumentUrl().equals(doc2.getValue().getUrl().getDocumentUrl());
     }
 
 }
