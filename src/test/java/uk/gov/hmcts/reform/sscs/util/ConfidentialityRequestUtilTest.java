@@ -12,9 +12,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 
 @RunWith(JUnitParamsRunner.class)
 public class ConfidentialityRequestUtilTest {
@@ -25,8 +26,8 @@ public class ConfidentialityRequestUtilTest {
     public void setup() {
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
                 .appeal(Appeal.builder().build())
-                .dwpState("previousDwpState")
-                .interlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId())
+                .dwpState(DwpState.FE_ACTIONED_NR)
+                .interlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE)
                 .build();
     }
 

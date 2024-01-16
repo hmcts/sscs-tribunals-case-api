@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -28,14 +29,11 @@ import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -90,27 +88,40 @@ public class FooterServiceTest {
         docs.add(document);
 
         sscsCaseData = SscsCaseData.builder()
-                .generateNotice("Yes")
+            .documentGeneration(DocumentGeneration.builder()
+                .generateNotice(YES)
                 .signedBy("User")
-                .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
                 .signedRole("Judge")
+                .build())
+            .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
+            .documentStaging(DocumentStaging.builder()
                 .dateAdded(LocalDate.now().minusDays(1))
-                .sscsDocument(docs)
                 .previewDocument(DocumentLink.builder()
-                        .documentUrl("dm-store/documents/123")
-                        .documentBinaryUrl("dm-store/documents/123/binary")
-                        .documentFilename("directionIssued.pdf")
-                        .build())
-                .appeal(Appeal.builder()
-                        .appellant(Appellant.builder()
-                                .name(Name.builder().build())
-                                .identity(Identity.builder().build())
-                                .build())
-                        .build()).build();
+                    .documentUrl("dm-store/documents/123")
+                    .documentBinaryUrl("dm-store/documents/123/binary")
+                    .documentFilename("directionIssued.pdf")
+                    .build())
+                .build())
+            .sscsDocument(docs)
+            .appeal(Appeal.builder()
+                .appellant(Appellant.builder()
+                    .name(Name.builder().build())
+                    .identity(Identity.builder().build())
+                    .build())
+                .build()).build();
     }
 
     @Test
-    public void givenADocument_thenAddAFooter() throws Exception {
+    @Parameters({
+        "DIRECTION_NOTICE, issued",
+        "STATEMENT_OF_EVIDENCE, issued",
+        "SET_ASIDE_APPLICATION, received",
+        "CORRECTION_APPLICATION, received",
+        "STATEMENT_OF_REASONS_APPLICATION, received",
+        "LIBERTY_TO_APPLY_APPLICATION, received",
+        "PERMISSION_TO_APPEAL_APPLICATION, received",
+    })
+    public void givenADocument_thenAddAFooter(DocumentType documentType, String verb) throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
         when(pdfStoreService.download(any())).thenReturn(pdfBytes);
 
@@ -121,21 +132,22 @@ public class FooterServiceTest {
         String now = LocalDate.now().toString();
 
         footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").documentFilename("afilename").build(),
-                sscsCaseData, DocumentType.DIRECTION_NOTICE, now, null, null, null);
+                sscsCaseData, documentType, now, null, null, null);
 
         assertEquals(2, sscsCaseData.getSscsDocument().size());
         SscsDocumentDetails footerDoc = sscsCaseData.getSscsDocument().get(0).getValue();
-        assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), footerDoc.getDocumentType());
-        assertEquals("Addition A - Directions Notice issued on " + now + ".pdf", footerDoc.getDocumentFileName());
+        assertEquals(documentType.getValue(), footerDoc.getDocumentType());
+        String expectedFilename = String.format("Addition A - %s %s on %s.pdf", documentType.getLabel(), verb, now);
+        assertEquals(expectedFilename, footerDoc.getDocumentFileName());
         assertEquals(now, footerDoc.getDocumentDateAdded());
         assertEquals(expectedDocumentUrl, footerDoc.getDocumentLink().getDocumentUrl());
         verify(pdfStoreService).storeDocument(any(), anyString());
-        assertEquals("Directions Notice", stringCaptor.getAllValues().get(0));
+        assertEquals(documentType.getLabel(), stringCaptor.getAllValues().get(0));
         assertEquals("Addition A", stringCaptor.getAllValues().get(1));
     }
 
     @Test
-    public void givenADocumentWithOverridenDateAndFileName_thenAddAFooterWithOverriddenValues() throws Exception {
+    public void givenADocumentWithOverriddenDateAndFileName_thenAddAFooterWithOverriddenValues() throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
         when(pdfStoreService.download(any())).thenReturn(pdfBytes);
 
@@ -144,12 +156,12 @@ public class FooterServiceTest {
         when(pdfWatermarker.shrinkAndWatermarkPdf(any(), stringCaptor.capture(), stringCaptor.capture())).thenReturn(new byte[]{});
 
         footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").documentFilename("afilename").build(),
-                sscsCaseData, DocumentType.DIRECTION_NOTICE, LocalDate.now().toString(), LocalDate.now().minusDays(1), "overriden.pdf", null);
+                sscsCaseData, DocumentType.DIRECTION_NOTICE, LocalDate.now().toString(), LocalDate.now().minusDays(1), "overridden.pdf", null);
 
         assertEquals(2, sscsCaseData.getSscsDocument().size());
         SscsDocumentDetails footerDoc = sscsCaseData.getSscsDocument().get(0).getValue();
         assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), footerDoc.getDocumentType());
-        assertEquals("overriden.pdf", footerDoc.getDocumentFileName());
+        assertEquals("overridden.pdf", footerDoc.getDocumentFileName());
         assertEquals(LocalDate.now().minusDays(1).toString(), footerDoc.getDocumentDateAdded());
         assertEquals(expectedDocumentUrl, footerDoc.getDocumentLink().getDocumentUrl());
         verify(pdfStoreService).storeDocument(any(), anyString());
@@ -299,44 +311,4 @@ public class FooterServiceTest {
         PdfState result = footerService.isReadablePdf("url.pdf");
         assertEquals(PdfState.PASSWORD_ENCRYPTED, result);
     }
-
-    @Test
-    public void shouldAddHearingDateToExcludeDateWhichIsNull() {
-        sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
-                .hearingDate(LocalDate.now().plusDays(1).toString())
-                .time("10:00")
-                .build()).build()));
-        sscsCaseData.setAppeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build());
-
-        footerService.setHearingDateAsExcludeDate(sscsCaseData.getHearings().get(0), sscsCaseData);
-
-        assertEquals(sscsCaseData.getAppeal().getHearingOptions().getExcludeDates().get(0).getValue().getStart(),
-                LocalDate.now().plusDays(1).toString());
-        assertEquals(sscsCaseData.getAppeal().getHearingOptions().getExcludeDates().get(0).getValue().getEnd(),
-                LocalDate.now().plusDays(1).toString());
-    }
-
-    @Test
-    public void shouldAddHearingDateToExistingExcludeDate() {
-        List<ExcludeDate> excludeDate = Arrays.asList(
-                ExcludeDate.builder().value(DateRange.builder()
-                        .start(LocalDate.now().toString())
-                        .end(LocalDate.now().toString())
-                        .build()).build());
-
-        sscsCaseData.setHearings(List.of(Hearing.builder().value(HearingDetails.builder()
-                .hearingDate(LocalDate.now().plusDays(1).toString())
-                .time("10:00")
-                .build()).build()));
-        sscsCaseData.setAppeal(
-                Appeal.builder().hearingOptions(
-                       HearingOptions.builder().excludeDates(excludeDate).build())
-                .build()
-        );
-
-        footerService.setHearingDateAsExcludeDate(sscsCaseData.getHearings().get(0), sscsCaseData);
-
-        assertEquals(2, sscsCaseData.getAppeal().getHearingOptions().getExcludeDates().size());
-    }
-
 }

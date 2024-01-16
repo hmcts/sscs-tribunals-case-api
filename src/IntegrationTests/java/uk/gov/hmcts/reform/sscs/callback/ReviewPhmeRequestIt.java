@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.PHE_GRANTED;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.NONE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.NONE;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -35,7 +35,7 @@ public class ReviewPhmeRequestIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
         SscsCaseData caseData = result.getData();
 
-        assertEquals(NONE.getId(), caseData.getInterlocReviewState());
-        assertEquals(PHE_GRANTED.getId(), caseData.getDwpState());
+        assertEquals(NONE, caseData.getInterlocReviewState());
+        assertEquals(PHE_GRANTED, caseData.getDwpState());
     }
 }

@@ -102,7 +102,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 sscsHearingRecordingCaseDataResponse.getDwpReleasedHearings().get(0).getValue()
                         .getDateApproved(), is(LocalDate.now().toString()));
         assertThat("Check DwpState is PROCESSED", response.getData().getDwpState(),
-                is(DwpState.HEARING_RECORDING_PROCESSED.getId()));
+                is(DwpState.HEARING_RECORDING_PROCESSED));
     }
 
     @Test
@@ -130,7 +130,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 sscsHearingRecordingCaseDataResponse.getRefusedHearings().get(0).getValue()
                         .getDateApproved(), is(nullValue()));
         assertThat("Check DwpState is PROCESSED", sscsCaseData.getDwpState(),
-                is(DwpState.HEARING_RECORDING_PROCESSED.getId()));
+                is(DwpState.HEARING_RECORDING_PROCESSED));
     }
 
     @Test
@@ -159,7 +159,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 sscsHearingRecordingCaseDataResponse.getRefusedHearings().get(0).getValue()
                         .getDateApproved(), is(nullValue()));
         assertThat("Check DwpState is PROCESSED", sscsCaseData.getDwpState(),
-                is(DwpState.HEARING_RECORDING_PROCESSED.getId()));
+                is(DwpState.HEARING_RECORDING_PROCESSED));
     }
 
     @Test
@@ -185,7 +185,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 sscsHearingRecordingCaseDataResponse.getDwpReleasedHearings().get(0).getValue()
                         .getSscsHearingRecording().getHearingId(), is("an_id1"));
         assertThat("Check DwpState is PROCESSED", sscsCaseData.getDwpState(),
-                is(DwpState.HEARING_RECORDING_PROCESSED.getId()));
+                is(DwpState.HEARING_RECORDING_PROCESSED));
     }
 
     @Test
@@ -211,7 +211,7 @@ public class ActionHearingRecordingRequestAboutToSubmitHandlerTest {
                 sscsHearingRecordingCaseDataResponse.getRequestedHearings().get(0).getValue()
                         .getSscsHearingRecording().getHearingId(), is("an_id1"));
         assertThat("Check DwpState is not PROCESSED", sscsCaseData.getDwpState(),
-                is(not(DwpState.HEARING_RECORDING_PROCESSED.getId())));
+                is(not(DwpState.HEARING_RECORDING_PROCESSED)));
     }
 
     @Test

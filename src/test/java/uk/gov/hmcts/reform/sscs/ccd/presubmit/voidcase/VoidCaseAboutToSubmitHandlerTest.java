@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -54,7 +55,10 @@ public class VoidCaseAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.ADMIN_SEND_TO_VOID_STATE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetails));
-        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").interlocReviewState("interlocState").directionDueDate("tomorrow")
+        sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("ccdId")
+            .interlocReviewState(InterlocReviewState.REVIEW_BY_TCW)
+            .directionDueDate("tomorrow")
                 .appeal(Appeal.builder().build())
                 .state(State.HEARING)
                 .schedulingAndListingFields(SchedulingAndListingFields.builder()

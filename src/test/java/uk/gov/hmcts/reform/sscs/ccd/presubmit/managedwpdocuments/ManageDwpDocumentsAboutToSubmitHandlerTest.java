@@ -91,8 +91,8 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "DWP_EVIDENCE_BUNDLE, true, You must upload an edited DWP evidence bundle",
-            "DWP_RESPONSE, true, You must upload an edited DWP response document"
+        "DWP_EVIDENCE_BUNDLE, true, You must upload an edited DWP evidence bundle",
+        "DWP_RESPONSE, true, You must upload an edited DWP response document"
     })
     public void shouldHaveErrorWhenDwpDocumentIsNotUploaded(DwpDocumentType documentType, boolean isEdited, String expectedErrorMessage) {
         addMandatoryDwpDocuments();
@@ -115,8 +115,8 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "DWP_EVIDENCE_BUNDLE, true, You must upload an edited DWP evidence bundle",
-            "DWP_RESPONSE, true, You must upload an edited DWP response document"
+        "DWP_EVIDENCE_BUNDLE, true, You must upload an edited DWP evidence bundle",
+        "DWP_RESPONSE, true, You must upload an edited DWP response document"
     })
     public void shouldHaveErrorWhenDwpDocumentHasNoDocumentLink(DwpDocumentType documentType, boolean isEdited, String expectedErrorMessage) {
         addMandatoryDwpDocuments();
@@ -138,10 +138,10 @@ public class ManageDwpDocumentsAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "DWP_EVIDENCE_BUNDLE, true, Only one edited DWP evidence bundle should be seen against each case\\, please correct",
-            "DWP_EVIDENCE_BUNDLE, false, Only one DWP evidence bundle should be seen against each case\\, please correct",
-            "DWP_RESPONSE, false, Only one DWP response should be seen against each case\\, please correct",
-            "DWP_RESPONSE, true, Only one edited DWP response should be seen against each case\\, please correct"
+        "DWP_EVIDENCE_BUNDLE, true, Only one edited DWP evidence bundle should be seen against each case\\, please correct",
+        "DWP_EVIDENCE_BUNDLE, false, Only one DWP evidence bundle should be seen against each case\\, please correct",
+        "DWP_RESPONSE, false, Only one DWP response should be seen against each case\\, please correct",
+        "DWP_RESPONSE, true, Only one edited DWP response should be seen against each case\\, please correct"
     })
     public void shouldHaveErrorWhenMoreThanOneEditedDwpResponseDocumentsAreUploaded(DwpDocumentType documentType, boolean isEdited, String expectedErrorMessage) {
         addMandatoryDwpDocuments();

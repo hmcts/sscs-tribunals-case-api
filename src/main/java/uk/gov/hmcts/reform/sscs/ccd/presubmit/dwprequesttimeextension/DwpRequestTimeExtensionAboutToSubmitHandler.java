@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
 
@@ -48,8 +48,8 @@ public class DwpRequestTimeExtensionAboutToSubmitHandler implements PreSubmitCal
 
     public SscsCaseData updateCaseData(SscsCaseData caseData) {
 
-        caseData.setDwpState(DwpState.EXTENSION_REQUESTED.getId());
-        caseData.setInterlocReferralReason(InterlocReferralReason.TIME_EXTENSION.getId());
+        caseData.setDwpState(DwpState.EXTENSION_REQUESTED);
+        caseData.setInterlocReferralReason(InterlocReferralReason.TIME_EXTENSION);
         caseData.setTimeExtensionRequested("Yes");
 
         DwpResponseDocument tl1Form = caseData.getTl1Form();

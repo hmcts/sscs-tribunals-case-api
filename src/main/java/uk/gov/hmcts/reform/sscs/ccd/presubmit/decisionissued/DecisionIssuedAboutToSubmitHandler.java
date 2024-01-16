@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
@@ -33,12 +32,15 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
     private final FooterService footerService;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
     private boolean isScheduleListingEnabled;
+    private boolean isPostHearingsEnabled;
 
     public DecisionIssuedAboutToSubmitHandler(FooterService footerService, ListAssistHearingMessageHelper
-            hearingMessageHelper, @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
+            hearingMessageHelper, @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled,
+            @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
         this.footerService = footerService;
         this.hearingMessageHelper = hearingMessageHelper;
         this.isScheduleListingEnabled = isScheduleListingEnabled;
+        this.isPostHearingsEnabled = isPostHearingsEnabled;
     }
 
     @Override
@@ -55,13 +57,17 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
+        if (isPostHearingsEnabled) {
+            clearInterlocReferralReason(caseData);
+        }
+
         final PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         DocumentLink url = null;
-        if (nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument()) && callback.getEvent() == EventType.DECISION_ISSUED) {
-            url = caseData.getPreviewDocument();
+        if (nonNull(callback.getCaseDetails().getCaseData().getDocumentStaging().getPreviewDocument()) && callback.getEvent() == EventType.DECISION_ISSUED) {
+            url = caseData.getDocumentStaging().getPreviewDocument();
         } else if (caseData.getSscsInterlocDecisionDocument() != null && callback.getEvent() == EventType.DECISION_ISSUED) {
             url = caseData.getSscsInterlocDecisionDocument().getDocumentLink();
-            caseData.setDateAdded(caseData.getSscsInterlocDecisionDocument().getDocumentDateAdded());
+            caseData.getDocumentStaging().setDateAdded(caseData.getSscsInterlocDecisionDocument().getDocumentDateAdded());
             if (!isFileAPdf(caseData.getSscsInterlocDecisionDocument().getDocumentLink())) {
                 sscsCaseDataPreSubmitCallbackResponse.addError("You need to upload PDF documents only");
                 return sscsCaseDataPreSubmitCallbackResponse;
@@ -77,15 +83,15 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
         if (callback.getEvent() == EventType.DECISION_ISSUED) {
             footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DECISION_NOTICE,
-                Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
+                Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now())
                     .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-                caseData.getDateAdded(), null, documentTranslationStatus);
+                caseData.getDocumentStaging().getDateAdded(), null, documentTranslationStatus);
         }
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             State beforeState = callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null);
-            clearTransientFields(caseData,beforeState);
-            caseData.setDwpState(DwpState.STRUCK_OUT.getId());
+            clearTransientFields(caseData);
+            caseData.setDwpState(DwpState.STRUCK_OUT);
             caseData.setDirectionDueDate(null);
 
             if (STRIKE_OUT.getValue().equals(caseData.getDecisionType())) {
@@ -100,7 +106,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
         } else {
             log.info("Case is a Welsh case so Decsion Notice requires translation for case id : {}", caseData.getCcdCaseId());
             clearBasicTransientFields(caseData);
-            caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
+            caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
             log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
             caseData.setTranslationWorkOutstanding("Yes");
 
@@ -127,4 +133,9 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
             && SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
             .       orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
             && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
+
+    // SSCS-11486 AC4
+    private void clearInterlocReferralReason(SscsCaseData caseData) {
+        caseData.setInterlocReferralReason(null);
+    }
 }

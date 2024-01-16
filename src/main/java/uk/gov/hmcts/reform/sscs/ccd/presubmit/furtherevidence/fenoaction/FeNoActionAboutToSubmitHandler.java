@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.fenoaction;
 
+import java.util.Arrays;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -16,7 +17,7 @@ public class FeNoActionAboutToSubmitHandler implements PreSubmitCallbackHandler<
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType != null && callback != null && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && callback.getEvent().equals(EventType.FE_NO_ACTION)
-            && DwpState.FE_RECEIVED.getId().equals(callback.getCaseDetails().getCaseData().getDwpState());
+            && DwpState.FE_RECEIVED.equals(callback.getCaseDetails().getCaseData().getDwpState());
     }
 
     @Override
@@ -25,7 +26,12 @@ public class FeNoActionAboutToSubmitHandler implements PreSubmitCallbackHandler<
             throw new IllegalStateException("Cannot handle callback");
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        caseData.setDwpState(caseData.getDwpStateFeNoAction().getValue().getCode());
+
+        DwpState dwpState = Arrays.stream(DwpState.values())
+            .filter(x -> x.getCcdDefinition().equals(caseData.getDwpStateFeNoAction().getValue().getCode()))
+            .findFirst()
+            .orElse(null);
+        caseData.setDwpState(dwpState);
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
 }

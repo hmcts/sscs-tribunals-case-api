@@ -14,9 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_INFORMATION
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -46,6 +44,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
@@ -56,7 +55,6 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService2;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesStatus;
 
-@SuppressWarnings("unchecked")
 @RunWith(JUnitParamsRunner.class)
 public class CcdMideventCallbackControllerTest {
 
@@ -92,24 +90,21 @@ public class CcdMideventCallbackControllerTest {
     @MockBean
     private RestoreCasesService2 restoreCasesService2;
 
-    private CcdMideventCallbackController controller;
-
     @Before
     public void setUp() {
-
         DynamicListItem listItem = new DynamicListItem("", "");
 
-        DynamicList dynamicList = new DynamicList(listItem, Arrays.asList(listItem));
+        DynamicList dynamicList = new DynamicList(listItem, List.of(listItem));
 
         when(writeFinalDecisionPreviewDecisionService.getBenefitType()).thenReturn("PIP");
 
         when(adjournCaseCcdService.getVenueDynamicListForRpcName(any())).thenReturn(dynamicList);
 
         DecisionNoticeService decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), new ArrayList<>(),
-            Arrays.asList(writeFinalDecisionPreviewDecisionService));
+                Collections.singletonList(writeFinalDecisionPreviewDecisionService));
 
-        controller = new CcdMideventCallbackController(authorisationService, deserializer, decisionNoticeService,
-            adjournCasePreviewService, adjournCaseCcdService, restoreCasesService2);
+        CcdMideventCallbackController controller = new CcdMideventCallbackController(authorisationService, deserializer, decisionNoticeService,
+                adjournCasePreviewService, adjournCaseCcdService, restoreCasesService2);
         mockMvc = standaloneSetup(controller)
             .setMessageConverters(new ByteArrayHttpMessageConverter(), new StringHttpMessageConverter(),
                 new ResourceHttpMessageConverter(false), new SourceHttpMessageConverter<>(),
@@ -120,7 +115,7 @@ public class CcdMideventCallbackControllerTest {
 
     @Test
     public void handleCcdMidEventPreviewFinalDecisionAndUpdateCaseData() throws Exception {
-        String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
+        String path = Objects.requireNonNull(getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json")).getFile();
         String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build()).build();
@@ -128,8 +123,9 @@ public class CcdMideventCallbackControllerTest {
                 new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
                 Optional.empty(), INTERLOC_INFORMATION_RECEIVED, false));
 
-        PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(SscsCaseData.builder().interlocReviewState("new_state").build());
-        when(writeFinalDecisionPreviewDecisionService.preview(any(),eq(DocumentType.DRAFT_DECISION_NOTICE), anyString(), eq(false)))
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            new PreSubmitCallbackResponse<>(SscsCaseData.builder().interlocReviewState(InterlocReviewState.WELSH_TRANSLATION).build());
+        when(writeFinalDecisionPreviewDecisionService.preview(any(),eq(DocumentType.DRAFT_DECISION_NOTICE), anyString(), eq(false), eq(false), eq(false)))
                 .thenReturn(response);
 
         mockMvc.perform(post("/ccdMidEventPreviewFinalDecision")
@@ -138,12 +134,38 @@ public class CcdMideventCallbackControllerTest {
                 .header("Authorization", "")
                 .content(content))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{'data': {'interlocReviewState': 'new_state'}}"));
+                .andExpect(content().json("{\"data\": {\"interlocReviewState\": \"welshTranslation\"}}"));
+    }
+
+    @Test
+    public void handleCcdMidEventPreviewFinalDecisionAndAddErrorWithNullBenefitType() throws Exception {
+        String path = Objects.requireNonNull(getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json")).getFile();
+        String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        SscsCaseData sscsCaseData = SscsCaseData.builder().build();
+        when(deserializer.deserialize(content)).thenReturn(new Callback<>(
+                new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
+                Optional.empty(), INTERLOC_INFORMATION_RECEIVED, false));
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                new PreSubmitCallbackResponse<>(SscsCaseData.builder().interlocReviewState(InterlocReviewState.WELSH_TRANSLATION).build());
+        when(writeFinalDecisionPreviewDecisionService.preview(any(),eq(DocumentType.DRAFT_DECISION_NOTICE), anyString(), eq(false), eq(false), eq(false)))
+                .thenReturn(response);
+
+        String expectedErrorsString = List.of("\"Unexpected error - benefit type is null\"").toString();
+
+        String expectedJsonErrorsAndWarningsString = "{\"errors\": " + expectedErrorsString + "}, {\"warnings\" : []}";
+
+        mockMvc.perform(post("/ccdMidEventPreviewFinalDecision")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("ServiceAuthorization", "")
+                        .header("Authorization", "")
+                        .content(content))
+                .andExpect(content().json(expectedJsonErrorsAndWarningsString));
     }
 
     @Test
     public void handleCcdMidEventAdminRestoreCasesWhenPathIsExtractedAndFailuresReturnedUncompleted() throws Exception {
-
         RestoreCasesStatus status = new RestoreCasesStatus(10, 6,
             Arrays.asList(1L, 2L, 3L, 4L), false);
 
@@ -153,7 +175,7 @@ public class CcdMideventCallbackControllerTest {
 
         // We don't care what the content is for this test, as we are defining behaviour through the
         // restoreCasesService2 mock config above
-        String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
+        String path = Objects.requireNonNull(getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json")).getFile();
         String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
@@ -162,9 +184,9 @@ public class CcdMideventCallbackControllerTest {
             new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
             Optional.empty(), ADMIN_RESTORE_CASES, false));
 
-        String expectedErrorsString = Arrays.asList("\"" + status.toString() + "\"").toString();
+        String expectedErrorsString = List.of("\"" + status + "\"").toString();
 
-        String expectedJsonErrorsAndWarningsString = "{'errors': " + expectedErrorsString + "}, {'warnings' : []}";
+        String expectedJsonErrorsAndWarningsString = "{\"errors\": " + expectedErrorsString + "}, {\"warnings\" : []}";
 
         mockMvc.perform(post("/ccdMidEventAdminRestoreCases")
             .contentType(MediaType.APPLICATION_JSON)
@@ -197,7 +219,7 @@ public class CcdMideventCallbackControllerTest {
 
         String expectedErrorsString = Arrays.asList("\"" + status.toString() + "\"").toString();
 
-        String expectedJsonErrorsAndWarningsString = "{'errors': " + expectedErrorsString + "}, {'warnings' : []}";
+        String expectedJsonErrorsAndWarningsString = "{\"errors\": " + expectedErrorsString + "}, {\"warnings\" : []}";
 
         mockMvc.perform(post("/ccdMidEventAdminRestoreCases")
             .contentType(MediaType.APPLICATION_JSON)
@@ -230,7 +252,7 @@ public class CcdMideventCallbackControllerTest {
 
         String expectedWarningsString = Arrays.asList("\"" + status.toString() + "\"", "Completed - no more cases").toString();
 
-        String expectedJsonErrorsAndWarningsString = "{'warnings': " + expectedWarningsString + "}, {'errors' : []}";
+        String expectedJsonErrorsAndWarningsString = "{\"warnings\": " + expectedWarningsString + "}, {\"errors\" : []}";
 
         mockMvc.perform(post("/ccdMidEventAdminRestoreCases")
             .contentType(MediaType.APPLICATION_JSON)
@@ -260,7 +282,7 @@ public class CcdMideventCallbackControllerTest {
 
         String expectedErrorsString = Arrays.asList("anything").toString();
 
-        String expectedJsonErrorsAndWarningsString = "{'errors': " + expectedErrorsString + "}, {'warnings' : []}";
+        String expectedJsonErrorsAndWarningsString = "{\"errors\": " + expectedErrorsString + "}, {\"warnings\" : []}";
 
         mockMvc.perform(post("/ccdMidEventAdminRestoreCases")
             .contentType(MediaType.APPLICATION_JSON)
@@ -288,7 +310,7 @@ public class CcdMideventCallbackControllerTest {
 
         String expectedErrorsString = Arrays.asList("anything").toString();
 
-        String expectedJsonErrorsAndWarningsString = "{'errors': " + expectedErrorsString + "}, {'warnings' : []}";
+        String expectedJsonErrorsAndWarningsString = "{\"errors\": " + expectedErrorsString + "}, {\"warnings\" : []}";
 
         mockMvc.perform(post("/ccdMidEventAdminRestoreCases")
             .contentType(MediaType.APPLICATION_JSON)
@@ -326,7 +348,7 @@ public class CcdMideventCallbackControllerTest {
 
         String expectedWarningsString = Arrays.asList("\"" + status.toString() + "\"", "Completed - no more cases").toString();
 
-        String expectedJsonErrorsAndWarningsString = "{'warnings': " + expectedWarningsString + "}, {'errors' : []}";
+        String expectedJsonErrorsAndWarningsString = "{\"warnings\": " + expectedWarningsString + "}, {\"errors\" : []}";
 
         mockMvc.perform(post("/ccdMidEventAdminRestoreCases")
             .contentType(MediaType.APPLICATION_JSON)

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
 import static java.util.Objects.*;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.idam.UserRole.CTSC_CLERK;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 
 import java.util.List;
@@ -86,8 +86,9 @@ public class CreateBundleAboutToStartEventHandler implements PreSubmitCallbackHa
 
             final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
             final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
+            final boolean hasCaseWorkerRole = userDetails.hasRole(CTSC_CLERK);
 
-            if (!hasSuperUserRole) {
+            if (!hasSuperUserRole && !hasCaseWorkerRole) {
                 response.addError("The bundle cannot be created as mandatory FTA documents are missing");
             } else {
                 response.addWarning("The bundle cannot be created as mandatory FTA documents are missing, do you want to proceed?");
@@ -119,14 +120,14 @@ public class CreateBundleAboutToStartEventHandler implements PreSubmitCallbackHa
     private List<DwpDocument> getDwpEvidenceBundleDocs(SscsCaseData sscsCaseData) {
         return emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
                 .filter(e -> DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue().equals(e.getValue().getDocumentType()))
-                .collect(toList());
+                .toList();
     }
 
     @NotNull
     private List<DwpDocument> getDwpResponseDocs(SscsCaseData sscsCaseData) {
         return emptyIfNull(sscsCaseData.getDwpDocuments()).stream()
                 .filter(e -> DwpDocumentType.DWP_RESPONSE.getValue().equals(e.getValue().getDocumentType()))
-                .collect(toList());
+                .toList();
     }
 
     private boolean hasMandatoryDocumentMissingForLegacyAppeals(List<DwpDocument> dwpResponseDocs) {

@@ -2,8 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.addnote;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.findLabelById;
 
+import java.util.Arrays;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,14 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 
 @Component
 @Slf4j
-public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<SscsCaseData> {
+public class AddNoteAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     protected final AddNoteService addNoteService;
 
@@ -55,18 +57,25 @@ public class AddNoteAboutToSubmitHandler  implements PreSubmitCallbackHandler<Ss
         String note = sscsCaseData.getTempNoteDetail();
 
         if (callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED && nonNull(sscsCaseData.getInterlocReferralReason())
-                && StringUtils.isNoneBlank(sscsCaseData.getInterlocReferralReason()) && !sscsCaseData.getInterlocReferralReason().equals(InterlocReferralReason.NONE.getId())
+                && sscsCaseData.getInterlocReferralReason() != InterlocReferralReason.NONE
                 && nonNull(sscsCaseData.getSelectWhoReviewsCase())) {
 
-            String reasonLabel = findLabelById(sscsCaseData.getInterlocReferralReason());
+            String reasonLabel = sscsCaseData.getInterlocReferralReason().getDescription();
 
             log.info("Add note details for case id {} - select who reviews case: {}, interloc referral reason: {}",
                     sscsCaseData.getCcdCaseId(), sscsCaseData.getSelectWhoReviewsCase(), sscsCaseData.getInterlocReferralReason());
 
+            String whoReviewsCaseCode = sscsCaseData.getSelectWhoReviewsCase().getValue().getCode();
+
+            Optional<String> whoReviewsCaseLabel = Arrays.stream(SelectWhoReviewsCase.values())
+                    .filter(selectWhoReviewsCase -> selectWhoReviewsCase.getId().equals(whoReviewsCaseCode))
+                    .map(selectWhoReviewsCase -> selectWhoReviewsCase.getLabel().toLowerCase())
+                    .findFirst();
+
             if (nonNull(note) && StringUtils.isNoneBlank(note)) {
-                note = "Referred to interloc for " + sscsCaseData.getSelectWhoReviewsCase().getValue().getLabel().toLowerCase() + " - " + reasonLabel + " - " + note;
+                note = "Referred to interloc for " + whoReviewsCaseLabel.orElse("") + " - " + reasonLabel + " - " + note;
             } else {
-                note = "Referred to interloc for " + sscsCaseData.getSelectWhoReviewsCase().getValue().getLabel().toLowerCase() + " - " + reasonLabel;
+                note = "Referred to interloc for " + whoReviewsCaseLabel.orElse("") + " - " + reasonLabel;
             }
         }
 

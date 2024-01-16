@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.ISSUE_DIRECTIONS_NOTICE;
 
 import java.time.LocalDate;
@@ -63,7 +64,7 @@ public class ActionPostponementRequestMidEventHandlerTest {
         openMocks(this);
 
         Map<EventType, String> englishEventTypeDocs = new HashMap<>();
-        englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
+        englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-directions-notice.docx");
 
         Map<LanguagePreference, Map<EventType, String>> documents = new HashMap<>();
         documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
@@ -72,12 +73,15 @@ public class ActionPostponementRequestMidEventHandlerTest {
         handler = new ActionPostponementRequestMidEventHandler(generateFile, documentConfiguration);
 
         sscsCaseData = SscsCaseData.builder()
-                .generateNotice("Yes").appeal(Appeal.builder().appellant(Appellant.builder()
-                        .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
-                        .identity(Identity.builder().build()).build()).build())
-                .directionDueDate(LocalDate.now().plusDays(1).toString())
-                .postponementRequest(PostponementRequest.builder().build())
-                .build();
+            .documentGeneration(DocumentGeneration.builder()
+                .generateNotice(YES)
+                .build())
+            .appeal(Appeal.builder().appellant(Appellant.builder()
+                    .name(Name.builder().firstName("APPELLANT").lastName("Last'NamE").build())
+                    .identity(Identity.builder().build()).build()).build())
+            .directionDueDate(LocalDate.now().plusDays(1).toString())
+            .postponementRequest(PostponementRequest.builder().build())
+            .build();
 
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -112,14 +116,14 @@ public class ActionPostponementRequestMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
-        assertThat(response.getData().getPreviewDocument(), is(notNullValue()));
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument(), is(notNullValue()));
         final DocumentLink expectedDocumentLink = DocumentLink.builder()
                 .documentFilename(String.format("Directions Notice issued on %s.pdf",
                         LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
                 .build();
-        assertThat(response.getData().getPreviewDocument(), is(expectedDocumentLink));
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument(), is(expectedDocumentLink));
 
         verify(generateFile, times(1)).assemble(any());
         verifyTemplateBody(
@@ -132,7 +136,7 @@ public class ActionPostponementRequestMidEventHandlerTest {
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertEquals(NoticeIssuedTemplateBody.ENGLISH_IMAGE, payload.getImage());
         assertEquals("DIRECTIONS NOTICE", payload.getNoticeType());
-        assertEquals("Appellant Lastname", payload.getAppellantFullName());
+        assertEquals("APPELLANT Last'NamE", payload.getAppellantFullName());
         assertEquals(templateId, value.getTemplateId());
     }
 

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.decisionissued;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,7 @@ public class DecisionIssuedMidEventHandler extends IssueDocumentHandler implemen
                 && callback.getEvent() == EventType.DECISION_ISSUED
                 && Objects.nonNull(callback.getCaseDetails())
                 && Objects.nonNull(callback.getCaseDetails().getCaseData())
-                && callback.getCaseDetails().getCaseData().isGenerateNotice();
+                && isYes(callback.getCaseDetails().getCaseData().getDocumentGeneration().getGenerateNotice());
     }
 
     @Override

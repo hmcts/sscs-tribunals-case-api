@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.domain.wrapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,13 +29,13 @@ public class UserDetails {
         this.subscriptions = subscriptions;
     }
 
-    @ApiModelProperty(example = "Appellant", required = true)
+    @Schema(example = "Appellant", required = true)
     @JsonProperty(value = "type")
     public String getType() {
         return type;
     }
 
-    @ApiModelProperty(example = "manish sharma", required = true)
+    @Schema(example = "manish sharma", required = true)
     @JsonProperty(value = "name")
     public String getName() {
         return name;
@@ -46,19 +46,19 @@ public class UserDetails {
         return addressDetails;
     }
 
-    @ApiModelProperty(example = "manish.sharma@gmail.com", required = true)
+    @Schema(example = "manish.sharma@gmail.com", required = true)
     @JsonProperty(value = "email")
     public String getEmail() {
         return email;
     }
 
-    @ApiModelProperty(example = "07972438178")
+    @Schema(example = "07972438178")
     @JsonProperty(value = "phone")
     public String getPhone() {
         return phone;
     }
 
-    @ApiModelProperty(example = "07972438178")
+    @Schema(example = "07972438178")
     @JsonProperty(value = "mobile")
     public String getMobile() {
         return mobile;

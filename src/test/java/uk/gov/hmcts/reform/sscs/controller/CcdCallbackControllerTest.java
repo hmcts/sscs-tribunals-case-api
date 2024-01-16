@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackDispatcher;
@@ -121,7 +122,7 @@ public class CcdCallbackControllerTest {
             .header("Authorization", "")
             .content(content))
             .andExpect(status().isOk())
-            .andExpect(content().json("{'data': {'originalSender': {'value': {'code': '1', 'label': '2'}}}}"));
+            .andExpect(content().json("{\"data\": {\"originalSender\": {\"value\": {\"code\": \"1\", \"label\": \"2\"}}}}"));
     }
 
     @Test
@@ -134,7 +135,8 @@ public class CcdCallbackControllerTest {
             new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
             Optional.empty(), INTERLOC_INFORMATION_RECEIVED, false));
 
-        PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(SscsCaseData.builder().interlocReviewState("new_state").build());
+        PreSubmitCallbackResponse response =
+            new PreSubmitCallbackResponse(SscsCaseData.builder().interlocReviewState(InterlocReviewState.WELSH_TRANSLATION).build());
         when(dispatcher.handle(any(CallbackType.class), any(), anyString()))
             .thenReturn(response);
 
@@ -144,7 +146,7 @@ public class CcdCallbackControllerTest {
             .header("Authorization", "")
             .content(content))
             .andExpect(status().isOk())
-            .andExpect(content().json("{'data': {'interlocReviewState': 'new_state'}}"));
+            .andExpect(content().json("{\"data\": {\"interlocReviewState\": \"welshTranslation\"}}"));
     }
 
     @Test
@@ -155,7 +157,7 @@ public class CcdCallbackControllerTest {
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(SscsCaseData.builder()
-            .interlocReviewState("interlocutoryReview")
+            .interlocReviewState(InterlocReviewState.REVIEW_BY_TCW)
             .build());
         when(dispatcher.handle(any(CallbackType.class), any(), anyString())).thenReturn(response);
 
@@ -165,7 +167,7 @@ public class CcdCallbackControllerTest {
             .header("Authorization", "Bearer token")
             .content("something"))
             .andExpect(status().isOk())
-            .andExpect(content().json("{'data': {'interlocReviewState': 'interlocutoryReview'}}"));
+            .andExpect(content().json("{\"data\": {\"interlocReviewState\": \"reviewByTcw\"}}"));
     }
 
     private Callback<SscsCaseData> buildCallbackForTestScenarioForGivenEvent() {

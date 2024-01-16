@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_WELSH_DOCUMENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -240,7 +241,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("reviewByTcw", caseData.getInterlocReviewState());
+        assertEquals(REVIEW_BY_TCW, caseData.getInterlocReviewState());
         assertNull(caseData.getSscsWelshPreviewNextEvent());
     }
 

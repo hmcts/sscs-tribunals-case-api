@@ -1,18 +1,29 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
-import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse.DwpUploadResponseAboutToSubmitHandler.NEW_OTHER_PARTY_RESPONSE_DUE_DAYS;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_1;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_2;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_3;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtilTest.ID_4;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +38,7 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,8 +47,30 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.WorkAllocationFields;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
@@ -47,6 +81,7 @@ import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 @RunWith(JUnitParamsRunner.class)
 public class DwpUploadResponseAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
+    public static final int UUID_SIZE = 36;
 
     private DwpUploadResponseAboutToSubmitHandler dwpUploadResponseAboutToSubmitHandler;
     private SscsCaseData sscsCaseData;
@@ -85,9 +120,10 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("1234")
-            .benefitCode("002")
+            .benefitCode("022")
             .issueCode("CC")
             .dwpFurtherInfo("Yes")
+            .dynamicDwpState(new DynamicList(""))
             .dwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build()).build())
             .dwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build()).build())
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
@@ -118,7 +154,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Test
     public void givenADwpUploadResponseEvent_thenSetCaseCode() {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals("002CC", response.getData().getCaseCode());
+        assertEquals("022CC", response.getData().getCaseCode());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpResponseDate());
     }
 
@@ -309,7 +345,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                 ))
         ));
 
-        assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
+        assertEquals(REVIEW_BY_JUDGE, response.getData().getInterlocReviewState());
     }
 
     @Test
@@ -317,6 +353,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         List<String> elementList = new ArrayList<>();
         elementList.add("testElement");
         sscsCaseData.setElementsDisputedList(elementList);
+        sscsCaseData.setCaseCode("001");
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("uc").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -324,7 +361,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("US", response.getData().getIssueCode());
         assertEquals("001", response.getData().getBenefitCode());
         assertEquals("001US", response.getData().getCaseCode());
-        assertEquals(DwpState.RESPONSE_SUBMITTED_DWP.getId(), response.getData().getDwpState());
+        assertEquals(DwpState.RESPONSE_SUBMITTED_DWP, response.getData().getDwpState());
         assertNull(response.getData().getInterlocReviewState());
     }
 
@@ -341,7 +378,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("UM", response.getData().getIssueCode());
         assertEquals("001", response.getData().getBenefitCode());
         assertEquals("001UM", response.getData().getCaseCode());
-        assertEquals(DwpState.RESPONSE_SUBMITTED_DWP.getId(), response.getData().getDwpState());
+        assertEquals(DwpState.RESPONSE_SUBMITTED_DWP, response.getData().getDwpState());
         assertNull(response.getData().getInterlocReviewState());
     }
 
@@ -369,11 +406,11 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("reviewByJudge", response.getData().getSelectWhoReviewsCase().getValue().getCode());
-        assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
-        assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
+        assertEquals(PHE_REQUEST, response.getData().getInterlocReferralReason());
+        assertEquals(REVIEW_BY_JUDGE, response.getData().getInterlocReviewState());
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
         assertEquals("Referred to interloc for review by judge - PHE request", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
-        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
+        assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
 
         dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
@@ -405,11 +442,11 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("reviewByJudge", response.getData().getSelectWhoReviewsCase().getValue().getCode());
-        assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
-        assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
+        assertEquals(PHE_REQUEST, response.getData().getInterlocReferralReason());
+        assertEquals(REVIEW_BY_JUDGE, response.getData().getInterlocReviewState());
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
         assertEquals("Referred to interloc for review by judge - PHE request", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
-        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
+        assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
     }
 
     @Test
@@ -438,11 +475,11 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getSelectWhoReviewsCase());
-        assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
-        assertEquals(REVIEW_BY_JUDGE.getId(), response.getData().getInterlocReviewState());
+        assertEquals(PHE_REQUEST, response.getData().getInterlocReferralReason());
+        assertEquals(REVIEW_BY_JUDGE, response.getData().getInterlocReviewState());
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
         assertEquals("Referred to interloc for review by judge - PHE request", response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
-        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
+        assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
     }
 
     @Test
@@ -591,8 +628,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("filename.mp4", audioVideoEvidence.getValue().getFileName());
         assertEquals(UploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
-        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
-        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), callback.getCaseDetails().getCaseData().getInterlocReferralReason());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW, callback.getCaseDetails().getCaseData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, callback.getCaseDetails().getCaseData().getInterlocReferralReason());
     }
 
     @Test
@@ -613,8 +650,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("filename.mp4", audioVideoEvidence.getValue().getFileName());
         assertEquals(UploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
-        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
-        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), callback.getCaseDetails().getCaseData().getInterlocReferralReason());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW, callback.getCaseDetails().getCaseData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, callback.getCaseDetails().getCaseData().getInterlocReferralReason());
     }
 
     @Test
@@ -650,8 +687,8 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
         assertEquals(2, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
-        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
-        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), callback.getCaseDetails().getCaseData().getInterlocReferralReason());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW, callback.getCaseDetails().getCaseData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, callback.getCaseDetails().getCaseData().getInterlocReferralReason());
     }
 
     @Test
@@ -676,7 +713,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("filename.mp4", audioVideoEvidence.getValue().getFileName());
         assertEquals(UploadParty.DWP, audioVideoEvidence.getValue().getPartyUploaded());
         assertNotNull(audioVideoEvidence.getValue().getDateAdded());
-        assertEquals(REVIEW_BY_JUDGE.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
+        assertEquals(REVIEW_BY_JUDGE, callback.getCaseDetails().getCaseData().getInterlocReviewState());
         assertNull(callback.getCaseDetails().getCaseData().getInterlocReferralReason());
     }
 
@@ -696,14 +733,14 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData.setDwpUploadAudioVideoEvidence(new ArrayList<>(
                 Arrays.asList(AudioVideoEvidence.builder().value(audioVideoEvidenceDetails).build())));
 
-        sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
+        sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
 
         dwpUploadResponseAboutToSubmitHandler.handleAudioVideoDocuments(sscsCaseData);
 
         assertNull(callback.getCaseDetails().getCaseData().getDwpUploadAudioVideoEvidence());
         assertEquals(2, callback.getCaseDetails().getCaseData().getAudioVideoEvidence().size());
-        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), callback.getCaseDetails().getCaseData().getInterlocReviewState());
-        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE.getId(), callback.getCaseDetails().getCaseData().getInterlocReferralReason());
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, callback.getCaseDetails().getCaseData().getInterlocReviewState());
+        assertEquals(REVIEW_AUDIO_VIDEO_EVIDENCE, callback.getCaseDetails().getCaseData().getInterlocReferralReason());
     }
 
     @Test
@@ -1121,7 +1158,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenOtherPartiesUcbIsYes_thenUpdateCasedataOtherPartyUcb() {
-        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty("2"), buildOtherParty("1")));
+        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty(ID_2), buildOtherParty(ID_1)));
         sscsCaseData.getAppeal().getBenefitType().setCode("childSupport");
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -1130,64 +1167,133 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenNewOtherPartyAdded_thenAssignAnId() {
-        sscsCaseData.setOtherParties(Arrays.asList(buildOtherPartyWithAppointeeAndRep(null, null, null)));
+        sscsCaseData.setOtherParties(Arrays.asList(
+            buildOtherPartyWithAppointeeAndRep(null, null, null)));
         sscsCaseData.getAppeal().getBenefitType().setCode("childSupport");
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(1, response.getData().getOtherParties().size());
-        assertEquals("1", response.getData().getOtherParties().get(0).getValue().getId());
-        assertEquals("2", response.getData().getOtherParties().get(0).getValue().getAppointee().getId());
-        assertEquals("3", response.getData().getOtherParties().get(0).getValue().getRep().getId());
-        assertTrue(YesNo.isYes(response.getData().getOtherParties().get(0).getValue().getSendNewOtherPartyNotification()));
+
+        Assertions.assertThat(response.getData().getOtherParties())
+            .hasSize(1)
+            .extracting(CcdValue::getValue)
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+                Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            });
     }
 
     @Test
-    public void givenExistingOtherParties_thenNewOtherPartyAssignedNextId() {
-        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty("2"), buildOtherParty("1"), buildOtherPartyWithAppointeeAndRep(null, null, null)));
+    public void givenExistingOtherParties_thenNewOtherPartyAssignedNewId() {
+        sscsCaseData.setOtherParties(Arrays.asList(
+            buildOtherParty(ID_2),
+            buildOtherParty(ID_1),
+            buildOtherPartyWithAppointeeAndRep(null, null, null)));
         sscsCaseData.getAppeal().getBenefitType().setCode("childSupport");
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(3, response.getData().getOtherParties().size());
-        assertEquals("3", response.getData().getOtherParties().get(2).getValue().getId());
-        assertEquals("4", response.getData().getOtherParties().get(2).getValue().getAppointee().getId());
-        assertEquals("5", response.getData().getOtherParties().get(2).getValue().getRep().getId());
-        assertTrue(YesNo.isYes(response.getData().getOtherParties().get(0).getValue().getSendNewOtherPartyNotification()));
-        assertTrue(YesNo.isYes(response.getData().getOtherParties().get(1).getValue().getSendNewOtherPartyNotification()));
-        assertTrue(YesNo.isYes(response.getData().getOtherParties().get(2).getValue().getSendNewOtherPartyNotification()));
-        assertEquals(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS), sscsCaseData.getDirectionDueDate());
+
+        Assertions.assertThat(response.getData().getOtherParties())
+            .hasSize(3)
+            .extracting(CcdValue::getValue)
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId())
+                    .isNotEqualTo(ID_1)
+                    .isNotEqualTo(ID_2)
+                    .hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+                Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            });
+
+        Assertions.assertThat(sscsCaseData.getDirectionDueDate())
+            .isEqualTo(DateTimeUtils.generateDwpResponseDueDate(NEW_OTHER_PARTY_RESPONSE_DUE_DAYS));
     }
 
     @Test
-    public void givenExistingOtherPartiesWithAppointeeAndRep_thenNewOtherPartyAssignedNextId() {
-        sscsCaseData.setOtherParties(Arrays.asList(buildOtherParty("2"), buildOtherPartyWithAppointeeAndRep("1", "3", "4"), buildOtherPartyWithAppointeeAndRep(null, null, null)));
+    public void givenExistingOtherPartiesWithAppointeeAndRep_thenNewOtherPartyAssignedNewId() {
+        sscsCaseData.setOtherParties(Arrays.asList(
+            buildOtherParty(ID_2),
+            buildOtherPartyWithAppointeeAndRep(ID_1, ID_3, ID_4),
+            buildOtherPartyWithAppointeeAndRep(null, null, null)));
         sscsCaseData.getAppeal().getBenefitType().setCode("childSupport");
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(3, response.getData().getOtherParties().size());
-        assertEquals("5", response.getData().getOtherParties().get(2).getValue().getId());
-        assertEquals("6", response.getData().getOtherParties().get(2).getValue().getAppointee().getId());
-        assertEquals("7", response.getData().getOtherParties().get(2).getValue().getRep().getId());
+
+        Assertions.assertThat(response.getData().getOtherParties())
+            .hasSize(3)
+            .extracting(CcdValue::getValue)
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+                Assertions.assertThat(otherParty.getAppointee().getId()).isEqualTo(ID_3);
+                Assertions.assertThat(otherParty.getRep().getId()).isEqualTo(ID_4);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId())
+                    .isNotEqualTo(ID_1)
+                    .isNotEqualTo(ID_2)
+                    .hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+                Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            });
     }
 
     @Test
-    public void givenExistingOtherParties_thenNewOtherPartyAppointeeAndRepAssignedNextId() {
-        sscsCaseData.setOtherParties(Arrays.asList(buildOtherPartyWithAppointeeAndRep("2", null, null), buildOtherPartyWithAppointeeAndRep("1", "3", "4"), buildOtherParty(null)));
+    public void givenExistingOtherParties_thenNewOtherPartyAppointeeAndRepAssignedNewId() {
+        sscsCaseData.setOtherParties(Arrays.asList(
+            buildOtherPartyWithAppointeeAndRep(ID_2, null, null),
+            buildOtherPartyWithAppointeeAndRep(ID_1, ID_3, ID_4),
+            buildOtherParty(null)));
         sscsCaseData.getAppeal().getBenefitType().setCode("childSupport");
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(3, response.getData().getOtherParties().size());
-        assertEquals("5", response.getData().getOtherParties().get(0).getValue().getAppointee().getId());
-        assertEquals("6", response.getData().getOtherParties().get(0).getValue().getRep().getId());
-        assertEquals("7", response.getData().getOtherParties().get(2).getValue().getId());
+
+        Assertions.assertThat(response.getData().getOtherParties())
+            .hasSize(3)
+            .extracting(CcdValue::getValue)
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_1);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+                Assertions.assertThat(otherParty.getAppointee().getId()).isEqualTo(ID_3);
+                Assertions.assertThat(otherParty.getRep().getId()).isEqualTo(ID_4);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId()).isEqualTo(ID_2);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+                Assertions.assertThat(otherParty.getAppointee().getId()).hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getRep().getId()).hasSize(UUID_SIZE);
+            })
+            .anySatisfy((OtherParty otherParty) -> {
+                Assertions.assertThat(otherParty.getId())
+                    .isNotEqualTo(ID_1)
+                    .isNotEqualTo(ID_2)
+                    .hasSize(UUID_SIZE);
+                Assertions.assertThat(otherParty.getSendNewOtherPartyNotification()).isEqualTo(YES);
+            });
     }
 
     private CcdValue<OtherParty> buildOtherParty(String id) {
         return CcdValue.<OtherParty>builder()
-                .value(OtherParty.builder()
-                        .id(id)
-                        .unacceptableCustomerBehaviour(YES)
-                        .build())
-                .build();
+            .value(OtherParty.builder()
+                .id(id)
+                    .unacceptableCustomerBehaviour(YES)
+                    .build())
+            .build();
     }
 
     private CcdValue<OtherParty> buildOtherPartyWithAppointeeAndRep(String id, String appointeeId, String repId) {
@@ -1220,7 +1326,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
-            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+        "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     public void givenChildSupportCaseAppellantWantsConfidentialNoEditedDocs_thenShowError(String shortName) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(YES).build());
@@ -1260,7 +1366,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
-            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+        "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     public void givenChildSupportCaseOtherPartyWantsConfidentialNoEditedDocs_thenShowError(String shortName) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(NO).build());
@@ -1282,7 +1388,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
-            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+        "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     public void givenChildSupportCaseAppellantAndOtherPartyWantsConfidentialNoEditedDocs_thenShow2Error(String shortName) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(YES).build());
@@ -1306,7 +1412,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
-            "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
+        "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     public void givenChildSupportCaseThatIsNotConfidentialNoEditedDocs_thenNoWarning(String shortName) {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code(shortName).build());
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().confidentialityRequired(NO).build());
@@ -1358,5 +1464,15 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().size(), is(1));
         assertThat(response.getWarnings().size(), is(0));
         assertEquals("Benefit code cannot be changed to the selected code", response.getErrors().stream().findFirst().get());
+    }
+
+    @Test
+    public void givenDynamicDwpStateHasBeenChosen_thenSetDwpState() {
+        sscsCaseData.setDynamicDwpState(new DynamicList("Withdrawn"));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getDwpState(), is(DwpState.WITHDRAWN));
+        assertNull(response.getData().getDynamicDwpState());
     }
 }

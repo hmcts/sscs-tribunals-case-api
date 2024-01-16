@@ -32,7 +32,8 @@ public class CcdCallbackController {
     private final SscsCaseCallbackDeserializer deserializer;
 
     @Autowired
-    public CcdCallbackController(AuthorisationService authorisationService, SscsCaseCallbackDeserializer deserializer,
+    public CcdCallbackController(AuthorisationService authorisationService,
+                                 SscsCaseCallbackDeserializer deserializer,
                                  PreSubmitCallbackDispatcher<SscsCaseData> dispatcher) {
         this.authorisationService = authorisationService;
         this.deserializer = deserializer;
@@ -59,7 +60,6 @@ public class CcdCallbackController {
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
         @RequestBody String message) {
-
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
         log.info("About to submit sscs case callback `{}` received for Case ID `{}`", callback.getEvent(),
             callback.getCaseDetails().getId());
@@ -102,11 +102,14 @@ public class CcdCallbackController {
         Preconditions.checkNotNull(serviceAuthHeader);
     }
 
-    private ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> performRequest(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+    private ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> performRequest(CallbackType callbackType,
+                                                                                   Callback<SscsCaseData> callback,
+                                                                                   String userAuthorisation) {
+        PreSubmitCallbackResponse<SscsCaseData> callbackResponse = dispatcher.handle(callbackType, callback,
+            userAuthorisation);
 
-        PreSubmitCallbackResponse<SscsCaseData> callbackResponse = dispatcher.handle(callbackType, callback, userAuthorisation);
-
-        log.info("Sscs Case CCD callback `{}` handled for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
+        log.info("Sscs Case CCD callback `{}` handled for Case ID `{}`", callback.getEvent(),
+            callback.getCaseDetails().getId());
 
         return ok(callbackResponse);
     }

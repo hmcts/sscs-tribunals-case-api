@@ -1,27 +1,47 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getLastValidHearing;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingVenue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTime;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody.AdjournCaseTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
-import uk.gov.hmcts.reform.sscs.service.LanguageService;
+import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
+import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
@@ -29,93 +49,94 @@ import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 @Component
 @Slf4j
 public class AdjournCasePreviewService extends IssueNoticeHandler {
-
     private final VenueDataLoader venueDataLoader;
-    private final LanguageService languageService;
+    private final JudicialRefDataService judicialRefDataService;
     private static final String DOCUMENT_DATE_PATTERN = "dd/MM/yyyy";
-    public static final String IN_CHAMBERS = "In chambers";
+    private final SignLanguagesService signLanguagesService;
+    private final AirLookupService airLookupService;
+    @Value("${feature.snl.adjournment.enabled}")
+    private boolean adjournmentFeature;
 
     @Autowired
-    public AdjournCasePreviewService(GenerateFile generateFile, UserDetailsService userDetailsService, VenueDataLoader venueDataLoader,
-                                     LanguageService languageService, @Value("${doc_assembly.adjourn_case}") String templateId) {
-        super(generateFile, userDetailsService, languagePreference -> templateId);
+    public AdjournCasePreviewService(GenerateFile generateFile,
+                                     UserDetailsService userDetailsService,
+                                     VenueDataLoader venueDataLoader,
+                                     @Value("${doc_assembly.adjourn_case}") String templateId,
+                                     AirLookupService airLookupService,
+                                     SignLanguagesService signLanguagesService,
+                                     JudicialRefDataService judicialRefDataService,
+                                     DocumentConfiguration documentConfiguration) {
+        super(generateFile, userDetailsService, languagePreference -> templateId, documentConfiguration);
         this.venueDataLoader = venueDataLoader;
-        this.languageService = languageService;
-    }
-
-    private LocalDate getDateForPeriodAfterIssueDate(LocalDate issueDate, String period) {
-        return issueDate.plusDays(Integer.parseInt(period));
+        this.airLookupService = airLookupService;
+        this.signLanguagesService = signLanguagesService;
+        this.judicialRefDataService = judicialRefDataService;
     }
 
     @Override
-    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response, SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
-        String userAuthorisation) {
-        NoticeIssuedTemplateBody formPayload = super
-            .createPayload(response, caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getAdjournCaseGeneratedDate()), isScottish, userAuthorisation);
+    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response,
+                                                     SscsCaseData caseData, String documentTypeLabel,
+                                                     LocalDate dateAdded, LocalDate generatedDate,
+                                                     boolean isScottish, boolean isPostHearingsEnabled,
+                                                     boolean isPostHearingsBEnabled,
+                                                     String userAuthorisation) {
+        Adjournment adjournment = caseData.getAdjournment();
+        NoticeIssuedTemplateBody formPayload = super.createPayload(
+            response,
+            caseData,
+            documentTypeLabel,
+            dateAdded,
+            adjournment.getGeneratedDate(),
+            isScottish,
+            isPostHearingsEnabled,
+            isPostHearingsBEnabled,
+            userAuthorisation);
         AdjournCaseTemplateBodyBuilder adjournCaseBuilder = AdjournCaseTemplateBody.builder();
 
         final NoticeIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
 
         builder.userName(buildSignedInJudgeName(userAuthorisation));
+        builder.idamSurname(buildSignedInJudgeSurname(userAuthorisation));
 
         adjournCaseBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
-        String venueName = setHearings(adjournCaseBuilder, caseData);
+        setHearings(adjournCaseBuilder, caseData);
+        String venueName = caseData.getProcessingVenue();
         adjournCaseBuilder.appellantName(buildName(caseData, false));
 
-        if (caseData.getAdjournCaseReasons() != null && !caseData.getAdjournCaseReasons().isEmpty()) {
+        if (adjournment.getReasons() != null && !adjournment.getReasons().isEmpty()) {
             adjournCaseBuilder.reasonsForDecision(
-                caseData.getAdjournCaseReasons().stream().map(CollectionItem::getValue).collect(Collectors.toList()));
+                adjournment.getReasons().stream().map(CollectionItem::getValue).toList());
         } else {
             adjournCaseBuilder.reasonsForDecision(null);
         }
 
-        if (caseData.getAdjournCaseAdditionalDirections() != null) {
-            adjournCaseBuilder.additionalDirections(caseData.getAdjournCaseAdditionalDirections().stream().map(CollectionItem::getValue).collect(Collectors.toList()));
+        if (adjournment.getAdditionalDirections() != null) {
+            adjournCaseBuilder.additionalDirections(adjournment.getAdditionalDirections().stream()
+                .map(CollectionItem::getValue).toList());
         }
 
-        adjournCaseBuilder.hearingType(caseData.getAdjournCaseTypeOfHearing());
+        String hearingType = adjournment.getTypeOfHearing() != null
+            ? adjournment.getTypeOfHearing().toString()
+            : null;
 
-        HearingType nextHearingType = HearingType.getByKey(caseData.getAdjournCaseTypeOfNextHearing());
+        adjournCaseBuilder.hearingType(hearingType);
+        HearingType nextHearingType = HearingType.getByKey(String.valueOf(adjournment.getTypeOfNextHearing()));
 
         if (HearingType.FACE_TO_FACE.equals(nextHearingType)) {
-            if ("somewhereElse".equalsIgnoreCase(caseData.getAdjournCaseNextHearingVenue())) {
-                if (caseData.getAdjournCaseNextHearingVenueSelected() != null && caseData.getAdjournCaseNextHearingVenueSelected().getValue() != null
-                        && caseData.getAdjournCaseNextHearingVenueSelected().getValue().getCode() != null) {
-                    VenueDetails venueDetails =
-                            venueDataLoader.getVenueDetailsMap().get(caseData.getAdjournCaseNextHearingVenueSelected().getValue().getCode());
-                    if (venueDetails == null) {
-                        throw new IllegalStateException("Unable to load venue details for id:" + caseData.getAdjournCaseNextHearingVenueSelected().getValue().getCode());
-                    }
-                    adjournCaseBuilder.nextHearingVenue(venueDetails.getGapsVenName());
-                    adjournCaseBuilder.nextHearingAtVenue(true);
-                } else {
-                    throw new IllegalStateException("A next hearing venue of somewhere else has been specified but no venue has been selected");
-                }
-            } else {
-                adjournCaseBuilder.nextHearingAtVenue(!IN_CHAMBERS.equals(venueName));
-                adjournCaseBuilder.nextHearingVenue(venueName);
-            }
+            handleFaceToFaceHearing(adjournment, adjournCaseBuilder, venueName);
         } else {
             adjournCaseBuilder.nextHearingAtVenue(false);
-            if (caseData.getAdjournCaseNextHearingVenueSelected() != null) {
+            if (adjournment.getNextHearingVenueSelected() != null) {
                 throw new IllegalStateException("adjournCaseNextHearingVenueSelected field should not be set");
             }
         }
         if (nextHearingType.isOralHearingType()) {
-            if (caseData.getAdjournCaseNextHearingListingDuration() != null) {
-                if (caseData.getAdjournCaseNextHearingListingDurationUnits() == null) {
-                    throw new IllegalStateException("Timeslot duration units not supplied on case data");
-                }
-                adjournCaseBuilder.nextHearingTimeslot(getTimeslotString(caseData.getAdjournCaseNextHearingListingDuration(),
-                        caseData.getAdjournCaseNextHearingListingDurationUnits()));
-            } else {
-                adjournCaseBuilder.nextHearingTimeslot("a standard time slot");
-            }
+            handleOralHearing(adjournment, adjournCaseBuilder);
         }
         adjournCaseBuilder.nextHearingType(nextHearingType.getValue());
 
-        adjournCaseBuilder.panelMembersExcluded(caseData.getAdjournCasePanelMembersExcluded());
+        adjournCaseBuilder.panelMembersExcluded(String.valueOf(adjournment.getPanelMembersExcluded()));
 
         setIntepreterDescriptionIfRequired(adjournCaseBuilder, caseData);
 
@@ -138,90 +159,129 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         return builder.build();
     }
 
+    private void handleOralHearing(Adjournment adjournment, AdjournCaseTemplateBodyBuilder adjournCaseBuilder) {
+        if (adjournment.getNextHearingListingDuration() != null) {
+            if (adjournment.getNextHearingListingDurationUnits() == null) {
+                throw new IllegalStateException("Timeslot duration units not supplied on case data");
+            }
+            adjournCaseBuilder.nextHearingTimeslot(getTimeslotString(adjournment.getNextHearingListingDuration(),
+                    adjournment.getNextHearingListingDurationUnits()));
+        } else {
+            adjournCaseBuilder.nextHearingTimeslot("a standard time slot");
+        }
+    }
+
+    private void handleFaceToFaceHearing(Adjournment adjournment, AdjournCaseTemplateBodyBuilder adjournCaseBuilder, String venueName) {
+        if (adjournment.getNextHearingVenue() == AdjournCaseNextHearingVenue.SOMEWHERE_ELSE) {
+            if (nonNull(adjournment.getNextHearingVenueSelected())
+                && nonNull(adjournment.getNextHearingVenueSelected().getValue())
+                && nonNull(adjournment.getNextHearingVenueSelected().getValue().getCode())) {
+                VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(
+                        adjournment.getNextHearingVenueSelected().getValue().getCode());
+                if (isNull(venueDetails)) {
+                    throw new IllegalStateException("Unable to load venue details for id:"
+                        + adjournment.getNextHearingVenueSelected().getValue().getCode());
+                }
+                adjournCaseBuilder.nextHearingVenue(venueDetails.getGapsVenName());
+                adjournCaseBuilder.nextHearingAtVenue(true);
+            } else {
+                throw new IllegalStateException("A next hearing venue of somewhere else has been specified but no venue has been selected");
+            }
+        } else {
+            Integer venueId = airLookupService.lookupVenueIdByAirVenueName(venueName);
+
+            if (nonNull(venueId)) {
+                VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(venueId.toString());
+
+                if (nonNull(venueDetails)) {
+                    adjournCaseBuilder.nextHearingVenue(venueDetails.getGapsVenName());
+                    adjournCaseBuilder.nextHearingAtVenue(true);
+
+                    return;
+                }
+            }
+
+            adjournCaseBuilder.nextHearingVenue(venueName);
+            adjournCaseBuilder.nextHearingAtVenue(!IN_CHAMBERS.equals(venueName));
+        }
+    }
+
     private void setIntepreterDescriptionIfRequired(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
-        if ("yes".equalsIgnoreCase(caseData.getAdjournCaseInterpreterRequired())) {
-            if (caseData.getAdjournCaseInterpreterLanguage() != null) {
-                adjournCaseBuilder.interpreterDescription(
-                    languageService.getInterpreterDescriptionForLanguageKey(
-                        caseData.getAdjournCaseInterpreterLanguage()));
+        if (isYes(caseData.getAdjournment().getInterpreterRequired())) {
+            if (caseData.getAdjournment().getInterpreterLanguage() != null) {
+                String languageLabel = caseData.getAdjournment().getInterpreterLanguage().getValue().getLabel();
+                String languageKey = caseData.getAdjournment().getInterpreterLanguage().getValue().getCode();
+                Language hmrcRefLanguage = signLanguagesService.getLanguageByHmcReference(languageKey);
+                String interpreterDescription = String.format("an interpreter in %s", languageLabel);
+                if (nonNull(hmrcRefLanguage)) {
+                    interpreterDescription = String.format("a sign language interpreter (%s)", languageLabel);
+                }
+                adjournCaseBuilder.interpreterDescription(interpreterDescription);
             } else {
                 throw new IllegalStateException("An interpreter is required but no language is set");
             }
         }
     }
 
-    private String getTimeslotString(String nextHearingListingDuration, String nextHearingListingDurationUnits) {
-        if (nextHearingListingDuration.equals("1")) {
-            return "1 " + nextHearingListingDurationUnits.substring(0, nextHearingListingDurationUnits.length() - 1);
-        } else {
-            return nextHearingListingDuration + " " +  nextHearingListingDurationUnits;
+    private String getTimeslotString(Integer duration, AdjournCaseNextHearingDurationUnits durationUnits) {
+        if (duration == null || durationUnits == null) {
+            return "";
         }
+        String formattedUnits = duration == 1
+            ? durationUnits.toString().substring(0, durationUnits.toString().length() - 1)
+            : durationUnits.toString();
+        return String.format("%d %s", duration, formattedUnits);
     }
 
 
     private void setNextHearingDateAndTime(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData, LocalDate issueDate) {
-        String hearingDateSentence;
-        if ("firstAvailableDate".equals(caseData.getAdjournCaseNextHearingDateType())) {
-            hearingDateSentence = buildSpecificTimeText(caseData.getAdjournCaseTime(), false);
+        String hearingDateSentence = "";
+        Adjournment adjournment = caseData.getAdjournment();
+        if (adjournment.getNextHearingDateType() == AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE) {
+            hearingDateSentence = buildSpecificTimeText(adjournment.getTime(), false);
 
-        } else if ("firstAvailableDateAfter".equals(caseData.getAdjournCaseNextHearingDateType())) {
-            hearingDateSentence = buildSpecificTimeText(caseData.getAdjournCaseTime(), false);
+        } else if (adjournment.getNextHearingDateType() == AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER) {
+            hearingDateSentence = buildSpecificTimeText(adjournment.getTime(), false);
 
-            if ("provideDate".equals(caseData.getAdjournCaseNextHearingDateOrPeriod())) {
-                if (caseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate() == null) {
+            if (adjournment.getNextHearingDateOrPeriod() == AdjournCaseNextHearingDateOrPeriod.PROVIDE_DATE) {
+                if (adjournment.getNextHearingFirstAvailableDateAfterDate() == null) {
                     throw new IllegalStateException("No value set for adjournCaseNextHearingFirstAvailableDateAfterDate in case data");
                 }
 
-                hearingDateSentence = hearingDateSentence + " after " + LocalDate.parse(caseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate())
+                hearingDateSentence = hearingDateSentence + " after " + adjournment.getNextHearingFirstAvailableDateAfterDate()
                         .format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN));
-            } else if ("providePeriod".equals(caseData.getAdjournCaseNextHearingDateOrPeriod())) {
-                if (caseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod() == null) {
+            } else if (adjournment.getNextHearingDateOrPeriod() == AdjournCaseNextHearingDateOrPeriod.PROVIDE_PERIOD) {
+                if (adjournment.getNextHearingFirstAvailableDateAfterPeriod() == null) {
                     throw new IllegalStateException("No value set for adjournCaseNextHearingFirstAvailableDateAfterPeriod in case data");
                 }
-                hearingDateSentence = hearingDateSentence + " after " + getDateForPeriodAfterIssueDate(issueDate,
-                        caseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod()).format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN));
+                hearingDateSentence = String.format("%s after %s",
+                    hearingDateSentence,
+                    issueDate.plusDays(adjournment.getNextHearingFirstAvailableDateAfterPeriod().getCcdDefinition())
+                        .format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN)));
             } else {
                 throw new IllegalStateException("Date or period indicator not available in case data");
             }
 
-        } else if ("dateToBeFixed".equals(caseData.getAdjournCaseNextHearingDateType())) {
-            hearingDateSentence = buildSpecificTimeText(caseData.getAdjournCaseTime(), true);
-
-
-        } else {
-            throw new IllegalStateException("Unknown next hearing date type for:" + caseData.getAdjournCaseNextHearingDateType());
+        } else if (adjournment.getNextHearingDateType() == AdjournCaseNextHearingDateType.DATE_TO_BE_FIXED) {
+            hearingDateSentence = buildSpecificTimeText(adjournment.getTime(), true);
         }
 
         adjournCaseBuilder.nextHearingDate(stripToEmpty(hearingDateSentence));
     }
 
     private String buildSpecificTimeText(AdjournCaseTime adjournCaseNextHearingSpecificTime, boolean fixDate) {
-        StringBuilder stringBuilder = new StringBuilder("");
+        StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("It will be ");
 
         if (adjournCaseNextHearingSpecificTime != null
                 && (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime() != null
-                || CollectionUtils.isNotEmpty(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession()))) {
-            if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession() != null
-                    && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession().size() > 0) {
-                stringBuilder.append("first ");
-            }
-
-            if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime() != null
-                    || CollectionUtils.isNotEmpty(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession())) {
-                String session = "";
-                if ("am".equalsIgnoreCase(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime())) {
-                    session = "morning ";
-                } else if ("pm".equalsIgnoreCase(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime())) {
-                    session = "afternoon ";
-                }
-                stringBuilder.append("in the ").append(session).append("session ");
-            }
+                || CollectionUtils.isNotEmpty(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession()))
+        ) {
+            handleSpecificTime(adjournCaseNextHearingSpecificTime, stringBuilder);
         } else {
             stringBuilder.append("re-scheduled ");
         }
-
 
         if (fixDate) {
             stringBuilder.append("on a date to be fixed");
@@ -232,6 +292,23 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         return stringBuilder.toString();
     }
 
+    private static void handleSpecificTime(AdjournCaseTime adjournCaseNextHearingSpecificTime, StringBuilder stringBuilder) {
+        if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession() != null
+                && !adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession().isEmpty()) {
+            stringBuilder.append("first ");
+        }
+
+        if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime() != null
+                || CollectionUtils.isNotEmpty(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession())) {
+            String session = "";
+            if ("am".equalsIgnoreCase(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime())) {
+                session = "morning ";
+            } else if ("pm".equalsIgnoreCase(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime())) {
+                session = "afternoon ";
+            }
+            stringBuilder.append("in the ").append(session).append("session ");
+        }
+    }
 
     protected void validateRequiredProperties(AdjournCaseTemplateBody payload) {
         if (payload.getHeldAt() == null && payload.getHeldOn() == null) {
@@ -243,38 +320,36 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         }
     }
 
-    protected String setHearings(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
-        String venue = IN_CHAMBERS;
-        if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
-            Hearing finalHearing = caseData.getHearings().get(0);
-            if (finalHearing != null && finalHearing.getValue() != null) {
-                if (finalHearing.getValue().getHearingDate() != null) {
-                    adjournCaseBuilder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
-                }
-                if (finalHearing.getValue().getVenue() != null) {
-                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getValue().getVenue(),
-                            finalHearing.getValue().getVenueId());
-                    if (venueName != null) {
-                        adjournCaseBuilder.heldAt(venueName);
-                        venue = venueName;
-                    }
+    protected void setHearings(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
+        HearingDetails finalHearing = getLastValidHearing(caseData);
+        if (finalHearing != null) {
+            if (finalHearing.getHearingDate() != null) {
+                adjournCaseBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
+            }
+            if (finalHearing.getVenue() != null) {
+                String venueName = venueDataLoader.getGapVenueName(finalHearing.getVenue(), finalHearing.getVenueId());
+                if (venueName != null) {
+                    adjournCaseBuilder.heldAt(venueName);
                 }
             }
         } else {
-            adjournCaseBuilder.heldOn(LocalDate.now());
-            adjournCaseBuilder.heldAt("In chambers");
+            setInChambers(adjournCaseBuilder);
         }
-        return venue;
+    }
+
+    private void setInChambers(AdjournCaseTemplateBodyBuilder adjournCaseBuilder) {
+        adjournCaseBuilder.heldOn(LocalDate.now());
+        adjournCaseBuilder.heldAt(IN_CHAMBERS);
     }
 
     @Override
     protected void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file) {
-        caseData.setAdjournCasePreviewDocument(file);
+        caseData.getAdjournment().setPreviewDocument(file);
     }
 
     @Override
     protected DocumentLink getDocumentFromCaseData(SscsCaseData caseData) {
-        return caseData.getAdjournCasePreviewDocument();
+        return caseData.getAdjournment().getPreviewDocument();
     }
 
     protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
@@ -284,15 +359,20 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             throw new IllegalStateException("Unable to obtain signed in user name");
         }
         names.add(signedInJudgeName);
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getAdjournCaseDisabilityQualifiedPanelMemberName())) {
-            names.add(caseData.getAdjournCaseDisabilityQualifiedPanelMemberName());
+
+        Adjournment adjournment = caseData.getAdjournment();
+
+        if (adjournmentFeature) {
+            List<JudicialUserBase> panelMembers = adjournment.getPanelMembers();
+            names.addAll(judicialRefDataService.getAllJudicialUsersFullNames(panelMembers));
+        } else {
+            List<String> panelMembers = Stream.of(adjournment.getDisabilityQualifiedPanelMemberName(),
+                adjournment.getMedicallyQualifiedPanelMemberName(), adjournment.getOtherPanelMemberName())
+                .filter(org.apache.commons.lang3.StringUtils::isNotBlank).toList();
+
+            names.addAll(panelMembers);
         }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getAdjournCaseMedicallyQualifiedPanelMemberName())) {
-            names.add(caseData.getAdjournCaseMedicallyQualifiedPanelMemberName());
-        }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getAdjournCaseOtherPanelMemberName())) {
-            names.add(caseData.getAdjournCaseOtherPanelMemberName());
-        }
+
         return StringUtils.getGramaticallyJoinedStrings(names);
     }
 
@@ -301,7 +381,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         // Update the generated date if (and only if) the event type is Adjourn Case
         // ( not for EventType.ISSUE_ADJOURNMENT)
         if (eventType == EventType.ADJOURN_CASE) {
-            sscsCaseData.setAdjournCaseGeneratedDate(LocalDate.now().toString());
+            sscsCaseData.getAdjournment().setGeneratedDate(LocalDate.now());
         }
     }
 }

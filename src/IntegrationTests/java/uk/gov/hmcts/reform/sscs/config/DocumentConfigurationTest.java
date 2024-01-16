@@ -32,12 +32,14 @@ public class DocumentConfigurationTest {
 
     public static Object[][] documentParameters() {
         return new Object[][] {
-                {LanguagePreference.ENGLISH, EventType.DECISION_ISSUED, Optional.empty(), "TB-SCS-GNO-ENG-00091.docx"},
-                {LanguagePreference.ENGLISH, EventType.DIRECTION_ISSUED, Optional.empty(), "TB-SCS-GNO-ENG-00091.docx"},
-                {LanguagePreference.ENGLISH, EventType.ISSUE_FINAL_DECISION, Optional.empty(), "TB-SCS-GNO-ENG-00642.docx"},
+                {LanguagePreference.ENGLISH, EventType.CORRECTION_GRANTED, Optional.empty(), "TB-SCS-GNO-ENG-corrected-decision-notice.docx"},
+                {LanguagePreference.ENGLISH, EventType.DECISION_ISSUED, Optional.empty(), "TB-SCS-GNO-ENG-draft-decision-notice.docx"},
+                {LanguagePreference.ENGLISH, EventType.DIRECTION_ISSUED, Optional.empty(), "TB-SCS-GNO-ENG-directions-notice.docx"},
+                {LanguagePreference.ENGLISH, EventType.ISSUE_FINAL_DECISION, Optional.empty(), "TB-SCS-GNO-ENG-final-decision-notice.docx"},
+                {LanguagePreference.WELSH, EventType.CORRECTION_GRANTED, Optional.empty(), "TB-SCS-GNO-ENG-corrected-decision-notice.docx"},
                 {LanguagePreference.WELSH, EventType.DECISION_ISSUED, Optional.empty(), "TB-SCS-GNO-WEL-00473.docx"},
                 {LanguagePreference.WELSH, EventType.DIRECTION_ISSUED, Optional.empty(), "TB-SCS-GNO-WEL-00473.docx"},
-                {LanguagePreference.WELSH, EventType.ISSUE_FINAL_DECISION, Optional.empty(), "TB-SCS-GNO-ENG-00642.docx"}
+                {LanguagePreference.WELSH, EventType.ISSUE_FINAL_DECISION, Optional.empty(), "TB-SCS-GNO-ENG-final-decision-notice.docx"}
         };
     }
 
@@ -52,8 +54,8 @@ public class DocumentConfigurationTest {
 
     public static Object[][] coverPageParameters() {
         return new Object[][] {
-                {LanguagePreference.ENGLISH, "SSCS-cover-page.docx"},
-                {LanguagePreference.WELSH, "TB-SCS-LET-WEL-00486.docx"},
+                {LanguagePreference.ENGLISH, "TB-SCS-LET-ENG-Cover-Letter.docx"},
+                {LanguagePreference.WELSH, "TB-SCS-LET-WEL-Cover-Letter.docx"},
         };
     }
 

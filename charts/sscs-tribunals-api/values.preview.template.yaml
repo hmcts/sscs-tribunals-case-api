@@ -14,3 +14,4 @@ java:
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
     WORK_ALLOCATION_FEATURE: true
     CASE_ACCESS_MANAGEMENT_FEATURE: true
+    SCHEDULE_LISTING_FEATURE: true

@@ -22,9 +22,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
 
 
@@ -51,8 +51,10 @@ public class AdminSendToInterlocIt extends AbstractEventIt {
 
         DynamicList expected = new DynamicList(
                 new DynamicListItem("", ""),
-                Arrays.asList(new DynamicListItem(SelectWhoReviewsCase.REVIEW_BY_TCW.getId(), SelectWhoReviewsCase.REVIEW_BY_TCW.getLabel()),
-                        new DynamicListItem(SelectWhoReviewsCase.REVIEW_BY_JUDGE.getId(), SelectWhoReviewsCase.REVIEW_BY_JUDGE.getLabel()),
+                Arrays.asList(new DynamicListItem(SelectWhoReviewsCase.REVIEW_BY_TCW.getId(),
+                        SelectWhoReviewsCase.REVIEW_BY_TCW.getLabel()),
+                        new DynamicListItem(SelectWhoReviewsCase.REVIEW_BY_JUDGE.getId(),
+                            SelectWhoReviewsCase.REVIEW_BY_JUDGE.getLabel()),
                         new DynamicListItem(SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getId(), SelectWhoReviewsCase.POSTPONEMENT_REQUEST_INTERLOC_SEND_TO_TCW.getLabel()))
         );
         assertEquals(expected, result.getData().getSelectWhoReviewsCase());
@@ -66,7 +68,7 @@ public class AdminSendToInterlocIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertNull(result.getData().getSelectWhoReviewsCase());
-        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), result.getData().getInterlocReviewState());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW, result.getData().getInterlocReviewState());
     }
 
     @Test
@@ -77,8 +79,8 @@ public class AdminSendToInterlocIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertNull(result.getData().getSelectWhoReviewsCase());
-        assertEquals(InterlocReviewState.REVIEW_BY_TCW.getId(), result.getData().getInterlocReviewState());
-        assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId(), result.getData().getInterlocReferralReason());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW, result.getData().getInterlocReviewState());
+        assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST, result.getData().getInterlocReferralReason());
         assertEquals(DocumentType.POSTPONEMENT_REQUEST.getValue(), result.getData().getSscsDocument().get(3).getValue().getDocumentType());
     }
 

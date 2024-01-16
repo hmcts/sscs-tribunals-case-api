@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.domain.wrapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Objects;
 
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
@@ -19,7 +19,7 @@ public class Evidence {
         this.createdDate = createdDate;
     }
 
-    @ApiModelProperty(example = "8f79deb3-5d7a-4e6f-846a-a8131ac6a3bb", required = true)
+    @Schema(example = "8f79deb3-5d7a-4e6f-846a-a8131ac6a3bb", required = true)
     @JsonProperty(value = "id")
     public String getId() {
         String[] split = documentLink.split("/");
@@ -27,13 +27,13 @@ public class Evidence {
         return split[split.length - 1];
     }
 
-    @ApiModelProperty(example = "some_file_name.txt", required = true)
+    @Schema(example = "some_file_name.txt", required = true)
     @JsonProperty(value = "file_name")
     public String getFileName() {
         return fileName;
     }
 
-    @ApiModelProperty(example = "2018-10-24'T'12:11:21Z", required = true)
+    @Schema(example = "2018-10-24'T'12:11:21Z", required = true)
     @JsonProperty(value = "created_date")
     public String getCreatedDate() {
         return createdDate;

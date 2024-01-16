@@ -5,9 +5,11 @@ import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -32,20 +34,18 @@ public class TyaController {
         this.documentDownloadService = documentDownloadService;
     }
 
-    @ApiOperation(value = "getAppeal",
-        notes = "Returns an appeal given the CCD case id",
-        response = String.class, responseContainer = "Appeal details")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Appeal", response = String.class)})
+    @Operation(summary = "getAppeal", description = "Returns an appeal given the CCD case id")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Appeal", content = {
+        @Content(schema = @Schema(implementation = String.class))})})
     @RequestMapping(value = "/appeals", method = GET, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getAppealByCaseId(@RequestParam(value = "caseId") Long caseId,
             @RequestParam(value = "mya", required = false, defaultValue = "false") boolean mya) {
         return ok(tribunalsService.findAppeal(caseId, mya).toString());
     }
 
-    @ApiOperation(value = "getDocument",
-            notes = "Returns hearing outcome document given the document url",
-            response = Resource.class)
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Document", response = Resource.class)})
+    @Operation(summary = "getDocument", description = "Returns hearing outcome document given the document url")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Document", content = {
+        @Content(schema = @Schema(implementation = Resource.class))})})
     @GetMapping(value = "/document", produces = APPLICATION_PDF_VALUE)
     public ResponseEntity<Resource> getAppealDocument(@RequestParam(value = "url") String url) {
         return documentDownloadService.downloadFile(url);

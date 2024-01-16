@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 
@@ -86,7 +87,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         openMocks(this);
 
         Map<EventType, String> englishEventTypeDocs = new HashMap<>();
-        englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
+        englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-directions-notice.docx");
 
         Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
         documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
@@ -95,29 +96,31 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         handler = new ProcessAudioVideoEvidenceMidEventHandler(generateFile, documentConfiguration, idamService);
 
         sscsCaseData = SscsCaseData.builder()
-                .generateNotice("Yes")
-                .directionDueDate(LocalDate.now().plusDays(1).toString())
-                .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
-                .processAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.ISSUE_DIRECTIONS_NOTICE.getCode()))
-                .selectedAudioVideoEvidence(new DynamicList(DOCUMENT_MANAGEMENT_URL + "/2124-12"))
+            .documentGeneration(DocumentGeneration.builder()
+                .generateNotice(YES)
                 .directionNoticeContent("Body Content")
-                .audioVideoEvidence(singletonList(AudioVideoEvidence.builder().value(
-                        AudioVideoEvidenceDetails.builder()
-                                .documentLink(DOCUMENT_LINK)
-                                .fileName("music.mp3")
-                                .partyUploaded(UploadParty.APPELLANT)
-                                .dateAdded(DATE)
-                                .build())
-                        .build()))
-                .selectedAudioVideoEvidenceDetails(AudioVideoEvidenceDetails.builder().build())
-                .appeal(Appeal.builder()
-                        .appellant(Appellant.builder()
-                                .name(Name.builder().firstName("APPELLANT")
-                                        .lastName("LastNamE")
-                                        .build())
-                                .identity(Identity.builder().build())
-                                .build())
-                        .build()).build();
+                .build())
+            .directionDueDate(LocalDate.now().plusDays(1).toString())
+            .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
+            .processAudioVideoAction(new DynamicList(ProcessAudioVideoActionDynamicListItems.ISSUE_DIRECTIONS_NOTICE.getCode()))
+            .selectedAudioVideoEvidence(new DynamicList(DOCUMENT_MANAGEMENT_URL + "/2124-12"))
+            .audioVideoEvidence(singletonList(AudioVideoEvidence.builder().value(
+                AudioVideoEvidenceDetails.builder()
+                    .documentLink(DOCUMENT_LINK)
+                    .fileName("music.mp3")
+                    .partyUploaded(UploadParty.APPELLANT)
+                    .dateAdded(DATE)
+                    .build())
+                .build()))
+            .selectedAudioVideoEvidenceDetails(AudioVideoEvidenceDetails.builder().build())
+            .appeal(Appeal.builder()
+                .appellant(Appellant.builder()
+                    .name(Name.builder().firstName("APPELLANT")
+                        .lastName("Last'NamE")
+                        .build())
+                    .identity(Identity.builder().build())
+                    .build())
+                .build()).build();
 
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -133,13 +136,13 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
-        assertThat(response.getData().getPreviewDocument(), is(notNullValue()));
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument(), is(notNullValue()));
         final DocumentLink expectedDocumentLink = DocumentLink.builder()
                 .documentFilename(String.format("Directions Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
                 .build();
-        assertThat(response.getData().getPreviewDocument(), is(expectedDocumentLink));
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument(), is(expectedDocumentLink));
 
         verify(generateFile, times(1)).assemble(any());
         verifyTemplateBody(
@@ -152,7 +155,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
-        assertThat(response.getData().getPreviewDocument(), is(nullValue()));
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument(), is(nullValue()));
         verifyNoInteractions(generateFile);
     }
 
@@ -162,7 +165,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
-        assertThat(response.getData().getPreviewDocument(), is(nullValue()));
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument(), is(nullValue()));
         verifyNoInteractions(generateFile);
     }
 
@@ -181,7 +184,7 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
                 .build();
 
         assertThat(response.getErrors().size(), is(0));
-        assertThat(response.getData().getPreviewDocument(), is(nullValue()));
+        assertThat(response.getData().getDocumentStaging().getPreviewDocument(), is(nullValue()));
         verifyNoInteractions(generateFile);
         assertEquals(response.getData().getSelectedAudioVideoEvidenceDetails(), expectedEvidenceDetails);
     }
@@ -288,8 +291,10 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         userDetails.getRoles().add(TCW.getValue());
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         SscsCaseData responseData = response.getData();
-        assertEquals(3, responseData.getProcessAudioVideoAction().getListItems().size());
+        assertEquals(5, responseData.getProcessAudioVideoAction().getListItems().size());
         assertEquals(ISSUE_DIRECTIONS_NOTICE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), ISSUE_DIRECTIONS_NOTICE.getCode()));
+        assertEquals(ADMIT_EVIDENCE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), ADMIT_EVIDENCE.getCode()));
+        assertEquals(EXCLUDE_EVIDENCE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), EXCLUDE_EVIDENCE.getCode()));
         assertEquals(SEND_TO_JUDGE.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), SEND_TO_JUDGE.getCode()));
         assertEquals(SEND_TO_ADMIN.getCode(), getItemCodeInList(responseData.getProcessAudioVideoAction(), SEND_TO_ADMIN.getCode()));
     }
@@ -329,8 +334,8 @@ public class ProcessAudioVideoEvidenceMidEventHandlerTest {
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertEquals(NoticeIssuedTemplateBody.ENGLISH_IMAGE, payload.getImage());
         assertEquals("DIRECTIONS NOTICE", payload.getNoticeType());
-        assertEquals("Appellant Lastname", payload.getAppellantFullName());
-        assertEquals(sscsCaseData.getDirectionNoticeContent(), payload.getNoticeBody());
+        assertEquals("APPELLANT Last'NamE", payload.getAppellantFullName());
+        assertEquals(sscsCaseData.getDocumentGeneration().getDirectionNoticeContent(), payload.getNoticeBody());
         assertEquals(templateId, value.getTemplateId());
     }
 

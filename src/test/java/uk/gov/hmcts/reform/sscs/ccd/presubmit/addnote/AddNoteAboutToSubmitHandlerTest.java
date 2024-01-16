@@ -6,12 +6,15 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.HMCTS_RESPONSE_REVIEWED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase.REVIEW_BY_TCW;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +23,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
@@ -74,10 +77,16 @@ public class AddNoteAboutToSubmitHandlerTest {
 
     @Test
     public void testTempNoteFilledIsNullAndResponseReviewedEvent_thenNoteIsAdded() {
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
+        listOptions.add(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()));
+
+        DynamicList dynamicList = new DynamicList(new DynamicListItem("reviewByJudge", "Review by Judge"), listOptions);
+
         when(callback.getEvent()).thenReturn(HMCTS_RESPONSE_REVIEWED);
         sscsCaseData.setTempNoteDetail(null);
-        sscsCaseData.setInterlocReferralReason("over300Pages");
-        sscsCaseData.setSelectWhoReviewsCase(new DynamicList("Review by Judge"));
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.OVER_300_PAGES);
+        sscsCaseData.setSelectWhoReviewsCase(getWhoReviewsCaseDynamicList());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -105,8 +114,8 @@ public class AddNoteAboutToSubmitHandlerTest {
     public void testInterlocReferralReasonIsNoneAndResponseReviewedEvent_thenNoNoteIsAdded() {
         when(callback.getEvent()).thenReturn(HMCTS_RESPONSE_REVIEWED);
         sscsCaseData.setTempNoteDetail(null);
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
-        sscsCaseData.setSelectWhoReviewsCase(new DynamicList("Review by Judge"));
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.NONE);
+        sscsCaseData.setSelectWhoReviewsCase(getWhoReviewsCaseDynamicList());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -148,22 +157,31 @@ public class AddNoteAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"timeExtension, Time extension",
-                 "phmeRequest, PHE request",
-                 "over300Pages, Over 300 pages",
-                 "over13months, Over 13 months",
-                 "other, Other",
-                 "noResponseToDirection, No response to a direction"})
-    public void ifEventIsResponseReviewed_AddInterlocReferralReasonToNote(String interlocReferralId, String interlocReferralLabel) {
+    @Parameters({
+        "TIME_EXTENSION",
+        "PHE_REQUEST",
+        "OVER_300_PAGES",
+        "OVER_13_MONTHS",
+        "OTHER",
+        "NO_RESPONSE_TO_DIRECTION"
+    })
+    public void ifEventIsResponseReviewed_AddInterlocReferralReasonToNote(InterlocReferralReason value) {
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
+        listOptions.add(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()));
+
+        DynamicList selectWhoReviewsCaseDynamicList = new DynamicList(new DynamicListItem("reviewByJudge", "Review by Judge"), listOptions);
+
         when(callback.getEvent()).thenReturn(HMCTS_RESPONSE_REVIEWED);
         sscsCaseData.setTempNoteDetail("Here is my note");
-        sscsCaseData.setInterlocReferralReason(interlocReferralId);
-        sscsCaseData.setSelectWhoReviewsCase(new DynamicList("Review by Judge"));
+        sscsCaseData.setInterlocReferralReason(value);
+        sscsCaseData.setSelectWhoReviewsCase(getWhoReviewsCaseDynamicList());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        String expectedNote = "Referred to interloc for review by judge - " + interlocReferralLabel + " - Here is my note";
+        String expectedNote = String.format("Referred to interloc for review by judge - %s - Here is my note",
+            value.getDescription());
 
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
         assertEquals(expectedNote, response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
@@ -229,4 +247,13 @@ public class AddNoteAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
+
+    @NotNull
+    private static DynamicList getWhoReviewsCaseDynamicList() {
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(REVIEW_BY_TCW.getId(), REVIEW_BY_TCW.getLabel()));
+        listOptions.add(new DynamicListItem(REVIEW_BY_JUDGE.getId(), REVIEW_BY_JUDGE.getLabel()));
+        return new DynamicList(new DynamicListItem("reviewByJudge",null), listOptions);
+    }
+
 }

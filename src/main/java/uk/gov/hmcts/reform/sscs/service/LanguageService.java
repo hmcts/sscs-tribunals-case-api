@@ -15,44 +15,17 @@ public class LanguageService {
 
     private static final String SIGN_LANGUAGE_NAME_PREFIX_1 = "Sign (";
     private static final String SIGN_LANGUAGE_NAME_PREFIX_2 = "Sign Language (";
+    public static final String REFERENCE_LANGUAGES_JSON = "reference/languages.json";
 
 
     private JSONArray languagesJson;
 
     @Autowired
     public LanguageService() throws IOException {
-        String languages = IOUtils.resourceToString("reference-data/languages.txt",
+        String languages = IOUtils.resourceToString(REFERENCE_LANGUAGES_JSON,
             StandardCharsets.UTF_8, Thread.currentThread().getContextClassLoader());
 
-        languagesJson = new JSONArray("[" + languages + "]");
-    }
-
-
-    public String getInterpreterDescriptionForLanguageKey(String languageKey) {
-        if (languageKey != null) {
-            String languageName = getLanguageNameFromLanguageKey(languageKey);
-            if (languageName != null) {
-                if (languageKey.startsWith("sign")) {
-                    String signLanguageType = getSignLanguageType(languageName);
-                    return "a sign language interpreter (" + signLanguageType + ")";
-                } else {
-                    return "an interpreter in " + languageName;
-                }
-            }
-
-        }
-        return null;
-    }
-
-    private String getSignLanguageType(String languageName) {
-
-        if (languageName.startsWith(SIGN_LANGUAGE_NAME_PREFIX_1) && languageName.endsWith(")")) {
-            return languageName.substring(SIGN_LANGUAGE_NAME_PREFIX_1.length(), languageName.length() - 1);
-        } else  if (languageName.startsWith(SIGN_LANGUAGE_NAME_PREFIX_2) && languageName.endsWith(")")) {
-            return languageName.substring(SIGN_LANGUAGE_NAME_PREFIX_2.length(), languageName.length() - 1);
-        } else {
-            return languageName;
-        }
+        languagesJson = new JSONArray(languages);
     }
 
     public String getLanguageNameFromLanguageKey(String languageKey) {

@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -108,7 +108,7 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
             log.info("{} setting previousState from {} to interlocutoryReviewState", sscsCaseData.getCcdCaseId(), previousState.getId());
         }
 
-        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
 
         ccdService.updateCase(sscsCaseData, caseId, nextEvent, "Upload Welsh Document",
                 "Upload Welsh Document", idamService.getIdamTokens());

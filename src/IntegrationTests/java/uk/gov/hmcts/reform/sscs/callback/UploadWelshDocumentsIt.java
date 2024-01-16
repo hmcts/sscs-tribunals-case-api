@@ -59,9 +59,9 @@ public class UploadWelshDocumentsIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         DynamicList expected = new DynamicList(
-                new DynamicListItem("sscs1.pdf", "sscs1.pdf"),
-                Arrays.asList(new DynamicListItem("sscs1.pdf", "sscs1.pdf"),
-                        new DynamicListItem("appellantEvidence.pdf", "appellantEvidence.pdf"))
+                new DynamicListItem("appellantEvidence.pdf", "appellantEvidence.pdf"),
+                Arrays.asList(new DynamicListItem("appellantEvidence.pdf", "appellantEvidence.pdf"),
+                        new DynamicListItem("sscs1.pdf", "sscs1.pdf"))
         );
         assertEquals(expected, result.getData().getOriginalDocuments());
     }

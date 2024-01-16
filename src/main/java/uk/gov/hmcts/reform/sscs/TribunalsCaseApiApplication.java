@@ -10,6 +10,7 @@ import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
@@ -31,17 +32,16 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
 
-@SpringBootApplication
-@EnableFeignClients(basePackages =
-        {
-                "uk.gov.hmcts.reform.authorisation",
-                "uk.gov.hmcts.reform.sscs.idam",
-                "uk.gov.hmcts.reform.sscs.document",
-                "uk.gov.hmcts.reform.docassembly",
-                "uk.gov.hmcts.reform.sscs.thirdparty",
-                "uk.gov.hmcts.reform.idam",
-                "uk.gov.hmcts.reform.sscs.client"
-        })
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@EnableFeignClients(basePackages = {
+    "uk.gov.hmcts.reform.authorisation",
+    "uk.gov.hmcts.reform.sscs.idam",
+    "uk.gov.hmcts.reform.sscs.document",
+    "uk.gov.hmcts.reform.docassembly",
+    "uk.gov.hmcts.reform.sscs.thirdparty",
+    "uk.gov.hmcts.reform.idam",
+    "uk.gov.hmcts.reform.sscs.client"
+})
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
 @EnableScheduling
 @EnableRetry

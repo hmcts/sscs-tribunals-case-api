@@ -5,11 +5,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.util.PactDslBuilderForCaseDetailsList.buildStartEventResponseWithEmptyCaseDetails;
 
-import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
+import au.com.dius.pact.consumer.dsl.PactBuilder;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
-import au.com.dius.pact.core.model.RequestResponsePact;
+import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
-import java.io.IOException;
 import java.util.Map;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
@@ -21,8 +20,9 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 public class StartForCitizenConsumerTest extends CcdConsumerTestBase {
 
     @Pact(provider = "ccdDataStoreAPI_Cases", consumer = "sscs_tribunalsCaseApi")
-    public RequestResponsePact startForCitizen(PactDslWithProvider builder) {
+    public V4Pact startForCitizen(PactBuilder builder) {
         return builder
+            .usingLegacyDsl()
             .given("A Start for a Citizen is requested", setUpStateMapForProviderWithoutCaseData())
             .uponReceiving("A Start for a Citizen")
             .path(buildPath())
@@ -34,12 +34,12 @@ public class StartForCitizenConsumerTest extends CcdConsumerTestBase {
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .status(200)
             .body(buildStartEventResponseWithEmptyCaseDetails(CREATE_DRAFT))
-            .toPact();
+            .toPact(V4Pact.class);
     }
 
     @Test
     @PactTestFor(pactMethod = "startForCitizen")
-    public void verifyStartForCitizen() throws IOException, JSONException {
+    public void verifyStartForCitizen() throws JSONException {
 
         StartEventResponse startEventResponse = coreCaseDataApi.startForCitizen(SOME_AUTHORIZATION_TOKEN,
             SOME_SERVICE_AUTHORIZATION_TOKEN, USER_ID, jurisdictionId,

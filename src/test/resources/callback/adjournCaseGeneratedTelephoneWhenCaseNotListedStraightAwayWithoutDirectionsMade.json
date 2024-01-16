@@ -29,7 +29,7 @@
       "adjournCaseCanCaseBeListedRightAway" : "No",
       "adjournCaseAreDirectionsBeingMadeToParties" : "No",
       "adjournCaseTypeOfNextHearing" : "telephone",
-      "adjournCasePanelMembersExcluded" : "yes",
+      "adjournCasePanelMembersExcluded" : "Yes",
       "adjournCaseNextHearingDateType" : "dateToBeFixed",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
       "adjournCaseTime" : {
@@ -754,7 +754,7 @@
       "adjournCaseCanCaseBeListedRightAway" : "No",
       "adjournCaseAreDirectionsBeingMadeToParties" : "No",
       "adjournCaseTypeOfNextHearing" : "telephone",
-      "adjournCasePanelMembersExcluded" : "yes",
+      "adjournCasePanelMembersExcluded" : "Yes",
       "adjournCaseNextHearingDateType" : "dateToBeFixed",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
       "adjournCaseNextHearingSpecificTime" : "am",

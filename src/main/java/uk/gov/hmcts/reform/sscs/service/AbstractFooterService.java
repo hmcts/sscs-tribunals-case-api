@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ComparatorUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,14 +42,26 @@ public abstract class AbstractFooterService<D extends AbstractDocument> {
 
             String bundleAddition = getNextBundleAddition(documents);
 
-            String bundleFileName = overrideFileName != null ? overrideFileName : buildBundleAdditionFileName(bundleAddition, label + " issued on " + dateIssued);
+            boolean isPostHearingApp = Set.of(SET_ASIDE_APPLICATION,
+                    CORRECTION_APPLICATION,
+                    STATEMENT_OF_REASONS_APPLICATION,
+                    LIBERTY_TO_APPLY_APPLICATION,
+                    UPPER_TRIBUNALS_DECISION_REMADE,
+                    UPPER_TRIBUNALS_DECISION_REFUSED,
+                    PERMISSION_TO_APPEAL_APPLICATION)
+                .contains(documentType);
+
+            String verb = isPostHearingApp ? " received on " : " issued on ";
+
+            String rightText = label + verb + dateIssued;
+            String bundleFileName = overrideFileName != null ? overrideFileName : buildBundleAdditionFileName(bundleAddition, rightText);
 
             url = addFooter(url, label, bundleAddition);
 
             footerDetails = new FooterDetails(url, bundleAddition, bundleFileName);
 
         } else {
-            log.info("Could not find {} documentso skipping generating footer", label);
+            log.info("Could not find {} document so skipping generating footer", label);
         }
         return footerDetails;
     }

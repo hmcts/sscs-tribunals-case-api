@@ -1,0 +1,31 @@
+---
+version: '3.5'
+
+name: cft-lib-doc-assembly
+
+services:
+  rpa-dg-docassembly-api:
+    image: hmctspublic.azurecr.io/dg/docassembly:latest
+    environment:
+      - S2S_BASE_URI=http://host.docker.internal:4502
+      - IDAM_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5062}
+      - APPINSIGHTS_INSTRUMENTATIONKEY=test-key
+      - OPEN_ID_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5062}/o
+      - DM_STORE_APP_URL=http://dm-store:5005
+      - S2S_NAMES_WHITELIST=sscs,divorce,ccd,em_gw,document-management-store,ccd_gw,idam-api,fpl_case_service,xui_webapp,ccd_case_document_am_api
+      # You need to add the below two keys for this service to work on docker locally. Values can be found in docmosis key vault.
+      # Requires VPN connection.
+      - DOCMOSIS_ACCESS_KEY=${DOCMOSIS_ACCESS_KEY}
+      - DOCMOSIS_TEMPLATES_ENDPOINT_AUTH=${DOCMOSIS_TEMPLATES_ENDPOINT_AUTH}
+      - SERVER_PORT=8079
+    ports:
+      - 4631:8079
+    extra_hosts:
+      - "docmosis.aat.platform.hmcts.net:10.10.161.100"
+      - "host.docker.internal:host-gateway"
+    networks:
+      - cftlib_default
+
+networks:
+  cftlib_default:
+    external: true

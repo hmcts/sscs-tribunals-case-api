@@ -80,7 +80,7 @@ public class GenerateCoversheetAboutToStartHandlerTest {
     public void setsThePreviewDocumentField() {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         DocumentLink documentLink = DocumentLink.builder().documentFilename("coversheet.pdf").documentBinaryUrl("urlLocation/binary").documentUrl("urlLocation").build();
-        assertEquals(response.getData().getPreviewDocument(), documentLink);
+        assertEquals(response.getData().getDocumentStaging().getPreviewDocument(), documentLink);
         verify(coversheetService).createCoverSheet(eq("ccdCaseId"));
         verify(pdfStoreService).storeDocument(any(), anyString(), any());
     }

@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -57,7 +60,7 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
     private void validateAdjournCaseEventValues(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         try {
 
-            if (isYes(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties())) {
+            if (isYes(sscsCaseData.getAdjournment().getAreDirectionsBeingMadeToParties())) {
                 checkDirectionsDueDateInvalid(sscsCaseData);
             }
             if (adjournCaseNextHearingDateOrPeriodIsProvideDate(sscsCaseData)
@@ -73,11 +76,11 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
     }
 
     private boolean adjournCaseNextHearingDateOrPeriodIsProvideDate(SscsCaseData sscsCaseData) {
-        return "provideDate".equalsIgnoreCase(sscsCaseData.getAdjournCaseNextHearingDateOrPeriod());
+        return sscsCaseData.getAdjournment().getNextHearingDateOrPeriod() == AdjournCaseNextHearingDateOrPeriod.PROVIDE_DATE;
     }
 
     private boolean adjournCaseNextHearingDateTypeIsFirstAvailableDateAfter(SscsCaseData sscsCaseData) {
-        return "firstAvailableDateAfter".equalsIgnoreCase(sscsCaseData.getAdjournCaseNextHearingDateType());
+        return sscsCaseData.getAdjournment().getNextHearingDateType() == AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER;
     }
 
 
@@ -88,21 +91,25 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
                 .forEach(preSubmitCallbackResponse::addError);
     }
 
-    private void validateAdjournCaseDirectionsDueDateIsInFuture(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (nonNull(sscsCaseData.getAdjournCaseDirectionsDueDate()) && !isDateInTheFuture(sscsCaseData.getAdjournCaseDirectionsDueDate())) {
+    private void validateAdjournCaseDirectionsDueDateIsInFuture(
+        SscsCaseData sscsCaseData,
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (nonNull(sscsCaseData.getAdjournment().getDirectionsDueDate())
+            && !isDateInTheFuture(sscsCaseData.getAdjournment().getDirectionsDueDate())
+        ) {
             preSubmitCallbackResponse.addError("Directions due date must be in the future");
         }
     }
 
     private boolean isNextHearingFirstAvailableDateAfterDateInvalid(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate() == null) {
+        if (sscsCaseData.getAdjournment().getNextHearingFirstAvailableDateAfterDate() == null) {
             throw new IllegalStateException("'First available date after' date must be provided");
         }
-        return isDateInThePast(sscsCaseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate());
+        return isDateInThePast(sscsCaseData.getAdjournment().getNextHearingFirstAvailableDateAfterDate());
     }
 
     private void checkDirectionsDueDateInvalid(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getAdjournCaseDirectionsDueDate() != null) {
+        if (sscsCaseData.getAdjournment().getDirectionsDueDate() != null) {
             if (directionDueDayIsNotEmptyOrZero(sscsCaseData)) {
                 throw new IllegalStateException(("Cannot specify both directions due date and directions due days offset"));
             }
@@ -114,10 +121,11 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
     }
 
     private boolean directionDueDaysIsEmpty(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset() == null;
+        return sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset() == null;
     }
 
     private boolean directionDueDayIsNotEmptyOrZero(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset() != null && !"0".equals(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset());
+        return sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset() != null
+            && sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset() != AdjournCaseDaysOffset.OTHER;
     }
 }

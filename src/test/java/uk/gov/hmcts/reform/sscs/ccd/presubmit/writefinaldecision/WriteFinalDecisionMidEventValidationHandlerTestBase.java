@@ -2,11 +2,11 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase.CANT_UPLOAD_ERROR_MESSAGE;
 
 import java.time.LocalDate;
 import javax.validation.Validation;
@@ -22,6 +22,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -50,6 +51,10 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     protected UserDetails userDetails;
 
     @Mock
+    protected UserInfo userInfo;
+
+
+    @Mock
     protected DecisionNoticeService decisionNoticeService;
 
     @Mock
@@ -65,13 +70,13 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
             .buildValidatorFactory()
             .getValidator();
 
-    protected abstract WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService);
+    protected abstract WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService, boolean isPostHearingsEnabled);
 
     @Before
     public void setUp() {
         openMocks(this);
 
-        handler = createValidationHandler(validator, decisionNoticeService);
+        handler = createValidationHandler(validator, decisionNoticeService, false);
 
         when(decisionNoticeService.getQuestionService(getBenefitType())).thenReturn(decisionNoticeQuestionService);
 
@@ -80,7 +85,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
         when(userDetails.getFullName()).thenReturn("Judge Full Name");
 
-        when(idamClient.getUserDetails("Bearer token")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer token")).thenReturn(userInfo);
 
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
@@ -343,6 +348,46 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
         assertEquals("na", caseDetails.getCaseData().getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
 
+    }
+
+    @Test
+    public void whenCorrectionIsInProgressDecisionWasUploadedGenerateNoticeIsYes_thenThrowError() {
+        handler = createValidationHandler(validator, decisionNoticeService, true);
+
+        when(caseDetails.getState()).thenReturn(State.POST_HEARING);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YesNo.YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionWasOriginalDecisionUploaded(YesNo.YES);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+        assertTrue(response.getErrors().contains(CANT_UPLOAD_ERROR_MESSAGE));
+    }
+
+    @Test
+    public void whenCorrectionIsInProgressDecisionWasGeneratedGenerateNoticeIsYes_thenDontThrowError() {
+        handler = createValidationHandler(validator, decisionNoticeService, true);
+
+        when(caseDetails.getState()).thenReturn(State.POST_HEARING);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YesNo.NO);
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionWasOriginalDecisionUploaded(YesNo.YES);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void whenCorrectionIsInProgressDecisionWasUploadedGenerateNoticeIsNo_thenDontThrowError() {
+        handler = createValidationHandler(validator, decisionNoticeService, true);
+
+        when(caseDetails.getState()).thenReturn(State.POST_HEARING);
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YesNo.YES);
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionWasOriginalDecisionUploaded(YesNo.NO);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
     }
 
     @Test(expected = IllegalStateException.class)

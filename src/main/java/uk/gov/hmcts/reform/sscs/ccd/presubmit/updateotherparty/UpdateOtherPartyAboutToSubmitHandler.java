@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
@@ -52,13 +53,16 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         List<CcdValue<OtherParty>> otherParties = sscsCaseData.getOtherParties();
         updateOtherPartyUcb(sscsCaseData);
         checkConfidentiality(sscsCaseData);
-        assignNewOtherPartyData(otherParties, UPDATE_OTHER_PARTY_DATA);
+        assignNewOtherPartyData(otherParties);
         clearOtherPartyIfEmpty(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
+        verifyHearingUnavailableDates(response, otherParties);
+
         final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
         final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
         updateHearingTypeForNonSscs1Case(sscsCaseData, response, hasSystemUserRole);
+        SscsHelper.updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
 
         if (sscsCaseData.getAppeal() != null && sscsCaseData.getAppeal().getBenefitType() != null
             && isBenefitTypeValidForOtherPartyValidation(sscsCaseData.getBenefitType())) {
@@ -102,5 +106,21 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
     private boolean isBenefitTypeValidForHearingTypeValidation(Optional<Benefit> benefitType) {
         return benefitType.filter(benefit -> SscsType.SSCS2.equals(benefit.getSscsType())
             || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
+    }
+
+    private boolean hasValidHearingOptionsAndWantsToExcludeDates(OtherParty otherParty) {
+        return otherParty.getHearingOptions() != null
+            && YesNo.isYes(otherParty.getHearingOptions().getWantsToAttend())
+            && YesNo.isYes(otherParty.getHearingOptions().getScheduleHearing());
+    }
+
+    private void verifyHearingUnavailableDates(PreSubmitCallbackResponse<SscsCaseData> response, List<CcdValue<OtherParty>> otherParties) {
+        for (CcdValue<OtherParty> ccdOtherParty : otherParties) {
+            OtherParty otherParty = ccdOtherParty.getValue();
+
+            if (hasValidHearingOptionsAndWantsToExcludeDates(otherParty)) {
+                SscsHelper.validateHearingOptionsAndExcludeDates(response, otherParty.getHearingOptions());
+            }
+        }
     }
 }

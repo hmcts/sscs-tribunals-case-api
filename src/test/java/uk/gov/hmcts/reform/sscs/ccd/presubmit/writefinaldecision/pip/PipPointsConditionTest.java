@@ -142,7 +142,7 @@ public class PipPointsConditionTest {
         List<String> answers = Arrays.asList("preparingFood", "someothercategory");
 
         SscsCaseData caseData = SscsCaseData.builder()
-                .pipSscsCaseData(SscsPipCaseData.builder()
+            .pipSscsCaseData(SscsPipCaseData.builder()
             .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build()).build();
 
         Mockito.when(decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData, "preparingFood")).thenReturn(Optional.empty());
@@ -151,11 +151,9 @@ public class PipPointsConditionTest {
 
         PipPointsCondition pointsCondition = PipPointsCondition.DAILY_LIVING_STANDARD;
 
+
         Optional<String> optionalErrorMessage = pointsCondition
-            .getOptionalErrorMessage(this.decisionNoticeQuestionService,
-                SscsCaseData.builder()
-                        .pipSscsCaseData(SscsPipCaseData.builder()
-                    .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build()).build());
+            .getOptionalErrorMessage(this.decisionNoticeQuestionService, caseData);
 
         Assert.assertFalse(optionalErrorMessage.isPresent());
 

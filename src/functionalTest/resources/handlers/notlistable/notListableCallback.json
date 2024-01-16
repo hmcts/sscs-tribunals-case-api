@@ -1,0 +1,2204 @@
+{
+  "case_details": {
+    "after_submit_callback_response": null,
+    "callback_response_status": null,
+    "callback_response_status_code": null,
+    "case_data": {
+      "appeal": {
+        "appealReasons": {
+          "otherReasons": "Another reason",
+          "reasons": [
+            {
+              "id": "8611432d-de46-48d8-940c-175ccc50f0b2",
+              "value": {
+                "description": "aaaaaaaaaa",
+                "reason": "aaaaaaaaaa"
+              }
+            },
+            {
+              "id": "4a2d0c3b-82aa-4812-97d9-380b90ab563f",
+              "value": {
+                "description": "bbbbbbbbbb",
+                "reason": "bbbbbbbbbb"
+              }
+            },
+            {
+              "id": "506b4eb3-5fc4-46d7-b2c6-d88de0ed9548",
+              "value": {
+                "description": "cccccccccc",
+                "reason": "cccccccccc"
+              }
+            }
+          ]
+        },
+        "appellant": {
+          "address": {
+            "county": "Kent",
+            "line1": "123 Hairy Lane",
+            "line2": "Off Hairy Park",
+            "postcode": "TS1 1ST",
+            "town": "Hairyfield"
+          },
+          "appointee": {
+            "address": {},
+            "contact": {
+              "email": null,
+              "mobile": null,
+              "phone": null
+            },
+            "identity": {
+              "dob": null,
+              "nino": null
+            },
+            "name": {
+              "firstName": null,
+              "lastName": null,
+              "title": null
+            }
+          },
+          "contact": {
+            "email": "sscstest+notify@greencroftconsulting.com",
+            "mobile": "07411222222",
+            "phone": null
+          },
+          "identity": {
+            "dob": "1990-02-26",
+            "nino": "AB877533C"
+          },
+          "isAddressSameAsAppointee": "No",
+          "isAppointee": "No",
+          "name": {
+            "firstName": "Joe",
+            "lastName": "Bloggs",
+            "title": "Mr"
+          }
+        },
+        "benefitType": {
+          "code": "PIP",
+          "description": "Personal Independence Payment"
+        },
+        "hearingOptions": {
+          "arrangements": [
+            "signLanguageInterpreter",
+            "hearingLoop"
+          ],
+          "excludeDates": [
+            {
+              "id": "fac34d11-a61a-480b-b130-ca792e877b4f",
+              "value": {
+                "end": "2018-04-04",
+                "start": "2018-04-04"
+              }
+            },
+            {
+              "id": "33f92c01-434c-46b1-b9f3-f4d468ccbcd4",
+              "value": {
+                "end": "2018-04-05",
+                "start": "2018-04-05"
+              }
+            },
+            {
+              "id": "f9c6086c-b73d-4a3d-a35d-4c0d413b65b6",
+              "value": {
+                "end": "2018-04-06",
+                "start": "2018-04-06"
+              }
+            }
+          ],
+          "languageInterpreter": "No",
+          "other": "Yes, this...",
+          "scheduleHearing": "Yes",
+          "signLanguageType": "Sign language",
+          "wantsSupport": "Yes",
+          "wantsToAttend": "Yes"
+        },
+        "hearingType": "oral",
+        "mrnDetails": {
+          "dwpIssuingOffice": "DWP PIP (1)",
+          "mrnDate": "2018-02-01",
+          "mrnLateReason": null,
+          "mrnMissingReason": null
+        },
+        "receivedVia": "Online",
+        "rep": {
+          "address": {
+            "county": "County",
+            "line1": "123 Hairy Lane",
+            "line2": "Off Hairy Park",
+            "postcode": "CM14 4LQ",
+            "town": "Town"
+          },
+          "contact": {
+            "email": "sscstest+notify2@greencroftconsulting.com",
+            "mobile": "07411999999",
+            "phone": null
+          },
+          "hasRepresentative": "Yes",
+          "name": {
+            "firstName": "Harry",
+            "lastName": "Potter",
+            "title": "Mr"
+          },
+          "organisation": "HP Ltd"
+        },
+        "signer": "Joe Bloggs"
+      },
+      "benefitCode": "002",
+      "caseCode": "002DD",
+      "caseCreated": "2020-07-16",
+      "clerkAppealSatisfactionText": [
+        "appealSatisfactionText"
+      ],
+      "clerkConfirmationOfMRN": "No",
+      "clerkConfirmationOther": "No idea",
+      "clerkDelegatedAuthority": [
+        "delegatedAuthorityText"
+      ],
+      "clerkOtherReason": "No",
+      "correspondence": [
+        {
+          "id": "f31a3923-33a0-45f0-b2d0-fd7478921641",
+          "value": {
+            "correspondenceType": "Letter",
+            "documentLink": {
+              "document_binary_url": "http://dm-store:5005/documents/f7bde965-43c5-4785-9039-d33dac2d072a/binary",
+              "document_filename": "issueAdjournment 21 Jul 2020 1600.pdf",
+              "document_url": "http://dm-store:5005/documents/f7bde965-43c5-4785-9039-d33dac2d072a"
+            },
+            "sentOn": "21 Jul 2020 16:00",
+            "to": "Joe Bloggs"
+          }
+        },
+        {
+          "id": "e17e70d5-f93c-4ea3-99d0-1b65cc7928fa",
+          "value": {
+            "correspondenceType": "Letter",
+            "documentLink": {
+              "document_binary_url": "http://dm-store:5005/documents/18ddbd97-a7e1-4047-95a5-4b399981e7b2/binary",
+              "document_filename": "issueAdjournment 21 Jul 2020 1600.pdf",
+              "document_url": "http://dm-store:5005/documents/18ddbd97-a7e1-4047-95a5-4b399981e7b2"
+            },
+            "sentOn": "21 Jul 2020 16:00",
+            "to": "Harry Potter"
+          }
+        }
+      ],
+      "documentSentToDwp": "Yes",
+      "dwpRegionalCentre": "Newcastle",
+      "dwpState": "adjournmentNotice",
+      "evidencePresent": "No",
+      "evidenceReceivedCF": {
+        "appellantInfoRequestCollection": [
+          {
+            "id": "e05c92f8-a8f3-48f2-8ec1-38b38deae14e",
+            "value": {
+              "evidenceReceivedBoolean": "Yes",
+              "evidenceReceivedDate": "2019-07-10"
+            }
+          }
+        ]
+      },
+      "interlocReferralDate": "2020-07-21",
+      "interlocReviewState": "reviewByJudge",
+      "isWaiverNeeded": "Yes",
+      "issueCode": "DD",
+      "notListableDueDate": "2020-11-10",
+      "notListableProvideReasons": "My reasons",
+      "panel": {
+        "assignedTo": "Bill",
+        "disabilityQualifiedMember": "Bob",
+        "medicalMember": "Gary"
+      },
+      "pcqId": "12345678",
+      "region": "LEEDS",
+      "regionalProcessingCenter": {
+        "address1": "HM Courts & Tribunals Service",
+        "address2": "Social Security & Child Support Appeals",
+        "address3": "York House",
+        "address4": "31 York Place",
+        "city": "LEEDS",
+        "email": "Leeds_SYA_Response@justice.gov.uk",
+        "faxNumber": "0870 739 4331",
+        "name": "LEEDS",
+        "phoneNumber": "0300 123 1142",
+        "postcode": "LS1 2ED"
+      },
+      "reservedToJudgeInterloc": {
+        "idamId" : "736238ce-5565-49b2-8d35-48d96ab438bf",
+        "personalCode" : "49933315"
+      },
+      "sscsDocument": [
+        {
+          "id": "beac0b90-4ff8-479c-95d9-259b2cd9e6ba",
+          "value": {
+            "bundleAddition": "A",
+            "documentDateAdded": "2020-07-21",
+            "documentFileName": "Addition A - Adjournment Notice issued on 21-07-2020.pdf",
+            "documentLink": {
+              "document_binary_url": "http://dm-store:5005/documents/7551a1b3-657c-40e7-9a1f-12c013ad611b/binary",
+              "document_filename": "2020_April_Statement_Halifax_joint.pdf",
+              "document_url": "http://dm-store:5005/documents/7551a1b3-657c-40e7-9a1f-12c013ad611b"
+            },
+            "documentType": "adjournmentNotice"
+          }
+        },
+        {
+          "id": "ea9d0e53-e9c0-42fd-ae51-564e6fc8dd9f",
+          "value": {
+            "bundleAddition": "B",
+            "documentDateAdded": "2020-07-21",
+            "documentFileName": "Addition B - Adjournment Notice issued on 21-07-2020.pdf",
+            "documentLink": {
+              "document_binary_url": "http://dm-store:5005/documents/4df0c859-50ff-47e2-b02d-ce91525107dc/binary",
+              "document_filename": "2020_April_Statement_Halifax_joint.pdf",
+              "document_url": "http://dm-store:5005/documents/4df0c859-50ff-47e2-b02d-ce91525107dc"
+            },
+            "documentType": "adjournmentNotice"
+          }
+        }
+      ],
+      "subscriptions": {
+        "appellantSubscription": {
+          "email": "sscstest+notify@greencroftconsulting.com",
+          "lastLoggedIntoMya": null,
+          "mobile": "+447398785050",
+          "reason": null,
+          "subscribeEmail": "Yes",
+          "subscribeSms": "Yes",
+          "tya": "omn2WpTMrd",
+          "wantSmsNotifications": "Yes"
+        },
+        "appointeeSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        },
+        "representativeSubscription": {
+          "email": "sscstest+notify2@greencroftconsulting.com",
+          "lastLoggedIntoMya": null,
+          "mobile": "+447398785051",
+          "reason": null,
+          "subscribeEmail": "Yes",
+          "subscribeSms": "Yes",
+          "tya": "C51W87bkmB",
+          "wantSmsNotifications": "Yes"
+        },
+        "supporterSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        }
+      },
+      "urgentCase": "Yes",
+      "waiverDeclaration": [
+        "waiverDeclarationText"
+      ],
+      "waiverReason": [
+        "nonCompliantOther",
+        "nonCompliantNoMRN"
+      ],
+      "waiverReasonOther": "Not sure"
+    },
+    "case_type_id": "Benefit",
+    "created_date": [
+      2020,
+      7,
+      16,
+      13,
+      30,
+      20,
+      768000000
+    ],
+    "data_classification": {
+      "adjournCasePreviewDocument": "PUBLIC",
+      "appeal": {
+        "classification": "PUBLIC",
+        "value": {
+          "appealReasons": {
+            "classification": "PUBLIC",
+            "value": {
+              "otherReasons": "PUBLIC",
+              "reasons": {
+                "classification": "PUBLIC",
+                "value": [
+                  {
+                    "id": "8611432d-de46-48d8-940c-175ccc50f0b2",
+                    "value": {
+                      "description": "PUBLIC",
+                      "reason": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "4a2d0c3b-82aa-4812-97d9-380b90ab563f",
+                    "value": {
+                      "description": "PUBLIC",
+                      "reason": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "506b4eb3-5fc4-46d7-b2c6-d88de0ed9548",
+                    "value": {
+                      "description": "PUBLIC",
+                      "reason": "PUBLIC"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "appellant": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {
+                  "county": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "line2": "PUBLIC",
+                  "postcode": "PUBLIC",
+                  "town": "PUBLIC"
+                }
+              },
+              "appointee": {
+                "classification": "PUBLIC",
+                "value": {
+                  "address": {
+                    "classification": "PUBLIC",
+                    "value": {}
+                  },
+                  "contact": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "email": "PUBLIC",
+                      "mobile": "PUBLIC",
+                      "phone": "PUBLIC"
+                    }
+                  },
+                  "identity": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "dob": "PUBLIC",
+                      "nino": "PUBLIC"
+                    }
+                  },
+                  "name": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "firstName": "PUBLIC",
+                      "lastName": "PUBLIC",
+                      "title": "PUBLIC"
+                    }
+                  }
+                }
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "identity": {
+                "classification": "PUBLIC",
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                }
+              },
+              "isAddressSameAsAppointee": "PUBLIC",
+              "isAppointee": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              }
+            }
+          },
+          "benefitType": {
+            "classification": "PUBLIC",
+            "value": {
+              "code": "PUBLIC",
+              "description": "PUBLIC"
+            }
+          },
+          "hearingOptions": {
+            "classification": "PUBLIC",
+            "value": {
+              "arrangements": "PUBLIC",
+              "excludeDates": {
+                "classification": "PUBLIC",
+                "value": [
+                  {
+                    "id": "fac34d11-a61a-480b-b130-ca792e877b4f",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "33f92c01-434c-46b1-b9f3-f4d468ccbcd4",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "f9c6086c-b73d-4a3d-a35d-4c0d413b65b6",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  }
+                ]
+              },
+              "languageInterpreter": "PUBLIC",
+              "other": "PUBLIC",
+              "scheduleHearing": "PUBLIC",
+              "signLanguageType": "PUBLIC",
+              "wantsSupport": "PUBLIC",
+              "wantsToAttend": "PUBLIC"
+            }
+          },
+          "hearingType": "PUBLIC",
+          "mrnDetails": {
+            "classification": "PUBLIC",
+            "value": {
+              "dwpIssuingOffice": "PUBLIC",
+              "mrnDate": "PUBLIC",
+              "mrnLateReason": "PUBLIC",
+              "mrnMissingReason": "PUBLIC"
+            }
+          },
+          "receivedVia": "PUBLIC",
+          "rep": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {
+                  "county": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "line2": "PUBLIC",
+                  "postcode": "PUBLIC",
+                  "town": "PUBLIC"
+                }
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "hasRepresentative": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              },
+              "organisation": "PUBLIC"
+            }
+          },
+          "signer": "PUBLIC"
+        }
+      },
+      "benefitCode": "PUBLIC",
+      "caseCode": "PUBLIC",
+      "caseCreated": "PUBLIC",
+      "clerkAppealSatisfactionText": "PUBLIC",
+      "clerkConfirmationOfMRN": "PUBLIC",
+      "clerkConfirmationOther": "PUBLIC",
+      "clerkDelegatedAuthority": "PUBLIC",
+      "clerkOtherReason": "PUBLIC",
+      "correspondence": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "f31a3923-33a0-45f0-b2d0-fd7478921641",
+            "value": {
+              "correspondenceType": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "sentOn": "PUBLIC",
+              "to": "PUBLIC"
+            }
+          },
+          {
+            "id": "e17e70d5-f93c-4ea3-99d0-1b65cc7928fa",
+            "value": {
+              "correspondenceType": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "sentOn": "PUBLIC",
+              "to": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "documentSentToDwp": "PUBLIC",
+      "dwpRegionalCentre": "PUBLIC",
+      "dwpState": "PUBLIC",
+      "evidencePresent": "PUBLIC",
+      "evidenceReceivedCF": {
+        "classification": "PUBLIC",
+        "value": {
+          "appellantInfoRequestCollection": {
+            "classification": "PUBLIC",
+            "value": [
+              {
+                "id": "e05c92f8-a8f3-48f2-8ec1-38b38deae14e",
+                "value": {
+                  "evidenceReceivedBoolean": "PUBLIC",
+                  "evidenceReceivedDate": "PUBLIC"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "interlocReferralDate": "PUBLIC",
+      "interlocReviewState": "PUBLIC",
+      "isWaiverNeeded": "PUBLIC",
+      "issueCode": "PUBLIC",
+      "notListableDueDate": "PUBLIC",
+      "notListableProvideReasons": "PUBLIC",
+      "panel": {
+        "classification": "PUBLIC",
+        "value": {
+          "assignedTo": "PUBLIC",
+          "disabilityQualifiedMember": "PUBLIC",
+          "medicalMember": "PUBLIC"
+        }
+      },
+      "pcqId": "PUBLIC",
+      "region": "PUBLIC",
+      "regionalProcessingCenter": {
+        "classification": "PUBLIC",
+        "value": {
+          "address1": "PUBLIC",
+          "address2": "PUBLIC",
+          "address3": "PUBLIC",
+          "address4": "PUBLIC",
+          "city": "PUBLIC",
+          "email": "PUBLIC",
+          "faxNumber": "PUBLIC",
+          "name": "PUBLIC",
+          "phoneNumber": "PUBLIC",
+          "postcode": "PUBLIC"
+        }
+      },
+      "reservedToJudgeInterloc": "PUBLIC",
+      "sscsDocument": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "beac0b90-4ff8-479c-95d9-259b2cd9e6ba",
+            "value": {
+              "bundleAddition": "PUBLIC",
+              "documentDateAdded": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC"
+            }
+          },
+          {
+            "id": "ea9d0e53-e9c0-42fd-ae51-564e6fc8dd9f",
+            "value": {
+              "bundleAddition": "PUBLIC",
+              "documentDateAdded": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "subscriptions": {
+        "classification": "PUBLIC",
+        "value": {
+          "appellantSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "appointeeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "representativeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "supporterSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          }
+        }
+      },
+      "updateNotListableDirectionsFulfilled": "PUBLIC",
+      "updateNotListableInterlocReview": "PUBLIC",
+      "updateNotListableWhoReviewsCase": "PUBLIC",
+      "urgentCase": "PUBLIC",
+      "waiverDeclaration": "PUBLIC",
+      "waiverReason": "PUBLIC",
+      "waiverReasonOther": "PUBLIC"
+    },
+    "delete_draft_response_status": null,
+    "delete_draft_response_status_code": null,
+    "id": 1594906220767436,
+    "jurisdiction": "SSCS",
+    "last_modified": [
+      2020,
+      7,
+      24,
+      12,
+      56,
+      59,
+      324000000
+    ],
+    "last_state_modified_date": [
+      2020,
+      7,
+      21,
+      14,
+      57,
+      24,
+      283000000
+    ],
+    "security_classification": "PUBLIC",
+    "security_classifications": {
+      "adjournCasePreviewDocument": "PUBLIC",
+      "appeal": {
+        "classification": "PUBLIC",
+        "value": {
+          "appealReasons": {
+            "classification": "PUBLIC",
+            "value": {
+              "otherReasons": "PUBLIC",
+              "reasons": {
+                "classification": "PUBLIC",
+                "value": [
+                  {
+                    "id": "8611432d-de46-48d8-940c-175ccc50f0b2",
+                    "value": {
+                      "description": "PUBLIC",
+                      "reason": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "4a2d0c3b-82aa-4812-97d9-380b90ab563f",
+                    "value": {
+                      "description": "PUBLIC",
+                      "reason": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "506b4eb3-5fc4-46d7-b2c6-d88de0ed9548",
+                    "value": {
+                      "description": "PUBLIC",
+                      "reason": "PUBLIC"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "appellant": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {
+                  "county": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "line2": "PUBLIC",
+                  "postcode": "PUBLIC",
+                  "town": "PUBLIC"
+                }
+              },
+              "appointee": {
+                "classification": "PUBLIC",
+                "value": {
+                  "address": {
+                    "classification": "PUBLIC",
+                    "value": {}
+                  },
+                  "contact": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "email": "PUBLIC",
+                      "mobile": "PUBLIC",
+                      "phone": "PUBLIC"
+                    }
+                  },
+                  "identity": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "dob": "PUBLIC",
+                      "nino": "PUBLIC"
+                    }
+                  },
+                  "name": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "firstName": "PUBLIC",
+                      "lastName": "PUBLIC",
+                      "title": "PUBLIC"
+                    }
+                  }
+                }
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "identity": {
+                "classification": "PUBLIC",
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                }
+              },
+              "isAddressSameAsAppointee": "PUBLIC",
+              "isAppointee": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              }
+            }
+          },
+          "benefitType": {
+            "classification": "PUBLIC",
+            "value": {
+              "code": "PUBLIC",
+              "description": "PUBLIC"
+            }
+          },
+          "hearingOptions": {
+            "classification": "PUBLIC",
+            "value": {
+              "arrangements": "PUBLIC",
+              "excludeDates": {
+                "classification": "PUBLIC",
+                "value": [
+                  {
+                    "id": "fac34d11-a61a-480b-b130-ca792e877b4f",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "33f92c01-434c-46b1-b9f3-f4d468ccbcd4",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "f9c6086c-b73d-4a3d-a35d-4c0d413b65b6",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  }
+                ]
+              },
+              "languageInterpreter": "PUBLIC",
+              "other": "PUBLIC",
+              "scheduleHearing": "PUBLIC",
+              "signLanguageType": "PUBLIC",
+              "wantsSupport": "PUBLIC",
+              "wantsToAttend": "PUBLIC"
+            }
+          },
+          "hearingType": "PUBLIC",
+          "mrnDetails": {
+            "classification": "PUBLIC",
+            "value": {
+              "dwpIssuingOffice": "PUBLIC",
+              "mrnDate": "PUBLIC",
+              "mrnLateReason": "PUBLIC",
+              "mrnMissingReason": "PUBLIC"
+            }
+          },
+          "receivedVia": "PUBLIC",
+          "rep": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {
+                  "county": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "line2": "PUBLIC",
+                  "postcode": "PUBLIC",
+                  "town": "PUBLIC"
+                }
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "hasRepresentative": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              },
+              "organisation": "PUBLIC"
+            }
+          },
+          "signer": "PUBLIC"
+        }
+      },
+      "benefitCode": "PUBLIC",
+      "caseCode": "PUBLIC",
+      "caseCreated": "PUBLIC",
+      "clerkAppealSatisfactionText": "PUBLIC",
+      "clerkConfirmationOfMRN": "PUBLIC",
+      "clerkConfirmationOther": "PUBLIC",
+      "clerkDelegatedAuthority": "PUBLIC",
+      "clerkOtherReason": "PUBLIC",
+      "correspondence": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "f31a3923-33a0-45f0-b2d0-fd7478921641",
+            "value": {
+              "correspondenceType": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "sentOn": "PUBLIC",
+              "to": "PUBLIC"
+            }
+          },
+          {
+            "id": "e17e70d5-f93c-4ea3-99d0-1b65cc7928fa",
+            "value": {
+              "correspondenceType": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "sentOn": "PUBLIC",
+              "to": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "documentSentToDwp": "PUBLIC",
+      "dwpRegionalCentre": "PUBLIC",
+      "dwpState": "PUBLIC",
+      "evidencePresent": "PUBLIC",
+      "evidenceReceivedCF": {
+        "classification": "PUBLIC",
+        "value": {
+          "appellantInfoRequestCollection": {
+            "classification": "PUBLIC",
+            "value": [
+              {
+                "id": "e05c92f8-a8f3-48f2-8ec1-38b38deae14e",
+                "value": {
+                  "evidenceReceivedBoolean": "PUBLIC",
+                  "evidenceReceivedDate": "PUBLIC"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "interlocReferralDate": "PUBLIC",
+      "interlocReviewState": "PUBLIC",
+      "isWaiverNeeded": "PUBLIC",
+      "issueCode": "PUBLIC",
+      "notListableDueDate": "PUBLIC",
+      "notListableProvideReasons": "PUBLIC",
+      "panel": {
+        "classification": "PUBLIC",
+        "value": {
+          "assignedTo": "PUBLIC",
+          "disabilityQualifiedMember": "PUBLIC",
+          "medicalMember": "PUBLIC"
+        }
+      },
+      "pcqId": "PUBLIC",
+      "region": "PUBLIC",
+      "regionalProcessingCenter": {
+        "classification": "PUBLIC",
+        "value": {
+          "address1": "PUBLIC",
+          "address2": "PUBLIC",
+          "address3": "PUBLIC",
+          "address4": "PUBLIC",
+          "city": "PUBLIC",
+          "email": "PUBLIC",
+          "faxNumber": "PUBLIC",
+          "name": "PUBLIC",
+          "phoneNumber": "PUBLIC",
+          "postcode": "PUBLIC"
+        }
+      },
+      "reservedToJudgeInterloc": "PUBLIC",
+      "sscsDocument": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "beac0b90-4ff8-479c-95d9-259b2cd9e6ba",
+            "value": {
+              "bundleAddition": "PUBLIC",
+              "documentDateAdded": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC"
+            }
+          },
+          {
+            "id": "ea9d0e53-e9c0-42fd-ae51-564e6fc8dd9f",
+            "value": {
+              "bundleAddition": "PUBLIC",
+              "documentDateAdded": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "subscriptions": {
+        "classification": "PUBLIC",
+        "value": {
+          "appellantSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "appointeeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "representativeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "supporterSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          }
+        }
+      },
+      "updateNotListableDirectionsFulfilled": "PUBLIC",
+      "updateNotListableInterlocReview": "PUBLIC",
+      "updateNotListableWhoReviewsCase": "PUBLIC",
+      "urgentCase": "PUBLIC",
+      "waiverDeclaration": "PUBLIC",
+      "waiverReason": "PUBLIC",
+      "waiverReasonOther": "PUBLIC"
+    },
+    "state": "notListable",
+    "version": 12
+  },
+  "case_details_before": {
+    "after_submit_callback_response": null,
+    "callback_response_status": null,
+    "callback_response_status_code": null,
+    "case_data": {
+      "adjournCasePreviewDocument": {
+        "document_binary_url": "http://dm-store:5005/documents/debc3f2e-c7b4-452d-8390-911e88f39bf4/binary",
+        "document_filename": "2020_April_Statement_Halifax_joint.pdf",
+        "document_url": "http://dm-store:5005/documents/debc3f2e-c7b4-452d-8390-911e88f39bf4"
+      },
+      "appeal": {
+        "appealReasons": {
+          "otherReasons": "Another reason",
+          "reasons": [
+            {
+              "id": "8611432d-de46-48d8-940c-175ccc50f0b2",
+              "value": {
+                "description": "aaaaaaaaaa",
+                "reason": "aaaaaaaaaa"
+              }
+            },
+            {
+              "id": "4a2d0c3b-82aa-4812-97d9-380b90ab563f",
+              "value": {
+                "description": "bbbbbbbbbb",
+                "reason": "bbbbbbbbbb"
+              }
+            },
+            {
+              "id": "506b4eb3-5fc4-46d7-b2c6-d88de0ed9548",
+              "value": {
+                "description": "cccccccccc",
+                "reason": "cccccccccc"
+              }
+            }
+          ]
+        },
+        "appellant": {
+          "address": {
+            "county": "Kent",
+            "line1": "123 Hairy Lane",
+            "line2": "Off Hairy Park",
+            "postcode": "TS1 1ST",
+            "town": "Hairyfield"
+          },
+          "appointee": {
+            "address": {},
+            "contact": {
+              "email": null,
+              "mobile": null,
+              "phone": null
+            },
+            "identity": {
+              "dob": null,
+              "nino": null
+            },
+            "name": {
+              "firstName": null,
+              "lastName": null,
+              "title": null
+            }
+          },
+          "contact": {
+            "email": "sscstest+notify@greencroftconsulting.com",
+            "mobile": "07411222222",
+            "phone": null
+          },
+          "identity": {
+            "dob": "1990-02-26",
+            "nino": "AB877533C"
+          },
+          "isAddressSameAsAppointee": "No",
+          "isAppointee": "No",
+          "name": {
+            "firstName": "Joe",
+            "lastName": "Bloggs",
+            "title": "Mr"
+          }
+        },
+        "benefitType": {
+          "code": "PIP",
+          "description": "Personal Independence Payment"
+        },
+        "hearingOptions": {
+          "arrangements": [
+            "signLanguageInterpreter",
+            "hearingLoop"
+          ],
+          "excludeDates": [
+            {
+              "id": "fac34d11-a61a-480b-b130-ca792e877b4f",
+              "value": {
+                "end": "2018-04-04",
+                "start": "2018-04-04"
+              }
+            },
+            {
+              "id": "33f92c01-434c-46b1-b9f3-f4d468ccbcd4",
+              "value": {
+                "end": "2018-04-05",
+                "start": "2018-04-05"
+              }
+            },
+            {
+              "id": "f9c6086c-b73d-4a3d-a35d-4c0d413b65b6",
+              "value": {
+                "end": "2018-04-06",
+                "start": "2018-04-06"
+              }
+            }
+          ],
+          "languageInterpreter": "No",
+          "other": "Yes, this...",
+          "scheduleHearing": "Yes",
+          "signLanguageType": "Sign language",
+          "wantsSupport": "Yes",
+          "wantsToAttend": "Yes"
+        },
+        "hearingType": "oral",
+        "mrnDetails": {
+          "dwpIssuingOffice": "DWP PIP (1)",
+          "mrnDate": "2018-02-01",
+          "mrnLateReason": null,
+          "mrnMissingReason": null
+        },
+        "receivedVia": "Online",
+        "rep": {
+          "address": {
+            "county": "County",
+            "line1": "123 Hairy Lane",
+            "line2": "Off Hairy Park",
+            "postcode": "CM14 4LQ",
+            "town": "Town"
+          },
+          "contact": {
+            "email": "sscstest+notify2@greencroftconsulting.com",
+            "mobile": "07411999999",
+            "phone": null
+          },
+          "hasRepresentative": "Yes",
+          "name": {
+            "firstName": "Harry",
+            "lastName": "Potter",
+            "title": "Mr"
+          },
+          "organisation": "HP Ltd"
+        },
+        "signer": "Joe Bloggs"
+      },
+      "benefitCode": "002",
+      "caseCode": "002DD",
+      "caseCreated": "2020-07-16",
+      "clerkAppealSatisfactionText": [
+        "appealSatisfactionText"
+      ],
+      "clerkConfirmationOfMRN": "No",
+      "clerkConfirmationOther": "No idea",
+      "clerkDelegatedAuthority": [
+        "delegatedAuthorityText"
+      ],
+      "clerkOtherReason": "No",
+      "correspondence": [
+        {
+          "id": "f31a3923-33a0-45f0-b2d0-fd7478921641",
+          "value": {
+            "correspondenceType": "Letter",
+            "documentLink": {
+              "document_binary_url": "http://dm-store:5005/documents/f7bde965-43c5-4785-9039-d33dac2d072a/binary",
+              "document_filename": "issueAdjournment 21 Jul 2020 1600.pdf",
+              "document_url": "http://dm-store:5005/documents/f7bde965-43c5-4785-9039-d33dac2d072a"
+            },
+            "sentOn": "21 Jul 2020 16:00",
+            "to": "Joe Bloggs"
+          }
+        },
+        {
+          "id": "e17e70d5-f93c-4ea3-99d0-1b65cc7928fa",
+          "value": {
+            "correspondenceType": "Letter",
+            "documentLink": {
+              "document_binary_url": "http://dm-store:5005/documents/18ddbd97-a7e1-4047-95a5-4b399981e7b2/binary",
+              "document_filename": "issueAdjournment 21 Jul 2020 1600.pdf",
+              "document_url": "http://dm-store:5005/documents/18ddbd97-a7e1-4047-95a5-4b399981e7b2"
+            },
+            "sentOn": "21 Jul 2020 16:00",
+            "to": "Harry Potter"
+          }
+        }
+      ],
+      "documentSentToDwp": "Yes",
+      "dwpRegionalCentre": "Newcastle",
+      "dwpState": "adjournmentNotice",
+      "evidencePresent": "No",
+      "evidenceReceivedCF": {
+        "appellantInfoRequestCollection": [
+          {
+            "id": "e05c92f8-a8f3-48f2-8ec1-38b38deae14e",
+            "value": {
+              "evidenceReceivedBoolean": "Yes",
+              "evidenceReceivedDate": "2019-07-10"
+            }
+          }
+        ]
+      },
+      "interlocReferralDate": "2020-07-21",
+      "interlocReviewState": "reviewByJudge",
+      "isWaiverNeeded": "Yes",
+      "issueCode": "DD",
+      "notListableDueDate": "2020-11-10",
+      "notListableProvideReasons": "erferf",
+      "panel": {
+        "assignedTo": "Bill",
+        "disabilityQualifiedMember": "Bob",
+        "medicalMember": "Gary"
+      },
+      "pcqId": "12345678",
+      "region": "LEEDS",
+      "regionalProcessingCenter": {
+        "address1": "HM Courts & Tribunals Service",
+        "address2": "Social Security & Child Support Appeals",
+        "address3": "York House",
+        "address4": "31 York Place",
+        "city": "LEEDS",
+        "email": "Leeds_SYA_Response@justice.gov.uk",
+        "faxNumber": "0870 739 4331",
+        "name": "LEEDS",
+        "phoneNumber": "0300 123 1142",
+        "postcode": "LS1 2ED"
+      },
+      "reservedToJudgeInterloc": {
+        "idamId" : "736238ce-5565-49b2-8d35-48d96ab438bf",
+        "personalCode" : "49933315"
+      },
+      "sscsDocument": [
+        {
+          "id": "beac0b90-4ff8-479c-95d9-259b2cd9e6ba",
+          "value": {
+            "bundleAddition": "A",
+            "documentDateAdded": "2020-07-21",
+            "documentFileName": "Addition A - Adjournment Notice issued on 21-07-2020.pdf",
+            "documentLink": {
+              "document_binary_url": "http://dm-store:5005/documents/7551a1b3-657c-40e7-9a1f-12c013ad611b/binary",
+              "document_filename": "2020_April_Statement_Halifax_joint.pdf",
+              "document_url": "http://dm-store:5005/documents/7551a1b3-657c-40e7-9a1f-12c013ad611b"
+            },
+            "documentType": "adjournmentNotice"
+          }
+        },
+        {
+          "id": "ea9d0e53-e9c0-42fd-ae51-564e6fc8dd9f",
+          "value": {
+            "bundleAddition": "B",
+            "documentDateAdded": "2020-07-21",
+            "documentFileName": "Addition B - Adjournment Notice issued on 21-07-2020.pdf",
+            "documentLink": {
+              "document_binary_url": "http://dm-store:5005/documents/4df0c859-50ff-47e2-b02d-ce91525107dc/binary",
+              "document_filename": "2020_April_Statement_Halifax_joint.pdf",
+              "document_url": "http://dm-store:5005/documents/4df0c859-50ff-47e2-b02d-ce91525107dc"
+            },
+            "documentType": "adjournmentNotice"
+          }
+        }
+      ],
+      "subscriptions": {
+        "appellantSubscription": {
+          "email": "sscstest+notify@greencroftconsulting.com",
+          "lastLoggedIntoMya": null,
+          "mobile": "+447398785050",
+          "reason": null,
+          "subscribeEmail": "Yes",
+          "subscribeSms": "Yes",
+          "tya": "omn2WpTMrd",
+          "wantSmsNotifications": "Yes"
+        },
+        "appointeeSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        },
+        "representativeSubscription": {
+          "email": "sscstest+notify2@greencroftconsulting.com",
+          "lastLoggedIntoMya": null,
+          "mobile": "+447398785051",
+          "reason": null,
+          "subscribeEmail": "Yes",
+          "subscribeSms": "Yes",
+          "tya": "C51W87bkmB",
+          "wantSmsNotifications": "Yes"
+        },
+        "supporterSubscription": {
+          "email": null,
+          "lastLoggedIntoMya": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "tya": null,
+          "wantSmsNotifications": null
+        }
+      },
+      "updateNotListableDirectionsFulfilled": "No",
+      "updateNotListableInterlocReview": "Yes",
+      "updateNotListableWhoReviewsCase": "reviewByJudge",
+      "urgentCase": "Yes",
+      "waiverDeclaration": [
+        "waiverDeclarationText"
+      ],
+      "waiverReason": [
+        "nonCompliantOther",
+        "nonCompliantNoMRN"
+      ],
+      "waiverReasonOther": "Not sure"
+    },
+    "case_type_id": "Benefit",
+    "created_date": [
+      2020,
+      7,
+      16,
+      13,
+      30,
+      20,
+      768000000
+    ],
+    "data_classification": {
+      "adjournCasePreviewDocument": "PUBLIC",
+      "appeal": {
+        "classification": "PUBLIC",
+        "value": {
+          "appealReasons": {
+            "classification": "PUBLIC",
+            "value": {
+              "otherReasons": "PUBLIC",
+              "reasons": {
+                "classification": "PUBLIC",
+                "value": [
+                  {
+                    "id": "8611432d-de46-48d8-940c-175ccc50f0b2",
+                    "value": {
+                      "description": "PUBLIC",
+                      "reason": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "4a2d0c3b-82aa-4812-97d9-380b90ab563f",
+                    "value": {
+                      "description": "PUBLIC",
+                      "reason": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "506b4eb3-5fc4-46d7-b2c6-d88de0ed9548",
+                    "value": {
+                      "description": "PUBLIC",
+                      "reason": "PUBLIC"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "appellant": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {
+                  "county": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "line2": "PUBLIC",
+                  "postcode": "PUBLIC",
+                  "town": "PUBLIC"
+                }
+              },
+              "appointee": {
+                "classification": "PUBLIC",
+                "value": {
+                  "address": {
+                    "classification": "PUBLIC",
+                    "value": {}
+                  },
+                  "contact": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "email": "PUBLIC",
+                      "mobile": "PUBLIC",
+                      "phone": "PUBLIC"
+                    }
+                  },
+                  "identity": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "dob": "PUBLIC",
+                      "nino": "PUBLIC"
+                    }
+                  },
+                  "name": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "firstName": "PUBLIC",
+                      "lastName": "PUBLIC",
+                      "title": "PUBLIC"
+                    }
+                  }
+                }
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "identity": {
+                "classification": "PUBLIC",
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                }
+              },
+              "isAddressSameAsAppointee": "PUBLIC",
+              "isAppointee": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              }
+            }
+          },
+          "benefitType": {
+            "classification": "PUBLIC",
+            "value": {
+              "code": "PUBLIC",
+              "description": "PUBLIC"
+            }
+          },
+          "hearingOptions": {
+            "classification": "PUBLIC",
+            "value": {
+              "arrangements": "PUBLIC",
+              "excludeDates": {
+                "classification": "PUBLIC",
+                "value": [
+                  {
+                    "id": "fac34d11-a61a-480b-b130-ca792e877b4f",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "33f92c01-434c-46b1-b9f3-f4d468ccbcd4",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "f9c6086c-b73d-4a3d-a35d-4c0d413b65b6",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  }
+                ]
+              },
+              "languageInterpreter": "PUBLIC",
+              "other": "PUBLIC",
+              "scheduleHearing": "PUBLIC",
+              "signLanguageType": "PUBLIC",
+              "wantsSupport": "PUBLIC",
+              "wantsToAttend": "PUBLIC"
+            }
+          },
+          "hearingType": "PUBLIC",
+          "mrnDetails": {
+            "classification": "PUBLIC",
+            "value": {
+              "dwpIssuingOffice": "PUBLIC",
+              "mrnDate": "PUBLIC",
+              "mrnLateReason": "PUBLIC",
+              "mrnMissingReason": "PUBLIC"
+            }
+          },
+          "receivedVia": "PUBLIC",
+          "rep": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {
+                  "county": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "line2": "PUBLIC",
+                  "postcode": "PUBLIC",
+                  "town": "PUBLIC"
+                }
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "hasRepresentative": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              },
+              "organisation": "PUBLIC"
+            }
+          },
+          "signer": "PUBLIC"
+        }
+      },
+      "benefitCode": "PUBLIC",
+      "caseCode": "PUBLIC",
+      "caseCreated": "PUBLIC",
+      "clerkAppealSatisfactionText": "PUBLIC",
+      "clerkConfirmationOfMRN": "PUBLIC",
+      "clerkConfirmationOther": "PUBLIC",
+      "clerkDelegatedAuthority": "PUBLIC",
+      "clerkOtherReason": "PUBLIC",
+      "correspondence": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "f31a3923-33a0-45f0-b2d0-fd7478921641",
+            "value": {
+              "correspondenceType": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "sentOn": "PUBLIC",
+              "to": "PUBLIC"
+            }
+          },
+          {
+            "id": "e17e70d5-f93c-4ea3-99d0-1b65cc7928fa",
+            "value": {
+              "correspondenceType": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "sentOn": "PUBLIC",
+              "to": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "documentSentToDwp": "PUBLIC",
+      "dwpRegionalCentre": "PUBLIC",
+      "dwpState": "PUBLIC",
+      "evidencePresent": "PUBLIC",
+      "evidenceReceivedCF": {
+        "classification": "PUBLIC",
+        "value": {
+          "appellantInfoRequestCollection": {
+            "classification": "PUBLIC",
+            "value": [
+              {
+                "id": "e05c92f8-a8f3-48f2-8ec1-38b38deae14e",
+                "value": {
+                  "evidenceReceivedBoolean": "PUBLIC",
+                  "evidenceReceivedDate": "PUBLIC"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "interlocReferralDate": "PUBLIC",
+      "interlocReviewState": "PUBLIC",
+      "isWaiverNeeded": "PUBLIC",
+      "issueCode": "PUBLIC",
+      "notListableDueDate": "PUBLIC",
+      "notListableProvideReasons": "PUBLIC",
+      "panel": {
+        "classification": "PUBLIC",
+        "value": {
+          "assignedTo": "PUBLIC",
+          "disabilityQualifiedMember": "PUBLIC",
+          "medicalMember": "PUBLIC"
+        }
+      },
+      "pcqId": "PUBLIC",
+      "region": "PUBLIC",
+      "regionalProcessingCenter": {
+        "classification": "PUBLIC",
+        "value": {
+          "address1": "PUBLIC",
+          "address2": "PUBLIC",
+          "address3": "PUBLIC",
+          "address4": "PUBLIC",
+          "city": "PUBLIC",
+          "email": "PUBLIC",
+          "faxNumber": "PUBLIC",
+          "name": "PUBLIC",
+          "phoneNumber": "PUBLIC",
+          "postcode": "PUBLIC"
+        }
+      },
+      "reservedToJudgeInterloc": "PUBLIC",
+      "sscsDocument": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "beac0b90-4ff8-479c-95d9-259b2cd9e6ba",
+            "value": {
+              "bundleAddition": "PUBLIC",
+              "documentDateAdded": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC"
+            }
+          },
+          {
+            "id": "ea9d0e53-e9c0-42fd-ae51-564e6fc8dd9f",
+            "value": {
+              "bundleAddition": "PUBLIC",
+              "documentDateAdded": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "subscriptions": {
+        "classification": "PUBLIC",
+        "value": {
+          "appellantSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "appointeeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "representativeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "supporterSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          }
+        }
+      },
+      "updateNotListableDirectionsFulfilled": "PUBLIC",
+      "updateNotListableInterlocReview": "PUBLIC",
+      "updateNotListableWhoReviewsCase": "PUBLIC",
+      "urgentCase": "PUBLIC",
+      "waiverDeclaration": "PUBLIC",
+      "waiverReason": "PUBLIC",
+      "waiverReasonOther": "PUBLIC"
+    },
+    "delete_draft_response_status": null,
+    "delete_draft_response_status_code": null,
+    "id": 1594906220767436,
+    "jurisdiction": "SSCS",
+    "last_modified": [
+      2020,
+      7,
+      21,
+      15,
+      0,
+      29,
+      513000000
+    ],
+    "last_state_modified_date": [
+      2020,
+      7,
+      21,
+      14,
+      57,
+      24,
+      283000000
+    ],
+    "security_classification": "PUBLIC",
+    "security_classifications": {
+      "adjournCasePreviewDocument": "PUBLIC",
+      "appeal": {
+        "classification": "PUBLIC",
+        "value": {
+          "appealReasons": {
+            "classification": "PUBLIC",
+            "value": {
+              "otherReasons": "PUBLIC",
+              "reasons": {
+                "classification": "PUBLIC",
+                "value": [
+                  {
+                    "id": "8611432d-de46-48d8-940c-175ccc50f0b2",
+                    "value": {
+                      "description": "PUBLIC",
+                      "reason": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "4a2d0c3b-82aa-4812-97d9-380b90ab563f",
+                    "value": {
+                      "description": "PUBLIC",
+                      "reason": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "506b4eb3-5fc4-46d7-b2c6-d88de0ed9548",
+                    "value": {
+                      "description": "PUBLIC",
+                      "reason": "PUBLIC"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "appellant": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {
+                  "county": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "line2": "PUBLIC",
+                  "postcode": "PUBLIC",
+                  "town": "PUBLIC"
+                }
+              },
+              "appointee": {
+                "classification": "PUBLIC",
+                "value": {
+                  "address": {
+                    "classification": "PUBLIC",
+                    "value": {}
+                  },
+                  "contact": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "email": "PUBLIC",
+                      "mobile": "PUBLIC",
+                      "phone": "PUBLIC"
+                    }
+                  },
+                  "identity": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "dob": "PUBLIC",
+                      "nino": "PUBLIC"
+                    }
+                  },
+                  "name": {
+                    "classification": "PUBLIC",
+                    "value": {
+                      "firstName": "PUBLIC",
+                      "lastName": "PUBLIC",
+                      "title": "PUBLIC"
+                    }
+                  }
+                }
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "identity": {
+                "classification": "PUBLIC",
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                }
+              },
+              "isAddressSameAsAppointee": "PUBLIC",
+              "isAppointee": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              }
+            }
+          },
+          "benefitType": {
+            "classification": "PUBLIC",
+            "value": {
+              "code": "PUBLIC",
+              "description": "PUBLIC"
+            }
+          },
+          "hearingOptions": {
+            "classification": "PUBLIC",
+            "value": {
+              "arrangements": "PUBLIC",
+              "excludeDates": {
+                "classification": "PUBLIC",
+                "value": [
+                  {
+                    "id": "fac34d11-a61a-480b-b130-ca792e877b4f",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "33f92c01-434c-46b1-b9f3-f4d468ccbcd4",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  },
+                  {
+                    "id": "f9c6086c-b73d-4a3d-a35d-4c0d413b65b6",
+                    "value": {
+                      "end": "PUBLIC",
+                      "start": "PUBLIC"
+                    }
+                  }
+                ]
+              },
+              "languageInterpreter": "PUBLIC",
+              "other": "PUBLIC",
+              "scheduleHearing": "PUBLIC",
+              "signLanguageType": "PUBLIC",
+              "wantsSupport": "PUBLIC",
+              "wantsToAttend": "PUBLIC"
+            }
+          },
+          "hearingType": "PUBLIC",
+          "mrnDetails": {
+            "classification": "PUBLIC",
+            "value": {
+              "dwpIssuingOffice": "PUBLIC",
+              "mrnDate": "PUBLIC",
+              "mrnLateReason": "PUBLIC",
+              "mrnMissingReason": "PUBLIC"
+            }
+          },
+          "receivedVia": "PUBLIC",
+          "rep": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {
+                  "county": "PUBLIC",
+                  "line1": "PUBLIC",
+                  "line2": "PUBLIC",
+                  "postcode": "PUBLIC",
+                  "town": "PUBLIC"
+                }
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "mobile": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "hasRepresentative": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              },
+              "organisation": "PUBLIC"
+            }
+          },
+          "signer": "PUBLIC"
+        }
+      },
+      "benefitCode": "PUBLIC",
+      "caseCode": "PUBLIC",
+      "caseCreated": "PUBLIC",
+      "clerkAppealSatisfactionText": "PUBLIC",
+      "clerkConfirmationOfMRN": "PUBLIC",
+      "clerkConfirmationOther": "PUBLIC",
+      "clerkDelegatedAuthority": "PUBLIC",
+      "clerkOtherReason": "PUBLIC",
+      "correspondence": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "f31a3923-33a0-45f0-b2d0-fd7478921641",
+            "value": {
+              "correspondenceType": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "sentOn": "PUBLIC",
+              "to": "PUBLIC"
+            }
+          },
+          {
+            "id": "e17e70d5-f93c-4ea3-99d0-1b65cc7928fa",
+            "value": {
+              "correspondenceType": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "sentOn": "PUBLIC",
+              "to": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "documentSentToDwp": "PUBLIC",
+      "dwpRegionalCentre": "PUBLIC",
+      "dwpState": "PUBLIC",
+      "evidencePresent": "PUBLIC",
+      "evidenceReceivedCF": {
+        "classification": "PUBLIC",
+        "value": {
+          "appellantInfoRequestCollection": {
+            "classification": "PUBLIC",
+            "value": [
+              {
+                "id": "e05c92f8-a8f3-48f2-8ec1-38b38deae14e",
+                "value": {
+                  "evidenceReceivedBoolean": "PUBLIC",
+                  "evidenceReceivedDate": "PUBLIC"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "interlocReferralDate": "PUBLIC",
+      "interlocReviewState": "PUBLIC",
+      "isWaiverNeeded": "PUBLIC",
+      "issueCode": "PUBLIC",
+      "notListableDueDate": "PUBLIC",
+      "notListableProvideReasons": "PUBLIC",
+      "panel": {
+        "classification": "PUBLIC",
+        "value": {
+          "assignedTo": "PUBLIC",
+          "disabilityQualifiedMember": "PUBLIC",
+          "medicalMember": "PUBLIC"
+        }
+      },
+      "pcqId": "PUBLIC",
+      "region": "PUBLIC",
+      "regionalProcessingCenter": {
+        "classification": "PUBLIC",
+        "value": {
+          "address1": "PUBLIC",
+          "address2": "PUBLIC",
+          "address3": "PUBLIC",
+          "address4": "PUBLIC",
+          "city": "PUBLIC",
+          "email": "PUBLIC",
+          "faxNumber": "PUBLIC",
+          "name": "PUBLIC",
+          "phoneNumber": "PUBLIC",
+          "postcode": "PUBLIC"
+        }
+      },
+      "reservedToJudgeInterloc": "PUBLIC",
+      "sscsDocument": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "beac0b90-4ff8-479c-95d9-259b2cd9e6ba",
+            "value": {
+              "bundleAddition": "PUBLIC",
+              "documentDateAdded": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC"
+            }
+          },
+          {
+            "id": "ea9d0e53-e9c0-42fd-ae51-564e6fc8dd9f",
+            "value": {
+              "bundleAddition": "PUBLIC",
+              "documentDateAdded": "PUBLIC",
+              "documentFileName": "PUBLIC",
+              "documentLink": "PUBLIC",
+              "documentType": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "subscriptions": {
+        "classification": "PUBLIC",
+        "value": {
+          "appellantSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "appointeeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "representativeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          },
+          "supporterSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "lastLoggedIntoMya": "PUBLIC",
+              "mobile": "PUBLIC",
+              "reason": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "tya": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC"
+            }
+          }
+        }
+      },
+      "updateNotListableDirectionsFulfilled": "PUBLIC",
+      "updateNotListableInterlocReview": "PUBLIC",
+      "updateNotListableWhoReviewsCase": "PUBLIC",
+      "urgentCase": "PUBLIC",
+      "waiverDeclaration": "PUBLIC",
+      "waiverReason": "PUBLIC",
+      "waiverReasonOther": "PUBLIC"
+    },
+    "state": "readyToList",
+    "version": 12
+  },
+  "event_id": "notListable",
+  "ignore_warning": false
+}

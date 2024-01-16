@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.service.venue;
 
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,7 @@ public class VenueRpcDetailsService {
 
     public List<VenueRpcDetails> getVenues(Predicate<VenueRpcDetails> predicate) {
         return venueDataLoader.getVenueDetailsMap().values().stream().filter(this::isActiveVenue)
-            .map(VenueRpcDetails::new).filter(predicate).collect(Collectors.toList());
+            .map(VenueRpcDetails::new).filter(predicate).toList();
     }
 
     private boolean isActiveVenue(VenueDetails venueDetails) {

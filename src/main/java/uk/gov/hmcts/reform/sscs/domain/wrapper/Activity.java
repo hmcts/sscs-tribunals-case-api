@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.domain.wrapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Objects;
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
@@ -17,13 +17,13 @@ public class Activity {
         this.selectionKey = selectionKey;
     }
 
-    @ApiModelProperty(example = "an activity", required = true)
+    @Schema(example = "an activity", required = true)
     @JsonProperty(value = "activity")
     public String getActivity() {
         return activity;
     }
 
-    @ApiModelProperty(example = "2.1", required = true)
+    @Schema(example = "2.1", required = true)
     @JsonProperty(value = "selection_key")
     public String getSelectionKey() {
         return selectionKey;

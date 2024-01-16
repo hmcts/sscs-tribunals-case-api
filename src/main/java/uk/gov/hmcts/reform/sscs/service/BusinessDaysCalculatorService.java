@@ -9,7 +9,7 @@ import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 
 public class BusinessDaysCalculatorService {
 
-    private BusinessDaysCalculatorService(){
+    private BusinessDaysCalculatorService() {
         //
     }
 

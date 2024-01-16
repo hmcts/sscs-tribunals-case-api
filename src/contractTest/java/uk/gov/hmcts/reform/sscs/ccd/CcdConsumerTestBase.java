@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd;
 
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
-import au.com.dius.pact.core.model.annotations.PactFolder;
+import au.com.dius.pact.core.model.annotations.PactDirectory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.ccd.client.model.Event;
 @ExtendWith(PactConsumerTestExt.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @PactTestFor(providerName = "ccdDataStoreAPI_Cases", port = "8891")
-@PactFolder("pacts")
+@PactDirectory("pacts")
 @SpringBootTest({
     "core_case_data.api.url : localhost:8891"
 })

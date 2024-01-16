@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.sscs.ccd;
 import static org.junit.Assert.assertNotNull;
 import static uk.gov.hmcts.reform.sscs.ccd.util.PactDslBuilderForCaseDetailsList.buildNewListOfCaseDetailsDsl;
 
-import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
+import au.com.dius.pact.consumer.dsl.PactBuilder;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
-import au.com.dius.pact.core.model.RequestResponsePact;
+import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import java.util.Collections;
 import java.util.List;
@@ -25,10 +25,11 @@ public class SearchForCitizenConsumerTest extends CcdConsumerTestBase {
     Map<String, Object> params = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
     @Pact(provider = "ccdDataStoreAPI_Cases", consumer = "sscs_tribunalsCaseApi")
-    public RequestResponsePact searchForCitizen(PactDslWithProvider builder) {
+    public V4Pact searchForCitizen(PactBuilder builder) {
         params = Collections.emptyMap();
 
         return builder
+            .usingLegacyDsl()
             .given("A Search cases for a Citizen is requested", setUpStateMapForProviderWithCaseData(caseDataContent))
             .uponReceiving("A Search Cases for a Citizen")
             .path(buildPath())
@@ -41,7 +42,7 @@ public class SearchForCitizenConsumerTest extends CcdConsumerTestBase {
             .status(200)
             .body(
                 buildNewListOfCaseDetailsDsl(CASE_ID))
-            .toPact();
+            .toPact(V4Pact.class);
     }
 
     @Test

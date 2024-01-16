@@ -4,29 +4,42 @@ java:
   readinessPath: '/health/readiness'
   aadIdentityName: sscs
   ingressHost: sscs-tribunals-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  memoryLimits: '4096Mi'
   keyVaults:
     sscs:
       resourceGroup: sscs
       secrets:
-        - sscs-email-mac-secret-text
-        - idam-oauth-user
-        - ccd-jid
-        - ccd-tid
-        - idam-redirect
-        - idam-sscs-systemupdate-user
-        - idam-sscs-systemupdate-password
-        - idam-sscs-oauth2-client-secret
-        - sscs-s2s-secret
-        - s2s-micro
+        - name: sscs-email-mac-secret-text
+          alias: SUBSCRIPTIONS_MAC_SECRET
+        - name: idam-oauth-user
+          alias: IDAM_OAUTH2_CLIENT_ID
+        - name: ccd-jid
+          alias: CORE_CASE_DATA_JURISDICTION_ID
+        - name: ccd-tid
+          alias: CORE_CASE_DATA_CASE_TYPE_ID
+        - name: idam-redirect
+          alias: IDAM_OAUTH2_REDIRECT_URL
+        - name: idam-sscs-systemupdate-user
+          alias: IDAM_SSCS_SYSTEMUPDATE_USER
+        - name: idam-sscs-systemupdate-password
+          alias: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
+        - name: idam-sscs-oauth2-client-secret
+          alias: IDAM_OAUTH2_CLIENT_SECRET
+        - name: sscs-s2s-secret
+          alias: IDAM_S2S_AUTH_TOTP_SECRET
+        - name: s2s-micro
+          alias: IDAM_S2S_AUTH_MICROSERVICE
         - robotics-email-to
         - robotics-email-from
         - robotics-email-scottish-to
         - appeal-email-to
         - appeal-email-from
         - docmosis-endpoint
-        - docmosis-api-key
-        - AppInsightsInstrumentationKey
-        - name: sscs-asb-connection-string
+        - name: docmosis-api-key
+          alias: PDF_SERVICE_ACCESS_KEY
+        - name: app-insights-connection-string
+          alias: app-insights-connection-string
+        - name: sscs-servicebus-connection-string-tf
           alias: HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING
   environment:
     SERVER_PORT: 8080
@@ -42,7 +55,7 @@ java:
     PDF_SERVICE_CONVERT_URL: https://docmosis.aat.platform.hmcts.net/rs/convert
     PDF_SERVICE_HEALTH_URL: https://docmosis.aat.platform.hmcts.net/rs/status
     DOCMOSIS_SERVICE_BASE_URL: https://docmosis.aat.platform.hmcts.net/rs/render
-    PDF_SERVICE_ACCESS_KEY: ${PDF_SERVICE_ACCESS_KEY}
+    CCD_CALLBACK_ORCHESTRATOR_API_URL: "http://sscs-ccd-callback-orchestrator-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     DOC_ASSEMBLY_URL: "http://dg-docassembly-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_OAUTH2_REDIRECT_URL: "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
     PDF_API_URL: "http://rpe-pdf-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
@@ -56,10 +69,12 @@ java:
     DM_GATEWAY_URL: https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net
     CASE_DOCUMENT_AM_URL: "http://ccd-case-document-am-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     RD_LOCATION_REF_API_URL: "http://rd-location-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    JUDICIAL_REF_API_URL: "http://rd-judicial-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     SECURE_DOC_STORE_FEATURE: true
     WORK_ALLOCATION_FEATURE: false
     HEARINGS_EVENT_QUEUE_NAME: tribunals-to-hearing-api-{{ .Values.global.environment }}
     CASE_ACCESS_MANAGEMENT_FEATURE: false
+    ELINKS_V2_FEATURE_ENABLED: false
 
 idam-pr:
   enabled: false
@@ -68,6 +83,8 @@ xui-webapp:
 elastic:
   enabled: false
 sscs-evidence-share:
+  enabled: false
+sscs-tya-notif:
   enabled: false
 sscs-ccd-callback-orchestrator:
   enabled: false

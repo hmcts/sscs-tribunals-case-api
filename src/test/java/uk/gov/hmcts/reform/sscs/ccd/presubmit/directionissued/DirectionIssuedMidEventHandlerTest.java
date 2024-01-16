@@ -10,6 +10,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -37,6 +39,7 @@ public class DirectionIssuedMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     //private static final String TEMPLATE_ID = "nuts.docx";
     private static final String URL = "http://dm-store/documents/123";
+    public static final String APPELLANT_LAST_NAME = "APPELLANT Last'NamE";
 
     private DirectionIssuedMidEventHandler handler;
 
@@ -60,8 +63,8 @@ public class DirectionIssuedMidEventHandlerTest {
     public void setUp() {
         openMocks(this);
         Map<EventType, String> englishEventTypeDocs = new HashMap<>();
-        englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
-        englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
+        englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-directions-notice.docx");
+        englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-draft-decision-notice.docx");
         englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00453.docx");
 
 
@@ -80,13 +83,15 @@ public class DirectionIssuedMidEventHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
         sscsCaseData = SscsCaseData.builder()
-                .generateNotice("Yes")
+            .documentGeneration(DocumentGeneration.builder()
+                .generateNotice(YES)
+                .build())
                 .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
                 .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
                 .appeal(Appeal.builder()
                         .appellant(Appellant.builder()
                                 .name(Name.builder().firstName("APPELLANT")
-                                        .lastName("LastNamE")
+                                        .lastName("Last'NamE")
                                         .build())
                                 .identity(Identity.builder().build())
                                 .build())
@@ -114,7 +119,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
     @Test
     public void givenGenerateNoticeIsNo_thenReturnFalse() {
-        sscsCaseData.setGenerateNotice("No");
+        sscsCaseData.getDocumentGeneration().setGenerateNotice(NO);
         assertFalse(handler.canHandle(MID_EVENT, callback));
     }
 
@@ -128,14 +133,14 @@ public class DirectionIssuedMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertNotNull(response.getData().getPreviewDocument());
+        assertNotNull(response.getData().getDocumentStaging().getPreviewDocument());
         assertEquals(DocumentLink.builder()
-                .documentFilename(String.format("Directions Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-                .documentBinaryUrl(URL + "/binary")
-                .documentUrl(URL)
-                .build(), response.getData().getPreviewDocument());
+            .documentFilename(String.format("Directions Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getDocumentStaging().getPreviewDocument());
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname",
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME,
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED),
                 sscsCaseData.isLanguagePreferenceWelsh());
     }
@@ -146,7 +151,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname",
+        verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, APPELLANT_LAST_NAME,
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED),
                 sscsCaseData.isLanguagePreferenceWelsh());
     }
@@ -156,14 +161,14 @@ public class DirectionIssuedMidEventHandlerTest {
         sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
                 .name(Name.builder().firstName("APPOINTEE")
-                        .lastName("SurNamE")
+                        .lastName("Sur-NamE")
                         .build())
                 .identity(Identity.builder().build())
                 .build());
 
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname",
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "APPOINTEE Sur-NamE, appointee for APPELLANT Last'NamE",
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED),
                 sscsCaseData.isLanguagePreferenceWelsh());
     }
@@ -174,14 +179,14 @@ public class DirectionIssuedMidEventHandlerTest {
         sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
                 .name(Name.builder().firstName("APPOINTEE")
-                        .lastName("SurNamE")
+                        .lastName("Sur-NamE")
                         .build())
                 .identity(Identity.builder().build())
                 .build());
 
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname",
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "APPOINTEE Sur-NamE, appointee for APPELLANT Last'NamE",
                 documentConfiguration.getDocuments().get(LanguagePreference.WELSH).get(EventType.DIRECTION_ISSUED),
                 sscsCaseData.isLanguagePreferenceWelsh());
     }

@@ -3,15 +3,14 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.decisionissued;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DecisionType.STRIKE_OUT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.STRUCK_OUT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.WELSH_TRANSLATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,23 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDecisionDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
@@ -90,7 +73,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, false);
+        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, false, false);
         when(callback.getEvent()).thenReturn(EventType.DECISION_ISSUED);
 
         SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("myTest.doc").build()).build();
@@ -98,34 +81,38 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         docs.add(document);
 
         sscsCaseData = SscsCaseData.builder()
-                .state(State.INTERLOCUTORY_REVIEW_STATE)
-                .generateNotice("Yes")
+            .state(State.INTERLOCUTORY_REVIEW_STATE)
+            .documentGeneration(DocumentGeneration.builder()
+                .generateNotice(YES)
                 .signedBy("User")
                 .signedRole("Judge")
+                .build())
+            .documentStaging(DocumentStaging.builder()
                 .dateAdded(LocalDate.now().minusDays(1))
-                .sscsDocument(docs)
-                .decisionType(STRIKE_OUT.getValue())
-                .directionDueDate("01/02/2020")
                 .previewDocument(DocumentLink.builder()
-                        .documentUrl(DOCUMENT_URL)
-                        .documentBinaryUrl(DOCUMENT_URL + "/binary")
-                        .documentFilename("decisionIssued.pdf")
-                        .build())
-                .appeal(Appeal.builder()
-                        .appellant(Appellant.builder()
-                                .name(Name.builder().build())
-                                .identity(Identity.builder().build())
-                                .build())
-                        .build())
-                .schedulingAndListingFields(SchedulingAndListingFields.builder()
-                        .hearingRoute(HearingRoute.LIST_ASSIST)
-                        .build())
-                .build();
+                    .documentUrl(DOCUMENT_URL)
+                    .documentBinaryUrl(DOCUMENT_URL + "/binary")
+                    .documentFilename("decisionIssued.pdf")
+                    .build())
+                .build())
+            .sscsDocument(docs)
+            .decisionType(STRIKE_OUT.getValue())
+            .directionDueDate("01/02/2020")
+            .appeal(Appeal.builder()
+                    .appellant(Appellant.builder()
+                            .name(Name.builder().build())
+                            .identity(Identity.builder().build())
+                            .build())
+                    .build())
+            .schedulingAndListingFields(SchedulingAndListingFields.builder()
+                    .hearingRoute(HearingRoute.LIST_ASSIST)
+                    .build())
+            .build();
 
         expectedDocument = SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
-                        .documentFileName(sscsCaseData.getPreviewDocument().getDocumentFilename())
-                        .documentLink(sscsCaseData.getPreviewDocument())
+                        .documentFileName(sscsCaseData.getDocumentStaging().getPreviewDocument().getDocumentFilename())
+                        .documentLink(sscsCaseData.getDocumentStaging().getPreviewDocument())
                         .documentDateAdded(LocalDate.now().minusDays(1).toString())
                         .documentType(DocumentType.DECISION_NOTICE.getValue())
                         .build()).build();
@@ -162,14 +149,14 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"strikeOut, struckOut, null", "null, struckOut, interlocutoryReviewState", ",struckOut, interlocutoryReviewState"})
+    @Parameters({"strikeOut, STRUCK_OUT, null", "null, STRUCK_OUT, REVIEW_BY_TCW", ",STRUCK_OUT, REVIEW_BY_TCW"})
     public void givenDecisionTypeIsStrikeOut_shouldSetDwpStateValueAndInterlocReviewState(@Nullable String decisionType,
-                                                                                          @Nullable String expectedDwpState,
-                                                                                          @Nullable String expectedInterlocReviewState) {
+                                                                                          @Nullable DwpState expectedDwpState,
+                                                                                          @Nullable InterlocReviewState expectedInterlocReviewState) {
         sscsCaseData.setDecisionType(decisionType);
-        sscsCaseData.setInterlocReviewState(State.INTERLOCUTORY_REVIEW_STATE.getId());
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        String currentDwpState = response.getData().getDwpState();
+        DwpState currentDwpState = response.getData().getDwpState();
         String assertionMsg = "dwpState value (%s) is not as expected (%s)";
         assertEquals(String.format(assertionMsg, currentDwpState, expectedDwpState), expectedDwpState, currentDwpState);
         assertEquals(expectedInterlocReviewState, response.getData().getInterlocReviewState());
@@ -179,15 +166,15 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void willCopyThePreviewFileToTheInterlocDecisionDocumentAndAddFooter() {
-        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, true);
+        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, true, false);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getPreviewDocument());
-        assertNull(response.getData().getSignedBy());
-        assertNull(response.getData().getSignedRole());
-        assertNull(response.getData().getGenerateNotice());
-        assertNull(response.getData().getDateAdded());
+        assertNull(response.getData().getDocumentStaging().getPreviewDocument());
+        assertNull(response.getData().getDocumentGeneration().getSignedBy());
+        assertNull(response.getData().getDocumentGeneration().getSignedRole());
+        assertNull(response.getData().getDocumentGeneration().getGenerateNotice());
+        assertNull(response.getData().getDocumentStaging().getDateAdded());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()),
                 any(), eq(DocumentType.DECISION_NOTICE), any(), any(), eq(null), eq(null));
@@ -198,7 +185,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void given2ManuallyUploadedDecisionDocumentsOneWithNoDate_thenIssueDocumentWithNoDate() {
-        sscsCaseData.setPreviewDocument(null);
+        sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
@@ -223,9 +210,9 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenDecisionIssuedAndCaseIsPreValidInterloc_setDwpStateToStruckOutAndOutcomeToNonCompliantAppealStruckout() {
-        sscsCaseData.setInterlocReviewState(State.INTERLOCUTORY_REVIEW_STATE.getId());
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(STRUCK_OUT.getId(), response.getData().getDwpState());
+        assertEquals(STRUCK_OUT, response.getData().getDwpState());
         assertEquals("nonCompliantAppealStruckout", response.getData().getOutcome());
         assertNull(response.getData().getInterlocReviewState());
         assertEquals(response.getData().getState(), (State.DORMANT_APPEAL_STATE));
@@ -237,7 +224,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(STRUCK_OUT.getId(), response.getData().getDwpState());
+        assertEquals(STRUCK_OUT, response.getData().getDwpState());
         assertEquals("struckOut", response.getData().getOutcome());
         assertEquals(response.getData().getState(), (State.DORMANT_APPEAL_STATE));
     }
@@ -249,7 +236,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("welshTranslation", response.getData().getInterlocReviewState());
+        assertEquals(WELSH_TRANSLATION, response.getData().getInterlocReviewState());
         assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
         assertNull(response.getData().getDwpState());
         assertNull(response.getData().getOutcome());
@@ -262,7 +249,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenDecisionIssuedWelshAndCaseIsWelsh_SetDwpStateAndOutcomeToStruckOut() {
-        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, true);
+        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, true, false);
         expectedWelshDocument = SscsWelshDocument.builder()
                 .value(SscsWelshDocumentDetails.builder()
                         .documentFileName("welshDecisionDocFilename")
@@ -281,7 +268,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getInterlocReviewState());
-        assertEquals(STRUCK_OUT.getId(), response.getData().getDwpState());
+        assertEquals(STRUCK_OUT, response.getData().getDwpState());
         assertEquals("struckOut", response.getData().getOutcome());
         assertEquals(response.getData().getState(), (State.DORMANT_APPEAL_STATE));
 
@@ -291,7 +278,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenNoPdfIsUploaded_thenAddAnErrorToResponse() {
-        sscsCaseData.setPreviewDocument(null);
+        sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
         sscsCaseData.setSscsInterlocDecisionDocument(null);
 
@@ -306,7 +293,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     @Test
     @Parameters({"file.png", "file.jpg", "file.doc"})
     public void givenManuallyUploadedFileIsNotAPdf_thenAddAnErrorToResponse(String filename) {
-        sscsCaseData.setPreviewDocument(null);
+        sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
         SscsInterlocDecisionDocument theDocument = SscsInterlocDecisionDocument.builder()
                 .documentType(DocumentType.DECISION_NOTICE.getValue())
@@ -321,5 +308,24 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("You need to upload PDF documents only", error);
         }
+    }
+
+    @Test
+    public void shouldNotClearInterlocReferralReasonIfPostHearingsNotEnabled() {
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_CORRECTION_APPLICATION);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(InterlocReferralReason.REVIEW_CORRECTION_APPLICATION, response.getData().getInterlocReferralReason());
+    }
+
+    @Test
+    public void shouldClearInterlocReferralReasonIfPostHearingsEnabled() {
+        handler = new DecisionIssuedAboutToSubmitHandler(footerService, hearingMessageHelper, true, true);
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_CORRECTION_APPLICATION);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getInterlocReferralReason());
     }
 }

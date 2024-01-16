@@ -7,7 +7,8 @@ import java.nio.file.Paths;
 
 public final class ResourceLoader {
 
-    private ResourceLoader(){
+    private ResourceLoader() {
+
     }
 
     public static String loadJson(final String filePath) throws Exception {

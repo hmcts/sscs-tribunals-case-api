@@ -51,25 +51,25 @@ public class DwpDirectionResponseAboutToSubmitHandlerTest {
     public void setsDwpStateWhenHandlingDwpDirectionResponseEvent() {
         when(callback.getEvent()).thenReturn(EventType.DWP_DIRECTION_RESPONSE);
         SscsCaseData sscsCaseData = SscsCaseData.builder()
-                .dwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId())
+                .dwpState(DwpState.DIRECTION_ACTION_REQUIRED)
                 .build();
         when(callback.getCaseDetails()).thenReturn(new CaseDetails(1, "Benefit", State.VOID_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_RESPONDED.getId()));
+        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_RESPONDED));
     }
 
     @Test
     public void doesNotSetDwpStateWhenHandlingDwpDirectionResponseEventButNotInDwpDirectResponseDate() {
         when(callback.getEvent()).thenReturn(EventType.DWP_DIRECTION_RESPONSE);
         SscsCaseData sscsCaseData = SscsCaseData.builder()
-                .dwpState(DwpState.FE_ACTIONED_NA.getId())
+                .dwpState(DwpState.FE_ACTIONED_NA)
                 .build();
         when(callback.getCaseDetails()).thenReturn(new CaseDetails(1, "Benefit", State.VOID_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getDwpState(), is(DwpState.FE_ACTIONED_NA.getId()));
+        assertThat(response.getData().getDwpState(), is(DwpState.FE_ACTIONED_NA));
     }
 }

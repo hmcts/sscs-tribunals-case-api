@@ -7,14 +7,18 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.RIP1;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQUIRED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_INFORMATION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.WELSH_TRANSLATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessedAction.DIRECTION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessedAction.SENT_TO_ADMIN;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessedAction.SENT_TO_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.WELSH_TRANSLATION;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.ADMIT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.EXCLUDE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.ISSUE_DIRECTIONS_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.SEND_TO_ADMIN;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.processaudiovideo.ProcessAudioVideoActionDynamicListItems.SEND_TO_JUDGE;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.getDocumentType;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.isSelectedEvidence;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
@@ -25,34 +29,46 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Note;
+import uk.gov.hmcts.reform.sscs.ccd.domain.NoteDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.NotePad;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ProcessedAction;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     public static final List<String> ACTIONS_THAT_REQUIRES_NOTICE = asList(ISSUE_DIRECTIONS_NOTICE.getCode(), EXCLUDE_EVIDENCE.getCode(), ADMIT_EVIDENCE.getCode());
 
     private final FooterService footerService;
     protected final UserDetailsService userDetailsService;
-
-    @Autowired
-    public ProcessAudioVideoEvidenceAboutToSubmitHandler(FooterService footerService, UserDetailsService userDetailsService) {
-        this.footerService = footerService;
-        this.userDetailsService = userDetailsService;
-    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -76,7 +92,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         }
 
         if (ACTIONS_THAT_REQUIRES_NOTICE.contains(caseData.getProcessAudioVideoAction().getValue().getCode())) {
-            if (isNull(caseData.getPreviewDocument())) {
+            if (isNull(caseData.getDocumentStaging().getPreviewDocument())) {
                 response.addError("There is no document notice");
             } else {
                 addDirectionNotice(caseData);
@@ -101,26 +117,26 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     }
 
     private void addDirectionNotice(SscsCaseData caseData) {
-        DocumentLink url = caseData.getPreviewDocument();
+        DocumentLink url = caseData.getDocumentStaging().getPreviewDocument();
         SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
         footerService.createFooterAndAddDocToCase(url, caseData, AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE,
-                Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
+                Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now())
                         .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
-                caseData.getDateAdded(), null, documentTranslationStatus);
+                caseData.getDocumentStaging().getDateAdded(), null, documentTranslationStatus);
     }
 
     private void processIfIssueDirectionNotice(SscsCaseData caseData) {
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), ISSUE_DIRECTIONS_NOTICE.getCode())) {
-            caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
-            caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
+            caseData.setInterlocReviewState(AWAITING_INFORMATION);
+            caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED);
             if (caseData.isLanguagePreferenceWelsh()) {
-                caseData.setWelshInterlocNextReviewState(AWAITING_INFORMATION.getId());
-                caseData.setInterlocReviewState(WELSH_TRANSLATION.getId());
+                caseData.setWelshInterlocNextReviewState(AWAITING_INFORMATION.getCcdDefinition());
+                caseData.setInterlocReviewState(WELSH_TRANSLATION);
             } else {
-                caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
+                caseData.setInterlocReviewState(AWAITING_INFORMATION);
             }
-            caseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId());
-            caseData.setInterlocReferralDate(LocalDate.now().toString());
+            caseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE);
+            caseData.setInterlocReferralDate(LocalDate.now());
             addProcessedActionToSelectedEvidence(caseData, DIRECTION_ISSUED);
         }
     }
@@ -128,8 +144,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     private void processIfAdmitEvidence(SscsCaseData caseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), ADMIT_EVIDENCE.getCode())) {
             caseData.setInterlocReviewState(null);
-            caseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
-            caseData.setDwpState(DIRECTION_ACTION_REQUIRED.getId());
+            caseData.setInterlocReferralReason(InterlocReferralReason.NONE);
+            caseData.setDwpState(DIRECTION_ACTION_REQUIRED);
 
             List<SscsDocument> sscsDocuments = new ArrayList<>();
             List<DwpDocument> dwpDocuments = new ArrayList<>();
@@ -185,7 +201,7 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         SscsDocumentTranslationStatus status = null;
 
         if (isWelshCase) {
-            response.getData().setInterlocReviewState(WELSH_TRANSLATION.getId());
+            response.getData().setInterlocReviewState(WELSH_TRANSLATION);
             status = SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
         }
 
@@ -267,8 +283,8 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     private void processIfExcludeEvidence(SscsCaseData caseData) {
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), EXCLUDE_EVIDENCE.getCode())) {
             caseData.setInterlocReviewState(null);
-            caseData.setInterlocReferralReason(InterlocReferralReason.NONE.getId());
-            caseData.setDwpState(DIRECTION_ACTION_REQUIRED.getId());
+            caseData.setInterlocReferralReason(InterlocReferralReason.NONE);
+            caseData.setDwpState(DIRECTION_ACTION_REQUIRED);
             caseData.getAudioVideoEvidence().removeIf(evidence -> isSelectedEvidence(evidence, caseData));
         }
     }
@@ -276,13 +292,13 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     private void processIfSendToJudge(SscsCaseData caseData, String userAuthorisation) {
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), SEND_TO_JUDGE.getCode())) {
             if (caseData.isLanguagePreferenceWelsh()) {
-                caseData.setWelshInterlocNextReviewState(REVIEW_BY_JUDGE.getId());
-                caseData.setInterlocReviewState(WELSH_TRANSLATION.getId());
+                caseData.setWelshInterlocNextReviewState(REVIEW_BY_JUDGE.getCcdDefinition());
+                caseData.setInterlocReviewState(WELSH_TRANSLATION);
             } else {
-                caseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
+                caseData.setInterlocReviewState(REVIEW_BY_JUDGE);
             }
-            caseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId());
-            caseData.setInterlocReferralDate(LocalDate.now().toString());
+            caseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE);
+            caseData.setInterlocReferralDate(LocalDate.now());
             addToNotesIfNoteExists(caseData, userAuthorisation);
             addProcessedActionToSelectedEvidence(caseData, SENT_TO_JUDGE);
         }
@@ -291,12 +307,12 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     private void processIfSendToAdmin(SscsCaseData caseData, String userAuthorisation) {
         if (StringUtils.equals(caseData.getProcessAudioVideoAction().getValue().getCode(), SEND_TO_ADMIN.getCode())) {
             if (caseData.isLanguagePreferenceWelsh()) {
-                caseData.setWelshInterlocNextReviewState(AWAITING_ADMIN_ACTION.getId());
-                caseData.setInterlocReviewState(WELSH_TRANSLATION.getId());
+                caseData.setWelshInterlocNextReviewState(AWAITING_ADMIN_ACTION.getCcdDefinition());
+                caseData.setInterlocReviewState(WELSH_TRANSLATION);
             } else {
-                caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+                caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
             }
-            caseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE.getId());
+            caseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE);
             addToNotesIfNoteExists(caseData, userAuthorisation);
             addProcessedActionToSelectedEvidence(caseData, SENT_TO_ADMIN);
         }
@@ -311,13 +327,13 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
         if (caseData.getProcessAudioVideoReviewState() != null) {
             switch (caseData.getProcessAudioVideoReviewState()) {
                 case AWAITING_INFORMATION:
-                    caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
+                    caseData.setInterlocReviewState(AWAITING_INFORMATION);
                     break;
                 case REVIEW_BY_JUDGE:
-                    caseData.setInterlocReviewState(REVIEW_BY_JUDGE.getId());
+                    caseData.setInterlocReviewState(REVIEW_BY_JUDGE);
                     break;
                 case AWAITING_ADMIN_ACTION:
-                    caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+                    caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION);
                     break;
                 case CLEAR_INTERLOC_REVIEW_STATE:
                     caseData.setInterlocReviewState(null);
@@ -330,21 +346,14 @@ public class ProcessAudioVideoEvidenceAboutToSubmitHandler implements PreSubmitC
     }
 
     private void clearEmptyAudioVideoList(SscsCaseData caseData) {
-        if (caseData.getAudioVideoEvidence() != null && caseData.getAudioVideoEvidence().size() == 0) {
+        if (caseData.getAudioVideoEvidence() != null && caseData.getAudioVideoEvidence().isEmpty()) {
             caseData.setAudioVideoEvidence(null);
         }
     }
 
     private void clearTransientFields(SscsCaseData caseData) {
-        caseData.setBodyContent(null);
-        caseData.setDirectionNoticeContent(null);
-        caseData.setPreviewDocument(null);
-        caseData.setGenerateNotice(null);
-        caseData.setReservedToJudge(null);
-        caseData.setGenerateNotice(null);
-        caseData.setSignedBy(null);
-        caseData.setSignedRole(null);
-        caseData.setDateAdded(null);
+        caseData.setDocumentGeneration(DocumentGeneration.builder().build());
+        caseData.setDocumentStaging(DocumentStaging.builder().build());
         caseData.setTempNoteDetail(null);
         caseData.setSelectedAudioVideoEvidenceDetails(null);
         caseData.setShowRip1DocPage(null);

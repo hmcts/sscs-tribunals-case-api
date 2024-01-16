@@ -62,6 +62,7 @@ def secretsForPR = [
         's2s-${env}'      : [
                 secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
                 secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
+                secret('microservicekey-ccd-admin', 'ADMIN_S2S_KEY'),
                 secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET')
         ],
         'ccd-${env}'      : [
@@ -83,7 +84,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   ]
 }
 
-def branchesToSync = ['demo', 'ithc', 'perftest']
+def branchesToSync = ['demo']
 
 withPipeline(type, product, component) {
     if (env.BRANCH_NAME.startsWith("PR")) {
@@ -96,26 +97,14 @@ withPipeline(type, product, component) {
     disableLegacyDeployment()
     syncBranchesWithMaster(branchesToSync)
 
-    before('akschartsinstall'){
-        def sscsCommonVersion = sh(script: './gradlew -q getSscsCommonVersion', returnStdout: true).trim()
-        def languages = sh(script: "curl https://raw.githubusercontent.com/hmcts/sscs-common/${sscsCommonVersion}/src/main/resources/reference-data/languages.txt", returnStdout: true)
-        env.CCD_DEF_LANGUAGES = "'${languages}'"
-        def pipQues = sh(script: "curl https://raw.githubusercontent.com/hmcts/sscs-common/${sscsCommonVersion}/src/main/resources/reference-data/pip-decision-notice-questions.txt", returnStdout: true)
-        env.PIP_DECISION_NOTICE_QUESTIONS = "'${pipQues}'"
-        def esaQues = sh(script:  "curl https://raw.githubusercontent.com/hmcts/sscs-common/${sscsCommonVersion}/src/main/resources/reference-data/esa-decision-notice-questions.txt", returnStdout: true)
-        env.ESA_DECISION_NOTICE_QUESTIONS = "'${esaQues}'"
-        def ucQues = sh(script: "curl https://raw.githubusercontent.com/hmcts/sscs-common/${sscsCommonVersion}/src/main/resources/reference-data/uc-decision-notice-questions.txt", returnStdout: true)
-        env.UC_DECISION_NOTICE_QUESTIONS = "'${ucQues}'"
-    }
-
-    after('akschartsinstall'){
+    afterSuccess('akschartsinstall'){
         // Vars needed for AKS testing
         env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
         env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
         if (env.BRANCH_NAME.startsWith("PR")) {
             def githubApi = new GithubAPI(this)
             for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
-                env.CORE_CASE_DATA_API_URL = "ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+                env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
                 println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
             }
         }
@@ -131,6 +120,5 @@ withPipeline(type, product, component) {
                         //Disabling due to IDAM OIDC issue. To be investigated under SSCS-10377
                       //AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK])
     }
-
 }
 

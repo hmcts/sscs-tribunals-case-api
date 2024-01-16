@@ -38,7 +38,7 @@ public class AbateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<S
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
-        sscsCaseDataPreSubmitCallbackResponse.getData().setDwpState(APPEAL_ABATED.getId());
+        sscsCaseDataPreSubmitCallbackResponse.getData().setDwpState(APPEAL_ABATED);
         sscsCaseDataPreSubmitCallbackResponse.getData().setOutcome(ABATED.getId());
 
         return sscsCaseDataPreSubmitCallbackResponse;

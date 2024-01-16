@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.interlocsendtotcw;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -18,8 +20,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 
 @RunWith(JUnitParamsRunner.class)
 public class InterlocSendToTcwAboutToSubmitHandlerTest {
@@ -42,7 +44,7 @@ public class InterlocSendToTcwAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.INTERLOC_SEND_TO_TCW);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
-                .interlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId()).build();
+                .interlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 

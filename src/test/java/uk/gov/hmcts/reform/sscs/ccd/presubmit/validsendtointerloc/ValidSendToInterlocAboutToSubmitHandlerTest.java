@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.SelectWhoReviewsCase;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
@@ -93,8 +93,8 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
 
-        assertEquals(selectWhoReviewsCase.getId(), response.getData().getInterlocReviewState());
-        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
+        assertEquals(selectWhoReviewsCase.getId(), response.getData().getInterlocReviewState().getCcdDefinition());
+        assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
         assertNull(response.getData().getSelectWhoReviewsCase());
         assertNull(response.getData().getDirectionDueDate());
     }
@@ -120,9 +120,9 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
 
-        assertEquals(REVIEW_BY_TCW.getId(), response.getData().getInterlocReviewState());
-        assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST.getId(), response.getData().getInterlocReferralReason());
-        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
+        assertEquals(InterlocReviewState.REVIEW_BY_TCW, response.getData().getInterlocReviewState());
+        assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST, response.getData().getInterlocReferralReason());
+        assertEquals(LocalDate.now(), response.getData().getInterlocReferralDate());
         assertEquals(YES, sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest());
         assertNull(response.getData().getSelectWhoReviewsCase());
         assertNull(response.getData().getDirectionDueDate());

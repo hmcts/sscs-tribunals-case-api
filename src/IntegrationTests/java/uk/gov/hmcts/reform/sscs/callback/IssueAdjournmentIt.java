@@ -60,7 +60,7 @@ public class IssueAdjournmentIt extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
         assertEquals(ADJOURNMENT_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals(DwpState.ADJOURNMENT_NOTICE_ISSUED.getId(), result.getData().getDwpState());
+        assertEquals(DwpState.ADJOURNMENT_NOTICE_ISSUED, result.getData().getDwpState());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("Addition A - Adjournment Notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("A", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());

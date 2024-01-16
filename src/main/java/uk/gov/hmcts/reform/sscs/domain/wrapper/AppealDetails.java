@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.domain.wrapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Objects;
 
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
@@ -21,25 +21,25 @@ public class AppealDetails {
         this.state = state;
     }
 
-    @ApiModelProperty(example = "some date format to do", required = true)
+    @Schema(example = "some date format to do", required = true)
     @JsonProperty(value = "submitted_date")
     public String getSubmittedDate() {
         return submittedDate;
     }
 
-    @ApiModelProperty(example = "some date format to do", required = true)
+    @Schema(example = "some date format to do", required = true)
     @JsonProperty(value = "mrn_date")
     public String getMrnDate() {
         return mrnDate;
     }
 
-    @ApiModelProperty(example = "PIP", required = true)
+    @Schema(example = "PIP", required = true)
     @JsonProperty(value = "benefit_type")
     public String getBenefitType() {
         return benefitType;
     }
 
-    @ApiModelProperty(example = "withDwp", required = true)
+    @Schema(example = "withDwp", required = true)
     @JsonProperty(value = "state")
     public String getState() {
         return state;

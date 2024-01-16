@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_WELSH_PREFERENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.WELSH_TRANSLATION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.WELSH_TRANSLATION;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -84,7 +84,7 @@ public class UpdateWelshPreferenceAboutToSubmitHandlerTest {
     public void givenWelshTransaltionsInterlocStateAddNote() {
         Callback<SscsCaseData> callback = buildCallback();
         callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("No");
-        callback.getCaseDetails().getCaseData().setInterlocReviewState(WELSH_TRANSLATION.getId());
+        callback.getCaseDetails().getCaseData().setInterlocReviewState(WELSH_TRANSLATION);
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals("No",result.getData().getLanguagePreferenceWelsh());
         assertEquals("No",result.getData().getTranslationWorkOutstanding());

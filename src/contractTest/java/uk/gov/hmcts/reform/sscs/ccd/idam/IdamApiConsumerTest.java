@@ -4,11 +4,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 
+import au.com.dius.pact.consumer.dsl.PactBuilder;
 import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
 import au.com.dius.pact.consumer.dsl.PactDslJsonRootValue;
-import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
-import au.com.dius.pact.core.model.RequestResponsePact;
+import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
@@ -24,9 +24,10 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 public class IdamApiConsumerTest extends IdamConsumerTestBase {
 
     @Pact(provider = "idamApi_oidc", consumer = "sscs_tribunalsCaseApi")
-    public RequestResponsePact generatePactForUserInfo(PactDslWithProvider builder) throws JSONException {
+    public V4Pact generatePactForUserInfo(PactBuilder builder) throws JSONException {
 
         return builder
+            .usingLegacyDsl()
             .given("userinfo is requested")
             .uponReceiving("A request for a UserInfo from SSCS Tribunals API")
             .path("/o/userinfo")
@@ -35,17 +36,18 @@ public class IdamApiConsumerTest extends IdamConsumerTestBase {
             .willRespondWith()
             .status(200)
             .body(createUserDetailsResponse())
-            .toPact();
+            .toPact(V4Pact.class);
     }
 
     @Pact(provider = "idamApi_oidc", consumer = "sscs_tribunalsCaseApi")
-    public RequestResponsePact generatePactForToken(PactDslWithProvider builder) {
+    public V4Pact generatePactForToken(PactBuilder builder) {
 
         Map<String, String> responseheaders = ImmutableMap.<String, String>builder()
             .put("Content-Type", "application/json")
             .build();
 
         return builder
+            .usingLegacyDsl()
             .given("a token is requested")
             .uponReceiving("Provider receives a POST /o/token request from SSCS Tribunals API")
             .path("/o/token")
@@ -62,7 +64,7 @@ public class IdamApiConsumerTest extends IdamConsumerTestBase {
             .status(HttpStatus.OK.value())
             .headers(responseheaders)
             .body(createAuthResponse())
-            .toPact();
+            .toPact(V4Pact.class);
     }
 
     @Test

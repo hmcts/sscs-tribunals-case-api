@@ -19,9 +19,9 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
@@ -48,7 +48,7 @@ public class InformationReceivedAboutToSubmitHandlerTest {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
                 .forename("Chris").surname("Davis").build().getFullName());
         when(callback.getEvent()).thenReturn(INTERLOC_INFORMATION_RECEIVED);
-        SscsCaseData sscsCaseData = SscsCaseData.builder().interlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId()).interlocReferralReason(InterlocReferralReason.OVER_200_PAGES.getId()).build();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().interlocReviewState(InterlocReviewState.REVIEW_BY_TCW).interlocReferralReason(InterlocReferralReason.OVER_300_PAGES).build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
@@ -62,7 +62,7 @@ public class InformationReceivedAboutToSubmitHandlerTest {
     @Test
     public void givenReviewByTcwState_addRelevantNote_withoutTempNote() {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
+        assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now()));
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
         assertEquals("Referred to interloc for review by TCW – Over 300 pages",
                 response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
@@ -70,12 +70,12 @@ public class InformationReceivedAboutToSubmitHandlerTest {
 
     @Test
     public void givenReviewByJudgeState_addRelevantNote_withTempNote() {
-        callback.getCaseDetails().getCaseData().setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+        callback.getCaseDetails().getCaseData().setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
         callback.getCaseDetails().getCaseData().setTempNoteDetail("new note to add");
-        callback.getCaseDetails().getCaseData().setInterlocReferralReason(InterlocReferralReason.COMPLEX_CASE.getId());
+        callback.getCaseDetails().getCaseData().setInterlocReferralReason(InterlocReferralReason.COMPLEX_CASE);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
+        assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now()));
         assertEquals(1, response.getData().getAppealNotePad().getNotesCollection().size());
         assertEquals("Referred to interloc for review by judge – Complex Case - new note to add",
                 response.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());

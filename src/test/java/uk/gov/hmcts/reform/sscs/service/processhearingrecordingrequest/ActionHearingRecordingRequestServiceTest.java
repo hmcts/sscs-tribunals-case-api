@@ -89,9 +89,9 @@ public class ActionHearingRecordingRequestServiceTest {
 
     @Test
     @Parameters({
-            "APPELLANT, GRANTED", "APPELLANT, REFUSED", "APPELLANT, REQUESTED",
-            "DWP, GRANTED",  "DWP, REFUSED", "DWP, REQUESTED",
-            "JOINT_PARTY, GRANTED", "JOINT_PARTY, REFUSED", "JOINT_PARTY, REQUESTED"})
+        "APPELLANT, GRANTED", "APPELLANT, REFUSED", "APPELLANT, REQUESTED",
+        "DWP, GRANTED",  "DWP, REFUSED", "DWP, REQUESTED",
+        "JOINT_PARTY, GRANTED", "JOINT_PARTY, REFUSED", "JOINT_PARTY, REQUESTED"})
     public void getChangedRequestStatus(PartyItemList party, RequestStatus status) {
         final Optional<RequestStatus> changedRequestStatus = service.getChangedRequestStatus(party, null, processHearingRecordingRequests(status), null);
         assertThat(changedRequestStatus.isPresent(), is(true));

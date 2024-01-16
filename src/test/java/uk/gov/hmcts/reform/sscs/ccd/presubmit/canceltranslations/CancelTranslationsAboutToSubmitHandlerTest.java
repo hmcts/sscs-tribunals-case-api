@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CANCEL_TRANSLATIONS;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -54,8 +55,8 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE",
-            "ABOUT_TO_START,CANCEL_TRANSLATIONS"
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE",
+        "ABOUT_TO_START,CANCEL_TRANSLATIONS"
     })
     public void givenCanHandleIsCalledWithInvalidCallBack_shouldReturnCorrectFalse(@Nullable CallbackType callbackType, @Nullable EventType eventType) {
         Callback<SscsCaseData> callback = buildCallback(eventType, State.VALID_APPEAL);
@@ -111,7 +112,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
         assertNull(response.getData().getSscsDocument().get(6).getValue().getDocumentTranslationStatus());
         assertEquals("No", response.getData().getTranslationWorkOutstanding());
 
-        assertEquals("reviewByTcw", response.getData().getInterlocReviewState());
+        assertEquals(REVIEW_BY_TCW, response.getData().getInterlocReviewState());
     }
 
     private Callback<SscsCaseData> buildCallback(EventType eventType, State state) {
@@ -122,12 +123,12 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
 
         SscsDocument sscs1Doc =
                 buildSscsDocument("english.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUIRED,
-                        DocumentType.SSCS1.getValue(), LocalDate.now().minusDays(3));
+                        DocumentType.SSCS1.getValue(), LocalDate.now().minusDays(1));
 
         SscsDocument sscs2Doc =
                 buildSscsDocument("anything.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUIRED,
                         DocumentType.DECISION_NOTICE
-                                .getValue(), LocalDate.now().minusDays(1));
+                                .getValue(), LocalDate.now().minusDays(3));
 
         SscsDocument sscs3Doc =
                 buildSscsDocument("anything.pdf", SscsDocumentTranslationStatus.TRANSLATION_COMPLETE,

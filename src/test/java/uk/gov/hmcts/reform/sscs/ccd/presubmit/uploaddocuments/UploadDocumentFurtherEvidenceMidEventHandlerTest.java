@@ -198,12 +198,12 @@ public class UploadDocumentFurtherEvidenceMidEventHandlerTest extends BaseHandle
 
     @Test
     @Parameters({
-            "MID_EVENT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,representativeEvidence,appellantEvidence,FILE_UPLOAD_IS_EMPTY",
-            "MID_EVENT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,representativeEvidence,appellantEvidence,FILE_UPLOAD_IS_NULL",
-            "MID_EVENT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,,appellantEvidence,null",
-            "MID_EVENT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,,representativeEvidence,null",
-            "MID_EVENT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,,,null",
-            "MID_EVENT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,,,FILE_UPLOAD_IS_NULL"
+        "MID_EVENT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,representativeEvidence,appellantEvidence,FILE_UPLOAD_IS_EMPTY",
+        "MID_EVENT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,representativeEvidence,appellantEvidence,FILE_UPLOAD_IS_NULL",
+        "MID_EVENT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,,appellantEvidence,null",
+        "MID_EVENT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,,representativeEvidence,null",
+        "MID_EVENT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,,,null",
+        "MID_EVENT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,,,FILE_UPLOAD_IS_NULL"
     })
     public void handleErrorScenariosWhenSomeFieldsAreNotProvided(@Nullable CallbackType callbackType,
                                                                  @Nullable EventType eventType, String state,

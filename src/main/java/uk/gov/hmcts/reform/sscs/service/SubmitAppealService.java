@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
@@ -56,6 +55,7 @@ public class SubmitAppealService {
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final AirLookupService airLookupService;
     private final RefDataService refDataService;
+    private final VenueService venueService;
     private final boolean caseAccessManagementFeature;
 
     @SuppressWarnings("squid:S107")
@@ -66,6 +66,7 @@ public class SubmitAppealService {
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
                         AirLookupService airLookupService,
                         RefDataService refDataService,
+                        VenueService venueService,
                         @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
@@ -75,6 +76,7 @@ public class SubmitAppealService {
         this.airLookupService = airLookupService;
         this.refDataService = refDataService;
         this.caseAccessManagementFeature = caseAccessManagementFeature;
+        this.venueService = venueService;
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
@@ -209,7 +211,7 @@ public class SubmitAppealService {
 
         return caseDetailsList.stream()
                 .map(convertAIntoBService::convert)
-                .collect(toList());
+                .toList();
     }
 
     private IdamTokens getUserTokens(String oauth2Token) {
@@ -254,16 +256,17 @@ public class SubmitAppealService {
         sscsCaseData.setProcessingVenue(processingVenue);
 
         if (caseAccessManagementFeature
-            && StringUtils.isNotEmpty(processingVenue)
-            && rpc != null) {
-            log.info("Getting venue details for " + processingVenue);
-            CourtVenue courtVenue = refDataService.getVenueRefData(processingVenue);
+                && StringUtils.isNotEmpty(processingVenue)
+                && rpc != null) {
+            String venueEpimsId = venueService.getEpimsIdForVenue(processingVenue);
+            CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
 
-            if (courtVenue != null) {
-                sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-                        .baseLocation(rpc.getEpimsId())
-                        .region(courtVenue.getRegionId()).build());
-            }
+            sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
+                .baseLocation(rpc.getEpimsId())
+                .region(courtVenue.getRegionId()).build());
+
+            log.info("Successfully updated case management location details for case {}. Processing venue {}, epimsId {}",
+                appeal.getCcdCaseId(), processingVenue, venueEpimsId);
         }
 
         log.info("{} - setting venue name to {}",
@@ -394,9 +397,13 @@ public class SubmitAppealService {
 
         SaveCaseResult result;
 
+        log.info("saveDraftCaseInCcd {}", forceCreate);
+
         if (Boolean.TRUE.equals(forceCreate)) {
+            log.info("saveDraftCaseInCcd createDraft");
             result = citizenCcdService.createDraft(caseData, idamTokens);
         } else {
+            log.info("saveDraftCaseInCcd saveCase");
             result = citizenCcdService.saveCase(caseData, idamTokens);
         }
 

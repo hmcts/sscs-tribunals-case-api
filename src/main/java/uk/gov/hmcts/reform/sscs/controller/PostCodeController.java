@@ -5,9 +5,11 @@ import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,10 +28,10 @@ public class PostCodeController {
     @Autowired
     private AirLookupService airLookupService;
 
-    @ApiOperation(value = "getRegionalCentre",
-            notes = "Returns the regional centre given the appellants full post code or out code",
-            response = String.class)
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Regional Centre", response = String.class)})
+    @Operation(summary = "getRegionalCentre",
+            description = "Returns the regional centre given the appellants full post code or out code")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Regional Centre", content = {
+        @Content(schema = @Schema(implementation = String.class))})})
     @RequestMapping(value = "/regionalcentre/{postCode}", method = GET, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getRegionalCentre(@PathVariable(value = "postCode") String postCode) {
         String regionalCentre = airLookupService.lookupRegionalCentre(postCode);

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +39,7 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
                 && callback.getEvent() == EventType.DIRECTION_ISSUED
                 && Objects.nonNull(callback.getCaseDetails())
                 && Objects.nonNull(callback.getCaseDetails().getCaseData())
-                && callback.getCaseDetails().getCaseData().isGenerateNotice();
+                && isYes(callback.getCaseDetails().getCaseData().getDocumentGeneration().getGenerateNotice());
     }
 
     @Override

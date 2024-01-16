@@ -29,7 +29,7 @@
       "adjournCaseCanCaseBeListedRightAway" : "No",
       "adjournCaseAreDirectionsBeingMadeToParties" : "No",
       "adjournCaseTypeOfNextHearing" : "faceToFace",
-      "adjournCasePanelMembersExcluded" : "yes",
+      "adjournCasePanelMembersExcluded" : "Yes",
       "adjournCaseNextHearingDateType" : "dateToBeFixed",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
       "adjournCaseTime": {
@@ -43,6 +43,7 @@
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
+      "processingVenue": "Chester Magistrate's Court",
       "hearings": [
         {
           "value": {
@@ -753,14 +754,14 @@
     "case_data": {
       "adjournCaseAdditionalDirections": null,
       "adjournCaseCanCaseBeListedRightAway": "Yes",
-      "adjournCaseDisabilityQualifiedPanelMemberName": null,
+      "adjournCasePanelMember1": null,
       "adjournCaseGenerateNotice": "Yes",
       "adjournCaseInterpreterRequired": "No",
-      "adjournCaseMedicallyQualifiedPanelMemberName": null,
+      "adjournCasePanelMember2": null,
       "adjournCaseNextHearingDateType": "dateToBeFixed",
       "adjournCaseNextHearingListingDurationType": "standardTimeSlot",
       "adjournCaseNextHearingVenue": "sameVenue",
-      "adjournCaseOtherPanelMemberName": null,
+      "adjournCasePanelMember3": null,
       "adjournCasePanelMembersExcluded": "Yes",
       "adjournCaseReasons": [
         {

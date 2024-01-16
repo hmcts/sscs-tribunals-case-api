@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.domain.wrapper;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Objects;
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
@@ -31,25 +31,25 @@ public class Decision {
         this.activities = activities;
     }
 
-    @ApiModelProperty(example = "decision_issued", required = true)
+    @Schema(example = "decision_issued", required = true)
     @JsonProperty(value = "decision_state")
     public String getDecisionState() {
         return decisionState;
     }
 
-    @ApiModelProperty(example = "2018-10-05T09:36:33Z", required = true)
+    @Schema(example = "2018-10-05T09:36:33Z", required = true)
     @JsonProperty(value = "decision_state_datetime")
     public String getDecisionStateDateTime() {
         return decisionStateDateTime;
     }
 
-    @ApiModelProperty(example = "2018-10-05", required = true)
+    @Schema(example = "2018-10-05", required = true)
     @JsonProperty(value = "start_date")
     public String getStartDate() {
         return startDate;
     }
 
-    @ApiModelProperty(example = "2018-10-05")
+    @Schema(example = "2018-10-05")
     @JsonProperty(value = "end_date")
     public String getEndDate() {
         return endDate;
@@ -60,7 +60,7 @@ public class Decision {
         return decisionRates;
     }
 
-    @ApiModelProperty(example = "Some reason for the decision", required = true)
+    @Schema(example = "Some reason for the decision", required = true)
     @JsonProperty(value = "reason")
     public String getReason() {
         return reason;
@@ -71,13 +71,13 @@ public class Decision {
         return activities;
     }
 
-    @ApiModelProperty(example = "decision_accepted")
+    @Schema(example = "decision_accepted")
     @JsonProperty(value = "appellant_reply")
     public String getAppellantReply() {
         return appellantReply;
     }
 
-    @ApiModelProperty(example = "2018-10-06T10:30:24Z")
+    @Schema(example = "2018-10-06T10:30:24Z")
     @JsonProperty(value = "appellant_reply_datetime")
     public String getAppellantReplyDateTime() {
         return appellantReplyDateTime;

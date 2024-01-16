@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.sscs.ccd;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.util.PactDslBuilderForCaseDetailsList.buildSearchResultDsl;
 
-import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
+import au.com.dius.pact.consumer.dsl.PactBuilder;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
-import au.com.dius.pact.core.model.RequestResponsePact;
+import au.com.dius.pact.core.model.V4Pact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,8 +26,9 @@ public class SearchCasesConsumerTest extends CcdConsumerTestBase {
     }
 
     @Pact(provider = "ccdDataStoreAPI_Cases", consumer = "sscs_tribunalsCaseApi")
-    public RequestResponsePact searchCases(PactDslWithProvider builder) {
+    public V4Pact searchCases(PactBuilder builder) {
         return builder
+            .usingLegacyDsl()
             .given("A Search for cases is requested", setUpStateMapForProviderWithCaseData(caseDataContent))
             .uponReceiving("A Search Cases request")
             .path("/searchCases")
@@ -42,7 +43,7 @@ public class SearchCasesConsumerTest extends CcdConsumerTestBase {
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .status(200)
             .body(buildSearchResultDsl())
-            .toPact();
+            .toPact(V4Pact.class);
     }
 
     @Test

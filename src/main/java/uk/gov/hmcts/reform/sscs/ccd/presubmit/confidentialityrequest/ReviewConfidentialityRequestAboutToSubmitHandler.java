@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
@@ -57,8 +57,9 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
                 boolean jointPartyGrantedNow = processJointPartyAndReturnWhetherGrantedNow(sscsCaseData);
 
                 if (appellantGrantedNow || jointPartyGrantedNow) {
-                    String interlocReviewState = !enhancedConfidentialityFeature && !State.RESPONSE_RECEIVED.equals(callback.getCaseDetails().getState())
-                        ? InterlocReviewState.AWAITING_ADMIN_ACTION.getId() : null;
+                    InterlocReviewState interlocReviewState =
+                        !enhancedConfidentialityFeature && !State.RESPONSE_RECEIVED.equals(callback.getCaseDetails().getState())
+                        ? InterlocReviewState.AWAITING_ADMIN_ACTION : null;
 
                     sscsCaseData.setInterlocReviewState(interlocReviewState);
                     sscsCaseData.setIsConfidentialCase(YesNo.YES);

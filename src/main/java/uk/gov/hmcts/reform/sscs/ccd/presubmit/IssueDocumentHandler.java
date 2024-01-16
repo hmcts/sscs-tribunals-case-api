@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -9,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.text.WordUtils;
 import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -20,36 +21,34 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Respondent;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
+import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
+
 
 @Slf4j
 public class IssueDocumentHandler {
-
     private static final String GLASGOW = "GLASGOW";
-    private static final DateTimeFormatter DATE_PATTERN = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     // Fields used for a short period in case progression are transient,
     // relevant for a short period of the case lifecycle.
-    protected void clearTransientFields(SscsCaseData caseData, State beforeState) {
+    protected void clearTransientFields(SscsCaseData caseData) {
         clearBasicTransientFields(caseData);
         caseData.setExtensionNextEventDl(null);
-        caseData.setSignedBy(null);
-        caseData.setSignedRole(null);
-
     }
 
     protected void clearBasicTransientFields(SscsCaseData caseData) {
-        caseData.setBodyContent(null);
-        caseData.setDirectionNoticeContent(null);
-        caseData.setPreviewDocument(null);
-        caseData.setGenerateNotice(null);
+        caseData.setDocumentGeneration(DocumentGeneration.builder().build());
+        caseData.setDocumentStaging(DocumentStaging.builder().build());
         caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(null);
-        caseData.setDateAdded(null);
         caseData.setSscsInterlocDirectionDocument(null);
         caseData.setSscsInterlocDecisionDocument(null);
-        caseData.setAdjournCasePreviewDocument(null);
     }
 
-    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response, SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation) {
+    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response,
+                                                     SscsCaseData caseData, String documentTypeLabel,
+                                                     LocalDate dateAdded, LocalDate generatedDate,
+                                                     boolean isScottish, boolean isPostHearingsEnabled,
+                                                     boolean isPostHearingsBEnabled,
+                                                     String userAuthorisation) {
         NoticeIssuedTemplateBody formPayload = NoticeIssuedTemplateBody.builder()
                 .appellantFullName(buildFullName(caseData))
                 .appointeeFullName(buildAppointeeName(caseData).orElse(null))
@@ -57,14 +56,27 @@ public class IssueDocumentHandler {
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
                 .shouldHideNino(isBenefitTypeValidToHideNino(caseData.getBenefitType()))
                 .respondents(getRespondents(caseData))
-                .noticeBody(Optional.ofNullable(caseData.getBodyContent())
-                        .orElse(caseData.getDirectionNoticeContent()))
-                .userName(caseData.getSignedBy())
                 .noticeType(documentTypeLabel.toUpperCase())
-                .userRole(caseData.getSignedRole())
                 .dateAdded(dateAdded)
                 .generatedDate(generatedDate)
+                .idamSurname(caseData.getDocumentGeneration().getSignedBy())
                 .build();
+
+        if (isPostHearingsEnabled) {
+            SscsFinalDecisionCaseData finalDecisionCaseData = caseData.getSscsFinalDecisionCaseData();
+
+            if (isYes(caseData.getPostHearing().getCorrection().getIsCorrectionFinalDecisionInProgress())) {
+                formPayload = formPayload.toBuilder()
+                        .generatedDate(finalDecisionCaseData.getFinalDecisionGeneratedDate())
+                        .idamSurname(finalDecisionCaseData.getFinalDecisionIdamSurname())
+                        .dateIssued(finalDecisionCaseData.getFinalDecisionIssuedDate())
+                        .correctedJudgeName(caseData.getDocumentGeneration().getSignedBy())
+                        .correctedGeneratedDate(generatedDate)
+                        .correctedDateIssued(LocalDate.now()).build();
+            }
+        }
+      
+        formPayload = PdfRequestUtil.populateNoticeBodySignedByAndSignedRole(caseData, formPayload, isPostHearingsEnabled, isPostHearingsBEnabled);
 
         if (isScottish) {
             formPayload = formPayload.toBuilder().image(NoticeIssuedTemplateBody.SCOTTISH_IMAGE).build();
@@ -110,27 +122,29 @@ public class IssueDocumentHandler {
                 || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
     }
 
-    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
+    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType,
+                                                                    String templateId, GenerateFile generateFile, String userAuthorisation) {
+        return issueDocument(callback, documentType, templateId, generateFile, userAuthorisation, false, false);
+    }
 
+    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType,
+                                                                    String templateId, GenerateFile generateFile, String userAuthorisation,
+                                                                    boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        if ((ADJOURNMENT_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType)) && caseData.getAdjournCaseGenerateNotice() == null) {
+        if ((ADJOURNMENT_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType))
+            && caseData.getAdjournment().getGenerateNotice() == null) {
             throw new IllegalStateException("Generate notice has not been set");
         }
 
         String documentUrl = Optional.ofNullable(getDocumentFromCaseData(caseData)).map(DocumentLink::getDocumentUrl).orElse(null);
-
-        LocalDate dateAdded = Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now());
-
-        String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
-
-        String embeddedDocumentTypeLabel = (FINAL_DECISION_NOTICE.equals(documentType) ? "Decision Notice" : documentTypeLabel);
-
+        LocalDate dateAdded = Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now());
+        String documentTypeLabel = getDocumentTypeLabel(caseData, documentType, isPostHearingsEnabled);
+        String embeddedDocumentTypeLabel = getEmbeddedDocumentTypeLabel(caseData, documentType, documentTypeLabel, isPostHearingsEnabled);
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-
-        FormPayload formPayload = createPayload(response, caseData, embeddedDocumentTypeLabel, dateAdded, LocalDate.now(), isScottish, userAuthorisation);
+        FormPayload formPayload = createPayload(response, caseData, embeddedDocumentTypeLabel, dateAdded, LocalDate.now(), isScottish, isPostHearingsEnabled, isPostHearingsBEnabled, userAuthorisation);
 
         if (!response.getErrors().isEmpty()) {
             return response;
@@ -144,11 +158,8 @@ public class IssueDocumentHandler {
                 .build();
 
         log.info(String.format("Generating %s document isScottish = %s", documentTypeLabel, isScottish));
-
         final String generatedFileUrl = generateFile.assemble(params);
-
-        documentTypeLabel = documentTypeLabel + ((DRAFT_DECISION_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType)) ? " generated" : " issued");
-
+        documentTypeLabel = documentTypeLabel + ((DRAFT_CORRECTED_NOTICE.equals(documentType) || DRAFT_DECISION_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType)) ? " generated" : " issued");
         final String filename = String.format("%s on %s.pdf", documentTypeLabel, dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         DocumentLink previewFile = DocumentLink.builder()
@@ -162,11 +173,49 @@ public class IssueDocumentHandler {
         return response;
     }
 
+    private String getDocumentTypeLabel(SscsCaseData caseData, DocumentType documentType, boolean isPostHearingsEnabled) {
+        String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
+
+        if (isPostHearingsEnabled) {
+            PostHearingReviewType reviewType = caseData.getPostHearing().getReviewType();
+
+            if (nonNull(reviewType)) {
+                documentTypeLabel = documentTypeLabel.replace(reviewType.getDescriptionEn(), reviewType.getShortDescriptionEn());
+            }
+        }
+
+        return documentTypeLabel;
+    }
+
+    protected String getEmbeddedDocumentTypeLabel(SscsCaseData caseData, DocumentType documentType, String documentTypeLabel, boolean isPostHearingsEnabled) {
+        String embeddedDocumentTypeLabel = (FINAL_DECISION_NOTICE.equals(documentType) || CORRECTION_GRANTED.equals(documentType) ? "Decision Notice" : documentTypeLabel);
+
+        if (isPostHearingsEnabled) {
+            PostHearing postHearing = caseData.getPostHearing();
+            PostHearingReviewType postHearingReviewType = postHearing.getReviewType();
+
+            if (nonNull(postHearingReviewType)) {
+                if (PostHearingReviewType.PERMISSION_TO_APPEAL.equals(postHearingReviewType)
+                        && PermissionToAppealActions.REVIEW.equals(postHearing.getPermissionToAppeal().getAction())) {
+                    return "Review Decision Notice";
+                }
+
+                return postHearingReviewType.getDescriptionEn() + " Decision Notice";
+            }
+
+            if (isYes(postHearing.getCorrection().getIsCorrectionFinalDecisionInProgress())) {
+                return documentTypeLabel;
+            }
+        }
+
+        return embeddedDocumentTypeLabel;
+    }
+
     /**
      * Override this method if previewDocument is not the correct field to set.
      */
     protected void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file) {
-        caseData.setPreviewDocument(file);
+        caseData.getDocumentStaging().setPreviewDocument(file);
     }
 
     /**
@@ -175,24 +224,24 @@ public class IssueDocumentHandler {
      * @return DocumentLink
      */
     protected DocumentLink getDocumentFromCaseData(SscsCaseData caseData) {
-        return caseData.getPreviewDocument();
+        return caseData.getDocumentStaging().getPreviewDocument();
     }
 
     protected String buildFullName(SscsCaseData caseData) {
         StringBuilder fullNameText = new StringBuilder();
         if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equalsIgnoreCase("Yes") && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
-            fullNameText.append(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
+            fullNameText.append(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle());
             fullNameText.append(", appointee for ");
         }
 
-        fullNameText.append(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle(), ' ', '.'));
+        fullNameText.append(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
 
         return fullNameText.toString();
     }
 
     protected Optional<String> buildAppointeeName(SscsCaseData caseData) {
         if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equalsIgnoreCase("Yes") && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
-            return Optional.of(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
+            return Optional.of(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle());
         } else {
             return Optional.empty();
         }

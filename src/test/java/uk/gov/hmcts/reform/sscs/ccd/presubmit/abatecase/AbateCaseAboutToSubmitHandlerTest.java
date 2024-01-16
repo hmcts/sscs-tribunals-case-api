@@ -69,7 +69,7 @@ public class AbateCaseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(ABATED.getId(), response.getData().getOutcome());
-        assertEquals(APPEAL_ABATED.getId(), response.getData().getDwpState());
+        assertEquals(APPEAL_ABATED, response.getData().getDwpState());
     }
 
     @Test(expected = IllegalStateException.class)

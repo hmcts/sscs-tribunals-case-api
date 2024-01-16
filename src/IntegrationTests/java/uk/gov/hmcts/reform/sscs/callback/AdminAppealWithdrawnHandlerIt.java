@@ -42,7 +42,7 @@ public class AdminAppealWithdrawnHandlerIt extends AbstractEventIt {
 
         assertEquals(4, result.getData().getSscsDocument().size());
         assertEquals(WITHDRAWAL_REQUEST.getValue(), result.getData().getSscsDocument().get(3).getValue().getDocumentType());
-        assertEquals(WITHDRAWAL_RECEIVED.getId(), result.getData().getDwpState());
+        assertEquals(WITHDRAWAL_RECEIVED, result.getData().getDwpState());
         assertEquals(1, result.getData().getAppealNotePad().getNotesCollection().size());
         assertEquals("withdrawal note added", result.getData().getAppealNotePad().getNotesCollection().get(0).getValue().getNoteDetail());
     }

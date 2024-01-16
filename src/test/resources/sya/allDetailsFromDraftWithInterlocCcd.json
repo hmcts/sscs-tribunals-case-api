@@ -1,6 +1,6 @@
 {
   "caseCreated" : "${json-unit.ignore}",
-  "caseAccessCategory": "personalIndependencePayment",
+  "CaseAccessCategory": "personalIndependencePayment",
   "caseManagementCategory": {
     "value": {
       "code": "PIP",
@@ -254,5 +254,25 @@
   "interlocReviewState" : "reviewByTcw",
   "isScottishCase" : "No",
   "workBasketHearingDate": null,
-  "workBasketHearingEpimsId": null
+  "workBasketHearingEpimsId": null,
+  "postHearingRequestType": null,
+  "postHearingReviewType": null,
+  "setAside": null,
+  "correction": null,
+  "statementOfReasons": null,
+  "libertyToApply": null,
+  "permissionToAppeal": null,
+  "dateAdded": null,
+  "previewDocument": null,
+  "generateNotice": null,
+  "correctionGenerateNotice": null,
+  "statementOfReasonsGenerateNotice": null,
+  "libertyToApplyGenerateNotice": null,
+  "bodyContent": null,
+  "correctionBodyContent": null,
+  "statementOfReasonsBodyContent": null,
+  "libertyToApplyBodyContent": null,
+  "directionNoticeContent": null,
+  "signedBy": null,
+  "signedRole": null
 }

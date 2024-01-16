@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_INFORMATION;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.createUploadResponse;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
@@ -68,7 +69,7 @@ public class DirectionIssuedIt extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getDocumentStaging().getPreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
@@ -92,11 +93,11 @@ public class DirectionIssuedIt extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertNull(result.getData().getPreviewDocument());
-        assertNull(result.getData().getSignedRole());
-        assertNull(result.getData().getSignedBy());
-        assertNull(result.getData().getGenerateNotice());
-        assertNull(result.getData().getDateAdded());
+        assertNull(result.getData().getDocumentStaging().getPreviewDocument());
+        assertNull(result.getData().getDocumentGeneration().getSignedRole());
+        assertNull(result.getData().getDocumentGeneration().getSignedBy());
+        assertNull(result.getData().getDocumentGeneration().getGenerateNotice());
+        assertNull(result.getData().getDocumentStaging().getDateAdded());
         assertNull(result.getData().getExtensionNextEventDl());
         assertNull(result.getData().getReinstatementOutcome());
         assertEquals(4, result.getData().getSscsDocument().size());
@@ -105,8 +106,8 @@ public class DirectionIssuedIt extends AbstractEventIt {
         assertEquals("Addition B - Directions Notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals(DwpState.DIRECTION_ACTION_REQUIRED.getId(), result.getData().getDwpState());
-        assertEquals("awaitingInformation", result.getData().getInterlocReviewState());
+        assertEquals(DwpState.DIRECTION_ACTION_REQUIRED, result.getData().getDwpState());
+        assertEquals(AWAITING_INFORMATION, result.getData().getInterlocReviewState());
 
     }
 
@@ -126,11 +127,11 @@ public class DirectionIssuedIt extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertNull(result.getData().getPreviewDocument());
-        assertNull(result.getData().getSignedRole());
-        assertNull(result.getData().getSignedBy());
-        assertNull(result.getData().getGenerateNotice());
-        assertNull(result.getData().getDateAdded());
+        assertNull(result.getData().getDocumentStaging().getPreviewDocument());
+        assertNull(result.getData().getDocumentGeneration().getSignedRole());
+        assertNull(result.getData().getDocumentGeneration().getSignedBy());
+        assertNull(result.getData().getDocumentGeneration().getGenerateNotice());
+        assertNull(result.getData().getDocumentStaging().getDateAdded());
         assertNull(result.getData().getExtensionNextEventDl());
         assertNull(result.getData().getReinstatementOutcome());
         assertEquals(4, result.getData().getSscsDocument().size());
@@ -139,8 +140,8 @@ public class DirectionIssuedIt extends AbstractEventIt {
         assertEquals("Addition B - Directions Notice issued on 09-02-2018.pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals(DwpState.DIRECTION_ACTION_REQUIRED.getId(), result.getData().getDwpState());
-        assertEquals("awaitingInformation", result.getData().getInterlocReviewState());
+        assertEquals(DwpState.DIRECTION_ACTION_REQUIRED, result.getData().getDwpState());
+        assertEquals(AWAITING_INFORMATION, result.getData().getInterlocReviewState());
     }
 
     @Test

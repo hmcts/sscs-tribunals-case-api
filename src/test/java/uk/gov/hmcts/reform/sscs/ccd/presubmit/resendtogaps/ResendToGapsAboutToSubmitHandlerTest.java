@@ -22,6 +22,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonValidator;
 
@@ -104,10 +105,10 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"required,$.apellant,nino,apellant.nino is missing/not populated - please correct.",
-            "required,,nino,nino is missing/not populated - please correct.",
-            "minLength,$.apellant.nino,,apellant.nino is missing/not populated - please correct.",
-            "pattern,$.apellant.nino,,apellant.nino is invalid - please correct.",
-            "whoknows,$.apellant.nino,,An unexpected error has occurred. Please raise a ServiceNow ticket - the following field has caused the issue: apellant.nino"
+        "required,,nino,nino is missing/not populated - please correct.",
+        "minLength,$.apellant.nino,,apellant.nino is missing/not populated - please correct.",
+        "pattern,$.apellant.nino,,apellant.nino is invalid - please correct.",
+        "whoknows,$.apellant.nino,,An unexpected error has occurred. Please raise a ServiceNow ticket - the following field has caused the issue: apellant.nino"
     })
     public void shouldReturnErrors_givenInvalidJson(String errorType, String path, String field, String expectedError) {
         when(validationMessage.getType()).thenReturn(errorType);
@@ -152,7 +153,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(hearingMessageHelper, atLeastOnce()).sendListAssistCancelHearingMessage("1234", null);
+        verify(hearingMessageHelper, atLeastOnce()).sendListAssistCancelHearingMessage("1234", CancellationReason.OTHER);
     }
 
     @Test
@@ -162,7 +163,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(hearingMessageHelper, never()).sendListAssistCancelHearingMessage("1234", null);
+        verify(hearingMessageHelper, never()).sendListAssistCancelHearingMessage("1234", CancellationReason.OTHER);
     }
 
     @Test
@@ -172,6 +173,6 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(hearingMessageHelper, never()).sendListAssistCancelHearingMessage("1234", null);
+        verify(hearingMessageHelper, never()).sendListAssistCancelHearingMessage("1234", CancellationReason.OTHER);
     }
 }

@@ -20,8 +20,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 
 @RunWith(JUnitParamsRunner.class)
 public class AdminSendToWithDwpAboutToSubmitHandlerTest {
@@ -78,15 +78,15 @@ public class AdminSendToWithDwpAboutToSubmitHandlerTest {
     @Test
     public void givenAdminSendToDwpEventWithInterlocReferralReasonSetToPhe_thenClearInterlocFlags() {
 
-        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHE_REQUEST.getId());
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHE_REQUEST);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
 
-        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.NONE.getId()));
-        assertThat(response.getData().getInterlocReferralReason(), is(InterlocReferralReason.NONE.getId()));
+        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.NONE));
+        assertThat(response.getData().getInterlocReferralReason(), is(InterlocReferralReason.NONE));
     }
 
     @Test(expected = IllegalStateException.class)

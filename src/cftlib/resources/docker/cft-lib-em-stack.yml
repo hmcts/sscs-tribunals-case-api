@@ -1,0 +1,65 @@
+
+name: cft-lib-em-stack
+
+services:
+  rpa-em-ccd-orchestrator:
+    image: hmctspublic.azurecr.io/em/ccdorc:latest
+    environment:
+      - SERVER_PORT=8080
+      - CALLBACK_DOMAIN=rpa-em-ccd-orchestrator
+      - IDAM_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5062}
+      - OPEN_ID_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5062}/o
+      - S2S_BASE_URI=http://host.docker.internal:4502
+      - APPINSIGHTS_INSTRUMENTATIONKEY=test_app
+      - DM_STORE_APP_URL=http://dm-store:5005
+      - CCD_DATA_API_URL=http://host.docker.internal:4452
+      - EM_STITCHING_API_URL=http://stitching-api:8080
+      - ENABLE_LIQUIBASE=true
+      - JSON_CONSOLE_PRETTY_PRINT=false
+      - ROOT_LOGGING_LEVEL=WARN
+      - REFORM_SERVICE_TYPE=java
+      - REFORM_SERVICE_NAME=rpa-em-ccd-orchestrator
+      - REFORM_TEAM=em-ccd-orchestrator
+      - REFORM_ENVIRONMENT=docker
+    ports:
+      - 4623:8080
+    networks:
+      - cftlib_default
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  stitching-api:
+    image: hmctspublic.azurecr.io/em/stitching:latest
+    healthcheck:
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://shared-database-pg12:5432/emstitch
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - S2S_BASE_URI=http://host.docker.internal:4502
+      - CDAM_URL=http://host.docker.internal:4455
+      - IDAM_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5062}
+      - OPEN_ID_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5062}/o
+      - ENABLE_LIQUIBASE=true
+      - APPINSIGHTS_INSTRUMENTATIONKEY=test-key
+      - DM_STORE_APP_URL=http://localhost:5005
+      - DOCMOSIS_ACCESS_KEY=${DOCMOSIS_ACCESS_KEY}
+      - ROOT_LOGGING_LEVEL=WARN
+      - LOG_OUTPUT=single
+      - JSON_CONSOLE_PRETTY_PRINT=false
+      - S2S_NAMES_WHITELIST:jui_webapp,em_ccd_orchestrator,em_gw,sscs
+      - FLYWAY_POSTGRESQL_TRANSACTIONAL_LOCK=false
+    ports:
+      - 4630:8080
+    networks:
+      - cftlib_default
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "docmosis.aat.platform.hmcts.net:10.10.161.100"
+
+networks:
+  cftlib_default:
+    external: true

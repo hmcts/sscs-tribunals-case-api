@@ -19,11 +19,10 @@ public class InterlocSendToTcwAboutToSubmitHandler implements PreSubmitCallbackH
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        requireNonNull(callbackType, "callbacktype must not be null");
+        requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && (callback.getEvent() == EventType.INTERLOC_SEND_TO_TCW
-            );
+                && (callback.getEvent() == EventType.INTERLOC_SEND_TO_TCW);
     }
 
     @Override
@@ -38,8 +37,6 @@ public class InterlocSendToTcwAboutToSubmitHandler implements PreSubmitCallbackH
 
         caseData.setDirectionDueDate(null);
 
-        PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-
-        return sscsCaseDataPreSubmitCallbackResponse;
+        return new PreSubmitCallbackResponse<>(caseData);
     }
 }

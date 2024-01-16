@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 public class OutcomeServiceHandlerTest {
@@ -108,7 +109,7 @@ public class OutcomeServiceHandlerTest {
     public void throwExceptionIfCannotHandleEventType() {
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
 
-        sscsCaseData = SscsCaseData.builder().interlocReviewState("someValue").build();
+        sscsCaseData = SscsCaseData.builder().interlocReviewState(InterlocReviewState.REVIEW_BY_TCW).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

@@ -5,12 +5,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -20,7 +21,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.sscs.service.*;
 public class PipIssueFinalDecisionAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
+    public static final String APPELLANT_LAST_NAME = "APPELLANT Last'NamE";
     private IssueFinalDecisionAboutToStartHandler handler;
     private static final String URL = "http://dm-store/documents/123";
     private static final String TEMPLATE_ID = "nuts.docx";
@@ -78,41 +79,33 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-
-        Mockito.when(previewDecisionService.getBenefitType()).thenReturn("PIP");
-        Mockito.when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
-
+        when(previewDecisionService.getBenefitType()).thenReturn("PIP");
+        when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
         decisionNoticeService =
-            new DecisionNoticeService(Arrays.asList(),
-                Arrays.asList(pipDecisionNoticeOutcomeService), Arrays.asList(previewDecisionService));
-
-        handler = new IssueFinalDecisionAboutToStartHandler(decisionNoticeService);
-
+            new DecisionNoticeService(List.of(), List.of(pipDecisionNoticeOutcomeService), List.of(previewDecisionService));
+        handler = new IssueFinalDecisionAboutToStartHandler(decisionNoticeService, false, false);
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-
         when(userDetailsService.buildLoggedInUserName("Bearer token")).thenReturn("Judge Full Name");
-
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
-
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionGeneratedDate("2018-01-01")
-                .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
+                .writeFinalDecisionPreviewDocument(DocumentLink.builder().documentFilename("test").build())
+                .writeFinalDecisionGenerateNotice(YES)
                 .build())
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("PIP").build())
                 .appellant(Appellant.builder()
                     .name(Name.builder().firstName("APPELLANT")
-                        .lastName("LastNamE")
+                        .lastName("Last'NamE")
                         .build())
                     .identity(Identity.builder().build())
                     .build())
                 .build()).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
         when(generateFile.assemble(any())).thenReturn(URL);
 
         Map<EventType, String> englishEventTypeDocs = new HashMap<>();
@@ -141,21 +134,17 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
 
     @Test
     public void givenAboutToStartRequest_willGeneratePreviewFile() {
-
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
         when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
-
-        PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(sscsCaseData);
-
         when(previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true)).thenReturn(response);
-        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        verify(previewDecisionService).preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
+        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        verify(previewDecisionService).preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true, false, false);
 
     }
 
     @Test
     public void givenAboutToStartRequestDescriptorFlow_willGeneratePreviewFileWithoutUpdatingGeneratedDate() throws IOException {
-
         when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
 
         PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
@@ -165,10 +154,10 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
 
         when(generateFile.assemble(any())).thenReturn(URL);
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingQuestion("preparingFood1a");
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(Arrays.asList("preparingFood"));
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionDailyLivingActivitiesQuestion(List.of("preparingFood"));
         sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityQuestion("movingAround1a");
-        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsPipCaseData().setPipWriteFinalDecisionMobilityActivitiesQuestion(List.of("movingAround"));
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionStartDate("2018-11-10");
@@ -183,12 +172,12 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
         // CHeck that the document has the correct (updated) issued date.
         assertNotNull(previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, false,
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
             true, true);
 
         // Check that the generated date has not been updated
@@ -208,7 +197,7 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("no");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -220,12 +209,12 @@ public class PipIssueFinalDecisionAboutToStartHandlerTest {
         // CHeck that the document has the correct (updated) issued date.
         assertNotNull(previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, false,
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
             false, true);
 
         // Check that the generated date has not been updated

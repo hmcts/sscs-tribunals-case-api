@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.sscs.callback;
 
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_INFORMATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION_INFORMATION_REQUESTED;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -44,7 +44,7 @@ public class RequestInfoIt extends AbstractEventIt {
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
         assertEquals(INCOMPLETE_APPLICATION_INFORMATION_REQUESTED, result.getData().getState());
-        assertEquals(AWAITING_INFORMATION.getId(), result.getData().getInterlocReviewState());
+        assertEquals(AWAITING_INFORMATION, result.getData().getInterlocReviewState());
     }
 
     @Test
@@ -56,7 +56,7 @@ public class RequestInfoIt extends AbstractEventIt {
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
         assertNull(result.getData().getState());
-        assertEquals(AWAITING_INFORMATION.getId(), result.getData().getInterlocReviewState());
+        assertEquals(AWAITING_INFORMATION, result.getData().getInterlocReviewState());
     }
 
 }

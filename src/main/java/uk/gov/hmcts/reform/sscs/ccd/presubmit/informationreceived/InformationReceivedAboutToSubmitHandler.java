@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.informationreceived;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason.findLabelById;
 
 import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +12,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 
@@ -47,20 +46,22 @@ public class InformationReceivedAboutToSubmitHandler implements PreSubmitCallbac
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        sscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
+        sscsCaseData.setInterlocReferralDate(LocalDate.now());
 
-        String interlocReviewState = sscsCaseData.getInterlocReviewState();
+        InterlocReviewState interlocReviewState = sscsCaseData.getInterlocReviewState();
 
 
-        if (interlocReviewState.equals(InterlocReviewState.REVIEW_BY_JUDGE.getId())
-                || interlocReviewState.equals(InterlocReviewState.REVIEW_BY_TCW.getId())) {
+        if (interlocReviewState == InterlocReviewState.REVIEW_BY_JUDGE
+            || interlocReviewState == InterlocReviewState.REVIEW_BY_TCW) {
 
             String finalNote;
 
-            if (interlocReviewState.equals(InterlocReviewState.REVIEW_BY_JUDGE.getId())) {
-                finalNote = "Referred to interloc for review by judge – " + findLabelById(sscsCaseData.getInterlocReferralReason());
+            if (interlocReviewState.equals(InterlocReviewState.REVIEW_BY_JUDGE)) {
+                finalNote = "Referred to interloc for review by judge – "
+                    + sscsCaseData.getInterlocReferralReason().getDescription();
             } else {
-                finalNote = "Referred to interloc for review by TCW – " + findLabelById(sscsCaseData.getInterlocReferralReason());
+                finalNote = "Referred to interloc for review by TCW – "
+                    + sscsCaseData.getInterlocReferralReason().getDescription();
             }
 
             String tempNote = sscsCaseData.getTempNoteDetail();

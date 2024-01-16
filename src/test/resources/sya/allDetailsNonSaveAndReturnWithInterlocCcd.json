@@ -1,6 +1,6 @@
 {
   "caseCreated" : "${json-unit.ignore}",
-  "caseAccessCategory": "personalIndependencePayment",
+  "CaseAccessCategory": "personalIndependencePayment",
   "caseManagementCategory": {
     "value": {
       "code": "PIP",
@@ -35,6 +35,7 @@
     "city" : "BRADFORD",
     "postcode" : "BD3 7BH",
     "phoneNumber" : "0300 123 1142",
+    "epimsId" : null,
     "faxNumber" : "0126 434 7983",
     "email": "SSCS_Bradford@justice.gov.uk",
     "hearingRoute":null,
@@ -254,5 +255,25 @@
   "interlocReviewState" : "reviewByTcw",
   "isScottishCase" : "No",
   "workBasketHearingDate": null,
-  "workBasketHearingEpimsId": null
+  "workBasketHearingEpimsId": null,
+  "postHearingRequestType": null,
+  "postHearingReviewType": null,
+  "setAside": null,
+  "correction": null,
+  "statementOfReasons": null,
+  "libertyToApply": null,
+  "permissionToAppeal": null,
+  "dateAdded": null,
+  "previewDocument": null,
+  "generateNotice": null,
+  "correctionGenerateNotice": null,
+  "statementOfReasonsGenerateNotice": null,
+  "libertyToApplyGenerateNotice": null,
+  "bodyContent": null,
+  "correctionBodyContent": null,
+  "statementOfReasonsBodyContent": null,
+  "libertyToApplyBodyContent": null,
+  "directionNoticeContent": null,
+  "signedBy": null,
+  "signedRole": null
 }

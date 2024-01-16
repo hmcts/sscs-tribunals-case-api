@@ -6,9 +6,11 @@ import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.status;
 
 import com.google.common.base.Preconditions;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +19,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
@@ -37,11 +47,10 @@ public class SyaController {
         this.submitAppealService = submitAppealService;
     }
 
-    @ApiOperation(value = "submitAppeal",
-        notes = "Creates a case from the SYA details",
-        response = String.class, responseContainer = "Appeal details")
-    @ApiResponses(value = {@ApiResponse(code = 201, message = "Submitted appeal successfully",
-        response = String.class)})
+    @Operation(summary = "submitAppeal", description = "Creates a case from the SYA details")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Submitted appeal successfully", content = {
+            @Content(schema = @Schema(implementation = String.class))})})
     @PostMapping(value = "/appeals", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createAppeals(@RequestHeader(value = AUTHORIZATION, required = false)
                                                     String authorisation, @RequestBody SyaCaseWrapper syaCaseWrapper) {
@@ -90,11 +99,13 @@ public class SyaController {
         log.info(stringBuilder.toString());
     }
 
-    @ApiOperation(value = "getDraftAppeals", notes = "Get all draft appeals", response = Draft.class)
-    @ApiResponses(value =
-            {@ApiResponse(code = 200, message = "Returns all draft appeals data if it exists.", response = SessionDraft.class),
-                    @ApiResponse(code = 404, message = "The user does not have any draft appeal."),
-                    @ApiResponse(code = 500, message = "Most probably the user is unauthorised.")})
+    @Operation(summary = "getDraftAppeals", description = "Get all draft appeals")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Returns all draft appeals data if it exists.", content = {
+            @Content(schema = @Schema(implementation = SessionDraft.class))}),
+        @ApiResponse(responseCode = "404", description = "The user does not have any draft appeal."),
+        @ApiResponse(responseCode = "500", description = "Most probably the user is unauthorised.")
+    })
     @GetMapping(value = "/drafts/all", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<SessionDraft>> getDraftAppeals(@RequestHeader(AUTHORIZATION) String authorisation) {
         Preconditions.checkNotNull(authorisation);
@@ -111,11 +122,13 @@ public class SyaController {
     }
 
 
-    @ApiOperation(value = "getDraftAppeal", notes = "Get a draft appeal", response = Draft.class)
+    @Operation(summary = "getDraftAppeal", description = "Get a draft appeal")
     @ApiResponses(value =
-        {@ApiResponse(code = 200, message = "Returns a draft appeal data if it exists.", response = SessionDraft.class),
-            @ApiResponse(code = 204, message = "The user does not have any draft appeal."),
-            @ApiResponse(code = 500, message = "Most probably the user is unauthorised.")})
+        {@ApiResponse(responseCode = "200", description = "Returns a draft appeal data if it exists.", content = {
+            @Content(schema = @Schema(implementation = SessionDraft.class))
+        }),
+            @ApiResponse(responseCode = "204", description = "The user does not have any draft appeal."),
+            @ApiResponse(responseCode = "500", description = "Most probably the user is unauthorised.")})
     @GetMapping(value = "/drafts", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SessionDraft> getDraftAppeal(@RequestHeader(AUTHORIZATION) String authorisation) {
         Preconditions.checkNotNull(authorisation);
@@ -127,9 +140,10 @@ public class SyaController {
         return draftAppeal.map(ResponseEntity::ok).orElse(ResponseEntity.noContent().build());
     }
 
-    @ApiOperation(value = "submitDraftAppeal", notes = "Creates a draft appeal", response = Draft.class)
-    @ApiResponses(value =
-        {@ApiResponse(code = 201, message = "Submitted draft appeal successfully", response = Draft.class)})
+    @Operation(summary = "submitDraftAppeal", description = "Creates a draft appeal")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Submitted draft appeal successfully", content = {
+            @Content(schema = @Schema(implementation = Draft.class))})})
     @PutMapping(value = "/drafts", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Draft> createDraftAppeal(
         @RequestHeader(AUTHORIZATION) String authorisation,
@@ -148,13 +162,16 @@ public class SyaController {
             forceCreateDraft = false;
         }
 
+        log.info("createDraftAppeal {} {}", forceCreateDraft, syaCaseWrapper.getCcdCaseId());
+
         Optional<SaveCaseResult> submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper, forceCreateDraft);
         return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
     }
 
-    @ApiOperation(value = "updateDraftAppeal", notes = "Updates a draft appeal", response = Draft.class)
-    @ApiResponses(value =
-            {@ApiResponse(code = 200, message = "Updated draft appeal successfully", response = Draft.class)})
+    @Operation(summary = "updateDraftAppeal", description = "Updates a draft appeal")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Updated draft appeal successfully", content = {
+            @Content(schema = @Schema(implementation = Draft.class))})})
     @PostMapping(value = "/drafts", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Draft> updateDraftAppeal(
             @RequestHeader(AUTHORIZATION) String authorisation,
@@ -169,9 +186,10 @@ public class SyaController {
         return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
     }
 
-    @ApiOperation(value = "archiveDraftAppeal", notes = "Archives a draft appeal", response = Draft.class)
-    @ApiResponses(value =
-            {@ApiResponse(code = 200, message = "Updated draft appeal successfully", response = Draft.class)})
+    @Operation(summary = "archiveDraftAppeal", description = "Archives a draft appeal")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Updated draft appeal successfully", content = {
+            @Content(schema = @Schema(implementation = Draft.class))})})
     @DeleteMapping (value = "/drafts/{id}", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Draft> archiveDraftAppeal(
             @RequestHeader(AUTHORIZATION) String authorisation,
