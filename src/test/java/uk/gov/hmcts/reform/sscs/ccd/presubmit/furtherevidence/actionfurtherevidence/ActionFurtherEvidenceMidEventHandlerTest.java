@@ -89,12 +89,13 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenAPostponementRequestInInterlocTcwActionAndCaseInHearing_thenAddNoError() {
+    @Parameters({"sendToInterlocReviewByTcw, Send to Interloc - Review by Tcw", "sendToInterlocReviewByJudge, Send to Interloc - Review by Judge"})
+    public void givenAPostponementRequestInInterlocTcwOrJudgeActionAndCaseInHearing_thenAddNoError(String FurtherEvidenceActionCode, String FurtherEvidenceActionLabel) {
 
         when(caseDetails.getState()).thenReturn(State.HEARING);
         sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
-                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
+                new DynamicListItem(FurtherEvidenceActionCode,
+                        FurtherEvidenceActionLabel));
 
         ScannedDocument scannedDocument = ScannedDocument.builder()
                 .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
@@ -132,7 +133,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenAPostponementRequestInOtherThanInterlocTcwAction_thenAddAnError() {
+    public void givenAPostponementRequestInOtherThanInterlocTcwOrJudgeAction_thenAddAnError() {
         List<ScannedDocument> docs = new ArrayList<>();
         when(caseDetails.getState()).thenReturn(State.HEARING);
         sscsCaseData.getFurtherEvidenceAction().setValue(
@@ -151,7 +152,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
         assertThat(response.getErrors(), is(not(empty())));
         assertThat(response.getErrors().iterator().next(),
-                is(ActionFurtherEvidenceMidEventHandler.POSTPONEMENTS_REVIEWED_BY_TCW));
+                is(ActionFurtherEvidenceMidEventHandler.POSTPONEMENTS_REVIEWED_BY_TCW_OR_JUDGE));
     }
 
     @Test
