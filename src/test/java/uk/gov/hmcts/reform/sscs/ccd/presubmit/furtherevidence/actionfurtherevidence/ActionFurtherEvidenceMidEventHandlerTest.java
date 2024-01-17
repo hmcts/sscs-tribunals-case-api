@@ -90,12 +90,12 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
     @Test
     @Parameters({"sendToInterlocReviewByTcw, Send to Interloc - Review by Tcw", "sendToInterlocReviewByJudge, Send to Interloc - Review by Judge"})
-    public void givenAPostponementRequestInInterlocTcwOrJudgeActionAndCaseInHearing_thenAddNoError(String FurtherEvidenceActionCode, String FurtherEvidenceActionLabel) {
+    public void givenAPostponementRequestInInterlocTcwOrJudgeActionAndCaseInHearing_thenAddNoError(String furtherEvidenceActionCode, String furtherEvidenceActionLabel) {
 
         when(caseDetails.getState()).thenReturn(State.HEARING);
         sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionCode,
-                        FurtherEvidenceActionLabel));
+                new DynamicListItem(furtherEvidenceActionCode,
+                        furtherEvidenceActionLabel));
 
         ScannedDocument scannedDocument = ScannedDocument.builder()
                 .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
