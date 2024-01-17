@@ -71,8 +71,8 @@ public class AttachScannedDocsAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAnAttachScannedDocEventHasEditedUrl_thenCheckThatItStays() {
-        sscsCaseData.setScannedDocuments(Collections.singletonList(ScannedDocument.builder().value(ScannedDocumentDetails.builder().build()).build()));
+    public void givenAnAttachScannedDocEventHasAnEditedUrl_thenCheckThatEditedUrlAndOtherScannedDocsRemain() {
+        sscsCaseData.setScannedDocuments(List.of(ScannedDocument.builder().value(ScannedDocumentDetails.builder().build()).build()));
 
         ScannedDocument document1 = ScannedDocument.builder().value(
                 ScannedDocumentDetails.builder()
@@ -114,8 +114,18 @@ public class AttachScannedDocsAboutToSubmitHandlerTest {
                         .build()
         ).build();
 
-        CaseData caseData = SscsCaseData.builder().scannedDocuments(List.of(document2, document4)).build();
-        CaseData caseDataBefore = SscsCaseData.builder().scannedDocuments(List.of(document1,document3)).build();
+        ScannedDocument documentWithoutEditedUrl = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .fileName("test")
+                        .url(DocumentLink.builder().documentUrl("test url")
+                                .documentBinaryUrl("test binary url").documentFilename("test filename").documentHash("test hash").build())
+                        .type("Other")
+                        .scannedDate("17 Apr 2023")
+                        .build()
+        ).build();
+
+        CaseData caseData = SscsCaseData.builder().scannedDocuments(List.of(document2, document4, documentWithoutEditedUrl)).build();
+        CaseData caseDataBefore = SscsCaseData.builder().scannedDocuments(List.of(document1,document3, documentWithoutEditedUrl)).build();
 
         CaseDetails<? extends CaseData> caseDetails = new CaseDetails<>(1L, "", null, caseData, null, null);
         CaseDetails<? extends CaseData> caseDetailsBefore = new CaseDetails<>(1L, "", null, caseDataBefore, null, null);
@@ -124,6 +134,8 @@ public class AttachScannedDocsAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, testCallback, USER_AUTHORISATION);
 
-        assertEquals(List.of(document1, document3), response.getData().getScannedDocuments());
+        assertEquals(List.of(document1, document3, documentWithoutEditedUrl), response.getData().getScannedDocuments());
+        assertEquals(document1.getValue().getEditedUrl(), response.getData().getScannedDocuments().get(0).getValue().getEditedUrl());
+        assertEquals(document3.getValue().getEditedUrl(), response.getData().getScannedDocuments().get(1).getValue().getEditedUrl());
     }
 }
