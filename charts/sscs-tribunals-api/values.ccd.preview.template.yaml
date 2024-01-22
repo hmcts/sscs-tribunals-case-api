@@ -116,7 +116,6 @@ xui-webapp:
       REDISCLOUD_URL: http://dummyrediscloudurl
       UV_THREADPOOL_SIZE: 128
       PROTOCOL: http
-      SERVICES_HEARINGS_CASETYPES_SSCS: Benefit-sscs-pr-3575
     keyVaults:
       rpx:
         resourceGroup: rpx
@@ -278,6 +277,7 @@ sscs-hearings-api:
   java:
     image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-562-02322ee-20240116112926" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
+    ingressHost: hearings-${SERVICE_FQDN}
     environment:
       ROOT_LOGGING_LEVEL: INFO
       SSCS_LOG_LEVEL: DEBUG #Switch to debug to see requests being sent.
