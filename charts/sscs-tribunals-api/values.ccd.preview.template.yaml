@@ -303,6 +303,7 @@ sscs-hearings-api:
       HMC_HEARINGS_TOPIC_NAMESPACE: hmc-servicebus-aat
       HMC_DEPLOYMENT_ID: deployment-${SERVICE_NAME}
       DUMMY: false
+      TF_VAR_deploymentId: deployment-${SERVICE_NAME}
     secrets:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: sscs-sb-preview
@@ -324,8 +325,6 @@ sscs-hearings-api:
             alias: IDAM_OAUTH2_CLIENT_ID
           - name: idam-sscs-oauth2-client-secret
             alias: IDAM_OAUTH2_CLIENT_SECRET
-    terraformEnvironmentVariables:
-      TF_VAR_deploymentId: deployment-${SERVICE_NAME}
 
 #Enable for queues/topics
 #If you need a subscription for a topic, topic name should be not longer than 10 characters
