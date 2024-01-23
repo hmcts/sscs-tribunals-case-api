@@ -167,6 +167,7 @@ sscs-tya-notif:
   java:
     image: hmctspublic.azurecr.io/sscs/tya-notif:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
+    ingressHost: tya-${SERVICE_FQDN}
     readinessDelay: 45
     environment:
       CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
