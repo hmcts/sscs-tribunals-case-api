@@ -325,7 +325,7 @@ sscs-hearings-api:
           - name: idam-sscs-oauth2-client-secret
             alias: IDAM_OAUTH2_CLIENT_SECRET
     terraformEnvironmentVariables:
-      TF_VAR_deploymentId: hearing-deployment-${SERVICE_NAME}
+      TF_VAR_deploymentId: deployment-${SERVICE_NAME}
 
 #Enable for queues/topics
 #If you need a subscription for a topic, topic name should be not longer than 10 characters
