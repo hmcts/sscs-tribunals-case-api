@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.reservetointerlocjudge;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,10 @@ public class ReserveToInterlocJudgeAboutToSubmitHandler implements PreSubmitCall
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
+
+        if (isNoOrNull(sscsCaseData.getJudgeReserved())) {
+            sscsCaseData.setReservedToJudgeInterloc(null);
+        }
 
         log.info("Reserve to judge field set to {}", sscsCaseData.getReservedToJudgeInterloc());
 
