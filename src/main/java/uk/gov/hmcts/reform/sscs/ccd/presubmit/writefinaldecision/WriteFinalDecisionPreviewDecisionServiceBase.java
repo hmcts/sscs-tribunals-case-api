@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getLastValidHearing;
 
 import java.time.LocalDate;
@@ -209,7 +210,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
     private void setHearings(WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder, SscsCaseData caseData) {
         String heldAt = SscsUtil.buildWriteFinalDecisionHeldAt(caseData, venueDataLoader);
 
-        if (!"In chambers".equals(heldAt)) {
+        if (!IN_CHAMBERS.equals(heldAt)) {
             HearingDetails finalHearing = getLastValidHearing(caseData);
 
             if (nonNull(finalHearing) && nonNull(finalHearing.getHearingDate())) {
