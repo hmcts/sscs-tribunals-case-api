@@ -45,8 +45,6 @@ public class ReserveToInterlocJudgeAboutToSubmitHandler implements PreSubmitCall
             sscsCaseData.setReservedToJudgeInterloc(null);
         }
 
-        log.info("Reserve to judge field set to {}", sscsCaseData.getReservedToJudgeInterloc());
-
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 

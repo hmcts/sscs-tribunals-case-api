@@ -52,12 +52,31 @@ public class ReserveToInterlocJudgeAboutToSubmitHandlerTest {
     }
 
     @Test
-    void handReserveToInterlocJudgeWhenIsSet() {
+    void handReserveToInterlocJudgeWhenIsSetAndReserveToIsNo() {
         given(callback.getEvent()).willReturn(EventType.RESERVE_TO_INTERLOC_JUDGE);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
 
         JudicialUserBase reservedJudge = new JudicialUserBase("idamId", "personalCode");
+        sscsCaseData.setJudgeReserved(YesNo.NO);
+        sscsCaseData.setReservedToJudgeInterloc(reservedJudge);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getReservedToJudgeInterloc()).isNull();
+    }
+
+    @Test
+    void handReserveToInterlocJudgeWhenIsSetAndReserveToIsYes() {
+        given(callback.getEvent()).willReturn(EventType.RESERVE_TO_INTERLOC_JUDGE);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+
+        JudicialUserBase reservedJudge = new JudicialUserBase("idamId", "personalCode");
+        sscsCaseData.setJudgeReserved(YesNo.YES);
         sscsCaseData.setReservedToJudgeInterloc(reservedJudge);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
                 ABOUT_TO_SUBMIT,
