@@ -651,10 +651,11 @@ sscs-ccd-callback-orchestrator:
 #Enable for SYA
 sscs-tribunals-frontend:
   enabled: true
+  releaseNameOverride: ${SERVICE_NAME}-sscs-submit-your-appeal
   nodejs:
     memoryLimits: "2Gi"
     cpuLimits: 2000m
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:pr-1429
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
