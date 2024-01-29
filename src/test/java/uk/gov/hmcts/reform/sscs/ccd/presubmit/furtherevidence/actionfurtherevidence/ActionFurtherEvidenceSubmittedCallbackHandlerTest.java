@@ -418,9 +418,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     private static Object[] interlocReferralReason() {
         return new Object[] {
-            new Object[]{ DocumentType.REINSTATEMENT_REQUEST, InterlocReferralReason.REVIEW_REINSTATEMENT_REQUEST },
-            new Object[]{DocumentType.CONFIDENTIALITY_REQUEST, InterlocReferralReason.REVIEW_CONFIDENTIALITY_REQUEST },
-            new Object[]{DocumentType.URGENT_HEARING_REQUEST, InterlocReferralReason.NONE }
+            new Object[]{DocumentType.REINSTATEMENT_REQUEST, InterlocReferralReason.REVIEW_REINSTATEMENT_REQUEST},
+            new Object[]{DocumentType.CONFIDENTIALITY_REQUEST, InterlocReferralReason.REVIEW_CONFIDENTIALITY_REQUEST},
+            new Object[]{DocumentType.URGENT_HEARING_REQUEST, InterlocReferralReason.NONE}
         };
     }
 }
