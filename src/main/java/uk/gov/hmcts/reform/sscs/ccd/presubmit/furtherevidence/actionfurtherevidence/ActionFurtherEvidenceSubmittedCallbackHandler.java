@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 
 import java.time.LocalDate;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -118,7 +117,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             }
 
             setSelectWhoReviewsCaseField(caseData, REVIEW_BY_JUDGE);
-            if(isWorkAllocationEnabled) {
+            if (isWorkAllocationEnabled) {
                 caseData.setInterlocReferralReason(
                         inferInterlocReferralReason(
                             caseData.getWorkAllocationFields().getScannedDocumentTypes()));
@@ -152,11 +151,11 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     }
 
     private InterlocReferralReason inferInterlocReferralReason(List<String> scannedDocumentTypes) {
-        if(scannedDocumentTypes!=null) {
-            if(scannedDocumentTypes.contains(DocumentType.REINSTATEMENT_REQUEST.getValue())) {
+        if (scannedDocumentTypes != null) {
+            if (scannedDocumentTypes.contains(DocumentType.REINSTATEMENT_REQUEST.getValue())) {
                 return InterlocReferralReason.REVIEW_REINSTATEMENT_REQUEST;
             }
-            if(scannedDocumentTypes.contains(DocumentType.CONFIDENTIALITY_REQUEST.getValue())) {
+            if (scannedDocumentTypes.contains(DocumentType.CONFIDENTIALITY_REQUEST.getValue())) {
                 return InterlocReferralReason.REVIEW_CONFIDENTIALITY_REQUEST;
             }
         }
