@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
@@ -177,6 +178,23 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
         assertEquals("You have already issued a final decision, only a salaried Judge can correct it", error);
     }
 
+    @Test
+    public void givenStateIsDormantAndSalariedJudge_thenNoErrors() {
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
+        List<String> userRoles = List.of(
+                UserRole.JUDGE.getValue(),
+                UserRole.SALARIED_JUDGE.getValue()
+        );
+        when(userDetailsService.getUserRoles(USER_AUTHORISATION)).thenReturn(userRoles);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+    }
+
     @ParameterizedTest
     @EnumSource(names = {"POST_HEARING", "DORMANT_APPEAL_STATE"})
     public void givenAWriteFinalDecisionEventForCorrectionWithPostHearingsEnabled_thenKeepData(State state) {
@@ -229,6 +247,19 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertDataRetained(response);
+    }
+
+    @Test
+    public void giveCorrectionInProgressAndDecisionIsUploaded_thenClearUploadedDecision() {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(NO);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
     }
 
     private void assertDataRetained(PreSubmitCallbackResponse<SscsCaseData> response) {
