@@ -8,6 +8,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 
 import java.time.LocalDate;
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +39,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
 
     @Value("${feature.postHearingsB.enabled}")
     private final boolean isPostHearingsBEnabled;
+
+    @Value("${feature.work-allocation.enabled}")
+    private final boolean isWorkAllocationEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -113,6 +118,11 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             }
 
             setSelectWhoReviewsCaseField(caseData, REVIEW_BY_JUDGE);
+            if(isWorkAllocationEnabled) {
+                caseData.setInterlocReferralReason(
+                        inferInterlocReferralReason(
+                            caseData.getWorkAllocationFields().getScannedDocumentTypes()));
+            }
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
                     REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
                     EventType.VALID_SEND_TO_INTERLOC, TCW_REVIEW_SEND_TO_JUDGE);
@@ -139,6 +149,18 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                 EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
                 "Issue to all parties", idamService.getIdamTokens());
+    }
+
+    private InterlocReferralReason inferInterlocReferralReason(List<String> scannedDocumentTypes) {
+        if(scannedDocumentTypes!=null) {
+            if(scannedDocumentTypes.contains(DocumentType.REINSTATEMENT_REQUEST.getValue())) {
+                return InterlocReferralReason.REVIEW_REINSTATEMENT_REQUEST;
+            }
+            if(scannedDocumentTypes.contains(DocumentType.CONFIDENTIALITY_REQUEST.getValue())) {
+                return InterlocReferralReason.REVIEW_CONFIDENTIALITY_REQUEST;
+            }
+        }
+        return InterlocReferralReason.NONE;
     }
 
     private SscsCaseDetails handlePostHearing(Callback<SscsCaseData> callback, SscsCaseData caseData, PostHearingRequestType postHearingRequestType) {

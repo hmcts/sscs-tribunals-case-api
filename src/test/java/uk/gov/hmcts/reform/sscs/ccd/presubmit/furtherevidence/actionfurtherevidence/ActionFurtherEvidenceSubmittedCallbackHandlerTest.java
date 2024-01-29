@@ -8,6 +8,7 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -59,7 +60,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, false, false);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, false, false, false);
     }
 
 
@@ -157,7 +158,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         Callback<SscsCaseData> callback = buildCallback(furtherEvidenceActionSelectedOption, ACTION_FURTHER_EVIDENCE);
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, false);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, false, false);
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals(interlocReviewState, captor.getValue().getInterlocReviewState());
@@ -194,7 +195,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, true);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, true, false);
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, captor.getValue().getInterlocReviewState());
@@ -222,7 +223,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, true);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, true, false);
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
         assertEquals(String.format("Post hearing request type is not implemented or recognised: %s", requestType), exception.getMessage());
     }
@@ -247,7 +248,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, false);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, false, false);
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
         assertEquals("Post hearings B is not enabled", exception.getMessage());
     }
@@ -381,7 +382,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                 any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, true);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, true, false);
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, captor.getValue().getInterlocReviewState());
@@ -389,5 +390,38 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         then(ccdService).should(times(1))
                 .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(POST_HEARING_OTHER.getCcdType()), anyString(),
                         anyString(), any(IdamTokens.class));
+    }
+
+    @Test
+    @Parameters(method = "interlocReferralReason")
+    public void givenDocumentType_shouldTriggerEventAndSetInterlocReferralReasonCorrectly(DocumentType docType, InterlocReferralReason referralReason) {
+        Callback<SscsCaseData> callback = buildCallback(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(), ACTION_FURTHER_EVIDENCE);
+        callback.getCaseDetails().getCaseData().getWorkAllocationFields().setScannedDocumentTypes(
+                Arrays.asList(docType.getValue()));
+
+        given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
+
+        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
+
+        given(ccdService.updateCase(captor.capture(), anyLong(), eq(VALID_SEND_TO_INTERLOC.getCcdType()), anyString(), anyString(),
+                any(IdamTokens.class)))
+                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, true, true);
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertEquals(referralReason, captor.getValue().getInterlocReferralReason());
+
+        then(ccdService).should(times(1))
+                .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(VALID_SEND_TO_INTERLOC.getCcdType()), anyString(),
+                        anyString(), any(IdamTokens.class));
+    }
+
+    private static Object[] interlocReferralReason() {
+        return new Object[] {
+            new Object[]{ DocumentType.REINSTATEMENT_REQUEST, InterlocReferralReason.REVIEW_REINSTATEMENT_REQUEST },
+            new Object[]{DocumentType.CONFIDENTIALITY_REQUEST, InterlocReferralReason.REVIEW_CONFIDENTIALITY_REQUEST },
+            new Object[]{DocumentType.URGENT_HEARING_REQUEST, InterlocReferralReason.NONE }
+        };
     }
 }
