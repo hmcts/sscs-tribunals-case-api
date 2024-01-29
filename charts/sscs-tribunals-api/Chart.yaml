@@ -6,6 +6,10 @@ description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
 dependencies:
+  - name: postgresql
+    version: 1.0.2
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: postgresql.enabled
   - name: java
     version: 5.0.0
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
@@ -63,10 +67,6 @@ dependencies:
     version: 1.0.4
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: servicebus.enabled
-  - name: postgresql
-    version: 1.0.2
-    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-    condition: postgresql.enabled
   - name: aac-manage-case-assignment
     version: ~0.2.11
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
