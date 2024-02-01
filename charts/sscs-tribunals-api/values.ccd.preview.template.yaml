@@ -304,6 +304,7 @@ sscs-hearings-api:
       HMC_DEPLOYMENT_ID: deployment-${SERVICE_NAME}
       DUMMY: false
       TF_VAR_deploymentId: deployment-${SERVICE_NAME}
+      HMC_DEPLOYMENT_FILTER_ENABLED: true
     secrets:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: sscs-sb-preview
