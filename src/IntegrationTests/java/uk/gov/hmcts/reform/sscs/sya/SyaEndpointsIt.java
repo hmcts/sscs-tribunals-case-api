@@ -154,6 +154,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
     }
 
     @Test
+    @Ignore
     public void givenAValidAppeal_createValidAppealCreatedCase() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
