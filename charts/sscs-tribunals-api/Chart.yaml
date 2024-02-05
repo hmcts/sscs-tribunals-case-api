@@ -93,7 +93,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wa.enabled
   - name: wa-workflow-api
-    version: 0.0.29
+    version: 0.0.38
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wa.enabled
 #    initiation
