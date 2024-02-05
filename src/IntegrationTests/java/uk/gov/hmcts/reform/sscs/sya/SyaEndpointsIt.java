@@ -171,6 +171,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
         verify(ccdClient).submitForCaseworker(any(), caseDataCaptor.capture());
 
         assertEquals("Ashford", ((SscsCaseData) caseDataCaptor.getValue().getData()).getProcessingVenue());
+        assertEquals("239985", ((SscsCaseData) caseDataCaptor.getValue().getData()).getProcessingVenueEpimsId());
         assertEquals("698118", ((SscsCaseData) caseDataCaptor.getValue().getData()).getCaseManagementLocation().getBaseLocation());
         assertEquals("2", ((SscsCaseData) caseDataCaptor.getValue().getData()).getCaseManagementLocation().getRegion());
     }
