@@ -167,7 +167,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
             .content(getCase("json/sya.json")))
             .andExpect(status().isCreated());
 
-        verify(ccdClient).startCaseForCaseworker(any(), eq(VALID_APPEAL_CREATED.getCcdType()));
+        verify(ccdClient).startCaseForCaseworker(any(), eq(NON_COMPLIANT.getCcdType()));
         verify(ccdClient).submitForCaseworker(any(), caseDataCaptor.capture());
 
         assertEquals("Ashford", ((SscsCaseData) caseDataCaptor.getValue().getData()).getProcessingVenue());
