@@ -419,6 +419,7 @@ ccd:
         ADMINWEB_ELASTIC_CASE_TYPES_URL: http://${SERVICE_NAME}-ccd-definition-store/elastic-support/case-types
         IDAM_ADMIN_WEB_SERVICE_KEY: ${ADMIN_S2S_KEY}
         IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
+        ALLOW_CONFIG_MUTATIONS: true
       keyVaults: [ ]
 
 
@@ -490,6 +491,7 @@ ccd:
         IDAM_SERVICE_KEY: ${CCD_API_GATEWAY_S2S_SECRET}
         IDAM_OAUTH2_CLIENT_SECRET: ${CCD_API_GATEWAY_IDAM_CLIENT_SECRET}
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
+        ALLOW_CONFIG_MUTATIONS: true
       ingressIP: ${INGRESS_IP}
       ingressHost: gateway-${SERVICE_FQDN}
       disableKeyVaults: true
@@ -506,7 +508,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:6.3.6nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-214-1nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -525,7 +527,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: 6.3.6nonProd
+      CCD_DEF_VERSION: S-214-1nonProd
     secrets: []
     userRoles:
       - citizen
@@ -654,7 +656,7 @@ sscs-tribunals-frontend:
   nodejs:
     memoryLimits: "2Gi"
     cpuLimits: 2000m
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:pr-1429
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
