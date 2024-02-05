@@ -28,6 +28,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -228,6 +229,13 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
                     sscsCaseData.getAppeal().getBenefitType());
 
                 sscsCaseData.setProcessingVenue(processingVenue);
+
+                if (StringUtils.isNotEmpty(processingVenue)) {
+                    String venueEpimsId = venueService.getEpimsIdForVenue(processingVenue);
+                    sscsCaseData.setProcessingVenueEpimsId(venueEpimsId);
+                } else {
+                    sscsCaseData.setProcessingVenueEpimsId(null);
+                }
             }
         }
     }

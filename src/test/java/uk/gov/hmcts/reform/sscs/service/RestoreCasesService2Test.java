@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -48,6 +49,9 @@ public class RestoreCasesService2Test {
     @Mock
     CSVReader reader;
 
+    @Mock
+    VenueService venueService;
+
     private static final RegionalProcessingCenterService regionalProcessingCenterService;
 
     private static AirLookupService airLookupService;
@@ -70,8 +74,10 @@ public class RestoreCasesService2Test {
 
     @Before
     public void setup() {
-        restoreCasesService2 = new RestoreCasesService2(ccdService, idamService, new ObjectMapper(), regionalProcessingCenterService, airLookupService);
+        restoreCasesService2 = new RestoreCasesService2(ccdService, idamService, new ObjectMapper(), regionalProcessingCenterService, airLookupService, venueService);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
+        when(venueService.getEpimsIdForVenue("Basildon CC")).thenReturn("111111");
+        when(venueService.getEpimsIdForVenue("Glasgow")).thenReturn("222222");
 
         sscsCaseDetails = SscsCaseDetails.builder().state(State.WITH_DWP.getId())
         .id(1234112842952455L).data(
@@ -120,6 +126,7 @@ public class RestoreCasesService2Test {
         Assert.assertEquals("002DD", sscsCaseDataCaptor.getAllValues().get(0).getCaseCode());
         Assert.assertEquals("No", sscsCaseDataCaptor.getAllValues().get(0).getIsScottishCase());
         Assert.assertEquals("Basildon CC", sscsCaseDataCaptor.getAllValues().get(0).getProcessingVenue());
+        Assert.assertEquals("111111", sscsCaseDataCaptor.getAllValues().get(0).getProcessingVenueEpimsId());
         Assert.assertEquals("Jeff Smith", sscsCaseDataCaptor.getAllValues().get(0).getAppeal().getSigner());
         Assert.assertEquals(UNREGISTERED, sscsCaseDataCaptor.getAllValues().get(0).getDwpState());
 
@@ -130,6 +137,7 @@ public class RestoreCasesService2Test {
         Assert.assertEquals("051DD", sscsCaseDataCaptor.getAllValues().get(1).getCaseCode());
         Assert.assertEquals("Yes", sscsCaseDataCaptor.getAllValues().get(1).getIsScottishCase());
         Assert.assertEquals("Glasgow", sscsCaseDataCaptor.getAllValues().get(1).getProcessingVenue());
+        Assert.assertEquals("222222", sscsCaseDataCaptor.getAllValues().get(1).getProcessingVenueEpimsId());
         Assert.assertEquals("Mary Berry", sscsCaseDataCaptor.getAllValues().get(1).getAppeal().getSigner());
         Assert.assertEquals(UNREGISTERED, sscsCaseDataCaptor.getAllValues().get(1).getDwpState());
 
@@ -163,6 +171,7 @@ public class RestoreCasesService2Test {
         Assert.assertEquals("002DD", sscsCaseDataCaptor.getAllValues().get(0).getCaseCode());
         Assert.assertEquals("No", sscsCaseDataCaptor.getAllValues().get(0).getIsScottishCase());
         Assert.assertEquals("Basildon CC", sscsCaseDataCaptor.getAllValues().get(0).getProcessingVenue());
+        Assert.assertEquals("111111", sscsCaseDataCaptor.getAllValues().get(0).getProcessingVenueEpimsId());
         Assert.assertEquals("Jeff Smith", sscsCaseDataCaptor.getAllValues().get(0).getAppeal().getSigner());
         Assert.assertNull(sscsCaseDataCaptor.getAllValues().get(0).getDwpState());
 
@@ -173,6 +182,7 @@ public class RestoreCasesService2Test {
         Assert.assertEquals("051DD", sscsCaseDataCaptor.getAllValues().get(1).getCaseCode());
         Assert.assertEquals("Yes", sscsCaseDataCaptor.getAllValues().get(1).getIsScottishCase());
         Assert.assertEquals("Glasgow", sscsCaseDataCaptor.getAllValues().get(1).getProcessingVenue());
+        Assert.assertEquals("222222", sscsCaseDataCaptor.getAllValues().get(1).getProcessingVenueEpimsId());
         Assert.assertEquals("Mary Berry", sscsCaseDataCaptor.getAllValues().get(1).getAppeal().getSigner());
         Assert.assertNull(sscsCaseDataCaptor.getAllValues().get(1).getDwpState());
 

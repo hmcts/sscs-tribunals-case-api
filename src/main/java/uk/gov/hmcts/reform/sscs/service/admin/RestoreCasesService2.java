@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.service.VenueService;
 
 @Slf4j
 @Service
@@ -37,18 +39,21 @@ public class RestoreCasesService2 {
     private final ObjectMapper objectMapper;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final AirLookupService airLookupService;
+    private final VenueService venueService;
 
     @Autowired
     public RestoreCasesService2(CcdService ccdService,
                                 IdamService idamService,
                                 ObjectMapper objectMapper,
                                 RegionalProcessingCenterService regionalProcessingCenterService,
-                                AirLookupService airLookupService) {
+                                AirLookupService airLookupService,
+                                VenueService venueService) {
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.objectMapper = objectMapper;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.airLookupService = airLookupService;
+        this.venueService = venueService;
     }
 
     public String getRestoreCaseFileName(String message) throws JsonProcessingException {
@@ -140,7 +145,13 @@ public class RestoreCasesService2 {
             caseData.setRegionalProcessingCenter(rpc);
         }
 
-        caseData.setProcessingVenue(airLookupService.lookupAirVenueNameByPostCode(postCode, caseData.getAppeal().getBenefitType()));
+        String processingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, caseData.getAppeal().getBenefitType());
+        caseData.setProcessingVenue(processingVenue);
+
+        if (StringUtils.isNotEmpty(processingVenue)) {
+            String venueEpimsId = venueService.getEpimsIdForVenue(processingVenue);
+            caseData.setProcessingVenueEpimsId(venueEpimsId);
+        }
 
         String benefitCode = generateBenefitCode(caseData.getAppeal().getBenefitType().getCode(), "")
                 .orElseThrow(() -> createException(caseData.getAppeal().getBenefitType().getCode()));

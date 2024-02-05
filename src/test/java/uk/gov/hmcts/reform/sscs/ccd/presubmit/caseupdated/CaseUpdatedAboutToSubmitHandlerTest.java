@@ -631,6 +631,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(venueB, response.getData().getProcessingVenue());
+        assertEquals(venueEpimsId, response.getData().getProcessingVenueEpimsId());
         assertNotNull(response.getData().getCaseManagementLocation());
         assertEquals("rpcEpimsId", response.getData().getCaseManagementLocation().getBaseLocation());
         assertEquals("regionId", response.getData().getCaseManagementLocation().getRegion());
@@ -661,6 +662,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(venueB, response.getData().getProcessingVenue());
+        assertEquals(venueEpimsId, response.getData().getProcessingVenueEpimsId());
         assertNotNull(response.getData().getCaseManagementLocation());
         assertEquals("rpcEpimsId", response.getData().getCaseManagementLocation().getBaseLocation());
         assertEquals("regionId", response.getData().getCaseManagementLocation().getRegion());
@@ -675,12 +677,14 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode(postcode);
         callback.getCaseDetails().getCaseData().setRegionalProcessingCenter(RegionalProcessingCenter.builder().name("rpc1").build());
         callback.getCaseDetails().getCaseData().setProcessingVenue("VenueA");
+        callback.getCaseDetails().getCaseData().setProcessingVenueEpimsId("123456");
         callback.getCaseDetails().getCaseData().setCaseManagementLocation(CaseManagementLocation.builder().baseLocation("base").region("region").build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verifyNoInteractions(airLookupService);
         assertEquals("VenueA", response.getData().getProcessingVenue());
+        assertEquals("123456", response.getData().getProcessingVenueEpimsId());
         assertEquals("rpc1", response.getData().getRegionalProcessingCenter().getName());
         assertNotNull(response.getData().getCaseManagementLocation());
         assertEquals("base", response.getData().getCaseManagementLocation().getBaseLocation());
@@ -720,6 +724,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(venueB, response.getData().getProcessingVenue());
+        assertEquals(venueEpimsId, response.getData().getProcessingVenueEpimsId());
         assertNotNull(response.getData().getCaseManagementLocation());
         assertEquals("rpcEpimsId", response.getData().getCaseManagementLocation().getBaseLocation());
         assertEquals("regionId", response.getData().getCaseManagementLocation().getRegion());

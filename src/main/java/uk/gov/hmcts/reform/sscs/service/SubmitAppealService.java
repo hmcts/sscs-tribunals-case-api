@@ -255,18 +255,22 @@ public class SubmitAppealService {
         String processingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
         sscsCaseData.setProcessingVenue(processingVenue);
 
-        if (caseAccessManagementFeature
-                && StringUtils.isNotEmpty(processingVenue)
-                && rpc != null) {
+        if (StringUtils.isNotEmpty(processingVenue)) {
             String venueEpimsId = venueService.getEpimsIdForVenue(processingVenue);
-            CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
+            sscsCaseData.setProcessingVenueEpimsId(venueEpimsId);
 
-            sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-                .baseLocation(rpc.getEpimsId())
-                .region(courtVenue.getRegionId()).build());
+            if (caseAccessManagementFeature
+                    && StringUtils.isNotEmpty(venueEpimsId)
+                    && rpc != null) {
+                CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
 
-            log.info("Successfully updated case management location details for case {}. Processing venue {}, epimsId {}",
-                appeal.getCcdCaseId(), processingVenue, venueEpimsId);
+                sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
+                        .baseLocation(rpc.getEpimsId())
+                        .region(courtVenue.getRegionId()).build());
+
+                log.info("Successfully updated case management location details for case {}. Processing venue {}, epimsId {}",
+                        appeal.getCcdCaseId(), processingVenue, venueEpimsId);
+            }
         }
 
         log.info("{} - setting venue name to {}",

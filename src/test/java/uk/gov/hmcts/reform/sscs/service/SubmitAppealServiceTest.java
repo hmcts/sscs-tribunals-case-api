@@ -946,6 +946,7 @@ public class SubmitAppealServiceTest {
         SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
 
         assertEquals(expectedVenue, caseData.getProcessingVenue());
+        assertEquals(epimsId, caseData.getProcessingVenueEpimsId());
         assertNotNull(caseData.getCaseManagementLocation());
         assertEquals(epimsId, caseData.getCaseManagementLocation().getBaseLocation());
         assertEquals(regionId, caseData.getCaseManagementLocation().getRegion());

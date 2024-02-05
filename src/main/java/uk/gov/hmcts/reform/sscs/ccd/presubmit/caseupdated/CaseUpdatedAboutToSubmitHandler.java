@@ -309,17 +309,20 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             sscsCaseData.setProcessingVenue(venue);
 
-            if (caseAccessManagementFeature && StringUtils.isNotEmpty(venue)) {
+            if (StringUtils.isNotEmpty(venue)) {
                 String venueEpimsId = venueService.getEpimsIdForVenue(venue);
-                CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
+                sscsCaseData.setProcessingVenueEpimsId(venueEpimsId);
 
-                sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-                    .baseLocation(rpcEpimsId)
-                    .region(courtVenue.getRegionId()).build());
+                if (caseAccessManagementFeature && StringUtils.isNotEmpty(venueEpimsId)) {
+                    CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
 
-                log.info("Successfully updated case management location details for case {}. Processing venue {}, epimsId {}",
-                    caseDetails.getId(), venue, venueEpimsId);
+                    sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
+                            .baseLocation(rpcEpimsId)
+                            .region(courtVenue.getRegionId()).build());
 
+                    log.info("Successfully updated case management location details for case {}. Processing venue {}, epimsId {}",
+                            caseDetails.getId(), venue, venueEpimsId);
+                }
             }
         } else {
             log.info("Processing venue has not changed or is null, skipping update for case {}, venue: {}",
