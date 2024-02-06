@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -163,11 +162,11 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
     private String buildFullName(SscsCaseData caseData) {
         StringBuilder fullNameText = new StringBuilder();
         if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equalsIgnoreCase("Yes") && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
-            fullNameText.append(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
+            fullNameText.append(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle());
             fullNameText.append(", appointee for ");
         }
 
-        fullNameText.append(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle(), ' ', '.'));
+        fullNameText.append(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
         return fullNameText.toString();
     }
 
