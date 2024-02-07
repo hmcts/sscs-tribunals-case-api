@@ -508,7 +508,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:163-7nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:6.3.6nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -527,7 +527,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: 163-7nonProd
+      CCD_DEF_VERSION: 6.3.6nonProd
     secrets: []
     userRoles:
       - citizen
@@ -589,7 +589,7 @@ sscs-evidence-share:
 # click create
 # azure steps should be repeated every time PR is undeployed from preview
 sscs-tya-notif:
-  enabled: true
+  enabled: false
   java:
     image: hmctspublic.azurecr.io/sscs/tya-notif:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
