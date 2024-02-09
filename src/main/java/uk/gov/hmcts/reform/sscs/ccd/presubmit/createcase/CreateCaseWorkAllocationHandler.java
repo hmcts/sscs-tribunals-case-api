@@ -23,8 +23,7 @@ public class CreateCaseWorkAllocationHandler implements PreSubmitCallbackHandler
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        return workAllocationFeature
-                && callbackType == CallbackType.ABOUT_TO_SUBMIT
+        return callbackType == CallbackType.ABOUT_TO_SUBMIT
                 && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
                 || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED
                 || callback.getEvent() == EventType.NON_COMPLIANT
@@ -40,7 +39,7 @@ public class CreateCaseWorkAllocationHandler implements PreSubmitCallbackHandler
         }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        caseData.setPreWorkAllocation(YesNo.NO);
+        caseData.setPreWorkAllocation(workAllocationFeature ? YesNo.NO : YesNo.YES);
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
