@@ -27,47 +27,69 @@ public class CreateCaseWorkAllocationHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private CreateCaseWorkAllocationHandler handler = new CreateCaseWorkAllocationHandler(true);
-
     @ParameterizedTest
     @CsvSource({
-        "VALID_APPEAL_CREATED",
-        "DRAFT_TO_VALID_APPEAL_CREATED",
-        "NON_COMPLIANT",
-        "DRAFT_TO_NON_COMPLIANT",
-        "INCOMPLETE_APPLICATION_RECEIVED",
-        "DRAFT_TO_INCOMPLETE_APPLICATION",
+        "VALID_APPEAL_CREATED, false",
+        "VALID_APPEAL_CREATED, true",
+        "DRAFT_TO_VALID_APPEAL_CREATED, false",
+        "DRAFT_TO_VALID_APPEAL_CREATED, true",
+        "NON_COMPLIANT, false","NON_COMPLIANT, false",
+        "NON_COMPLIANT, false","NON_COMPLIANT, true",
+        "DRAFT_TO_NON_COMPLIANT, false",
+        "DRAFT_TO_NON_COMPLIANT, true",
+        "INCOMPLETE_APPLICATION_RECEIVED, false",
+        "INCOMPLETE_APPLICATION_RECEIVED, true",
+        "DRAFT_TO_INCOMPLETE_APPLICATION, false",
+        "DRAFT_TO_INCOMPLETE_APPLICATION, true"
     })
-    public void givenValidEvent_thenReturnTrue(EventType eventType) {
+    public void givenValidEvent_thenReturnTrue(EventType eventType, boolean workAllocationFeature) {
+        CreateCaseWorkAllocationHandler handler = new CreateCaseWorkAllocationHandler(workAllocationFeature);
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, createCallBack(eventType)));
     }
 
     @ParameterizedTest
     @CsvSource({
-        "UPLOAD_DOCUMENT"
+        "UPLOAD_DOCUMENT, true",
+        "UPLOAD_DOCUMENT, false"
     })
-    public void givenAnInvalidEvent_thenReturnFalse(EventType eventType) {
+    public void givenAnInvalidEvent_thenReturnFalse(EventType eventType, boolean workAllocationFeature) {
+        CreateCaseWorkAllocationHandler handler = new CreateCaseWorkAllocationHandler(workAllocationFeature);
         assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, createCallBack(eventType)));
     }
 
-    @Test
-    @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
-    public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
+    @ParameterizedTest
+    @CsvSource({
+        "ABOUT_TO_START, true",
+        "ABOUT_TO_START, false",
+        "MID_EVENT, true",
+        "MID_EVENT, false",
+        "SUBMITTED, true",
+        "SUBMITTED, false"
+    })
+    public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType, boolean workAllocationFeature) {
+        CreateCaseWorkAllocationHandler handler = new CreateCaseWorkAllocationHandler(workAllocationFeature);
         assertFalse(handler.canHandle(callbackType, createCallBack(EventType.VALID_APPEAL_CREATED)));
     }
 
     @ParameterizedTest
     @CsvSource({
-        "VALID_APPEAL_CREATED",
-        "DRAFT_TO_VALID_APPEAL_CREATED",
-        "NON_COMPLIANT",
-        "DRAFT_TO_NON_COMPLIANT",
-        "INCOMPLETE_APPLICATION_RECEIVED",
-        "DRAFT_TO_INCOMPLETE_APPLICATION",
+        "VALID_APPEAL_CREATED, false, YES",
+        "VALID_APPEAL_CREATED, true, NO",
+        "DRAFT_TO_VALID_APPEAL_CREATED, false, YES",
+        "DRAFT_TO_VALID_APPEAL_CREATED, true, NO",
+        "NON_COMPLIANT, false, YES",
+        "NON_COMPLIANT, true, NO",
+        "DRAFT_TO_NON_COMPLIANT, false, YES",
+        "DRAFT_TO_NON_COMPLIANT, true, NO",
+        "INCOMPLETE_APPLICATION_RECEIVED, false, YES",
+        "INCOMPLETE_APPLICATION_RECEIVED, true, NO",
+        "DRAFT_TO_INCOMPLETE_APPLICATION, false, YES",
+        "DRAFT_TO_INCOMPLETE_APPLICATION, true, NO"
     })
-    public void whenWorkAllocationEnabled_setFieldPreWorkAllocationToNo(EventType event) {
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, createCallBack(event), USER_AUTHORISATION);
-        assertEquals(YesNo.NO, response.getData().getPreWorkAllocation());
+    public void whenNewCaseCreated_setFieldPreWorkAllocationCorrectly(EventType eventType, boolean workAllocationFeature, String preWorkAllocation) {
+        CreateCaseWorkAllocationHandler handler = new CreateCaseWorkAllocationHandler(workAllocationFeature);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, createCallBack(eventType), USER_AUTHORISATION);
+        assertEquals(YesNo.valueOf(preWorkAllocation), response.getData().getPreWorkAllocation());
     }
 
     private Callback<SscsCaseData> createCallBack(EventType event) {
