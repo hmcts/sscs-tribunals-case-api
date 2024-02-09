@@ -121,6 +121,9 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .benefitType(BenefitType.builder()
                     .code("PIP")
                     .build())
+                .hearingOptions(HearingOptions.builder()
+                        .languagesList(new DynamicList(null))
+                        .build())
                 .appellant(Appellant.builder()
                         .name(Name.builder().firstName("First").lastName("Last").build())
                         .address(Address.builder().line1("Line1").line2("Line2").postcode("CM120NS").build())
@@ -1685,7 +1688,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         appeal.setHearingType("paper");
         HearingOptions hearingOptions = HearingOptions.builder()
                 .wantsToAttend("Yes")
-                .languages(language)
+                .languages(null)
+                .languagesList(new DynamicList(language))
                 .build();
         appeal.setHearingOptions(hearingOptions);
 

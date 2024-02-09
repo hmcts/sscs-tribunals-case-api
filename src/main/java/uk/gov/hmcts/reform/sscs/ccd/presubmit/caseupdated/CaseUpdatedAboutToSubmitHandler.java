@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -136,6 +137,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         checkConfidentiality(sscsCaseData);
         updateCaseName(callback, sscsCaseData);
         updateCaseCategoriesIfBenefitTypeUpdated(callback, sscsCaseData, preSubmitCallbackResponse);
+        updateLanguage(sscsCaseData);
 
         final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
 
@@ -158,6 +160,24 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         return preSubmitCallbackResponse;
+    }
+
+    private void updateLanguage(SscsCaseData sscsCaseData) {
+        HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
+        if (nonNull(hearingOptions)) {
+            DynamicList languageList = hearingOptions.getLanguagesList();
+
+            String language = null;
+            if (nonNull(languageList)) {
+                DynamicListItem selectedValue = languageList.getValue();
+
+                if (nonNull(selectedValue)) {
+                    language = selectedValue.getLabel();
+                }
+            }
+
+            hearingOptions.setLanguages(language);
+        }
     }
 
     private void validateBenefitIssueCode(SscsCaseData caseData,
