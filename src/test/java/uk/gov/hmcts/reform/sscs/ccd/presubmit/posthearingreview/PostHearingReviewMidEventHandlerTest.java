@@ -76,7 +76,7 @@ class PostHearingReviewMidEventHandlerTest {
                 .permissionToAppealGenerateNotice(YES)
                 .build())
             .appeal(Appeal.builder().appellant(Appellant.builder()
-                    .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
+                    .name(Name.builder().firstName("APPELLANT").lastName("Last'NamE").build())
                     .identity(Identity.builder().build()).build()).build())
             .directionDueDate(LocalDate.now().plusDays(1).toString())
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -157,7 +157,49 @@ class PostHearingReviewMidEventHandlerTest {
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
         assertThat(payload.getNoticeType()).isEqualTo(postHearingReviewType.getDescriptionEn().toUpperCase() + " DECISION NOTICE");
-        assertThat(payload.getAppellantFullName()).isEqualTo("Appellant Lastname");
+        assertThat(payload.getAppellantFullName()).isEqualTo("APPELLANT Last'NamE");
+        assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
+    }
+
+    @Test
+    void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentFieldForPtaReview() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        when(generateFile.assemble(any())).thenReturn(URL);
+        when(callback.getPageId()).thenReturn(PAGE_ID_GENERATE_NOTICE);
+
+        when(documentConfiguration.getDocuments()).thenReturn(new HashMap<>(Map.of(
+                LanguagePreference.ENGLISH,  new HashMap<>(Map.of(
+                        DECISION_ISSUED, TEMPLATE_ID)
+                ))
+        ));
+
+        caseData.getPostHearing().setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
+        caseData.getPostHearing().getPermissionToAppeal().setAction(PermissionToAppealActions.REVIEW);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        DocumentLink previewDocument = response.getData().getDocumentStaging().getPostHearingPreviewDocument();
+        assertThat(previewDocument).isNotNull();
+
+        String expectedFilename = String.format("Review Granted issued on %s.pdf",
+                LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+
+        assertThat(previewDocument.getDocumentFilename()).isEqualTo(expectedFilename);
+        assertThat(previewDocument.getDocumentBinaryUrl()).isEqualTo(URL + "/binary");
+        assertThat(previewDocument.getDocumentUrl()).isEqualTo(URL);
+
+        verify(generateFile, times(1)).assemble(any());
+
+        verify(generateFile, atLeastOnce()).assemble(capture.capture());
+
+        var value = capture.getValue();
+        NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
+        assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
+        assertThat(payload.getNoticeType()).isEqualTo("REVIEW DECISION NOTICE");
+        assertThat(payload.getAppellantFullName()).isEqualTo("APPELLANT Last'NamE");
         assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
     }
 
@@ -240,7 +282,7 @@ class PostHearingReviewMidEventHandlerTest {
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
         assertThat(payload.getNoticeType()).isEqualTo("DECISION NOTICE");
-        assertThat(payload.getAppellantFullName()).isEqualTo("Appellant Lastname");
+        assertThat(payload.getAppellantFullName()).isEqualTo("APPELLANT Last'NamE");
         assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
     }
 

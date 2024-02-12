@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.reissuefurtherevidence;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.userFriendlyName;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 import static uk.gov.hmcts.reform.sscs.util.ReissueUtils.setUpOtherPartyOptions;
@@ -77,23 +79,30 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
 
     private void setDocumentDropdown(SscsCaseData sscsCaseData, List<? extends AbstractDocument> availableDocumentsToReIssue) {
         List<DynamicListItem> listCostOptions = new ArrayList<>();
+        boolean isConfidentialCase = isYes(sscsCaseData.getIsConfidentialCase());
 
         for (AbstractDocument doc : availableDocumentsToReIssue) {
-            String label = buildFormattedLabel(doc);
+            String label = buildFormattedLabel(doc, isConfidentialCase);
             if (doc.getValue().getDocumentLink() != null) {
-                listCostOptions.add(new DynamicListItem(doc.getValue().getDocumentLink().getDocumentUrl(), label));
+                DocumentLink documentLink = isConfidentialCase ? ofNullable(doc.getValue().getEditedDocumentLink())
+                    .orElse(doc.getValue().getDocumentLink()) : doc.getValue().getDocumentLink();
+                listCostOptions.add(new DynamicListItem(documentLink.getDocumentUrl(), label));
             }
         }
 
         sscsCaseData.getReissueArtifactUi().setReissueFurtherEvidenceDocument(new DynamicList(listCostOptions.get(0), listCostOptions));
     }
 
-    private String buildFormattedLabel(AbstractDocument doc) {
-        String filenameLabel = doc.getValue().getDocumentFileName();
-        if (doc instanceof SscsWelshDocument) {
-            filenameLabel = getBilingualLabel(doc);
+    private String buildFormattedLabel(AbstractDocument doc, boolean isConfidentialCase) {
+        if (isConfidentialCase && doc.getValue().getEditedDocumentLink() != null) {
+            return doc.getValue().getEditedDocumentLink().getDocumentFilename();
+        } else {
+            String filenameLabel = doc.getValue().getDocumentFileName();
+            if (doc instanceof SscsWelshDocument) {
+                filenameLabel = getBilingualLabel(doc);
+            }
+            return String.format("%s -  %s", filenameLabel, userFriendlyName(doc.getValue().getDocumentType()));
         }
-        return String.format("%s -  %s", filenameLabel, userFriendlyName(doc.getValue().getDocumentType()));
     }
 
     @NotNull
