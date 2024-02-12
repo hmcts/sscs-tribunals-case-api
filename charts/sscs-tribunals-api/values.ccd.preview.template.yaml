@@ -192,22 +192,6 @@ sscs-tya-notif:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
         key: primaryKey
-    keyVaults:
-      sscs:
-        secrets:
-          - idam-api
-          - idam-oauth-user
-          - idam-redirect
-          - idam-sscs-systemupdate-user
-          - idam-sscs-systemupdate-password
-          - sscs-email-mac-secret-text
-          - idam-sscs-oauth2-client-secret
-          - sscs-s2s-secret
-          - s2s-micro
-          - evidence-share-topic-shared-access-key
-          - docmosis-api-key
-          - notification-key
-          - notification-test-key
 
 sscs-ccd-callback-orchestrator:
   enabled: true
