@@ -165,14 +165,17 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private void updateLanguage(SscsCaseData sscsCaseData) {
         HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions();
         if (nonNull(hearingOptions)) {
-            DynamicList languageList = hearingOptions.getLanguagesList();
+            String language = "";
 
-            String language = null;
-            if (nonNull(languageList)) {
-                DynamicListItem selectedValue = languageList.getValue();
+            if (isYes(hearingOptions.getLanguageInterpreter())) {
+                DynamicList languageList = hearingOptions.getLanguagesList();
 
-                if (nonNull(selectedValue)) {
-                    language = selectedValue.getLabel();
+                if (nonNull(languageList)) {
+                    DynamicListItem selectedValue = languageList.getValue();
+
+                    if (nonNull(selectedValue)) {
+                        language = selectedValue.getLabel();
+                    }
                 }
             }
 
