@@ -1690,6 +1690,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .wantsToAttend("Yes")
                 .languages(null)
                 .languagesList(new DynamicList(language))
+                .languageInterpreter(YES.getValue())
                 .build();
         appeal.setHearingOptions(hearingOptions);
 
