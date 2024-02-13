@@ -164,7 +164,7 @@ sscs-evidence-share:
 # click create
 # azure steps should be repeated every time PR is undeployed from preview
 sscs-tya-notif:
-  enabled: true
+  enabled: false
   java:
     image: hmctspublic.azurecr.io/sscs/tya-notif:prod-b07ff0a-20240208095500
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
@@ -192,6 +192,22 @@ sscs-tya-notif:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
         key: primaryKey
+    keyVaults:
+      sscs:
+        secrets:
+          - idam-api
+          - idam-oauth-user
+          - idam-redirect
+          - idam-sscs-systemupdate-user
+          - idam-sscs-systemupdate-password
+          - sscs-email-mac-secret-text
+          - idam-sscs-oauth2-client-secret
+          - sscs-s2s-secret
+          - s2s-micro
+          - evidence-share-topic-shared-access-key
+          - docmosis-api-key
+          - notification-key
+          - notification-test-key
 
 sscs-ccd-callback-orchestrator:
   enabled: true
