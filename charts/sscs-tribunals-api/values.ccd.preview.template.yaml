@@ -276,7 +276,7 @@ redis:
 sscs-hearings-api:
   enabled: true
   java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-573-c88c67f-20240213124750" #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:562-2eeb4a6-20240207111019" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     ingressHost: hearings-${SERVICE_FQDN}
     environment:
@@ -302,8 +302,8 @@ sscs-hearings-api:
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
       TRIBUNALS_EVENT_QUEUE_NAMESPACE: sscs-sb-preview
       HMC_HEARINGS_TOPIC_NAMESPACE: hmc-servicebus-aat
-      HMC_DEPLOYMENT_ID: deployment-${SERVICE_NAME}
-      HMC_DEPLOYMENT_FILTER_ENABLED: false
+#      HMC_DEPLOYMENT_ID: deployment-${SERVICE_NAME}
+      HMC_DEPLOYMENT_FILTER_ENABLED: true
     secrets:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: sscs-sb-preview
