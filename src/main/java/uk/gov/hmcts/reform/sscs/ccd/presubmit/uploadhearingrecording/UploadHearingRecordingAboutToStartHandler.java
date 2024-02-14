@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
@@ -58,6 +59,7 @@ public class UploadHearingRecordingAboutToStartHandler implements PreSubmitCallb
         }
 
         List<DynamicListItem> validHearings = sscsCaseData.getHearings().stream()
+                .filter(hearing -> hearing.getValue().getHearingStatus() != HearingStatus.CANCELLED)
                 .filter(this::isHearingInThePast)
                 .map(hearing -> new DynamicListItem(hearing.getValue().getHearingId(), selectHearing(hearing)))
                 .toList();
