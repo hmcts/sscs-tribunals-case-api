@@ -87,6 +87,10 @@ public class WorkAllocationHandler implements PreSubmitCallbackHandler<SscsCaseD
     }
 
     private List<String> mergeRoleList(List<String> previousRoles, List<String> currentRoles) {
+
+        log.info("WA previous roles: {}", previousRoles);
+        log.info("WA current roles {}", currentRoles);
+
         List<String> mergedRoles = new ArrayList<>();
 
         if (previousRoles != null) {
