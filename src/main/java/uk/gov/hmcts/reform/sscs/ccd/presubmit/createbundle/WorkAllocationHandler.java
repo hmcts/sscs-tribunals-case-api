@@ -76,6 +76,7 @@ public class WorkAllocationHandler implements PreSubmitCallbackHandler<SscsCaseD
                 Arrays.asList(Long.toString(caseId)));
 
         if (response != null && response.getCaseAssignmentUserRoles() != null) {
+            log.info("WA newly assigned roles {}", response.getCaseAssignmentUserRoles());
             return response.getCaseAssignmentUserRoles().stream()
                     .map(a -> a.getCaseRole())
                     .distinct()
