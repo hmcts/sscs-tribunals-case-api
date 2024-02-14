@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -72,6 +73,7 @@ public class AttachScannedDocsAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnAttachScannedDocEventHasAnEditedUrl_thenCheckThatEditedUrlAndOtherScannedDocsRemain() {
+        ReflectionTestUtils.setField(handler, "deletedRedactedDocEnabled", true);
         sscsCaseData.setScannedDocuments(List.of(ScannedDocument.builder().value(ScannedDocumentDetails.builder().build()).build()));
 
         ScannedDocument document1 = ScannedDocument.builder().value(
