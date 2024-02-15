@@ -150,6 +150,25 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Parameters({"videoRecording.mp4, videoDocument", "audioEvidence.mp3, audioDocument"})
+    public void doesNotReturnErrorIfAvEvidenceIsPresent(String fileName, String fileType) {
+        SscsDocument avDocument = SscsDocument.builder().value(
+                SscsDocumentDetails.builder()
+                        .documentType(fileType)
+                        .documentFileName(fileName)
+                        .documentLink(null)
+                        .build()
+        ).build();
+        List<SscsDocument> sscsDocs = new ArrayList<SscsDocument>();
+        sscsDocs.add(avDocument);
+        sscsDocs.add(document2);
+        sscsCaseData.setSscsDocument(sscsDocs);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(Collections.EMPTY_SET, response.getErrors());
+    }
+
+    @Test
     public void returnAnErrorIfNoSelectedDocument() {
         sscsCaseData.getReissueArtifactUi().setReissueFurtherEvidenceDocument(null);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
