@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -159,7 +158,7 @@ public class SscsHelperTest {
                 ExcludeDate.builder().value(DateRange.builder().start("2023-01-01").end("2023-01-01").build()).build(),
                 ExcludeDate.builder().value(DateRange.builder().start("2023-01-02").end("2023-01-01").build()).build(),
                 ExcludeDate.builder().value(DateRange.builder().start("2023-03-01").end("2023-04-02").build()).build()
-       ));
+        ));
 
         Set<String> errors =
                 validateHearingOptionsAndExcludeDates(otherParty.getValue().getHearingOptions().getExcludeDates());

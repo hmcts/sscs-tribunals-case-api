@@ -40,11 +40,11 @@ import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 @Slf4j
 public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private static final String WARN_NON_SSCS1_PAPER_TO_ORAL = "The hearing type will be changed from Paper to " +
-            "Oral as at least one of the parties to the case would like to attend the hearing";
+    private static final String WARN_NON_SSCS1_PAPER_TO_ORAL = "The hearing type will be changed from Paper to Oral as "
+            + "at least one of the parties to the case would like to attend the hearing";
 
-    private static final String WARN_INVALID_OTHER_PARTY_ROLE_FOR_SSCS5 = "You have entered a role for the Other " +
-            "Party which is not valid for an SSCS5 case. This role will be ignored when the event completes.";
+    private static final String WARN_INVALID_OTHER_PARTY_ROLE_FOR_SSCS5 = "You have entered a role for the Other Party "
+            + "which is not valid for an SSCS5 case. This role will be ignored when the event completes.";
 
     private static final String ERR_ROLE_REQUIRED = "Role is required for the selected case";
 
