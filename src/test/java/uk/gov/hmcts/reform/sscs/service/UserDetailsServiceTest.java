@@ -38,8 +38,8 @@ class UserDetailsServiceTest {
 
     @Test
     void givenUserAuthorisation_thenReturnUserFullName() {
-        when(idamClient.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
-                .forename("John").surname("Lewis").build());
+        when(idamClient.getUserInfo(USER_AUTHORISATION)).thenReturn(UserInfo.builder()
+                .givenName("John").familyName("Lewis").build());
 
         assertThat(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).isEqualTo("John Lewis");
     }
@@ -48,13 +48,13 @@ class UserDetailsServiceTest {
     void givenUserNotFound_thenThrowAnException() {
         assertThatThrownBy(() -> userDetailsService.buildLoggedInUserName(USER_AUTHORISATION))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageStartingWith("Unable to obtain signed in user details");
+                .hasMessageStartingWith("Unable to obtain signed in user info");
     }
 
     @Test
     void givenUserAuthorisation_thenReturnUserSurname() {
-        when(idamClient.getUserDetails(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
-                .forename("John").surname("Lewis").build());
+        when(idamClient.getUserInfo(USER_AUTHORISATION)).thenReturn(UserInfo.builder()
+                .givenName("John").familyName("Lewis").build());
 
         assertThat(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).isEqualTo("Lewis");
     }
