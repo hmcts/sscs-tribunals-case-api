@@ -41,6 +41,8 @@ class PostHearingReviewAboutToSubmitHandlerTest {
     void setUp() {
         handler = new PostHearingReviewAboutToSubmitHandler(footerService, true);
 
+        PostHearing postHearing = PostHearing.builder().requestType(PostHearingRequestType.SET_ASIDE).build();
+
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
                 .hearingRoute(LIST_ASSIST).build())
@@ -48,6 +50,7 @@ class PostHearingReviewAboutToSubmitHandlerTest {
             .documentGeneration(DocumentGeneration.builder()
                 .directionNoticeContent("Body Content")
                 .build())
+            .postHearing(postHearing)
             .build();
     }
 
