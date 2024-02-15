@@ -218,4 +218,35 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest extends ReissueArtifa
         assertEquals(new DynamicListItem("welshUrl5", "Bilingual - welshFile5.pdf -  Other party rep evidence"), response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(9));
         assertNull(response.getData().getOriginalSender());
     }
+
+    @Test
+    public void givenDocumentEditedAndCaseIsConfidential_ThenAddToDropDownOptions() {
+
+        SscsDocument documentWithEditedDoc = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentFileName("file1.pdf")
+            .documentType(APPELLANT_EVIDENCE.getValue())
+            .documentLink(DocumentLink.builder().documentUrl("url1").build())
+            .editedDocumentLink(DocumentLink.builder().documentFilename("editedFile1").documentUrl("editedUrl").build())
+            .build()).build();
+        SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentFileName("file2.pdf")
+            .documentType(APPELLANT_EVIDENCE.getValue())
+            .documentLink(DocumentLink.builder().documentUrl("url2").build())
+            .build()).build();
+
+        sscsCaseData.setSscsDocument(Arrays.asList(documentWithEditedDoc, document));
+        sscsCaseData.setIsConfidentialCase(YesNo.YES);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals(Collections.EMPTY_SET, response.getErrors());
+        assertEquals(2, response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().size());
+        assertEquals(new DynamicListItem("editedUrl", "editedFile1"),
+            response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(0));
+        assertEquals(new DynamicListItem("url2", "file2.pdf -  Appellant evidence"),
+            response.getData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getListItems().get(1));
+
+    }
 }
