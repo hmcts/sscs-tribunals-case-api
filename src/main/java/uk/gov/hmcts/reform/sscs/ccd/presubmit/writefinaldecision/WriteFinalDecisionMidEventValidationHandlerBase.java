@@ -97,8 +97,8 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
         setShowPageFlags(sscsCaseData);
         setDefaultFields(sscsCaseData);
 
-        if (SscsUtil.isCorrectionInProgress(sscsCaseData, isPostHearingsEnabled) &&
-                !YesNo.isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
+        if (SscsUtil.isCorrectionInProgress(sscsCaseData, isPostHearingsEnabled)
+                && !YesNo.isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
             sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(null);
         }
 
