@@ -32,7 +32,7 @@ public class UploadHearingRecordingAboutToStartHandler implements PreSubmitCallb
     private static DateTimeFormatter resultFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
     private static DateTimeFormatter hearingTimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    @Value("feature.hearing-recording-filter.enabled")
+    @Value("${feature.hearing-recording-filter.enabled}")
     private Boolean hearingRecordingFilterEnabled;
 
     @Override
