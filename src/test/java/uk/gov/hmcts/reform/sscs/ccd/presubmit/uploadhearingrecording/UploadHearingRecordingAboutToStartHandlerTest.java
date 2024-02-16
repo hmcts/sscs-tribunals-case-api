@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -62,6 +63,7 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(EventType.UPLOAD_HEARING_RECORDING);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        ReflectionTestUtils.setField(handler, "hearingRecordingFilterEnabled", true);
     }
 
     @Test
