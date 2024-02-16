@@ -36,30 +36,35 @@ public class ActionPostponementRequestSubmittedCallbackHandler implements PreSub
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        SscsCaseDetails sscsCaseDetails = updateCase(callback, caseData);
-        clearTransientFields(sscsCaseDetails.getData());
+        SscsCaseData updateCase = updateCase(callback, callback.getCaseDetails().getCaseData());
+        clearTransientFields(updateCase);
 
-        return new PreSubmitCallbackResponse<>(sscsCaseDetails.getData());
+        return new PreSubmitCallbackResponse<>(updateCase);
     }
 
-    private SscsCaseDetails updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
+    private SscsCaseData updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
         String actionRequested = caseData.getPostponementRequest().getActionPostponementRequestSelected();
+        long caseId = callback.getCaseDetails().getId();
+
         if (SEND_TO_JUDGE.getValue().equals(actionRequested)) {
-            return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                    EventType.POSTPONEMENT_SEND_TO_JUDGE.getCcdType(), "Postponement request sent to judge",
-                    "Postponement request sent to judge", idamService.getIdamTokens());
+            return updateCase(caseData, caseId, EventType.POSTPONEMENT_SEND_TO_JUDGE.getCcdType(),
+                    "Postponement request sent to judge", "Postponement request sent to judge");
         } else if (REFUSE.getValue().equals(actionRequested)) {
-            return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+            return updateCase(caseData, caseId,
                     EventType.POSTPONEMENT_REFUSED.getCcdType(), "Postponement refused",
-                    "Postponement refused", idamService.getIdamTokens());
+                    "Postponement refused");
         } else if (GRANT.getValue().equals(actionRequested)) {
-            return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+            return updateCase(caseData, caseId,
                     EventType.POSTPONEMENT_GRANTED.getCcdType(), "Postponement granted",
-                    "Postponement granted", idamService.getIdamTokens());
+                    "Postponement granted");
         }
 
-        return SscsCaseDetails.builder().data(caseData).build();
+        return caseData;
+    }
+
+    private SscsCaseData updateCase(SscsCaseData caseData, long caseId, String eventType, String summary, String description) {
+        var caseDetails = ccdService.updateCase(caseData, caseId, eventType, summary, description, idamService.getIdamTokens());
+        return caseDetails.getData();
     }
 
     private void clearTransientFields(SscsCaseData caseData) {

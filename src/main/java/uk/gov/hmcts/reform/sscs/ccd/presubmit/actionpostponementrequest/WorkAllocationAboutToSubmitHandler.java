@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +30,7 @@ public class WorkAllocationAboutToSubmitHandler implements PreSubmitCallbackHand
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        requireNonNull(callbackType, "callbacktype must not be null");
+        requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
                 && callback.getEvent() == EventType.ACTION_POSTPONEMENT_REQUEST
@@ -54,8 +55,8 @@ public class WorkAllocationAboutToSubmitHandler implements PreSubmitCallbackHand
     private Integer calculateDaysToHearing(List<Hearing> hearings) {
         if (hearings != null) {
             Optional<LocalDate> nextHearingDate = hearings.stream()
-                .map(h -> hearingDate(h))
-                .filter(d -> d != null)
+                .map(this::hearingDate)
+                .filter(Objects::nonNull)
                 .filter(d -> !d.isBefore(LocalDate.now()))
                 .min(LocalDate::compareTo);
             if (nextHearingDate.isPresent()) {
@@ -68,10 +69,8 @@ public class WorkAllocationAboutToSubmitHandler implements PreSubmitCallbackHand
     private LocalDate hearingDate(Hearing hearing) {
         if (hearing != null) {
             HearingDetails details = hearing.getValue();
-            if (details != null) {
-                if (details.getHearingDate() != null) {
-                    return parseDate(details.getHearingDate());
-                }
+            if (details != null && details.getHearingDate() != null) {
+                return parseDate(details.getHearingDate());
             }
         }
         return null;
