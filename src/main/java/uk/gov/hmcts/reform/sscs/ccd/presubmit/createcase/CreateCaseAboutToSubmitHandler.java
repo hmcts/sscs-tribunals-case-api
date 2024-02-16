@@ -49,6 +49,7 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
         caseData.setPoAttendanceConfirmed(YesNo.NO);
+        caseData.setTribunalDirectPoToAttend(YesNo.NO);
 
         handleBenefitType(caseData);
 

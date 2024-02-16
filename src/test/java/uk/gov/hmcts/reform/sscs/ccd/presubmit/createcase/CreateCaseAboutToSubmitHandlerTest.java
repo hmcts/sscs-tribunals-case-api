@@ -122,13 +122,15 @@ public class CreateCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    void whenCaseCreated_shouldUpdatePoAttendingToNo() throws CcdException {
+    void whenCaseCreated_shouldUpdatePoAttendingAndTribinalDirectPoAttendToNo() throws CcdException {
         when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
         caseDetails.getCaseData().getAppeal().getAppellant().getAppointee().setName(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(response.getData().getPoAttendanceConfirmed(), YesNo.NO);
+        assertEquals(response.getData().getTribunalDirectPoToAttend(), YesNo.NO);
+
     }
 
     @Test
