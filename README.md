@@ -155,3 +155,40 @@ If you need to run the CCD provider test against the Preview environment for a p
 ## Gotchas
 
 PRs that start with _"Bump"_ won't have a preview environment. The decision was made after we realised that most the preview environments were created by Depandabot.
+
+## Running tribunals with hearings enabled
+If you need to test Tribunals with HMC Hearings you must carry out the following steps:
+First you need to create a pull request on github for your branch, once this is done you then need to upload a CCD Definition file to AAT CCD. This definition file should have a unique CaseType ID in this format:
+
+```
+Benefit-sscs-PR-XXXX 
+```
+You must ensure the callbacks for the CaseEvents match the service ingress values within your PR's preview chart. Here is an example of a callback URL for a tribunals PR with an id of 3575:
+
+```
+https://sscs-tribunals-api-pr-3575.preview.platform.hmcts.net/ccdAboutToSubmit
+```
+
+Once this file has been uploaded to AAT, you will need to create a service bus subscription for the HMC hearings topic on AAT. In the Azure portal go to hmc-servicebus-aat and create a subscription for the hmc-to-cft-aat topic,
+name it in this format:
+
+```
+hmc-to-sscs-subscription-pr-XXXX
+```
+
+And on that subscription create a Correlation filter with these values:
+```
+hmctsServiceId:BBA3
+```
+
+Once this has been completed go to values.ccd.preview.template.yaml and enable sscs-hearings-api. you will need to replace 
+
+```
+HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-aat"
+```
+
+With the name of the subscription you have created. 
+
+Once this is done you should be able to deploy to preview with hearings enabled.
+
+Note: When you are finished with preview testing remember to delete the uploaded CCD from AAT and the subscription created on hmc-to-cft-aat.
