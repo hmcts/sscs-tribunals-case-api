@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -62,6 +63,7 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getEvent()).thenReturn(EventType.UPLOAD_HEARING_RECORDING);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        ReflectionTestUtils.setField(handler, "hearingRecordingFilterEnabled", true);
     }
 
     @Test
@@ -234,6 +236,29 @@ public class UploadHearingRecordingAboutToStartHandlerTest {
         List<DynamicListItem> selectHearingDetails = response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems();
         assertEquals(hearingList.size(), selectHearingDetails.size());
         assertTrue(selectHearingDetails.stream().allMatch(o -> "venue name 09:00:00 06 Jun 2021".equals(o.getLabel())));
+    }
+
+    @Test
+    public void givenHearingHasNoDate_FilterFromList() {
+        List<Hearing> hearingList = new ArrayList<>();
+
+        HearingDetails hearingDetails1 = HearingDetails.builder()
+                .hearingId("1")
+                .venue(Venue.builder().name("venue name").build())
+                .build();
+        HearingDetails hearingDetails2 = HearingDetails.builder()
+                .hearingId("2")
+                .venue(Venue.builder().name("venue name").build())
+                .hearingDate("2021-06-06")
+                .time("09:00:00").build();
+        hearingList.add(Hearing.builder().value(hearingDetails1).build());
+        hearingList.add(Hearing.builder().value(hearingDetails2).build());
+        sscsCaseData.setHearings(unmodifiableList(hearingList));
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        List<DynamicListItem> selectHearingDetails = response.getData().getSscsHearingRecordingCaseData().getSelectHearingDetails().getListItems();
+        assertEquals(0, response.getErrors().size());
+        assertEquals(0, selectHearingDetails.stream().filter(x -> x.getCode().equals("1")).toList().size());
+
     }
 
     private void assertNoHearingsInThePastError() {
