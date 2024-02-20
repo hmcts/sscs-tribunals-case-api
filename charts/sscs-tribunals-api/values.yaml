@@ -75,6 +75,8 @@ java:
     HEARINGS_EVENT_QUEUE_NAME: tribunals-to-hearing-api-{{ .Values.global.environment }}
     CASE_ACCESS_MANAGEMENT_FEATURE: false
     ELINKS_V2_FEATURE_ENABLED: false
+    DELETED_REDACTED_DOC_ENABLED: false
+    UPLOAD_HEARING_FILTER_ENABLED: false
 
 xui-webapp:
   enabled: false
