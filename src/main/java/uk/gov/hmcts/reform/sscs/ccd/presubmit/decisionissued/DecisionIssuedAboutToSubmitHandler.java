@@ -32,12 +32,15 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
     private final FooterService footerService;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
     private boolean isScheduleListingEnabled;
+    private boolean isPostHearingsEnabled;
 
     public DecisionIssuedAboutToSubmitHandler(FooterService footerService, ListAssistHearingMessageHelper
-            hearingMessageHelper, @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled) {
+            hearingMessageHelper, @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled,
+            @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
         this.footerService = footerService;
         this.hearingMessageHelper = hearingMessageHelper;
         this.isScheduleListingEnabled = isScheduleListingEnabled;
+        this.isPostHearingsEnabled = isPostHearingsEnabled;
     }
 
     @Override
@@ -53,6 +56,10 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+
+        if (isPostHearingsEnabled) {
+            clearInterlocReferralReason(caseData);
+        }
 
         final PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         DocumentLink url = null;
@@ -83,7 +90,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             State beforeState = callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null);
-            clearTransientFields(caseData,beforeState);
+            clearTransientFields(caseData);
             caseData.setDwpState(DwpState.STRUCK_OUT);
             caseData.setDirectionDueDate(null);
 
@@ -126,4 +133,9 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
             && SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
             .       orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
             && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
+
+    // SSCS-11486 AC4
+    private void clearInterlocReferralReason(SscsCaseData caseData) {
+        caseData.setInterlocReferralReason(null);
+    }
 }

@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.ScannedDocumentType.REINSTATEMENT_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceAboutToSubmitHandlerTest.buildOriginalSenderItemListForGivenOption;
 
 import java.util.*;
@@ -45,7 +46,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new ActionFurtherEvidenceMidEventHandler(footerService);
+        handler = new ActionFurtherEvidenceMidEventHandler(footerService, false, false);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
         when(footerService.isReadablePdf(any())).thenReturn(PdfState.OK);
@@ -88,12 +89,13 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenAPostponementRequestInInterlocTcwActionAndCaseInHearing_thenAddNoError() {
+    @Parameters({"sendToInterlocReviewByTcw, Send to Interloc - Review by Tcw", "sendToInterlocReviewByJudge, Send to Interloc - Review by Judge"})
+    public void givenAPostponementRequestInInterlocTcwOrJudgeActionAndCaseInHearing_thenAddNoError(String furtherEvidenceActionCode, String furtherEvidenceActionLabel) {
 
         when(caseDetails.getState()).thenReturn(State.HEARING);
         sscsCaseData.getFurtherEvidenceAction().setValue(
-                new DynamicListItem(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
-                        FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
+                new DynamicListItem(furtherEvidenceActionCode,
+                        furtherEvidenceActionLabel));
 
         ScannedDocument scannedDocument = ScannedDocument.builder()
                 .value(ScannedDocumentDetails.builder().type(DocumentType.POSTPONEMENT_REQUEST.getValue())
@@ -131,7 +133,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
     }
 
     @Test
-    public void givenAPostponementRequestInOtherThanInterlocTcwAction_thenAddAnError() {
+    public void givenAPostponementRequestInOtherThanInterlocTcwOrJudgeAction_thenAddAnError() {
         List<ScannedDocument> docs = new ArrayList<>();
         when(caseDetails.getState()).thenReturn(State.HEARING);
         sscsCaseData.getFurtherEvidenceAction().setValue(
@@ -150,7 +152,7 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
 
         assertThat(response.getErrors(), is(not(empty())));
         assertThat(response.getErrors().iterator().next(),
-                is(ActionFurtherEvidenceMidEventHandler.POSTPONEMENTS_REVIEWED_BY_TCW));
+                is(ActionFurtherEvidenceMidEventHandler.POSTPONEMENTS_REVIEWED_BY_TCW_OR_JUDGE));
     }
 
     @Test
@@ -484,6 +486,62 @@ public class ActionFurtherEvidenceMidEventHandlerTest {
         Iterator<String> iterator = response.getErrors().iterator();
         assertEquals("You cannot select 'Other party hearing preferences' as a Document Type as an Other party not selected from Original Sender list", iterator.next());
     }
+
+    @Test
+    @Parameters({"setAsideApplication", "correctionApplication","statementOfReasonsApplication",
+        "libertyToApplyApplication", "permissionToAppealApplication"})
+    public void givenAGapsCaseAndPostponementRequest_thenAddAnErrorToResponse(String doctype) {
+        handler = new ActionFurtherEvidenceMidEventHandler(footerService, true, true);
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
+        DynamicListItem issueEvidenceAction = new DynamicListItem(
+            FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+            FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
+
+        sscsCaseData.getFurtherEvidenceAction().setValue(issueEvidenceAction);
+
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+            .type(doctype)
+            .fileName("Test.pdf")
+            .url(DocumentLink.builder().documentUrl("test.com").build())
+            .build();
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+            .value(scannedDocDetails)
+            .build();
+
+        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("Cannot upload post hearing requests on GAPS cases", response.getErrors().iterator().next());
+    }
+
+    @Test
+    public void givenAGapsCaseAndNotPostponementRequest_thenDontAddErrorToResponse() {
+        handler = new ActionFurtherEvidenceMidEventHandler(footerService, true, true);
+        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
+        DynamicListItem issueEvidenceAction = new DynamicListItem(
+            FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+            FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
+
+        sscsCaseData.getFurtherEvidenceAction().setValue(issueEvidenceAction);
+
+        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+            .type(REINSTATEMENT_REQUEST.getValue())
+            .fileName("Test.pdf")
+            .url(DocumentLink.builder().documentUrl("test.com").build())
+            .build();
+        ScannedDocument scannedDocument = ScannedDocument.builder()
+            .value(scannedDocDetails)
+            .build();
+
+        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+    }
+
 
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheAppeal() {

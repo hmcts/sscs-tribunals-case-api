@@ -210,7 +210,7 @@ public class OtherPartyDataUtil {
                     .collect(Collectors.toSet())
                     .containsAll(after.stream()
                             .map(o -> o.getValue().getId())
-                            .collect(Collectors.toList()));
+                            .toList());
         }
         return false;
     }
@@ -220,7 +220,7 @@ public class OtherPartyDataUtil {
             sscsCaseData.getOtherParties().stream()
                 .filter(otherPartyCcdValue -> nonNull(otherPartyCcdValue.getValue()))
                 .map(CcdValue::getValue)
-                .forEach(otherParty -> clearRoleForOtherParty(otherParty));
+                .forEach(OtherPartyDataUtil::clearRoleForOtherParty);
         }
     }
 
@@ -249,5 +249,12 @@ public class OtherPartyDataUtil {
     private static void clearRoleForOtherParty(OtherParty otherParty) {
         otherParty.setShowRole(NO);
         otherParty.setRole(null);
+    }
+
+    public static boolean isSscs2Case(String benefitTypeCode) {
+        return Optional.ofNullable(benefitTypeCode)
+            .filter(b -> Benefit.findBenefitByShortName(b)
+            .filter(benefit -> benefit.getSscsType().equals(SscsType.SSCS2)).isPresent())
+            .isPresent();
     }
 }

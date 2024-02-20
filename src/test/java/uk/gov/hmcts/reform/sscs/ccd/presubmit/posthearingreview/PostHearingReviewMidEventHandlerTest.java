@@ -31,17 +31,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
@@ -75,14 +65,18 @@ class PostHearingReviewMidEventHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, true);
+        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, true, true);
 
         caseData = SscsCaseData.builder()
             .documentGeneration(DocumentGeneration.builder()
                 .generateNotice(YES)
+                .correctionGenerateNotice(YES)
+                .statementOfReasonsGenerateNotice(YES)
+                .libertyToApplyGenerateNotice(YES)
+                .permissionToAppealGenerateNotice(YES)
                 .build())
             .appeal(Appeal.builder().appellant(Appellant.builder()
-                    .name(Name.builder().firstName("APPELLANT").lastName("LastNamE").build())
+                    .name(Name.builder().firstName("APPELLANT").lastName("Last'NamE").build())
                     .identity(Identity.builder().build()).build()).build())
             .directionDueDate(LocalDate.now().plusDays(1).toString())
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -112,13 +106,21 @@ class PostHearingReviewMidEventHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, false);
+        handler = new PostHearingReviewMidEventHandler(documentConfiguration, generateFile, false, false);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(MID_EVENT, callback)).isFalse();
     }
 
-    @Test
-    void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentField() {
+    @ParameterizedTest
+    @EnumSource(
+        value = PostHearingReviewType.class,
+        names = {
+            "SET_ASIDE",
+            "STATEMENT_OF_REASONS",
+            "LIBERTY_TO_APPLY",
+            "PERMISSION_TO_APPEAL"
+        })
+    void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentField(PostHearingReviewType postHearingReviewType) {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
@@ -131,13 +133,16 @@ class PostHearingReviewMidEventHandlerTest {
             ))
         ));
 
+        caseData.getPostHearing().setReviewType(postHearingReviewType);
+
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-        DocumentLink previewDocument = response.getData().getDocumentStaging().getPreviewDocument();
+        DocumentLink previewDocument = response.getData().getDocumentStaging().getPostHearingPreviewDocument();
         assertThat(previewDocument).isNotNull();
 
-        String expectedFilename = String.format("Decision Notice issued on %s.pdf",
+        String expectedFilename = String.format("%s Granted Decision Notice issued on %s.pdf",
+            postHearingReviewType.getShortDescriptionEn(),
             LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         assertThat(previewDocument.getDocumentFilename()).isEqualTo(expectedFilename);
@@ -151,8 +156,91 @@ class PostHearingReviewMidEventHandlerTest {
         var value = capture.getValue();
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
+        assertThat(payload.getNoticeType()).isEqualTo(postHearingReviewType.getDescriptionEn().toUpperCase() + " DECISION NOTICE");
+        assertThat(payload.getAppellantFullName()).isEqualTo("APPELLANT Last'NamE");
+        assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
+    }
+
+    @Test
+    void givenLanguagePreferenceIsEnglish_NoticeIsGeneratedAndPopulatedInPreviewDocumentFieldForPtaReview() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        when(generateFile.assemble(any())).thenReturn(URL);
+        when(callback.getPageId()).thenReturn(PAGE_ID_GENERATE_NOTICE);
+
+        when(documentConfiguration.getDocuments()).thenReturn(new HashMap<>(Map.of(
+                LanguagePreference.ENGLISH,  new HashMap<>(Map.of(
+                        DECISION_ISSUED, TEMPLATE_ID)
+                ))
+        ));
+
+        caseData.getPostHearing().setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
+        caseData.getPostHearing().getPermissionToAppeal().setAction(PermissionToAppealActions.REVIEW);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        DocumentLink previewDocument = response.getData().getDocumentStaging().getPostHearingPreviewDocument();
+        assertThat(previewDocument).isNotNull();
+
+        String expectedFilename = String.format("Review Granted issued on %s.pdf",
+                LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+
+        assertThat(previewDocument.getDocumentFilename()).isEqualTo(expectedFilename);
+        assertThat(previewDocument.getDocumentBinaryUrl()).isEqualTo(URL + "/binary");
+        assertThat(previewDocument.getDocumentUrl()).isEqualTo(URL);
+
+        verify(generateFile, times(1)).assemble(any());
+
+        verify(generateFile, atLeastOnce()).assemble(capture.capture());
+
+        var value = capture.getValue();
+        NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
+        assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
+        assertThat(payload.getNoticeType()).isEqualTo("REVIEW DECISION NOTICE");
+        assertThat(payload.getAppellantFullName()).isEqualTo("APPELLANT Last'NamE");
+        assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
+    }
+
+    @Test
+    void givenReviewTypeIsNull_NoticeUsesDefaultDecisionNoticeName() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        when(generateFile.assemble(any())).thenReturn(URL);
+        when(callback.getPageId()).thenReturn(PAGE_ID_GENERATE_NOTICE);
+
+        when(documentConfiguration.getDocuments()).thenReturn(new HashMap<>(Map.of(
+                LanguagePreference.ENGLISH,  new HashMap<>(Map.of(
+                        DECISION_ISSUED, TEMPLATE_ID)
+                ))
+        ));
+
+        caseData.getPostHearing().setReviewType(null);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        DocumentLink previewDocument = response.getData().getDocumentStaging().getPostHearingPreviewDocument();
+        assertThat(previewDocument).isNotNull();
+
+        String expectedFilename = String.format("Decision Notice issued on %s.pdf",
+                LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+
+        assertThat(previewDocument.getDocumentFilename()).isEqualTo(expectedFilename);
+        assertThat(previewDocument.getDocumentBinaryUrl()).isEqualTo(URL + "/binary");
+        assertThat(previewDocument.getDocumentUrl()).isEqualTo(URL);
+
+        verify(generateFile, times(1)).assemble(any());
+
+        verify(generateFile, atLeastOnce()).assemble(capture.capture());
+
+        var value = capture.getValue();
+        NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
+        assertThat(payload.getImage()).isEqualTo(NoticeIssuedTemplateBody.ENGLISH_IMAGE);
         assertThat(payload.getNoticeType()).isEqualTo("DECISION NOTICE");
-        assertThat(payload.getAppellantFullName()).isEqualTo("Appellant Lastname");
+        assertThat(payload.getAppellantFullName()).isEqualTo("APPELLANT Last'NamE");
         assertThat(value.getTemplateId()).isEqualTo(TEMPLATE_ID);
     }
 

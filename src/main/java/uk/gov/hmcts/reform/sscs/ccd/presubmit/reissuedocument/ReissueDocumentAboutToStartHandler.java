@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.util.ReissueUtils.setUpOtherPartyOptions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -60,7 +59,9 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
         List<DynamicListItem> listCostOptions = new ArrayList<>();
 
         if (nonNull(sscsCaseData.getSscsDocument()) || nonNull(sscsCaseData.getSscsWelshDocuments())) {
-            List<? extends AbstractDocument> filteredSscsDocuments = Stream.of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments()).flatMap(x -> x == null ? null : x.stream()).filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentType())).collect(Collectors.toList());
+            List<? extends AbstractDocument> filteredSscsDocuments = Stream.of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments())
+                    .flatMap(x -> x == null ? null : x.stream()).filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentType()))
+                    .toList();
             if (filteredSscsDocuments.stream()
                     .anyMatch(doc -> doc.getValue().getDocumentType().equals(DECISION_NOTICE.getValue()))) {
                 listCostOptions.add(new DynamicListItem(sscsCaseData.isLanguagePreferenceWelsh() ? EventType.DECISION_ISSUED_WELSH.getCcdType() : EventType.DECISION_ISSUED.getCcdType(), DECISION_NOTICE.getValue()));
@@ -78,8 +79,6 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
                 listCostOptions.add(new DynamicListItem(EventType.ISSUE_ADJOURNMENT_NOTICE.getCcdType(), ADJOURNMENT_NOTICE.getLabel()));
             }
         }
-
         return listCostOptions;
-
     }
 }

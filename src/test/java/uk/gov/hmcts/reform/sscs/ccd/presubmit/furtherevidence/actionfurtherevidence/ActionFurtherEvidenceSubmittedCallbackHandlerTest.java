@@ -4,6 +4,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -14,13 +15,18 @@ import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,7 +59,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, false, false);
     }
 
 
@@ -135,12 +141,11 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         "informationReceivedForInterlocJudge, REVIEW_BY_JUDGE, interlocInformationReceivedActionFurtherEvidence",
         "informationReceivedForInterlocTcw, REVIEW_BY_TCW, interlocInformationReceivedActionFurtherEvidence",
         "sendToInterlocReviewByJudge, REVIEW_BY_JUDGE, validSendToInterloc",
-        "sendToInterlocReviewByTcw, REVIEW_BY_TCW, validSendToInterloc"
+        "sendToInterlocReviewByTcw, REVIEW_BY_TCW, validSendToInterloc",
+        "adminActionCorrection, AWAITING_ADMIN_ACTION, correctionRequest"
     })
     public void givenFurtherEvidenceActionSelectedOption_shouldTriggerEventAndUpdateCaseCorrectly(
             String furtherEvidenceActionSelectedOption, InterlocReviewState interlocReviewState, String eventType) {
-
-        Callback<SscsCaseData> callback = buildCallback(furtherEvidenceActionSelectedOption, ACTION_FURTHER_EVIDENCE);
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
@@ -150,6 +155,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                 any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
+        Callback<SscsCaseData> callback = buildCallback(furtherEvidenceActionSelectedOption, ACTION_FURTHER_EVIDENCE);
+
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, false);
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals(interlocReviewState, captor.getValue().getInterlocReviewState());
@@ -162,6 +170,86 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         then(ccdService).should(times(1))
                 .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(eventType), anyString(),
                         anyString(), any(IdamTokens.class));
+    }
+
+    @Test
+    @Parameters({
+        "SET_ASIDE, setAsideRequest",
+        "CORRECTION, correctionRequest",
+        "STATEMENT_OF_REASONS, sORRequest",
+        "LIBERTY_TO_APPLY, libertyToApplyRequest",
+        "PERMISSION_TO_APPEAL, permissionToAppealRequest"
+    })
+    public void givenPostHearingAndFurtherEvidenceActionIsReviewByJudge_shouldTriggerEventAndUpdateCaseCorrectly(
+        PostHearingRequestType requestType, String eventType) {
+
+        Callback<SscsCaseData> callback = buildCallback("sendToInterlocReviewByJudge", ACTION_FURTHER_EVIDENCE);
+        callback.getCaseDetails().getCaseData().getPostHearing().setRequestType(requestType);
+
+        given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
+
+        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
+
+        given(ccdService.updateCase(captor.capture(), anyLong(), eq(eventType), anyString(), anyString(),
+            any(IdamTokens.class)))
+            .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, true);
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, captor.getValue().getInterlocReviewState());
+
+        then(ccdService).should(times(1))
+            .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(eventType), anyString(),
+                anyString(), any(IdamTokens.class));
+    }
+
+    @Ignore("Re-enable once new post hearings B types are added to the enum")
+    @Test
+    @Parameters({ // TODO add remaining post hearing B types once implemented
+    })
+    public void givenPostHearingNotImplementedAndFurtherEvidenceActionIsReviewByJudge_shouldThrowException(
+        PostHearingRequestType requestType, String eventType) {
+
+        Callback<SscsCaseData> callback = buildCallback("sendToInterlocReviewByJudge", ACTION_FURTHER_EVIDENCE);
+        callback.getCaseDetails().getCaseData().getPostHearing().setRequestType(requestType);
+
+        given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
+
+        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
+
+        given(ccdService.updateCase(captor.capture(), anyLong(), eq(eventType), anyString(), anyString(),
+            any(IdamTokens.class)))
+            .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, true);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
+        assertEquals(String.format("Post hearing request type is not implemented or recognised: %s", requestType), exception.getMessage());
+    }
+
+    @Test
+    @Parameters({
+        "LIBERTY_TO_APPLY, libertyToApplyRequest",
+        "PERMISSION_TO_APPEAL, permissionToAppealRequest"
+        // TODO add remaining post hearing B types once implemented
+    })
+    public void givenPostHearingsBNotEnabledAndFurtherEvidenceActionIsReviewByJudge_shouldThrowException(
+        PostHearingRequestType requestType, String eventType) {
+
+        Callback<SscsCaseData> callback = buildCallback("sendToInterlocReviewByJudge", ACTION_FURTHER_EVIDENCE);
+        callback.getCaseDetails().getCaseData().getPostHearing().setRequestType(requestType);
+
+        given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
+
+        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
+
+        given(ccdService.updateCase(captor.capture(), anyLong(), eq(eventType), anyString(), anyString(),
+            any(IdamTokens.class)))
+            .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, false);
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
+        assertEquals("Post hearings B is not enabled", exception.getMessage());
     }
 
     @Test
@@ -273,6 +361,33 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         then(ccdService).should(times(1))
                 .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(eventType),
                         eq(ActionFurtherEvidenceSubmittedCallbackHandler.TCW_REVIEW_SEND_TO_JUDGE),
+                        anyString(), any(IdamTokens.class));
+    }
+
+    @Test
+    public void givenPostHearingOtherAndFurtherEvidenceActionIsReviewByJudge_shouldTriggerEventAndUpdateCaseCorrectly() {
+        Callback<SscsCaseData> callback = buildCallback(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(), ACTION_FURTHER_EVIDENCE);
+        callback.getCaseDetails().getCaseData().setSscsDocument(List.of(SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType(DocumentType.POST_HEARING_OTHER.getValue())
+                .build())
+            .build()));
+
+        given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
+
+        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
+
+        given(ccdService.updateCase(captor.capture(), anyLong(), eq(POST_HEARING_OTHER.getCcdType()), anyString(), anyString(),
+                any(IdamTokens.class)))
+                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, true);
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, captor.getValue().getInterlocReviewState());
+
+        then(ccdService).should(times(1))
+                .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(POST_HEARING_OTHER.getCcdType()), anyString(),
                         anyString(), any(IdamTokens.class));
     }
 }

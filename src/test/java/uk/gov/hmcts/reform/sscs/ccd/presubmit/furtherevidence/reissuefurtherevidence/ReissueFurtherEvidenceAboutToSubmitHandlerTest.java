@@ -52,6 +52,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
                 .documentType(REPRESENTATIVE_EVIDENCE.getValue())
                 .evidenceIssued("Yes")
                 .documentLink(DocumentLink.builder().documentUrl("url1").build())
+                .editedDocumentLink(DocumentLink.builder().documentFilename("editedFile1").documentUrl("editedUrl").build())
                 .build()).build();
         document2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName("file2.pdf")
@@ -106,7 +107,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"url1, file1.pdf - representativeEvidence, APPELLANT", "url2, file2.pdf - appellantEvidence, DWP", "welshUrl1, welshFile1.pdf - appellantEvidence, APPELLANT", "welshUrl2, welshFile2.pdf - representativeEvidence, APPELLANT"})
+    @Parameters({"url1, file1.pdf - representativeEvidence, APPELLANT", "editedUrl, editedFile1.pdf, APPELLANT", "url2, file2.pdf - appellantEvidence, DWP", "welshUrl1, welshFile1.pdf - appellantEvidence, APPELLANT", "welshUrl2, welshFile2.pdf - representativeEvidence, APPELLANT"})
     public void setsEvidenceHandledFlagToNoForDocumentSelected(String selectedUrl, String selectedLabel, PartyItemList newSender) {
 
         sscsCaseData = sscsCaseData.toBuilder()
@@ -127,13 +128,23 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals(Collections.EMPTY_SET, response.getErrors());
 
 
-        Optional<? extends AbstractDocumentDetails> selectedDocumentValue = Stream.of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments()).flatMap(x -> x == null ? null : x.stream()).filter(f -> f.getValue().getDocumentLink().getDocumentUrl().equals(selectedUrl)).map(f -> f.getValue()).findFirst();
+        Optional<? extends AbstractDocumentDetails> selectedDocumentValue = Stream.of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments())
+            .flatMap(x -> x == null ? null : x.stream())
+            .filter(f -> f.getValue().getDocumentLink().getDocumentUrl().equals(selectedUrl)
+                || (f.getValue().getEditedDocumentLink() != null && f.getValue().getEditedDocumentLink().getDocumentUrl().equals(selectedUrl)))
+            .map(f -> f.getValue())
+            .findFirst();
 
         assertEquals("No", selectedDocumentValue.map(AbstractDocumentDetails::getEvidenceIssued).orElse("Unknown"));
         assertEquals(newSender.getCode() + "Evidence", selectedDocumentValue.map(AbstractDocumentDetails::getDocumentType).orElse("Unknown"));
 
-        DocumentType expectedDocumentTypeOfUnselectedDocument = (selectedUrl.equals("url1")) ? APPELLANT_EVIDENCE : REPRESENTATIVE_EVIDENCE;
-        Optional<SscsDocumentDetails> otherDocumentValue = response.getData().getSscsDocument().stream().filter(f -> !f.getValue().getDocumentLink().getDocumentUrl().equals(selectedUrl)).map(f -> f.getValue()).findFirst();
+        DocumentType expectedDocumentTypeOfUnselectedDocument =
+            (selectedUrl.equals("url1") || selectedUrl.equals("editedUrl")) ? APPELLANT_EVIDENCE : REPRESENTATIVE_EVIDENCE;
+        Optional<SscsDocumentDetails> otherDocumentValue = response.getData().getSscsDocument().stream()
+                .filter(f -> !(f.getValue().getDocumentLink().getDocumentUrl().equals(selectedUrl)
+                        || (f.getValue().getEditedDocumentLink() != null && f.getValue().getEditedDocumentLink().getDocumentUrl().equals(selectedUrl))))
+                .map(f -> f.getValue())
+                .findFirst();
         assertEquals("Yes", otherDocumentValue.map(SscsDocumentDetails::getEvidenceIssued).orElse("Unknown"));
         assertEquals(expectedDocumentTypeOfUnselectedDocument.getValue(), otherDocumentValue.map(SscsDocumentDetails::getDocumentType).orElse("Unknown"));
     }

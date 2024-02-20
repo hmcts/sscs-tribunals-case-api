@@ -17,7 +17,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -31,19 +31,19 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @Component
 @Slf4j
+@AllArgsConstructor
 public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    public static final String POSTPONEMENTS_REVIEWED_BY_TCW = "Postponement requests need to be reviewed by TCW";
+    public static final String POSTPONEMENTS_REVIEWED_BY_TCW_OR_JUDGE = "Postponement requests need to be reviewed by TCW or Judge";
     public static final String POSTPONEMENTS_NOT_POSSIBLE_GAPS = "Postponement requests cannot be made for hearings listed in GAPS";
     public static final String POSTPONEMENT_IN_HEARING_STATE = "You can only submit a postponement request on cases in 'hearing' state";
     public static final String ONLY_ONE_POSTPONEMENT_AT_A_TIME = "Only one request for postponement can be submitted at a time";
     public static final String OTHER_PARTY_ORIGINAL_PARTY_ERROR = "You cannot select 'Other party hearing preferences' as a Document Type as an Other party not selected from Original Sender list";
     private final FooterService footerService;
-
-    @Autowired
-    public ActionFurtherEvidenceMidEventHandler(FooterService footerService) {
-        this.footerService = footerService;
-    }
+    @Value("${feature.postHearings.enabled}")
+    private final boolean isPostHearingsEnabled;
+    @Value("${feature.postHearings.enabled}")
+    private final boolean isPostHearingsBEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -68,7 +68,7 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
                 new PreSubmitCallbackResponse<>(sscsCaseData);
 
         buildSscsDocumentFromScan(sscsCaseData, caseDetails.getId(), callback.isIgnoreWarnings(),
-                preSubmitCallbackResponse);
+                preSubmitCallbackResponse, isPostHearingsEnabled, isPostHearingsBEnabled);
 
         if (showPostponementDetailsPage(preSubmitCallbackResponse)) {
             sscsCaseData.getPostponementRequest().setShowPostponementDetailsPage(YesNo.YES);
@@ -88,9 +88,12 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
                         && doc.getValue().getType().equals(DocumentType.POSTPONEMENT_REQUEST.getValue())).findAny();
 
         if (postponementRequest.isPresent()) {
-            if (!sscsCaseData.getFurtherEvidenceAction().getValue().getCode()
-                    .equals(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())) {
-                preSubmitCallbackResponse.addError(POSTPONEMENTS_REVIEWED_BY_TCW);
+            if (!(sscsCaseData.getFurtherEvidenceAction().getValue().getCode()
+                    .equals(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())
+                    || sscsCaseData.getFurtherEvidenceAction().getValue().getCode()
+                    .equals(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode()))
+            ) {
+                preSubmitCallbackResponse.addError(POSTPONEMENTS_REVIEWED_BY_TCW_OR_JUDGE);
             }
 
             if (HearingRoute.GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute())) {
@@ -138,7 +141,8 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
     }
 
     private void buildSscsDocumentFromScan(SscsCaseData sscsCaseData, long caseId, Boolean ignoreWarnings,
-                                           PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+                                           PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
+                                           boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
 
         if (isEmpty(sscsCaseData.getScannedDocuments())) {
             preSubmitCallbackResponse.addError("Please add a scanned document");
@@ -147,7 +151,8 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
         List<PdfReadable> pdfReadableErrorList = getPdfReadableErrorList(sscsCaseData);
 
         if (pdfReadableErrorList.isEmpty()) {
-            checkForWarningsAndErrorsOnScannedDocuments(sscsCaseData, ignoreWarnings, preSubmitCallbackResponse);
+            checkForWarningsAndErrorsOnScannedDocuments(sscsCaseData, ignoreWarnings,
+                preSubmitCallbackResponse, isPostHearingsEnabled, isPostHearingsBEnabled);
         }
 
         addErrorsIfPdfsHaveErrors(caseId, preSubmitCallbackResponse, pdfReadableErrorList);
@@ -178,17 +183,22 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
         return pdfReadableErrorList.stream()
                 .filter(pdfReadable -> pdfReadable.getPdfState().equals(pdfState))
                 .map(PdfReadable::getFilename)
-                .collect(toUnmodifiableList());
+                .toList();
     }
 
-    private void checkForWarningsAndErrorsOnScannedDocuments(SscsCaseData sscsCaseData, Boolean ignoreWarnings, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+    private void checkForWarningsAndErrorsOnScannedDocuments(SscsCaseData sscsCaseData, Boolean ignoreWarnings,
+                                                             PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse,
+                                                             boolean isPostHearingsEnabled,
+                                                             boolean isPostHearingsBEnabled) {
         emptyIfNull(sscsCaseData.getScannedDocuments())
                 .forEach(scannedDocument -> checkWarningsAndErrors(
                         sscsCaseData,
                         scannedDocument,
                         sscsCaseData.getCcdCaseId(),
                         ignoreWarnings,
-                        preSubmitCallbackResponse));
+                        preSubmitCallbackResponse,
+                        isPostHearingsEnabled,
+                        isPostHearingsBEnabled));
     }
 
     @NotNull

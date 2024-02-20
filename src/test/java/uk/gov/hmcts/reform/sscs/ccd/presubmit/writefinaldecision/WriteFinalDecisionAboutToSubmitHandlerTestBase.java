@@ -15,18 +15,12 @@ import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
-import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.*;
 
 public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends DecisionNoticeQuestionService> {
 
@@ -38,6 +32,8 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
 
     @Mock
     protected CaseDetails<SscsCaseData> caseDetails;
+    @Mock
+    protected UserDetailsService userDetailsService;
 
     protected T decisionNoticeQuestionService;
     protected DecisionNoticeOutcomeService decisionNoticeOutcomeService;
@@ -57,7 +53,7 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
         openMocks(this);
         decisionNoticeService = new DecisionNoticeService(Arrays.asList(decisionNoticeQuestionService), Arrays.asList(createOutcomeService(decisionNoticeQuestionService)), Arrays.asList());
         previewDocumentService = new PreviewDocumentService();
-        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeService, previewDocumentService);
+        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeService, previewDocumentService, userDetailsService, false);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -88,10 +84,9 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
      */
     @Test
     public void givenValidSubmissionWithGeneratedDateNotSet_thenSetGeneratedDateAsNowAndDoNotDisplayAnError() {
-
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
 
@@ -112,10 +107,9 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
      */
     @Test
     public void givenValidSubmissionWithGeneratedDateSet_thenSetUpdateGeneratedDateAndDoNotDisplayAnError() {
-
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-01-01");
 
@@ -130,7 +124,6 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
 
     @Test
     public void givenEndDateTypeOfIndefinite_thenDoNotSetEndDateTypeToNull() {
-
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getDocumentGeneration().setGenerateNotice(YES);
@@ -145,10 +138,9 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
 
     @Test
     public void givenEndDateTypeOfSetEndDate_thenDoNotSetEndDateTypeToNull() {
-
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("setEndDate");
 
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
@@ -164,10 +156,9 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
 
     @Test
     public void givenEndDateTypeOfNA_thenSetEndDateTypeToNull() {
-
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionEndDateType("na");
 
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
@@ -177,7 +168,39 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends D
         assertEquals(0, response.getErrors().size());
 
         assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
+    }
 
+    @Test
+    public void givenWriteFinalDecisionPostHearingsEnabledAndNoIssueFinalDate_shouldUpdateFinalCaseData() {
+        ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", true);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        sscsCaseData.getDocumentGeneration().setSignedBy("name");
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn("surname");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+
+        assertEquals(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionIdamSurname(), "surname");
+        assertEquals(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionGeneratedDate(), LocalDate.now());
+    }
+
+    @Test
+    public void givenWriteFinalDecisionPostHearingsEnabledAndNoNullIssueFinalDate_shouldNotUpdateFinalCaseData() {
+        ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", true);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionIssuedDate(LocalDate.now());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionIdamSurname());
+        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionGeneratedDate());
     }
 
     @Test
