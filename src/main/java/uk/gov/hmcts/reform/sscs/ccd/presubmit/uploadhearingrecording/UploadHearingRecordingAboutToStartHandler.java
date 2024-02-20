@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -30,6 +31,9 @@ public class UploadHearingRecordingAboutToStartHandler implements PreSubmitCallb
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static DateTimeFormatter resultFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
     private static DateTimeFormatter hearingTimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    @Value("${feature.hearing-recording-filter.enabled}")
+    private boolean hearingRecordingFilterEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -89,6 +93,9 @@ public class UploadHearingRecordingAboutToStartHandler implements PreSubmitCallb
     private boolean isHearingInThePast(Hearing hearing) {
         String hearingDate = hearing.getValue().getHearingDate();
         String hearingTime = hearing.getValue().getTime();
+        if (hearingRecordingFilterEnabled && isBlank(hearingDate)) {
+            return false;
+        }
         if (isBlank(hearingTime)) {
             LocalDate localDate = LocalDate.parse(hearingDate);
             return DateTimeUtils.isDateInThePast(localDate.atStartOfDay());
