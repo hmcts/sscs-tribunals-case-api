@@ -72,6 +72,7 @@ public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandl
 
         caseData.setInterlocReviewState(null);
         caseData.setDirectionDueDate(null);
+        caseData.clearPoDetails();
         callback.getCaseDetailsBefore().ifPresent(f -> caseData.setPreviousState(f.getState()));
 
         String caseID = callback.getCaseDetails().getCaseData().getCcdCaseId();

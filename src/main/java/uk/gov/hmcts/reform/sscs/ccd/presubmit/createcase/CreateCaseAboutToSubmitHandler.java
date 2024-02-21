@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientException;
@@ -18,16 +18,11 @@ import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 
 @Component
 @Slf4j
+@AllArgsConstructor
 public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final SscsPdfService sscsPdfService;
     private final EmailHelper emailHelper;
-
-    @Autowired
-    public CreateCaseAboutToSubmitHandler(SscsPdfService sscsPdfService, EmailHelper emailHelper) {
-        this.sscsPdfService = sscsPdfService;
-        this.emailHelper = emailHelper;
-    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -50,9 +45,10 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData caseData = caseDetails.getCaseData();
-        log.info("Handling create appeal pdf event for case [" + caseData.getCcdCaseId() + "]");
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
+
+        caseData.setPoAttendanceConfirmed(YesNo.NO);
 
         handleBenefitType(caseData);
 
@@ -123,10 +119,10 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         if (caseData.getSscsDocument() != null) {
             for (SscsDocument document : caseData.getSscsDocument()) {
                 if (!fileName.equals(document.getValue().getDocumentFileName())) {
-                    return "Yes";
+                    return YesNo.YES.getValue();
                 }
             }
         }
-        return "No";
+        return YesNo.NO.getValue();
     }
 }
