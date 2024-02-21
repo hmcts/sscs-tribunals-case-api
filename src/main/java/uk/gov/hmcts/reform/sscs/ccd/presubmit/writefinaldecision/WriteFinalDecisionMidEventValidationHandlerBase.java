@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
@@ -96,11 +95,6 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
         validateAwardTypes(sscsCaseData, preSubmitCallbackResponse);
         setShowPageFlags(sscsCaseData);
         setDefaultFields(sscsCaseData);
-
-        if (SscsUtil.isCorrectionInProgress(sscsCaseData, isPostHearingsEnabled)
-                && !YesNo.isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice())) {
-            sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(null);
-        }
 
         return preSubmitCallbackResponse;
     }

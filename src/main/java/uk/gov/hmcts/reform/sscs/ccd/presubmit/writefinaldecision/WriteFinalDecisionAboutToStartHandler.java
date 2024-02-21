@@ -67,13 +67,9 @@ public class WriteFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
     private void clearTransientFields(SscsCaseData caseData) {
         if (isDraftDecisionNotOnCase(caseData) && !isCorrectionInProgress(caseData)) {
             clearFinalDecisionTransientFields(caseData);
-        } else if (isCorrectionInProgress(caseData) && !isGenerateNotice(caseData)) {
+        } else if (isCorrectionInProgress(caseData)) {
             caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(null);
         }
-    }
-
-    private boolean isGenerateNotice(SscsCaseData caseData) {
-        return isYes(caseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice());
     }
 
     private boolean isDraftDecisionNotOnCase(SscsCaseData caseData) {
