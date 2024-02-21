@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.requestinfo;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
@@ -10,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -126,5 +128,21 @@ public class RequestForInformationAboutToStartHandlerTest {
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+    }
+
+    @Test
+    public void givenFieldsAlreadySet_thenClearFields() {
+        sscsCaseData.setInformationFromAppellant(YES.getValue());
+        sscsCaseData.setInformationFromPartySelected(new DynamicList("value"));
+        sscsCaseData.setInfoRequests(new InfoRequests(List.of()));
+        sscsCaseData.setResponseRequired(YES.getValue());
+        sscsCaseData.setDirectionDueDate(LocalDate.now().toString());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getInformationFromAppellant());
+        assertNull(response.getData().getInfoRequests());
+        assertNull(response.getData().getResponseRequired());
+        assertNull(response.getData().getDirectionDueDate());
     }
 }
