@@ -24,15 +24,21 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
+import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Slf4j
 public class SscsUtil {
+    public static final String IN_CHAMBERS = "In chambers";
+
+    public static final String INVALID_BENEFIT_ISSUE_CODE = "Incorrect benefit/issue code combination";
+    public static final String BENEFIT_CODE_NOT_IN_USE = "The benefit code selected is not in use";
 
     private SscsUtil() {
         //
@@ -173,13 +179,6 @@ public class SscsUtil {
         caseData.setSscsDocument(documents);
     }
 
-    public static void addDocumentToBundle(FooterService footerService, SscsCaseData sscsCaseData, SscsDocument sscsDocument) {
-        DocumentLink url = sscsDocument.getValue().getDocumentLink();
-        DocumentType documentType = DocumentType.fromValue(sscsDocument.getValue().getDocumentType());
-        String dateIssued = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        footerService.createFooterAndAddDocToCase(url, sscsCaseData, documentType, dateIssued, null, null, null);
-    }
-
     public static DocumentType getPostHearingReviewDocumentType(PostHearing postHearing, boolean isPostHearingsEnabled) {
         if (isPostHearingsEnabled && nonNull(postHearing.getReviewType())) {
             return getPostHearingReviewDocumentType(postHearing);
@@ -297,6 +296,24 @@ public class SscsUtil {
         return GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute());
     }
 
+    public static void validateBenefitIssueCode(SscsCaseData caseData,
+                                                PreSubmitCallbackResponse<SscsCaseData> response,
+                                                SessionCategoryMapService categoryMapService) {
+        boolean isSecondDoctorPresent = isNotBlank(caseData.getSscsIndustrialInjuriesData().getSecondPanelDoctorSpecialism());
+        boolean fqpmRequired = isYes(caseData.getIsFqpmRequired());
+
+
+        if (isNull(Benefit.getBenefitFromBenefitCode(caseData.getBenefitCode()))) {
+            response.addError(BENEFIT_CODE_NOT_IN_USE);
+        }
+
+
+        if (isNull(categoryMapService.getSessionCategory(caseData.getBenefitCode(), caseData.getIssueCode(),
+                isSecondDoctorPresent, fqpmRequired))) {
+            response.addError(INVALID_BENEFIT_ISSUE_CODE);
+        }
+    }
+  
     public static String buildWriteFinalDecisionHeldBefore(SscsCaseData caseData, @NonNull String signedInJudgeName) {
         List<String> names = new ArrayList<>();
         names.add(signedInJudgeName);
@@ -325,24 +342,34 @@ public class SscsUtil {
             }
         }
 
-        return "In chambers";
+        return IN_CHAMBERS;
     }
 
     public static HearingDetails getLastValidHearing(SscsCaseData caseData) {
-        for (Hearing hearing : caseData.getHearings()) {
-            if (hearing != null) {
-                HearingDetails hearingDetails = hearing.getValue();
-                if (hearingDetails != null
-                        && org.apache.commons.lang3.StringUtils.isNotBlank(hearingDetails.getHearingDate())
-                        && hearingDetails.getVenue() != null
-                        && org.apache.commons.lang3.StringUtils.isNotBlank(hearingDetails.getVenue().getName())) {
-                    return hearingDetails;
+        List<Hearing> hearings = caseData.getHearings();
+        if (nonNull(hearings)) {
+            for (Hearing hearing : hearings) {
+                if (isHearingValid(hearing)) {
+                    return hearing.getValue();
                 }
             }
         }
+
         return null;
     }
 
+    private static boolean isHearingValid(Hearing hearing) {
+        if (nonNull(hearing)) {
+            HearingDetails hearingDetails = hearing.getValue();
+            return nonNull(hearingDetails)
+                    && isNotBlank(hearingDetails.getHearingDate())
+                    && nonNull(hearingDetails.getVenue())
+                    && isNotBlank(hearingDetails.getVenue().getName());
+        }
+
+        return false;
+    }
+    
     public static DynamicList getBenefitDescriptions() {
         List<DynamicListItem> items = Arrays.stream(Benefit.values())
                 .sorted(Comparator.comparing(Benefit::getDescription))
@@ -449,6 +476,36 @@ public class SscsUtil {
             sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
             log.info("Set the InterlocReviewState to {},  for case id : {}", sscsCaseData.getInterlocReviewState(), sscsCaseData.getCcdCaseId());
             sscsCaseData.setTranslationWorkOutstanding(YES.getValue());
+        }
+    }
+
+    public static void clearPostHearingRequestFormatAndContentFields(SscsCaseData caseData, PostHearingRequestType requestType) {
+        PostHearing postHearing = caseData.getPostHearing();
+        DocumentGeneration docGen = caseData.getDocumentGeneration();
+
+        switch (requestType) {
+            case SET_ASIDE -> {
+                postHearing.getSetAside().setRequestFormat(null);
+                docGen.setBodyContent(null);
+            }
+            case CORRECTION -> {
+                postHearing.getCorrection().setRequestFormat(null);
+                docGen.setCorrectionBodyContent(null);
+            }
+            case STATEMENT_OF_REASONS -> {
+                postHearing.getStatementOfReasons().setRequestFormat(null);
+                docGen.setStatementOfReasonsBodyContent(null);
+            }
+            case LIBERTY_TO_APPLY -> {
+                postHearing.getLibertyToApply().setRequestFormat(null);
+                docGen.setLibertyToApplyBodyContent(null);
+            }
+            case PERMISSION_TO_APPEAL -> {
+                postHearing.getPermissionToAppeal().setRequestFormat(null);
+                docGen.setPermissionToAppealBodyContent(null);
+            }
+            default -> {
+            }
         }
     }
 }

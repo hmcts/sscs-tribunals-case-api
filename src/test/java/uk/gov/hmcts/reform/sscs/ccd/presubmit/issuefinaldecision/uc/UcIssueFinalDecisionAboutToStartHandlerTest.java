@@ -16,8 +16,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -59,6 +58,7 @@ import uk.gov.hmcts.reform.sscs.service.*;
 public class UcIssueFinalDecisionAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
+    public static final String APPELLANT_LAST_NAME = "APPELLANT Last'NamE";
     private IssueFinalDecisionAboutToStartHandler handler;
     private static final String URL = "http://dm-store/documents/123";
     private static final String UC_TEMPLATE_ID = "esanuts.docx";
@@ -96,35 +96,27 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-
-        Mockito.when(previewDecisionService.getBenefitType()).thenReturn("UC");
-        Mockito.when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
-
+        when(previewDecisionService.getBenefitType()).thenReturn("UC");
+        when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
         decisionNoticeService =
-            new DecisionNoticeService(Arrays.asList(),
-                Arrays.asList(ucDecisionNoticeOutcomeService), Arrays.asList(previewDecisionService));
-
+            new DecisionNoticeService(List.of(), List.of(ucDecisionNoticeOutcomeService), List.of(previewDecisionService));
         handler = new IssueFinalDecisionAboutToStartHandler(decisionNoticeService, false, false);
-
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-
         when(userDetailsService.buildLoggedInUserName("Bearer token")).thenReturn("Judge Full Name");
-
-
         capture = ArgumentCaptor.forClass(GenerateFileParams.class);
-
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder()
                 .writeFinalDecisionGeneratedDate("2018-01-01")
                 .writeFinalDecisionPreviewDocument(DocumentLink.builder().documentFilename("filename").build())
+                .writeFinalDecisionGenerateNotice(YES)
                 .build())
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("UC").build())
                 .appellant(Appellant.builder()
                     .name(Name.builder().firstName("APPELLANT")
-                        .lastName("LastNamE")
+                        .lastName("Last'NamE")
                         .build())
                     .identity(Identity.builder().build())
                     .build())
@@ -160,38 +152,29 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
 
     @Test
     public void givenAboutToStartRequest_willGeneratePreviewFile() {
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
         when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
-
-        PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(sscsCaseData);
-
         when(previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true)).thenReturn(response);
+
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
         verify(previewDecisionService).preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true, false, false);
-
     }
 
     @Test
     public void givenAboutToStartRequestDescriptorFlow_willGeneratePreviewFileWithoutUpdatingGeneratedDate() throws IOException {
-
         when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
-
         UcDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new UcDecisionNoticeQuestionService();
-
         final UcWriteFinalDecisionPreviewDecisionService previewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, userDetailsService,
             esaDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration, venueDataLoader);
-
         when(generateFile.assemble(any())).thenReturn(URL);
-
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
-        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(List.of("mobilisingUnaided"));
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
         sscsCaseData.setWcaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
-
         when(ucDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
 
         final PreSubmitCallbackResponse<SscsCaseData> previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
@@ -199,12 +182,12 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
         // CHeck that the document has the correct (updated) issued date.
         assertNotNull(previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, false,
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
             true, true);
 
         // Check that the generated date has not been updated
@@ -236,12 +219,12 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
         // CHeck that the document has the correct (updated) issued date.
         assertNotNull(previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), previewResponse.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, false,
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, false,
             false, true);
 
         // Check that the generated date has not been updated
