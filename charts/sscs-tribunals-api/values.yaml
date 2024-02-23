@@ -76,6 +76,8 @@ java:
     CASE_ACCESS_MANAGEMENT_FEATURE: false
     ELINKS_V2_FEATURE_ENABLED: false
 
+postgresql:
+  enabled: false
 idam-pr:
   enabled: false
 xui-webapp:
@@ -105,6 +107,14 @@ servicebus:
 ccd-case-document-am-api:
   enabled: false
 aac-manage-case-assignment:
-  enabled: true
+  enabled: false
+am-org-role-mapping-service:
+  enabled: false
 wa:
   enabled: false
+  taskBatchCron:
+    enabled: false
+  reconfigurationBatchCron:
+    enabled: false
+  terminationBatchCron:
+    enabled: false
