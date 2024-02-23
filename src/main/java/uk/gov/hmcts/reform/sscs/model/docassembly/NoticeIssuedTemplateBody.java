@@ -34,7 +34,7 @@ public class NoticeIssuedTemplateBody implements FormPayload {
     @JsonProperty("should_hide_nino")
     boolean shouldHideNino;
     @JsonProperty("respondents")
-    List respondents;
+    List<?> respondents;
     @JsonProperty("notice_body")
     String noticeBody;
     @JsonProperty("user_name")
@@ -73,4 +73,12 @@ public class NoticeIssuedTemplateBody implements FormPayload {
     LocalDate correctedGeneratedDate;
     @JsonProperty("corrected_date_issued")
     LocalDate correctedDateIssued;
+    @JsonProperty("held_at")
+    String heldAt;
+    @JsonProperty("held_before")
+    String heldBefore;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonProperty("held_on")
+    LocalDate heldOn;
 }

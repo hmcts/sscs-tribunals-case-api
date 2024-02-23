@@ -44,6 +44,7 @@ java:
     JAVA_OPTS: -Xmx6G
     GAPS_SWITCHOVER_FEATURE: true
     ELASTIC_SEARCH_FEATURE: true
+    ELINKS_V2_FEATURE_ENABLED: true
     DUMMY: true
 
 idam-pr:
@@ -138,6 +139,7 @@ xui-webapp:
       FEATURE_TERMS_AND_CONDITIONS_ENABLED: false
       FEATURE_HELMET_ENABLED: false
       FEATURE_OIDC_ENABLED: false
+      ALLOW_CONFIG_MUTATIONS: true
       FEATURE_JRD_E_LINKS_V2_ENABLED: true
       NOW: false
       REDISCLOUD_URL: http://dummyrediscloudurl
@@ -534,6 +536,7 @@ ccd:
         ADMINWEB_ELASTIC_CASE_TYPES_URL: http://${SERVICE_NAME}-ccd-definition-store/elastic-support/case-types
         IDAM_ADMIN_WEB_SERVICE_KEY: ${ADMIN_S2S_KEY}
         IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
+        ALLOW_CONFIG_MUTATIONS: true
       keyVaults: [ ]
 
 
@@ -602,6 +605,7 @@ ccd:
         IDAM_SERVICE_KEY: ${CCD_API_GATEWAY_S2S_SECRET}
         IDAM_OAUTH2_CLIENT_SECRET: ${CCD_API_GATEWAY_IDAM_CLIENT_SECRET}
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
+        ALLOW_CONFIG_MUTATIONS: true
       ingressIP: ${INGRESS_IP}
       ingressHost: gateway-${SERVICE_FQDN}
       disableKeyVaults: true
@@ -618,7 +622,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S12006ABnonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S12006ACnonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -637,7 +641,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S12006ABnonProd
+      CCD_DEF_VERSION: S12006ACnonProd
     secrets: []
     userRoles:
       - citizen

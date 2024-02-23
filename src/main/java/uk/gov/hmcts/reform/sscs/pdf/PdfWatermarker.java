@@ -23,6 +23,7 @@ public class PdfWatermarker {
 
     public byte[] shrinkAndWatermarkPdf(byte[] input, String leftText, String rightText) throws Exception {
         try (PDDocument document = PDDocument.load(input)) {
+            document.setAllSecurityToBeRemoved(true);
             int count = 1;
             for (PDPage page : document.getPages()) {
                 scaleContent(document, page, SCALE_PERCENTAGE);
