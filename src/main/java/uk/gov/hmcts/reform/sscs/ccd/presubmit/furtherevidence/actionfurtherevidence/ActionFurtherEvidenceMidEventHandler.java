@@ -34,7 +34,7 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 @AllArgsConstructor
 public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    public static final String POSTPONEMENTS_REVIEWED_BY_TCW = "Postponement requests need to be reviewed by TCW";
+    public static final String POSTPONEMENTS_REVIEWED_BY_TCW_OR_JUDGE = "Postponement requests need to be reviewed by TCW or Judge";
     public static final String POSTPONEMENTS_NOT_POSSIBLE_GAPS = "Postponement requests cannot be made for hearings listed in GAPS";
     public static final String POSTPONEMENT_IN_HEARING_STATE = "You can only submit a postponement request on cases in 'hearing' state";
     public static final String ONLY_ONE_POSTPONEMENT_AT_A_TIME = "Only one request for postponement can be submitted at a time";
@@ -88,9 +88,12 @@ public class ActionFurtherEvidenceMidEventHandler implements PreSubmitCallbackHa
                         && doc.getValue().getType().equals(DocumentType.POSTPONEMENT_REQUEST.getValue())).findAny();
 
         if (postponementRequest.isPresent()) {
-            if (!sscsCaseData.getFurtherEvidenceAction().getValue().getCode()
-                    .equals(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())) {
-                preSubmitCallbackResponse.addError(POSTPONEMENTS_REVIEWED_BY_TCW);
+            if (!(sscsCaseData.getFurtherEvidenceAction().getValue().getCode()
+                    .equals(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode())
+                    || sscsCaseData.getFurtherEvidenceAction().getValue().getCode()
+                    .equals(FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode()))
+            ) {
+                preSubmitCallbackResponse.addError(POSTPONEMENTS_REVIEWED_BY_TCW_OR_JUDGE);
             }
 
             if (HearingRoute.GAPS.equals(sscsCaseData.getSchedulingAndListingFields().getHearingRoute())) {
