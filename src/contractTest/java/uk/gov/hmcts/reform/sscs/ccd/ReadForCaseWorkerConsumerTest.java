@@ -35,7 +35,6 @@ public class ReadForCaseWorkerConsumerTest extends CcdConsumerTestBase {
     @Test
     @PactTestFor(pactMethod = "readForCaseDetails")
     public void verifyReadForCaseDetails() throws JSONException {
-
         CaseDetails caseDetailsReponse =
             coreCaseDataApi.readForCaseWorker(
                 SOME_AUTHORIZATION_TOKEN,
