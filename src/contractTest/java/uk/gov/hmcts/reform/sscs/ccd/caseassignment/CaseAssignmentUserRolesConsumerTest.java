@@ -90,9 +90,10 @@ public class CaseAssignmentUserRolesConsumerTest {
         List<CaseAssignmentUserRole> caseAssignmentUserRoles = caseAssignmentUserRolesResource.getCaseAssignmentUserRoles();
         assertNotNull(caseAssignmentUserRoles);
         assertEquals(1, caseAssignmentUserRoles.size());
-        assertEquals(caseId, caseAssignmentUserRoles.get(0).getCaseDataId());
-        assertEquals(userId, caseAssignmentUserRoles.get(0).getUserId());
-        assertEquals(caseRole, caseAssignmentUserRoles.get(0).getCaseRole());
+        CaseAssignmentUserRole userRole = caseAssignmentUserRoles.get(0);
+        assertEquals(caseId, userRole.getCaseDataId());
+        assertEquals(userId, userRole.getUserId());
+        assertEquals(caseRole, userRole.getCaseRole());
     }
 
 }
