@@ -26,11 +26,9 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 
 @ExtendWith(PactConsumerTestExt.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@PactTestFor(providerName = "am_roleAssignment_getRoles", port = "8891")
+@PactTestFor(providerName = "ccdDataStoreAPI_Cases", port = "8891")
 @PactDirectory("pacts")
-@SpringBootTest({
-    "core_case_data.api.url : localhost:8891"
-})
+@SpringBootTest
 @TestPropertySource(locations = {"/config/application_contract.properties"})
 public class CaseAssignmentUserRolesConsumerTest {
 
