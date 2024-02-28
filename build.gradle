@@ -339,8 +339,8 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '98d1754'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.10'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '6482a2d'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.13'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.42.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.2'
@@ -377,7 +377,7 @@ dependencies {
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.8.0'
     implementation group: 'org.apache.tika', name: 'tika-parsers', version: '2.8.0'
 
-    implementation group: 'org.json', name: 'json', version: '20230618'
+    implementation group: 'org.json', name: 'json', version: '20240205'
 
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.7.1'
 
