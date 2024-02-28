@@ -22,7 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
@@ -64,7 +64,9 @@ public class AdjournCaseIt extends AbstractEventIt {
     public static final String FIRST_MORNING_SESSION_ON_A_DATE_TO_BE_FIXED =
         "It will be first in the morning session on a date to be fixed";
     public static final String A_STANDARD_TIME_SLOT = "a standard time slot";
-    public static final String JUDGE_FULL_NAME = "Judge Full Name";
+    public static final String JUDGE_GIVEN_NAME = "Judge";
+    public static final String JUDGE_FAMILY_NAME = "Family Name";
+    public static final String JUDGE_FULL_NAME = "Judge Family Name";
     public static final String DATE_2017 = "2017-07-17";
     public static final String DATE_2019 = "2019-10-10";
     public static final String DOCUMENT_URL = "document.url";
@@ -73,7 +75,7 @@ public class AdjournCaseIt extends AbstractEventIt {
     @MockBean
     private GenerateFile generateFile;
     @MockBean
-    private UserDetails userDetails;
+    private UserInfo userInfo;
 
     @DisplayName("Call to mid event callback when path is YES NO YES will validate the data when due date in past")
     @Test
@@ -375,9 +377,10 @@ public class AdjournCaseIt extends AbstractEventIt {
     private PreSubmitCallbackResponse<SscsCaseData> getPreSubmitCallbackResponse() throws Exception {
         when(generateFile.assemble(any())).thenReturn(DOCUMENT_URL);
 
-        when(userDetails.getFullName()).thenReturn(JUDGE_FULL_NAME);
+        when(userInfo.getGivenName()).thenReturn(JUDGE_GIVEN_NAME);
+        when(userInfo.getFamilyName()).thenReturn(JUDGE_FAMILY_NAME);
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_MID_EVENT_PREVIEW_ADJOURN_CASE));
         assertHttpStatus(response, HttpStatus.OK);
