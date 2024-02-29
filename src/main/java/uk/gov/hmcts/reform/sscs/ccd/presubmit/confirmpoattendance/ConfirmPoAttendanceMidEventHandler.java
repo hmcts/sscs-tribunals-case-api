@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
@@ -42,7 +43,9 @@ public class ConfirmPoAttendanceMidEventHandler implements PreSubmitCallbackHand
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         Contact poContact = sscsCaseData.getPresentingOfficersDetails().getContact();
-        if (isEmpty(poContact.getMobile()) && isEmpty(poContact.getPhone())) {
+        if (YesNo.YES.equals(sscsCaseData.getPoAttendanceConfirmed())
+                && isEmpty(poContact.getMobile())
+                && isEmpty(poContact.getPhone())) {
             response.addError("Add a contact or mobile number");
         }
 

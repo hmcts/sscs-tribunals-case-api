@@ -38,7 +38,9 @@ public class ConfirmPoAttendanceAboutToSubmitHandler implements PreSubmitCallbac
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        sscsCaseData.setPoAttendanceConfirmed(YesNo.YES);
+        if (YesNo.NO.equals(sscsCaseData.getPoAttendanceConfirmed())) {
+            sscsCaseData.clearPoDetails();
+        }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }

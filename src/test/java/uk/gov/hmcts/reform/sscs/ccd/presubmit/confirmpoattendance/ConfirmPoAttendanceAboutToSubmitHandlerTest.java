@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.PoDetails;
 
 @ExtendWith(MockitoExtension.class)
 public class ConfirmPoAttendanceAboutToSubmitHandlerTest {
@@ -54,8 +55,10 @@ public class ConfirmPoAttendanceAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenHandlerIsCalled_setPoAttendanceConfirmedToYes() {
-        assertThat(caseData.getPoAttendanceConfirmed()).isNull();
+    void givenHandlerIsCalledAndPoAttendanceIsYes_thenKeepPoValues() {
+        PoDetails poDetails = PoDetails.builder().contact(Contact.builder().email("sds").mobile("sdsd").build()).build();
+        caseData.setPoAttendanceConfirmed(YesNo.YES);
+        caseData.setPresentingOfficersDetails(poDetails);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
@@ -63,6 +66,21 @@ public class ConfirmPoAttendanceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getPoAttendanceConfirmed()).isEqualTo(YesNo.YES);
+        assertThat(response.getData().getPresentingOfficersDetails()).isEqualTo(poDetails);
+    }
+
+    @Test
+    void givenHandlerIsCalledAndPoAttendanceIsNo_thenRemovePoValues() {
+        PoDetails poDetails = PoDetails.builder().contact(Contact.builder().email("sds").mobile("sdsd").build()).build();
+        caseData.setPoAttendanceConfirmed(YesNo.NO);
+        caseData.setPresentingOfficersDetails(poDetails);
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(callback.getEvent()).thenReturn(CONFIRM_PO_ATTENDANCE);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getPresentingOfficersDetails()).isEqualTo(PoDetails.builder().build());
     }
 }

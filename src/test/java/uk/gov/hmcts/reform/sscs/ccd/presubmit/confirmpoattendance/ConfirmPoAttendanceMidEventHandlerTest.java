@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 @ExtendWith(MockitoExtension.class)
 public class ConfirmPoAttendanceMidEventHandlerTest {
@@ -37,7 +38,7 @@ public class ConfirmPoAttendanceMidEventHandlerTest {
     void setUp() {
         handler = new ConfirmPoAttendanceMidEventHandler();
 
-        caseData = SscsCaseData.builder().build();
+        caseData = SscsCaseData.builder().poAttendanceConfirmed(YesNo.YES).build();
     }
 
     @Test
@@ -72,6 +73,19 @@ public class ConfirmPoAttendanceMidEventHandlerTest {
     void givenMobileNumberOnCase_thenSubmitEvent() {
         caseData.getPresentingOfficersDetails().setContact(Contact.builder().mobile("07415103842").build());
 
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(callback.getEvent()).thenReturn(CONFIRM_PO_ATTENDANCE);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getWarnings()).isEmpty();
+    }
+
+    @Test
+    void givenPoAttendanceIsNoAndNoPhoneNumber_thenSubmitEvent() {
+        caseData.setPoAttendanceConfirmed(YesNo.NO);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(callback.getEvent()).thenReturn(CONFIRM_PO_ATTENDANCE);
