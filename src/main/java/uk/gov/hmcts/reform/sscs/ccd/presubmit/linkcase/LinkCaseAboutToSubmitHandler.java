@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Lists;
 import java.util.*;
+import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -109,7 +110,10 @@ public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
                 sscsCaseData.setLinkedCase(linkedCaseList);
 
                 if (!sscsCaseData.getCcdCaseId().equals(caseInCallback)) {
-                    ccdService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()), EventType.CASE_UPDATED.getCcdType(), "Case updated", "Linked case added", idamService.getIdamTokens());
+                    Consumer<SscsCaseData> caseDataConsumer = caseData -> {
+                        caseData.setLinkedCase(linkedCaseList);
+                    };
+                    ccdService.updateCaseV2(Long.valueOf(sscsCaseData.getCcdCaseId()), EventType.CASE_UPDATED.getCcdType(), "Case updated", "Linked case added", idamService.getIdamTokens(), caseDataConsumer);
                 }
             }
         }

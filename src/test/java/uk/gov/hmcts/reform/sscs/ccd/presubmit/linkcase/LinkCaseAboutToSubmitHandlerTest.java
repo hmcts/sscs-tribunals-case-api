@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.linkcase;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -10,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -56,7 +58,8 @@ public class LinkCaseAboutToSubmitHandlerTest {
     private SscsCaseDetails sscsCaseDetailsD;
 
     @Captor
-    private ArgumentCaptor<SscsCaseData> capture;
+    private ArgumentCaptor<Consumer> capture;
+
 
     @Before
     public void setUp() {
@@ -98,10 +101,12 @@ public class LinkCaseAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(ccdService).updateCase(capture.capture(), eq(2L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        verify(ccdService, times(1)).updateCase(any(), any(), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        assertEquals(1, capture.getValue().getLinkedCase().size());
-        assertEquals("1", capture.getValue().getLinkedCase().get(0).getValue().getCaseReference());
+        verify(ccdService).updateCaseV2(eq(2L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), capture.capture());
+
+        Consumer<SscsCaseData> caseDataConsumer = capture.getValue();
+        SscsCaseData sscsCaseData = new SscsCaseData(); // You nee
+        caseDataConsumer.accept(sscsCaseData);
+        assertEquals("1", sscsCaseData.getLinkedCase().get(0).getValue().getCaseReference());
     }
 
     @Test
@@ -133,7 +138,7 @@ public class LinkCaseAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(ccdService, times(0)).updateCase(any(), any(), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
+        verify(ccdService, times(0)).updateCaseV2(any(), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), any(Consumer.class));
     }
 
     @Test
@@ -145,15 +150,21 @@ public class LinkCaseAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(ccdService).updateCase(capture.capture(), eq(2L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        verify(ccdService).updateCase(capture.capture(), eq(3L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        verify(ccdService, times(2)).updateCase(any(), any(), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        assertEquals(2, capture.getAllValues().get(0).getLinkedCase().size());
-        assertEquals(2, capture.getAllValues().get(1).getLinkedCase().size());
-        assertEquals("1", capture.getAllValues().get(0).getLinkedCase().get(0).getValue().getCaseReference());
-        assertEquals("3", capture.getAllValues().get(0).getLinkedCase().get(1).getValue().getCaseReference());
-        assertEquals("1", capture.getAllValues().get(1).getLinkedCase().get(0).getValue().getCaseReference());
-        assertEquals("2", capture.getAllValues().get(1).getLinkedCase().get(1).getValue().getCaseReference());
+        verify(ccdService).updateCaseV2(eq(2L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), capture.capture());
+
+        verify(ccdService).updateCaseV2(eq(3L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), capture.capture());
+
+        SscsCaseData linkedSscsCaseData1 = new SscsCaseData();
+        SscsCaseData linkedSscsCaseData2 = new SscsCaseData();
+
+        capture.getAllValues().get(0).accept(linkedSscsCaseData1);
+        capture.getAllValues().get(1).accept(linkedSscsCaseData2);
+
+        assertEquals(2, linkedSscsCaseData1.getLinkedCase().size());
+        assertEquals("1", linkedSscsCaseData1.getLinkedCase().get(0).getValue().getCaseReference());
+        assertEquals("3", linkedSscsCaseData1.getLinkedCase().get(1).getValue().getCaseReference());
+        assertEquals("1", linkedSscsCaseData2.getLinkedCase().get(0).getValue().getCaseReference());
+        assertEquals("2", linkedSscsCaseData2.getLinkedCase().get(1).getValue().getCaseReference());
     }
 
     @Test
@@ -170,18 +181,24 @@ public class LinkCaseAboutToSubmitHandlerTest {
         assertEquals("2", result.getData().getLinkedCase().get(0).getValue().getCaseReference());
         assertEquals("3", result.getData().getLinkedCase().get(1).getValue().getCaseReference());
 
-        verify(ccdService, times(0)).updateCase(capture.capture(), eq(1L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        verify(ccdService).updateCase(capture.capture(), eq(2L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        verify(ccdService).updateCase(capture.capture(), eq(3L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        verify(ccdService, times(2)).updateCase(any(), any(), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
 
-        assertEquals(2, capture.getAllValues().get(0).getLinkedCase().size());
-        assertEquals(2, capture.getAllValues().get(1).getLinkedCase().size());
+        verify(ccdService, times(0)).updateCaseV2(eq(1L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), any(Consumer.class));
+        verify(ccdService).updateCaseV2(eq(2L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), capture.capture());
+        verify(ccdService).updateCaseV2(eq(3L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), capture.capture());
 
-        assertEquals("1", capture.getAllValues().get(0).getLinkedCase().get(0).getValue().getCaseReference());
-        assertEquals("3", capture.getAllValues().get(0).getLinkedCase().get(1).getValue().getCaseReference());
-        assertEquals("1", capture.getAllValues().get(1).getLinkedCase().get(0).getValue().getCaseReference());
-        assertEquals("2", capture.getAllValues().get(1).getLinkedCase().get(1).getValue().getCaseReference());
+        SscsCaseData linkedSscsCaseData1 = new SscsCaseData();
+        SscsCaseData linkedSscsCaseData2 = new SscsCaseData();
+
+        capture.getAllValues().get(0).accept(linkedSscsCaseData1);
+        capture.getAllValues().get(1).accept(linkedSscsCaseData2);
+
+        assertEquals(2, linkedSscsCaseData1.getLinkedCase().size());
+        assertEquals(2, linkedSscsCaseData2.getLinkedCase().size());
+
+        assertEquals("1", linkedSscsCaseData1.getLinkedCase().get(0).getValue().getCaseReference());
+        assertEquals("3", linkedSscsCaseData1.getLinkedCase().get(1).getValue().getCaseReference());
+        assertEquals("1", linkedSscsCaseData2.getLinkedCase().get(0).getValue().getCaseReference());
+        assertEquals("2", linkedSscsCaseData2.getLinkedCase().get(1).getValue().getCaseReference());
     }
 
     @Test
@@ -199,13 +216,17 @@ public class LinkCaseAboutToSubmitHandlerTest {
         assertEquals("2", result.getData().getLinkedCase().get(0).getValue().getCaseReference());
         assertEquals("3", result.getData().getLinkedCase().get(1).getValue().getCaseReference());
 
-        verify(ccdService, times(0)).updateCase(capture.capture(), eq(1L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        verify(ccdService).updateCase(capture.capture(), eq(3L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        verify(ccdService, times(1)).updateCase(any(), any(), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
 
-        assertEquals(2, capture.getAllValues().get(0).getLinkedCase().size());
-        assertEquals("1", capture.getAllValues().get(0).getLinkedCase().get(0).getValue().getCaseReference());
-        assertEquals("2", capture.getAllValues().get(0).getLinkedCase().get(1).getValue().getCaseReference());
+        verify(ccdService, times(0)).updateCaseV2(eq(1L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), any(Consumer.class));
+
+        verify(ccdService).updateCaseV2(eq(3L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), capture.capture());
+
+        SscsCaseData linkedSscsCaseData1 = new SscsCaseData();
+        capture.getAllValues().get(0).accept(linkedSscsCaseData1);
+
+        assertEquals(2, linkedSscsCaseData1.getLinkedCase().size());
+        assertEquals("1", linkedSscsCaseData1.getLinkedCase().get(0).getValue().getCaseReference());
+        assertEquals("2", linkedSscsCaseData1.getLinkedCase().get(1).getValue().getCaseReference());
     }
 
     @Test
@@ -231,25 +252,34 @@ public class LinkCaseAboutToSubmitHandlerTest {
         assertEquals("3", result.getData().getLinkedCase().get(1).getValue().getCaseReference());
         assertEquals("4", result.getData().getLinkedCase().get(2).getValue().getCaseReference());
 
-        verify(ccdService, times(0)).updateCase(capture.capture(), eq(1L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        verify(ccdService).updateCase(capture.capture(), eq(2L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        verify(ccdService).updateCase(capture.capture(), eq(3L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        verify(ccdService).updateCase(capture.capture(), eq(4L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        verify(ccdService, times(3)).updateCase(any(), any(), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
 
-        assertEquals(3, capture.getAllValues().get(0).getLinkedCase().size());
-        assertEquals(3, capture.getAllValues().get(1).getLinkedCase().size());
-        assertEquals(3, capture.getAllValues().get(2).getLinkedCase().size());
+        verify(ccdService, times(0)).updateCaseV2(eq(1L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), any(Consumer.class));
+        verify(ccdService).updateCaseV2(eq(2L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), capture.capture());
+        verify(ccdService).updateCaseV2(eq(3L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), capture.capture());
+        verify(ccdService).updateCaseV2(eq(4L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), capture.capture());
 
-        assertEquals("1", capture.getAllValues().get(0).getLinkedCase().get(0).getValue().getCaseReference());
-        assertEquals("3", capture.getAllValues().get(0).getLinkedCase().get(1).getValue().getCaseReference());
-        assertEquals("4", capture.getAllValues().get(0).getLinkedCase().get(2).getValue().getCaseReference());
-        assertEquals("1", capture.getAllValues().get(1).getLinkedCase().get(0).getValue().getCaseReference());
-        assertEquals("2", capture.getAllValues().get(1).getLinkedCase().get(1).getValue().getCaseReference());
-        assertEquals("4", capture.getAllValues().get(1).getLinkedCase().get(2).getValue().getCaseReference());
-        assertEquals("1", capture.getAllValues().get(2).getLinkedCase().get(0).getValue().getCaseReference());
-        assertEquals("2", capture.getAllValues().get(2).getLinkedCase().get(1).getValue().getCaseReference());
-        assertEquals("3", capture.getAllValues().get(2).getLinkedCase().get(2).getValue().getCaseReference());
+
+        SscsCaseData linkedSscsCaseData1 = new SscsCaseData();
+        SscsCaseData linkedSscsCaseData2 = new SscsCaseData();
+        SscsCaseData linkedSscsCaseData3 = new SscsCaseData();
+        capture.getAllValues().get(0).accept(linkedSscsCaseData1);
+        capture.getAllValues().get(1).accept(linkedSscsCaseData2);
+        capture.getAllValues().get(2).accept(linkedSscsCaseData3);
+
+
+        assertEquals(3, linkedSscsCaseData1.getLinkedCase().size());
+        assertEquals(3, linkedSscsCaseData2.getLinkedCase().size());
+        assertEquals(3, linkedSscsCaseData3.getLinkedCase().size());
+
+        assertEquals("1", linkedSscsCaseData1.getLinkedCase().get(0).getValue().getCaseReference());
+        assertEquals("3", linkedSscsCaseData1.getLinkedCase().get(1).getValue().getCaseReference());
+        assertEquals("4", linkedSscsCaseData1.getLinkedCase().get(2).getValue().getCaseReference());
+        assertEquals("1", linkedSscsCaseData2.getLinkedCase().get(0).getValue().getCaseReference());
+        assertEquals("2", linkedSscsCaseData2.getLinkedCase().get(1).getValue().getCaseReference());
+        assertEquals("4", linkedSscsCaseData2.getLinkedCase().get(2).getValue().getCaseReference());
+        assertEquals("1", linkedSscsCaseData3.getLinkedCase().get(0).getValue().getCaseReference());
+        assertEquals("2", linkedSscsCaseData3.getLinkedCase().get(1).getValue().getCaseReference());
+        assertEquals("3", linkedSscsCaseData3.getLinkedCase().get(2).getValue().getCaseReference());
     }
 
     @Test
@@ -273,25 +303,31 @@ public class LinkCaseAboutToSubmitHandlerTest {
         assertEquals("3", result.getData().getLinkedCase().get(1).getValue().getCaseReference());
         assertEquals("4", result.getData().getLinkedCase().get(2).getValue().getCaseReference());
 
-        verify(ccdService, times(0)).updateCase(capture.capture(), eq(1L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        verify(ccdService).updateCase(capture.capture(), eq(2L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        verify(ccdService).updateCase(capture.capture(), eq(3L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        verify(ccdService).updateCase(capture.capture(), eq(4L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
-        verify(ccdService, times(3)).updateCase(any(), any(), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
+        verify(ccdService, times(0)).updateCaseV2(eq(1L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), any(Consumer.class));
+        verify(ccdService).updateCaseV2(eq(2L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), capture.capture());
+        verify(ccdService).updateCaseV2(eq(3L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), capture.capture());
+        verify(ccdService).updateCaseV2(eq(4L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), capture.capture());
 
-        assertEquals(3, capture.getAllValues().get(0).getLinkedCase().size());
-        assertEquals(3, capture.getAllValues().get(1).getLinkedCase().size());
-        assertEquals(3, capture.getAllValues().get(2).getLinkedCase().size());
+        SscsCaseData linkedSscsCaseData1 = new SscsCaseData();
+        SscsCaseData linkedSscsCaseData2 = new SscsCaseData();
+        SscsCaseData linkedSscsCaseData3 = new SscsCaseData();
+        capture.getAllValues().get(0).accept(linkedSscsCaseData1);
+        capture.getAllValues().get(1).accept(linkedSscsCaseData2);
+        capture.getAllValues().get(2).accept(linkedSscsCaseData3);
 
-        assertEquals("1", capture.getAllValues().get(0).getLinkedCase().get(0).getValue().getCaseReference());
-        assertEquals("3", capture.getAllValues().get(0).getLinkedCase().get(1).getValue().getCaseReference());
-        assertEquals("4", capture.getAllValues().get(0).getLinkedCase().get(2).getValue().getCaseReference());
-        assertEquals("1", capture.getAllValues().get(1).getLinkedCase().get(0).getValue().getCaseReference());
-        assertEquals("2", capture.getAllValues().get(1).getLinkedCase().get(1).getValue().getCaseReference());
-        assertEquals("4", capture.getAllValues().get(1).getLinkedCase().get(2).getValue().getCaseReference());
-        assertEquals("1", capture.getAllValues().get(2).getLinkedCase().get(0).getValue().getCaseReference());
-        assertEquals("2", capture.getAllValues().get(2).getLinkedCase().get(1).getValue().getCaseReference());
-        assertEquals("3", capture.getAllValues().get(2).getLinkedCase().get(2).getValue().getCaseReference());
+        assertEquals(3, linkedSscsCaseData1.getLinkedCase().size());
+        assertEquals(3, linkedSscsCaseData2.getLinkedCase().size());
+        assertEquals(3, linkedSscsCaseData3.getLinkedCase().size());
+
+        assertEquals("1", linkedSscsCaseData1.getLinkedCase().get(0).getValue().getCaseReference());
+        assertEquals("3", linkedSscsCaseData1.getLinkedCase().get(1).getValue().getCaseReference());
+        assertEquals("4", linkedSscsCaseData1.getLinkedCase().get(2).getValue().getCaseReference());
+        assertEquals("1", linkedSscsCaseData2.getLinkedCase().get(0).getValue().getCaseReference());
+        assertEquals("2", linkedSscsCaseData2.getLinkedCase().get(1).getValue().getCaseReference());
+        assertEquals("4", linkedSscsCaseData2.getLinkedCase().get(2).getValue().getCaseReference());
+        assertEquals("1", linkedSscsCaseData3.getLinkedCase().get(0).getValue().getCaseReference());
+        assertEquals("2", linkedSscsCaseData3.getLinkedCase().get(1).getValue().getCaseReference());
+        assertEquals("3", linkedSscsCaseData3.getLinkedCase().get(2).getValue().getCaseReference());
     }
 
     @Test
@@ -314,7 +350,7 @@ public class LinkCaseAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(ccdService, times(0)).updateCase(any(), any(), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
+        verify(ccdService, times(0)).updateCaseV2(eq(1L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), any(Consumer.class));
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Case cannot be linked as number of linked cases exceeds the limit", error);
