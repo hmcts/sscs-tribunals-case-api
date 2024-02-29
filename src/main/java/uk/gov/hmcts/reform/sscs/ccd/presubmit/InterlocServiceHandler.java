@@ -60,7 +60,6 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
         }
 
         setInterlocReferralDate(newSscsCaseData, eventType);
-
         clearDirectionDueDate(newSscsCaseData, eventType);
 
         return newSscsCaseData;

@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Slf4j
 public class SscsUtil {
+    public static final String IN_CHAMBERS = "In chambers";
 
     public static final String INVALID_BENEFIT_ISSUE_CODE = "Incorrect benefit/issue code combination";
     public static final String BENEFIT_CODE_NOT_IN_USE = "The benefit code selected is not in use";
@@ -341,24 +342,34 @@ public class SscsUtil {
             }
         }
 
-        return "In chambers";
+        return IN_CHAMBERS;
     }
 
     public static HearingDetails getLastValidHearing(SscsCaseData caseData) {
-        for (Hearing hearing : caseData.getHearings()) {
-            if (hearing != null) {
-                HearingDetails hearingDetails = hearing.getValue();
-                if (hearingDetails != null
-                        && org.apache.commons.lang3.StringUtils.isNotBlank(hearingDetails.getHearingDate())
-                        && hearingDetails.getVenue() != null
-                        && org.apache.commons.lang3.StringUtils.isNotBlank(hearingDetails.getVenue().getName())) {
-                    return hearingDetails;
+        List<Hearing> hearings = caseData.getHearings();
+        if (nonNull(hearings)) {
+            for (Hearing hearing : hearings) {
+                if (isHearingValid(hearing)) {
+                    return hearing.getValue();
                 }
             }
         }
+
         return null;
     }
 
+    private static boolean isHearingValid(Hearing hearing) {
+        if (nonNull(hearing)) {
+            HearingDetails hearingDetails = hearing.getValue();
+            return nonNull(hearingDetails)
+                    && isNotBlank(hearingDetails.getHearingDate())
+                    && nonNull(hearingDetails.getVenue())
+                    && isNotBlank(hearingDetails.getVenue().getName());
+        }
+
+        return false;
+    }
+    
     public static DynamicList getBenefitDescriptions() {
         List<DynamicListItem> items = Arrays.stream(Benefit.values())
                 .sorted(Comparator.comparing(Benefit::getDescription))
@@ -465,6 +476,36 @@ public class SscsUtil {
             sscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
             log.info("Set the InterlocReviewState to {},  for case id : {}", sscsCaseData.getInterlocReviewState(), sscsCaseData.getCcdCaseId());
             sscsCaseData.setTranslationWorkOutstanding(YES.getValue());
+        }
+    }
+
+    public static void clearPostHearingRequestFormatAndContentFields(SscsCaseData caseData, PostHearingRequestType requestType) {
+        PostHearing postHearing = caseData.getPostHearing();
+        DocumentGeneration docGen = caseData.getDocumentGeneration();
+
+        switch (requestType) {
+            case SET_ASIDE -> {
+                postHearing.getSetAside().setRequestFormat(null);
+                docGen.setBodyContent(null);
+            }
+            case CORRECTION -> {
+                postHearing.getCorrection().setRequestFormat(null);
+                docGen.setCorrectionBodyContent(null);
+            }
+            case STATEMENT_OF_REASONS -> {
+                postHearing.getStatementOfReasons().setRequestFormat(null);
+                docGen.setStatementOfReasonsBodyContent(null);
+            }
+            case LIBERTY_TO_APPLY -> {
+                postHearing.getLibertyToApply().setRequestFormat(null);
+                docGen.setLibertyToApplyBodyContent(null);
+            }
+            case PERMISSION_TO_APPEAL -> {
+                postHearing.getPermissionToAppeal().setRequestFormat(null);
+                docGen.setPermissionToAppealBodyContent(null);
+            }
+            default -> {
+            }
         }
     }
 }

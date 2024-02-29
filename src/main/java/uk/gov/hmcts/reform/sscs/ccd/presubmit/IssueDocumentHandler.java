@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.text.WordUtils;
 import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -123,11 +122,14 @@ public class IssueDocumentHandler {
                 || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
     }
 
-    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
+    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType,
+                                                                    String templateId, GenerateFile generateFile, String userAuthorisation) {
         return issueDocument(callback, documentType, templateId, generateFile, userAuthorisation, false, false);
     }
 
-    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation, boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
+    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType,
+                                                                    String templateId, GenerateFile generateFile, String userAuthorisation,
+                                                                    boolean isPostHearingsEnabled, boolean isPostHearingsBEnabled) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         if ((ADJOURNMENT_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType))
@@ -136,16 +138,12 @@ public class IssueDocumentHandler {
         }
 
         String documentUrl = Optional.ofNullable(getDocumentFromCaseData(caseData)).map(DocumentLink::getDocumentUrl).orElse(null);
-
         LocalDate dateAdded = Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now());
-
         String documentTypeLabel = getDocumentTypeLabel(caseData, documentType, isPostHearingsEnabled);
-
         String embeddedDocumentTypeLabel = getEmbeddedDocumentTypeLabel(caseData, documentType, documentTypeLabel, isPostHearingsEnabled);
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-
         FormPayload formPayload = createPayload(response, caseData, embeddedDocumentTypeLabel, dateAdded, LocalDate.now(), isScottish, isPostHearingsEnabled, isPostHearingsBEnabled, userAuthorisation);
 
         if (!response.getErrors().isEmpty()) {
@@ -160,11 +158,8 @@ public class IssueDocumentHandler {
                 .build();
 
         log.info(String.format("Generating %s document isScottish = %s", documentTypeLabel, isScottish));
-
         final String generatedFileUrl = generateFile.assemble(params);
-
         documentTypeLabel = documentTypeLabel + ((DRAFT_CORRECTED_NOTICE.equals(documentType) || DRAFT_DECISION_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType)) ? " generated" : " issued");
-
         final String filename = String.format("%s on %s.pdf", documentTypeLabel, dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         DocumentLink previewFile = DocumentLink.builder()
@@ -196,13 +191,19 @@ public class IssueDocumentHandler {
         String embeddedDocumentTypeLabel = (FINAL_DECISION_NOTICE.equals(documentType) || CORRECTION_GRANTED.equals(documentType) ? "Decision Notice" : documentTypeLabel);
 
         if (isPostHearingsEnabled) {
-            PostHearingReviewType postHearingReviewType = caseData.getPostHearing().getReviewType();
+            PostHearing postHearing = caseData.getPostHearing();
+            PostHearingReviewType postHearingReviewType = postHearing.getReviewType();
 
             if (nonNull(postHearingReviewType)) {
+                if (PostHearingReviewType.PERMISSION_TO_APPEAL.equals(postHearingReviewType)
+                        && PermissionToAppealActions.REVIEW.equals(postHearing.getPermissionToAppeal().getAction())) {
+                    return "Review Decision Notice";
+                }
+
                 return postHearingReviewType.getDescriptionEn() + " Decision Notice";
             }
 
-            if (isYes(caseData.getPostHearing().getCorrection().getIsCorrectionFinalDecisionInProgress())) {
+            if (isYes(postHearing.getCorrection().getIsCorrectionFinalDecisionInProgress())) {
                 return documentTypeLabel;
             }
         }
@@ -229,18 +230,18 @@ public class IssueDocumentHandler {
     protected String buildFullName(SscsCaseData caseData) {
         StringBuilder fullNameText = new StringBuilder();
         if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equalsIgnoreCase("Yes") && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
-            fullNameText.append(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
+            fullNameText.append(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle());
             fullNameText.append(", appointee for ");
         }
 
-        fullNameText.append(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle(), ' ', '.'));
+        fullNameText.append(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
 
         return fullNameText.toString();
     }
 
     protected Optional<String> buildAppointeeName(SscsCaseData caseData) {
         if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equalsIgnoreCase("Yes") && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
-            return Optional.of(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
+            return Optional.of(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle());
         } else {
             return Optional.empty();
         }

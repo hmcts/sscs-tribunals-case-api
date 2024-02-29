@@ -3,12 +3,12 @@ plugins {
     id 'pmd'
     id 'org.sonarqube' version '4.3.0.3225'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.7.14'
+    id 'org.springframework.boot' version '2.7.18'
     id 'uk.gov.hmcts.java' version '0.12.43'
     id 'com.gorylenko.gradle-git-properties' version '2.4.1'
     id 'com.github.ben-manes.versions' version '0.46.0'
     id "info.solidsoft.pitest" version '1.9.11'
-    id 'org.owasp.dependencycheck' version '8.3.1'
+    id 'org.owasp.dependencycheck' version '9.0.6'
     id 'au.com.dius.pact' version '4.3.15'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.771'
 }
@@ -166,7 +166,7 @@ dependencyCheck {
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild', 'true') == 'true' ? 7.0 : 11
     suppressionFile = 'config/owasp/suppressions.xml'
 
-    cveValidForHours = 24
+    nvd.validForHours = 24
 
     analyzers {
         retirejs {
@@ -262,27 +262,20 @@ dependencyManagement {
             entry 'snakeyaml'
         }
 
-        // CVE-2022-41881, CVE-2022-41915
-        dependencySet(group: 'io.netty', version: '4.1.95.Final') {
-            entry 'netty-buffer'
-            entry 'netty-common'
-            entry 'netty-codec'
-            entry 'netty-codec-dns'
-            entry 'netty-codec-http'
-            entry 'netty-codec-http2'
-            entry 'netty-codec-socks'
-            entry 'netty-handler'
-            entry 'netty-handler-proxy'
-            entry 'netty-resolver'
-            entry 'netty-resolver-dns'
-            entry 'netty-resolver-dns-classes-macos'
-            entry 'netty-resolver-dns-native-macos'
-            entry 'netty-transport'
-            entry 'netty-transport-classes-epoll'
-            entry 'netty-transport-classes-kqueue'
-            entry 'netty-transport-native-epoll'
-            entry 'netty-transport-native-kqueue'
-            entry 'netty-transport-native-unix-common'
+        //CVE-2023-33202
+        dependencySet(group: 'org.springframework.security', version: '1.1.1') {
+            entry 'spring-security-rsa'
+        }
+
+        //CVE-2024-25710
+        dependencySet(group: 'org.apache.commons', version: '1.26.0') {
+            entry 'commons-compress'
+        }
+
+        //CVE-2023-6378, CVE-2023-6481
+        dependencySet(group: 'ch.qos.logback', version: '1.2.13') {
+            entry 'logback-core'
+            entry 'logback-classic'
         }
 
         imports {
@@ -302,10 +295,10 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-activemq'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security'
 
-    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.8.5'
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.5'
-    implementation group: 'org.springframework.security', name: 'spring-security-config', version: '5.8.5'
-    implementation group: 'org.springframework.security', name: 'spring-security-web', version: '5.8.5'
+    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.8.10'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.10'
+    implementation group: 'org.springframework.security', name: 'spring-security-config', version: '5.8.10'
+    implementation group: 'org.springframework.security', name: 'spring-security-web', version: '5.8.10'
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.4'
@@ -339,11 +332,11 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '7d6e1ce'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.10'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '594f4ff'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.13'
 
-    implementation group: 'com.azure', name: 'azure-core', version: '1.42.0'
-    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.2'
+    implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
+    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
 
     implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.5.8'
 
@@ -377,14 +370,14 @@ dependencies {
     implementation group: 'org.apache.tika', name: 'tika-core', version: '2.8.0'
     implementation group: 'org.apache.tika', name: 'tika-parsers', version: '2.8.0'
 
-    implementation group: 'org.json', name: 'json', version: '20230618'
+    implementation group: 'org.json', name: 'json', version: '20240205'
 
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.7.1'
 
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.81"
     
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.80'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.80'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.86'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.86'
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.13.0'
 
@@ -399,8 +392,8 @@ dependencies {
 
     testImplementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version:  '4.5.14'
 
-    testImplementation group: 'com.azure', name: 'azure-core', version: '1.42.0'
-    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.2'
+    testImplementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
+    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.37.0'
