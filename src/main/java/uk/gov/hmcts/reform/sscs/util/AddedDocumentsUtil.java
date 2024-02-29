@@ -27,7 +27,9 @@ public class AddedDocumentsUtil {
     }
 
     public void clearAddedDocumentsBeforeEventSubmit(SscsCaseData sscsCaseData) {
-        sscsCaseData.getWorkAllocationFields().setAddedDocuments(null);
+        if (workAllocationFeature) {
+            sscsCaseData.getWorkAllocationFields().setAddedDocuments(null);
+        }
     }
 
     public void computeDocumentsAddedThisEvent(SscsCaseData sscsCaseData,
@@ -61,7 +63,9 @@ public class AddedDocumentsUtil {
     }
 
     public void updateScannedDocumentTypes(SscsCaseData sscsCaseData, List<String> documentsAddedThisEvent) {
-        sscsCaseData.getWorkAllocationFields().setScannedDocumentTypes(documentsAddedThisEvent.stream().distinct().collect(Collectors.toList()));
+        if (workAllocationFeature) {
+            sscsCaseData.getWorkAllocationFields().setScannedDocumentTypes(documentsAddedThisEvent.stream().distinct().collect(Collectors.toList()));
+        }
     }
 
     public List<String> addedDocumentTypes(List<? extends AbstractDocument> previousDocuments, List<? extends AbstractDocument> documents) {
