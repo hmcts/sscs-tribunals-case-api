@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientException;
@@ -14,20 +15,18 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 
 @Component
 @Slf4j
+@AllArgsConstructor
 public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final SscsPdfService sscsPdfService;
     private final EmailHelper emailHelper;
-
-    @Autowired
-    public CreateCaseAboutToSubmitHandler(SscsPdfService sscsPdfService, EmailHelper emailHelper) {
-        this.sscsPdfService = sscsPdfService;
-        this.emailHelper = emailHelper;
-    }
+    private final VerbalLanguagesService verbalLanguagesService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -55,6 +54,7 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
         handleBenefitType(caseData);
+        updateLanguage(caseData);
 
         if (!isNull(caseData.getBenefitCode())) {
             if (isNull(caseData.getIssueCode())) {
@@ -71,6 +71,22 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         }
 
         return preSubmitCallbackResponse;
+    }
+
+    private void updateLanguage(SscsCaseData caseData) {
+        Appeal appeal = caseData.getAppeal();
+        if (nonNull(appeal)) {
+            HearingOptions hearingOptions = appeal.getHearingOptions();
+
+            if (nonNull(hearingOptions)) {
+                String syaSelectedLanguage = hearingOptions.getLanguages();
+                Language language = verbalLanguagesService.getVerbalLanguage(syaSelectedLanguage);
+
+                if (nonNull(language)) {
+                    hearingOptions.setLanguages(language.getNameEn());
+                }
+            }
+        }
     }
 
     private void createAppealPdf(SscsCaseData caseData) {
