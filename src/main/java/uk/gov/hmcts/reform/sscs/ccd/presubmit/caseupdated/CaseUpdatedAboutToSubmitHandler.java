@@ -3,12 +3,16 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.checkConfidentiality;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isConfidential;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 
 import java.util.*;
@@ -27,7 +31,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler;
 import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
-import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
@@ -134,7 +137,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             }
         }
 
-        checkConfidentiality(sscsCaseData);
+        sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData));
         updateCaseName(callback, sscsCaseData);
         updateCaseCategoriesIfBenefitTypeUpdated(callback, sscsCaseData, preSubmitCallbackResponse);
         updateLanguage(sscsCaseData);
@@ -256,7 +259,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
 
         if (hasValidHearingOptionsAndWantsToExcludeDates(hearingOptions)) {
-            SscsHelper.validateHearingOptionsAndExcludeDates(response, hearingOptions);
+            response.addErrors(
+                    validateHearingOptionsAndExcludeDates(hearingOptions.getExcludeDates())
+            );
         }
     }
 
@@ -281,7 +286,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private boolean validateBenefitType(BenefitType benefitType, PreSubmitCallbackResponse<SscsCaseData> response) {
-        if (benefitType == null || StringUtils.isEmpty(benefitType.getCode())) {
+        if (benefitType == null || isEmpty(benefitType.getCode())) {
             response.addWarning("Benefit type code is empty");
             return false;
         } else if (Benefit.findBenefitByShortName(benefitType.getCode()).isEmpty()) {
@@ -296,7 +301,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private boolean validateDwpIssuingOffice(MrnDetails mrnDetails, BenefitType benefitType, PreSubmitCallbackResponse<SscsCaseData> response) {
         if (mrnDetails != null) {
-            if (StringUtils.isEmpty(mrnDetails.getDwpIssuingOffice())) {
+            if (isEmpty(mrnDetails.getDwpIssuingOffice())) {
                 response.addWarning("FTA issuing office is empty");
                 return false;
             } else if (Benefit.findBenefitByShortName(benefitType.getCode()).isPresent()) {
@@ -332,7 +337,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
             sscsCaseData.setProcessingVenue(venue);
 
-            if (caseAccessManagementFeature && StringUtils.isNotEmpty(venue)) {
+            if (caseAccessManagementFeature && isNotEmpty(venue)) {
                 String venueEpimsId = venueService.getEpimsIdForVenue(venue);
                 CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
 
@@ -355,18 +360,18 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         if (entity != null) {
             if (entity.getName() != null) {
-                if (StringUtils.isBlank(entity.getName().getFirstName())) {
+                if (isBlank(entity.getName().getFirstName())) {
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", partyType));
                 }
-                if (StringUtils.isBlank(entity.getName().getLastName())) {
+                if (isBlank(entity.getName().getLastName())) {
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", partyType));
                 }
             }
             if (entity.getIdentity() != null) {
-                if (StringUtils.isBlank(entity.getIdentity().getDob())) {
+                if (isBlank(entity.getIdentity().getDob())) {
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "Date of Birth", partyType));
                 }
-                if (StringUtils.isBlank(entity.getIdentity().getNino())) {
+                if (isBlank(entity.getIdentity().getNino())) {
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "National Insurance Number", partyType));
                 }
             }
@@ -402,10 +407,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         List<String> listOfWarnings = new ArrayList<>();
 
         if (entity != null && entity.getName() != null) {
-            if (StringUtils.isBlank(entity.getName().getFirstName())) {
+            if (isBlank(entity.getName().getFirstName())) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", entityType));
             }
-            if (StringUtils.isBlank(entity.getName().getLastName())) {
+            if (isBlank(entity.getName().getLastName())) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", entityType));
             }
         }
@@ -416,7 +421,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         final boolean hasRepresentative = sscsCaseData.isThereARepresentative();
         if (hasRepresentative) {
             Representative representativeInfo = sscsCaseData.getAppeal().getRep();
-            if (StringUtils.isBlank(representativeInfo.getOrganisation())) {
+            if (isBlank(representativeInfo.getOrganisation())) {
                 List<String> warnings = validateRepAndJointPartyCaseData(representativeInfo, "Representative");
                 if (!warnings.isEmpty()) {
                     response.addWarnings(warnings);
