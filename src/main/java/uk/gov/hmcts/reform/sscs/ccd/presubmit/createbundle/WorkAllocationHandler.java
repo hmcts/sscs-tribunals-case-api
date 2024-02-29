@@ -3,13 +3,13 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
+import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -73,12 +73,12 @@ public class WorkAllocationHandler implements PreSubmitCallbackHandler<SscsCaseD
         CaseAssignmentUserRolesResource response = caseAssignmentApi.getUserRoles(
                 tokens.getIdamOauth2Token(),
                 tokens.getServiceAuthorization(),
-                Arrays.asList(Long.toString(caseId)));
+                List.of(Long.toString(caseId)));
 
         if (response != null && response.getCaseAssignmentUserRoles() != null) {
             log.info("WA newly assigned roles {}", response.getCaseAssignmentUserRoles());
             return response.getCaseAssignmentUserRoles().stream()
-                    .map(a -> a.getCaseRole())
+                    .map(CaseAssignmentUserRole::getCaseRole)
                     .distinct()
                     .filter(r -> !excludeRoles.contains(r))
                     .collect(Collectors.toList());
