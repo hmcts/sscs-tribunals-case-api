@@ -14,18 +14,21 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Service
 public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final CcdService ccdService;
+    private final UpdateCcdCaseService updateCcdCaseService;
     private final IdamService idamService;
 
     @Autowired
-    public LinkCaseAboutToSubmitHandler(CcdService ccdService,
+    public LinkCaseAboutToSubmitHandler(CcdService ccdService, UpdateCcdCaseService updateCcdCaseService,
                                         IdamService idamService) {
         this.ccdService = ccdService;
+        this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
     }
 
@@ -113,7 +116,7 @@ public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
                     Consumer<SscsCaseData> caseDataConsumer = caseData -> {
                         caseData.setLinkedCase(linkedCaseList);
                     };
-                    ccdService.updateCaseV2(Long.valueOf(sscsCaseData.getCcdCaseId()), EventType.CASE_UPDATED.getCcdType(), "Case updated", "Linked case added", idamService.getIdamTokens(), caseDataConsumer);
+                    updateCcdCaseService.updateCaseV2(Long.valueOf(sscsCaseData.getCcdCaseId()), EventType.CASE_UPDATED.getCcdType(), "Case updated", "Linked case added", idamService.getIdamTokens(), caseDataConsumer);
                 }
             }
         }
