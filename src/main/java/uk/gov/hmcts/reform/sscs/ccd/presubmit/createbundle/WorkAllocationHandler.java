@@ -31,7 +31,8 @@ public class WorkAllocationHandler implements PreSubmitCallbackHandler<SscsCaseD
 
     private CaseAssignmentApi caseAssignmentApi;
 
-    public WorkAllocationHandler(CaseAssignmentApi caseAssignmentApi, IdamService idamService, @Value("${feature.work-allocation.enabled}") boolean workAllocationFeature) {
+    public WorkAllocationHandler(CaseAssignmentApi caseAssignmentApi, IdamService idamService,
+                                 @Value("${feature.work-allocation.enabled}") boolean workAllocationFeature) {
         this.caseAssignmentApi = caseAssignmentApi;
         this.idamService = idamService;
         this.workAllocationFeature = workAllocationFeature;
