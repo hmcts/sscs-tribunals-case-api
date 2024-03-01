@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +62,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        requireNonNull(callbackType, "callbacktype must not be null");
+        requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && callback.getEvent() == EVENT_TYPE;
@@ -192,7 +191,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, dwpAudioVideoEvidence.stream()
             .map(evidence -> evidence.getValue().getDocumentType())
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList()), EVENT_TYPE);
+                .toList(), EVENT_TYPE);
 
         sort(sscsCaseData.getAudioVideoEvidence());
 

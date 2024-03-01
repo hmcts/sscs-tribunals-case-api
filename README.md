@@ -13,7 +13,7 @@ For versions and complete list of dependencies see build.gradle
 * Gradle
 
 ## Building and deploying the application 
-  
+
 ### Building the application
 
 To build the project execute the following command:
