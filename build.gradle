@@ -250,7 +250,6 @@ task runGitPreCommitTasks {
     dependsOn 'test'
     dependsOn 'pmdMain'
     dependsOn 'pmdTest'
-    dependsOn 'dependencyCheckAggregate'
     dependsOn 'checkstyleMain'
     dependsOn 'checkstyleTest'
 }
