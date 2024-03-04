@@ -30,7 +30,7 @@ import uk.gov.hmcts.reform.sscs.service.servicebus.TopicPublisher;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = {TribunalsCaseApiApplication.class})
 @EnableFeignClients(basePackageClasses = {IdamApi.class})
-public class CCDCallbackOrchestratorControllerSmokeTest {
+public class CcdCallbackOrchestratorControllerSmokeTest {
     @MockBean
     private TopicPublisher topicPublisher;
 

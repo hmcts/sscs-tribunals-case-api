@@ -40,7 +40,7 @@ public class TopicPublisher {
         backoff = @Backoff(delay = 2000, multiplier = 3)
     )
     public void sendMessage(final String message, String caseId, final AtomicReference<Message> msg) {
-        log.info("Sending message for caseId {}", caseId);
+        log.info("Tribs API - Sending message for caseId {}", caseId);
 
         try {
             jmsTemplate.convertAndSend(destination, message, m -> {
@@ -68,7 +68,7 @@ public class TopicPublisher {
 
     @Recover
     public void recoverMessage(Throwable ex) throws Throwable {
-        log.error("TopicPublisher.recover(): Send message failed with exception: ", ex);
+        log.error("Tribs API - TopicPublisher.recover(): Send message failed with exception: ", ex);
         throw ex;
     }
 }
