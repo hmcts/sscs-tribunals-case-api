@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static java.util.Objects.requireNonNull;
+
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-
-import static java.util.Objects.requireNonNull;
 
 @Component
 public class WorkAllocationMigrationHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -18,8 +18,8 @@ public class WorkAllocationMigrationHandler implements PreSubmitCallbackHandler<
         requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-        && callback.getEvent() == EventType.WA_CASE_MIGRATION;
-        }
+            && callback.getEvent() == EventType.WA_CASE_MIGRATION;
+    }
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
