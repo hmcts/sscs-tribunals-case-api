@@ -33,7 +33,7 @@ public class CcdCallbackOrchestratorControllerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        controller = new CcdCallbackOrchestratorController(authorisationService, topicPublisher);
+        controller = new CcdCallbackOrchestratorController(authorisationService, topicPublisher, new ObjectMapper());
     }
 
     @Test
