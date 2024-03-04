@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.reform.sscs.config.SpringConfig;
 import uk.gov.hmcts.reform.sscs.domain.CaseData;
 import uk.gov.hmcts.reform.sscs.exception.OrchestratorJsonException;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
@@ -20,14 +21,13 @@ import uk.gov.hmcts.reform.sscs.service.servicebus.TopicPublisher;
 public class CcdCallbackOrchestratorController {
     private final AuthorisationService authorisationService;
     private final TopicPublisher topicPublisher;
-    private final ObjectMapper mapper;
+    private ObjectMapper mapper;
 
     public CcdCallbackOrchestratorController(final AuthorisationService authorisationService,
-                                             final TopicPublisher topicPublisher,
-                                             final ObjectMapper mapper) {
+                                             final TopicPublisher topicPublisher) {
         this.authorisationService = authorisationService;
         this.topicPublisher = topicPublisher;
-        this.mapper = mapper;
+        this.mapper = SpringConfig.mapper();
     }
 
     @RequestMapping(value = "/send", produces = APPLICATION_JSON_VALUE, method = RequestMethod.POST)
