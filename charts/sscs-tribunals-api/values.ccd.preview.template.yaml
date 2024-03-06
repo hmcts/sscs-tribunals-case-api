@@ -127,8 +127,20 @@ xui-webapp:
 ccd:
   enabled: true
   ccd:
+    adminWeb:
+      enabled: false
+    definitionImporter:
+      enabled: false
+    userProfileImporter:
+      enabled: false
+    apiGatewayWeb:
+      enabled: false
     postgresql:
       enabled: true
+    s2s:
+      enabled: false
+    elastic:
+      enabled: false
   postgresql:
     primary:
       initdb:
