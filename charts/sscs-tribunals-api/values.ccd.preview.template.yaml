@@ -65,12 +65,12 @@ em-ccdorc:
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
 
 ccd-case-document-am-api:
-  enabled: false
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
     environment:
-      CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
+      CCD_DATA_STORE_API_BASE_URL: http://ccd-data-store-api-aat.service.core-compute-aat.internal
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
       OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts
@@ -244,7 +244,7 @@ sscs-tribunals-frontend:
       PCQ_ENABLED: true
       MULTIPLE_DRAFTS_ENABLED: true
       ALLOW_CONFIG_MUTATIONS: true
-      TRIBUNALS_CASE_API_URL: ${SERVICE_FQDN}
+      TRIBUNALS_CASE_API_URL: http://${SERVICE_NAME}-java
       UPLOAD_EVIDENCE_URL: http://${SERVICE_NAME}/evidence/upload
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
