@@ -164,7 +164,7 @@ sscs-evidence-share:
 # click create
 # azure steps should be repeated every time PR is undeployed from preview
 sscs-tya-notif:
-  enabled: false
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/sscs/tya-notif:prod-b07ff0a-20240208095500
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
