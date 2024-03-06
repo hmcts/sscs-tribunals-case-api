@@ -155,6 +155,18 @@ ccd:
         postgresUsername: hmcts
         postgresPassword: "${postgresPassword:hmcts}"
 
+  ccd-user-profile-api:
+    enabled: false
+
+  am-role-assignment-service:
+    enabled: false
+
+  ccd-definition-store-api:
+    enabled: false
+
+  ccd-data-store-api:
+    enabled: false
+
 
 elastic:
   enabled: true
