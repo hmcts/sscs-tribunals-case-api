@@ -124,6 +124,25 @@ xui-webapp:
           - system-user-name
           - system-user-password
 
+ccd:
+  enabled: true
+  ccd:
+    postgresql:
+      enabled: true
+  postgresql:
+    primary:
+      initdb:
+        scripts:
+          init.sql: |
+            CREATE DATABASE "sscsjobscheduler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+  global:
+    enableKeyVaults: true
+    devMode: true
+    postgresql:
+      auth:
+        postgresUsername: hmcts
+        postgresPassword: "${postgresPassword:hmcts}"
+
 
 elastic:
   enabled: true
