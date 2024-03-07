@@ -26,9 +26,6 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
     private final HearingMessagingServiceFactory hearingMessagingServiceFactory;
 
-    private static String GAPS_CASE_PROCEED_WARNING = "This is a GAPS case, If you do want to proceed, then please change the hearing route to List Assist";
-    private static String LIST_ASSIST_HEARING_EXIST_WARNING = "There is already a hearing request in List assist, are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first";
-
     public ReadyToListAboutToSubmitHandler(@Value("${feature.gaps-switchover.enabled}") boolean gapsSwitchOverFeature,
                                            @Autowired RegionalProcessingCenterService regionalProcessingCenterService,
                                            @Autowired HearingMessagingServiceFactory hearingMessagingServiceFactory) {
@@ -59,6 +56,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
             if (!callback.isIgnoreWarnings()) {
                 PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+                String GAPS_CASE_PROCEED_WARNING = "This is a GAPS case, If you do want to proceed, then please change the hearing route to List Assist";
                 response.addWarning(GAPS_CASE_PROCEED_WARNING);
                 return response;
             }
@@ -70,6 +68,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         if (SscsHelper.hasHearingScheduledInTheFuture(sscsCaseData)
                 && !callback.isIgnoreWarnings()) {
             PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+            String LIST_ASSIST_HEARING_EXIST_WARNING = "There is already a hearing request in List assist, are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first";
             response.addWarning(LIST_ASSIST_HEARING_EXIST_WARNING);
             return response;
         }

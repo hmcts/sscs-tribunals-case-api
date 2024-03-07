@@ -1,14 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadhearingrecording;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
@@ -29,6 +31,9 @@ public class UploadHearingRecordingAboutToStartHandler implements PreSubmitCallb
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static DateTimeFormatter resultFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy");
     private static DateTimeFormatter hearingTimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    @Value("${feature.hearing-recording-filter.enabled}")
+    private boolean hearingRecordingFilterEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -58,12 +63,10 @@ public class UploadHearingRecordingAboutToStartHandler implements PreSubmitCallb
         }
 
         List<DynamicListItem> validHearings = sscsCaseData.getHearings().stream()
-                .filter(hearing -> DateTimeUtils.isDateInThePast(
-                        LocalDateTime.parse(hearing.getValue().getHearingDate()
-                                        + " " + checkHearingTime(hearing.getValue().getTime()),
-                                hearingTimeformatter)))
+                .filter(hearing -> hearing.getValue().getHearingStatus() != HearingStatus.CANCELLED)
+                .filter(this::isHearingInThePast)
                 .map(hearing -> new DynamicListItem(hearing.getValue().getHearingId(), selectHearing(hearing)))
-                .collect(Collectors.toList());
+                .toList();
         if (validHearings.isEmpty()) {
             response.addError("No hearing has been conducted on this case");
             return response;
@@ -76,14 +79,36 @@ public class UploadHearingRecordingAboutToStartHandler implements PreSubmitCallb
 
     @NotNull
     private String selectHearing(Hearing hearing) {
-        return hearing.getValue().getVenue().getName() + " "
-            + checkHearingTime(hearing.getValue().getTime()) + " "
-            + LocalDate.parse(hearing.getValue().getHearingDate(), formatter).format(resultFormatter);
+        String venueName = hearing.getValue().getVenue().getName();
+        String hearingTime = checkHearingTime(hearing.getValue().getTime());
+        String hearingDate = LocalDate.parse(hearing.getValue().getHearingDate(), formatter).format(resultFormatter);
+        String returnValue = venueName;
+
+        if (!hearingTime.equals("")) {
+            returnValue += " " + hearingTime;
+        }
+        return returnValue + " " + hearingDate;
+    }
+
+    private boolean isHearingInThePast(Hearing hearing) {
+        String hearingDate = hearing.getValue().getHearingDate();
+        String hearingTime = hearing.getValue().getTime();
+        if (hearingRecordingFilterEnabled && isBlank(hearingDate)) {
+            return false;
+        }
+        if (isBlank(hearingTime)) {
+            LocalDate localDate = LocalDate.parse(hearingDate);
+            return DateTimeUtils.isDateInThePast(localDate.atStartOfDay());
+        }
+        LocalDateTime parsedHearingDateAndTime = LocalDateTime.parse(hearingDate + " " + checkHearingTime(hearingTime), hearingTimeformatter);
+        return DateTimeUtils.isDateInThePast(parsedHearingDateAndTime);
     }
 
     @NotNull
     private String checkHearingTime(String hearingTime) {
-        return (hearingTime.length() == 5) ? (hearingTime + ":00") : hearingTime;
+        if (isBlank(hearingTime)) {
+            return "";
+        }
+        return (hearingTime.length() > 5 ? hearingTime.substring(0, 5) : hearingTime) + ":00";
     }
-
 }

@@ -1,37 +1,39 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.lang.String.join;
 import static java.util.Objects.isNull;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
+import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
 
 @Service
+@Slf4j
+@AllArgsConstructor
 public class UserDetailsService {
-
     protected final IdamClient idamClient;
-
-    @Autowired
-    public UserDetailsService(IdamClient idamClient) {
-        this.idamClient = idamClient;
-    }
+    protected final JudicialRefDataService judicialRefDataService;
 
     public String buildLoggedInUserName(String userAuthorisation) {
-        UserDetails userDetails = getUserDetails(userAuthorisation);
-        return userDetails.getFullName();
+        UserInfo userInfo = getUserInfo(userAuthorisation);
+        return join(" ", userInfo.getGivenName(), userInfo.getFamilyName());
     }
 
     public String buildLoggedInUserSurname(String userAuthorisation) {
-        UserDetails userDetails = getUserDetails(userAuthorisation);
-        return userDetails.getSurname().orElse("");
+        return getUserInfo(userAuthorisation).getFamilyName();
+    }
+
+    public List<String> getUserRoles(String userAuthorisation) {
+        return getUserInfo(userAuthorisation).getRoles();
     }
 
     public String getUserRole(String userAuthorisation) {
-        List<String> users = getUserInfo(userAuthorisation).getRoles();
+        List<String> users = getUserRoles(userAuthorisation);
 
         for (UserRole userRole : UserRole.values()) {
             if (users.contains(userRole.getValue())) {
@@ -50,11 +52,13 @@ public class UserDetailsService {
         return userInfo;
     }
 
-    private UserDetails getUserDetails(String userAuthorisation) throws IllegalStateException {
-        UserDetails userDetails = idamClient.getUserDetails(userAuthorisation);
-        if (userDetails == null) {
-            throw new IllegalStateException("Unable to obtain signed in user details");
-        }
-        return userDetails;
+    public JudicialUserBase getLoggedInUserAsJudicialUser(String userAuthorisation) {
+        UserInfo userInfo = getUserInfo(userAuthorisation);
+
+        String idamId = userInfo.getUid();
+
+        log.info("Getting personal code for idamId: {}", idamId);
+
+        return judicialRefDataService.getJudicialUserFromIdamId(idamId);
     }
 }

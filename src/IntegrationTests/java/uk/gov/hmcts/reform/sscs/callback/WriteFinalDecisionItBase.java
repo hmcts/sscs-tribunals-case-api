@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
@@ -55,6 +56,8 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
 
     @MockBean
     protected UserDetails userDetails;
+    @MockBean
+    protected UserInfo userInfo;
 
     protected abstract String getBenefitType();
 
@@ -72,9 +75,10 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -89,7 +93,7 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -100,7 +104,7 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test, payload.getAppellantName());
         assertNull(payload.getStartDate());
         assertNull(payload.getEndDate());
         assertEquals(true, payload.isIndefinite());

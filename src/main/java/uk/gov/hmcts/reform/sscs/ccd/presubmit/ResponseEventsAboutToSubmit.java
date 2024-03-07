@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsType.SSCS5;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.idam.UserRole.*;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDateTime;
@@ -12,7 +11,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -119,7 +117,7 @@ public class ResponseEventsAboutToSubmit {
                     .equalsIgnoreCase(response.getData().getAppeal().getBenefitType().getCode())
                     && !Benefit.CHILD_SUPPORT.getCaseLoaderKeyId().contains(response.getData().getBenefitCode())) {
                     if (response.getData().getOtherParties() != null
-                        && response.getData().getOtherParties().size() > 0) {
+                        && !response.getData().getOtherParties().isEmpty()) {
                         response.addError("Benefit code cannot be changed on cases with registered 'Other Party'");
                     } else if (!hasErrors) {
                         response.addWarning("The benefit code will be changed to a non-child support benefit code");
@@ -193,20 +191,20 @@ public class ResponseEventsAboutToSubmit {
             .filter(benefit -> SSCS5.equals(benefit.getSscsType()))
             .map(Benefit::getCaseLoaderKeyId)
             .flatMap(Collection::stream)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private List<String> buildSscs5BenefitCode() {
         return Arrays.stream(Benefit.values())
             .filter(benefit -> SSCS5.equals(benefit.getSscsType()))
             .map(Benefit::getShortName)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private List<String> buildSscs5BenefitDescription() {
         return Arrays.stream(Benefit.values())
             .filter(benefit -> SSCS5.equals(benefit.getSscsType()))
             .map(Benefit::getDescription)
-            .collect(Collectors.toList());
+            .toList();
     }
 }

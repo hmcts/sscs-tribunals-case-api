@@ -50,9 +50,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -67,7 +68,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -78,7 +79,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -102,20 +103,20 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
             + "\n"
             + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
             + "\n"
-            + "An Test has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
+            + "AN Test has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
             + "\n"
             + "In applying the Work Capability Assessment 15 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013 made up as follows:\n"
             + "\n"
             + "1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.\ta.Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.\t15\n"
             + "\n"
             + "\n"
-            + "An Test does not have limited capability for work-related activity because no descriptor from Schedule 7 of the UC Regulations applied. Schedule 9, paragraph 4 did not apply.\n"
+            + "AN Test does not have limited capability for work-related activity because no descriptor from Schedule 7 of the UC Regulations applied. Schedule 9, paragraph 4 did not apply.\n"
             + "\n"
             + "My reasons for decision\n"
             + "\n"
             + "Something else.\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. An Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
                 + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
     }
 
@@ -127,9 +128,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -144,7 +146,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -155,7 +157,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -178,7 +180,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
             + "\n"
             + "Something else.\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. An Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
                 + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
     }
 
@@ -197,9 +199,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -214,7 +217,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -225,7 +228,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isAllowed());
         assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -250,7 +253,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
             + "\n"
             + "The decision made by the Secretary of State on 01/09/2018 is confirmed.\n"
             + "\n"
-            + "An Test does not have limited capability for work and cannot be treated as having limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
+            + "AN Test does not have limited capability for work and cannot be treated as having limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
             + "\n"
             + "In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013. This is insufficient to meet the threshold for the test. Schedule 8, paragraph 4 of the UC Regulations did not apply.\n"
             + "\n"
@@ -261,7 +264,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
             + "\n"
             + "Something else.\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. An Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
                 + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
     }
 
@@ -274,9 +277,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -292,7 +296,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -303,7 +307,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isAllowed());
         assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -329,9 +333,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -346,7 +351,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -357,7 +362,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isAllowed());
         assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -389,9 +394,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -413,9 +419,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -436,9 +443,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -459,9 +467,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -481,9 +490,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -505,9 +515,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -528,9 +539,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -545,7 +557,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -556,7 +568,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isAllowed());
         assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -581,9 +593,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -604,9 +617,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -627,9 +641,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -651,9 +666,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -668,7 +684,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -679,7 +695,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -704,9 +720,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -727,9 +744,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -750,9 +768,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -773,9 +792,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -790,7 +810,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -801,7 +821,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -826,9 +846,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -850,9 +871,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -873,9 +895,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -890,7 +913,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -901,7 +924,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -933,9 +956,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -956,9 +980,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -979,9 +1004,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1004,9 +1030,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1021,7 +1048,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -1032,7 +1059,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -1064,9 +1091,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1087,9 +1115,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1112,9 +1141,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1137,9 +1167,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1162,9 +1193,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1179,7 +1211,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -1190,7 +1222,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -1222,9 +1254,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1245,9 +1278,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1270,9 +1304,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1295,9 +1330,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1322,9 +1358,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1339,7 +1376,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -1350,7 +1387,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -1382,9 +1419,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1405,9 +1443,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1422,7 +1461,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -1433,7 +1472,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -1465,9 +1504,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1488,9 +1528,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1505,7 +1546,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -1516,7 +1557,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isAllowed());
         assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -1540,7 +1581,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
             + "\n"
             + "Something else.\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. An Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
                 + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
         UcTemplateContent ucTemplateContent = (UcTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(UcScenario.SCENARIO_10, ucTemplateContent.getScenario());
@@ -1554,9 +1595,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1571,7 +1613,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -1582,7 +1624,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -1606,7 +1648,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
             + "\n"
             + "Something else.\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. An Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
                 + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
         UcTemplateContent ucTemplateContent = (UcTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(UcScenario.SCENARIO_10, ucTemplateContent.getScenario());
@@ -1621,9 +1663,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1638,7 +1681,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -1649,7 +1692,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -1673,7 +1716,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
             + "\n"
             + "Something else.\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. An Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
                 + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
     }
 
@@ -1685,9 +1728,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1702,7 +1746,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
-        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals(AN_Test, parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
@@ -1713,7 +1757,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
+        assertEquals(AN_Test,payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
@@ -1745,9 +1789,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1771,9 +1816,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1794,9 +1840,10 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);

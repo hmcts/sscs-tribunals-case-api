@@ -104,6 +104,14 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             if (isPostHearingsEnabled && nonNull(postHearingRequestType)) {
                 return handlePostHearing(callback, caseData, postHearingRequestType);
             }
+
+            if (isPostHearingsBEnabled && isPostHearingOtherRequest(caseData)) {
+                caseData.setInterlocReviewState(REVIEW_BY_JUDGE);
+                return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                        EventType.POST_HEARING_OTHER.getCcdType(), "Post hearing application 'Other'",
+                        "Post hearing application 'Other'", idamService.getIdamTokens());
+            }
+
             setSelectWhoReviewsCaseField(caseData, REVIEW_BY_JUDGE);
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
                     REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
@@ -135,28 +143,39 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
 
     private SscsCaseDetails handlePostHearing(Callback<SscsCaseData> callback, SscsCaseData caseData, PostHearingRequestType postHearingRequestType) {
         switch (postHearingRequestType) {
-            case SET_ASIDE:
+            case SET_ASIDE -> {
                 return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
-                    REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
-                    EventType.SET_ASIDE_REQUEST, "Set aside request");
-            case CORRECTION:
+                        REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
+                        EventType.SET_ASIDE_REQUEST, "Set aside request");
+            }
+            case CORRECTION -> {
                 return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
-                    REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
-                    EventType.CORRECTION_REQUEST, "Correction request");
-            case STATEMENT_OF_REASONS:
+                        REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
+                        EventType.CORRECTION_REQUEST, "Correction request");
+            }
+            case STATEMENT_OF_REASONS -> {
                 return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
-                    REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
-                    EventType.SOR_REQUEST, "Statement of reasons request");
-            case LIBERTY_TO_APPLY:
+                        REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
+                        EventType.SOR_REQUEST, "Statement of reasons request");
+            }
+            case LIBERTY_TO_APPLY -> {
                 if (isPostHearingsBEnabled) {
                     return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
-                        REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
-                        EventType.LIBERTY_TO_APPLY_REQUEST, "Liberty to apply request");
+                            REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
+                            EventType.LIBERTY_TO_APPLY_REQUEST, "Liberty to apply request");
                 }
                 throw new IllegalStateException("Post hearings B is not enabled");
-            case PERMISSION_TO_APPEAL:
-            default:
-                throw new IllegalArgumentException("Post hearing request type is not implemented or recognised: " + postHearingRequestType);
+            }
+            case PERMISSION_TO_APPEAL -> {
+                if (isPostHearingsBEnabled) {
+                    return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
+                            REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
+                            EventType.PERMISSION_TO_APPEAL_REQUEST, "Permission to appeal request");
+                }
+                throw new IllegalStateException("Post hearings B is not enabled");
+            }
+            default ->
+                    throw new IllegalArgumentException("Post hearing request type is not implemented or recognised: " + postHearingRequestType);
         }
     }
 
@@ -164,6 +183,13 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         return emptyIfNull(caseData.getSscsDocument()).stream()
                 .anyMatch(document -> document.getValue().getDocumentType() != null
                         && document.getValue().getDocumentType().equals(DocumentType.POSTPONEMENT_REQUEST
+                        .getValue()));
+    }
+
+    private boolean isPostHearingOtherRequest(SscsCaseData caseData) {
+        return emptyIfNull(caseData.getSscsDocument()).stream()
+                .anyMatch(document -> document.getValue().getDocumentType() != null
+                        && document.getValue().getDocumentType().equals(DocumentType.POST_HEARING_OTHER
                         .getValue()));
     }
 

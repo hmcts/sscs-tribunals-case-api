@@ -4,6 +4,10 @@ tags:
 
 java:
   image: ${IMAGE_NAME}
+  memoryLimits: "8Gi"
+  memoryRequests: "1Gi"
+  cpuRequests: "2"
+  cpuLimits: 2000m
   readinessDelay: 45
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
@@ -22,6 +26,7 @@ java:
     IDAM_S2S-AUTH_MICROSERVICE: ${IDAM_S2S_AUTH_MICROSERVICE}
     IDAM_SSCS_SYSTEMUPDATE_USER: ${IDAM_SSCS_SYSTEMUPDATE_USER}
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
+    CCD_CALLBACK_ORCHESTRATOR_API_URL: http://${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     CORE_CASE_DATA_JURISDICTION_ID: SSCS
     CORE_CASE_DATA_CASE_TYPE_ID: Benefit
     TEST_URL: http://${SERVICE_NAME}
@@ -31,6 +36,11 @@ java:
     SCHEDULE_LISTING_FEATURE: true
     POST_HEARINGS_FEATURE: true
     POST_HEARINGS_B_FEATURE: true
+    ADJOURNMENT_FEATURE: true
+    GAPS_SWITCHOVER_FEATURE: true
+    ELASTIC_SEARCH_FEATURE: true
+    ELINKS_V2_FEATURE_ENABLED: true
+    DUMMY: true
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -77,12 +87,14 @@ ccd-case-document-am-api:
 xui-webapp:
   enabled: true
   nodejs:
+    memoryLimits: "4Gi"
+    cpuLimits: 2000m
+    memoryRequests: "1Gi"
+    cpuRequests: "1"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
     ingressHost: xui-${SERVICE_FQDN}
-    memoryLimits: 1836Mi
-    cpuLimits: 1900m
     environment:
       HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
       HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
@@ -100,6 +112,7 @@ xui-webapp:
       SERVICES_PRD_JUDICIAL_API: http://rd-judicial-api-aat.service.core-compute-aat.internal
       SERVICES_PRD_COMMONDATA_API: http://rd-commondata-api-aat.service.core-compute-aat.internal
       SERVICES_DOCUMENTS_API_V2: http://${SERVICE_NAME}-ccd-case-document-am-api
+      GLOBAL_SEARCH_SERVICES: IA,CIVIL,PRIVATELAW,PUBLICLAW,SSCS
       JURISDICTIONS: SSCS
       LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
       FEATURE_REDIS_ENABLED: false
@@ -109,6 +122,8 @@ xui-webapp:
       FEATURE_TERMS_AND_CONDITIONS_ENABLED: false
       FEATURE_HELMET_ENABLED: false
       FEATURE_OIDC_ENABLED: false
+      ALLOW_CONFIG_MUTATIONS: true
+      FEATURE_JRD_E_LINKS_V2_ENABLED: true
       NOW: false
       REDISCLOUD_URL: http://dummyrediscloudurl
       UV_THREADPOOL_SIZE: 128
@@ -170,7 +185,7 @@ ccd:
     postgresql:
       auth:
         postgresUsername: hmcts
-        postgresPassword: hmcts
+        postgresPassword: "${postgresPassword:hmcts}"
 
   am-role-assignment-service:
     java:
@@ -218,7 +233,7 @@ ccd:
     nameOverride: ${SERVICE_NAME}-es
     clusterName: "es"
     replicas: 1
-    
+
   logstash:
     image: hmctspublic.azurecr.io/imported/logstash/logstash
     imageTag: "7.16.1"
@@ -394,14 +409,17 @@ ccd:
                 timeout => 60
             }
         }
-        
+
   ccd-admin-web:
     nodejs:
       image: hmctspublic.azurecr.io/ccd/admin-web:latest
       ingressHost: admin-web-${SERVICE_FQDN}
       environment:
+        ADMINWEB_GLOBAL_SEARCH_INDEX_URL: http://${SERVICE_NAME}-ccd-definition-store/elastic-support/global-search/index
+        ADMINWEB_ELASTIC_CASE_TYPES_URL: http://${SERVICE_NAME}-ccd-definition-store/elastic-support/case-types
         IDAM_ADMIN_WEB_SERVICE_KEY: ${ADMIN_S2S_KEY}
         IDAM_OAUTH2_AW_CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
+        ALLOW_CONFIG_MUTATIONS: true
       keyVaults: [ ]
 
 
@@ -473,7 +491,9 @@ ccd:
         IDAM_SERVICE_KEY: ${CCD_API_GATEWAY_S2S_SECRET}
         IDAM_OAUTH2_CLIENT_SECRET: ${CCD_API_GATEWAY_IDAM_CLIENT_SECRET}
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
+        ALLOW_CONFIG_MUTATIONS: true
       ingressIP: ${INGRESS_IP}
+      ingressHost: gateway-${SERVICE_FQDN}
       disableKeyVaults: true
 
   ccd-user-profile-importer:
@@ -488,7 +508,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S-10603-1
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:6.3.9nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -507,7 +527,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S-10603-1
+      CCD_DEF_VERSION: 6.3.9nonProd
     secrets: []
     userRoles:
       - citizen
@@ -517,6 +537,7 @@ ccd:
       - caseworker-sscs-anonymouscitizen
       - caseworker-sscs-callagent
       - caseworker-sscs-judge
+      - caseworker-sscs-judge-salaried
       - caseworker-sscs-clerk
       - caseworker-sscs-dwpresponsewriter
       - caseworker-sscs-registrar
@@ -526,6 +547,9 @@ ccd:
       - caseworker-sscs-bulkscan
       - caseworker-sscs-pcqextractor
       - caseworker-sscs-hmrcresponsewriter
+      - caseworker-wa-task-configuration
+      - caseworker-ras-validation
+      - GS_profile
 elastic:
   enabled: true
 
@@ -549,6 +573,7 @@ sscs-evidence-share:
       ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
       ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
       CASE_ACCESS_MANAGEMENT_FEATURE: true
+      ISSUE_GENERIC_LETTER: true
     secrets:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
@@ -564,7 +589,7 @@ sscs-evidence-share:
 # click create
 # azure steps should be repeated every time PR is undeployed from preview
 sscs-tya-notif:
-  enabled: false
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/sscs/tya-notif:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
@@ -579,11 +604,14 @@ sscs-tya-notif:
       JOB_SCHEDULER_DB_HOST: ${SERVICE_NAME}-postgresql
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
       JOB_SCHEDULER_DB_USERNAME: hmcts
-      JOB_SCHEDULER_DB_PASSWORD: hmcts
+      JOB_SCHEDULER_DB_PASSWORD: "${JOB_SCHEDULER:hmcts}"
       HOURS_START_TIME: 0
       HOURS_END_TIME: 23
       RUN_DB_MIGRATION_ON_STARTUP: true
       TEST_RECIPIENTS_POSTCODE: "*"
+      POST_HEARINGS_FEATURE: true
+      POST_HEARINGS_B_FEATURE: true
+      DUMMY: true
     secrets:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
@@ -626,7 +654,9 @@ sscs-ccd-callback-orchestrator:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:prod-99baf80-20230629135543
+    memoryLimits: "2Gi"
+    cpuLimits: 2000m
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
@@ -636,6 +666,7 @@ sscs-tribunals-frontend:
       FT_WELSH: true
       PCQ_ENABLED: true
       MULTIPLE_DRAFTS_ENABLED: true
+      ALLOW_CONFIG_MUTATIONS: true
       TRIBUNALS_CASE_API_URL: http://${SERVICE_NAME}-java
       UPLOAD_EVIDENCE_URL: http://${SERVICE_NAME}/evidence/upload
       SERVICES_IDAM_LOGIN_URL: https://idam-web-public.aat.platform.hmcts.net/login
@@ -750,7 +781,7 @@ hmc-cft-hearing-service:
 servicebus:
   enabled: true
   resourceGroup: sscs-aso-preview-rg
-  sbNamespace: sscs
+  sbNamespace: sscs-servicebus-preview
   #Each topic/queue matches up to one used in the config above
   setup:
     topics:

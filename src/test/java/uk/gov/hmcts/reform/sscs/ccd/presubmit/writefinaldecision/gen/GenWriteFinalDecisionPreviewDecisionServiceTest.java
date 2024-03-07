@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.gen;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -127,7 +129,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
     @Override
     public void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate() {
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-10-10");
@@ -135,7 +137,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true, false, true,
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, true, false, true,
             documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
@@ -150,14 +152,14 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     public void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate() {
         setDescriptorFlowIndicator("no", sscsCaseData);
         setCommonNonDescriptorRoutePreviewParams(sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("no");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(NO);
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGeneratedDate("2018-10-10");
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true, true, true,
             false, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
@@ -174,7 +176,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         setCommonNonDescriptorRoutePreviewParams(sscsCaseData);
 
         setDescriptorFlowIndicator("no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -193,7 +195,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         boolean setAsideExpectation = true;
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, false, true,
             documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
@@ -234,13 +236,13 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         otherPartyList.add(otherPartyCcdValue1);
         otherPartyList.add(otherPartyCcdValue2);
         sscsCaseData.setOtherParties(otherPartyList);
-        OtherPartyAttendedQuestion otherPartyAttendedQuestion1 = OtherPartyAttendedQuestion.builder().value(OtherPartyAttendedQuestionDetails.builder().otherPartyName("otherPartyFirstName1 otherPartyLastName1").attendedOtherParty(YesNo.YES).build()).build();
-        OtherPartyAttendedQuestion otherPartyAttendedQuestion2 = OtherPartyAttendedQuestion.builder().value(OtherPartyAttendedQuestionDetails.builder().otherPartyName("otherPartyFirstName2 otherPartyLastName2").attendedOtherParty(YesNo.NO).build()).build();
+        OtherPartyAttendedQuestion otherPartyAttendedQuestion1 = OtherPartyAttendedQuestion.builder().value(OtherPartyAttendedQuestionDetails.builder().otherPartyName("otherPartyFirstName1 otherPartyLastName1").attendedOtherParty(YES).build()).build();
+        OtherPartyAttendedQuestion otherPartyAttendedQuestion2 = OtherPartyAttendedQuestion.builder().value(OtherPartyAttendedQuestionDetails.builder().otherPartyName("otherPartyFirstName2 otherPartyLastName2").attendedOtherParty(NO).build()).build();
         List<OtherPartyAttendedQuestion> otherPartyAttendedQuestionList = new ArrayList<>();
         otherPartyAttendedQuestionList.add(otherPartyAttendedQuestion1);
         otherPartyAttendedQuestionList.add(otherPartyAttendedQuestion2);
         sscsCaseData.getSscsFinalDecisionCaseData().setOtherPartyAttendedQuestions(otherPartyAttendedQuestionList);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -259,7 +261,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         boolean setAsideExpectation = true;
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10",
                 appealAllowedExpectation, setAsideExpectation, true, false, true,
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
@@ -293,7 +295,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         setCommonNonDescriptorRoutePreviewParams(sscsCaseData);
 
         setDescriptorFlowIndicator("no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -312,7 +314,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         boolean setAsideExpectation = false;
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, false, true,
             documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
@@ -347,7 +349,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionReasons(new ArrayList<>());
 
         setDescriptorFlowIndicator("no", sscsCaseData);
-        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -366,7 +368,7 @@ public class GenWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         boolean setAsideExpectation = true;
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, true, false, true,
             documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 

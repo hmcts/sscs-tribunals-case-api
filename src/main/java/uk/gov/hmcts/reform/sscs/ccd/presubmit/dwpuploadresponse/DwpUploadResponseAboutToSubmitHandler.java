@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
 import static java.lang.String.format;
 import static java.util.Collections.sort;
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
@@ -9,11 +10,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.PHE_REQ
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.assignNewOtherPartyData;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyUcb;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isValidBenefitTypeForConfidentiality;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.updateOtherPartyUcb;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.sendNewOtherPartyNotification;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,18 +32,22 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
-import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
 import uk.gov.hmcts.reform.sscs.service.AddNoteService;
 import uk.gov.hmcts.reform.sscs.service.DwpDocumentService;
@@ -92,6 +97,8 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             return preSubmitCallbackResponse;
         }
 
+        updateDwpState(sscsCaseData);
+
         addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
         setCaseCode(preSubmitCallbackResponse, callback);
 
@@ -107,20 +114,43 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         checkSscs2AndSscs5Confidentiality(preSubmitCallbackResponse, sscsCaseData);
 
-        if (isValidBenefitTypeForConfidentiality(sscsCaseData)
+        if (isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType())
                 && sscsCaseData.getOtherParties() != null) {
-            assignNewOtherPartyData(sscsCaseData.getOtherParties());
-            updateOtherPartyUcb(sscsCaseData);
+            sscsCaseData.getOtherParties().forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
+                    .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
+            sscsCaseData.setOtherPartyUcb(getOtherPartyUcb(sscsCaseData.getOtherParties()));
             if (sscsCaseData.getOtherParties().stream().anyMatch(o -> YesNo.isYes(o.getValue().getSendNewOtherPartyNotification()))) {
                 sscsCaseData.setDwpDueDate(null);
             }
         }
-        SscsHelper.updateDirectionDueDateByAnAmountOfDays(sscsCaseData);
+        sscsCaseData.setDirectionDueDate(getUpdatedDirectionDueDate(sscsCaseData));
+        updateBenefitType(sscsCaseData);
         return preSubmitCallbackResponse;
     }
 
+
+    private void updateBenefitType(SscsCaseData caseData) {
+        String benefitCode = caseData.getBenefitCode();
+        if (nonNull(benefitCode)) {
+            Benefit benefit = Benefit.getBenefitFromBenefitCode(benefitCode);
+            BenefitType benefitType = new BenefitType(benefit.getShortName(), benefit.getDescription(), null);
+
+            caseData.getAppeal().setBenefitType(benefitType);
+        }
+    }
+
+    private void updateDwpState(SscsCaseData sscsCaseData) {
+        DynamicList dynamicDwpState = sscsCaseData.getDynamicDwpState();
+
+        if (nonNull(dynamicDwpState)) {
+            DynamicListItem selectedState = dynamicDwpState.getValue();
+            sscsCaseData.setDwpState(DwpState.fromValue(selectedState.getCode()));
+            sscsCaseData.setDynamicDwpState(null);
+        }
+    }
+
     private void checkSscs2AndSscs5Confidentiality(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse, SscsCaseData sscsCaseData) {
-        if (isValidBenefitTypeForConfidentiality(sscsCaseData)) {
+        if (isValidBenefitTypeForConfidentiality(sscsCaseData.getAppeal().getBenefitType())) {
             if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
                 if (otherPartyHasConfidentiality(sscsCaseData)) {
                     preSubmitCallbackResponse.addError("Other Party requires confidentiality, upload edited and unedited responses");
@@ -143,10 +173,8 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private boolean otherPartyHasConfidentiality(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getOtherParties() != null) {
-            Optional otherParty = sscsCaseData.getOtherParties().stream().filter(op -> YesNo.isYes(op.getValue().getConfidentialityRequired())).findAny();
-            if (otherParty.isPresent()) {
-                return true;
-            }
+            Optional<CcdValue<OtherParty>> otherParty = sscsCaseData.getOtherParties().stream().filter(op -> YesNo.isYes(op.getValue().getConfidentialityRequired())).findAny();
+            return otherParty.isPresent();
         }
         return false;
     }
@@ -178,7 +206,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, dwpAudioVideoEvidence.stream()
             .map(evidence -> evidence.getValue().getDocumentType())
                 .filter(Objects::nonNull)
-            .collect(Collectors.toUnmodifiableList()), EVENT_TYPE);
+            .toList(), EVENT_TYPE);
 
         sort(sscsCaseData.getAudioVideoEvidence());
 

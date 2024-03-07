@@ -6,20 +6,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +29,7 @@ import junitparams.Parameters;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -41,11 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
-import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.*;
 
 @RunWith(JUnitParamsRunner.class)
 public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
@@ -68,7 +62,13 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     private FooterService footerService;
 
     @Mock
+    private UserDetailsService userDetailsService;
+
+    @Mock
     private ListAssistHearingMessageHelper hearingMessageHelper;
+
+    @Mock
+    private VenueDataLoader venueDataLoader;
 
     private SscsCaseData sscsCaseData;
 
@@ -87,8 +87,8 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
         decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), Arrays.asList(esaecisionNoticeOutcomeService), new ArrayList<>());
 
-        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, false);
+        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, userDetailsService,
+                validator, hearingMessageHelper, venueDataLoader, false);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -169,12 +169,48 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenAnIssueFinalDecisionEventRemoveDraftDecisionNotice() {
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice(NO);
+
+        SscsDocument document1 = buildSscsDocumentWithDocumentType(DRAFT_DECISION_NOTICE.getValue());
+        SscsDocument document2 = buildSscsDocumentWithDocumentType(FINAL_DECISION_NOTICE.getValue());
+
+        List<SscsDocument> documentList = new ArrayList<>(List.of(document1, document2));
+        callback.getCaseDetails().getCaseData().setSscsDocument(documentList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+        assertEquals(1, response.getData().getSscsDocument().size());
+    }
+
+    @Test
+    public void givenAnIssueFinalDecisionEventWhenDocumentTypeIsNullThenRemoveDraftDecisionNotice() {
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice(NO);
+
+        SscsDocument document1 = buildSscsDocumentWithDocumentType(FINAL_DECISION_NOTICE.getValue());
+        SscsDocument document3 = buildSscsDocumentWithDocumentType(DRAFT_DECISION_NOTICE.getValue());
+
+        List<SscsDocument> documentList = new ArrayList<>(List.of(document1, document3));
+        callback.getCaseDetails().getCaseData().setSscsDocument(documentList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+        assertEquals(1, response.getData().getSscsDocument().size());
+    }
+
+    @Test
     public void givenAnIssueFinalDecisionEventForGenerateNoticeFlowWhenAllowedOrRefusedIsNull_ThenDisplayAnError() {
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(documentLink);
         callback.getCaseDetails().getCaseData().setWcaAppeal(YES);
         callback.getCaseDetails().getCaseData().setSupportGroupOnlyAppeal("Yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(null);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -234,155 +270,11 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAnIssueFinalDecisionEventForGenerateNoticeFlowWhenAllowedOrRefusedIsNotNull_ThenDoNotDisplayAnError() {
-        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(documentLink);
-        callback.getCaseDetails().getCaseData().setWcaAppeal(YES);
-        callback.getCaseDetails().getCaseData().setSupportGroupOnlyAppeal("Yes");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
-
-        HearingDetails hearingDetails = HearingDetails.builder()
-                .hearingDate(LocalDate.now().plusDays(1).toString())
-                .start(LocalDateTime.now().plusDays(1))
-                .hearingId(String.valueOf(1))
-                .venue(Venue.builder().name("Venue 1").build())
-                .time("12:00")
-                .build();
-        Hearing hearing = Hearing.builder().value(hearingDetails).build();
-        callback.getCaseDetails().getCaseData().setHearings(List.of(hearing));
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(0, response.getErrors().size());
-
-        verify(footerService).createFooterAndAddDocToCase(eq(documentLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null), eq(null));
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
-        verifyNoMoreInteractions(hearingMessageHelper);
-        assertEquals(FINAL_DECISION_ISSUED, response.getData().getDwpState());
-
-        assertEquals("decisionInFavourOfAppellant", response.getData().getOutcome());
-
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionTypeOfHearing());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPresentingOfficerAttendedQuestion());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused());
-        assertNull(sscsCaseData.getWcaAppeal());
-        assertNull(sscsCaseData.getSupportGroupOnlyAppeal());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionStartDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionAppropriatenessOfBehaviourQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionAwarenessOfHazardsQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionCommunicationQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionConsciousnessQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionCopingWithChangeQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionGettingAboutQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionLearningTasksQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionLossOfControlQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMakingSelfUnderstoodQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionManualDexterityQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMentalAssessmentQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMobilisingUnaidedQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionNavigationQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionPersonalActionQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionPickingUpQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionReachingQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSocialEngagementQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionStandingAndSittingQuestion());
-        assertNull(sscsCaseData.getDwpReassessTheAward());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionReasons());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPageSectionReference());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow());
-        assertNull(sscsCaseData.getWcaAppeal());
-        assertNull(sscsCaseData.getSupportGroupOnlyAppeal());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getDoesRegulation35Apply());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getDoesRegulation29Apply());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused());
-    }
-
-
-    @Test
-    @Parameters({
-        "allowed, decisionInFavourOfAppellant",
-        "refused, decisionUpheld"
-    })
-    public void givenAnIssueFinalDecisionEvent_thenCreateDecisionWithFooterAndClearTransientFields(String allowedOrRefused, String expectedOutcome) {
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(documentLink);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused(allowedOrRefused);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(0, response.getErrors().size());
-
-        verify(footerService).createFooterAndAddDocToCase(eq(documentLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null), eq(null));
-        assertEquals(FINAL_DECISION_ISSUED, response.getData().getDwpState());
-
-        assertEquals(expectedOutcome, response.getData().getOutcome());
-
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionTypeOfHearing());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPresentingOfficerAttendedQuestion());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAppellantAttendedQuestion());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused());
-        assertNull(sscsCaseData.getWcaAppeal());
-        assertNull(sscsCaseData.getSupportGroupOnlyAppeal());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionStartDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDateType());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionEndDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionDateOfDecision());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionAppropriatenessOfBehaviourQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionAwarenessOfHazardsQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionCommunicationQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionConsciousnessQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionCopingWithChangeQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionGettingAboutQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionLearningTasksQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionLossOfControlQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMakingSelfUnderstoodQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionManualDexterityQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMentalAssessmentQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMobilisingUnaidedQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionNavigationQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionPersonalActionQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionPickingUpQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionReachingQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSocialEngagementQuestion());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionStandingAndSittingQuestion());
-        assertNull(sscsCaseData.getDwpReassessTheAward());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionReasons());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPageSectionReference());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow());
-        assertNull(sscsCaseData.getWcaAppeal());
-        assertNull(sscsCaseData.getSupportGroupOnlyAppeal());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getDoesRegulation35Apply());
-        assertNull(sscsCaseData.getSscsEsaCaseData().getDoesRegulation29Apply());
-        assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionAllowedOrRefused());
-    }
-
-    @Test
     public void givenAnIssueFinalDecisionEventAndNoDraftDecisionOnCase_thenDisplayAnError() {
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(null);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -394,7 +286,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     public void givenANonPdfDecisionNotice_thenDisplayAnError() {
         documentLink = DocumentLink.builder().documentUrl("test.doc").build();
         sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(documentLink);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice("yes");
+        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
         callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
@@ -426,7 +318,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
         sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
         sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
-        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice(YES);
         sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         callback.getCaseDetails().getCaseData().setState(State.VOID_STATE);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -439,7 +331,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
         sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
         sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
-        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice(YES);
         sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         callback.getCaseDetails().getCaseData().setState(State.VOID_STATE);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -449,11 +341,43 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenAnIssueFinalDecisionEventWithPostHearingsTrueAndCorrectionNotInProgress_shouldUpdateStateAndDwpStateWhenStateIsNotReadyToListOrWithFta() {
+        ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", true);
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice(YES);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        callback.getCaseDetails().getCaseData().setState(State.VOID_STATE);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn("judge name");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getState(), is(State.DORMANT_APPEAL_STATE));
+        assertThat(response.getData().getDwpState(), is(FINAL_DECISION_ISSUED));
+    }
+
+    @Test
+    public void givenAnIssueFinalDecisionEventWithPostHearingsTrueAndCorrectionInProgress_dontUpdateState() {
+        ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", true);
+        sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(YES);
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice(YES);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        callback.getCaseDetails().getCaseData().setState(State.VOID_STATE);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(" judge name");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getState(), is(State.VOID_STATE));
+    }
+
+    @Test
     public void givenAnIssueFinalDecisionEvent_shouldNotUpdateStateAndDwpStateWhenStateIsReadyToList() {
         SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
         sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
         sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
-        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice(YES);
         sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         callback.getCaseDetails().getCaseData().setState(State.READY_TO_LIST);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.DIRECTION_RESPONDED);
@@ -468,7 +392,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
         sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
         sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
-        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice(YES);
         sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         callback.getCaseDetails().getCaseData().setState(State.WITH_DWP);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.DIRECTION_RESPONDED);
@@ -479,156 +403,47 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAnIssueFinalDecisionEventIfHearingsIsNull_ThenDoNotSendHearingCancellationRequest() {
-        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
-
-        DocumentLink docLink = DocumentLink.builder()
-                .documentUrl("bla.com")
-                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-                .build();
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        callback.getCaseDetails().getCaseData().setHearings(null);
+    public void givenWriteFinalDecisionPostHearingsEnabledAndNoNullIssueFinalDate_shouldNotUpdateFinalCaseData() {
+        ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", true);
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice(YES);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        callback.getCaseDetails().getCaseData().setState(State.WITH_DWP);
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.DIRECTION_RESPONDED);
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionIssuedDate(LocalDate.now());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertEquals(0, response.getErrors().size());
-        verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+
+        Assertions.assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionIdamSurname());
+        Assertions.assertNull(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionGeneratedDate());
     }
 
     @Test
-    public void givenAnIssueFinalDecisionEventIfHearingsIsInThePastOnly_ThenDoNotSendHearingCancellationRequest() {
-        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
+    public void givenWriteFinalDecisionPostHearingsEnabledAndNoIssueFinalDate_shouldUpdateFinalCaseData() {
+        ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", true);
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice(YES);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        callback.getCaseDetails().getCaseData().setState(State.WITH_DWP);
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.DIRECTION_RESPONDED);
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionIssuedDate(null);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn("judge name");
 
-        DocumentLink docLink = DocumentLink.builder()
-                .documentUrl("bla.com")
-                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-                .build();
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-
-        HearingDetails hearingDetails1 = HearingDetails.builder()
-                .hearingDate(LocalDate.now().minusDays(10).toString())
-                .start(LocalDateTime.now().minusDays(10))
-                .hearingId(String.valueOf(1))
-                .venue(Venue.builder().name("Venue 1").build())
-                .time("12:00")
-                .build();
-        Hearing hearing1 = Hearing.builder().value(hearingDetails1).build();
-
-        HearingDetails hearingDetails2 = HearingDetails.builder()
-                .hearingDate(LocalDate.now().minusDays(5).toString())
-                .start(LocalDateTime.now().minusDays(5))
-                .hearingId(String.valueOf(1))
-                .venue(Venue.builder().name("Venue 1").build())
-                .time("12:00")
-                .build();
-        Hearing hearing2 = Hearing.builder().value(hearingDetails2).build();
-
-        callback.getCaseDetails().getCaseData().setHearings(List.of(hearing1, hearing2));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertEquals(0, response.getErrors().size());
-        verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+
+        assertEquals(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionIssuedDate(), LocalDate.now());
     }
 
-    @Test
-    public void givenAnIssueFinalDecisionEventIfHearingsIsInThePastAndInTheFuture_ThenSendHearingCancellationRequest() {
-        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
-
-        DocumentLink docLink = DocumentLink.builder()
-                .documentUrl("bla.com")
-                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-                .build();
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-
-        HearingDetails hearingDetails1 = HearingDetails.builder()
-                .hearingDate(LocalDate.now().minusDays(10).toString())
-                .start(LocalDateTime.now().minusDays(10))
-                .hearingId(String.valueOf(1))
-                .venue(Venue.builder().name("Venue 1").build())
-                .time("12:00")
-                .build();
-        Hearing hearing1 = Hearing.builder().value(hearingDetails1).build();
-
-        HearingDetails hearingDetails2 = HearingDetails.builder()
-                .hearingDate(LocalDate.now().plusDays(5).toString())
-                .start(LocalDateTime.now().plusDays(5))
-                .hearingId(String.valueOf(1))
-                .venue(Venue.builder().name("Venue 1").build())
-                .time("12:00")
-                .build();
-        Hearing hearing2 = Hearing.builder().value(hearingDetails2).build();
-
-        callback.getCaseDetails().getCaseData().setHearings(List.of(hearing1, hearing2));
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
-    }
-
-    @Test
-    public void givenAnIssueFinalDecisionEventIfHearingsIsInTheFutureOnly_ThenSendHearingCancellationRequest() {
-        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
-
-        DocumentLink docLink = DocumentLink.builder()
-                .documentUrl("bla.com")
-                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-                .build();
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-
-        HearingDetails hearingDetails = HearingDetails.builder()
-                .hearingDate(LocalDate.now().plusDays(5).toString())
-                .start(LocalDateTime.now().plusDays(5))
-                .hearingId(String.valueOf(1))
-                .venue(Venue.builder().name("Venue 1").build())
-                .time("12:00")
-                .build();
-        Hearing hearing = Hearing.builder().value(hearingDetails).build();
-
-        callback.getCaseDetails().getCaseData().setHearings(List.of(hearing));
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
-    }
-
-    @Test
-    public void givenAnIssueFinalDecisionEventIfHearingsListIsEmpty_ThenDoNotSendHearingCancellationRequest() {
-        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
-
-        DocumentLink docLink = DocumentLink.builder()
-                .documentUrl("bla.com")
-                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-                .build();
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        callback.getCaseDetails().getCaseData().setHearings(List.of());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
-    }
-
-    @Test
-    public void givenAnIssueFinalDecisionEventIfHearingsExistsWithoutHearingDetails_ThenDoNotSendHearingCancellationRequest() {
-        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator,
-                hearingMessageHelper, true);
-
-        DocumentLink docLink = DocumentLink.builder()
-                .documentUrl("bla.com")
-                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-                .build();
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
-        Hearing hearing = Hearing.builder().build();
-
-        callback.getCaseDetails().getCaseData().setHearings(List.of(hearing));
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-        verify(hearingMessageHelper, times(0)).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+    private SscsDocument buildSscsDocumentWithDocumentType(String documentType) {
+        SscsDocumentDetails sscsDocumentDetails = SscsDocumentDetails.builder().documentType(documentType).build();
+        return SscsDocument.builder().value(sscsDocumentDetails).build();
     }
 }

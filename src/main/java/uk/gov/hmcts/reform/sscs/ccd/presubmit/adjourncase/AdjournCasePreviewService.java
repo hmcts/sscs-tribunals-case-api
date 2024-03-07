@@ -1,16 +1,16 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getLastValidHearing;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
@@ -39,6 +40,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SignLanguagesService;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
@@ -50,8 +52,8 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     private final VenueDataLoader venueDataLoader;
     private final JudicialRefDataService judicialRefDataService;
     private static final String DOCUMENT_DATE_PATTERN = "dd/MM/yyyy";
-    public static final String IN_CHAMBERS = "In chambers";
     private final SignLanguagesService signLanguagesService;
+    private final AirLookupService airLookupService;
     @Value("${feature.snl.adjournment.enabled}")
     private boolean adjournmentFeature;
 
@@ -60,10 +62,13 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                                      UserDetailsService userDetailsService,
                                      VenueDataLoader venueDataLoader,
                                      @Value("${doc_assembly.adjourn_case}") String templateId,
+                                     AirLookupService airLookupService,
                                      SignLanguagesService signLanguagesService,
-                                     JudicialRefDataService judicialRefDataService) {
-        super(generateFile, userDetailsService, languagePreference -> templateId);
+                                     JudicialRefDataService judicialRefDataService,
+                                     DocumentConfiguration documentConfiguration) {
+        super(generateFile, userDetailsService, languagePreference -> templateId, documentConfiguration);
         this.venueDataLoader = venueDataLoader;
+        this.airLookupService = airLookupService;
         this.signLanguagesService = signLanguagesService;
         this.judicialRefDataService = judicialRefDataService;
     }
@@ -95,19 +100,20 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         adjournCaseBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
-        String venueName = setHearings(adjournCaseBuilder, caseData);
+        setHearings(adjournCaseBuilder, caseData);
+        String venueName = caseData.getProcessingVenue();
         adjournCaseBuilder.appellantName(buildName(caseData, false));
 
         if (adjournment.getReasons() != null && !adjournment.getReasons().isEmpty()) {
             adjournCaseBuilder.reasonsForDecision(
-                adjournment.getReasons().stream().map(CollectionItem::getValue).collect(Collectors.toList()));
+                adjournment.getReasons().stream().map(CollectionItem::getValue).toList());
         } else {
             adjournCaseBuilder.reasonsForDecision(null);
         }
 
         if (adjournment.getAdditionalDirections() != null) {
             adjournCaseBuilder.additionalDirections(adjournment.getAdditionalDirections().stream()
-                .map(CollectionItem::getValue).collect(Collectors.toList()));
+                .map(CollectionItem::getValue).toList());
         }
 
         String hearingType = adjournment.getTypeOfHearing() != null
@@ -167,13 +173,12 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
     private void handleFaceToFaceHearing(Adjournment adjournment, AdjournCaseTemplateBodyBuilder adjournCaseBuilder, String venueName) {
         if (adjournment.getNextHearingVenue() == AdjournCaseNextHearingVenue.SOMEWHERE_ELSE) {
-            if (adjournment.getNextHearingVenueSelected() != null
-                && adjournment.getNextHearingVenueSelected().getValue() != null
-                && adjournment.getNextHearingVenueSelected().getValue().getCode() != null
-            ) {
+            if (nonNull(adjournment.getNextHearingVenueSelected())
+                && nonNull(adjournment.getNextHearingVenueSelected().getValue())
+                && nonNull(adjournment.getNextHearingVenueSelected().getValue().getCode())) {
                 VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(
-                    adjournment.getNextHearingVenueSelected().getValue().getCode());
-                if (venueDetails == null) {
+                        adjournment.getNextHearingVenueSelected().getValue().getCode());
+                if (isNull(venueDetails)) {
                     throw new IllegalStateException("Unable to load venue details for id:"
                         + adjournment.getNextHearingVenueSelected().getValue().getCode());
                 }
@@ -183,8 +188,21 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                 throw new IllegalStateException("A next hearing venue of somewhere else has been specified but no venue has been selected");
             }
         } else {
-            adjournCaseBuilder.nextHearingAtVenue(!IN_CHAMBERS.equals(venueName));
+            Integer venueId = airLookupService.lookupVenueIdByAirVenueName(venueName);
+
+            if (nonNull(venueId)) {
+                VenueDetails venueDetails = venueDataLoader.getVenueDetailsMap().get(venueId.toString());
+
+                if (nonNull(venueDetails)) {
+                    adjournCaseBuilder.nextHearingVenue(venueDetails.getGapsVenName());
+                    adjournCaseBuilder.nextHearingAtVenue(true);
+
+                    return;
+                }
+            }
+
             adjournCaseBuilder.nextHearingVenue(venueName);
+            adjournCaseBuilder.nextHearingAtVenue(!IN_CHAMBERS.equals(venueName));
         }
     }
 
@@ -302,28 +320,21 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         }
     }
 
-    protected String setHearings(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
-        String venue = IN_CHAMBERS;
-        if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
-            HearingDetails finalHearing = getLastValidHearing(caseData);
-            if (finalHearing != null) {
-                if (finalHearing.getHearingDate() != null) {
-                    adjournCaseBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
+    protected void setHearings(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
+        HearingDetails finalHearing = getLastValidHearing(caseData);
+        if (finalHearing != null) {
+            if (finalHearing.getHearingDate() != null) {
+                adjournCaseBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
+            }
+            if (finalHearing.getVenue() != null) {
+                String venueName = venueDataLoader.getGapVenueName(finalHearing.getVenue(), finalHearing.getVenueId());
+                if (venueName != null) {
+                    adjournCaseBuilder.heldAt(venueName);
                 }
-                if (finalHearing.getVenue() != null) {
-                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getVenue(), finalHearing.getVenueId());
-                    if (venueName != null) {
-                        adjournCaseBuilder.heldAt(venueName);
-                        venue = venueName;
-                    }
-                }
-            } else {
-                setInChambers(adjournCaseBuilder);
             }
         } else {
             setInChambers(adjournCaseBuilder);
         }
-        return venue;
     }
 
     private void setInChambers(AdjournCaseTemplateBodyBuilder adjournCaseBuilder) {
@@ -353,17 +364,11 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         if (adjournmentFeature) {
             List<JudicialUserBase> panelMembers = adjournment.getPanelMembers();
-
-            names.addAll(panelMembers.stream()
-                .filter(panelMember -> isNotBlank(panelMember.getPersonalCode()))
-                .map(panelMember ->
-                    judicialRefDataService.getJudicialUserFullName(panelMember.getPersonalCode()))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList()));
+            names.addAll(judicialRefDataService.getAllJudicialUsersFullNames(panelMembers));
         } else {
             List<String> panelMembers = Stream.of(adjournment.getDisabilityQualifiedPanelMemberName(),
                 adjournment.getMedicallyQualifiedPanelMemberName(), adjournment.getOtherPanelMemberName())
-                .filter(org.apache.commons.lang3.StringUtils::isNotBlank).collect(Collectors.toList());
+                .filter(org.apache.commons.lang3.StringUtils::isNotBlank).toList();
 
             names.addAll(panelMembers);
         }

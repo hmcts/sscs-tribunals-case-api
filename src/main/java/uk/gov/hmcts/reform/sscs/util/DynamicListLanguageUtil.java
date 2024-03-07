@@ -5,7 +5,6 @@ import static java.util.Objects.nonNull;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -41,11 +40,11 @@ public class DynamicListLanguageUtil {
         return Stream.concat(signLanguages.stream(), verbalLanguages.stream())
             .map(this::getLanguageDynamicListItem)
             .sorted(Comparator.comparing(DynamicListItem::getLabel))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @NotNull
-    private DynamicListItem getLanguageDynamicListItem(Language language) {
+    public DynamicListItem getLanguageDynamicListItem(Language language) {
         String reference = language.getReference();
         String name = language.getNameEn();
 

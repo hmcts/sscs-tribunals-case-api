@@ -151,7 +151,9 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     }
 
     private void addDirectionNotice(SscsCaseData caseData) {
-        SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData, POSTPONEMENT_REQUEST_DIRECTION_NOTICE);
+        SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData,
+                caseData.getDocumentStaging().getPreviewDocument(),
+                POSTPONEMENT_REQUEST_DIRECTION_NOTICE);
     }
 
     private Note createPostponementRequestNote(String userAuthorisation, String details) {
@@ -167,7 +169,6 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     private void clearTransientFields(SscsCaseData caseData) {
         caseData.setDocumentGeneration(DocumentGeneration.builder().build());
         caseData.setDocumentStaging(DocumentStaging.builder().build());
-        caseData.setReservedToJudge(null);
         caseData.setTempNoteDetail(null);
         caseData.setShowRip1DocPage(null);
 

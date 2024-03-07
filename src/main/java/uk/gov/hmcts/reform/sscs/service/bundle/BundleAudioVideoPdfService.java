@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -83,12 +82,10 @@ public class BundleAudioVideoPdfService {
     }
 
     public List<PdfTableDescriptor> buildDescriptorsUsingDocuments(List<? extends AbstractDocument> abstractDocument) {
-
         return abstractDocument.stream()
                 .filter(e -> e.getValue().getAvDocumentLink() != null && (e.getValue().getAvDocumentLink().getDocumentFilename().endsWith(".mp3") || e.getValue().getAvDocumentLink().getDocumentFilename().endsWith(".mp4")))
-                .map(audioVideoDocument -> buildDescriptorsFromAudioVideoEvidence(audioVideoDocument))
-                .collect(Collectors.toList());
-
+                .map(this::buildDescriptorsFromAudioVideoEvidence)
+                .toList();
     }
 
     private PdfTableDescriptor buildDescriptorsFromAudioVideoEvidence(AbstractDocument document) {
