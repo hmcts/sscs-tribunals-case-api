@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hasHearingScheduledInTheFuture;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -107,11 +108,11 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             sscsCaseData.setState(State.DORMANT_APPEAL_STATE);
         }
 
-        if (eligibleForHearingsCancel.test(callback) && SscsHelper.hasHearingScheduledInTheFuture(sscsCaseData)) {
+        if (eligibleForHearingsCancel.test(callback) && hasHearingScheduledInTheFuture(sscsCaseData)) {
             log.info("Issue Final Decision: HearingRoute ListAssist Case ({}). Sending cancellation message",
-                sscsCaseData.getCcdCaseId());
+                    sscsCaseData.getCcdCaseId());
             hearingMessageHelper.sendListAssistCancelHearingMessage(sscsCaseData.getCcdCaseId(),
-                CancellationReason.OTHER);
+                    CancellationReason.OTHER);
         }
 
         if (isAdjournmentEnabled) {
@@ -127,14 +128,14 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                                        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if (sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument() == null) {
             preSubmitCallbackResponse
-                .addError("There is no Preview Draft Decision Notice on the case so decision cannot be issued");
+                    .addError("There is no Preview Draft Decision Notice on the case so decision cannot be issued");
         }
     }
 
     private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback -> isScheduleListingEnabled
-        && SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
-        .orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
-        && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
+            && SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
+                    .orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
 
     private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
 
@@ -159,8 +160,8 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
     private void clearTransientFields(SscsCaseData sscsCaseData) {
         sscsCaseData.getSscsDocument()
-            .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
+                .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
         sscsCaseData.getSscsDocument()
-            .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_CORRECTED_NOTICE.getValue()));
+                .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_CORRECTED_NOTICE.getValue()));
     }
 }

@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 public class SscsHelper {
 
     private static final List<State> PRE_VALID_STATES =
-        asList(INCOMPLETE_APPLICATION, INCOMPLETE_APPLICATION_INFORMATION_REQUESTED, INTERLOCUTORY_REVIEW_STATE);
+            asList(INCOMPLETE_APPLICATION, INCOMPLETE_APPLICATION_INFORMATION_REQUESTED, INTERLOCUTORY_REVIEW_STATE);
 
     private SscsHelper() {
     }
@@ -39,7 +39,7 @@ public class SscsHelper {
 
     private static boolean hasNewOtherPartyEntryAdded(SscsCaseData sscsCaseData) {
         Optional<CcdValue<OtherParty>> otherParty = Optional.ofNullable(sscsCaseData.getOtherParties()).orElse(Collections.emptyList()).stream().filter(
-            op -> YesNo.isYes(op.getValue().getSendNewOtherPartyNotification())
+                op -> YesNo.isYes(op.getValue().getSendNewOtherPartyNotification())
         ).findFirst();
         return otherParty.isPresent();
     }
