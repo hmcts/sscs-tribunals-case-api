@@ -275,5 +275,6 @@
   "libertyToApplyBodyContent": null,
   "directionNoticeContent": null,
   "signedBy": null,
-  "signedRole": null
+  "signedRole": null,
+  "preWorkAllocation": "Yes"
 }
