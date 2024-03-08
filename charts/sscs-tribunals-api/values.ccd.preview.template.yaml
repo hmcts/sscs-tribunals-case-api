@@ -41,6 +41,7 @@ java:
     ELASTIC_SEARCH_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
     DUMMY: true
+    ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: true
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr

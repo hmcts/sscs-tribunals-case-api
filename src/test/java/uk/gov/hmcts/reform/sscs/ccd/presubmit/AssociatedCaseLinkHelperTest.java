@@ -23,6 +23,7 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -36,13 +37,15 @@ public class AssociatedCaseLinkHelperTest {
     private CcdService ccdService;
     @Mock
     private IdamService idamService;
+    @Mock
+    private UpdateCcdCaseService updateCcdCaseService;
 
     private AssociatedCaseLinkHelper associatedCaseLinkHelper;
 
     @Before
     public void setUp() {
 
-        associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService);
+        associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService, updateCcdCaseService);
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
