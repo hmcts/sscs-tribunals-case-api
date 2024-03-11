@@ -27,6 +27,7 @@ public class SyaAppellant {
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate dob;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String nino;
 
     @JsonProperty("contactDetails")
@@ -35,7 +36,6 @@ public class SyaAppellant {
     @JsonProperty("isAddressSameAsAppointee")
     private Boolean isAddressSameAsAppointee;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public void setNino(String nino) {
         this.nino = normaliseNino(nino);
     }
