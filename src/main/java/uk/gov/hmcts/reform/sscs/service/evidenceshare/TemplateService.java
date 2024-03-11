@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
+import uk.gov.hmcts.reform.sscs.config.evidenceshare.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
 
 @Service

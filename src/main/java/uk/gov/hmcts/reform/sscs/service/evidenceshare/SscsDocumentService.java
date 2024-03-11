@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
-import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
+import uk.gov.hmcts.reform.sscs.exception.evidenceshare.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.helper.PdfHelper;
 import uk.gov.hmcts.reform.sscs.model.evidenceshare.PdfDocument;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;

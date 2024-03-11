@@ -13,8 +13,8 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
-import uk.gov.hmcts.reform.sscs.exception.PdfStoreException;
-import uk.gov.hmcts.reform.sscs.exception.UnableToContactThirdPartyException;
+import uk.gov.hmcts.reform.sscs.exception.evidenceshare.PdfStoreException;
+import uk.gov.hmcts.reform.sscs.exception.evidenceshare.UnableToContactThirdPartyException;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @Slf4j
