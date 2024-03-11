@@ -308,7 +308,7 @@ sscs-hearings-api:
       HMC_HEARINGS_TOPIC_NAMESPACE: hmc-servicebus-aat
       HMC_DEPLOYMENT_ID: deployment-${SERVICE_NAME}
       HMC_DEPLOYMENT_FILTER_ENABLED: true
-      CORE_CASE_DATA_CASE_TYPE_ID: Benefit
+      CORE_CASE_DATA_CASE_TYPE_ID: Benefit-sscs-pr-3575
     secrets:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: sscs-sb-preview
