@@ -19,14 +19,14 @@ public class AssociatedCaseLinkHelper {
     private final CcdService ccdService;
     private final IdamService idamService;
     private final UpdateCcdCaseService updateCcdCaseService;
-    @Value("${feature.add-link-to-other-associated-cases-v2.enabled:false}")
-    private boolean addLinkToOtherAssociatedCasesV2;
+    private final boolean addLinkToOtherAssociatedCasesV2;
 
     @Autowired
-    public AssociatedCaseLinkHelper(CcdService ccdService, IdamService idamService, UpdateCcdCaseService updateCcdCaseService) {
+    public AssociatedCaseLinkHelper(CcdService ccdService, IdamService idamService, UpdateCcdCaseService updateCcdCaseService, @Value("${feature.add-link-to-other-associated-cases-v2.enabled}") boolean addLinkToOtherAssociatedCasesV2) {
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.updateCcdCaseService = updateCcdCaseService;
+        this.addLinkToOtherAssociatedCasesV2 = addLinkToOtherAssociatedCasesV2;
     }
 
     public SscsCaseData linkCaseByNino(SscsCaseData sscsCaseData, Optional<CaseDetails<SscsCaseData>> previousSscsCaseDataCaseDetails) {
