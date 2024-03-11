@@ -26,7 +26,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
@@ -41,7 +41,6 @@ import uk.gov.hmcts.reform.sendletter.api.proxy.SendLetterApiProxy;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @PactFolder("pacts")
 @PactTestFor(providerName = "rpeSendLetterService_SendLetterController", port = "4021")
-@ContextConfiguration(classes = {SendLetterServiceConsumerApplication.class})
 @TestPropertySource(locations = {"classpath:application.properties"})
 public class SendLetterServiceConsumerTest {
     @Autowired

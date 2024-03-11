@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
     "uk.gov.hmcts.reform.sscs.client",
     "uk.gov.hmcts.reform.sendletter",
     "uk.gov.hmcts.reform.ccd.client",
+    "uk.gov.hmcts.reform.sscs.service.documentmanagement"
 })
 
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform"})

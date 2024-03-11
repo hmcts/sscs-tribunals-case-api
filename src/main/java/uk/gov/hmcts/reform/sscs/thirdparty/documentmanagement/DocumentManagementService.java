@@ -20,9 +20,9 @@ public class DocumentManagementService {
     private final DocumentManagementClient documentManagementClient;
     private final DocumentUploadClientApi documentUploadClientApi;
 
-    public DocumentManagementService(@Autowired AuthTokenGenerator authTokenGenerator,
-                                     @Autowired DocumentManagementClient documentManagementClient,
-                                     @Autowired DocumentUploadClientApi documentUploadClientApi) {
+    public DocumentManagementService(AuthTokenGenerator authTokenGenerator,
+                                     DocumentManagementClient documentManagementClient,
+                                     DocumentUploadClientApi documentUploadClientApi) {
         this.authTokenGenerator = authTokenGenerator;
         this.documentManagementClient = documentManagementClient;
         this.documentUploadClientApi = documentUploadClientApi;
