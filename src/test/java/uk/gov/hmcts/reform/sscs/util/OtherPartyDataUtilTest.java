@@ -7,6 +7,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyUcb;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.sendNewOtherPartyNotification;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,31 +32,32 @@ public class OtherPartyDataUtilTest {
 
     @Test
     public void givenUcbIsYesForOneOtherParty_thenSetCaseDataOtherPartyUcb() {
-        SscsCaseData data = SscsCaseData.builder().otherParties(Arrays.asList(
+        List<CcdValue<OtherParty>> otherParties = Arrays.asList(
             buildOtherParty(ID_1, true),
-            buildOtherParty(ID_2, false))).build();
-        OtherPartyDataUtil.updateOtherPartyUcb(data);
-        assertEquals(YesNo.YES.getValue(), data.getOtherPartyUcb());
+            buildOtherParty(ID_2, false)
+        );
+
+        assertEquals(YesNo.YES.getValue(), getOtherPartyUcb(otherParties));
     }
 
     @Test
     public void givenUcbIsNoForAllOtherParty_thenSetCaseDataOtherPartyUcb() {
-        SscsCaseData data = SscsCaseData.builder().otherParties(Arrays.asList(
+        List<CcdValue<OtherParty>> otherParties = Arrays.asList(
             buildOtherParty(ID_1, false),
-            buildOtherParty(ID_2, false))).build();
-        OtherPartyDataUtil.updateOtherPartyUcb(data);
-        assertEquals(YesNo.NO.getValue(), data.getOtherPartyUcb());
+            buildOtherParty(ID_2, false)
+        );
+
+        assertEquals(YesNo.NO.getValue(), getOtherPartyUcb(otherParties));
     }
 
     @Test
     @Parameters({"UPDATE_OTHER_PARTY_DATA", "DWP_UPLOAD_RESPONSE"})
     public void givenNewOtherPartyAdded_thenAssignAnIdAndNotificationFlag(EventType eventType) {
-
-
         List<CcdValue<OtherParty>> otherParties = Arrays.asList(
             buildOtherPartyWithAppointeeAndRep(null, null, null));
 
-        OtherPartyDataUtil.assignNewOtherPartyData(otherParties);
+        otherParties.forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
+                .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
 
         Assertions.assertThat(otherParties)
             .hasSize(1)
@@ -74,7 +77,8 @@ public class OtherPartyDataUtilTest {
             buildOtherParty(ID_1),
             buildOtherPartyWithAppointeeAndRep(null, null, null));
 
-        OtherPartyDataUtil.assignNewOtherPartyData(otherParties);
+        otherParties.forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
+                .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
 
         Assertions.assertThat(otherParties)
             .hasSize(3)
@@ -105,7 +109,8 @@ public class OtherPartyDataUtilTest {
             buildOtherPartyWithAppointeeAndRep(ID_1, ID_3, ID_4),
             buildOtherPartyWithAppointeeAndRep(null, null, null));
 
-        OtherPartyDataUtil.assignNewOtherPartyData(otherParties);
+        otherParties.forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
+                .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
 
         Assertions.assertThat(otherParties)
             .hasSize(3)
@@ -138,7 +143,8 @@ public class OtherPartyDataUtilTest {
             buildOtherPartyWithAppointeeAndRep(ID_1, ID_3, ID_4),
             buildOtherParty(null));
 
-        OtherPartyDataUtil.assignNewOtherPartyData(otherParties);
+        otherParties.forEach(otherPartyCcdValue -> otherPartyCcdValue.getValue()
+                .setSendNewOtherPartyNotification(sendNewOtherPartyNotification(otherPartyCcdValue)));
 
         Assertions.assertThat(otherParties)
             .hasSize(3)
