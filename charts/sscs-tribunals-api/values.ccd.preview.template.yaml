@@ -165,7 +165,7 @@ sscs-evidence-share:
 # click create
 # azure steps should be repeated every time PR is undeployed from preview
 sscs-tya-notif:
-  enabled: false
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/sscs/tya-notif:prod-b07ff0a-20240208095500
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
@@ -327,6 +327,19 @@ sscs-hearings-api:
             alias: IDAM_OAUTH2_CLIENT_ID
           - name: idam-sscs-oauth2-client-secret
             alias: IDAM_OAUTH2_CLIENT_SECRET
+
+postgresql:
+  enabled: true
+  primary:
+    initdb:
+      scripts:
+        init.sql: |
+          CREATE DATABASE "sscsjobscheduler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+  auth:
+    postgresUsername: hmcts
+    postgresPassword: "${postgresPassword:hmcts}"
+
+
 
 #Enable for queues/topics
 #If you need a subscription for a topic, topic name should be not longer than 10 characters
