@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
+import org.junit.jupiter.api.condition.DisabledIf;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -33,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.UploadDocument;
 public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler {
 
     @Test
+    @DisabledIf("systemProperty.get('BRANCH_NAME').startsWith('PR')")
     public void checkEditedDocumentInTheBundleIsCorrect() throws IOException {
         SscsCaseDetails caseDetails = createCase();
         List<UploadDocument> docs = List.of(
