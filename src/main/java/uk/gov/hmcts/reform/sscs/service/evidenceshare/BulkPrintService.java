@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-
 import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
@@ -49,7 +48,7 @@ public class BulkPrintService implements PrintService {
                             IdamService idamService,
                             BulkPrintServiceHelper bulkPrintServiceHelper,
                             @Value("${send-letter.enabled}") boolean sendLetterEnabled,
-                            @Value("${send-letter.maxRetryAttempts}")Integer maxRetryAttempts, CcdNotificationService ccdNotificationService) {
+                            @Value("${send-letter.maxRetryAttempts}") Integer maxRetryAttempts, CcdNotificationService ccdNotificationService) {
         this.idamService = idamService;
         this.bulkPrintServiceHelper = bulkPrintServiceHelper;
         this.sendLetterApi = sendLetterApi;

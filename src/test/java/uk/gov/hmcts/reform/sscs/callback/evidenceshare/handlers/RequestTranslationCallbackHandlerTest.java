@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscs.callback.evidenceshare.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REQUEST_TRANSLATION_FROM_WLU;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
@@ -60,7 +59,7 @@ public class RequestTranslationCallbackHandlerTest {
 
     @Before
     public void setUp() {
-        handler  = new RequestTranslationCallbackHandler(requestTranslationService, ccdCaseService, idamService);
+        handler = new RequestTranslationCallbackHandler(requestTranslationService, ccdCaseService, idamService);
 
     }
 
@@ -68,7 +67,7 @@ public class RequestTranslationCallbackHandlerTest {
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
     public void givenCallbackIsNotSubmitted_willThrowAnException(CallbackType callbackType) {
         handler.handle(callbackType,
-                HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().languagePreferenceWelsh("No").build(), APPEAL_CREATED, REQUEST_TRANSLATION_FROM_WLU));
+            HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().languagePreferenceWelsh("No").build(), APPEAL_CREATED, REQUEST_TRANSLATION_FROM_WLU));
     }
 
     @Test
@@ -102,25 +101,25 @@ public class RequestTranslationCallbackHandlerTest {
 
     @Test
     public void whenCallbackFailsThrowWelshException() {
-        RequestTranslationCallbackHandler mockHandle =  mock(RequestTranslationCallbackHandler.class);
-        Mockito.doThrow(new WelshException(new Exception())).when(mockHandle).handle(any(),any());
+        RequestTranslationCallbackHandler mockHandle = mock(RequestTranslationCallbackHandler.class);
+        Mockito.doThrow(new WelshException(new Exception())).when(mockHandle).handle(any(), any());
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("Yes");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), REQUEST_TRANSLATION_FROM_WLU, false);
 
         WelshException exception = assertThrows(
-                WelshException.class, () -> mockHandle.handle(SUBMITTED, callback));
+            WelshException.class, () -> mockHandle.handle(SUBMITTED, callback));
         assertNotNull(exception.getMessage());
     }
 
     private CaseDetails<SscsCaseData> getCaseDetails(String languagePreference) {
         SscsCaseData caseData = SscsCaseData.builder()
-                .ccdCaseId("123")
-                .appeal(Appeal.builder().build())
-                .languagePreferenceWelsh(languagePreference)
-                .build();
+            .ccdCaseId("123")
+            .appeal(Appeal.builder().build())
+            .languagePreferenceWelsh(languagePreference)
+            .build();
 
-        return new CaseDetails<>(123L, "jurisdiction", APPEAL_CREATED, caseData,  LocalDateTime.now(), "Benefit");
+        return new CaseDetails<>(123L, "jurisdiction", APPEAL_CREATED, caseData, LocalDateTime.now(), "Benefit");
     }
 
 }

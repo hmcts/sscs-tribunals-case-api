@@ -4,7 +4,6 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscs.callback.evidenceshare.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
@@ -33,9 +32,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.evidenceshare.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.domain.evidenceshare.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.evidenceshare.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.service.evidenceshare.CoverLetterService;
-import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.evidenceshare.placeholders.PlaceholderConstants;
 import uk.gov.hmcts.reform.sscs.service.evidenceshare.placeholders.SorPlaceholderService;
 

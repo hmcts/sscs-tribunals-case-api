@@ -35,8 +35,8 @@ import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.evidenceshare.BulkPrintInfo;
-import uk.gov.hmcts.reform.sscs.service.evidenceshare.DocumentManagementServiceWrapper;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
+import uk.gov.hmcts.reform.sscs.service.evidenceshare.DocumentManagementServiceWrapper;
 import uk.gov.hmcts.reform.sscs.service.evidenceshare.PrintService;
 import uk.gov.hmcts.reform.sscs.service.evidenceshare.placeholders.PlaceholderUtility;
 
@@ -101,11 +101,11 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
         return callbackType.equals(CallbackType.SUBMITTED)
             && ((callback.getEvent() == EventType.VALID_APPEAL_CREATED
-                || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED
-                || callback.getEvent() == EventType.VALID_APPEAL
-                || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL
-                || callback.getEvent() == EventType.APPEAL_TO_PROCEED
-                || callback.getEvent() == EventType.SEND_TO_DWP)
+            || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED
+            || callback.getEvent() == EventType.VALID_APPEAL
+            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL
+            || callback.getEvent() == EventType.APPEAL_TO_PROCEED
+            || callback.getEvent() == EventType.SEND_TO_DWP)
             && !callback.getCaseDetails().getCaseData().isTranslationWorkOutstanding())
             || callback.getEvent() == EventType.RESEND_TO_DWP;
 
@@ -192,7 +192,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             documentManagementServiceWrapper.generateDocumentAndAddToCcd(holder, caseData, idamTokens);
             List<SscsDocument> sscsDocuments = getSscsDocumentsToPrint(caseData.getSscsDocument());
             if (CollectionUtils.isEmpty(sscsDocuments)
-                    || !documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(sscsDocuments)) {
+                || !documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(sscsDocuments)) {
                 throw new NoDl6DocumentException();
             }
 

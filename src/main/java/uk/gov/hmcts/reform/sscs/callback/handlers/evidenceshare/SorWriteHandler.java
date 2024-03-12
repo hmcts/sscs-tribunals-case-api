@@ -22,9 +22,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.evidenceshare.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.evidenceshare.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.evidenceshare.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.service.evidenceshare.CoverLetterService;
-import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.evidenceshare.placeholders.SorPlaceholderService;
 
 @Slf4j
@@ -81,7 +81,7 @@ public class SorWriteHandler implements CallbackHandler<SscsCaseData> {
         docmosisCoverSheetTemplate = template.get(languagePreference).get(POST_HEARING_APP_SOR_WRITTEN).get("cover");
 
         LinkedHashMap<Entity, FurtherEvidenceLetterType> parties = getParties(caseData);
-        for (Map.Entry<Entity, FurtherEvidenceLetterType> entry: parties.entrySet()) {
+        for (Map.Entry<Entity, FurtherEvidenceLetterType> entry : parties.entrySet()) {
             Entity party = entry.getKey();
             var partyId = party instanceof OtherParty || entry.getValue() == FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER ? party.getId() : null;
             var placeholders = sorPlaceholderService.populatePlaceholders(caseData,

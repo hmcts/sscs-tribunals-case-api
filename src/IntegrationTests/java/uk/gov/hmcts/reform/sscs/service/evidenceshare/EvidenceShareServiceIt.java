@@ -180,7 +180,7 @@ public class EvidenceShareServiceIt {
     }
 
     @Test
-    public void givenNonDigitalCaseAndSecureDocstoreOff_shouldGenerateDLDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException {
+    public void givenNonDigitalCaseAndSecureDocstoreOff_shouldGenerateDlDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException {
         //FIXME: Remove this test once secureDocStoreEnabled feature switched on
         ReflectionTestUtils.setField(pdfStoreService, "secureDocStoreEnabled", false);
 
@@ -221,7 +221,7 @@ public class EvidenceShareServiceIt {
     }
 
     @Test
-    public void givenNonDigitalCaseAndSecureDocStoreOn_shouldGenerateDLDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException {
+    public void givenNonDigitalCaseAndSecureDocStoreOn_shouldGenerateDlDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException {
         ReflectionTestUtils.setField(pdfStoreService, "secureDocStoreEnabled", true);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()

@@ -39,9 +39,9 @@ import uk.gov.hmcts.reform.sscs.exception.evidenceshare.NonPdfBulkPrintException
 import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.evidenceshare.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.service.evidenceshare.DocumentManagementServiceWrapper;
-import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 @RunWith(JUnitParamsRunner.class)
 public class SendToBulkPrintHandlerTest {
@@ -94,7 +94,6 @@ public class SendToBulkPrintHandlerTest {
             .documentLink(DocumentLink.builder().documentUrl(docUrl)
                 .documentFilename(docPdf.getName()).build())
             .build()).build()), APPEAL_CREATED);
-
 
 
     Map<String, Object> placeholders = new HashMap<>();
@@ -394,7 +393,7 @@ public class SendToBulkPrintHandlerTest {
                 .documentLink(DocumentLink.builder().documentUrl(docUrl)
                     .documentFilename(docPdf.getName()).build())
                 .build()).build()
-            ), APPEAL_CREATED);
+        ), APPEAL_CREATED);
 
         when(pdfStoreService.download(eq(docUrl))).thenReturn(docPdf.getContent());
         when(documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(anyList())).thenReturn(true);
