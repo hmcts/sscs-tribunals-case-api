@@ -10,22 +10,14 @@ import java.io.IOException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.junit.jupiter.api.condition.DisabledIf;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Bundle;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BundleDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BundleFolder;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BundleFolderDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 import uk.gov.hmcts.reform.sscs.functional.handlers.UploadDocument;
 
@@ -37,22 +29,22 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.UploadDocument;
 public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler {
 
     @Test
-    @DisabledIfEnvironmentVariable(named = "JENKINS_BRANCH", matches = "PR*")
+    @DisabledIfEnvironmentVariable(named = "JENKINS_BRANCH", matches = "^PR.*")
     public void checkEditedDocumentInTheBundleIsCorrect() throws IOException {
         SscsCaseDetails caseDetails = createCase();
         List<UploadDocument> docs = List.of(
-                UploadDocument.builder()
-                        .data(getPdf("dwpResponse"))
-                        .filename("dwpResponse.pdf")
-                        .documentType(DwpDocumentType.DWP_RESPONSE.getValue())
-                        .hasEditedDocumentLink(true)
-                        .build(),
-                UploadDocument.builder()
-                        .data(getPdf("dwpEvidenceBundle"))
-                        .filename("dwpEvidenceBundle.pdf")
-                        .documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())
-                        .hasEditedDocumentLink(true)
-                        .build()
+            UploadDocument.builder()
+                .data(getPdf("dwpResponse"))
+                .filename("dwpResponse.pdf")
+                .documentType(DwpDocumentType.DWP_RESPONSE.getValue())
+                .hasEditedDocumentLink(true)
+                .build(),
+            UploadDocument.builder()
+                .data(getPdf("dwpEvidenceBundle"))
+                .filename("dwpEvidenceBundle.pdf")
+                .documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())
+                .hasEditedDocumentLink(true)
+                .build()
         );
         caseDetails = addDocumentsToCase(caseDetails.getData(), docs);
         caseDetails.getData().setPhmeGranted(YES);
@@ -62,23 +54,23 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
         final SscsCaseDetails updatedCaseDetails = getByCaseId(caseDetails.getId());
 
         assertThat(updatedCaseDetails.getData().getCaseBundles())
-                .hasSize(2)
-                .extracting(Bundle::getValue)
-                .allSatisfy(bundleDetails -> {
-                    assertThat(bundleDetails.getFolders())
-                            .hasSize(2)
-                            .extracting(BundleFolder::getValue)
-                            .extracting(BundleFolderDetails::getName)
-                            .containsExactly("FTA", "Further additions");
+            .hasSize(2)
+            .extracting(Bundle::getValue)
+            .allSatisfy(bundleDetails -> {
+                assertThat(bundleDetails.getFolders())
+                    .hasSize(2)
+                    .extracting(BundleFolder::getValue)
+                    .extracting(BundleFolderDetails::getName)
+                    .containsExactly("FTA", "Further additions");
 
-                    assertThat(bundleDetails.getFolders())
-                            .extracting(BundleFolder::getValue)
-                            .extracting(BundleFolderDetails::getDocuments)
-                            .extracting(List::size)
-                            .containsExactly(2,0);
-                })
-                .extracting(BundleDetails::getTitle)
-                .containsExactly("SSCS Bundle Original", "SSCS Bundle Edited");
+                assertThat(bundleDetails.getFolders())
+                    .extracting(BundleFolder::getValue)
+                    .extracting(BundleFolderDetails::getDocuments)
+                    .extracting(List::size)
+                    .containsExactly(2, 0);
+            })
+            .extracting(BundleDetails::getTitle)
+            .containsExactly("SSCS Bundle Original", "SSCS Bundle Edited");
 
         assertThatBundleStitchedSuccessfully(caseDetails.getId(), 2);
     }
@@ -87,22 +79,22 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
     public void checkBundleAdditionIsAddedCorrectly() throws IOException {
         SscsCaseDetails caseDetails = createCase();
         List<UploadDocument> docs = List.of(
-                UploadDocument.builder()
-                        .data(getPdf("appellant"))
-                        .filename("appellant.pdf")
-                        .documentType(DocumentType.APPELLANT_EVIDENCE.getValue())
-                        .bundleAddition("A")
-                        .build(),
-                UploadDocument.builder()
-                        .data(getPdf("dwpResponse"))
-                        .filename("dwpResponse.pdf")
-                        .documentType(DwpDocumentType.DWP_RESPONSE.getValue())
-                        .build(),
-                UploadDocument.builder()
-                        .data(getPdf("dwpEvidenceBundle"))
-                        .filename("dwpEvidenceBundle.pdf")
-                        .documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())
-                        .build()
+            UploadDocument.builder()
+                .data(getPdf("appellant"))
+                .filename("appellant.pdf")
+                .documentType(DocumentType.APPELLANT_EVIDENCE.getValue())
+                .bundleAddition("A")
+                .build(),
+            UploadDocument.builder()
+                .data(getPdf("dwpResponse"))
+                .filename("dwpResponse.pdf")
+                .documentType(DwpDocumentType.DWP_RESPONSE.getValue())
+                .build(),
+            UploadDocument.builder()
+                .data(getPdf("dwpEvidenceBundle"))
+                .filename("dwpEvidenceBundle.pdf")
+                .documentType(DwpDocumentType.DWP_EVIDENCE_BUNDLE.getValue())
+                .build()
         );
         caseDetails = addDocumentsToCase(caseDetails.getData(), docs);
         runEvent(caseDetails.getData(), EventType.CREATE_BUNDLE);
@@ -110,47 +102,47 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
         final SscsCaseDetails updatedCaseDetails = getByCaseId(caseDetails.getId());
 
         assertThat(updatedCaseDetails.getData().getCaseBundles())
-                .hasSize(1)
-                .extracting(Bundle::getValue)
-                .allSatisfy(bundleDetails -> {
-                    assertThat(bundleDetails.getFolders())
-                            .hasSize(2)
-                            .extracting(BundleFolder::getValue)
-                            .extracting(BundleFolderDetails::getName)
-                            .containsExactly("FTA", "Further additions");
+            .hasSize(1)
+            .extracting(Bundle::getValue)
+            .allSatisfy(bundleDetails -> {
+                assertThat(bundleDetails.getFolders())
+                    .hasSize(2)
+                    .extracting(BundleFolder::getValue)
+                    .extracting(BundleFolderDetails::getName)
+                    .containsExactly("FTA", "Further additions");
 
-                    assertThat(bundleDetails.getFolders())
-                            .extracting(BundleFolder::getValue)
-                            .extracting(BundleFolderDetails::getDocuments)
-                            .extracting(List::size)
-                            .containsExactly(2,1);
-                });
+                assertThat(bundleDetails.getFolders())
+                    .extracting(BundleFolder::getValue)
+                    .extracting(BundleFolderDetails::getDocuments)
+                    .extracting(List::size)
+                    .containsExactly(2, 1);
+            });
 
         assertThatBundleStitchedSuccessfully(caseDetails.getId(), 1);
     }
 
     private void assertThatBundleStitchedSuccessfully(long caseId, int expectedBundles) {
         await()
-                .atMost(60, SECONDS)
-                .pollInterval(1, SECONDS)
-                .untilAsserted(() -> {
-                    SscsCaseDetails updatedCaseDetails = getByCaseId(caseId);
-                    assertThat(updatedCaseDetails.getData().getCaseBundles())
-                            .isNotEmpty()
-                            .extracting(Bundle::getValue)
-                            .extracting(BundleDetails::getStitchStatus)
-                            .doesNotContainNull()
-                            .doesNotContain("NEW");
-                });
+            .atMost(60, SECONDS)
+            .pollInterval(1, SECONDS)
+            .untilAsserted(() -> {
+                SscsCaseDetails updatedCaseDetails = getByCaseId(caseId);
+                assertThat(updatedCaseDetails.getData().getCaseBundles())
+                    .isNotEmpty()
+                    .extracting(Bundle::getValue)
+                    .extracting(BundleDetails::getStitchStatus)
+                    .doesNotContainNull()
+                    .doesNotContain("NEW");
+            });
 
         SscsCaseDetails updatedCaseDetails = getByCaseId(caseId);
 
         assertThat(updatedCaseDetails.getData().getCaseBundles())
-                .hasSize(expectedBundles)
-                .extracting(Bundle::getValue)
-                .allSatisfy(bundleDetails -> {
-                    assertThat(bundleDetails.getStitchedDocument()).isNotNull();
-                    assertThat(bundleDetails.getStitchStatus()).isEqualTo("DONE");
-                });
+            .hasSize(expectedBundles)
+            .extracting(Bundle::getValue)
+            .allSatisfy(bundleDetails -> {
+                assertThat(bundleDetails.getStitchedDocument()).isNotNull();
+                assertThat(bundleDetails.getStitchStatus()).isEqualTo("DONE");
+            });
     }
 }
