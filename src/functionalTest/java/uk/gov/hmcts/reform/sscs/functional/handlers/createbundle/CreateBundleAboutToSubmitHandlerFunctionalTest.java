@@ -11,6 +11,9 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.jupiter.api.condition.DisabledIf;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -34,7 +37,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.UploadDocument;
 public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler {
 
     @Test
-    @DisabledIf("systemProperty.get('BRANCH_NAME').startsWith('PR')")
+    @DisabledIfEnvironmentVariable(named = "JENKINS_BRANCH", matches = "PR*")
     public void checkEditedDocumentInTheBundleIsCorrect() throws IOException {
         SscsCaseDetails caseDetails = createCase();
         List<UploadDocument> docs = List.of(
