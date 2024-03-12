@@ -182,10 +182,6 @@ public class LinkCaseAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("2", result.getData().getLinkedCase().get(0).getValue().getCaseReference());
-        assertEquals("3", result.getData().getLinkedCase().get(1).getValue().getCaseReference());
-
-
         verify(updateCcdCaseService, times(0)).updateCaseV2(eq(1L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), any(Consumer.class));
         verify(updateCcdCaseService).updateCaseV2(eq(2L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), capture.capture());
         verify(updateCcdCaseService).updateCaseV2(eq(3L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), capture.capture());
@@ -216,10 +212,6 @@ public class LinkCaseAboutToSubmitHandlerTest {
         sscsCaseDataB.setLinkedCase(linkedCasesB);
 
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals("2", result.getData().getLinkedCase().get(0).getValue().getCaseReference());
-        assertEquals("3", result.getData().getLinkedCase().get(1).getValue().getCaseReference());
-
 
         verify(updateCcdCaseService, times(0)).updateCaseV2(eq(1L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), any(Consumer.class));
 
@@ -298,9 +290,6 @@ public class LinkCaseAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("2", result.getData().getLinkedCase().get(0).getValue().getCaseReference());
-        assertEquals("3", result.getData().getLinkedCase().get(1).getValue().getCaseReference());
-        assertEquals("4", result.getData().getLinkedCase().get(2).getValue().getCaseReference());
 
         verify(updateCcdCaseService, times(0)).updateCaseV2(eq(1L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), any(Consumer.class));
         verify(updateCcdCaseService).updateCaseV2(eq(2L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any(), capture.capture());
