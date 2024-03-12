@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -13,18 +12,18 @@ import uk.gov.hmcts.reform.document.domain.UploadResponse;
 
 @Slf4j
 @Service
-public class DocumentManagementService {
+public class DocumentStoreService {
     private static final String OAUTH2_TOKEN = "oauth2Token";
     private static final String USER_ID = "sscs";
     private final AuthTokenGenerator authTokenGenerator;
-    private final DocumentManagementClient documentManagementClient;
+    private final DocumentStoreClient documentStoreClient;
     private final DocumentUploadClientApi documentUploadClientApi;
 
-    public DocumentManagementService(AuthTokenGenerator authTokenGenerator,
-                                     DocumentManagementClient documentManagementClient,
-                                     DocumentUploadClientApi documentUploadClientApi) {
+    public DocumentStoreService(AuthTokenGenerator authTokenGenerator,
+                                DocumentStoreClient documentStoreClient,
+                                DocumentUploadClientApi documentUploadClientApi) {
         this.authTokenGenerator = authTokenGenerator;
-        this.documentManagementClient = documentManagementClient;
+        this.documentStoreClient = documentStoreClient;
         this.documentUploadClientApi = documentUploadClientApi;
     }
 
@@ -44,6 +43,8 @@ public class DocumentManagementService {
     }
 
     public void delete(String documentId) {
-        documentManagementClient.deleteDocument(OAUTH2_TOKEN, authTokenGenerator.generate(), USER_ID, documentId);
+        documentStoreClient.deleteDocument(OAUTH2_TOKEN, authTokenGenerator.generate(), USER_ID, documentId);
     }
+
+
 }

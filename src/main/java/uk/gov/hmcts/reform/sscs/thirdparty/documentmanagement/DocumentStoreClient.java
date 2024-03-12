@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
         name = "documentManagement",
         url = "${document_management.url}"
 )
-public interface DocumentManagementClient {
+public interface DocumentStoreClient {
     @DeleteMapping(value = "/documents/{documentId}")
     void deleteDocument(
             @RequestHeader(AUTHORIZATION) String authorisation,

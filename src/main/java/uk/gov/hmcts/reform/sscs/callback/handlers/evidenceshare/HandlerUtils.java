@@ -16,7 +16,7 @@ public class HandlerUtils {
         // empty
     }
 
-    protected static boolean isANewJointParty(Callback<SscsCaseData> callback, SscsCaseData caseData) {
+    public static boolean isANewJointParty(Callback<SscsCaseData> callback, SscsCaseData caseData) {
         boolean wasNotAlreadyJointParty = false;
         CaseDetails oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
         if (oldCaseDetails != null) {

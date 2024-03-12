@@ -26,7 +26,7 @@ public class CaseAccessManagementFieldsHelper {
         setOgdType(sscsCaseData);
     }
 
-    static void setCategories(SscsCaseData sscsCaseData) {
+    public static void setCategories(SscsCaseData sscsCaseData) {
         Appeal appeal = sscsCaseData.getAppeal();
 
         if (nonNull(appeal)
@@ -42,7 +42,7 @@ public class CaseAccessManagementFieldsHelper {
         }
     }
 
-    static void setCaseNames(SscsCaseData sscsCaseData) {
+    public static void setCaseNames(SscsCaseData sscsCaseData) {
         if (hasAppellantName(sscsCaseData.getAppeal())) {
             sscsCaseData
                 .getCaseAccessManagementFields()
@@ -55,7 +55,7 @@ public class CaseAccessManagementFieldsHelper {
         }
     }
 
-    static void setOgdType(SscsCaseData sscsCaseData) {
+    public static void setOgdType(SscsCaseData sscsCaseData) {
         if (nonNull(sscsCaseData.getAppeal())
             && nonNull(sscsCaseData.getAppeal().getBenefitType())) {
             sscsCaseData
@@ -69,7 +69,7 @@ public class CaseAccessManagementFieldsHelper {
             sscsCaseData.getCcdCaseId());
     }
 
-    static boolean hasAppellantName(Appeal appeal) {
+    public static boolean hasAppellantName(Appeal appeal) {
         return nonNull(appeal)
             && nonNull(appeal.getAppellant())
             && nonNull(appeal.getAppellant().getName())
@@ -77,7 +77,7 @@ public class CaseAccessManagementFieldsHelper {
             && nonNull(appeal.getAppellant().getName().getLastName());
     }
 
-    static boolean isHmrcBenefit(SscsCaseData sscsCaseData) {
+    public static boolean isHmrcBenefit(SscsCaseData sscsCaseData) {
         return getBenefitOptionalByCode(sscsCaseData.getAppeal().getBenefitType().getCode())
             .map(benefit -> SscsType.SSCS5.equals(benefit.getSscsType()))
             .orElseGet(() -> FormType.SSCS5.equals(sscsCaseData.getFormType()));

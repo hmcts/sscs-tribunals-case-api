@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
-import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.DocumentStoreService;
 
 @ExtendWith(PactConsumerTestExt.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -73,8 +73,6 @@ public abstract class CcdConsumerTestBase {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
-    DocumentManagementService documentManagementService;
 
     protected static final String USER_ID = "123456";
     protected static final Long CASE_ID = 1593694526480034L;

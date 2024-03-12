@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.exception.evidenceshare;
+package uk.gov.hmcts.reform.sscs.service.exceptions;
 
 @SuppressWarnings("squid:MaximumInheritanceDepth")
 public class ClientAuthorisationException extends RuntimeException {
