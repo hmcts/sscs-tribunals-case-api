@@ -19,9 +19,7 @@ public class SessionAwareServiceBusMessagingService implements SessionAwareMessa
 
     @Override
     public boolean sendMessage(SessionAwareRequest message) {
-
         try {
-
             ServiceBusMessage serviceBusMessage = new ServiceBusMessage(objectMapper.writeValueAsString(message));
             serviceBusMessage.setContentType(MediaType.APPLICATION_JSON_VALUE);
             serviceBusMessage.getApplicationProperties().put("_type", "uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest");
