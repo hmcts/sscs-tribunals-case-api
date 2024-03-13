@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import javax.swing.plaf.synth.Region;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -43,6 +46,9 @@ public class SubscriptionEndPointsIt {
 
     @MockBean
     IdamService idamService;
+
+    @MockBean
+    AirLookupService airLookupService;
 
     CaseDetails caseDetails = CaseDataUtils.buildCaseDetails();
     SearchResult searchResult = SearchResult.builder().cases(singletonList(caseDetails)).build();
