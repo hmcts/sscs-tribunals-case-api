@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.UploadDocument;
 public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler {
 
     @Test
-    @DisabledIfEnvironmentVariable(named = "JENKINS_BRANCH", matches = "preview")
+    @DisabledIfEnvironmentVariable(named = "BRANCH_NAME", matches = "^PR.*")
     public void checkEditedDocumentInTheBundleIsCorrect() throws IOException {
         SscsCaseDetails caseDetails = createCase();
         List<UploadDocument> docs = List.of(
@@ -76,7 +76,7 @@ public class CreateBundleAboutToSubmitHandlerFunctionalTest extends BaseHandler 
     }
 
     @Test
-    @DisabledIfEnvironmentVariable(named = "JENKINS_BRANCH", matches = "preview")
+    @DisabledIfEnvironmentVariable(named = "BRANCH_NAME", matches = "^PR.*")
     public void checkBundleAdditionIsAddedCorrectly() throws IOException {
         SscsCaseDetails caseDetails = createCase();
         List<UploadDocument> docs = List.of(

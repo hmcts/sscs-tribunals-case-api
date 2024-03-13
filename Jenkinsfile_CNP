@@ -114,13 +114,11 @@ withPipeline(type, product, component) {
     env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
     onMaster() {
         enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
-        env.JENKINS_BRANCH = "master"
     }
     onPR() {
         enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
                         //Disabling due to IDAM OIDC issue. To be investigated under SSCS-10377
                       //AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK])
-        env.JENKINS_BRANCH = "preview"
     }
 }
 
