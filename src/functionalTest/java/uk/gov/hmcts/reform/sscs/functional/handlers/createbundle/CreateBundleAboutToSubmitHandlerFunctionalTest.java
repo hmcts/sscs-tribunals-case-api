@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.functional.handlers.PdfHelper.getPdf;
 import java.io.IOException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
