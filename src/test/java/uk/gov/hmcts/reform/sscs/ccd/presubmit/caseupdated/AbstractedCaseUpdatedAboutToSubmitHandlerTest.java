@@ -98,7 +98,9 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     @BeforeEach
     void setUp() {
         Boolean addLinkToOtherAssociatedCasesV2Boolean = getAddLinkToOtherAssociatedCasesV2();
-        AssociatedCaseLinkHelper associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService, updateCcdCaseService, addLinkToOtherAssociatedCasesV2Boolean);
+        AssociatedCaseLinkHelper associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService, updateCcdCaseService);
+        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2", addLinkToOtherAssociatedCasesV2Boolean);
+
         handler = new CaseUpdatedAboutToSubmitHandler(
             regionalProcessingCenterService,
             associatedCaseLinkHelper,

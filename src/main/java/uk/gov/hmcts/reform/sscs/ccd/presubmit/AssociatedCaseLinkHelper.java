@@ -19,14 +19,14 @@ public class AssociatedCaseLinkHelper {
     private final CcdService ccdService;
     private final IdamService idamService;
     private final UpdateCcdCaseService updateCcdCaseService;
-    private final boolean addLinkToOtherAssociatedCasesV2;
+    @Value("${feature.add-link-to-other-associated-cases-v2.enabled}")
+    private boolean addLinkToOtherAssociatedCasesV2;
 
     @Autowired
-    public AssociatedCaseLinkHelper(CcdService ccdService, IdamService idamService, UpdateCcdCaseService updateCcdCaseService, @Value("${feature.add-link-to-other-associated-cases-v2.enabled}") boolean addLinkToOtherAssociatedCasesV2) {
+    public AssociatedCaseLinkHelper(CcdService ccdService, IdamService idamService, UpdateCcdCaseService updateCcdCaseService) {
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.updateCcdCaseService = updateCcdCaseService;
-        this.addLinkToOtherAssociatedCasesV2 = addLinkToOtherAssociatedCasesV2;
     }
 
     public SscsCaseData linkCaseByNino(SscsCaseData sscsCaseData, Optional<CaseDetails<SscsCaseData>> previousSscsCaseDataCaseDetails) {
@@ -68,7 +68,6 @@ public class AssociatedCaseLinkHelper {
         if (!matchedByNinoCases.isEmpty()) {
             caseData.setAssociatedCase(new ArrayList<>(associatedCases));
             caseData.setLinkedCasesBoolean("Yes");
-            log.info("ADDING LINK TO OTHER ASSOCIATED CASES V2: " + addLinkToOtherAssociatedCasesV2);
             if (addLinkToOtherAssociatedCasesV2) {
                 addLinkToOtherAssociatedCasesV2(matchedByNinoCases, caseData.getCcdCaseId());
             } else {
@@ -82,6 +81,7 @@ public class AssociatedCaseLinkHelper {
     }
 
     private void addLinkToOtherAssociatedCases(List<SscsCaseDetails> matchedByNinoCases, String caseId) {
+        log.info("Adding link to other associated cases");
         if (!matchedByNinoCases.isEmpty() && !StringUtils.isEmpty(caseId)) {
             for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
                 SscsCaseData sscsCaseData = sscsCaseDetails.getData();
