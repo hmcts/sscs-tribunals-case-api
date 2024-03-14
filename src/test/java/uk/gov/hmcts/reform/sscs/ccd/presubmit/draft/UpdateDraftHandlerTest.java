@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.draft;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalToObject;
-import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -73,16 +70,16 @@ public class UpdateDraftHandlerTest {
     public void givenValidEvent_handleDoesNothing() {
         SscsCaseData caseData = CaseDataUtils.buildCaseData();
         caseData.setCcdCaseId(CCD_CASE_ID.toString());
-        String expected = caseData.toString();
 
         when(callback.getEvent()).thenReturn(EventType.UPDATE_DRAFT);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
+        String expected = caseData.toString();
+
         PreSubmitCallbackResponse<SscsCaseData> response = updateDraftHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         String actual = response.getData().toString();
-
         assertEquals(expected, actual);
     }
 }
