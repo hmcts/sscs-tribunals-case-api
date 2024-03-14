@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -68,7 +69,8 @@ public abstract class AbstractCitizenLoginServiceTest {
         when(postcodeUtil.hasAppellantOrOtherPartyPostcode(any(SscsCaseDetails.class), eq(APPEAL_POSTCODE), eq("someEmail@exaple.com"))).thenReturn(true);
         onlineHearingService = mock(OnlineHearingService.class);
 
-        underTest = new CitizenLoginService(citizenCcdService, ccdService, updateCcdCaseService, sscsCcdConvertService, idamService, postcodeUtil, onlineHearingService, v2IsEnabled());
+        underTest = new CitizenLoginService(citizenCcdService, ccdService, updateCcdCaseService, sscsCcdConvertService, idamService, postcodeUtil, onlineHearingService);
+        ReflectionTestUtils.setField(underTest, "citizenLogicServiceV2Enabled", v2IsEnabled());
         sscsCaseDetailsWithDifferentTya = createSscsCaseDetailsWithAppellantSubscription("anotherTya");
         tya = "123-123-123-123";
     }

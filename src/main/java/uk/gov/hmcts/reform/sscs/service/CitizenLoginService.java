@@ -40,10 +40,11 @@ public class CitizenLoginService {
     private final IdamService idamService;
     private final PostcodeUtil postcodeUtil;
     private final OnlineHearingService onlineHearingService;
-    private final boolean citizenLogicServiceV2;
+    @Value("${feature.citizen-login-service-v2.enabled}")
+    private boolean citizenLogicServiceV2Enabled;
 
 
-    public CitizenLoginService(CitizenCcdService citizenCcdService, CcdService ccdService, UpdateCcdCaseService updateCcdCaseService, SscsCcdConvertService sscsCcdConvertService, IdamService idamService, PostcodeUtil postcodeUtil, OnlineHearingService onlineHearingService, @Value("${feature.citizen-login-service-v2.enabled}") boolean citizenLogicServiceV2) {
+    public CitizenLoginService(CitizenCcdService citizenCcdService, CcdService ccdService, UpdateCcdCaseService updateCcdCaseService, SscsCcdConvertService sscsCcdConvertService, IdamService idamService, PostcodeUtil postcodeUtil, OnlineHearingService onlineHearingService) {
         this.citizenCcdService = citizenCcdService;
         this.ccdService = ccdService;
         this.updateCcdCaseService = updateCcdCaseService;
@@ -51,7 +52,6 @@ public class CitizenLoginService {
         this.idamService = idamService;
         this.postcodeUtil = postcodeUtil;
         this.onlineHearingService = onlineHearingService;
-        this.citizenLogicServiceV2 = citizenLogicServiceV2;
     }
 
     public List<OnlineHearing> findCasesForCitizen(IdamTokens idamTokens, String tya) {
@@ -167,23 +167,13 @@ public class CitizenLoginService {
     }
 
     private void updateCaseWithLastLoggedIntoMya(String email, SscsCaseDetails caseByAppealNumber) {
-        if (citizenLogicServiceV2) {
-            updateCcdCaseService.updateCaseV2(
-                    caseByAppealNumber.getId(),
-                    EventType.UPDATE_CASE_ONLY.getCcdType(),
-                    "SSCS - update last logged in MYA",
-                    UPDATED_SSCS,
-                    idamService.getIdamTokens(),
-                    caseData -> updateSubscriptionWithLastLoggedIntoMya(caseData, email));
+        if (citizenLogicServiceV2Enabled) {
+            updateCcdCaseService.updateCaseV2(caseByAppealNumber.getId(), EventType.UPDATE_CASE_ONLY.getCcdType(), "SSCS - update last logged in MYA",
+                    UPDATED_SSCS, idamService.getIdamTokens(), caseData -> updateSubscriptionWithLastLoggedIntoMya(caseData, email));
         } else {
             updateSubscriptionWithLastLoggedIntoMya(caseByAppealNumber.getData(), email);
-            ccdService.updateCase(
-                    caseByAppealNumber.getData(),
-                    caseByAppealNumber.getId(),
-                    EventType.UPDATE_CASE_ONLY.getCcdType(),
-                    "SSCS - update last logged in MYA",
-                    UPDATED_SSCS,
-                    idamService.getIdamTokens()
+            ccdService.updateCase(caseByAppealNumber.getData(), caseByAppealNumber.getId(), EventType.UPDATE_CASE_ONLY.getCcdType(),
+                    "SSCS - update last logged in MYA", UPDATED_SSCS, idamService.getIdamTokens()
             );
         }
     }
