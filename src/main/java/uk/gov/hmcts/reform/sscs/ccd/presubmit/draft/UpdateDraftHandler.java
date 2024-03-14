@@ -19,7 +19,7 @@ public class UpdateDraftHandler implements PreSubmitCallbackHandler<SscsCaseData
             && callback.getEvent() == EventType.UPDATE_DRAFT;
     }
 
-    git @Override
+    @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
