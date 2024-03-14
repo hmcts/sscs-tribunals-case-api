@@ -4,7 +4,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService.normali
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -27,7 +26,6 @@ public class SyaAppellant {
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate dob;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String nino;
 
     @JsonProperty("contactDetails")
