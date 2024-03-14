@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Lists;
 import java.util.*;
+import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -13,18 +14,21 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Service
 public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final CcdService ccdService;
+    private final UpdateCcdCaseService updateCcdCaseService;
     private final IdamService idamService;
 
     @Autowired
-    public LinkCaseAboutToSubmitHandler(CcdService ccdService,
+    public LinkCaseAboutToSubmitHandler(CcdService ccdService, UpdateCcdCaseService updateCcdCaseService,
                                         IdamService idamService) {
         this.ccdService = ccdService;
+        this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
     }
 
@@ -106,10 +110,11 @@ public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
             linkedCaseList.remove(caseLink);
 
             if (sscsCaseData != null && (sscsCaseData.getLinkedCase() == null || !sscsCaseData.getLinkedCase().containsAll(linkedCaseList))) {
-                sscsCaseData.setLinkedCase(linkedCaseList);
-
                 if (!sscsCaseData.getCcdCaseId().equals(caseInCallback)) {
-                    ccdService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()), EventType.CASE_UPDATED.getCcdType(), "Case updated", "Linked case added", idamService.getIdamTokens());
+                    Consumer<SscsCaseData> caseDataConsumer = caseData -> {
+                        caseData.setLinkedCase(linkedCaseList);
+                    };
+                    updateCcdCaseService.updateCaseV2(Long.valueOf(sscsCaseData.getCcdCaseId()), EventType.CASE_UPDATED.getCcdType(), "Case updated", "Linked case added", idamService.getIdamTokens(), caseDataConsumer);
                 }
             }
         }
