@@ -42,11 +42,10 @@ import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
     "uk.gov.hmcts.reform.idam",
     "uk.gov.hmcts.reform.sscs.client",
     "uk.gov.hmcts.reform.sendletter",
-    "uk.gov.hmcts.reform.ccd.client",
-    "uk.gov.hmcts.reform.sscs.service.documentmanagement"
+    "uk.gov.hmcts.reform.ccd.client"
 })
 
-@ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
+@ComponentScan(basePackages = {"uk.gov.hmcts.reform", "uk.gov.hmcts.reform.sscs", "uk.gov.hmcts.reform.ccd.document.am"})
 @EnableScheduling
 @EnableRetry
 public class TribunalsCaseApiApplication {

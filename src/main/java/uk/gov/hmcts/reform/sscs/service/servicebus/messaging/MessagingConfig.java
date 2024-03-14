@@ -18,6 +18,7 @@ import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.util.backoff.FixedBackOff;
 
 @Configuration
 @Slf4j
@@ -35,7 +36,7 @@ public class MessagingConfig {
     }
 
     @Bean
-    public ConnectionFactory jmsConnectionFactory(@Value("${spring.application.name}") final String clientId,
+    public ConnectionFactory jmsConnectionFactory(@Value("${amqp.clientId}") final String clientId,
                                                   @Value("${amqp.username}") final String username,
                                                   @Value("${amqp.password}") final String password,
                                                   @Autowired final String jmsUrlString,
@@ -108,6 +109,7 @@ public class MessagingConfig {
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);
         returnValue.setSubscriptionDurable(Boolean.TRUE);
+        returnValue.setBackOff(new FixedBackOff(5000, 3));
         returnValue.setErrorHandler(new JmsErrorHandler());
         return returnValue;
     }
