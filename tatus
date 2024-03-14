@@ -1,0 +1,94 @@
+[1mdiff --git a/src/test/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/draft/UpdateDraftHandlerTest.java b/src/test/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/draft/UpdateDraftHandlerTest.java[m
+[1mindex 2b9ed7971..2431772ed 100644[m
+[1m--- a/src/test/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/draft/UpdateDraftHandlerTest.java[m
+[1m+++ b/src/test/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/draft/UpdateDraftHandlerTest.java[m
+[36m@@ -1,2 +1,88 @@[m
+[31m-package uk.gov.hmcts.reform.sscs.ccd.presubmit.draft;public class UpdateDraftHandlerTest {[m
+[32m+[m[32mpackage uk.gov.hmcts.reform.sscs.ccd.presubmit.draft;[m
+[32m+[m
+[32m+[m[32mimport static org.hamcrest.MatcherAssert.assertThat;[m
+[32m+[m[32mimport static org.hamcrest.Matchers.equalToObject;[m
+[32m+[m[32mimport static org.hamcrest.Matchers.samePropertyValuesAs;[m
+[32m+[m[32mimport static org.junit.Assert.assertFalse;[m
+[32m+[m[32mimport static org.junit.Assert.assertThrows;[m
+[32m+[m[32mimport static org.junit.Assert.assertTrue;[m
+[32m+[m[32mimport static org.junit.jupiter.api.Assertions.assertEquals;[m
+[32m+[m[32mimport static org.mockito.Mockito.when;[m
+[32m+[m[32mimport static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;[m
+[32m+[m
+[32m+[m[32mimport org.junit.jupiter.api.BeforeEach;[m
+[32m+[m[32mimport org.junit.jupiter.api.Test;[m
+[32m+[m[32mimport org.junit.jupiter.api.extension.ExtendWith;[m
+[32m+[m[32mimport org.mockito.Mock;[m
+[32m+[m[32mimport org.mockito.junit.jupiter.MockitoExtension;[m
+[32m+[m[32mimport uk.gov.hmcts.reform.sscs.ccd.callback.Callback;[m
+[32m+[m[32mimport uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;[m
+[32m+[m[32mimport uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;[m
+[32m+[m[32mimport uk.gov.hmcts.reform.sscs.ccd.domain.EventType;[m
+[32m+[m[32mimport uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;[m
+[32m+[m[32mimport uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;[m
+[32m+[m
+[32m+[m[32m@ExtendWith(MockitoExtension.class)[m
+[32m+[m[32mpublic class UpdateDraftHandlerTest {[m
+[32m+[m
+[32m+[m[32m    private static final String USER_AUTHORISATION = "Bearer token";[m
+[32m+[m[32m    private static final Long CCD_CASE_ID = 1234567890L;[m
+[32m+[m
+[32m+[m[32m    @Mock[m
+[32m+[m[32m    private Callback<SscsCaseData> callback;[m
+[32m+[m
+[32m+[m[32m    @Mock[m
+[32m+[m[32m    private CaseDetails<SscsCaseData> caseDetails;[m
+[32m+[m
+[32m+[m[32m    private UpdateDraftHandler updateDraftHandler;[m
+[32m+[m
+[32m+[m[32m    @BeforeEach[m
+[32m+[m[32m    void setUp() {[m
+[32m+[m[32m        updateDraftHandler = new UpdateDraftHandler();[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    @Test[m
+[32m+[m[32m    public void givenValidEvent_thenReturnTrue() {[m
+[32m+[m[32m        when(callback.getEvent()).thenReturn(EventType.UPDATE_DRAFT);[m
+[32m+[m
+[32m+[m[32m        assertTrue(updateDraftHandler.canHandle(ABOUT_TO_SUBMIT, callback));[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    @Test[m
+[32m+[m[32m    public void givenAnInvalidEvent_thenReturnFalse() {[m
+[32m+[m[32m        when(callback.getEvent()).thenReturn(EventType.UPDATE_CASE_ONLY);[m
+[32m+[m
+[32m+[m[32m        assertFalse(updateDraftHandler.canHandle(ABOUT_TO_SUBMIT, callback));[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    @Test[m
+[32m+[m[32m    public void givenAnInvalidEvent_handleThrowsIllegalStateException() {[m
+[32m+[m[32m        when(callback.getEvent()).thenReturn(EventType.UPDATE_CASE_ONLY);[m
+[32m+[m
+[32m+[m[32m        Exception exception = assertThrows(IllegalStateException.class, () -> {[m
+[32m+[m[32m            updateDraftHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);[m
+[32m+[m[32m        });[m
+[32m+[m
+[32m+[m[32m        String expectedMessage = "Cannot handle callback";[m
+[32m+[m[32m        String actualMessage = exception.getMessage();[m
+[32m+[m
+[32m+[m[32m        assertTrue(actualMessage.contains(expectedMessage));[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    @Test[m
+[32m+[m[32m    public void givenValidEvent_handleDoesNothing() {[m
+[32m+[m[32m        SscsCaseData caseData = CaseDataUtils.buildCaseData();[m
+[32m+[m[32m        caseData.setCcdCaseId(CCD_CASE_ID.toString());[m
+[32m+[m[32m        String expected = caseData.toString();[m
+[32m+[m
+[32m+[m[32m        when(callback.getEvent()).thenReturn(EventType.UPDATE_DRAFT);[m
+[32m+[m[32m        when(callback.getCaseDetails()).thenReturn(caseDetails);[m
+[32m+[m[32m        when(caseDetails.getCaseData()).thenReturn(caseData);[m
+[32m+[m
+[32m+[m[32m        PreSubmitCallbackResponse<SscsCaseData> response = updateDraftHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);[m
+[32m+[m
+[32m+[m[32m        String actual = response.getData().toString();[m
+[32m+[m
+[32m+[m[32m        assertEquals(expected, actual);[m
+[32m+[m[32m    }[m
+ }[m
