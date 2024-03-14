@@ -10,11 +10,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -22,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -34,6 +38,7 @@ public class CancelTranslationsSubmittedHandlerTest {
 
     @Mock
     private CcdService ccdService;
+
     @Mock
     private IdamService idamService;
 
@@ -43,12 +48,18 @@ public class CancelTranslationsSubmittedHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private UpdateCcdCaseService updateCcdCaseService;
+
+    @Captor
+    private ArgumentCaptor<Consumer<SscsCaseData>> caseDataConsumer;
+
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        handler = new CancelTranslationsSubmittedHandler(ccdService, idamService);
+        handler = new CancelTranslationsSubmittedHandler(ccdService, idamService, updateCcdCaseService);
         when(callback.getEvent()).thenReturn(EventType.CANCEL_TRANSLATIONS);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build())
             .sscsWelshPreviewNextEvent("sendToDwp")
@@ -88,19 +99,22 @@ public class CancelTranslationsSubmittedHandlerTest {
 
     @Test
     public void shouldCallUpdateCaseWithUrgentCaseEvent() {
-        SscsCaseData caseData = buildDataWithDocumentType(DocumentType.URGENT_HEARING_REQUEST.getValue());
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.MAKE_CASE_URGENT.getCcdType(), "Send a case to urgent hearing",
-                OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens))
-                .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+        SscsCaseData caseData = buildDataWithDocumentType(DocumentType.URGENT_HEARING_REQUEST.getValue());
+        when(updateCcdCaseService.updateCaseV2(eq(callback.getCaseDetails().getId()),
+                eq(EventType.MAKE_CASE_URGENT.getCcdType()),
+                anyString(), anyString(), any(IdamTokens.class), any(Consumer.class)))
+                .thenReturn(SscsCaseDetails.builder().data(caseData).build());
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.MAKE_CASE_URGENT.getCcdType(),
-                "Send a case to urgent hearing", OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens);
+        verify(updateCcdCaseService).updateCaseV2(eq(callback.getCaseDetails().getId()), eq(EventType.MAKE_CASE_URGENT.getCcdType()),
+                eq("Send a case to urgent hearing"), eq(OTHER_DOCUMENT_MANUAL.getLabel()), any(), caseDataConsumer.capture());
+
+        Consumer<SscsCaseData> caseDataConsumerValue = caseDataConsumer.getValue();
+        caseDataConsumerValue.accept(caseData);
         assertNull(caseData.getSscsWelshPreviewNextEvent());
     }
 

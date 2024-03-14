@@ -16,8 +16,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Service
@@ -26,11 +26,14 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
 
     private final CcdService ccdService;
     private final IdamService idamService;
+    private final UpdateCcdCaseService updateCcdCaseService;
 
     public CancelTranslationsSubmittedHandler(CcdService ccdService,
-                                              IdamService idamService) {
+                                              IdamService idamService,
+                                              UpdateCcdCaseService updateCcdCaseService) {
         this.ccdService = ccdService;
         this.idamService = idamService;
+        this.updateCcdCaseService = updateCcdCaseService;
     }
 
     @Override
@@ -53,8 +56,7 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
         caseData.setSscsWelshPreviewNextEvent(null);
 
         if (isValidUrgentDocument(callback.getCaseDetails().getCaseData())) {
-            setMakeCaseUrgentTriggerEvent(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(),
-                    OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Send a case to urgent hearing");
+            setMakeCaseUrgentTriggerEvent(callback.getCaseDetails().getId());
         } else if (isValidResinstatementRequestDocument(callback.getCaseDetails().getCaseData())) {
 
             updateForReinstatementRequestEvent(caseData, callback.getCaseDetails().getId(), sscsWelshPreviewNextEvent);
@@ -80,12 +82,16 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
                 && (!CollectionUtils.isEmpty(caseData.getSscsDocument()) && caseData.getSscsDocument().stream().anyMatch(d -> REINSTATEMENT_REQUEST.getValue().equals(d.getValue().getDocumentType())));
     }
 
-    private SscsCaseDetails setMakeCaseUrgentTriggerEvent(
-            SscsCaseData caseData, Long caseId,
-            FurtherEvidenceActionDynamicListItems interlocType, EventType eventType, String summary) {
-        return ccdService.updateCase(caseData, caseId,
-                eventType.getCcdType(), summary,
-                interlocType.getLabel(), idamService.getIdamTokens());
+    private SscsCaseDetails setMakeCaseUrgentTriggerEvent(Long caseId) {
+        log.info("Triggering makeCaseUrgent event using updateCaseV2 for {}", caseId);
+        return updateCcdCaseService.updateCaseV2(
+                caseId,
+                EventType.MAKE_CASE_URGENT.getCcdType(),
+                "Send a case to urgent hearing",
+                OTHER_DOCUMENT_MANUAL.getLabel(),
+                idamService.getIdamTokens(),
+                sscsCaseData -> { }
+        );
     }
 
     private SscsCaseDetails updateForReinstatementRequestEvent(
