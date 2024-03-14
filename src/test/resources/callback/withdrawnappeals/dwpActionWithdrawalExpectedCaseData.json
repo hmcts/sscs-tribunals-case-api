@@ -52,8 +52,7 @@
         },
         "organisation": null,
         "identity": {
-          "dob": null,
-          "nino": null
+          "dob": null
         }
       },
       "isAddressSameAsAppointee": null
