@@ -99,7 +99,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     void setUp() {
         Boolean addLinkToOtherAssociatedCasesV2Boolean = getAddLinkToOtherAssociatedCasesV2();
         AssociatedCaseLinkHelper associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService, updateCcdCaseService);
-        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2", addLinkToOtherAssociatedCasesV2Boolean);
+        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2Enabled", addLinkToOtherAssociatedCasesV2Boolean);
 
         handler = new CaseUpdatedAboutToSubmitHandler(
             regionalProcessingCenterService,

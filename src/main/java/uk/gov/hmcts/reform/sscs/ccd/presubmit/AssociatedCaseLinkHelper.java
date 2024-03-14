@@ -20,7 +20,7 @@ public class AssociatedCaseLinkHelper {
     private final IdamService idamService;
     private final UpdateCcdCaseService updateCcdCaseService;
     @Value("${feature.add-link-to-other-associated-cases-v2.enabled}")
-    private boolean addLinkToOtherAssociatedCasesV2;
+    private boolean addLinkToOtherAssociatedCasesV2Enabled;
 
     @Autowired
     public AssociatedCaseLinkHelper(CcdService ccdService, IdamService idamService, UpdateCcdCaseService updateCcdCaseService) {
@@ -68,8 +68,8 @@ public class AssociatedCaseLinkHelper {
         if (!matchedByNinoCases.isEmpty()) {
             caseData.setAssociatedCase(new ArrayList<>(associatedCases));
             caseData.setLinkedCasesBoolean("Yes");
-            if (addLinkToOtherAssociatedCasesV2) {
-                addLinkToOtherAssociatedCasesV2(matchedByNinoCases, caseData.getCcdCaseId());
+            if (addLinkToOtherAssociatedCasesV2Enabled) {
+                addLinkToOtherAssociatedCasesV2Enabled(matchedByNinoCases, caseData.getCcdCaseId());
             } else {
                 addLinkToOtherAssociatedCases(matchedByNinoCases, caseData.getCcdCaseId());
             }
@@ -96,7 +96,7 @@ public class AssociatedCaseLinkHelper {
         }
     }
 
-    private void addLinkToOtherAssociatedCasesV2(List<SscsCaseDetails> matchedByNinoCases, String caseId) {
+    private void addLinkToOtherAssociatedCasesV2Enabled(List<SscsCaseDetails> matchedByNinoCases, String caseId) {
         log.info("Adding link to other associated cases V2");
         if (!matchedByNinoCases.isEmpty() && !StringUtils.isEmpty(caseId)) {
             for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {

@@ -58,7 +58,7 @@ public class AssociatedCaseLinkHelperTest {
 
     @Test
     public void shouldLinkCaseByNinoIfPreviousNinoNotPresent() {
-        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2", false);
+        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2Enabled", false);
 
         Appellant appellant = Appellant.builder().identity(Identity.builder().nino("AB223344B").build()).build();
 
@@ -88,7 +88,7 @@ public class AssociatedCaseLinkHelperTest {
 
     @Test
     public void shouldLinkCaseByNinoIfPreviousNinoNotPresentV2() {
-        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2", true);
+        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2Enabled", true);
 
         Appellant appellant = Appellant.builder().identity(Identity.builder().nino("AB223344B").build()).build();
 
@@ -124,9 +124,9 @@ public class AssociatedCaseLinkHelperTest {
 
     @Test
     @Parameters({"true", "false"})
-    public void shouldNotLinkCaseByNinoIfPreviousNinoIsPresent(String addLinkToOtherAssociatedCasesV2) {
-        Boolean addLinkToOtherAssociatedCasesV2Boolean = Boolean.valueOf(addLinkToOtherAssociatedCasesV2);
-        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2", addLinkToOtherAssociatedCasesV2Boolean);
+    public void shouldNotLinkCaseByNinoIfPreviousNinoIsPresent(String addLinkToOtherAssociatedCasesV2Enabled) {
+        Boolean addLinkToOtherAssociatedCasesV2Boolean = Boolean.valueOf(addLinkToOtherAssociatedCasesV2Enabled);
+        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2Enabled", addLinkToOtherAssociatedCasesV2Boolean);
 
         Appellant appellant = Appellant.builder().identity(Identity.builder().nino("AB223344B").build()).build();
 
@@ -154,9 +154,9 @@ public class AssociatedCaseLinkHelperTest {
 
     @Test
     @Parameters({"true", "false"})
-    public void shouldLinkCaseByNinoButNotToOthersIfCaseIdIsNull(String addLinkToOtherAssociatedCasesV2) {
-        Boolean addLinkToOtherAssociatedCasesV2Boolean = Boolean.valueOf(addLinkToOtherAssociatedCasesV2);
-        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2", addLinkToOtherAssociatedCasesV2Boolean);
+    public void shouldLinkCaseByNinoButNotToOthersIfCaseIdIsNull(String addLinkToOtherAssociatedCasesV2Enabled) {
+        Boolean addLinkToOtherAssociatedCasesV2Boolean = Boolean.valueOf(addLinkToOtherAssociatedCasesV2Enabled);
+        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2Enabled", addLinkToOtherAssociatedCasesV2Boolean);
 
         Appellant appellant = Appellant.builder().identity(Identity.builder().nino("AB223344B").build()).build();
         SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
@@ -183,7 +183,7 @@ public class AssociatedCaseLinkHelperTest {
 
     @Test
     public void givenMultipleAssociatedCases_thenAddAllAssociatedCaseLinksToCase() {
-        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2", false);
+        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2Enabled", false);
 
         SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").build()).build();
         SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().ccdCaseId("56765676").build()).build();
@@ -209,7 +209,7 @@ public class AssociatedCaseLinkHelperTest {
 
     @Test
     public void givenMultipleAssociatedCases_thenAddAllAssociatedCaseLinksToCaseV2() {
-        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2", true);
+        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2Enabled", true);
 
         SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").build()).build();
         SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().ccdCaseId("56765676").build()).build();
@@ -241,9 +241,9 @@ public class AssociatedCaseLinkHelperTest {
 
     @Test
     @Parameters({"true", "false"})
-    public void addNoAssociatedCases(String addLinkToOtherAssociatedCasesV2) {
-        Boolean addLinkToOtherAssociatedCasesV2Boolean = Boolean.valueOf(addLinkToOtherAssociatedCasesV2);
-        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2", addLinkToOtherAssociatedCasesV2Boolean);
+    public void addNoAssociatedCases(String addLinkToOtherAssociatedCasesV2Enabled) {
+        Boolean addLinkToOtherAssociatedCasesV2Boolean = Boolean.valueOf(addLinkToOtherAssociatedCasesV2Enabled);
+        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2Enabled", addLinkToOtherAssociatedCasesV2Boolean);
 
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
 
@@ -258,9 +258,9 @@ public class AssociatedCaseLinkHelperTest {
 
     @Test
     @Parameters({"true", "false"})
-    public void getMatchedCases(String addLinkToOtherAssociatedCasesV2) {
-        Boolean addLinkToOtherAssociatedCasesV2Boolean = Boolean.valueOf(addLinkToOtherAssociatedCasesV2);
-        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2", addLinkToOtherAssociatedCasesV2Boolean);
+    public void getMatchedCases(String addLinkToOtherAssociatedCasesV2Enabled) {
+        Boolean addLinkToOtherAssociatedCasesV2Boolean = Boolean.valueOf(addLinkToOtherAssociatedCasesV2Enabled);
+        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2Enabled", addLinkToOtherAssociatedCasesV2Boolean);
 
         given(ccdService.findCaseBy(any(), any(), any())).willReturn(Collections.singletonList(
                 SscsCaseDetails.builder().id(12345678L).build()
