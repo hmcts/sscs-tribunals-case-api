@@ -198,16 +198,17 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (isNull(party.getAddress())) {
             response.addError("You must enter address line 1 for the " + partyName);
             response.addError("You must enter a valid UK postcode for the " + partyName);
-        }
-        String addressLine1 = party.getAddress().getLine1();
-        String postcode = party.getAddress().getPostcode();
+        } else {
+            String addressLine1 = party.getAddress().getLine1();
+            String postcode = party.getAddress().getPostcode();
 
-        if (isBlank(addressLine1)) {
-            response.addError("You must enter address line 1 for the " + partyName);
-        }
+            if (isBlank(addressLine1)) {
+                response.addError("You must enter address line 1 for the " + partyName);
+            }
 
-        if (isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
-            response.addError("You must enter a valid UK postcode for the " + partyName);
+            if (isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
+                response.addError("You must enter a valid UK postcode for the " + partyName);
+            }
         }
     }
 
