@@ -46,7 +46,7 @@ public class DocumentServiceConsumerTest {
     private static final String DOCUMENT_ID = "5c3c3906-2b51-468e-8cbb-a4002eded075";
     private static final String AUTH_TOKEN = "Bearer someAuthToken";
 
-    @Pact(provider = "em_dm_store", consumer = "sscs_evidenceShare")
+    @Pact(provider = "em_dm_store", consumer = "sscs_tribunalsCaseApi")
     public RequestResponsePact generatePactFragment(PactDslWithProvider builder) throws IOException {
         Map<String, String> headers = Maps.newHashMap();
         headers.put("ServiceAuthorization", SOME_SERVICE_AUTHORIZATION_TOKEN);

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.idam;
+package uk.gov.hmcts.reform.sscs.idam;
 
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.consumer.junit5.PactTestFor;

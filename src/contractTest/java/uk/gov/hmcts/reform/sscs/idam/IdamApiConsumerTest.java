@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.idam;
+package uk.gov.hmcts.reform.sscs.idam;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

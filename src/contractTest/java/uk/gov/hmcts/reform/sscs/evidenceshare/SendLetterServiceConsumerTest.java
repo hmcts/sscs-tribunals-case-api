@@ -53,7 +53,7 @@ public class SendLetterServiceConsumerTest {
     private static final String SERVICE_AUTHORIZATION_HEADER = "ServiceAuthorization";
     private final String someServiceAuthToken = "someServiceAuthToken";
 
-    @Pact(provider = "rpeSendLetterService_SendLetterController", consumer = "sscs_evidenceShare")
+    @Pact(provider = "rpeSendLetterService_SendLetterController", consumer = "sscs_tribunalsCaseApi")
     public RequestResponsePact createPactFragment(PactDslWithProvider builder) throws IOException, URISyntaxException {
         return builder
             .given("A valid send letter request is received")
