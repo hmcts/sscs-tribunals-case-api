@@ -195,10 +195,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void validateAddressAndPostcode(PreSubmitCallbackResponse<SscsCaseData> response, Entity party, String partyName) {
-        //    if(isNull(party.getAddress())){
-        //        response.addError("You must enter address line 1 for the " + partyName);
-        //        response.addError("You must enter a valid UK postcode for the " + partyName);
-        //    }
+        if (isNull(party.getAddress())) {
+            response.addError("You must enter address line 1 for the " + partyName);
+            response.addError("You must enter a valid UK postcode for the " + partyName);
+        }
         String addressLine1 = party.getAddress().getLine1();
         String postcode = party.getAddress().getPostcode();
 
