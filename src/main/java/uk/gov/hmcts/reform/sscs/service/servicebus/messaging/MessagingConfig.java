@@ -109,7 +109,6 @@ public class MessagingConfig {
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);
         returnValue.setSubscriptionDurable(Boolean.TRUE);
-        returnValue.setBackOff(new FixedBackOff(5000, 3));
         returnValue.setErrorHandler(new JmsErrorHandler());
         return returnValue;
     }
