@@ -53,9 +53,6 @@ public abstract class AbstractEventIt {
     @MockBean
     protected AuthorisationService authorisationService;
 
-    @MockBean
-    protected AirLookupService airLookupService;
-
     @Autowired
     protected SscsCaseCallbackDeserializer deserializer;
 
