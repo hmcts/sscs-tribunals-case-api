@@ -41,6 +41,10 @@ java:
     ELASTIC_SEARCH_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
     DUMMY: true
+  secrets:
+    AMQP_PASSWORD:
+      secretRef: sscs-sb-preview
+      key: primaryKey
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
