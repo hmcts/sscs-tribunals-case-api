@@ -82,15 +82,14 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
                 && (!CollectionUtils.isEmpty(caseData.getSscsDocument()) && caseData.getSscsDocument().stream().anyMatch(d -> REINSTATEMENT_REQUEST.getValue().equals(d.getValue().getDocumentType())));
     }
 
-    private SscsCaseDetails setMakeCaseUrgentTriggerEvent(Long caseId) {
+    private void setMakeCaseUrgentTriggerEvent(Long caseId) {
         log.info("Triggering makeCaseUrgent event using updateCaseV2 for {}", caseId);
-        return updateCcdCaseService.updateCaseV2(
+        updateCcdCaseService.updateCaseV2(
                 caseId,
                 EventType.MAKE_CASE_URGENT.getCcdType(),
                 "Send a case to urgent hearing",
                 OTHER_DOCUMENT_MANUAL.getLabel(),
-                idamService.getIdamTokens(),
-                sscsCaseData -> { }
+                idamService.getIdamTokens()
         );
     }
 

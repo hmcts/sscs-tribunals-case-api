@@ -86,15 +86,14 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
         return (isTranslationsOutstanding && (isDocReinstatement || isWelshReinstatement));
     }
 
-    private SscsCaseDetails setMakeCaseUrgentTriggerEvent(Long caseId) {
+    private void setMakeCaseUrgentTriggerEvent(Long caseId) {
         log.info("Triggering makeCaseUrgent event using updateCaseV2 for {}", caseId);
-        return updateCcdCaseService.updateCaseV2(
+        updateCcdCaseService.updateCaseV2(
                 caseId,
                 EventType.MAKE_CASE_URGENT.getCcdType(),
                 "Send a case to urgent hearing",
                 OTHER_DOCUMENT_MANUAL.getLabel(),
-                idamService.getIdamTokens(),
-                sscsCaseData -> { }
+                idamService.getIdamTokens()
         );
     }
 

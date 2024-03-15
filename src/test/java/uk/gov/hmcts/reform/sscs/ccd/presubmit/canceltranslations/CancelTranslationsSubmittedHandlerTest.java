@@ -10,14 +10,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -50,9 +47,6 @@ public class CancelTranslationsSubmittedHandlerTest {
 
     @Mock
     private UpdateCcdCaseService updateCcdCaseService;
-
-    @Captor
-    private ArgumentCaptor<Consumer<SscsCaseData>> caseDataConsumer;
 
     private SscsCaseData sscsCaseData;
 
@@ -102,20 +96,11 @@ public class CancelTranslationsSubmittedHandlerTest {
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        SscsCaseData caseData = buildDataWithDocumentType(DocumentType.URGENT_HEARING_REQUEST.getValue());
-        when(updateCcdCaseService.updateCaseV2(eq(callback.getCaseDetails().getId()),
-                eq(EventType.MAKE_CASE_URGENT.getCcdType()),
-                anyString(), anyString(), any(IdamTokens.class), any(Consumer.class)))
-                .thenReturn(SscsCaseDetails.builder().data(caseData).build());
-
+        buildDataWithDocumentType(DocumentType.URGENT_HEARING_REQUEST.getValue());
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         verify(updateCcdCaseService).updateCaseV2(eq(callback.getCaseDetails().getId()), eq(EventType.MAKE_CASE_URGENT.getCcdType()),
-                eq("Send a case to urgent hearing"), eq(OTHER_DOCUMENT_MANUAL.getLabel()), any(), caseDataConsumer.capture());
-
-        Consumer<SscsCaseData> caseDataConsumerValue = caseDataConsumer.getValue();
-        caseDataConsumerValue.accept(caseData);
-        assertNull(caseData.getSscsWelshPreviewNextEvent());
+                eq("Send a case to urgent hearing"), eq(OTHER_DOCUMENT_MANUAL.getLabel()), any());
     }
 
     @Test

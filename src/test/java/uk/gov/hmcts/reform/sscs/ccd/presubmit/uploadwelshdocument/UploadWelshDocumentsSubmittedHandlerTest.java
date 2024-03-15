@@ -12,14 +12,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -52,9 +49,6 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
     @Mock
     private UpdateCcdCaseService updateCcdCaseService;
-
-    @Captor
-    private ArgumentCaptor<Consumer<SscsCaseData>> caseDataCaptor;
 
     private SscsCaseData sscsCaseData;
 
@@ -103,23 +97,13 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
     public void shouldCallUpdateCaseWithUrgentCaseEvent() {
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        SscsCaseData caseData = buildDataWithUrgentRequestDocument();
-        when(updateCcdCaseService.updateCaseV2(eq(callback.getCaseDetails().getId()),
-                eq(EventType.MAKE_CASE_URGENT.getCcdType()), eq("Send a case to urgent hearing"),
-                eq(OTHER_DOCUMENT_MANUAL.getLabel()), any(), any()))
-                .thenReturn(SscsCaseDetails.builder().data(caseData).build());
+        buildDataWithUrgentRequestDocument();
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         verify(updateCcdCaseService).updateCaseV2(eq(callback.getCaseDetails().getId()),
                 eq(EventType.MAKE_CASE_URGENT.getCcdType()), eq("Send a case to urgent hearing"),
-                eq(OTHER_DOCUMENT_MANUAL.getLabel()), any(), caseDataCaptor.capture());
-
-        Consumer<SscsCaseData> caseDataCaptorValue = caseDataCaptor.getValue();
-        caseDataCaptorValue.accept(caseData);
-        assertNull(caseData.getSscsWelshPreviewNextEvent());
-
+                eq(OTHER_DOCUMENT_MANUAL.getLabel()), any());
     }
 
     @Test
@@ -139,19 +123,10 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        when(updateCcdCaseService.updateCaseV2(anyLong(),
-                eq(EventType.MAKE_CASE_URGENT.getCcdType()), eq("Send a case to urgent hearing"),
-                eq(OTHER_DOCUMENT_MANUAL.getLabel()), any(), any()))
-                .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
-
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         verify(updateCcdCaseService).updateCaseV2(eq(callback.getCaseDetails().getId()), eq(EventType.MAKE_CASE_URGENT.getCcdType()),
-                eq("Send a case to urgent hearing"), eq(OTHER_DOCUMENT_MANUAL.getLabel()), any(), caseDataCaptor.capture());
-
-        Consumer<SscsCaseData> caseDataCaptorValue = caseDataCaptor.getValue();
-        caseDataCaptorValue.accept(caseData);
-        assertNull(caseData.getSscsWelshPreviewNextEvent());
+                eq("Send a case to urgent hearing"), eq(OTHER_DOCUMENT_MANUAL.getLabel()), any());
     }
 
     @Test
