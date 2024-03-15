@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
@@ -122,6 +123,9 @@ public class EvidenceShareServiceIt {
 
     @Captor
     private ArgumentCaptor<SscsCaseData> caseDataCaptor;
+
+    @MockBean
+    protected AirLookupService airLookupService;
 
     private static final String FILE_CONTENT = "Welcome to PDF document service";
 

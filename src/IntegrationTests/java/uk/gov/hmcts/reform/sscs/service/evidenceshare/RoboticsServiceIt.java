@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsWrapper;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -66,6 +67,7 @@ public class RoboticsServiceIt {
 
     @Mock
     private SscsCaseDetails sscsCaseDetails;
+
 
     @Before
     public void setup() {

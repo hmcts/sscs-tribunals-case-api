@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.PdfDocumentRequest;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
 import uk.gov.hmcts.reform.sscs.service.servicebus.TopicConsumer;
 
@@ -92,6 +93,9 @@ public class ReissueFurtherEvidenceServiceIt {
 
     @Autowired
     private TopicConsumer topicConsumer;
+
+    @MockBean
+    protected AirLookupService airLookupService;
 
     @Captor
     ArgumentCaptor<ArrayList<Pdf>> documentCaptor;

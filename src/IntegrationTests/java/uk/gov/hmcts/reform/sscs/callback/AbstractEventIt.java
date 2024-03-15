@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackDispatcher;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @TestPropertySource(locations = "classpath:config/application_it.properties")
@@ -51,6 +52,9 @@ public abstract class AbstractEventIt {
 
     @MockBean
     protected AuthorisationService authorisationService;
+
+    @MockBean
+    protected AirLookupService airLookupService;
 
     @Autowired
     protected SscsCaseCallbackDeserializer deserializer;

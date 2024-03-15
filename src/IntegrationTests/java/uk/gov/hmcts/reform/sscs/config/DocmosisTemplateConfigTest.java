@@ -7,12 +7,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.config.evidenceshare.DocmosisTemplateConfig;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_it.properties")
@@ -28,6 +30,9 @@ public class DocmosisTemplateConfigTest {
 
     @Autowired
     private DocmosisTemplateConfig docmosisTemplateConfig;
+
+    @MockBean
+    protected AirLookupService airLookupService;
 
     @Test
     public void docmosisTemplate() {

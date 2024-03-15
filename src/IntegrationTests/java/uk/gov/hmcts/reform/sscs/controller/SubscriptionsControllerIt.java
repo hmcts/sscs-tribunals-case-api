@@ -17,6 +17,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.MessageAuthenticationService;
 
 @RunWith(SpringRunner.class)
@@ -24,6 +25,9 @@ import uk.gov.hmcts.reform.sscs.service.MessageAuthenticationService;
 @TestPropertySource(locations = "classpath:config/application_it.properties")
 @AutoConfigureMockMvc(addFilters = false)
 public class SubscriptionsControllerIt {
+
+    @MockBean
+    protected AirLookupService airLookupService;
 
     @Autowired
     private MockMvc mockMvc;

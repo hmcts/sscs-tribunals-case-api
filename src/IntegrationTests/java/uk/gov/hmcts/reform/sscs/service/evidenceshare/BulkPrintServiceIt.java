@@ -19,6 +19,7 @@ import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 
 
 @RunWith(JUnitParamsRunner.class)
@@ -47,6 +48,9 @@ public class BulkPrintServiceIt {
     @MockBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
     private CcdClient ccdClient;
+
+    @MockBean
+    protected AirLookupService airLookupService;
 
     @Autowired
     private BulkPrintService bulkPrintService;

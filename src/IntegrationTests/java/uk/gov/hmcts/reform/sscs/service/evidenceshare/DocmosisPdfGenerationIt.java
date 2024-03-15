@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 
 @SpringBootTest(classes = TribunalsCaseApiApplication.class)
 @TestPropertySource(locations = "classpath:config/application_es_it.properties")
@@ -38,6 +40,9 @@ public class DocmosisPdfGenerationIt {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @MockBean
+    protected AirLookupService airLookupService;
 
     private MockRestServiceServer mockServer;
 
