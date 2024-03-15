@@ -40,22 +40,24 @@ public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackH
         if (deletedRedactedDocEnabled) {
             var scannedDocuments = callback.getCaseDetails().getCaseData().getScannedDocuments();
 
-            callback.getCaseDetailsBefore().ifPresent(
-                    sscsCaseDataCaseDetailsBefore -> {
-                        sscsCaseDataCaseDetailsBefore.getCaseData().getScannedDocuments()
-                                .stream()
-                                .filter(scannedDocumentBefore -> scannedDocumentBefore.getValue().getEditedUrl() != null)
-                                .forEach(scannedDocumentBefore -> {
-                                    scannedDocuments
-                                            .stream()
-                                            .forEach(scannedDocument -> {
-                                                if (compare(scannedDocumentBefore, scannedDocument)) {
-                                                    scannedDocument.getValue().setEditedUrl(scannedDocumentBefore.getValue().getEditedUrl());
-                                                }
-                                            });
-                                });
+            if (scannedDocuments != null) {
+                callback.getCaseDetailsBefore().ifPresent(
+                        sscsCaseDataCaseDetailsBefore -> {
+                            sscsCaseDataCaseDetailsBefore.getCaseData().getScannedDocuments()
+                                    .stream()
+                                    .filter(scannedDocumentBefore -> scannedDocumentBefore.getValue().getEditedUrl() != null)
+                                    .forEach(scannedDocumentBefore -> {
+                                        scannedDocuments
+                                                .stream()
+                                                .forEach(scannedDocument -> {
+                                                    if (compare(scannedDocumentBefore, scannedDocument)) {
+                                                        scannedDocument.getValue().setEditedUrl(scannedDocumentBefore.getValue().getEditedUrl());
+                                                    }
+                                                });
+                                    });
 
-                    });
+                        });
+            }
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
