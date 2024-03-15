@@ -26,6 +26,7 @@ public class UpdateDraftHandler implements PreSubmitCallbackHandler<SscsCaseData
         }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        // No nothing, null nino fields will be clean up.
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }
