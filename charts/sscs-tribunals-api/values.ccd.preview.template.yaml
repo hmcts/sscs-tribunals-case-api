@@ -42,6 +42,14 @@ java:
     ELINKS_V2_FEATURE_ENABLED: true
     DELETED_REDACTED_DOC_ENABLED: true
     DUMMY: true
+    TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+    SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+    AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
+    AMQP_USERNAME: "RootManageSharedAccessKey"
+  secrets:
+    AMQP_PASSWORD:
+      secretRef: sscs-sb-preview
+      key: primaryKey
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -790,3 +798,5 @@ servicebus:
         subscriptionNeeded: yes
     queues:
       - name: sscs-orchestrator-queue-preview
+
+
