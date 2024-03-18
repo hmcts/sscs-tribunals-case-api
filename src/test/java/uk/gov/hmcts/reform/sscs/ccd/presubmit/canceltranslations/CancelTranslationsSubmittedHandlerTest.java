@@ -99,7 +99,7 @@ public class CancelTranslationsSubmittedHandlerTest {
         buildDataWithDocumentType(DocumentType.URGENT_HEARING_REQUEST.getValue());
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verify(updateCcdCaseService).updateCaseV2(eq(callback.getCaseDetails().getId()), eq(EventType.MAKE_CASE_URGENT.getCcdType()),
+        verify(updateCcdCaseService).triggerCaseEventV2(eq(callback.getCaseDetails().getId()), eq(EventType.MAKE_CASE_URGENT.getCcdType()),
                 eq("Send a case to urgent hearing"), eq(OTHER_DOCUMENT_MANUAL.getLabel()), any());
     }
 

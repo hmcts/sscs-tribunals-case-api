@@ -83,8 +83,8 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
     }
 
     private void setMakeCaseUrgentTriggerEvent(Long caseId) {
-        log.info("Triggering makeCaseUrgent event using updateCaseV2 for {}", caseId);
-        updateCcdCaseService.updateCaseV2(
+        log.info("Triggering makeCaseUrgent event using triggerCaseEventV2 for {}", caseId);
+        updateCcdCaseService.triggerCaseEventV2(
                 caseId,
                 EventType.MAKE_CASE_URGENT.getCcdType(),
                 "Send a case to urgent hearing",
