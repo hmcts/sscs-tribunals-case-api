@@ -254,7 +254,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
                                         .data(data)
                                         .build())
                         .build()
-                );
+            );
 
         given(coreCaseDataApi.submitEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
             eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
