@@ -20,8 +20,8 @@ public final class PlaceholderConstants {
     public static final String REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL = "rpc_address_line3";
     public static final String REGIONAL_OFFICE_ADDRESS_LINE4_LITERAL = "rpc_address_line4";
     public static final String REGIONAL_OFFICE_COUNTY_LITERAL = "rpc_address_county";
-    static final String REGIONAL_OFFICE_PHONE_LITERAL = "rpc_address_phone";
-    static final String REGIONAL_OFFICE_FAX_LITERAL = "rpc_address_fax";
+    public static final String REGIONAL_OFFICE_PHONE_LITERAL = "rpc_address_phone";
+    public static final String REGIONAL_OFFICE_FAX_LITERAL = "rpc_address_fax";
     public static final String REGIONAL_OFFICE_POSTCODE_LITERAL = "rpc_address_postcode";
 
     public static final String EXELA_ADDRESS_LINE1_LITERAL = "exela_address_line1";
