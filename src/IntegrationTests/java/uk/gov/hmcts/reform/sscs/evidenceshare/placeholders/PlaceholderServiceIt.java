@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders;
+package uk.gov.hmcts.reform.sscs.evidenceshare.placeholders;
 
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
@@ -19,6 +19,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderService;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 
 
