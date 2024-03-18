@@ -84,8 +84,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         if (isPostHearingsEnabled && isFurtherEvidenceActionOptionValid(furtherEvidenceAction, ADMIN_ACTION_CORRECTION)) {
             // TODO 10581 navigate user to Admin correction screen
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
-                    AWAITING_ADMIN_ACTION, ADMIN_ACTION_CORRECTION,
-                    EventType.CORRECTION_REQUEST, "Admin action correction");
+                AWAITING_ADMIN_ACTION, ADMIN_ACTION_CORRECTION,
+                EventType.CORRECTION_REQUEST, "Admin action correction");
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
             caseData.setInterlocReferralDate(LocalDate.now());
