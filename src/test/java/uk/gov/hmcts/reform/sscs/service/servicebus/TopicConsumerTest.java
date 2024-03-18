@@ -15,9 +15,9 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.evidenceshare.exception.*;
 import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
 import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
-import uk.gov.hmcts.reform.sscs.exception.evidenceshare.*;
 import uk.gov.hmcts.reform.sscs.service.exceptions.ClientAuthorisationException;
 
 @RunWith(MockitoJUnitRunner.class)

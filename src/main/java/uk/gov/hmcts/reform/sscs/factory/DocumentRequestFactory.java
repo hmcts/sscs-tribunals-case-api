@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
+import uk.gov.hmcts.reform.sscs.evidenceshare.service.TemplateService;
+import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
-import uk.gov.hmcts.reform.sscs.service.evidenceshare.TemplateService;
-import uk.gov.hmcts.reform.sscs.service.evidenceshare.placeholders.PlaceholderService;
 
 @Component
 @Slf4j

@@ -4,7 +4,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.service.evidenceshare.FeatureToggleService;
+import uk.gov.hmcts.reform.sscs.evidenceshare.service.FeatureToggleService;
 
 
 @Component

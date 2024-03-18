@@ -5,10 +5,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
-import static uk.gov.hmcts.reform.sscs.callback.evidenceshare.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,12 +23,12 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
-import uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.IssueFurtherEvidenceHandler;
-import uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.RoboticsCallbackHandler;
-import uk.gov.hmcts.reform.sscs.callback.handlers.evidenceshare.SendToBulkPrintHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.IssueFurtherEvidenceHandler;
+import uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.RoboticsCallbackHandler;
+import uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.SendToBulkPrintHandler;
 
 @RunWith(JUnitParamsRunner.class)
 public class CallbackDispatcherTest {
