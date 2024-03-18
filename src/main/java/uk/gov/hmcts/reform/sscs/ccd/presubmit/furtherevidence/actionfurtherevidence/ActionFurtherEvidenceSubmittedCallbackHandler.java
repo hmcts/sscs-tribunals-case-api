@@ -157,15 +157,13 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                     OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Send a case to urgent hearing");
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, OTHER_DOCUMENT_MANUAL)) {
-            return updateCcdCaseService.updateCaseV2(callback.getCaseDetails().getId(),
+            return updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
                     EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Actioned manually",
-                    "Actioned manually", idamService.getIdamTokens(), sscsCaseData -> {
-                    });
+                    "Actioned manually", idamService.getIdamTokens());
         }
-        return updateCcdCaseService.updateCaseV2(callback.getCaseDetails().getId(),
+        return updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
                 EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
-                "Issue to all parties", idamService.getIdamTokens(), sscsCaseData -> {
-                });
+                "Issue to all parties", idamService.getIdamTokens());
     }
 
     private SscsCaseDetails handlePostHearing(Callback<SscsCaseData> callback, SscsCaseData caseData, PostHearingRequestType postHearingRequestType) {
@@ -269,12 +267,10 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     private SscsCaseDetails setMakeCaseUrgentTriggerEvent(
             Long caseId,
             FurtherEvidenceActionDynamicListItems interlocType, EventType eventType, String summary) {
-        return updateCcdCaseService.updateCaseV2(
+        return updateCcdCaseService.triggerCaseEventV2(
                 caseId,
                 eventType.getCcdType(), summary,
-                interlocType.getLabel(), idamService.getIdamTokens(),
-                sscsCaseData -> {
-                }
+                interlocType.getLabel(), idamService.getIdamTokens()
         );
     }
 
