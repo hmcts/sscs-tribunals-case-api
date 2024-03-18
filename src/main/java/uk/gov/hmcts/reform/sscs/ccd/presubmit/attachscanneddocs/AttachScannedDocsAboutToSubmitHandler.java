@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
+import feign.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -38,25 +39,26 @@ public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackH
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
 
         if (deletedRedactedDocEnabled) {
-            var scannedDocuments = callback.getCaseDetails().getCaseData().getScannedDocuments();
+            try {
+                var scannedDocuments = callback.getCaseDetails().getCaseData().getScannedDocuments();
 
-            if (scannedDocuments != null) {
                 callback.getCaseDetailsBefore().ifPresent(
-                        sscsCaseDataCaseDetailsBefore -> {
-                            sscsCaseDataCaseDetailsBefore.getCaseData().getScannedDocuments()
-                                    .stream()
-                                    .filter(scannedDocumentBefore -> scannedDocumentBefore.getValue().getEditedUrl() != null)
-                                    .forEach(scannedDocumentBefore -> {
-                                        scannedDocuments
-                                                .stream()
-                                                .forEach(scannedDocument -> {
-                                                    if (compare(scannedDocumentBefore, scannedDocument)) {
-                                                        scannedDocument.getValue().setEditedUrl(scannedDocumentBefore.getValue().getEditedUrl());
-                                                    }
-                                                });
-                                    });
-
+                    sscsCaseDataCaseDetailsBefore -> {
+                        sscsCaseDataCaseDetailsBefore.getCaseData().getScannedDocuments()
+                        .stream()
+                        .filter(scannedDocumentBefore -> scannedDocumentBefore.getValue().getEditedUrl() != null)
+                        .forEach(scannedDocumentBefore -> {
+                            scannedDocuments
+                            .stream()
+                            .forEach(scannedDocument -> {
+                                if (compare(scannedDocumentBefore, scannedDocument)) {
+                                    scannedDocument.getValue().setEditedUrl(scannedDocumentBefore.getValue().getEditedUrl());
+                                }
+                            });
                         });
+                    });
+            } catch (NullPointerException e) {
+                System.out.println("Unhandled exception:" + e);
             }
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
