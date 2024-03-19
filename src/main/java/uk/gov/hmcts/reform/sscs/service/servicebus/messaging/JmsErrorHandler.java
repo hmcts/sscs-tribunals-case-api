@@ -9,6 +9,7 @@ public class JmsErrorHandler implements ErrorHandler {
 
     @Override
     public void handleError(@NonNull Throwable throwable) {
-        log.error(throwable.getCause().getMessage(), throwable);
+        log.warn("spring jms custom error handling example");
+        log.error(throwable.getCause().getMessage());
     }
 }
