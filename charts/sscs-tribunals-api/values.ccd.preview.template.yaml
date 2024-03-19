@@ -798,4 +798,9 @@ servicebus:
     queues:
       - name: sscs-orchestrator-queue-preview
 
+ccd-def-cleanup:
+  enabled: true
+  change_id: sscs-pr-3575
+  case_type_ids:
+    - Benefit
 
