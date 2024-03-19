@@ -28,7 +28,7 @@ java:
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
     CCD_CALLBACK_ORCHESTRATOR_API_URL: http://${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     CORE_CASE_DATA_JURISDICTION_ID: SSCS
-    CORE_CASE_DATA_CASE_TYPE_ID: Benefit-sscs-pr-3575
+    CORE_CASE_DATA_CASE_TYPE_ID: Benefit
     TEST_URL: http://${SERVICE_NAME}
     CREATE_CCD_ENDPOINT: true
     CASE_ACCESS_MANAGEMENT_FEATURE: true
@@ -279,17 +279,17 @@ redis:
     persistence:
       enabled: false
 
-#Turning either hearings api (with either listener on) or cft hearing service on requires
-#service bus to be turned on.
+#Turning hearings api on requires you to follow the hearing steps described in the readme
+#HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME and CORE_CASE_DATA_CASE_TYPE_ID must be updated
 sscs-hearings-api:
-  enabled: true
+  enabled: false
   java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-562-e64eb04-20240308164731" #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     ingressHost: hearings-${SERVICE_FQDN}
     environment:
       ROOT_LOGGING_LEVEL: INFO
-      SSCS_LOG_LEVEL: DEBUG #Switch to debug to see requests being sent.
+      SSCS_LOG_LEVEL: INFO #Switch to debug to see requests being sent.
       SERVICE_BUS_LOG_LEVEL: ERROR
       LOG_OUTPUT: single
       CREATE_CCD_ENDPOINT: false
