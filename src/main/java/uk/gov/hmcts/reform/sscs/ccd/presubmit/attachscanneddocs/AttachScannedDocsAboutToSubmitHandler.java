@@ -62,7 +62,6 @@ public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackH
                         });
             } catch (NullPointerException e) {
                 LOGGER.error("NullPointerException occurred in handle method", e);
-                LOGGER.info("NullPointerException occurred in handle method", e);
             }
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
