@@ -24,3 +24,6 @@ java:
     ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
     ROBOTICS_EMAIL_TO: "fake"
     ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
+    ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
+    ISSUE_GENERIC_LETTER: true
+
