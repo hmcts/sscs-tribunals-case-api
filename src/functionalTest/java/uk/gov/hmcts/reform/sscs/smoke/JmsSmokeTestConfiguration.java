@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.config;
+package uk.gov.hmcts.reform.sscs.smoke;
 
 import javax.jms.ConnectionFactory;
 import org.apache.activemq.ActiveMQConnectionFactory;
@@ -11,7 +11,7 @@ import org.springframework.jms.core.JmsTemplate;
 
 @Configuration
 @EnableJms
-public class JmsConfigurationIT {
+public class JmsSmokeTestConfiguration {
 
     @Bean
     public JmsListenerContainerFactory<?> jmsListenerContainerFactory() {
