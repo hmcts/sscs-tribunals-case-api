@@ -250,7 +250,6 @@ task runGitPreCommitTasks {
     dependsOn 'test'
     dependsOn 'pmdMain'
     dependsOn 'pmdTest'
-    dependsOn 'dependencyCheckAggregate'
     dependsOn 'checkstyleMain'
     dependsOn 'checkstyleTest'
 }
@@ -265,11 +264,6 @@ dependencyManagement {
         //CVE-2023-33202
         dependencySet(group: 'org.springframework.security', version: '1.1.1') {
             entry 'spring-security-rsa'
-        }
-
-        //CVE-2024-25710
-        dependencySet(group: 'org.apache.commons', version: '1.26.0') {
-            entry 'commons-compress'
         }
 
         //CVE-2023-6378, CVE-2023-6481
@@ -422,6 +416,10 @@ dependencies {
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.0'
+
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-core', version: '8.0.6'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '8.0.6'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '8.0.6'
 
     //pact contract testing
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'

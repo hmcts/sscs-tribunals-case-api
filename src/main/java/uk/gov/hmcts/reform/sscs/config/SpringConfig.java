@@ -23,7 +23,8 @@ public class SpringConfig {
         return new SscsCaseCallbackDeserializer(mapper());
     }
 
-    private ObjectMapper mapper() {
+
+    public static ObjectMapper mapper() {
         Jackson2ObjectMapperBuilder objectMapperBuilder =
             new Jackson2ObjectMapperBuilder()
                 .featuresToEnable(READ_ENUMS_USING_TO_STRING)
