@@ -326,10 +326,8 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.3.6'
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.4'
-
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
@@ -418,6 +416,10 @@ dependencies {
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.0'
+
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-core', version: '8.0.6'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '8.0.6'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '8.0.6'
 
     //pact contract testing
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
