@@ -4,8 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -17,9 +16,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
+@Slf4j
 public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AttachScannedDocsAboutToSubmitHandler.class);
     @Value("${feature.deleted-redacted-doc.enabled}")
     private boolean deletedRedactedDocEnabled;
 
@@ -61,7 +59,7 @@ public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackH
 
                         });
             } catch (NullPointerException e) {
-                LOGGER.error("NullPointerException occurred in handle method", e);
+                log.error("NullPointerException occurred in handle method", e);
             }
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
