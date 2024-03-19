@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
+package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.helper;
 
 import static com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils.isNotBlank;
 import static java.util.Objects.nonNull;

@@ -40,6 +40,7 @@ public class IssueDirectionHandler implements CallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        log.info("IssueDirectionHandler canHandle method called for caseId {} and callbackType {}", callback.getCaseDetails().getId(), callbackType);
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 

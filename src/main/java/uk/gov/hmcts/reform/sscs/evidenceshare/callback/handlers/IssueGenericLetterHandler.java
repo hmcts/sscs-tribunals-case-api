@@ -60,6 +60,8 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        log.info("IssueGenericLetterHandler canHandle method called for caseId {} and callbackType {} and event {}"
+            ,callback.getCaseDetails().getId(), callbackType, callback.getEvent());
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbackType must not be null");
 

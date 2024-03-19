@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS1;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS5;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.CaseAccessManagementFieldsHelper.*;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.helper.CaseAccessManagementFieldsHelper.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

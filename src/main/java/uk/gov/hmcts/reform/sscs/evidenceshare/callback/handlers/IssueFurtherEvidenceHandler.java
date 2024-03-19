@@ -47,6 +47,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        log.info("IssueFurtherEvidenceHandler canHandle method called for caseId {} and callbackType {}", callback.getCaseDetails().getId(), callbackType);
         requireNonNull(callback, "callback must not be null");
         return callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent() == EventType.ISSUE_FURTHER_EVIDENCE

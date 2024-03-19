@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
 
 @Component
+@Slf4j
 public class CallbackDispatcher<T extends CaseData> {
 
     private final List<CallbackHandler<T>> callbackHandlers;
@@ -36,6 +38,7 @@ public class CallbackDispatcher<T extends CaseData> {
 
     private void dispatchToHandlers(CallbackType callbackType, Callback<T> callback,
                                     List<CallbackHandler<T>> callbackHandlers) {
+        log.info("Dispatching callback of type {} to {} handlers", callbackType, callbackHandlers.size());
         callbackHandlers.stream()
             .filter(handler -> handler.canHandle(callbackType, callback))
             .forEach(handler -> handler.handle(callbackType, callback));

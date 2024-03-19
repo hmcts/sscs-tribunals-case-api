@@ -28,6 +28,7 @@ public class ConfirmPanelCompositionHandler implements CallbackHandler<SscsCaseD
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        log.info("ConfirmPanelCompositionHandler canHandle method called for caseId {} and callbackType {}", callback.getCaseDetails().getId(), callbackType);
         requireNonNull(callback, "callback must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
