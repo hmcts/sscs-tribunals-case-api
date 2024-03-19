@@ -17,7 +17,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
@@ -168,9 +173,11 @@ public class CitizenLoginService {
 
     private void updateCaseWithLastLoggedIntoMya(String email, SscsCaseDetails caseByAppealNumber) {
         if (citizenLogicServiceV2Enabled) {
+            log.info("Updating case with last logged in MYA using V2, case id: {}, matching email: {}", caseByAppealNumber.getId(), email);
             updateCcdCaseService.updateCaseV2(caseByAppealNumber.getId(), EventType.UPDATE_CASE_ONLY.getCcdType(), "SSCS - update last logged in MYA",
                     UPDATED_SSCS, idamService.getIdamTokens(), caseData -> updateSubscriptionWithLastLoggedIntoMya(caseData, email));
         } else {
+            log.info("Updating case with last logged in MYA using V1, case id: {}, matching email: {}", caseByAppealNumber.getId(), email);
             updateSubscriptionWithLastLoggedIntoMya(caseByAppealNumber.getData(), email);
             ccdService.updateCase(caseByAppealNumber.getData(), caseByAppealNumber.getId(), EventType.UPDATE_CASE_ONLY.getCcdType(),
                     "SSCS - update last logged in MYA", UPDATED_SSCS, idamService.getIdamTokens()
