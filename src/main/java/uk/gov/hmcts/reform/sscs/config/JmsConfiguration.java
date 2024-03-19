@@ -4,6 +4,7 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.jms.JmsConnectionFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jms.DefaultJmsListenerContainerFactoryConfigurer;
@@ -13,7 +14,10 @@ import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
+import uk.gov.hmcts.reform.sscs.service.servicebus.messaging.JmsErrorHandler;
+
 
 @Slf4j
 @Configuration
@@ -61,6 +65,24 @@ public class JmsConfiguration {
         factory.setMessageConverter(new JsonMessageConverter());
         defaultJmsListenerContainerFactoryConfigurer.configure(factory, tribunalsHearingsJmsConnectionFactory);
         return factory;
+    }
+
+
+    @Bean
+    public JmsTemplate jmsTemplate(@Qualifier("tribunalsHearingsJmsConnectionFactory") ConnectionFactory jmsConnectionFactory) {
+        JmsTemplate returnValue = new JmsTemplate();
+        returnValue.setConnectionFactory(jmsConnectionFactory);
+        return returnValue;
+    }
+
+    @Bean
+    public JmsListenerContainerFactory topicJmsListenerContainerFactory(@Qualifier("tribunalsHearingsJmsConnectionFactory") ConnectionFactory connectionFactory) {
+        log.info("Creating JMSListenerContainer bean for topics..");
+        DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
+        returnValue.setConnectionFactory(connectionFactory);
+        returnValue.setSubscriptionDurable(Boolean.TRUE);
+        returnValue.setErrorHandler(new JmsErrorHandler());
+        return returnValue;
     }
 
 }
