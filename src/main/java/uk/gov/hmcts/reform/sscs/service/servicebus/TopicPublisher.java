@@ -30,7 +30,7 @@ public class TopicPublisher {
     @Autowired
     public TopicPublisher(JmsTemplate jmsTemplate,
                           @Value("${amqp.topic}") final String destination,
-                          @Qualifier("tribunalsHearingsJmsConnectionFactory") ConnectionFactory connectionFactory) {
+                          ConnectionFactory connectionFactory) {
         this.jmsTemplate = jmsTemplate;
         this.destination = destination;
         this.connectionFactory = connectionFactory;

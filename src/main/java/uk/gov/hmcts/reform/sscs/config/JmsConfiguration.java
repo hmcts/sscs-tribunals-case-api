@@ -69,14 +69,14 @@ public class JmsConfiguration {
 
 
     @Bean
-    public JmsTemplate jmsTemplate(@Qualifier("tribunalsHearingsJmsConnectionFactory") ConnectionFactory jmsConnectionFactory) {
+    public JmsTemplate jmsTemplate(ConnectionFactory jmsConnectionFactory) {
         JmsTemplate returnValue = new JmsTemplate();
         returnValue.setConnectionFactory(jmsConnectionFactory);
         return returnValue;
     }
 
     @Bean
-    public JmsListenerContainerFactory topicJmsListenerContainerFactory(@Qualifier("tribunalsHearingsJmsConnectionFactory") ConnectionFactory connectionFactory) {
+    public JmsListenerContainerFactory topicJmsListenerContainerFactory(ConnectionFactory connectionFactory) {
         log.info("Creating JMSListenerContainer bean for topics..");
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);
