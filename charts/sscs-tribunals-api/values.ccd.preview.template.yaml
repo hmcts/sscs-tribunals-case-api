@@ -28,7 +28,7 @@ java:
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
     CCD_CALLBACK_ORCHESTRATOR_API_URL: http://${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     CORE_CASE_DATA_JURISDICTION_ID: SSCS
-    CORE_CASE_DATA_CASE_TYPE_ID: Benefit
+    CORE_CASE_DATA_CASE_TYPE_ID: Benefit-sscs-pr-3575
     TEST_URL: http://${SERVICE_NAME}
     CREATE_CCD_ENDPOINT: true
     CASE_ACCESS_MANAGEMENT_FEATURE: true
@@ -282,7 +282,7 @@ redis:
 #Turning hearings api on requires you to follow the hearing steps described in the readme
 #HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME and CORE_CASE_DATA_CASE_TYPE_ID must be updated
 sscs-hearings-api:
-  enabled: false
+  enabled: true
   java:
     image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
@@ -350,3 +350,9 @@ servicebus:
     queues:
       - name: sscs-orchestrator-queue-preview
       - name: tribunals-to-hearing-api
+
+ccd-def-cleanup:
+  enabled: true
+  change_id: sscs-pr-3575
+  case_type_ids:
+    - Benefit
