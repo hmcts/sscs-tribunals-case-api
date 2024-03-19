@@ -60,6 +60,6 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = getPartiesOnCaseWithDwpAndHmcts(sscsCaseData);
 
-        sscsCaseData.setOriginalSender(new DynamicList(listOptions.get(0), listOptions));
+        sscsCaseData.setOriginalSender(new DynamicList(new DynamicListItem("", ""), listOptions));
     }
 }
