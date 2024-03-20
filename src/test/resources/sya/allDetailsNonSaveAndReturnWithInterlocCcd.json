@@ -277,7 +277,7 @@
   "directionNoticeContent": null,
   "signedBy": null,
   "signedRole": null,
-  "dwpIsOfficerAttending":  null,
-  "poAttendanceConfirmed": null,
-  "tribunalDirectPoToAttend": null
+  "dwpIsOfficerAttending":  "No",
+  "poAttendanceConfirmed": "No",
+  "tribunalDirectPoToAttend": "No"
 }

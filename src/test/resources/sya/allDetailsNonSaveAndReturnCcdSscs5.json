@@ -275,7 +275,7 @@
   "signedBy": null,
   "signedRole": null,
   "preWorkAllocation": "No",
-  "dwpIsOfficerAttending":  null,
-  "poAttendanceConfirmed": null,
-  "tribunalDirectPoToAttend": null
+  "dwpIsOfficerAttending":  "No",
+  "poAttendanceConfirmed": "No",
+  "tribunalDirectPoToAttend": "No"
 }
