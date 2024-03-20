@@ -277,6 +277,7 @@
   "directionNoticeContent": null,
   "signedBy": null,
   "signedRole": null,
+  "preWorkAllocation": "No",
   "dwpIsOfficerAttending":  "No",
   "poAttendanceConfirmed": "No",
   "tribunalDirectPoToAttend": "No"
