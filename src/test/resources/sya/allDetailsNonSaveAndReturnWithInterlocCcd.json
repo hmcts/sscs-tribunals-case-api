@@ -276,5 +276,8 @@
   "libertyToApplyBodyContent": null,
   "directionNoticeContent": null,
   "signedBy": null,
-  "signedRole": null
+  "signedRole": null,
+  "dwpIsOfficerAttending":  null,
+  "poAttendanceConfirmed": null,
+  "tribunalDirectPoToAttend": null
 }
