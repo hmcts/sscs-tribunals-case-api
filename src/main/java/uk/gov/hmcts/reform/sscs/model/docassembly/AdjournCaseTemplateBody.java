@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 @Builder(toBuilder = true)
 @Getter
@@ -47,6 +48,9 @@ public class AdjournCaseTemplateBody {
 
     @JsonProperty("panel_members_excluded")
     private String panelMembersExcluded;
+
+    @JsonProperty("tribunal_direct_po_to_attend")
+    private YesNo tribunalDirectPoToAttend;
 
     @JsonProperty("reasons_for_decision")
     private List<String> reasonsForDecision;
