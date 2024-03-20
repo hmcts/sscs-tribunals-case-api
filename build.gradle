@@ -574,6 +574,8 @@ bootWithCCD {
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs,wa_task_management_api,wa_task_monitor,camunda_bpm,wa_workflow_api,wa_case_event_handler,em_stitching_api'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service,em_ccd_orchestrator,em_stitching_api,wa_task_management_api,wa_task_monitor,camunda_bpm,wa_workflow_api,wa_case_event_handler'
+    environment 'ROLE_ASSIGNMENT_S2S_AUTHORISED_SERVICES', 'ccd_gw,am_role_assignment_service,am_org_role_mapping_service,am_role_assignment_refresh_batch,xui_webapp,aac_manage_case_assignment,ccd_data,wa_workflow_api,wa_task_management_api,wa_task_monitor,wa_case_event_handler,iac,hmc_cft_hearing_service,ccd_case_disposer,sscs,fis_hmc_api,fpl_case_service,disposer-idam-user,civil_service,prl_cos_api'
+    environment 'BYPASS_ORG_DROOL_RULE', 'true'
 
     //Wiremock
     environment 'RD_LOCATION_REF_API_URL', 'http://localhost:8084'
