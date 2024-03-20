@@ -233,6 +233,7 @@
     ]
   },
   "workBasketHearingDate": null,
+  "workBasketHearingDateIssued": null,
   "workBasketHearingEpimsId": null,
   "postHearingRequestType": null,
   "postHearingReviewType": null,
