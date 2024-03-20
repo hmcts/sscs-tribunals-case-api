@@ -395,6 +395,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             if (isBlank(entity.getName().getLastName())) {
                 listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", entityType));
             }
+        } else {
+            listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", entityType));
+            listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", entityType));
         }
         return listOfWarnings;
     }
