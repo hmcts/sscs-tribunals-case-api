@@ -255,6 +255,7 @@
   "interlocReviewState" : "reviewByTcw",
   "isScottishCase" : "No",
   "workBasketHearingDate": null,
+  "workBasketHearingDateIssued": null,
   "workBasketHearingEpimsId": null,
   "postHearingRequestType": null,
   "postHearingReviewType": null,
@@ -275,8 +276,5 @@
   "libertyToApplyBodyContent": null,
   "directionNoticeContent": null,
   "signedBy": null,
-  "signedRole": null,
-  "dwpIsOfficerAttending":  null,
-  "poAttendanceConfirmed": null,
-  "tribunalDirectPoToAttend": null
+  "signedRole": null
 }
