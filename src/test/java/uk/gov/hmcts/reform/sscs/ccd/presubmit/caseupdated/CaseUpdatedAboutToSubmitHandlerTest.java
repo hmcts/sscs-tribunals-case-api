@@ -486,7 +486,20 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenACaseUpdatedEventWithNullRepresentativeName_thenProvideAnError() {
+    void givenACaseUpdatedEventWithNullRepresentativeAddress_thenProvideErrors() {
+        Representative representative = Representative.builder()
+                .name(Name.builder().firstName("Test").lastName("Test").build())
+                .address(null)
+                .hasRepresentative(YES.getValue())
+                .build();
+        callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(2));
+    }
+
+    @Test
+    void givenACaseUpdatedEventWithNullRepresentativeName_thenProvideWarnings() {
         Representative representative = Representative.builder()
                 .name(null)
                 .address(Address.builder().line1("123 Lane").postcode("CM120NS").build())
