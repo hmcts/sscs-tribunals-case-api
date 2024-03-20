@@ -326,7 +326,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.3.9'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.3.6'
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.13'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
@@ -375,6 +375,7 @@ dependencies {
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.13.0'
 
+
     functionalTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.13.0'
 
     implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
@@ -420,6 +421,10 @@ dependencies {
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-core', version: '8.0.6'
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '8.0.6'
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '8.0.6'
+
+    testImplementation group: 'org.springframework', name: 'spring-jms', version: '4.3.4.RELEASE'
+    testImplementation group: 'org.apache.activemq.tooling', name: 'activemq-junit', version: '5.16.5'
+    testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.17.3'
 
     //pact contract testing
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
