@@ -421,12 +421,7 @@ dependencies {
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-core', version: '8.0.6'
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '8.0.6'
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '8.0.6'
-
-    testImplementation group: 'org.springframework', name: 'spring-jms', version: '4.3.4.RELEASE'
-    testImplementation group: 'org.apache.activemq.tooling', name: 'activemq-junit', version: '5.16.5'
-    testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.17.3'
-
-
+    
     //pact contract testing
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
 
