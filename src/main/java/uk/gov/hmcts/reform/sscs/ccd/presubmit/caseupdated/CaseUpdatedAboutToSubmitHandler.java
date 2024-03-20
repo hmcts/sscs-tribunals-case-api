@@ -60,6 +60,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
 
+    private static final String FIRST_NAME = "First Name";
+
+    private static final String LAST_NAME = "Last Name";
+
 
     @SuppressWarnings("squid:S107")
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
@@ -343,10 +347,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (entity != null) {
             if (entity.getName() != null) {
                 if (isBlank(entity.getName().getFirstName())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", partyType));
+                    listOfWarnings.add(String.format(WARNING_MESSAGE, FIRST_NAME, partyType));
                 }
                 if (isBlank(entity.getName().getLastName())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", partyType));
+                    listOfWarnings.add(String.format(WARNING_MESSAGE, LAST_NAME, partyType));
                 }
             }
             if (entity.getIdentity() != null) {
@@ -390,14 +394,14 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         if (entity != null && entity.getName() != null) {
             if (isBlank(entity.getName().getFirstName())) {
-                listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", entityType));
+                listOfWarnings.add(String.format(WARNING_MESSAGE, FIRST_NAME, entityType));
             }
             if (isBlank(entity.getName().getLastName())) {
-                listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", entityType));
+                listOfWarnings.add(String.format(WARNING_MESSAGE, LAST_NAME, entityType));
             }
         } else {
-            listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", entityType));
-            listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", entityType));
+            listOfWarnings.add(String.format(WARNING_MESSAGE, FIRST_NAME, entityType));
+            listOfWarnings.add(String.format(WARNING_MESSAGE, LAST_NAME, entityType));
         }
         return listOfWarnings;
     }
