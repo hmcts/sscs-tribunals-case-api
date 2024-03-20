@@ -353,6 +353,6 @@ servicebus:
 
 ccd-def-cleanup:
   enabled: true
-  change_id: sscs-pr-3575
+  change_id: ${CHANGE_ID}
   case_type_ids:
-    - Benefit
+    - Benefit-sscs-pr
