@@ -1,7 +1,8 @@
-package uk.gov.hmcts.reform.sscs.smoke;
+package uk.gov.hmcts.reform.sscs.config;
 
 import javax.jms.ConnectionFactory;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.EnableJms;
@@ -11,7 +12,8 @@ import org.springframework.jms.core.JmsTemplate;
 
 @Configuration
 @EnableJms
-public class JmsSmokeTestConfiguration {
+@ConditionalOnProperty(name = "jms.enabled", havingValue = "false")
+public class JmsConfigurationLocalMode {
 
     @Bean
     public JmsListenerContainerFactory<?> jmsListenerContainerFactory() {
