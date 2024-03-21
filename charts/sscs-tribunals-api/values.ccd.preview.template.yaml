@@ -40,8 +40,7 @@ java:
     GAPS_SWITCHOVER_FEATURE: true
     ELASTIC_SEARCH_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
-    DUMMY: true
-    ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: true
+    DUMMY: Benefit-${CHANGE_ID}
     TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
@@ -353,7 +352,7 @@ servicebus:
       - name: tribunals-to-hearing-api
 
 ccd-def-cleanup:
-  enabled: true
+  enabled: false
   change_id: ${CHANGE_ID}
   case_type_ids:
-    - Benefit-sscs-pr
+    - Benefit
