@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
-import uk.gov.hmcts.reform.sscs.service.correspondence.EventPublisher;
+import uk.gov.hmcts.reform.sscs.service.event.EventPublisher;
 
 @ExtendWith(MockitoExtension.class)
 public class IssueFinalDecisionSubmittedHandlerTest {

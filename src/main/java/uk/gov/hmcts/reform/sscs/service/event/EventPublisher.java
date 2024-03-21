@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.service.correspondence;
+package uk.gov.hmcts.reform.sscs.service.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;

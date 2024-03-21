@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.service.correspondence;
+package uk.gov.hmcts.reform.sscs.service.event;
 
 import static java.lang.Long.parseLong;
 import static org.mockito.ArgumentMatchers.any;
