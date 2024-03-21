@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.sscs.service.event.EventPublisher;
 @AllArgsConstructor
 public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final CcdCallbackMapService ccdCallbackMapService;
-    private final EventPublisher correspondenceService;
+    private final EventPublisher eventPublisher;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
@@ -57,7 +57,7 @@ public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
             }
         }
         log.info("Sending message to the callback orchestrator for the event {}", callback.getEvent());
-        correspondenceService.publishEvent(callback);
+        eventPublisher.publishEvent(callback);
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
