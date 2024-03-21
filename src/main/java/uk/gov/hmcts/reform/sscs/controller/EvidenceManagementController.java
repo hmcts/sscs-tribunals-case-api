@@ -77,6 +77,7 @@ public class EvidenceManagementController {
                         .upload(convertedFiles, idamService.getIdamTokens()).getDocuments();
                 ObjectMapper objectMapper = new ObjectMapper();
 
+
                 String jsonText =  "{\"documents\": " + objectMapper.writeValueAsString(documents) + "}";
                 return ResponseEntity.ok(jsonText);
             } else {
