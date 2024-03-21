@@ -52,6 +52,7 @@ java:
         - robotics-email-pip-ae-to
         - ld-sdk-key
         - sendgrid-api-key
+
   environment:
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
@@ -93,6 +94,7 @@ java:
     SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     SEND_LETTER_SERVICE_ENABLED: "true"
     TRUST_ALL_CERTS: "true"
+    ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: false
     SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-{{ .Values.global.environment }}"
     TOPIC_NAME: "sscs-evidenceshare-topic-{{ .Values.global.environment }}"
     AMQP_HOST: "sscs-servicebus-{{ .Values.global.environment }}.servicebus.windows.net"
