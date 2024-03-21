@@ -281,9 +281,9 @@ redis:
       enabled: false
 
 #Turning hearings api on requires you to follow the hearing steps described in the readme
-#HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME and CORE_CASE_DATA_CASE_TYPE_ID must be updated
+#HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME must be updated
 sscs-hearings-api:
-  enabled: true
+  enabled: false
   java:
     image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
