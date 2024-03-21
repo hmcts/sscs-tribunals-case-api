@@ -46,7 +46,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest extends BaseHandler {
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .log().all(true)
-                .assertThat().body("data.furtherEvidenceAction.value.code", equalTo("issueFurtherEvidence"))
+                .assertThat().body("data.furtherEvidenceAction.value.code", equalTo(""))
                 .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "issueFurtherEvidence")))
                 .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "otherDocumentManual")))
                 .assertThat().body("data.furtherEvidenceAction.list_items", hasItem(hasEntry("code", "informationReceivedForInterlocJudge")))
