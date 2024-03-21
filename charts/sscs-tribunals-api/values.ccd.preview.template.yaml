@@ -353,7 +353,7 @@ servicebus:
       - name: tribunals-to-hearing-api
 
 ccd-def-cleanup:
-  enabled: false
+  enabled: true
   change_id: ${CHANGE_ID}
   case_type_ids:
     - Benefit
