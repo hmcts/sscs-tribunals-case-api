@@ -327,7 +327,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.3.9'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.13'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.4'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
@@ -369,7 +369,7 @@ dependencies {
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.7.1'
 
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.81"
-    
+
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.86'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.86'
 
