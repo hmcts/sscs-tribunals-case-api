@@ -42,30 +42,31 @@ Once the application running locally, please make sure
 
 ## Running tribunals with hearings enabled
 If you need to test Tribunals with HMC Hearings you must carry out the following steps:
-1. First you need to create a pull request on github for your branch, once this is done you then need to upload a CCD Definition file to AAT CCD. This definition file should have a unique CaseType ID in this format:
+1. First you need to create a pull request on github for your branch
+2. Once this is done you then need to upload a CCD Definition file to AAT CCD. This definition file should have a unique CaseType ID in this format (3575 represents the Pull request number):
 
 ```
-Benefit-sscs-PR-XXXX 
+Benefit-3575 
 ```
-2. You must ensure the callbacks for the CaseEvents match the service ingress values within your PR's preview chart. Here is an example of a callback URL for a tribunals PR with an id of 3575:
+3. You must ensure the callbacks for the CaseEvents match the service ingress values within your PR's preview chart. Here is an example of a callback URL for a tribunals PR with an id of 3575:
 
 ```
 https://sscs-tribunals-api-pr-3575.preview.platform.hmcts.net/ccdAboutToSubmit
 ```
 
-3. Once this file has been uploaded to AAT, you will need to create a service bus subscription for the HMC hearings topic on AAT. In the Azure portal go to hmc-servicebus-aat and create a subscription for the hmc-to-cft-aat topic,
+4. Once this file has been uploaded to AAT, you will need to create a service bus subscription for the HMC hearings topic on AAT. In the Azure portal go to hmc-servicebus-aat and create a subscription for the hmc-to-cft-aat topic,
    name it in this format:
 
 ```
 hmc-to-sscs-subscription-pr-XXXX
 ```
 
-4. And on that subscription create a Correlation filter with these values:
+5. And on that subscription create a Correlation filter with these values:
 ```
 hmctsServiceId:BBA3
 ```
 
-5. Once this has been completed go to values.ccd.preview.template.yaml and enable sscs-hearings-api. you will need to replace
+6. Once this has been completed go to values.ccd.preview.template.yaml and enable sscs-hearings-api. you will need to replace
 
 ```
 HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-aat"
@@ -73,9 +74,8 @@ HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-aat"
 
 With the name of the subscription you have created.
 
-7. You will also need to update CORE_CASE_DATA_CASE_TYPE_ID in the java chart to your new CaseTypeID.
 
-8. Once this is done you should be able to deploy to preview with hearings enabled.
+Once this is done you should be able to deploy to preview with hearings enabled.
 
 Note: When you are finished with preview testing remember to delete the uploaded CCD from AAT and the subscription created on hmc-to-cft-aat.
 
