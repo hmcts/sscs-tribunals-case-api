@@ -28,7 +28,7 @@ java:
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
     CCD_CALLBACK_ORCHESTRATOR_API_URL: http://${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     CORE_CASE_DATA_JURISDICTION_ID: SSCS
-    CORE_CASE_DATA_CASE_TYPE_ID: Benefit-sscs-pr-3575
+    CORE_CASE_DATA_CASE_TYPE_ID: Benefit-${CHANGE_ID}
     TEST_URL: http://${SERVICE_NAME}
     CREATE_CCD_ENDPOINT: true
     CASE_ACCESS_MANAGEMENT_FEATURE: true
@@ -40,7 +40,7 @@ java:
     GAPS_SWITCHOVER_FEATURE: true
     ELASTIC_SEARCH_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
-    DUMMY: Benefit-${CHANGE_ID}
+    DUMMY: false
     ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: true
     TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
@@ -313,7 +313,7 @@ sscs-hearings-api:
       HMC_HEARINGS_TOPIC_NAMESPACE: hmc-servicebus-aat
       HMC_DEPLOYMENT_ID: deployment-${SERVICE_NAME}
       HMC_DEPLOYMENT_FILTER_ENABLED: true
-      CORE_CASE_DATA_CASE_TYPE_ID: Benefit-sscs-pr-3575
+      CORE_CASE_DATA_CASE_TYPE_ID: Benefit-${CHANGE_ID}
     secrets:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: sscs-sb-preview
