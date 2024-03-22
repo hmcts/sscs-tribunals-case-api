@@ -508,7 +508,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors().size(), is(2));
+        assertThat(response.getErrors().size(), is(1));
     }
 
     @Test

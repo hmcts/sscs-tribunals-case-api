@@ -62,6 +62,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private static final String ERROR_MESSAGE = "%s has not been provided for the %s";
 
+    private static final String REP_ERROR_MESSAGE = "Name/Organisation has not been provided for the Representative";
+
     private static final String FIRST_NAME = "First Name";
 
     private static final String LAST_NAME = "Last Name";
@@ -402,8 +404,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                 listOfErrors.add(String.format(ERROR_MESSAGE, LAST_NAME, entityType));
             }
         } else {
-            listOfErrors.add(String.format(ERROR_MESSAGE, FIRST_NAME, entityType));
-            listOfErrors.add(String.format(ERROR_MESSAGE, LAST_NAME, entityType));
+            if (entityType.equals("Representative")) {
+                listOfErrors.add(REP_ERROR_MESSAGE);
+            } else {
+                listOfErrors.add(String.format(ERROR_MESSAGE, FIRST_NAME, entityType));
+                listOfErrors.add(String.format(ERROR_MESSAGE, LAST_NAME, entityType));
+            }
         }
         return listOfErrors;
     }
