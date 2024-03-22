@@ -46,6 +46,15 @@ java:
     ELASTIC_SEARCH_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
     DUMMY: true
+    ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: true
+    TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+    SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+    AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
+    AMQP_USERNAME: "RootManageSharedAccessKey"
+  secrets:
+    AMQP_PASSWORD:
+      secretRef: sscs-sb-preview
+      key: primaryKey
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -623,7 +632,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S12371JnonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S12006AFnonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -642,7 +651,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S12371JnonProd
+      CCD_DEF_VERSION: S12006AFnonProd
     secrets: []
     userRoles:
       - citizen
@@ -719,6 +728,7 @@ sscs-tya-notif:
       JOB_SCHEDULER_DB_HOST: sscs-preview.postgres.database.azure.com
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       JOB_SCHEDULER_DB_USERNAME: hmcts
+      JOB_SCHEDULER_DB_PASSWORD: "${JOB_SCHEDULER:hmcts}"
       HOURS_START_TIME: 0
       HOURS_END_TIME: 23
       RUN_DB_MIGRATION_ON_STARTUP: true
