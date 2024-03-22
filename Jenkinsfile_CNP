@@ -89,6 +89,7 @@ def branchesToSync = ['demo']
 withPipeline(type, product, component) {
     if (env.BRANCH_NAME.startsWith("PR")) {
         loadVaultSecrets(secretsForPR)
+        env.LOCAL_CCD_ENABLED = false
     } else {
         loadVaultSecrets(secrets)
     }

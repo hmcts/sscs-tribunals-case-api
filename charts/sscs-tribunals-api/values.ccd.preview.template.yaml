@@ -147,22 +147,22 @@ xui-webapp:
           - system-user-password
 
 ccd:
-  enabled: true
+  enabled: ${LOCAL_CCD_ENABLED}
   ccd:
     adminWeb:
-      enabled: true
+      enabled: ${LOCAL_CCD_ENABLED}
     definitionImporter:
-      enabled: true
+      enabled: ${LOCAL_CCD_ENABLED}
     userProfileImporter:
-      enabled: true
+      enabled: ${LOCAL_CCD_ENABLED}
     apiGatewayWeb:
-      enabled: true
+      enabled: ${LOCAL_CCD_ENABLED}
     postgresql:
-      enabled: true
+      enabled: ${LOCAL_CCD_ENABLED}
     s2s:
-      enabled: false
+      enabled: ${LOCAL_CCD_ENABLED}
     elastic:
-      enabled: true
+      enabled: ${LOCAL_CCD_ENABLED}
 
   postgresql:
     primary:
