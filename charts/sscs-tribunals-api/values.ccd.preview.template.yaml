@@ -300,8 +300,8 @@ sscs-cor-frontend:
         secrets:
           - sscs-cor-idam-client-secret
           - sscs-s2s-secret
-          - sscs-cor-redis-access-key
-          - sscs-cor-redis-connection-string
+          - sscs-redis-access-key
+          - sscs-redis-connection-string
           - tyacookiesecret
           - idam-sscs-oauth2-client-secret
           - AppInsightsInstrumentationKey
