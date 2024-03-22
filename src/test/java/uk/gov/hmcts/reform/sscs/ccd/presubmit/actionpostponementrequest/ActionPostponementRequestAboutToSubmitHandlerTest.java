@@ -377,13 +377,13 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         assertThat(sscsCaseData.getPresentingOfficersHearingLink()).isNull();
     }
   
-      private SscsDocument buildSscsDocument(String documentType,String date, UploadParty uploadParty, String originalPartySender) {
+    private SscsDocument buildSscsDocument(String documentType,String date, UploadParty uploadParty, String originalPartySender) {
         SscsDocumentDetails docDetails = SscsDocumentDetails.builder()
-                .documentType(documentType)
-                .documentDateAdded(date)
-                .partyUploaded(uploadParty)
-                .originalPartySender(originalPartySender)
-                .build();
+            .documentType(documentType)
+            .documentDateAdded(date)
+            .partyUploaded(uploadParty)
+            .originalPartySender(originalPartySender)
+            .build();
         return SscsDocument.builder().value(docDetails).build();
     }
 }
