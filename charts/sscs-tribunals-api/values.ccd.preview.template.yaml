@@ -280,7 +280,7 @@ sscs-cor-frontend:
     environment:
       IDAM_ENABLE_STUB: false
       REDIS_HOST: ${SERVICE_NAME}-redis-master
-      REDIS_PORT: 6380
+      REDIS_PORT: 6379
       SSCS_API_URL: http://${SERVICE_NAME}-java
       IDAM_URL: https://idam-web-public.aat.platform.hmcts.net
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
