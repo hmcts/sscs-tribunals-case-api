@@ -11,7 +11,7 @@ services:
       CAMUNDA_DB_HOST: shared-database-pg12
       CAMUNDA_DB_PORT: 5432
       CAMUNDA_DB_USER_NAME: postgres
-      CAMUNDA_DB_PASSWORD: admin
+      CAMUNDA_DB_PASSWORD: "${CAMUNDA_DB_PASSWORD:admin}"
       "camunda.bpm.database.schema-update": true
       CAMUNDA_API_AUTH_ENABLED: false
       S2S_URL: http://host.docker.internal:4502/
@@ -34,7 +34,7 @@ services:
       DATA_STORE_DB_NAME: datastore
       DATA_STORE_DB_OPTIONS: ?stringtype=unspecified&ssl=false
       DATA_STORE_DB_USERNAME: postgres
-      DATA_STORE_DB_PASSWORD: admin
+      DATA_STORE_DB_PASSWORD: "${DATA_STORE_DB_PASSWORD:admin}"
       SERVICE_BUS_CONNECTION_STRING: ${AZURE_SERVICE_BUS_CONNECTION_STRING:-Endpoint=sb://ccd-servicebus-demo.servicebus.windows.net/;SharedAccessKeyName=SendAndRecieveCCDMessage;SharedAccessKey=REPLACEME}
       CCD_CASE_EVENTS_DESTINATION: ${AZURE_SERVICE_BUS_TOPIC_NAME:-wa-case-event-handler-topic-sessions-ft}
     ports:
@@ -53,7 +53,7 @@ services:
       POSTGRES_PORT: 5432
       POSTGRES_NAME: wa_workflow_api
       POSTGRES_USERNAME: postgres
-      POSTGRES_PASSWORD: admin
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:admin}"
       WA_S2S_AUTHORIZED_SERVICES: wa_workflow_api,wa_case_event_handler,camunda-bpm,xui_webapp
       LAUNCH_DARKLY_SDK_KEY: "${LAUNCH_DARKLY_SDK_KEY}"
     ports:
@@ -99,7 +99,7 @@ services:
       environment:
         POSTGRES_HOST: shared-database-pg12
         POSTGRES_USERNAME: postgres
-        POSTGRES_PASSWORD: admin
+        POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:admin}"
         POSTGRES_CONNECTION_OPTIONS: "?stringtype=unspecified&gssEncMode=disable"
         AZURE_SERVICE_BUS_CONNECTION_STRING: "${AZURE_SERVICE_BUS_CONNECTION_STRING}"
         AZURE_SERVICE_BUS_TOPIC_NAME: "${AZURE_SERVICE_BUS_TOPIC_NAME}"
