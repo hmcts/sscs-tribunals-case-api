@@ -157,27 +157,10 @@ ccd:
       enabled: ${LOCAL_CCD_ENABLED}
     apiGatewayWeb:
       enabled: ${LOCAL_CCD_ENABLED}
-    postgresql:
-      enabled: ${LOCAL_CCD_ENABLED}
     s2s:
       enabled: ${LOCAL_CCD_ENABLED}
     elastic:
       enabled: ${LOCAL_CCD_ENABLED}
-
-  postgresql:
-    primary:
-      initdb:
-        scripts:
-          init.sql: |
-            CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "draftstore" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "evidence" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "annotation" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "sscsjobscheduler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
 
   global:
     ccdApiGatewayIngress: ${SERVICE_NAME}-ccd-api-gw
@@ -537,7 +520,7 @@ ccd:
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
       CCD_DEF_VERSION: 6.3.14nonProd
-    secrets: []
+    secrets: [ ]
     userRoles:
       - citizen
       - caseworker
@@ -609,11 +592,10 @@ sscs-tya-notif:
       AMQP_USERNAME: "RootManageSharedAccessKey"
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
-      JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
-      JOB_SCHEDULER_DB_HOST: ${SERVICE_NAME}-postgresql
-      JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
-      JOB_SCHEDULER_DB_USERNAME: hmcts
-      JOB_SCHEDULER_DB_PASSWORD: "${JOB_SCHEDULER:hmcts}"
+      JOB_SCHEDULER_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
+      JOB_SCHEDULER_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
+      JOB_SCHEDULER_DB_NAME: "{{ .Values.postgresql.auth.database}}"
+      JOB_SCHEDULER_DB_HOST: "{{ .Release.Name }}-postgresql"
       HOURS_START_TIME: 0
       HOURS_END_TIME: 23
       RUN_DB_MIGRATION_ON_STARTUP: true
@@ -641,6 +623,22 @@ sscs-tya-notif:
           - docmosis-api-key
           - notification-key
           - notification-test-key
+
+postgresql:
+  primary:
+    initdb:
+      scripts:
+        init.sql: |
+          CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+          CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+          CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+          CREATE DATABASE "draftstore" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+          CREATE DATABASE "evidence" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+          CREATE DATABASE "annotation" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+          CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+          CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+          CREATE DATABASE "sscsjobscheduler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+
 
 sscs-ccd-callback-orchestrator:
   enabled: true
@@ -762,7 +760,7 @@ hmc-cft-hearing-service:
       CFT_HEARING_SERVICE_DB_PORT: 5432
       HMC_ACCESS_CONTROL_ENABLED: false
       ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
-      SPRING_CONFIG_IMPORT : "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
+      SPRING_CONFIG_IMPORT: "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
     secrets:
       HMC_SERVICE_BUS_CONNECTION_STRING:
         secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
@@ -798,5 +796,3 @@ servicebus:
         subscriptionNeeded: yes
     queues:
       - name: sscs-orchestrator-queue-preview
-
-
