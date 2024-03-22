@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.service.servicebus.messaging;
+package uk.gov.hmcts.reform.sscs.config;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -11,18 +11,20 @@ import javax.net.ssl.X509TrustManager;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.jms.JmsConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
+import uk.gov.hmcts.reform.sscs.service.servicebus.messaging.JmsErrorHandler;
 
 
 @Configuration
 @Slf4j
+@EnableJms
 public class MessagingConfig {
 
     @Bean
@@ -99,14 +101,14 @@ public class MessagingConfig {
     }
 
     @Bean
-    public JmsTemplate jmsTemplate(@Qualifier("jmsConnectionFactory") ConnectionFactory jmsConnectionFactory) {
+    public JmsTemplate jmsTemplate(ConnectionFactory jmsConnectionFactory) {
         JmsTemplate returnValue = new JmsTemplate();
         returnValue.setConnectionFactory(jmsConnectionFactory);
         return returnValue;
     }
 
     @Bean
-    public JmsListenerContainerFactory topicJmsListenerContainerFactory(@Qualifier("jmsConnectionFactory") ConnectionFactory connectionFactory) {
+    public JmsListenerContainerFactory topicJmsListenerContainerFactory(ConnectionFactory connectionFactory) {
         log.info("Creating JMSListenerContainer bean for topics..");
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);
