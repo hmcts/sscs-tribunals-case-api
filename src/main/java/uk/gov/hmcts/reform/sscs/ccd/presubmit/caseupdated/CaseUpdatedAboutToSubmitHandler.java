@@ -60,6 +60,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
 
+    private static final String ERROR_MESSAGE = "%s has not been provided for the %s";
+
     private static final String FIRST_NAME = "First Name";
 
     private static final String LAST_NAME = "Last Name";
@@ -390,20 +392,20 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private List<String> validateRepAndJointPartyCaseData(Entity entity, String entityType) {
-        List<String> listOfWarnings = new ArrayList<>();
+        List<String> listOfErrors = new ArrayList<>();
 
         if (entity != null && entity.getName() != null) {
             if (isBlank(entity.getName().getFirstName())) {
-                listOfWarnings.add(String.format(WARNING_MESSAGE, FIRST_NAME, entityType));
+                listOfErrors.add(String.format(ERROR_MESSAGE, FIRST_NAME, entityType));
             }
             if (isBlank(entity.getName().getLastName())) {
-                listOfWarnings.add(String.format(WARNING_MESSAGE, LAST_NAME, entityType));
+                listOfErrors.add(String.format(ERROR_MESSAGE, LAST_NAME, entityType));
             }
         } else {
-            listOfWarnings.add(String.format(WARNING_MESSAGE, FIRST_NAME, entityType));
-            listOfWarnings.add(String.format(WARNING_MESSAGE, LAST_NAME, entityType));
+            listOfErrors.add(String.format(ERROR_MESSAGE, FIRST_NAME, entityType));
+            listOfErrors.add(String.format(ERROR_MESSAGE, LAST_NAME, entityType));
         }
-        return listOfWarnings;
+        return listOfErrors;
     }
 
     private void validateRepresentativeNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
@@ -413,7 +415,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             if (isBlank(representativeInfo.getOrganisation())) {
                 List<String> warnings = validateRepAndJointPartyCaseData(representativeInfo, "Representative");
                 if (!warnings.isEmpty()) {
-                    response.addWarnings(warnings);
+                    response.addErrors(warnings);
                 }
             }
         }
@@ -426,7 +428,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (hasJointParty) {
             List<String> warnings = validateRepAndJointPartyCaseData(jointPartyInfo, "Joint Party");
             if (!warnings.isEmpty()) {
-                response.addWarnings(warnings);
+                response.addErrors(warnings);
             }
         }
     }

@@ -264,13 +264,13 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     @Test
     void givenACaseUpdatedEventWithEmptyAppellantDetails_thenProvideAnError() {
         Representative representative = Representative.builder()
-                .name(Name.builder().firstName("").lastName("").build())
+                .name(Name.builder().firstName("Test").lastName("Test").build())
                 .address(Address.builder().line1("123 Lane").postcode(null).build())
                 .hasRepresentative(YES.getValue())
                 .build();
 
         JointParty jointParty = JointParty.builder()
-                .name(Name.builder().firstName("").lastName("").build())
+                .name(Name.builder().firstName("Test").lastName("Test").build())
                 .jointPartyAddressSameAsAppellant(NO)
                 .address(Address.builder().line1("123 Lane").postcode(null).build())
                 .hasJointParty(YES)
@@ -297,13 +297,13 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     @Test
     public void givenPartyTypeHasFirstLineOfAddressAndInvalidPostcode_thenProvideAnError() {
         Representative representative = Representative.builder()
-                .name(Name.builder().firstName("").lastName("").build())
+                .name(Name.builder().firstName("Test").lastName("Test").build())
                 .address(Address.builder().line1("123 Lane").postcode("73GH Y7U").build())
                 .hasRepresentative(YES.getValue())
                 .build();
 
         JointParty jointParty = JointParty.builder()
-                .name(Name.builder().firstName("").lastName("").build())
+                .name(Name.builder().firstName("Test").lastName("Test").build())
                 .jointPartyAddressSameAsAppellant(NO)
                 .address(Address.builder().line1("123 Lane").postcode("73GH Y7U").build())
                 .hasJointParty(YES)
@@ -330,13 +330,13 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     @Test
     public void givenPartyTypeHasNoFirstLineOfAddressAndValidPostcode_thenProvideAnError() {
         Representative representative = Representative.builder()
-                .name(Name.builder().firstName("").lastName("").build())
+                .name(Name.builder().firstName("Test").lastName("Test").build())
                 .address(Address.builder().line1(null).postcode("CM120NS").build())
                 .hasRepresentative(YES.getValue())
                 .build();
 
         JointParty jointParty = JointParty.builder()
-                .name(Name.builder().firstName("").lastName("").build())
+                .name(Name.builder().firstName("Test").lastName("Test").build())
                 .jointPartyAddressSameAsAppellant(NO)
                 .address(Address.builder().line1(null).postcode("CM120NS").build())
                 .hasJointParty(YES)
@@ -410,7 +410,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors().size(), is(6));
+        assertThat(response.getErrors().size(), is(10));
 
     }
 
@@ -420,7 +420,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("73GH Y7U");
 
         JointParty jointParty = JointParty.builder()
-                .name(Name.builder().firstName("").lastName("").build())
+                .name(Name.builder().firstName("Test").lastName("Test").build())
                 .jointPartyAddressSameAsAppellant(YES)
                 .address(Address.builder().line1("123 The Street").postcode("CM120NS").build())
                 .hasJointParty(YES)
@@ -442,7 +442,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("CM120NS");
 
         JointParty jointParty = JointParty.builder()
-                .name(Name.builder().firstName("").lastName("").build())
+                .name(Name.builder().firstName("Test").lastName("Test").build())
                 .jointPartyAddressSameAsAppellant(YES)
                 .address(Address.builder().line1(null).postcode(null).build())
                 .hasJointParty(YES)
@@ -482,7 +482,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getWarnings().size(), is(2));
+        assertThat(response.getErrors().size(), is(2));
     }
 
     @Test
@@ -509,7 +509,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setJointParty(jointParty);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getWarnings().size(), is(2));
+        assertThat(response.getErrors().size(), is(3));
     }
 
 
