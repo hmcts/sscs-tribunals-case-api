@@ -32,7 +32,7 @@ java:
     TEST_URL: http://${SERVICE_NAME}
     CREATE_CCD_ENDPOINT: true
     CASE_ACCESS_MANAGEMENT_FEATURE: true
-    WORK_ALLOCATION_FEATURE: false
+    WORK_ALLOCATION_FEATURE: true
     SCHEDULE_LISTING_FEATURE: true
     POST_HEARINGS_FEATURE: true
     POST_HEARINGS_B_FEATURE: true
@@ -41,6 +41,15 @@ java:
     ELASTIC_SEARCH_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
     DUMMY: true
+    ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: true
+    TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+    SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+    AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
+    AMQP_USERNAME: "RootManageSharedAccessKey"
+  secrets:
+    AMQP_PASSWORD:
+      secretRef: sscs-sb-preview
+      key: primaryKey
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -789,3 +798,5 @@ servicebus:
         subscriptionNeeded: yes
     queues:
       - name: sscs-orchestrator-queue-preview
+
+
