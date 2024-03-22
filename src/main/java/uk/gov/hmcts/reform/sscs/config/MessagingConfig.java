@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.service.servicebus.messaging;
+package uk.gov.hmcts.reform.sscs.config;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -14,13 +14,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
+import uk.gov.hmcts.reform.sscs.service.servicebus.messaging.JmsErrorHandler;
+
 
 @Configuration
 @Slf4j
+@EnableJms
 public class MessagingConfig {
 
     @Bean
