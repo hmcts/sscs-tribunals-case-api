@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.support.JmsHeaders;
@@ -36,11 +37,13 @@ public class TopicConsumer {
         this.sscsDeserializer = sscsDeserializer;
     }
 
+
     @JmsListener(
         destination = "${amqp.topic}",
         containerFactory = "topicJmsListenerContainerFactory",
         subscription = "${amqp.subscription}"
     )
+    @ConditionalOnProperty(name = "feature.bypass-evidence-share-service.enabled", havingValue = "true")
     public void onMessage(String message, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
         processMessageWithRetry(message, 1, messageId);
     }

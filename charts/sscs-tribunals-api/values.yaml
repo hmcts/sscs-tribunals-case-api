@@ -96,7 +96,6 @@ java:
     SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     SEND_LETTER_SERVICE_ENABLED: "true"
     TRUST_ALL_CERTS: "true"
-    ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: false
     SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-{{ .Values.global.environment }}"
     TOPIC_NAME: "sscs-evidenceshare-topic-{{ .Values.global.environment }}"
     AMQP_HOST: "sscs-servicebus-{{ .Values.global.environment }}.servicebus.windows.net"
@@ -108,6 +107,7 @@ java:
     EMAIL_SERVER_PORT: "25"
     EMAIL_SMTP_TLS_ENABLED: "true"
     EMAIL_SMTP_SSL_TRUST: "*"
+    BYPASS_EVIDENCE_SHARE_SERVICE: true
 
 idam-pr:
   enabled: false

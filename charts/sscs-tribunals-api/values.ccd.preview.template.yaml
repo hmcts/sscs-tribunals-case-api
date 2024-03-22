@@ -563,7 +563,7 @@ elastic:
   enabled: true
 
 sscs-evidence-share:
-  enabled: false
+  enabled: {not ${BYPASS_EVIDENCE_SHARE}}
   java:
     image: hmctspublic.azurecr.io/sscs/evidence-share:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
