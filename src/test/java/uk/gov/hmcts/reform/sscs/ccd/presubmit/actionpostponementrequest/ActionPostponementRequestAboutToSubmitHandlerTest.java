@@ -385,5 +385,5 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
                 .originalPartySender(originalPartySender)
                 .build();
         return SscsDocument.builder().value(docDetails).build();
-      }
+    }
 }
