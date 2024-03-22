@@ -2,16 +2,15 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getLastValidHearing;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -53,7 +52,6 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     private final VenueDataLoader venueDataLoader;
     private final JudicialRefDataService judicialRefDataService;
     private static final String DOCUMENT_DATE_PATTERN = "dd/MM/yyyy";
-    public static final String IN_CHAMBERS = "In chambers";
     private final SignLanguagesService signLanguagesService;
     private final AirLookupService airLookupService;
     @Value("${feature.snl.adjournment.enabled}")
@@ -112,6 +110,8 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         } else {
             adjournCaseBuilder.reasonsForDecision(null);
         }
+
+        adjournCaseBuilder.tribunalDirectPoToAttend(caseData.getTribunalDirectPoToAttend());
 
         if (adjournment.getAdditionalDirections() != null) {
             adjournCaseBuilder.additionalDirections(adjournment.getAdditionalDirections().stream()
@@ -323,20 +323,16 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     }
 
     protected void setHearings(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
-        if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
-            HearingDetails finalHearing = getLastValidHearing(caseData);
-            if (finalHearing != null) {
-                if (finalHearing.getHearingDate() != null) {
-                    adjournCaseBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
+        HearingDetails finalHearing = getLastValidHearing(caseData);
+        if (finalHearing != null) {
+            if (finalHearing.getHearingDate() != null) {
+                adjournCaseBuilder.heldOn(LocalDate.parse(finalHearing.getHearingDate()));
+            }
+            if (finalHearing.getVenue() != null) {
+                String venueName = venueDataLoader.getGapVenueName(finalHearing.getVenue(), finalHearing.getVenueId());
+                if (venueName != null) {
+                    adjournCaseBuilder.heldAt(venueName);
                 }
-                if (finalHearing.getVenue() != null) {
-                    String venueName = venueDataLoader.getGapVenueName(finalHearing.getVenue(), finalHearing.getVenueId());
-                    if (venueName != null) {
-                        adjournCaseBuilder.heldAt(venueName);
-                    }
-                }
-            } else {
-                setInChambers(adjournCaseBuilder);
             }
         } else {
             setInChambers(adjournCaseBuilder);
@@ -370,13 +366,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         if (adjournmentFeature) {
             List<JudicialUserBase> panelMembers = adjournment.getPanelMembers();
-
-            names.addAll(panelMembers.stream()
-                .filter(panelMember -> isNotBlank(panelMember.getPersonalCode()))
-                .map(panelMember ->
-                    judicialRefDataService.getJudicialUserFullName(panelMember.getPersonalCode()))
-                .filter(Objects::nonNull)
-                .toList());
+            names.addAll(judicialRefDataService.getAllJudicialUsersFullNames(panelMembers));
         } else {
             List<String> panelMembers = Stream.of(adjournment.getDisabilityQualifiedPanelMemberName(),
                 adjournment.getMedicallyQualifiedPanelMemberName(), adjournment.getOtherPanelMemberName())

@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.model.PoDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
@@ -363,7 +364,20 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         verifyNoInteractions(hearingMessageHelper);
     }
 
-    private SscsDocument buildSscsDocument(String documentType,String date, UploadParty uploadParty, String originalPartySender) {
+    @Test
+    public void givenGrantedActionPostponement_thenClearPoFields() {
+        sscsCaseData.setPoAttendanceConfirmed(YES);
+        sscsCaseData.setPresentingOfficersDetails(PoDetails.builder().name(Name.builder().build()).build());
+        sscsCaseData.setPresentingOfficersHearingLink("link");
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getPoAttendanceConfirmed()).isEqualTo(NO);
+        assertThat(sscsCaseData.getPresentingOfficersDetails()).isEqualTo(PoDetails.builder().build());
+        assertThat(sscsCaseData.getPresentingOfficersHearingLink()).isNull();
+    }
+  
+      private SscsDocument buildSscsDocument(String documentType,String date, UploadParty uploadParty, String originalPartySender) {
         SscsDocumentDetails docDetails = SscsDocumentDetails.builder()
                 .documentType(documentType)
                 .documentDateAdded(date)
@@ -371,5 +385,5 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
                 .originalPartySender(originalPartySender)
                 .build();
         return SscsDocument.builder().value(docDetails).build();
-    }
+      }
 }
