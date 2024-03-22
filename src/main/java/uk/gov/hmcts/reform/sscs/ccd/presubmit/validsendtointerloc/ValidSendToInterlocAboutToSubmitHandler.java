@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -23,6 +24,8 @@ import uk.gov.hmcts.reform.sscs.service.PostponementRequestService;
 public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final PostponementRequestService postponementRequestService;
+    @Value("${feature.refusePostponement.enabled}")
+    private boolean isRefusePostponementEnabled;
 
     @Autowired
     public ValidSendToInterlocAboutToSubmitHandler(PostponementRequestService postponementRequestService) {
@@ -69,7 +72,13 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
                 return preSubmitCallbackResponse;
             }
             UploadParty uploadParty = getUploadParty(sscsCaseData.getOriginalSender());
-            postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty, Optional.empty());
+            if (isRefusePostponementEnabled){
+                postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty, Optional.empty());
+            }
+            else {
+                postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty);
+            }
+
         } else {
             InterlocReviewState interlocState = Arrays.stream(InterlocReviewState.values())
                 .filter(x -> x.getCcdDefinition().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode()))

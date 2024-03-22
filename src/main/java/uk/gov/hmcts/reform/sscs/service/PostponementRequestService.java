@@ -7,6 +7,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -23,6 +25,17 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 @Service
 public class PostponementRequestService {
 
+    //    remove after feature.refusePostponement.enabled set to enabled in prod
+    public void processPostponementRequest(SscsCaseData sscsCaseData, UploadParty uploadParty) {
+        ensureSscsDocumentsIsNotNull(sscsCaseData);
+        final SscsDocument sscsDocument = buildNewSscsDocumentFromPostponementRequest(sscsCaseData, uploadParty);
+        addToSscsDocuments(sscsCaseData, sscsDocument);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
+        sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
+        sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(YES);
+        clearTransientFields(sscsCaseData);
+    }
+
     public void processPostponementRequest(SscsCaseData sscsCaseData, UploadParty originalSender, Optional<UploadParty> uploadParty) {
         ensureSscsDocumentsIsNotNull(sscsCaseData);
         final SscsDocument sscsDocument = buildNewSscsDocumentFromPostponementRequest(sscsCaseData, originalSender, uploadParty);
@@ -31,6 +44,17 @@ public class PostponementRequestService {
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
         sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(YES);
         clearTransientFields(sscsCaseData);
+    }
+
+    //    remove after feature.refusePostponement.enabled set to enabled in prod
+    private SscsDocument buildNewSscsDocumentFromPostponementRequest(SscsCaseData sscsCaseData, UploadParty uploadParty) {
+        return SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentLink(sscsCaseData.getPostponementRequest().getPostponementPreviewDocument())
+                .documentFileName(sscsCaseData.getPostponementRequest().getPostponementPreviewDocument().getDocumentFilename())
+                .documentType(DocumentType.POSTPONEMENT_REQUEST.getValue())
+                .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
+                .originalPartySender(uploadParty.getValue())
+                .build()).build();
     }
 
     private SscsDocument buildNewSscsDocumentFromPostponementRequest(SscsCaseData sscsCaseData, UploadParty originalSender, Optional<UploadParty> uploadParty) {

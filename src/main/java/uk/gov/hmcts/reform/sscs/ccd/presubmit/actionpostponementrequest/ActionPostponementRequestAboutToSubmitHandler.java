@@ -60,6 +60,8 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
     private final ListAssistHearingMessageHelper hearingMessageHelper;
     @Value("${feature.snl.enabled}")
     private boolean isScheduleListingEnabled;
+    @Value("${feature.refusePostponement.enabled}")
+    private boolean isRefusePostponementEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -196,10 +198,17 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         caseData.setShowRip1DocPage(null);
 
         YesNo unprocessedPostponementRequest = caseData.getPostponementRequest().getUnprocessedPostponementRequest();
-        caseData.setPostponementRequest(PostponementRequest.builder()
-                .unprocessedPostponementRequest(unprocessedPostponementRequest)
-                .actionPostponementRequestSelected(caseData.getPostponementRequest().getActionPostponementRequestSelected())
-                .build());
+        if (isRefusePostponementEnabled) {
+            caseData.setPostponementRequest(PostponementRequest.builder()
+                    .unprocessedPostponementRequest(unprocessedPostponementRequest)
+                    .actionPostponementRequestSelected(caseData.getPostponementRequest().getActionPostponementRequestSelected())
+                    .build());
+        }
+        else {
+            caseData.setPostponementRequest(PostponementRequest.builder()
+                    .unprocessedPostponementRequest(unprocessedPostponementRequest)
+                    .build());
+        }
     }
 
     private SscsDocument getLatestPostponementDocumentForDwpType(List<SscsDocument> postponementDocuments) {

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -27,6 +28,8 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
     private final PostponementRequestService postponementRequestService;
     private final FooterService footerService;
     private final IdamService idamService;
+    @Value("${feature.refusePostponement.enabled}")
+    private boolean isRefusePostponementEnabled;
 
     @Autowired
     public PostponementRequestAboutToSubmitHandler(PostponementRequestService postponementRequestService, FooterService footerService, IdamService idamService) {
@@ -60,7 +63,13 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
                 uploadParty = Optional.of(UploadParty.DWP);
             }
 
-            postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.DWP, uploadParty);
+            if (isRefusePostponementEnabled) {
+                postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.DWP, uploadParty);
+            }
+            else {
+                postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.DWP);
+            }
+
             List<SscsDocument> documents = sscsCaseData.getSscsDocument();
             documents.get(documents.size() - 1).getValue().setBundleAddition(footerService.getNextBundleAddition(documents));
         }
