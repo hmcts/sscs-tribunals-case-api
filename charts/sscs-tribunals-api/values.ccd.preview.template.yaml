@@ -625,6 +625,7 @@ sscs-tya-notif:
           - notification-test-key
 
 postgresql:
+  enabled: true
   primary:
     initdb:
       scripts:
