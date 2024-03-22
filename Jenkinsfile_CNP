@@ -90,6 +90,9 @@ withPipeline(type, product, component) {
     if (env.BRANCH_NAME.startsWith("PR")) {
         loadVaultSecrets(secretsForPR)
         env.LOCAL_CCD_ENABLED = false
+        env.CASE_TYPE = Benefit-${CHANGE_ID}
+        env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+        env.CCD_DATA_STORE_API_BASE_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     } else {
         loadVaultSecrets(secrets)
     }
