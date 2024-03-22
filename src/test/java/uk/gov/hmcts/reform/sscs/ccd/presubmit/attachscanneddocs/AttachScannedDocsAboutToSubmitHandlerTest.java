@@ -7,9 +7,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -66,5 +69,75 @@ public class AttachScannedDocsAboutToSubmitHandlerTest {
 
         assertEquals(YesNo.NO.getValue(), response.getData().getEvidenceHandled());
         assertEquals(YesNo.YES, response.getData().getHasUnprocessedAudioVideoEvidence());
+    }
+
+    @Test
+    public void givenAnAttachScannedDocEventHasAnEditedUrl_thenCheckThatEditedUrlAndOtherScannedDocsRemain() {
+        ReflectionTestUtils.setField(handler, "deletedRedactedDocEnabled", true);
+        sscsCaseData.setScannedDocuments(List.of(ScannedDocument.builder().value(ScannedDocumentDetails.builder().build()).build()));
+
+        ScannedDocument document1 = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .editedUrl(DocumentLink.builder().documentUrl("edited url")
+                                .documentBinaryUrl("edited binary url").documentFilename("edited scanned doc").documentHash("hash edited").build())
+                        .url(DocumentLink.builder().documentUrl("original url")
+                                .documentBinaryUrl("original binary url").documentFilename("original scanned doc").documentHash("hash original").build())
+                        .type("Other")
+                        .scannedDate("20 Jun 2023")
+                        .build()
+        ).build();
+
+        ScannedDocument document2 = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .url(DocumentLink.builder().documentUrl("original url")
+                                .documentBinaryUrl("original binary url").documentFilename("original scanned doc").documentHash("hash original").build())
+                        .type("Other")
+                        .scannedDate("20 Jun 2023")
+                        .build()
+        ).build();
+
+        ScannedDocument document3 = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .editedUrl(DocumentLink.builder().documentUrl("edited url2")
+                                .documentBinaryUrl("edited binary url2").documentFilename("edited scanned doc2").documentHash("hash edited2").build())
+                        .url(DocumentLink.builder().documentUrl("original url2")
+                                .documentBinaryUrl("original binary url2").documentFilename("original scanned doc2").documentHash("hash original2").build())
+                        .type("Other")
+                        .scannedDate("24 Jun 2023")
+                        .build()
+        ).build();
+
+        ScannedDocument document4 = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .url(DocumentLink.builder().documentUrl("original url2")
+                                .documentBinaryUrl("original binary url2").documentFilename("original scanned doc2").documentHash("hash original2").build())
+                        .type("Other")
+                        .scannedDate("24 Jun 2023")
+                        .build()
+        ).build();
+
+        ScannedDocument documentWithoutEditedUrl = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .fileName("test")
+                        .url(DocumentLink.builder().documentUrl("test url")
+                                .documentBinaryUrl("test binary url").documentFilename("test filename").documentHash("test hash").build())
+                        .type("Other")
+                        .scannedDate("17 Apr 2023")
+                        .build()
+        ).build();
+
+        CaseData caseData = SscsCaseData.builder().scannedDocuments(List.of(document2, document4, documentWithoutEditedUrl)).build();
+        CaseData caseDataBefore = SscsCaseData.builder().scannedDocuments(List.of(document1,document3, documentWithoutEditedUrl)).build();
+
+        CaseDetails<? extends CaseData> caseDetails = new CaseDetails<>(1L, "", null, caseData, null, null);
+        CaseDetails<? extends CaseData> caseDetailsBefore = new CaseDetails<>(1L, "", null, caseDataBefore, null, null);
+
+        Callback<SscsCaseData> testCallback = new Callback(caseDetails, Optional.of(caseDetailsBefore), EventType.ATTACH_SCANNED_DOCS, false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, testCallback, USER_AUTHORISATION);
+
+        assertEquals(List.of(document1, document3, documentWithoutEditedUrl), response.getData().getScannedDocuments());
+        assertEquals(document1.getValue().getEditedUrl(), response.getData().getScannedDocuments().get(0).getValue().getEditedUrl());
+        assertEquals(document3.getValue().getEditedUrl(), response.getData().getScannedDocuments().get(1).getValue().getEditedUrl());
     }
 }

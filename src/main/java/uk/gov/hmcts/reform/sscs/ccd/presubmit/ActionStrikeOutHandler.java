@@ -32,6 +32,7 @@ public class ActionStrikeOutHandler extends EventToFieldPreSubmitCallbackHandler
             .findFirst()
             .orElse(null);
         sscsCaseData.setDwpState(dwpState);
+        sscsCaseData.clearPoDetails();
         return sscsCaseData;
     }
 

@@ -46,6 +46,15 @@ java:
     ELASTIC_SEARCH_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
     DUMMY: true
+    ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: true
+    TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+    SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+    AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
+    AMQP_USERNAME: "RootManageSharedAccessKey"
+  secrets:
+    AMQP_PASSWORD:
+      secretRef: sscs-sb-preview
+      key: primaryKey
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -718,6 +727,7 @@ sscs-tya-notif:
       JOB_SCHEDULER_DB_HOST: sscs-preview.postgres.database.azure.com
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       JOB_SCHEDULER_DB_USERNAME: hmcts
+      JOB_SCHEDULER_DB_PASSWORD: "${JOB_SCHEDULER:hmcts}"
       HOURS_START_TIME: 0
       HOURS_END_TIME: 23
       RUN_DB_MIGRATION_ON_STARTUP: true

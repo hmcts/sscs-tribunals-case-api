@@ -65,9 +65,10 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -134,9 +135,10 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -441,9 +443,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -503,9 +503,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -632,9 +630,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -699,9 +695,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -761,10 +755,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         }
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
-
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -827,9 +818,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -890,9 +879,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -953,9 +940,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1017,9 +1002,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1090,9 +1073,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1157,9 +1138,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1231,9 +1210,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1305,9 +1282,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1381,9 +1356,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1448,9 +1421,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1519,9 +1490,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1594,9 +1563,7 @@ public class PipWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
-
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);

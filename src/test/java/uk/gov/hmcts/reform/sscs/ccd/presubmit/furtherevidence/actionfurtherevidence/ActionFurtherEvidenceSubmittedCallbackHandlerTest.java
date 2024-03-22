@@ -12,6 +12,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
@@ -23,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -41,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -52,6 +55,10 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     public MockitoRule rule = MockitoJUnit.rule();
     @Mock
     private CcdService ccdService;
+
+    @Mock
+    private UpdateCcdCaseService updateCcdCaseService;
+
     @Mock
     private IdamService idamService;
 
@@ -59,7 +66,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, false, false);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, idamService, false, false);
     }
 
 
@@ -125,15 +132,21 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
-        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
+        ArgumentCaptor<Consumer<SscsCaseData>> captor = ArgumentCaptor.forClass(Consumer.class);
 
-        given(ccdService.updateCase(captor.capture(), anyLong(), eq("issueFurtherEvidence"),
-                anyString(), anyString(), any(IdamTokens.class)))
-                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+        var sscsCaseData = SscsCaseData.builder().build();
+        given(updateCcdCaseService.updateCaseV2(anyLong(), eq("issueFurtherEvidence"),
+                anyString(), anyString(), any(IdamTokens.class), captor.capture()))
+                .willReturn(SscsCaseDetails.builder().data(sscsCaseData).build());
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        assertNull(captor.getValue().getInterlocReviewState());
+        verify(updateCcdCaseService).updateCaseV2(anyLong(), eq("issueFurtherEvidence"),
+                anyString(), anyString(), any(IdamTokens.class), captor.capture());
+
+        captor.getValue().accept(sscsCaseData);
+
+        assertNull(sscsCaseData.getInterlocReviewState());
     }
 
     @Test
@@ -157,7 +170,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         Callback<SscsCaseData> callback = buildCallback(furtherEvidenceActionSelectedOption, ACTION_FURTHER_EVIDENCE);
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, false);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, idamService, true, false);
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals(interlocReviewState, captor.getValue().getInterlocReviewState());
@@ -194,7 +207,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, true);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, idamService, true, true);
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, captor.getValue().getInterlocReviewState());
@@ -222,7 +235,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, true);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, idamService, true, true);
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
         assertEquals(String.format("Post hearing request type is not implemented or recognised: %s", requestType), exception.getMessage());
     }
@@ -247,7 +260,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, false);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, idamService, true, false);
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
         assertEquals("Post hearings B is not enabled", exception.getMessage());
     }
@@ -381,7 +394,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                 any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, idamService, true, true);
+        handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, idamService, true, true);
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, captor.getValue().getInterlocReviewState());
