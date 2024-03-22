@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.voidcase;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -9,6 +10,8 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
@@ -26,10 +29,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.model.PoDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 
 @RunWith(JUnitParamsRunner.class)
@@ -83,8 +88,7 @@ public class VoidCaseAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"VOID_CASE"})
-    public void givenAVoidCaseEventAndSnLFeatureEnabled_thenActionsAndHearingCancel(EventType
-        eventType) {
+    public void givenAVoidCaseEventAndSnLFeatureEnabled_thenActionsAndHearingCancel(EventType eventType) {
         handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, true);
         when(callback.getEvent()).thenReturn(eventType);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -100,8 +104,7 @@ public class VoidCaseAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"VOID_CASE"})
-    public void givenAVoidCaseEventAndSnLFeatureNotEnabled_thenActionsButNoHearingCancel(EventType
-                                                                                            eventType) {
+    public void givenAVoidCaseEventAndSnLFeatureNotEnabled_thenActionsButNoHearingCancel(EventType eventType) {
         handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, false);
         when(callback.getEvent()).thenReturn(eventType);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -115,8 +118,7 @@ public class VoidCaseAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"ADMIN_SEND_TO_VOID_STATE"})
-    public void givenAdminVoidCaseEventAndSnLFeatureEnabled_thenActionsButNoHearingCancel(EventType
-                                                                                                            eventType) {
+    public void givenAdminVoidCaseEventAndSnLFeatureEnabled_thenActionsButNoHearingCancel(EventType eventType) {
         handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, true);
         when(callback.getEvent()).thenReturn(eventType);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -126,6 +128,19 @@ public class VoidCaseAboutToSubmitHandlerTest {
         Assert.assertNull(response.getData().getInterlocReviewState());
         Assert.assertNull(response.getData().getDirectionDueDate());
         verifyNoInteractions(hearingMessageHelper);
+    }
+
+    @Test
+    public void givenVoidCase_thenClearPoFields() {
+        sscsCaseData.setPoAttendanceConfirmed(YES);
+        sscsCaseData.setPresentingOfficersDetails(PoDetails.builder().name(Name.builder().build()).build());
+        sscsCaseData.setPresentingOfficersHearingLink("link");
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getPoAttendanceConfirmed()).isEqualTo(NO);
+        assertThat(sscsCaseData.getPresentingOfficersDetails()).isEqualTo(PoDetails.builder().build());
+        assertThat(sscsCaseData.getPresentingOfficersHearingLink()).isNull();
     }
 
     @Test(expected = IllegalStateException.class)

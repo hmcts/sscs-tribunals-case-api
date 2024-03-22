@@ -15,7 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
@@ -29,8 +29,8 @@ public class AdminAppealWithdrawnHandlerIt extends AbstractEventIt {
 
     @Before
     public void setup() throws IOException {
-        given(idamClient.getUserDetails(anyString())).willReturn(UserDetails.builder()
-                .forename("Jason").surname("Hart").build());
+        given(idamClient.getUserInfo(anyString())).willReturn(UserInfo.builder()
+                .givenName("Jason").familyName("Hart").build());
 
         setup("callback/adminAppealWithdrawn.json");
     }

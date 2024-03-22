@@ -4,16 +4,21 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
 public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    @Value("${feature.deleted-redacted-doc.enabled}")
+    private boolean deletedRedactedDocEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -32,7 +37,31 @@ public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackH
         sscsCaseData.setEvidenceHandled(NO.getValue());
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
 
+        if (deletedRedactedDocEnabled) {
+            var scannedDocuments = callback.getCaseDetails().getCaseData().getScannedDocuments();
+
+            callback.getCaseDetailsBefore().ifPresent(
+                    sscsCaseDataCaseDetailsBefore -> {
+                        sscsCaseDataCaseDetailsBefore.getCaseData().getScannedDocuments()
+                                .stream()
+                                .filter(scannedDocumentBefore -> scannedDocumentBefore.getValue().getEditedUrl() != null)
+                                .forEach(scannedDocumentBefore -> {
+                                    scannedDocuments
+                                            .stream()
+                                            .forEach(scannedDocument -> {
+                                                if (compare(scannedDocumentBefore, scannedDocument)) {
+                                                    scannedDocument.getValue().setEditedUrl(scannedDocumentBefore.getValue().getEditedUrl());
+                                                }
+                                            });
+                                });
+
+                    });
+        }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
+    }
+
+    private boolean compare(ScannedDocument doc1, ScannedDocument doc2) {
+        return doc1.getValue().getUrl().getDocumentUrl().equals(doc2.getValue().getUrl().getDocumentUrl());
     }
 
 }

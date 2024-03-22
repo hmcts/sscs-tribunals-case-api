@@ -4,7 +4,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.clearOtherPartyIfEmpty;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.clearOtherPartiesIfEmpty;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandler implements PreSubmit
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         checkOtherPartyButtonsNotPressed(callback, response);
-        clearOtherPartyIfEmpty(response.getData());
+        response.getData().setOtherParties(clearOtherPartiesIfEmpty(response.getData()));
 
         final ReasonableAdjustments reasonableAdjustments = sscsCaseData.getReasonableAdjustments();
         if (isYes(sscsCaseData.getAppeal().getAppellant().getIsAppointee()) || nonNull(reasonableAdjustments.getAppellant()) && isNoOrNull(sscsCaseData.getReasonableAdjustments().getAppellant().getWantsReasonableAdjustment())) {

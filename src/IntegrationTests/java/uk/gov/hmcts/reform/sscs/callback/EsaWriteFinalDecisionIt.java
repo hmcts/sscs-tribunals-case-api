@@ -50,9 +50,10 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -78,9 +79,9 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals(AN_Test,payload.getAppellantName());
-        assertEquals("2018-10-10",payload.getStartDate());
-        assertEquals("2018-11-10",payload.getEndDate());
+        assertEquals(AN_Test, payload.getAppellantName());
+        assertEquals("2018-10-10", payload.getStartDate());
+        assertEquals("2018-11-10", payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("lower rate", payload.getEsaAwardRate());
@@ -100,24 +101,24 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertEquals("The appeal is allowed.\n"
-            + "\n"
-            + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
-            + "\n"
-            + "AN Test has limited capability for work.\n"
-            + "\n"
-            + "In applying the Work Capability Assessment 15 points were scored from the activities and descriptors in Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 made up as follows:\n"
-            + "\n"
-            + "1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.\ta.Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.\t15\n"
-            + "\n"
-            + "\n"
-            + "AN Test does not have limited capability for work-related activity because no descriptor from Schedule 3 of the ESA Regulations applied. Regulation 35 did not apply.\n"
-            + "\n"
-            + "My reasons for decision\n"
-            + "\n"
-            + "Something else.\n"
-            + "\n"
-            + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
-            + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
+                + "\n"
+                + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
+                + "\n"
+                + "AN Test has limited capability for work.\n"
+                + "\n"
+                + "In applying the Work Capability Assessment 15 points were scored from the activities and descriptors in Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 made up as follows:\n"
+                + "\n"
+                + "1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.\ta.Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.\t15\n"
+                + "\n"
+                + "\n"
+                + "AN Test does not have limited capability for work-related activity because no descriptor from Schedule 3 of the ESA Regulations applied. Regulation 35 did not apply.\n"
+                + "\n"
+                + "My reasons for decision\n"
+                + "\n"
+                + "Something else.\n"
+                + "\n"
+                + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+                + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
     }
 
     @Override
@@ -128,14 +129,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario1_ZeroPoints() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "ANSWER", "REGULATION_29", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused",  "No", "1e", "No", "", ""));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "ANSWER", "REGULATION_29", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused", "No", "1e", "No", "", ""));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -162,9 +164,9 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isAllowed());
         assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals(AN_Test,payload.getAppellantName());
-        assertEquals("2018-10-10",payload.getStartDate());
-        assertEquals("2018-11-10",payload.getEndDate());
+        assertEquals(AN_Test, payload.getAppellantName());
+        assertEquals("2018-10-10", payload.getStartDate());
+        assertEquals("2018-11-10", payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
         assertEquals(false, payload.isEsaIsEntited());
         assertEquals("no award", payload.getEsaAwardRate());
@@ -176,21 +178,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        EsaTemplateContent esaTemplateContent = (EsaTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
+        EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_1, esaTemplateContent.getScenario());
     }
 
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario1_LowPoints() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "ANSWER", "REGULATION_29", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused",  "No", "1c", "No", "", ""));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "ANSWER", "REGULATION_29", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused", "No", "1c", "No", "", ""));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -216,9 +219,9 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isAllowed());
         assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals(AN_Test,payload.getAppellantName());
-        assertEquals("2018-10-10",payload.getStartDate());
-        assertEquals("2018-11-10",payload.getEndDate());
+        assertEquals(AN_Test, payload.getAppellantName());
+        assertEquals("2018-10-10", payload.getStartDate());
+        assertEquals("2018-11-10", payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
         assertEquals(false, payload.isEsaIsEntited());
         assertEquals("no award", payload.getEsaAwardRate());
@@ -236,21 +239,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        EsaTemplateContent esaTemplateContent = (EsaTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
+        EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_1, esaTemplateContent.getScenario());
     }
 
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario1_LowPoints_WhenIncorrectlyAllowed() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "ANSWER", "REGULATION_29", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "allowed",  "No", "1c", "No", "", ""));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "ANSWER", "REGULATION_29", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "allowed", "No", "1c", "No", "", ""));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -259,7 +263,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(1, result.getErrors().size());
         // Assert we get a user-friendly error message, as this combination is a possible (incorrect) combination selectable by the user
         assertEquals("You have awarded less than 15 points, specified that the appeal is allowed and specified that Support Group Only Appeal does not apply, "
-            + "but have answered No for the Regulation 29 question. Please review your previous selection.", result.getErrors().iterator().next());
+                + "but have answered No for the Regulation 29 question. Please review your previous selection.", result.getErrors().iterator().next());
         assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         verifyNoInteractions(generateFile);
     }
@@ -267,14 +271,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario1_LowPoints_WhenRegulation29SetToYes() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "ANSWER", "REGULATION_29", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused",  "No", "1c", "Yes", "", ""));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "ANSWER", "REGULATION_29", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused", "No", "1c", "Yes", "", ""));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -290,14 +295,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario1_LowPoints_WhenSupportGroupOnlySetToYes() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "ANSWER", "REGULATION_29", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused",  "Yes", "1c", "No", "", ""));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "ANSWER", "REGULATION_29", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused", "Yes", "1c", "No", "", ""));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -313,14 +319,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario1_LowPoints_WhenSupportGroupOnlyNotSet() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "\"supportGroupOnlyAppeal\" : \"SUPPORT_GROUP_ONLY\",", "ANSWER", "REGULATION_29", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused",  "", "1c", "No", "", ""));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "\"supportGroupOnlyAppeal\" : \"SUPPORT_GROUP_ONLY\",", "ANSWER", "REGULATION_29", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused", "", "1c", "No", "", ""));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -335,14 +342,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario1_LowPoints_WhenRegulation29NotSet() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "ANSWER", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused",  "No", "1c", "", "", ""));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "ANSWER", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused", "No", "1c", "", "", ""));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -359,14 +367,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario1_WhenHighPoints() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "ANSWER", "REGULATION_29", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused",  "No", "1a", "No", "", ""));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "ANSWER", "REGULATION_29", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused", "No", "1a", "No", "", ""));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -382,14 +391,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario2() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3"), Arrays.asList("2018-10-10", "refused", "Yes", "", "No", "No"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3"), Arrays.asList("2018-10-10", "refused", "Yes", "", "No", "No"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -415,9 +425,9 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isAllowed());
         assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals(AN_Test,payload.getAppellantName());
-        assertEquals("2018-10-10",payload.getStartDate());
-        assertEquals("2018-11-10",payload.getEndDate());
+        assertEquals(AN_Test, payload.getAppellantName());
+        assertEquals("2018-10-10", payload.getStartDate());
+        assertEquals("2018-11-10", payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("lower rate", payload.getEsaAwardRate());
@@ -428,21 +438,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        EsaTemplateContent esaTemplateContent = (EsaTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
+        EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_2, esaTemplateContent.getScenario());
     }
 
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario2_WhenIncorrectlyAllowed() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3"), Arrays.asList("2018-10-10", "allowed", "Yes", "", "No", "No"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3"), Arrays.asList("2018-10-10", "allowed", "Yes", "", "No", "No"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -458,14 +469,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario2_WhenRegulation35NotSet() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3"), Arrays.asList("2018-10-10", "refused", "Yes", "", "", "No"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3"), Arrays.asList("2018-10-10", "refused", "Yes", "", "", "No"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -481,14 +493,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario2_WhenSchedule3NotSet() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused", "Yes", "", "No", ""));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused", "Yes", "", "No", ""));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -505,14 +518,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario3() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3"), Arrays.asList("2018-10-10", "allowed", "Yes", "", "Yes", "No"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3"), Arrays.asList("2018-10-10", "allowed", "Yes", "", "Yes", "No"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -538,9 +552,9 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals(AN_Test,payload.getAppellantName());
-        assertEquals("2018-10-10",payload.getStartDate());
-        assertEquals("2018-11-10",payload.getEndDate());
+        assertEquals(AN_Test, payload.getAppellantName());
+        assertEquals("2018-10-10", payload.getStartDate());
+        assertEquals("2018-11-10", payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("higher rate", payload.getEsaAwardRate());
@@ -551,21 +565,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        EsaTemplateContent esaTemplateContent = (EsaTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
+        EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_3, esaTemplateContent.getScenario());
     }
 
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario3_WhenIncorrectlyRefused() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3"), Arrays.asList("2018-10-10", "refused", "Yes", "", "Yes", "No"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3"), Arrays.asList("2018-10-10", "refused", "Yes", "", "Yes", "No"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -581,14 +596,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario3_WhenRegulation35NotSet() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3"), Arrays.asList("2018-10-10", "allowed", "Yes", "", "", "No"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3"), Arrays.asList("2018-10-10", "allowed", "Yes", "", "", "No"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -604,14 +620,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario3_WhenSchedule3NotSet() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused", "Yes", "", "Yes", ""));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\","), Arrays.asList("2018-10-10", "refused", "Yes", "", "Yes", ""));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -627,14 +644,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario4() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3"), Arrays.asList("2018-10-10", "allowed", "Yes", "", "", "Yes"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3"), Arrays.asList("2018-10-10", "allowed", "Yes", "", "", "Yes"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -660,9 +678,9 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals(AN_Test,payload.getAppellantName());
-        assertEquals("2018-10-10",payload.getStartDate());
-        assertEquals("2018-11-10",payload.getEndDate());
+        assertEquals(AN_Test, payload.getAppellantName());
+        assertEquals("2018-10-10", payload.getStartDate());
+        assertEquals("2018-11-10", payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("higher rate", payload.getEsaAwardRate());
@@ -673,21 +691,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        EsaTemplateContent esaTemplateContent = (EsaTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
+        EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_4, esaTemplateContent.getScenario());
     }
 
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario4_WhenIncorrectlyRefused() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3"), Arrays.asList("2018-10-10", "refused", "Yes", "", "", "Yes"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3"), Arrays.asList("2018-10-10", "refused", "Yes", "", "", "Yes"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -704,14 +723,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario4_WhenNoSchedule3() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3"), Arrays.asList("2018-10-10", "allowed", "Yes", "", "", "No"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3"), Arrays.asList("2018-10-10", "allowed", "Yes", "", "", "No"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -727,14 +747,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario5() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "No", "No", "1a"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "No", "No", "1a"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -760,9 +781,9 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals(AN_Test,payload.getAppellantName());
-        assertEquals("2018-10-10",payload.getStartDate());
-        assertEquals("2018-11-10",payload.getEndDate());
+        assertEquals(AN_Test, payload.getAppellantName());
+        assertEquals("2018-10-10", payload.getStartDate());
+        assertEquals("2018-11-10", payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("lower rate", payload.getEsaAwardRate());
@@ -780,21 +801,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        EsaTemplateContent esaTemplateContent = (EsaTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
+        EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_5, esaTemplateContent.getScenario());
     }
 
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario5_WhenIncorrectlyRefused() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "", "No", "No", "1a"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "", "No", "No", "1a"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -810,14 +832,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario5_Regulation35NotSet() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "", "No", "1a"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "", "No", "1a"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -833,14 +856,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario5_LowPoints() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "", "No", "1c"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "", "No", "1c"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -858,14 +882,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario6() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "", "Yes", "1a"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "", "Yes", "1a"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -891,9 +916,9 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals(AN_Test,payload.getAppellantName());
-        assertEquals("2018-10-10",payload.getStartDate());
-        assertEquals("2018-11-10",payload.getEndDate());
+        assertEquals(AN_Test, payload.getAppellantName());
+        assertEquals("2018-10-10", payload.getStartDate());
+        assertEquals("2018-11-10", payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("higher rate", payload.getEsaAwardRate());
@@ -911,21 +936,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        EsaTemplateContent esaTemplateContent = (EsaTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
+        EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_6, esaTemplateContent.getScenario());
     }
 
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario6_WhenIncorrectlyRefused() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "", "", "Yes", "1a"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "", "", "Yes", "1a"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -941,14 +967,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario6_WhenSchedule3NotSet() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\",", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "", "", "1a"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\",", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "", "", "1a"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -966,14 +993,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario6_WhenNotSchedule3() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "", "No", "1a"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "", "No", "1a"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -991,14 +1019,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario6_WhenLowPoints() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "", "Yes", "1c"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "", "Yes", "1c"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1016,14 +1045,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario7() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "Yes", "No", "No", "1c"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "Yes", "No", "No", "1c"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1049,9 +1079,9 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals(AN_Test,payload.getAppellantName());
-        assertEquals("2018-10-10",payload.getStartDate());
-        assertEquals("2018-11-10",payload.getEndDate());
+        assertEquals(AN_Test, payload.getAppellantName());
+        assertEquals("2018-10-10", payload.getStartDate());
+        assertEquals("2018-11-10", payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("lower rate", payload.getEsaAwardRate());
@@ -1069,21 +1099,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        EsaTemplateContent esaTemplateContent = (EsaTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
+        EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_7, esaTemplateContent.getScenario());
     }
 
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario7_WhenIncorrectlyRefused() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "Yes", "No", "No", "1c"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "Yes", "No", "No", "1c"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1099,14 +1130,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario7_WhenRegulation35NotSet() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "Yes", "", "No", "1c"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "Yes", "", "No", "1c"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1124,14 +1156,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario7_WhenSchedule3NotSet() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\",", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "Yes", "No", "", "1c"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\",", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "Yes", "No", "", "1c"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1149,14 +1182,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario7_WhenRegulation29IncorrectlyDoesNotApply() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "No", "No", "No", "1c"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "No", "No", "No", "1c"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1176,14 +1210,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario8() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "Yes", "Yes", "No", "1c"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "Yes", "Yes", "No", "1c"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1209,9 +1244,9 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals(AN_Test,payload.getAppellantName());
-        assertEquals("2018-10-10",payload.getStartDate());
-        assertEquals("2018-11-10",payload.getEndDate());
+        assertEquals(AN_Test, payload.getAppellantName());
+        assertEquals("2018-10-10", payload.getStartDate());
+        assertEquals("2018-11-10", payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("higher rate", payload.getEsaAwardRate());
@@ -1229,21 +1264,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        EsaTemplateContent esaTemplateContent = (EsaTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
+        EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_8, esaTemplateContent.getScenario());
     }
 
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario8_WhenIncorrectlyRefused() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "Yes", "Yes", "No", "1c"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "Yes", "Yes", "No", "1c"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1259,14 +1295,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario9() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "Yes", "No", "Yes", "1c"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "Yes", "No", "Yes", "1c"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1292,9 +1329,9 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals(AN_Test,payload.getAppellantName());
-        assertEquals("2018-10-10",payload.getStartDate());
-        assertEquals("2018-11-10",payload.getEndDate());
+        assertEquals(AN_Test, payload.getAppellantName());
+        assertEquals("2018-10-10", payload.getStartDate());
+        assertEquals("2018-11-10", payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("higher rate", payload.getEsaAwardRate());
@@ -1312,21 +1349,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        EsaTemplateContent esaTemplateContent = (EsaTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
+        EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_9, esaTemplateContent.getScenario());
     }
 
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario9_WhenIncorrectlyRefused() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "Yes", "No", "Yes", "1c"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "Yes", "No", "Yes", "1c"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1347,9 +1385,10 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1375,9 +1414,9 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(false, payload.isAllowed());
         assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals(AN_Test,payload.getAppellantName());
-        assertEquals("2018-10-10",payload.getStartDate());
-        assertEquals("2018-11-10",payload.getEndDate());
+        assertEquals(AN_Test, payload.getAppellantName());
+        assertEquals("2018-10-10", payload.getStartDate());
+        assertEquals("2018-11-10", payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
         assertEquals(false, payload.isEsaIsEntited());
         assertNull(payload.getEsaAwardRate());
@@ -1390,18 +1429,18 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertEquals("The appeal is refused.\n"
-            + "\n"
-            + "The decision made by the Secretary of State on 01/09/2018 is confirmed.\n"
-            + "\n"
-            + "This is my summary.\n"
-            + "\n"
-            + "My reasons for decision\n"
-            + "\n"
-            + "Something else.\n"
-            + "\n"
-            + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
-            + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
-        EsaTemplateContent esaTemplateContent = (EsaTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
+                + "\n"
+                + "The decision made by the Secretary of State on 01/09/2018 is confirmed.\n"
+                + "\n"
+                + "This is my summary.\n"
+                + "\n"
+                + "My reasons for decision\n"
+                + "\n"
+                + "Something else.\n"
+                + "\n"
+                + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+                + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
+        EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_10, esaTemplateContent.getScenario());
     }
 
@@ -1413,9 +1452,10 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1441,9 +1481,9 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals(AN_Test,payload.getAppellantName());
-        assertEquals("2018-10-10",payload.getStartDate());
-        assertEquals("2018-11-10",payload.getEndDate());
+        assertEquals(AN_Test, payload.getAppellantName());
+        assertEquals("2018-10-10", payload.getStartDate());
+        assertEquals("2018-11-10", payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
         assertEquals(false, payload.isEsaIsEntited());
         assertNull(payload.getEsaAwardRate());
@@ -1456,18 +1496,18 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertEquals("The appeal is allowed.\n"
-            + "\n"
-            + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
-            + "\n"
-            + "This is my summary.\n"
-            + "\n"
-            + "My reasons for decision\n"
-            + "\n"
-            + "Something else.\n"
-            + "\n"
-            + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
-            + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
-        EsaTemplateContent esaTemplateContent = (EsaTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
+                + "\n"
+                + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
+                + "\n"
+                + "This is my summary.\n"
+                + "\n"
+                + "My reasons for decision\n"
+                + "\n"
+                + "Something else.\n"
+                + "\n"
+                + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+                + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
+        EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_10, esaTemplateContent.getScenario());
     }
 
@@ -1480,9 +1520,10 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1508,9 +1549,9 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals(AN_Test,payload.getAppellantName());
-        assertEquals("2018-10-10",payload.getStartDate());
-        assertEquals("2018-11-10",payload.getEndDate());
+        assertEquals(AN_Test, payload.getAppellantName());
+        assertEquals("2018-10-10", payload.getStartDate());
+        assertEquals("2018-11-10", payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
         assertEquals(false, payload.isEsaIsEntited());
         assertNull(payload.getEsaAwardRate());
@@ -1523,30 +1564,31 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertEquals("The appeal is allowed.\n"
-            + "\n"
-            + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
-            + "\n"
-            + "This is my summary.\n"
-            + "\n"
-            + "My reasons for decision\n"
-            + "\n"
-            + "Something else.\n"
-            + "\n"
-            + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
-            + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
+                + "\n"
+                + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
+                + "\n"
+                + "This is my summary.\n"
+                + "\n"
+                + "My reasons for decision\n"
+                + "\n"
+                + "Something else.\n"
+                + "\n"
+                + "This has been an oral (face to face) hearing. AN Test the appellant attended the hearing today and the Tribunal considered the appeal bundle to page A1. First Tier Agency representative attended on behalf of the Respondent.\n"
+                + "\n", parentPayload.getWriteFinalDecisionTemplateContent().toString());
     }
 
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario12() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "Yes", "No", "1a"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "Yes", "No", "1a"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1572,9 +1614,9 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals(AN_Test,payload.getAppellantName());
-        assertEquals("2018-10-10",payload.getStartDate());
-        assertEquals("2018-11-10",payload.getEndDate());
+        assertEquals(AN_Test, payload.getAppellantName());
+        assertEquals("2018-10-10", payload.getStartDate());
+        assertEquals("2018-11-10", payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
         assertEquals(true, payload.isEsaIsEntited());
         assertEquals("higher rate", payload.getEsaAwardRate());
@@ -1592,21 +1634,22 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        EsaTemplateContent esaTemplateContent = (EsaTemplateContent)parentPayload.getWriteFinalDecisionTemplateContent();
+        EsaTemplateContent esaTemplateContent = (EsaTemplateContent) parentPayload.getWriteFinalDecisionTemplateContent();
         Assert.assertEquals(EsaScenario.SCENARIO_12, esaTemplateContent.getScenario());
     }
 
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario12_WhenIncorrectlyRefused() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "", "Yes", "No", "1a"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "", "Yes", "No", "1a"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1620,19 +1663,18 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
 
-
-
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario12_WhenRegulation35NotSet() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "", "No", "1a"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "", "No", "1a"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -1648,14 +1690,15 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario12_WhenLowPoints() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "Yes", "No", "1c"));
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "Yes", "No", "1c"));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
-        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+        when(userInfo.getGivenName()).thenReturn("Judge");
+        when(userInfo.getFamilyName()).thenReturn("Full Name");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);

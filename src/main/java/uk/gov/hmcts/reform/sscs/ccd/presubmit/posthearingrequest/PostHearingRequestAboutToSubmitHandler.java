@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.UPLOAD;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostHearingRequestFormatAndContentFields;
 
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -12,10 +13,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
@@ -58,6 +56,8 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
                 callback.getEvent());
         }
 
+        clearPostHearingRequestFormatAndContentFields(caseData, caseData.getPostHearing().getRequestType());
+
         return response;
     }
 
@@ -91,4 +91,5 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
             caseData.getDocumentStaging().setPreviewDocument(renamedPreviewDoc);
         }
     }
+
 }
