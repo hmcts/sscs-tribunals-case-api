@@ -581,7 +581,7 @@ sscs-evidence-share:
 # click create
 # azure steps should be repeated every time PR is undeployed from preview
 sscs-tya-notif:
-  enabled: true
+  enabled: false
   java:
     image: hmctspublic.azurecr.io/sscs/tya-notif:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
@@ -624,23 +624,6 @@ sscs-tya-notif:
           - docmosis-api-key
           - notification-key
           - notification-test-key
-
-postgresql:
-  enabled: true
-  primary:
-    initdb:
-      scripts:
-        init.sql: |
-          CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-          CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-          CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-          CREATE DATABASE "draftstore" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-          CREATE DATABASE "evidence" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-          CREATE DATABASE "annotation" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-          CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-          CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-          CREATE DATABASE "sscsjobscheduler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-
 
 sscs-ccd-callback-orchestrator:
   enabled: true
@@ -745,45 +728,6 @@ sscs-hearings-api:
       HMC_HEARINGS_TOPIC_ACCESS_KEY:
         secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
         key: primaryKey
-
-hmc-cft-hearing-service:
-  enabled: false
-  java:
-    releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
-    image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
-    environment:
-      HMC_SERVICE_BUS_TOPIC: "hmc-to-cft"
-      HMC_SERVICE_BUS_SUBSCRIPTION: "hmc-to-sscs-subscription"
-      HMC_SERVICE_BUS_QUEUE: hmc-from-hmi
-      HMC_OUTBOUND_SERVICE_BUS_QUEUE: hmc-to-hmi
-      CFT_HEARING_SERVICE_DB_HOST: "${SERVICE_NAME}-postgresql"
-      CFT_HEARING_SERVICE_DB_NAME: "hmc-cft-hearing-service"
-      CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
-      CFT_HEARING_SERVICE_DB_PORT: 5432
-      HMC_ACCESS_CONTROL_ENABLED: false
-      ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
-      SPRING_CONFIG_IMPORT: "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
-    secrets:
-      HMC_SERVICE_BUS_CONNECTION_STRING:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: connectionString
-      HMC_QUEUE_CONNECTION_STRING:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-from-hmi
-        key: connectionString
-      HMC_OUTBOUND_QUEUE_CONNECTION_STRING:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-to-hmi
-        key: connectionString
-    keyVaults:
-      hmc:
-        resourceGroup: hmc-shared
-        secrets:
-          - name: AppInsightsInstrumentationKey
-      sscs:
-        secrets:
-          - name: preview-ccd-db-username
-            alias: CFT_HEARING_SERVICE_DB_USERNAME
-          - name: preview-ccd-db-password
-            alias: CFT_HEARING_SERVICE_DB_PASSWORD
 
 #Enable for queues/topics
 #If you need a subscription for a topic, topic name should be not longer than 10 characters
