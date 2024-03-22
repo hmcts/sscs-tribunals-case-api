@@ -164,8 +164,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
       
         return updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
                 EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
-                "Issue to all parties", idamService.getIdamTokens(), sscsCaseData -> {
-                });
+                "Issue to all parties", idamService.getIdamTokens());
     }
 
     private SscsCaseDetails handlePostHearing(Callback<SscsCaseData> callback, SscsCaseData caseData, PostHearingRequestType postHearingRequestType) {
