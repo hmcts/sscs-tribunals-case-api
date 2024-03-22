@@ -173,7 +173,7 @@ sscs-evidence-share:
 sscs-tya-notif:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
+    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2421-1302f89-20240322094957
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     ingressHost: tya-${SERVICE_FQDN}
     readinessDelay: 45
@@ -321,7 +321,7 @@ redis:
 #Turning hearings api on requires you to follow the hearing steps described in the readme
 #HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME must be updated
 sscs-hearings-api:
-  enabled: false
+  enabled: true
   java:
     image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
