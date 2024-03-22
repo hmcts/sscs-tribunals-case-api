@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionpostponementrequest;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction.*;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -15,12 +15,18 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
 public class ActionPostponementRequestSubmittedCallbackHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final CcdService ccdService;
     private final IdamService idamService;
+    private final boolean workAllocationFeature;
 
+    public ActionPostponementRequestSubmittedCallbackHandler(CcdService ccdService, IdamService idamService,
+                                                             @Value("${feature.work-allocation.enabled}") boolean workAllocationFeature) {
+        this.ccdService = ccdService;
+        this.idamService = idamService;
+        this.workAllocationFeature = workAllocationFeature;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -28,7 +34,8 @@ public class ActionPostponementRequestSubmittedCallbackHandler implements PreSub
         requireNonNull(callbackType, "callbackType must not be null");
         return callbackType.equals(CallbackType.SUBMITTED)
                 && (callback.getEvent().equals(EventType.ACTION_POSTPONEMENT_REQUEST)
-                    || callback.getEvent().equals(EventType.ACTION_POSTPONEMENT_REQUEST_WELSH));
+                    || callback.getEvent().equals(EventType.ACTION_POSTPONEMENT_REQUEST_WELSH))
+                && workAllocationFeature;
     }
 
     @Override

@@ -56,7 +56,7 @@ public class ActionPostponementRequestSubmittedCallbackHandlerTest {
                 .postponementRequest(PostponementRequest.builder().build())
                 .build();
 
-        handler = new ActionPostponementRequestSubmittedCallbackHandler(ccdService, idamService);
+        handler = new ActionPostponementRequestSubmittedCallbackHandler(ccdService, idamService, true);
     }
 
     @Test
@@ -69,6 +69,14 @@ public class ActionPostponementRequestSubmittedCallbackHandlerTest {
     public void givenIncorrectCallbackType_thenThrowError() {
         assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
+
+    @Test
+    public void givenWaFlagIsFalse_thenReturnFalse() {
+        when(callback.getEvent()).thenReturn(EventType.ACTION_POSTPONEMENT_REQUEST);
+        handler = new ActionPostponementRequestSubmittedCallbackHandler(ccdService, idamService, false);
+        assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
+    }
+
 
     @Test
     public void givePostponementActionIsNull_thenShouldNotThrowError() {
