@@ -15,9 +15,3 @@ java:
     WORK_ALLOCATION_FEATURE: true
     CASE_ACCESS_MANAGEMENT_FEATURE: true
     SCHEDULE_LISTING_FEATURE: true
-
-ccd-def-cleanup:
-  enabled: true
-  change_id: ${CHANGE_ID}
-  case_type_ids:
-    - Benefit
