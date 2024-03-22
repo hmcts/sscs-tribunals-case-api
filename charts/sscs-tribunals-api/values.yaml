@@ -113,3 +113,6 @@ servicebus:
   enabled: false
 ccd-case-document-am-api:
   enabled: false
+postgresql:
+  enabled: false
+
