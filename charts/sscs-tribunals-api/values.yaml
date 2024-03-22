@@ -85,6 +85,8 @@ java:
     AMQP_HOST: "sscs-servicebus-{{ .Values.global.environment }}.servicebus.windows.net"
     AMQP_USERNAME: "SendAndListenSharedAccessKey"
 
+postgresql:
+  enabled: false
 idam-pr:
   enabled: false
 xui-webapp:
@@ -113,3 +115,15 @@ servicebus:
   enabled: false
 ccd-case-document-am-api:
   enabled: false
+aac-manage-case-assignment:
+  enabled: false
+am-org-role-mapping-service:
+  enabled: false
+wa:
+  enabled: false
+  taskBatchCron:
+    enabled: false
+  reconfigurationBatchCron:
+    enabled: false
+  terminationBatchCron:
+    enabled: false

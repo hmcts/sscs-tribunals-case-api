@@ -18,5 +18,127 @@
       }
     ],
     "overrideAll": true
+  },
+  {
+    "email": "ctsc-administrator@hmcts.net",
+    "id": "3f63b6ec-4e3a-3d18-8ce3-7867407d3972",
+    "roleAssignments": [
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "ctsc",
+        "grantType": "STANDARD",
+        "roleCategory": "CTSC",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "Benefit",
+          "jurisdiction": "SSCS"
+        },
+        "authorisations": []
+      }
+    ],
+    "overrideAll": true
+  },
+  {
+    "email": "regional-centre-admin@fake.hmcts.net",
+    "id": "e11c7f69-3154-33e4-ad3d-18e9a0918ed9",
+    "roleAssignments": [
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "regional-centre-admin",
+        "grantType": "STANDARD",
+        "roleCategory": "ADMIN",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "Benefit",
+          "jurisdiction": "SSCS"
+        },
+        "authorisations": []
+      }
+    ],
+    "overrideAll": true
+  },
+  {
+    "email": "judge@example.com",
+    "id": "fbd1ba5b-9251-3bd7-b8d1-677d8e5ccbb6",
+    "roleAssignments": [
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "judge",
+        "grantType": "STANDARD",
+        "roleCategory": "JUDICIAL",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "Benefit",
+          "jurisdiction": "SSCS"
+        },
+        "authorisations": []
+      }
+    ],
+    "overrideAll": true
+  },
+  {
+    "email": "tribunal-member-1@fake.hmcts.net",
+    "id": "764794e0-fb99-3806-b670-c74cea74b606",
+    "roleAssignments": [
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "tribunal-member-1",
+        "grantType": "STANDARD",
+        "roleCategory": "JUDICIAL",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "Benefit",
+          "jurisdiction": "SSCS"
+        },
+        "authorisations": []
+      }
+    ],
+    "overrideAll": true
+  },
+  {
+    "email": "tribunal-member-2@fake.hmcts.net",
+    "id": "115ef1a1-8d97-39e2-baa5-6eef4fd6aaef",
+    "roleAssignments": [
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "tribunal-member-2",
+        "grantType": "STANDARD",
+        "roleCategory": "JUDICIAL",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "Benefit",
+          "jurisdiction": "SSCS"
+        },
+        "authorisations": []
+      }
+    ],
+    "overrideAll": true
+  },
+  {
+    "email": "tribunal-member-3@fake.hmcts.net",
+    "id": "8354ee77-7261-337e-ac2d-039fc6a34052",
+    "roleAssignments": [
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "tribunal-member-3",
+        "grantType": "STANDARD",
+        "roleCategory": "JUDICIAL",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "Benefit",
+          "jurisdiction": "SSCS"
+        },
+        "authorisations": []
+      }
+    ],
+    "overrideAll": true
   }
 ]
+
+

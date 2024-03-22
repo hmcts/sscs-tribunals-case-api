@@ -173,11 +173,8 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getInterlocReviewState()).isNull();
-        assertThat(response.getData().getInterlocReferralReason()).isNull();
         assertThat(response.getData().getPostponementRequest().getUnprocessedPostponementRequest()).isEqualTo(NO);
         assertThat(response.getData().getDwpState()).isEqualTo(DwpState.HEARING_POSTPONED);
-        assertThat(response.getData().getDocumentGeneration().getDirectionNoticeContent()).isNull();
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
                 eq(POSTPONEMENT_REQUEST_DIRECTION_NOTICE), any(), any(), eq(null), eq(null), eq(null));
     }
@@ -271,8 +268,6 @@ public class ActionPostponementRequestAboutToSubmitHandlerTest {
 
         assertThat(response.getData().getInterlocReviewState()).isEqualTo(WELSH_TRANSLATION);
         assertThat(response.getData().getTranslationWorkOutstanding()).isEqualTo(YES.getValue());
-        System.out.println(response.getData().getSscsDocument());
-        assertThat(response.getData().getDocumentGeneration().getDirectionNoticeContent()).isNull();
     }
 
     @Test

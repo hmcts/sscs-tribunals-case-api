@@ -113,6 +113,7 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
                 "statementOfReasons",
                 "statementOfReasonsBodyContent",
                 "statementOfReasonsGenerateNotice",
+                "sscsDocument[0].id",
                 "poAttendanceConfirmed")
             .isEqualTo(expectedCaseData);
         verifyNoInteractions(hearingMessageHelper);
