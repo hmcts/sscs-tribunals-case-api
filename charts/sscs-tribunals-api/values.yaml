@@ -79,13 +79,12 @@ java:
     ELINKS_V2_FEATURE_ENABLED: false
     DELETED_REDACTED_DOC_ENABLED: false
     UPLOAD_HEARING_FILTER_ENABLED: false
+    ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: false
     SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-{{ .Values.global.environment }}"
     TOPIC_NAME: "sscs-evidenceshare-topic-{{ .Values.global.environment }}"
     AMQP_HOST: "sscs-servicebus-{{ .Values.global.environment }}.servicebus.windows.net"
     AMQP_USERNAME: "SendAndListenSharedAccessKey"
 
-idam-pr:
-  enabled: false
 xui-webapp:
   enabled: false
 elastic:
@@ -106,9 +105,9 @@ em-ccdorc:
   enabled: false
 sscs-hearings-api:
   enabled: false
-hmc-cft-hearing-service:
-  enabled: false
 servicebus:
   enabled: false
 ccd-case-document-am-api:
+  enabled: false
+ccd-def-cleanup:
   enabled: false
