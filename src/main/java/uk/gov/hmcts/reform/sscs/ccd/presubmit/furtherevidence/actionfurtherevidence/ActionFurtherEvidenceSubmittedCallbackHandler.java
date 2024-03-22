@@ -37,13 +37,13 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     public static final String TCW_REVIEW_SEND_TO_JUDGE = "Send a case to a judge for review";
 
     private final CcdService ccdService;
-
+  
     private final UpdateCcdCaseService updateCcdCaseService;
 
     private final CcdClient ccdClient;
 
     private final SscsCcdConvertService sscsCcdConvertService;
-
+  
     private final IdamService idamService;
 
     @Value("${feature.postHearings.enabled}")
@@ -161,9 +161,11 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                     EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Actioned manually",
                     "Actioned manually", idamService.getIdamTokens());
         }
+      
         return updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
                 EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
-                "Issue to all parties", idamService.getIdamTokens());
+                "Issue to all parties", idamService.getIdamTokens(), sscsCaseData -> {
+                });
     }
 
     private SscsCaseDetails handlePostHearing(Callback<SscsCaseData> callback, SscsCaseData caseData, PostHearingRequestType postHearingRequestType) {

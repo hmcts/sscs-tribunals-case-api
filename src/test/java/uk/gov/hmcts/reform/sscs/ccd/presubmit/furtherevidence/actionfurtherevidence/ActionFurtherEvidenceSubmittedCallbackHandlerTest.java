@@ -191,6 +191,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                 .willReturn(SscsCaseDetails.builder().data(sscsCaseData).build());
 
         handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, false);
+
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         ArgumentCaptor<Consumer<SscsCaseData>> captor = ArgumentCaptor.forClass(Consumer.class);
@@ -241,6 +242,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                 .willReturn(SscsCaseDetails.builder().data(sscsCaseData).build());
 
         handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, true);
+
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         ArgumentCaptor<Consumer<SscsCaseData>> captor = ArgumentCaptor.forClass(Consumer.class);
@@ -286,6 +288,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                 .willReturn(SscsCaseDetails.builder().data(sscsCaseData).build());
 
         handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, false);
+
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
         assertEquals(String.format("Post hearing request type is not implemented or recognised: %s", requestType), exception.getMessage());
     }
@@ -316,6 +319,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
 
         handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, false);
+
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
         assertEquals("Post hearings B is not enabled", exception.getMessage());
     }
@@ -496,6 +500,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                 .willReturn(SscsCaseDetails.builder().data(sscsCaseData).build());
 
         handler = new ActionFurtherEvidenceSubmittedCallbackHandler(ccdService, updateCcdCaseService, ccdClient, sscsCcdConvertService, idamService, true, true);
+
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         ArgumentCaptor<Consumer<SscsCaseData>> captor = ArgumentCaptor.forClass(Consumer.class);
