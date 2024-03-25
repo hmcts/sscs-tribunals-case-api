@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 import java.time.LocalDate;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     public static final String TCW_REVIEW_POSTPONEMENT_REQUEST = "Review hearing postponement request";
     public static final String TCW_REVIEW_SEND_TO_JUDGE = "Send a case to a judge for review";
@@ -127,6 +129,10 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             }
 
             if (isPostHearingsBEnabled && isPostHearingOtherRequest(caseData)) {
+                log.info("Updating case using updateCaseV2 to trigger '{}' for caseId: {}, interlocReviewState: {}",
+                        EventType.POST_HEARING_OTHER.getCcdType(),
+                        callback.getCaseDetails().getId(),
+                        REVIEW_BY_JUDGE.getCcdDefinition());
                 return updateCcdCaseService.updateCaseV2(callback.getCaseDetails().getId(),
                         EventType.POST_HEARING_OTHER.getCcdType(), "Post hearing application 'Other'",
                         "Post hearing application 'Other'", idamService.getIdamTokens(),
@@ -157,11 +163,18 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                     OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Send a case to urgent hearing");
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, OTHER_DOCUMENT_MANUAL)) {
+            log.info("Updating case using triggerCaseEventV2 for event {}, caseId {}",
+                    EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(),
+                    callback.getCaseDetails().getId());
             return updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
                     EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Actioned manually",
                     "Actioned manually", idamService.getIdamTokens());
         }
-      
+
+        log.info("Updating case using triggerCaseEventV2 for event: {}, event description: {}, caseId: {}",
+                EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(),
+                "Issue to all parties",
+                callback.getCaseDetails().getId());
         return updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
                 EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
                 "Issue to all parties", idamService.getIdamTokens());
@@ -253,6 +266,12 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             FurtherEvidenceActionDynamicListItems interlocType,
             EventType eventType,
             String summary) {
+
+        log.info(
+                "Updating case using updateCaseV2 to trigger '{}' for caseId: {}, "
+                + "interlocReviewState: {}, interlocType: {}",
+                eventType.getCcdType(), caseId, interlocReviewState.getCcdDefinition(),
+                interlocType.getLabel());
         return updateCcdCaseService.updateCaseV2(
                 caseId,
                 eventType.getCcdType(),
@@ -268,6 +287,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     private SscsCaseDetails setMakeCaseUrgentTriggerEvent(
             Long caseId,
             FurtherEvidenceActionDynamicListItems interlocType, EventType eventType, String summary) {
+        log.info("Updating case using updateCaseV2 to trigger '{}' for caseId {}", eventType.getCcdType(), caseId);
         return updateCcdCaseService.triggerCaseEventV2(
                 caseId,
                 eventType.getCcdType(), summary,
