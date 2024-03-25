@@ -47,7 +47,7 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
 
     private void setFurtherEvidenceActionDropdown(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = getFurtherActionEvidenceItems(List.of(values()));
-        sscsCaseData.setFurtherEvidenceAction(new DynamicList(listOptions.get(0), listOptions));
+        sscsCaseData.setFurtherEvidenceAction(new DynamicList(new DynamicListItem("", ""), listOptions));
     }
 
     private List<DynamicListItem> getFurtherActionEvidenceItems(List<FurtherEvidenceActionDynamicListItems> items) {
@@ -60,6 +60,6 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = getPartiesOnCaseWithDwpAndHmcts(sscsCaseData);
 
-        sscsCaseData.setOriginalSender(new DynamicList(listOptions.get(0), listOptions));
+        sscsCaseData.setOriginalSender(new DynamicList(new DynamicListItem("", ""), listOptions));
     }
 }

@@ -71,12 +71,12 @@ public class CitizenLoginTest extends BaseFunctionTest {
     public void logUserWithCase_returnsNoContent() throws IOException, InterruptedException {
 
         // Give ES time to index
-        Thread.sleep(5000L);
+        Thread.sleep(6000L);
 
         sscsMyaBackendRequests.assignCaseToUser(ccdCase.getAppellantTya(), userEmail, "TN32 6PL");
 
         // Wait for above request to finish
-        Thread.sleep(5000L);
+        Thread.sleep(6000L);
 
         Long caseId = Long.valueOf(ccdCase.getCaseId());
         sscsMyaBackendRequests.logUserWithCase(caseId);

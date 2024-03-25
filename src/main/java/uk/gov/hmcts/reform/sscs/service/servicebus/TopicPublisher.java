@@ -7,7 +7,6 @@ import javax.jms.Message;
 import javax.jms.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.IllegalStateException;
 import org.springframework.jms.connection.CachingConnectionFactory;
@@ -30,7 +29,7 @@ public class TopicPublisher {
     @Autowired
     public TopicPublisher(JmsTemplate jmsTemplate,
                           @Value("${amqp.topic}") final String destination,
-                          @Qualifier("jmsConnectionFactory") ConnectionFactory connectionFactory) {
+                          ConnectionFactory connectionFactory) {
         this.jmsTemplate = jmsTemplate;
         this.destination = destination;
         this.connectionFactory = connectionFactory;
