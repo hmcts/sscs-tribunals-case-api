@@ -57,7 +57,8 @@ public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCall
             Optional<? extends AbstractDocument> optionalSelectedDocument  = Stream
                     .of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments())
                     .flatMap(x -> x == null ? null : x.stream())
-                    .filter(f -> selectedDocumentUrl.get().equals(f.getValue().getDocumentLink().getDocumentUrl()))
+                    .filter(f -> f.getValue().getDocumentLink() != null
+                            && selectedDocumentUrl.get().equals(f.getValue().getDocumentLink().getDocumentUrl()))
                     .findFirst();
             if (optionalSelectedDocument.isEmpty()) {
                 optionalSelectedDocument  = Stream
