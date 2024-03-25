@@ -179,7 +179,7 @@ public class PostponementRequestAboutToSubmitHandlerTest {
 //        assertThat(document.getValue().getDocumentType(), is(POSTPONEMENT_REQUEST.getValue()));
 //        assertThat(document.getValue().getOriginalPartySender(), is(UploadParty.DWP.getValue()));
 //        assertThat(document.getValue().getPartyUploaded(), is(UploadParty.DWP));
-//    }
+//        }
 
     @Test
     public void givenAPostponementRequest_AddGeneratedDocumentToBundle() {
