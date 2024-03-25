@@ -112,8 +112,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
 
             // TODO 10581 navigate user to Admin correction screen
             return setInterlocReviewStateFieldAndTriggerEvent(
-                    sscsCaseData -> {
-                    },
+                    sscsCaseData -> sscsCaseData.setInterlocReviewState(AWAITING_ADMIN_ACTION),
                     callback.getCaseDetails().getId(),
                     AWAITING_ADMIN_ACTION, ADMIN_ACTION_CORRECTION,
                     EventType.CORRECTION_REQUEST, "Admin action correction");
@@ -127,24 +126,32 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                     INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode(),
                     EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE,
                     callback.getCaseDetails().getId());
-            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseData -> sscsCaseData.setInterlocReferralDate(LocalDate.now()),
-                    callback.getCaseDetails().getId(),
-                    REVIEW_BY_JUDGE, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
-                    EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
+
+            return setInterlocReviewStateFieldAndTriggerEvent(
+                sscsCaseData -> {
+                    sscsCaseData.setInterlocReferralDate(LocalDate.now());
+                    sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
+                },
+                callback.getCaseDetails().getId(),
+                REVIEW_BY_JUDGE, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
+                EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_TCW)) {
 
             log.info("setInterlocReviewStateFieldAndTriggerEvent for furtherEvidenceAction: {}, "
-                            + "interlocReviewState: {}, interlocType: {}, eventType: {}, caseId: {} ",
-                    INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode(),
-                    REVIEW_BY_TCW.getCcdDefinition(),
-                    INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode(),
-                    EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE,
-                    callback.getCaseDetails().getId());
-            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseData -> sscsCaseData.setInterlocReferralDate(LocalDate.now()),
-                    callback.getCaseDetails().getId(),
-                    REVIEW_BY_TCW, INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
-                    EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
+                + "interlocReviewState: {}, interlocType: {}, eventType: {}, caseId: {} ",
+                INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode(),
+                REVIEW_BY_TCW.getCcdDefinition(),
+                INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode(),
+                EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE,
+                callback.getCaseDetails().getId());
+            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseData -> {
+                sscsCaseData.setInterlocReferralDate(LocalDate.now());
+                sscsCaseData.setInterlocReviewState(REVIEW_BY_TCW);
+            },
+            callback.getCaseDetails().getId(),
+            REVIEW_BY_TCW, INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
+            EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_JUDGE)) {
             PostHearingRequestType postHearingRequestType = caseData.getPostHearing().getRequestType();
@@ -165,10 +172,13 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                 );
             }
 
-            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseData -> setSelectWhoReviewsCaseField(sscsCaseData, REVIEW_BY_JUDGE),
-                    callback.getCaseDetails().getId(),
-                    REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
-                    EventType.VALID_SEND_TO_INTERLOC, TCW_REVIEW_SEND_TO_JUDGE);
+            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseData -> {
+                setSelectWhoReviewsCaseField(sscsCaseData, REVIEW_BY_JUDGE);
+                sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE);
+            },
+            callback.getCaseDetails().getId(),
+            REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
+            EventType.VALID_SEND_TO_INTERLOC, TCW_REVIEW_SEND_TO_JUDGE);
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_TCW)) {
             Consumer<SscsCaseData> caseDataConsumer = sscsCaseData -> {
@@ -176,6 +186,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                 if (isPostponementRequest(sscsCaseData)) {
                     sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
                 }
+                sscsCaseData.setInterlocReviewState(REVIEW_BY_TCW);
             };
 
             return setInterlocReviewStateFieldAndTriggerEvent(caseDataConsumer, callback.getCaseDetails().getId(),
@@ -217,8 +228,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                         EventType.SET_ASIDE_REQUEST,
                         callback.getCaseDetails().getId());
                 return setInterlocReviewStateFieldAndTriggerEvent(
-                        sscsCaseData -> {
-                        },
+                        sscsCaseData -> sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE),
                         callback.getCaseDetails().getId(),
                         REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
                         EventType.SET_ASIDE_REQUEST, "Set aside request");
@@ -233,8 +243,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                         EventType.CORRECTION_REQUEST,
                         callback.getCaseDetails().getId());
                 return setInterlocReviewStateFieldAndTriggerEvent(
-                        sscsCaseData -> {
-                        },
+                        sscsCaseData -> sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE),
                         callback.getCaseDetails().getId(),
                         REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
                         EventType.CORRECTION_REQUEST, "Correction request");
@@ -249,8 +258,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                         EventType.SOR_REQUEST,
                         callback.getCaseDetails().getId());
                 return setInterlocReviewStateFieldAndTriggerEvent(
-                        sscsCaseData -> {
-                        },
+                        sscsCaseData -> sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE),
                         callback.getCaseDetails().getId(),
                         REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
                         EventType.SOR_REQUEST, "Statement of reasons request");
@@ -266,8 +274,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                         callback.getCaseDetails().getId());
                 if (isPostHearingsBEnabled) {
                     return setInterlocReviewStateFieldAndTriggerEvent(
-                            sscsCaseData -> {
-                            },
+                            sscsCaseData -> sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE),
                             callback.getCaseDetails().getId(),
                             REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
                             EventType.LIBERTY_TO_APPLY_REQUEST, "Liberty to apply request");
@@ -285,8 +292,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                         callback.getCaseDetails().getId());
                 if (isPostHearingsBEnabled) {
                     return setInterlocReviewStateFieldAndTriggerEvent(
-                            sscsCaseData -> {
-                            },
+                            sscsCaseData -> sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE),
                             callback.getCaseDetails().getId(),
                             REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
                             EventType.PERMISSION_TO_APPEAL_REQUEST, "Permission to appeal request");
@@ -343,9 +349,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                 summary,
                 interlocType.getLabel(),
                 idamService.getIdamTokens(),
-                sscsCaseDataConsumer.andThen(
-                        sscsCaseData -> sscsCaseData.setInterlocReviewState(interlocReviewState)
-                )
+                sscsCaseDataConsumer
         );
     }
 
