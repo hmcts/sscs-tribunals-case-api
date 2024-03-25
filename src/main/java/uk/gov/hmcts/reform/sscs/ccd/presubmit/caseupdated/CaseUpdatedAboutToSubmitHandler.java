@@ -141,6 +141,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         sscsCaseData.setIsConfidentialCase(isConfidential(sscsCaseData));
         updateCaseName(callback, sscsCaseData);
         updateCaseCategoriesIfBenefitTypeUpdated(callback, sscsCaseData, preSubmitCallbackResponse);
+        updateLanguage(sscsCaseData);
 
         final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
 
