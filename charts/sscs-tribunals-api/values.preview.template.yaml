@@ -23,13 +23,13 @@ java:
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
     AMQP_USERNAME: "RootManageSharedAccessKey"
     HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
-  secrets:
-    HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
-      secretRef: sscs-sb-preview
-      key: connectionString
-    AMQP_PASSWORD:
-      secretRef: sscs-sb-preview
-      key: primaryKey
+    secrets:
+      HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
+        secretRef: sscs-sb-preview
+        key: connectionString
+      AMQP_PASSWORD:
+        secretRef: sscs-sb-preview
+        key: primaryKey
 
 xui-webapp:
   enabled: ${HEARINGS_ENABLED}
