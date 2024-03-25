@@ -41,6 +41,7 @@ java:
     ELASTIC_SEARCH_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
     DUMMY: true
+    CITIZEN_LOGIN_SERVICE_V2: true
     ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: true
     TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
