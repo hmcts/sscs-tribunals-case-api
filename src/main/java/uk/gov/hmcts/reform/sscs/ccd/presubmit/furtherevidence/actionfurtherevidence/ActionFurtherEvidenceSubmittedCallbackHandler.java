@@ -166,20 +166,18 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             log.info("Updating case using triggerCaseEventV2 for event {}, caseId {}",
                     EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(),
                     callback.getCaseDetails().getId());
-            return updateCcdCaseService.updateCaseV2(callback.getCaseDetails().getId(),
+            return updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
                     EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Actioned manually",
-                    "Actioned manually", idamService.getIdamTokens(), sscsCaseData -> {
-                    });
+                    "Actioned manually", idamService.getIdamTokens());
         }
 
         log.info("Updating case using triggerCaseEventV2 for event: {}, event description: {}, caseId: {}",
                 EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(),
                 "Issue to all parties",
                 callback.getCaseDetails().getId());
-        return updateCcdCaseService.updateCaseV2(callback.getCaseDetails().getId(),
+        return updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
                 EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
-                "Issue to all parties", idamService.getIdamTokens(), sscsCaseData -> {
-                });
+                "Issue to all parties", idamService.getIdamTokens());
     }
 
     private SscsCaseDetails handlePostHearing(Callback<SscsCaseData> callback, SscsCaseData caseData, PostHearingRequestType postHearingRequestType) {
@@ -271,7 +269,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
 
         log.info(
                 "Updating case using updateCaseV2 to trigger '{}' for caseId: {}, "
-                + "interlocReviewState: {}, interlocType: {}",
+                        + "interlocReviewState: {}, interlocType: {}",
                 eventType.getCcdType(), caseId, interlocReviewState.getCcdDefinition(),
                 interlocType.getLabel());
         return updateCcdCaseService.updateCaseV2(
@@ -290,12 +288,10 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             Long caseId,
             FurtherEvidenceActionDynamicListItems interlocType, EventType eventType, String summary) {
         log.info("Updating case using updateCaseV2 to trigger '{}' for caseId {}", eventType.getCcdType(), caseId);
-        return updateCcdCaseService.updateCaseV2(
+        return updateCcdCaseService.triggerCaseEventV2(
                 caseId,
                 eventType.getCcdType(), summary,
-                interlocType.getLabel(), idamService.getIdamTokens(),
-                sscsCaseData -> {
-                }
+                interlocType.getLabel(), idamService.getIdamTokens()
         );
     }
 
