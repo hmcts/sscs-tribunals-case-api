@@ -77,7 +77,7 @@ em-ccdorc:
       S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       EM_STITCHING_API_URL: http://em-stitching-aat.service.core-compute-aat.internal
       DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
-      CCD_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
+      CCD_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
       CALLBACK_HTTP_SCHEME: https
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
 
@@ -87,7 +87,7 @@ ccd-case-document-am-api:
     image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
     environment:
-      CCD_DATA_STORE_API_BASE_URL: ${CCD_DATA_STORE_API_BASE_URL}
+      CCD_DATA_STORE_API_BASE_URL: ${CORE_CASE_DATA_API_URL}
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
       OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts
@@ -601,7 +601,7 @@ sscs-tya-notif:
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
-      CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
+      CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       AMQP_USERNAME: "RootManageSharedAccessKey"
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
@@ -707,6 +707,7 @@ sscs-hearings-api:
   java:
     image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
+    ingressHost: hearings-${SERVICE_FQDN}
     environment:
       ROOT_LOGGING_LEVEL: INFO
       SSCS_LOG_LEVEL: INFO #Switch to debug to see requests being sent.
@@ -720,29 +721,41 @@ sscs-hearings-api:
       COMMON_REF_API_URL: "http://rd-commondata-api-aat.service.core-compute-aat.internal"
       JUDICIAL_REF_API_URL: "http://rd-judicial-api-aat.service.core-compute-aat.internal"
       EXUI_API_URL: "https://${SERVICE_NAME}-xui"
-      HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+      HMC_API_URL: "http://hmc-cft-hearing-service-aat.service.core-compute-aat.internal"
       #Messaging
-      HMC_HEARING_LISTENING_ENABLED: false
-      HEARINGS_TOPIC_NAME: "hmc-to-cft"
-      HEARINGS_TOPIC_SUBSCRIPTION_NAME: "tribunals-to-hearing-api"
-      HMC_HEARINGS_TOPIC_POLICY_NAME: RootManageSharedAccessKey
-      TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
-      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
+      HMC_HEARINGS_LISTENING_ENABLED: true
+      HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
+      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-3575"
+      TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
+      TRIBUNALS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
-      CORE_CASE_DATA_CASE_TYPE_ID: ${CASE_TYPE}
+      TRIBUNALS_EVENT_QUEUE_NAMESPACE: sscs-sb-preview
+      HMC_HEARINGS_TOPIC_NAMESPACE: hmc-servicebus-aat
+      HMC_DEPLOYMENT_ID: deployment-${SERVICE_NAME}
+      HMC_DEPLOYMENT_FILTER_ENABLED: true
+      CORE_CASE_DATA_CASE_TYPE_ID: Benefit-${CHANGE_ID}
     secrets:
-      TRIBUNALS_EVENT_QUEUE_NAMESPACE:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
-        key: namespaceName
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
+        secretRef: sscs-sb-preview
         key: primaryKey
-      HMC_HEARINGS_TOPIC_NAMESPACE:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: namespaceName
-      HMC_HEARINGS_TOPIC_ACCESS_KEY:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: primaryKey
+    keyVaults:
+      sscs:
+        secrets:
+          - name: hmc-servicebus-shared-access-key-tf
+            alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
+          - name: sscs-hearing-manager-username
+            alias: IDAM_SSCS_SYSTEMUPDATE_USER
+          - name: sscs-hearing-manager-pass
+            alias: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
+          - name: app-insights-connection-string
+            alias: app-insights-connection-string
+          - name: sscs-s2s-secret
+            alias: IDAM_S2S_AUTH_TOTP_SECRET
+          - name: idam-oauth-user
+            alias: IDAM_OAUTH2_CLIENT_ID
+          - name: idam-sscs-oauth2-client-secret
+            alias: IDAM_OAUTH2_CLIENT_SECRET
+
 
 #Enable for queues/topics
 #If you need a subscription for a topic, topic name should be not longer than 10 characters
@@ -757,3 +770,5 @@ servicebus:
         subscriptionNeeded: yes
     queues:
       - name: sscs-orchestrator-queue-preview
+      - name: tribunals-to-hearing-api
+
