@@ -203,8 +203,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                     .unprocessedPostponementRequest(unprocessedPostponementRequest)
                     .actionPostponementRequestSelected(caseData.getPostponementRequest().getActionPostponementRequestSelected())
                     .build());
-        }
-        else {
+        } else {
             caseData.setPostponementRequest(PostponementRequest.builder()
                     .unprocessedPostponementRequest(unprocessedPostponementRequest)
                     .build());

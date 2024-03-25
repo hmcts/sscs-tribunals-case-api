@@ -72,10 +72,9 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
                 return preSubmitCallbackResponse;
             }
             UploadParty uploadParty = getUploadParty(sscsCaseData.getOriginalSender());
-            if (isRefusePostponementEnabled){
+            if (isRefusePostponementEnabled) {
                 postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty, Optional.empty());
-            }
-            else {
+            } else {
                 postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty);
             }
 

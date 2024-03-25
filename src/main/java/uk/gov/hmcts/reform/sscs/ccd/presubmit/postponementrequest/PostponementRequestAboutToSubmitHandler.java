@@ -65,8 +65,7 @@ public class PostponementRequestAboutToSubmitHandler implements PreSubmitCallbac
 
             if (isRefusePostponementEnabled) {
                 postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.DWP, uploadParty);
-            }
-            else {
+            } else {
                 postponementRequestService.processPostponementRequest(sscsCaseData, UploadParty.DWP);
             }
 
