@@ -132,7 +132,8 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
                 "data.signedRole",
                 "data.statementOfReasons",
                 "data.statementOfReasonsBodyContent",
-                "data.statementOfReasonsGenerateNotice")
+                "data.statementOfReasonsGenerateNotice",
+                "data.workBasketHearingDateIssued")
             .isEqualTo(getExpectedResponse());
         assertNull(actualCaseData.getData().getDwpState());
         assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());

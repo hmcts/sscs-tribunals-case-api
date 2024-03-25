@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 
 import lombok.AllArgsConstructor;
@@ -26,6 +28,7 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
     private final SscsPdfService sscsPdfService;
     private final EmailHelper emailHelper;
+
     private final VerbalLanguagesService verbalLanguagesService;
 
     @Override
@@ -49,12 +52,18 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData caseData = caseDetails.getCaseData();
-        log.info("Handling create appeal pdf event for case [" + caseData.getCcdCaseId() + "]");
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
+        caseData.setPoAttendanceConfirmed(YesNo.NO);
+        caseData.setTribunalDirectPoToAttend(YesNo.NO);
+
         handleBenefitType(caseData);
         updateLanguage(caseData);
+
+        if (isNull(caseData.getDwpIsOfficerAttending())) {
+            caseData.setDwpIsOfficerAttending(NO.toString());
+        }
 
         if (!isNull(caseData.getBenefitCode())) {
             if (isNull(caseData.getIssueCode())) {
@@ -139,10 +148,10 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         if (caseData.getSscsDocument() != null) {
             for (SscsDocument document : caseData.getSscsDocument()) {
                 if (!fileName.equals(document.getValue().getDocumentFileName())) {
-                    return "Yes";
+                    return YES.getValue();
                 }
             }
         }
-        return "No";
+        return NO.getValue();
     }
 }
