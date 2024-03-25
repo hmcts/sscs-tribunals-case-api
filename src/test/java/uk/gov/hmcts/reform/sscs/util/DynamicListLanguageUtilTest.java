@@ -130,4 +130,27 @@ public class DynamicListLanguageUtilTest {
         assertThat(referenceList).containsAll(resultCodeList);
         assertThat(nameList).containsAll(resultLabelList);
     }
+
+    @Test
+    public void whenDialectReferenceIsNonNull_returnNameAsDialect() {
+        Language language = new Language(
+            "reference-1",
+            "name-1",
+            "mrdReference-1",
+            "dialect-1",
+            "dialectRef-1",
+            null);
+
+        DynamicListItem result = dynamicListLanguageUtil.getLanguageDynamicListItem(language);
+
+        assertThat(result.getLabel().equals("dialectRef-1"));
+
+    }
+
+    @Test
+    public void whenDynamicListIsNullForGenerateInterpreterLanguageFields_returnNewDynamicList() {
+        DynamicList list = dynamicListLanguageUtil.generateInterpreterLanguageFields(null);
+
+        assertThat(list.getListItems().size() == 0);
+    }
 }
