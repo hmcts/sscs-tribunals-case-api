@@ -158,7 +158,7 @@ ccd:
     apiGatewayWeb:
       enabled: ${LOCAL_CCD_ENABLED}
     s2s:
-      enabled: ${LOCAL_CCD_ENABLED}
+      enabled: false
     elastic:
       enabled: ${LOCAL_CCD_ENABLED}
 
