@@ -111,11 +111,11 @@ public class DynamicListLanguageUtilTest {
     @Test
     public void generateGenerateInterpreterLanguageFieldsWithMrdReference() {
         List<Language> languages = List.of(
-            new Language("reference-1", "name-1", null, null, "mrdReference-1", null),
-            new Language("reference-2", "name-2", null, null, "mrdReference-2", null),
-            new Language("reference-3", "name-3", null, null, "mrdReference-3", null),
-            new Language("reference-4", "name-4", null, null, "mrdReference-4", null),
-            new Language("reference-5", "name-5", null, null, "mrdReference-5", null)
+            new Language("reference-1", "name-1", "mrdReference-1", null, "mrdReference-1", null),
+            new Language("reference-2", "name-2", "mrdReference-2", null, "mrdReference-2", null),
+            new Language("reference-3", "name-3", "mrdReference-3", null, "mrdReference-3", null),
+            new Language("reference-4", "name-4", "mrdReference-4", null, "mrdReference-4", null),
+            new Language("reference-5", "name-5", "mrdReference-5", null, "mrdReference-5", null)
         );
         given(signLanguagesService.getSignLanguages()).willReturn(languages);
         DynamicList list = dynamicListLanguageUtil.generateInterpreterLanguageFields(null);
