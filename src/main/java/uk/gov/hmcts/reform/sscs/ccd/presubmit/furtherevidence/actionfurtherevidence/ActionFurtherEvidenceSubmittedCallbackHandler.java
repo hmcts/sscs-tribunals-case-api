@@ -39,13 +39,13 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     public static final String TCW_REVIEW_SEND_TO_JUDGE = "Send a case to a judge for review";
 
     private final CcdService ccdService;
-  
+
     private final UpdateCcdCaseService updateCcdCaseService;
 
     private final CcdClient ccdClient;
 
     private final SscsCcdConvertService sscsCcdConvertService;
-  
+
     private final IdamService idamService;
 
     @Value("${feature.postHearings.enabled}")
@@ -166,18 +166,20 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             log.info("Updating case using triggerCaseEventV2 for event {}, caseId {}",
                     EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(),
                     callback.getCaseDetails().getId());
-            return updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
+            return updateCcdCaseService.updateCaseV2(callback.getCaseDetails().getId(),
                     EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Actioned manually",
-                    "Actioned manually", idamService.getIdamTokens());
+                    "Actioned manually", idamService.getIdamTokens(), sscsCaseData -> {
+                    });
         }
 
         log.info("Updating case using triggerCaseEventV2 for event: {}, event description: {}, caseId: {}",
                 EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(),
                 "Issue to all parties",
                 callback.getCaseDetails().getId());
-        return updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
+        return updateCcdCaseService.updateCaseV2(callback.getCaseDetails().getId(),
                 EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
-                "Issue to all parties", idamService.getIdamTokens());
+                "Issue to all parties", idamService.getIdamTokens(), sscsCaseData -> {
+                });
     }
 
     private SscsCaseDetails handlePostHearing(Callback<SscsCaseData> callback, SscsCaseData caseData, PostHearingRequestType postHearingRequestType) {
@@ -288,10 +290,12 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             Long caseId,
             FurtherEvidenceActionDynamicListItems interlocType, EventType eventType, String summary) {
         log.info("Updating case using updateCaseV2 to trigger '{}' for caseId {}", eventType.getCcdType(), caseId);
-        return updateCcdCaseService.triggerCaseEventV2(
+        return updateCcdCaseService.updateCaseV2(
                 caseId,
                 eventType.getCcdType(), summary,
-                interlocType.getLabel(), idamService.getIdamTokens()
+                interlocType.getLabel(), idamService.getIdamTokens(),
+                sscsCaseData -> {
+                }
         );
     }
 
