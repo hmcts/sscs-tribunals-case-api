@@ -79,6 +79,7 @@ java:
     ELINKS_V2_FEATURE_ENABLED: false
     DELETED_REDACTED_DOC_ENABLED: false
     UPLOAD_HEARING_FILTER_ENABLED: false
+    CITIZEN_LOGIN_SERVICE_V2: false
     ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: false
     SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-{{ .Values.global.environment }}"
     TOPIC_NAME: "sscs-evidenceshare-topic-{{ .Values.global.environment }}"
