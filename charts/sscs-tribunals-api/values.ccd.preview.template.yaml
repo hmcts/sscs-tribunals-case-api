@@ -110,11 +110,11 @@ xui-webapp:
     image: hmctspublic.azurecr.io/xui/webapp:latest
     ingressHost: xui-${SERVICE_FQDN}
     environment:
-      HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
+      HEALTH_CCD_COMPONENT_API: ${CCD_GW_API}/health
       HEALTH_CCD_DATA_API: ${CORE_CASE_DATA_API_URL}/health
       HEALTH_TERMS_AND_CONDITIONS_API: http://${SERVICE_NAME}-xui-terms-and-conditions/health
-      SERVICES_EM_ANNO_API: http://${SERVICE_NAME}-ccd-api-gw
-      SERVICES_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw
+      SERVICES_EM_ANNO_API: ${CCD_GW_API}
+      SERVICES_CCD_COMPONENT_API: ${CCD_GW_API}
       SERVICES_CCD_DATA_STORE_API: ${CORE_CASE_DATA_API_URL}
       SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac
       SERVICES_TERMS_AND_CONDITIONS: http://${SERVICE_NAME}-xui-terms-and-conditions
