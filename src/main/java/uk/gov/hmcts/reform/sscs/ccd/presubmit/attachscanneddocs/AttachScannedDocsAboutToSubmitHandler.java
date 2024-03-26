@@ -39,27 +39,30 @@ public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackH
         setHasUnprocessedAudioVideoEvidenceFlag(sscsCaseData);
 
         if (deletedRedactedDocEnabled) {
-            try {
-                var scannedDocuments = callback.getCaseDetails().getCaseData().getScannedDocuments();
+            var scannedDocuments = callback.getCaseDetails().getCaseData().getScannedDocuments();
 
+            if (scannedDocuments != null) {
                 callback.getCaseDetailsBefore().ifPresent(
                         sscsCaseDataCaseDetailsBefore -> {
-                            sscsCaseDataCaseDetailsBefore.getCaseData().getScannedDocuments()
-                                    .stream()
-                                    .filter(scannedDocumentBefore -> scannedDocumentBefore.getValue().getEditedUrl() != null)
-                                    .forEach(scannedDocumentBefore -> {
-                                        scannedDocuments
-                                                .stream()
-                                                .forEach(scannedDocument -> {
-                                                    if (compare(scannedDocumentBefore, scannedDocument)) {
-                                                        scannedDocument.getValue().setEditedUrl(scannedDocumentBefore.getValue().getEditedUrl());
-                                                    }
-                                                });
-                                    });
+                            var scannedDocumentsBefore = sscsCaseDataCaseDetailsBefore.getCaseData().getScannedDocuments();
 
+                            if (scannedDocumentsBefore != null) {
+                                scannedDocumentsBefore.stream()
+                                        .filter(scannedDocumentBefore -> scannedDocumentBefore.getValue().getEditedUrl() != null)
+                                        .forEach(scannedDocumentBefore -> {
+                                            scannedDocuments
+                                                    .stream()
+                                                    .forEach(scannedDocument -> {
+                                                        if (compare(scannedDocumentBefore, scannedDocument)) {
+                                                            scannedDocument.getValue().setEditedUrl(scannedDocumentBefore.getValue().getEditedUrl());
+                                                        }
+                                                    });
+                                        });
+
+                            }
                         });
-            } catch (NullPointerException e) {
-                log.error("NullPointerException occurred in handle method", e);
+            } else {
+                log.error("NullPointerException occurred in handle method");
             }
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
