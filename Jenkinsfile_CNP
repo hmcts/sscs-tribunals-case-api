@@ -116,7 +116,7 @@ withPipeline(type, product, component) {
 
         env.HEARINGS_LABEL = githubApi.getLabelsbyPattern(branch_name, "enable_hearings").contains("enable_hearings")
         println "Hearings label: ${env.HEARINGS_LABEL}"
-        if (env.BRANCH_NAME.startsWith("PR") ) {
+        if (env.BRANCH_NAME.startsWith("PR") && env.HEARINGS_LABEL == false) {
             for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
                 env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
                 println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
