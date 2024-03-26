@@ -113,14 +113,15 @@ withPipeline(type, product, component) {
         env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
         env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
         env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
-
-        env.HEARINGS_LABEL = githubApi.getLabelsbyPattern(branch_name, "enable_hearings").contains("enable_hearings")
-        println "Hearings label: ${env.HEARINGS_LABEL}"
-        if (env.BRANCH_NAME.startsWith("PR") && env.HEARINGS_LABEL == false) {
+        if (env.BRANCH_NAME.startsWith("PR") ) {
             for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
                 env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
                 println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
                 env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
+            }
+            for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_hearings") ) {
+                env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+                env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
             }
         }
         println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}. - The branch name is ${env.BRANCH_NAME}""".stripIndent()
