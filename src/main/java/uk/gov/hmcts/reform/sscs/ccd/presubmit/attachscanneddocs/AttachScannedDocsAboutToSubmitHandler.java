@@ -62,7 +62,7 @@ public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackH
                             }
                         });
             } else {
-                log.error("NullPointerException occurred in handle method");
+                log.error("There are no scanned documents in this case");
             }
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
