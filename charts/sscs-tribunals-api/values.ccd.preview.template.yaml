@@ -42,6 +42,7 @@ java:
     ELINKS_V2_FEATURE_ENABLED: true
     REFUSE_POSTPONEMENT_FEATURE: false
     DUMMY: true
+    CITIZEN_LOGIN_SERVICE_V2: true
     ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: true
     TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
@@ -146,6 +147,7 @@ xui-webapp:
           - mc-idam-client-secret
           - system-user-name
           - system-user-password
+
 
 ccd:
   enabled: true
