@@ -61,6 +61,14 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private static final String WARNING_MESSAGE = "%s has not been provided for the %s, do you want to ignore this warning and proceed?";
 
+    private static final String ERROR_MESSAGE = "%s has not been provided for the %s";
+
+    private static final String REP_ERROR_MESSAGE = "Name/Organisation has not been provided for the Representative";
+
+    private static final String FIRST_NAME = "First Name";
+
+    private static final String LAST_NAME = "Last Name";
+
 
     @SuppressWarnings("squid:S107")
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
@@ -209,15 +217,20 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private void validateAddressAndPostcode(PreSubmitCallbackResponse<SscsCaseData> response, Entity party, String partyName) {
-        String addressLine1 = party.getAddress().getLine1();
-        String postcode = party.getAddress().getPostcode();
-
-        if (isBlank(addressLine1)) {
+        if (isNull(party.getAddress())) {
             response.addError("You must enter address line 1 for the " + partyName);
-        }
-
-        if (isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
             response.addError("You must enter a valid UK postcode for the " + partyName);
+        } else {
+            String addressLine1 = party.getAddress().getLine1();
+            String postcode = party.getAddress().getPostcode();
+
+            if (isBlank(addressLine1)) {
+                response.addError("You must enter address line 1 for the " + partyName);
+            }
+
+            if (isBlank(postcode) || !postcodeValidator.isValid(postcode, context)) {
+                response.addError("You must enter a valid UK postcode for the " + partyName);
+            }
         }
     }
 
@@ -352,10 +365,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (entity != null) {
             if (entity.getName() != null) {
                 if (isBlank(entity.getName().getFirstName())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", partyType));
+                    listOfWarnings.add(String.format(WARNING_MESSAGE, FIRST_NAME, partyType));
                 }
                 if (isBlank(entity.getName().getLastName())) {
-                    listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", partyType));
+                    listOfWarnings.add(String.format(WARNING_MESSAGE, LAST_NAME, partyType));
                 }
             }
             if (entity.getIdentity() != null) {
@@ -395,17 +408,24 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private List<String> validateRepAndJointPartyCaseData(Entity entity, String entityType) {
-        List<String> listOfWarnings = new ArrayList<>();
+        List<String> listOfErrors = new ArrayList<>();
 
         if (entity != null && entity.getName() != null) {
             if (isBlank(entity.getName().getFirstName())) {
-                listOfWarnings.add(String.format(WARNING_MESSAGE, "First Name", entityType));
+                listOfErrors.add(String.format(ERROR_MESSAGE, FIRST_NAME, entityType));
             }
             if (isBlank(entity.getName().getLastName())) {
-                listOfWarnings.add(String.format(WARNING_MESSAGE, "Last Name", entityType));
+                listOfErrors.add(String.format(ERROR_MESSAGE, LAST_NAME, entityType));
+            }
+        } else {
+            if (entityType.equals("Representative")) {
+                listOfErrors.add(REP_ERROR_MESSAGE);
+            } else {
+                listOfErrors.add(String.format(ERROR_MESSAGE, FIRST_NAME, entityType));
+                listOfErrors.add(String.format(ERROR_MESSAGE, LAST_NAME, entityType));
             }
         }
-        return listOfWarnings;
+        return listOfErrors;
     }
 
     private void validateRepresentativeNameData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
@@ -415,7 +435,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             if (isBlank(representativeInfo.getOrganisation())) {
                 List<String> warnings = validateRepAndJointPartyCaseData(representativeInfo, "Representative");
                 if (!warnings.isEmpty()) {
-                    response.addWarnings(warnings);
+                    response.addErrors(warnings);
                 }
             }
         }
@@ -428,7 +448,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         if (hasJointParty) {
             List<String> warnings = validateRepAndJointPartyCaseData(jointPartyInfo, "Joint Party");
             if (!warnings.isEmpty()) {
-                response.addWarnings(warnings);
+                response.addErrors(warnings);
             }
         }
     }
