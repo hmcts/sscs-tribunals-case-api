@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
@@ -31,14 +31,16 @@ public class CitizenRequestService {
     private static final String UPLOAD_DATE_FORMATTER = "yyyy-MM-dd";
 
     private final OnlineHearingService onlineHearingService;
-    private final CcdService ccdService;
     private final IdamService idamService;
+    private final UpdateCcdCaseService updateCcdCaseService;
 
 
-    public CitizenRequestService(OnlineHearingService onlineHearingService, CcdService ccdService, IdamService idamService) {
+    public CitizenRequestService(OnlineHearingService onlineHearingService,
+                                 IdamService idamService,
+                                 UpdateCcdCaseService updateCcdCaseService) {
         this.onlineHearingService = onlineHearingService;
-        this.ccdService = ccdService;
         this.idamService = idamService;
+        this.updateCcdCaseService = updateCcdCaseService;
     }
 
     /**
@@ -63,7 +65,7 @@ public class CitizenRequestService {
     public boolean requestHearingRecordings(String identifier, List<String> hearingIds, String authorisation) {
         Optional<SscsCaseDetails> caseDetails = onlineHearingService.getCcdCaseByIdentifier(identifier);
         UserDetails user = idamService.getUserDetails(authorisation);
-        return caseDetails.map(sscsCase -> submitHearingRecordingRequest(sscsCase.getData(), sscsCase.getId(), hearingIds, user.getEmail())).orElse(false);
+        return caseDetails.map(sscsCase -> submitHearingRecordingRequest(sscsCase.getId(), hearingIds, user.getEmail())).orElse(false);
     }
 
     private HearingRecordingResponse mapToHearingRecording(SscsCaseData sscsCaseData, String idamEmail) {
@@ -125,8 +127,17 @@ public class CitizenRequestService {
         return subscription != null ? subscription.getEmail() : null;
     }
 
-    private boolean submitHearingRecordingRequest(SscsCaseData sscsCaseData, Long ccdCaseId, List<String> hearingIds, String idamEmail) {
+    private boolean submitHearingRecordingRequest(long ccdCaseId, List<String> hearingIds, String idamEmail) {
 
+        updateCcdCaseService.updateCaseV2(ccdCaseId, CITIZEN_REQUEST_HEARING_RECORDING.getCcdType(),
+                "SSCS - hearing recording request from MYA",
+                "Requested hearing recordings", idamService.getIdamTokens(),
+                caseData -> submitHearingRecordingRequestConsumer(caseData, hearingIds, idamEmail));
+
+        return true;
+    }
+
+    private void submitHearingRecordingRequestConsumer(SscsCaseData sscsCaseData, List<String> hearingIds, String idamEmail) {
         List<HearingRecordingRequest> newHearingRequests = new ArrayList<>();
         for (String hearingId : hearingIds) {
             Optional<SscsHearingRecording> sscsHearingRecording = sscsCaseData.getSscsHearingRecordingCaseData().getSscsHearingRecordings()
@@ -153,11 +164,6 @@ public class CitizenRequestService {
 
         sscsCaseData.getSscsHearingRecordingCaseData().setRequestedHearings(hearingRecordingRequests);
         sscsCaseData.getSscsHearingRecordingCaseData().setHearingRecordingRequestOutstanding(YesNo.YES);
-
-        ccdService.updateCase(sscsCaseData, ccdCaseId, CITIZEN_REQUEST_HEARING_RECORDING.getCcdType(),
-                "SSCS - hearing recording request from MYA",
-                "Requested hearing recordings", idamService.getIdamTokens());
-        return true;
     }
 
     private CitizenHearingRecording populateCitizenHearingRecordings(SscsHearingRecordingDetails recording) {
