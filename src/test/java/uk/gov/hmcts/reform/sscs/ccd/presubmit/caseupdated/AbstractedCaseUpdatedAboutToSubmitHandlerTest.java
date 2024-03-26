@@ -1719,4 +1719,26 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
 
         assertTrue(response.getErrors().stream().allMatch(e -> e.equals("Hearing video email address must be valid email address")));
     }
+
+    @Test
+    public void givenInterpreterLanguage_thenSetInterpreterLanguageFromLanguageList() {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+
+        DynamicListItem item = new DynamicListItem("ENG", "english");
+        DynamicList languagesList = new DynamicList(item, null);
+
+        HearingOptions hearingOptions = HearingOptions.builder()
+            .wantsToAttend(YES.getValue())
+            .languageInterpreter(YES.getValue())
+            .languagesList(languagesList)
+            .build();
+
+        sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String language = sscsCaseData.getAppeal().getHearingOptions().getLanguages();
+
+        assertEquals(language, item.getLabel());
+    }
 }
