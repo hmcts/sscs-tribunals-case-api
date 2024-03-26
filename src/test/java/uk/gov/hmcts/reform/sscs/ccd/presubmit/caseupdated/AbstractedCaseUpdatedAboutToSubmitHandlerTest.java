@@ -1703,4 +1703,20 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors().size(), is(1));
     }
+
+    @Test
+    public void givenInvalidHearingVideoEmail_thenValidateAndReturnErrorMessage() {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+
+        HearingSubtype hearingSubType = HearingSubtype.builder()
+            .hearingVideoEmail("12345")
+            .wantsHearingTypeVideo(YES.getValue())
+            .build();
+
+        sscsCaseData.getAppeal().setHearingSubtype(hearingSubType);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().stream().allMatch(e -> e.equals("Hearing video email address must be valid email address")));
+    }
 }
