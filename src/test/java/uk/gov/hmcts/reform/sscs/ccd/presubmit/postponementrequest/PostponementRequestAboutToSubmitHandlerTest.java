@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -171,6 +172,7 @@ public class PostponementRequestAboutToSubmitHandlerTest {
     @Test
     public void givenAPostponementRequestByDwp_setUploadPartyToDwp() {
         UserDetails dwpUserDetails = UserDetails.builder().roles(new ArrayList<>(asList("dwp", UserRole.DWP.getValue()))).build();
+        ReflectionTestUtils.setField(handler, "isRefusePostponementEnabled", true);
         when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(dwpUserDetails);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -178,6 +180,7 @@ public class PostponementRequestAboutToSubmitHandlerTest {
         final SscsDocument document = sscsCaseData.getSscsDocument().get(0);
         assertThat(document.getValue().getDocumentType(), is(POSTPONEMENT_REQUEST.getValue()));
         assertThat(document.getValue().getOriginalPartySender(), is(UploadParty.DWP.getValue()));
+        assertThat(document.getValue().getPartyUploaded(), is(UploadParty.DWP));
     }
 
     @Test

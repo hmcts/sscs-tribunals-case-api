@@ -98,7 +98,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             refusePostponement(sscsCaseData);
         } else if (GRANT.getValue().equals(actionRequested)) {
             grantPostponement(sscsCaseData, response);
-        } else if (REFUSE_ON_THE_DAY.getValue().equals(actionRequested)) {
+        } else if (REFUSE_ON_THE_DAY.getValue().equals(actionRequested) && isRefusePostponementEnabled) {
             refuseOnTheDay(sscsCaseData);
         } else {
             log.info("Action postponement request: unhandled requested action {} for case {}", actionRequested,
