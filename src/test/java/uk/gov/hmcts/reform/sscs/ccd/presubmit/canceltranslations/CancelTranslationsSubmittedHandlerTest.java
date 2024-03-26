@@ -10,18 +10,20 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -32,9 +34,6 @@ public class CancelTranslationsSubmittedHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private CancelTranslationsSubmittedHandler handler;
-
-    @Mock
-    private CcdService ccdService;
 
     @Mock
     private IdamService idamService;
@@ -50,10 +49,13 @@ public class CancelTranslationsSubmittedHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
+    @Captor
+    private ArgumentCaptor<Consumer<SscsCaseData>> sscsCaseDataCaptor;
+
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        handler = new CancelTranslationsSubmittedHandler(ccdService, idamService, updateCcdCaseService);
+        handler = new CancelTranslationsSubmittedHandler(idamService, updateCcdCaseService);
         when(callback.getEvent()).thenReturn(EventType.CANCEL_TRANSLATIONS);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build())
             .sscsWelshPreviewNextEvent("sendToDwp")
@@ -74,21 +76,21 @@ public class CancelTranslationsSubmittedHandlerTest {
 
     @Test
     public void shouldCallUpdateCaseWithCorrectEvent() {
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
-        when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(), EventType.SEND_TO_DWP.getCcdType(),
-            "Cancel welsh translations",
-            "Cancel welsh translations", idamTokens))
-            .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-        verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.SEND_TO_DWP.getCcdType(),
-            "Cancel welsh translations", "Cancel welsh translations", idamTokens);
-        verify(ccdService, never()).updateCase(caseData, callback.getCaseDetails().getId(), EventType.MAKE_CASE_URGENT.getCcdType(),
-                "Send a case to urgent hearing", OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens);
+
+        verify(updateCcdCaseService).updateCaseV2(eq(callback.getCaseDetails().getId()), eq(EventType.SEND_TO_DWP.getCcdType()),
+                eq("Cancel welsh translations"), eq("Cancel welsh translations"), eq(idamTokens), sscsCaseDataCaptor.capture());
+
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        Consumer<SscsCaseData> caseDataCaptorValue = sscsCaseDataCaptor.getValue();
+        caseDataCaptorValue.accept(caseData);
         assertNull(caseData.getSscsWelshPreviewNextEvent());
 
+        verify(updateCcdCaseService, never()).updateCaseV2(eq(callback.getCaseDetails().getId()), eq(EventType.MAKE_CASE_URGENT.getCcdType()),
+                eq("Send a case to urgent hearing"), eq(OTHER_DOCUMENT_MANUAL.getLabel()), any(IdamTokens.class), any(Consumer.class));
     }
 
     @Test
@@ -96,11 +98,15 @@ public class CancelTranslationsSubmittedHandlerTest {
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        buildDataWithDocumentType(DocumentType.URGENT_HEARING_REQUEST.getValue());
+        SscsCaseData caseData = buildDataWithDocumentType(DocumentType.URGENT_HEARING_REQUEST.getValue());
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verify(updateCcdCaseService).triggerCaseEventV2(eq(callback.getCaseDetails().getId()), eq(EventType.MAKE_CASE_URGENT.getCcdType()),
-                eq("Send a case to urgent hearing"), eq(OTHER_DOCUMENT_MANUAL.getLabel()), any());
+        verify(updateCcdCaseService).updateCaseV2(eq(callback.getCaseDetails().getId()), eq(EventType.MAKE_CASE_URGENT.getCcdType()),
+                eq("Send a case to urgent hearing"), eq(OTHER_DOCUMENT_MANUAL.getLabel()), eq(idamTokens), sscsCaseDataCaptor.capture());
+
+        Consumer<SscsCaseData> caseDataCaptorValue = sscsCaseDataCaptor.getValue();
+        caseDataCaptorValue.accept(caseData);
+        assertNull(caseData.getSscsWelshPreviewNextEvent());
     }
 
     @Test
@@ -109,17 +115,21 @@ public class CancelTranslationsSubmittedHandlerTest {
         caseData.setUrgentCase("Yes");
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
-        when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(), EventType.SEND_TO_DWP.getCcdType(),
+        /*when(updateCcdCaseService.updateCaseV2(callback.getCaseDetails().getId(), EventType.SEND_TO_DWP.getCcdType(),
                 "Cancel welsh translations",
-                "Cancel welsh translations", idamTokens))
-                .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+                "Cancel welsh translations", idamTokens, any(Consumer.class)))
+                .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());*/
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-        verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.SEND_TO_DWP.getCcdType(),
-                "Cancel welsh translations", "Cancel welsh translations", idamTokens);
-        verify(ccdService, never()).updateCase(caseData, callback.getCaseDetails().getId(), EventType.MAKE_CASE_URGENT.getCcdType(),
-                "Send a case to urgent hearing", OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens);
+
+        verify(updateCcdCaseService).updateCaseV2(eq(callback.getCaseDetails().getId()), eq(EventType.SEND_TO_DWP.getCcdType()),
+                eq("Cancel welsh translations"), eq("Cancel welsh translations"), eq(idamTokens), sscsCaseDataCaptor.capture());
+        Consumer<SscsCaseData> caseDataCaptorValue = sscsCaseDataCaptor.getValue();
+        caseDataCaptorValue.accept(caseData);
         assertNull(caseData.getSscsWelshPreviewNextEvent());
+
+        verify(updateCcdCaseService, never()).updateCaseV2(eq(callback.getCaseDetails().getId()), eq(EventType.MAKE_CASE_URGENT.getCcdType()),
+                eq("Send a case to urgent hearing"), eq(OTHER_DOCUMENT_MANUAL.getLabel()), eq(idamTokens), any(Consumer.class));
     }
 
     @Test
@@ -139,15 +149,12 @@ public class CancelTranslationsSubmittedHandlerTest {
 
         caseData.getSscsDocument().add(sscsDocument);
 
-        when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.UPDATE_CASE_ONLY.getCcdType(), "Set Reinstatement Request",
-                "Set Reinstatement Request", idamTokens))
-                .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
-
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.UPDATE_CASE_ONLY.getCcdType(),
-                "Set Reinstatement Request", "Set Reinstatement Request", idamTokens);
+        verify(updateCcdCaseService).updateCaseV2(eq(callback.getCaseDetails().getId()), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                eq("Set Reinstatement Request"), eq("Set Reinstatement Request"), eq(idamTokens), sscsCaseDataCaptor.capture());
+        Consumer<SscsCaseData> caseDataCaptorValue = sscsCaseDataCaptor.getValue();
+        caseDataCaptorValue.accept(caseData);
         assertNull(caseData.getSscsWelshPreviewNextEvent());
     }
 
@@ -170,15 +177,17 @@ public class CancelTranslationsSubmittedHandlerTest {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
         caseData.setSscsWelshPreviewNextEvent(EventType.UPDATE_CASE_ONLY.getCcdType());
 
-        when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+        /*when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                 EventType.UPDATE_CASE_ONLY.getCcdType(), "Cancel welsh translations",
                 "Cancel welsh translations", idamTokens))
-                .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+                .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());*/
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.UPDATE_CASE_ONLY.getCcdType(),
-                "Cancel welsh translations", "Cancel welsh translations", idamTokens);
+        verify(updateCcdCaseService).updateCaseV2(eq(callback.getCaseDetails().getId()), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                eq("Cancel welsh translations"), eq("Cancel welsh translations"), eq(idamTokens), sscsCaseDataCaptor.capture());
+        Consumer<SscsCaseData> caseDataCaptorValue = sscsCaseDataCaptor.getValue();
+        caseDataCaptorValue.accept(caseData);
         assertNull(caseData.getSscsWelshPreviewNextEvent());
     }
 
