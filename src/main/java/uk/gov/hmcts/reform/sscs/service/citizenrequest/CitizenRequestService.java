@@ -127,7 +127,7 @@ public class CitizenRequestService {
         return subscription != null ? subscription.getEmail() : null;
     }
 
-    private boolean submitHearingRecordingRequest(long ccdCaseId, List<String> hearingIds, String idamEmail) {
+    private boolean submitHearingRecordingRequest(Long ccdCaseId, List<String> hearingIds, String idamEmail) {
 
         updateCcdCaseService.updateCaseV2(ccdCaseId, CITIZEN_REQUEST_HEARING_RECORDING.getCcdType(),
                 "SSCS - hearing recording request from MYA",
