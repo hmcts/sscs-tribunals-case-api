@@ -11,19 +11,23 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Correction;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CorrectionActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
-import uk.gov.hmcts.reform.sscs.service.CallbackOrchestratorService;
+import uk.gov.hmcts.reform.sscs.service.event.EventPublisher;
 
 @Component
 @Slf4j
 @AllArgsConstructor
 public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final CcdCallbackMapService ccdCallbackMapService;
-    private final CallbackOrchestratorService callbackOrchestratorService;
+    private final EventPublisher eventPublisher;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
+
 
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -52,8 +56,8 @@ public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
                 return new PreSubmitCallbackResponse<>(caseData);
             }
         }
-
-        callbackOrchestratorService.sendMessageToCallbackOrchestrator(callback);
+        log.info("Publishing message for the event {}", callback.getEvent());
+        eventPublisher.publishEvent(callback);
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
