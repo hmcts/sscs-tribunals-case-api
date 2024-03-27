@@ -75,6 +75,8 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        sscsCaseData.clearPoDetails();
+
         Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
         for (ConstraintViolation<SscsCaseData> violation : violations) {
             preSubmitCallbackResponse.addError(violation.getMessage());
