@@ -76,8 +76,7 @@ public class VoidCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"VOID_CASE"})
-    public void givenAVoidCaseEventAndSnLFeatureEnabled_thenActionsAndHearingCancel(EventType eventType) {
+    public void givenAVoidCaseEventAndSnLFeatureEnabled_thenActionsAndHearingCancel() {
         handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, true);
         when(callback.getEvent()).thenReturn(VOID_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -95,8 +94,7 @@ public class VoidCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"VOID_CASE"})
-    public void givenAVoidCaseEventAndSnLFeatureNotEnabled_thenActionsButNoHearingCancel(EventType eventType) {
+    public void givenAVoidCaseEventAndSnLFeatureNotEnabled_thenActionsButNoHearingCancel() {
         handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, false);
         when(callback.getEvent()).thenReturn(VOID_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -110,8 +108,7 @@ public class VoidCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"ADMIN_SEND_TO_VOID_STATE"})
-    public void givenAdminVoidCaseEventAndSnLFeatureEnabled_thenActionsButNoHearingCancel(EventType eventType) {
+    public void givenAdminVoidCaseEventAndSnLFeatureEnabled_thenActionsButNoHearingCancel() {
         handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, true);
         when(callback.getEvent()).thenReturn(ADMIN_SEND_TO_VOID_STATE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
