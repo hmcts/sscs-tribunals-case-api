@@ -5,9 +5,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
-import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
-import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hasHearingScheduledInTheFuture;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
 
 import java.time.LocalDate;
 import java.util.*;
