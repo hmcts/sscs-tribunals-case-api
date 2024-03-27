@@ -75,6 +75,11 @@ public class MessagingConfig {
         return null;
     }
 
+    /*
+     * DO NOT USE THIS IN PRODUCTION!
+     * This was only used for testing unverified ssl certs locally!
+     */
+    @Deprecated
     private TrustManager[] getTrustManagers() {
         return new TrustManager[]{
             new X509TrustManager() {

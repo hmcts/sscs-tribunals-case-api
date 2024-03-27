@@ -27,8 +27,8 @@ public class PostCodeEndpointsIt {
     public void shouldReturnRegionalCentreFromPostCode() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/regionalcentre/br2 8pn")
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
+            .andExpect(status().isOk())
+            .andReturn();
 
         String result = mvcResult.getResponse().getContentAsString();
 
@@ -41,8 +41,8 @@ public class PostCodeEndpointsIt {
     public void shouldReturnNotFoundFromPostCodeThatDoesNotExist() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/regionalcentre/aa1")
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())
-                .andReturn();
+            .andExpect(status().isNotFound())
+            .andReturn();
 
     }
 }

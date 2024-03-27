@@ -19,24 +19,24 @@ public class DocumentManagementServiceTest {
     private DocumentUploadClientApi documentUploadClientApi;
     private String authToken;
     private List<MultipartFile> files;
-    private DocumentManagementService documentManagementService;
-    private DocumentManagementClient documentManagementClient;
+    private DocumentStoreService documentStoreService;
+    private DocumentStoreClient documentStoreClient;
 
     @Before
     public void setUp() {
         authToken = "authToken";
         files = singletonList(mock(MultipartFile.class));
         authTokenGenerator = mock(AuthTokenGenerator.class);
-        documentManagementClient = mock(DocumentManagementClient.class);
+        documentStoreClient = mock(DocumentStoreClient.class);
         documentUploadClientApi = mock(DocumentUploadClientApi.class);
-        documentManagementService = new DocumentManagementService(authTokenGenerator, documentManagementClient, documentUploadClientApi);
+        documentStoreService = new DocumentStoreService(authTokenGenerator, documentStoreClient, documentUploadClientApi);
     }
 
     @Test
     public void passesUploadToDocumentUploadClientApi() {
         when(authTokenGenerator.generate()).thenReturn(authToken);
 
-        documentManagementService.upload(files);
+        documentStoreService.upload(files);
 
         verify(documentUploadClientApi).upload("oauth2Token", authToken, "sscs", files);
     }
@@ -45,7 +45,7 @@ public class DocumentManagementServiceTest {
     public void throwsIllegalFileTypeExceptionIfDocumentStoreCannotStoreFile() {
         when(documentUploadClientApi.upload(any(), any(), any(), any())).thenThrow(new HttpClientErrorException(HttpStatus.UNPROCESSABLE_ENTITY));
 
-        documentManagementService.upload(files);
+        documentStoreService.upload(files);
     }
 
     @Test
@@ -54,8 +54,8 @@ public class DocumentManagementServiceTest {
         String someToken = "someToken";
         when(authTokenGenerator.generate()).thenReturn(someToken);
 
-        documentManagementService.delete(someDocumentId);
+        documentStoreService.delete(someDocumentId);
 
-        verify(documentManagementClient).deleteDocument("oauth2Token", someToken, "sscs", someDocumentId);
+        verify(documentStoreClient).deleteDocument("oauth2Token", someToken, "sscs", someDocumentId);
     }
 }

@@ -92,15 +92,15 @@ public abstract class AbstractEventIt {
 
     protected void setJson(SscsCaseData sscsCaseData, EventType eventType) throws JsonProcessingException {
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(parseLong(sscsCaseData.getCcdCaseId()), JURISDICTION,
-                sscsCaseData.getState(), sscsCaseData, LocalDateTime.now(), "Benefit");
+            sscsCaseData.getState(), sscsCaseData, LocalDateTime.now(), "Benefit");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(),
-                eventType, false);
+            eventType, false);
         json = mapper.writeValueAsString(callback);
     }
 
     protected String getJson(String fileLocation) throws IOException {
         String path = Objects.requireNonNull(getClass().getClassLoader()
-                .getResource(fileLocation)).getFile();
+            .getResource(fileLocation)).getFile();
         return FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
     }
 
@@ -125,9 +125,9 @@ public abstract class AbstractEventIt {
     public PreSubmitCallbackResponse<SscsCaseData> deserialize(String source) {
         try {
             return mapper.readValue(
-                    source,
-                    new TypeReference<>() {
-                    }
+                source,
+                new TypeReference<>() {
+                }
             );
 
         } catch (IOException e) {

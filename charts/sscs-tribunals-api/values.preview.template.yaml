@@ -15,3 +15,15 @@ java:
     WORK_ALLOCATION_FEATURE: true
     CASE_ACCESS_MANAGEMENT_FEATURE: true
     SCHEDULE_LISTING_FEATURE: true
+    SEND_LETTER_SERVICE_ENABLED: "true"
+    SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
+    SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
+    TOPIC_NAME: "sscs-evidenceshare-topic-aat"
+    AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
+    AMQP_USERNAME: "SendAndListenSharedAccessKey"
+    ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
+    ROBOTICS_EMAIL_TO: "fake"
+    ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
+    ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
+    ISSUE_GENERIC_LETTER: true
+    BYPASS_EVIDENCE_SHARE_SERVICE: true
