@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.personalisation;
 
-import static uk.gov.hmcts.reform.sscs.config.PersonalisationMappingConstants.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
 
 import java.util.Map;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.domain.SscsCaseDataWrapper;
-import uk.gov.hmcts.reform.sscs.domain.SubscriptionWithType;
-import uk.gov.hmcts.reform.sscs.factory.CcdNotificationWrapper;
-import uk.gov.hmcts.reform.sscs.service.NotificationUtils;
-import uk.gov.hmcts.reform.sscs.service.SendNotificationHelper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationHelper;
 
 
 @Component

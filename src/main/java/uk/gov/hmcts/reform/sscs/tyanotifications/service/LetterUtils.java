@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
+import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.config.NotificationEventTypeLists.EVENTS_FOR_ACTION_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENTS_FOR_ACTION_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.*;
-import static uk.gov.hmcts.reform.sscs.service.NotificationUtils.hasAppointee;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasAppointee;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,10 +24,10 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.domain.SscsCaseDataWrapper;
-import uk.gov.hmcts.reform.sscs.domain.SubscriptionWithType;
-import uk.gov.hmcts.reform.sscs.exception.NotificationClientRuntimeException;
-import uk.gov.hmcts.reform.sscs.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRuntimeException;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 
 public class LetterUtils {

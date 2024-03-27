@@ -6,9 +6,9 @@ import java.time.ZonedDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.config.RetryConfig;
-import uk.gov.hmcts.reform.sscs.exception.NotificationServiceException;
-import uk.gov.hmcts.reform.sscs.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.RetryConfig;
+import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.service.notify.NotificationClientException;
 
 @Service

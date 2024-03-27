@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
 
 @Component
 public class CallbackDispatcher {

@@ -4,11 +4,17 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.config.PersonalisationMappingConstants.*;
-import static uk.gov.hmcts.reform.sscs.domain.notify.NotificationEventType.*;
-import static uk.gov.hmcts.reform.sscs.service.LetterUtils.*;
-import static uk.gov.hmcts.reform.sscs.service.NotificationUtils.*;
-import static uk.gov.hmcts.reform.sscs.service.NotificationValidService.isBundledLetter;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CORRECTION_GRANTED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_GRANTED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_REFUSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.REVIEW_AND_SET_ASIDE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SET_ASIDE_GRANTED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SET_ASIDE_REFUSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService.isBundledLetter;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
@@ -24,16 +30,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.config.AppConstants;
-import uk.gov.hmcts.reform.sscs.config.NotificationEventTypeLists;
-import uk.gov.hmcts.reform.sscs.config.SubscriptionType;
-import uk.gov.hmcts.reform.sscs.domain.SubscriptionWithType;
-import uk.gov.hmcts.reform.sscs.domain.notify.Notification;
-import uk.gov.hmcts.reform.sscs.domain.notify.NotificationEventType;
-import uk.gov.hmcts.reform.sscs.exception.NotificationServiceException;
-import uk.gov.hmcts.reform.sscs.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notification;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
-import uk.gov.hmcts.reform.sscs.service.docmosis.PdfLetterService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 import uk.gov.service.notify.NotificationClientException;
 
 @Service
@@ -364,7 +370,7 @@ public class SendNotificationService {
             return getDocumentForType(newSscsCaseData.getLatestWelshDocumentForDocumentType(POSTPONEMENT_REQUEST_DIRECTION_NOTICE).orElse(null));
         } else if (CORRECTION_GRANTED.equals(notificationEventType)) {
             return getDocumentForType(newSscsCaseData.getLatestDocumentForDocumentType(DocumentType.CORRECTION_GRANTED));
-        } else if (CORRECTION_REFUSED.equals(notificationEventType)) {
+        } else if (NotificationEventType.CORRECTION_REFUSED.equals(notificationEventType)) {
             return getDocumentForType(newSscsCaseData.getLatestDocumentForDocumentType(DocumentType.CORRECTION_REFUSED));
         } else if (REVIEW_AND_SET_ASIDE.equals(notificationEventType)) {
             return getDocumentForType(newSscsCaseData.getLatestDocumentForDocumentType(DocumentType.REVIEW_AND_SET_ASIDE));
@@ -380,9 +386,9 @@ public class SendNotificationService {
             return getDocumentForType(newSscsCaseData.getLatestDocumentForDocumentType(STATEMENT_OF_REASONS_GRANTED));
         } else if (SOR_REFUSED.equals(notificationEventType)) {
             return getDocumentForType(newSscsCaseData.getLatestDocumentForDocumentType(STATEMENT_OF_REASONS_REFUSED));
-        } else if (LIBERTY_TO_APPLY_GRANTED.equals(notificationEventType)) {
+        } else if (NotificationEventType.LIBERTY_TO_APPLY_GRANTED.equals(notificationEventType)) {
             return getDocumentForType(newSscsCaseData.getLatestDocumentForDocumentType(DocumentType.LIBERTY_TO_APPLY_GRANTED));
-        } else if (LIBERTY_TO_APPLY_REFUSED.equals(notificationEventType)) {
+        } else if (NotificationEventType.LIBERTY_TO_APPLY_REFUSED.equals(notificationEventType)) {
             return getDocumentForType(newSscsCaseData.getLatestDocumentForDocumentType(DocumentType.LIBERTY_TO_APPLY_REFUSED));
         } else if (ADMIN_CORRECTION_HEADER.equals(notificationEventType)) {
             return getDocumentForType(newSscsCaseData.getLatestDocumentForDocumentType(CORRECTED_DECISION_NOTICE));

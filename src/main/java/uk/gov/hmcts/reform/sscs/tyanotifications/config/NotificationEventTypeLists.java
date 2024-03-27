@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.config;
 
-import static uk.gov.hmcts.reform.sscs.domain.notify.NotificationEventType.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 
 import java.util.EnumSet;
 import java.util.Set;
-import uk.gov.hmcts.reform.sscs.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 
 public final class NotificationEventTypeLists {
 

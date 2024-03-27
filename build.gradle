@@ -327,7 +327,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.3.13'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.4'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.5'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
@@ -347,6 +347,12 @@ dependencies {
     implementation group: 'org.pitest', name: 'pitest', version:  '1.14.2'
     implementation group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.9.11'
     implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: '0.5'
+
+    implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '1.5.7', {
+        exclude group: "uk.gov.hmcts.reform", module:"properties-volume-spring-boot-starter"
+    }
+    implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.0-RELEASE'
+    implementation group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.17.0'
 
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.3.1'
     testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.3.1'
@@ -595,3 +601,20 @@ bootWithCCD {
         }
     }
 }
+
+// this is required to force Java running on the Azure Windows Server OS into using
+// UTF-8 as the default character set instead of windows-1252 which causes issues
+applicationDefaultJvmArgs = ["-Dfile.encoding=UTF-8"]
+
+run {
+    def debug = System.getProperty("debug")
+    if (debug == 'true') {
+        jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
+    }
+}
+
+def dbHost = System.env.JOB_SCHEDULER_DB_HOST ?: "localhost"
+def dbPort = System.env.JOB_SCHEDULER_DB_PORT ?: 5432
+def dbName = System.env.JOB_SCHEDULER_DB_NAME ?: "sscsjobscheduler"
+def dbUser = System.env.JOB_SCHEDULER_DB_USERNAME ?: "sscsjobscheduler"
+def dbPass = System.env.JOB_SCHEDULER_DB_PASSWORD ?: "sscsjobscheduler"

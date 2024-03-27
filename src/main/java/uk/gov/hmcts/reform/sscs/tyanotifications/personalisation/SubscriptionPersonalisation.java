@@ -1,14 +1,14 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.personalisation;
 
-import static uk.gov.hmcts.reform.sscs.service.NotificationUtils.getSubscription;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.getSubscription;
 
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
-import uk.gov.hmcts.reform.sscs.domain.SscsCaseDataWrapper;
-import uk.gov.hmcts.reform.sscs.domain.SubscriptionWithType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 
 @Component
 @Slf4j

@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis;
 
-import static uk.gov.hmcts.reform.sscs.config.PersonalisationMappingConstants.*;
-import static uk.gov.hmcts.reform.sscs.domain.notify.NotificationEventType.APPEAL_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.personalisation.Personalisation.translateToWelshDate;
-import static uk.gov.hmcts.reform.sscs.service.LetterUtils.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.Personalisation.translateToWelshDate;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -20,16 +20,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
-import uk.gov.hmcts.reform.sscs.config.DocmosisTemplatesConfig;
-import uk.gov.hmcts.reform.sscs.config.properties.EvidenceProperties;
-import uk.gov.hmcts.reform.sscs.domain.SubscriptionWithType;
-import uk.gov.hmcts.reform.sscs.domain.docmosis.PdfCoverSheet;
-import uk.gov.hmcts.reform.sscs.domain.notify.Notification;
-import uk.gov.hmcts.reform.sscs.domain.notify.NotificationEventType;
-import uk.gov.hmcts.reform.sscs.exception.NotificationClientRuntimeException;
-import uk.gov.hmcts.reform.sscs.factory.NotificationWrapper;
-import uk.gov.hmcts.reform.sscs.service.DocmosisPdfService;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.DocmosisTemplatesConfig;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.properties.EvidenceProperties;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.docmosis.PdfCoverSheet;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notification;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRuntimeException;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.DocmosisPdfService;
 
 @Service
 @Slf4j

@@ -6,12 +6,13 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SUBSCRIPTION_UPDATED;
-import static uk.gov.hmcts.reform.sscs.config.NotificationEventTypeLists.*;
-import static uk.gov.hmcts.reform.sscs.config.SubscriptionType.*;
-import static uk.gov.hmcts.reform.sscs.domain.notify.NotificationEventType.*;
-import static uk.gov.hmcts.reform.sscs.service.NotificationUtils.getSubscription;
-import static uk.gov.hmcts.reform.sscs.service.NotificationUtils.isOkToSendNotification;
-import static uk.gov.hmcts.reform.sscs.service.NotificationValidService.isMandatoryLetterEventType;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.getSubscription;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendNotification;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService.isMandatoryLetterEventType;
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -23,11 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.config.NotificationConfig;
-import uk.gov.hmcts.reform.sscs.domain.SubscriptionWithType;
-import uk.gov.hmcts.reform.sscs.domain.notify.*;
-import uk.gov.hmcts.reform.sscs.factory.NotificationFactory;
-import uk.gov.hmcts.reform.sscs.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationConfig;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.*;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Service
@@ -99,7 +100,7 @@ public class NotificationService {
     }
 
     private boolean functionalTest(SscsCaseData newSscsCaseData) {
-        return YesNo.isYes(newSscsCaseData.getFunctionalTest());
+        return isYes(newSscsCaseData.getFunctionalTest());
     }
 
     private void sendSecondNotification(NotificationWrapper notificationWrapper) {
@@ -213,7 +214,7 @@ public class NotificationService {
                 && emptyIfNull(sscsCaseData.getReissueArtifactUi().getOtherPartyOptions()).stream()
                         .map(OtherPartyOption::getValue)
                         .filter(otherPartyOptionDetails -> String.valueOf(partyId).equals(otherPartyOptionDetails.getOtherPartyOptionId()))
-                        .anyMatch(otherPartyOptionDetails -> YesNo.isYes(otherPartyOptionDetails.getResendToOtherParty()));
+                        .anyMatch(otherPartyOptionDetails -> isYes(otherPartyOptionDetails.getResendToOtherParty()));
     }
 
     private void scrubEmailAndSmsIfSubscribedBefore(NotificationWrapper notificationWrapper, SubscriptionWithType subscriptionWithType) {

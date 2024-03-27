@@ -2,12 +2,12 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.factory;
 
 import static java.util.Objects.isNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.config.AppealHearingType.ORAL;
-import static uk.gov.hmcts.reform.sscs.config.AppealHearingType.PAPER;
-import static uk.gov.hmcts.reform.sscs.config.NotificationEventTypeLists.*;
-import static uk.gov.hmcts.reform.sscs.config.SubscriptionType.*;
-import static uk.gov.hmcts.reform.sscs.domain.notify.NotificationEventType.*;
-import static uk.gov.hmcts.reform.sscs.service.NotificationUtils.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType.ORAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType.PAPER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,14 +15,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.config.AppealHearingType;
-import uk.gov.hmcts.reform.sscs.domain.SscsCaseDataWrapper;
-import uk.gov.hmcts.reform.sscs.domain.SubscriptionWithType;
-import uk.gov.hmcts.reform.sscs.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityPartyMembers;
 import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
-import uk.gov.hmcts.reform.sscs.service.scheduler.CcdActionSerializer;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.CcdActionSerializer;
 
 @Slf4j
 public class CcdNotificationWrapper implements NotificationWrapper {

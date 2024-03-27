@@ -18,9 +18,9 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.config.AppConstants;
-import uk.gov.hmcts.reform.sscs.exception.MacException;
-import uk.gov.hmcts.reform.sscs.exception.TokenException;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants;
+import uk.gov.hmcts.reform.sscs.tyanotifications.exception.MacException;
+import uk.gov.hmcts.reform.sscs.tyanotifications.exception.TokenException;
 
 @Service
 public class MessageAuthenticationServiceImpl {

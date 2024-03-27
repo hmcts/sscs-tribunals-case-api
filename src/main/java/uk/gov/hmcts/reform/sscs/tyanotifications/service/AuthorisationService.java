@@ -5,8 +5,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 import feign.FeignException;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
-import uk.gov.hmcts.reform.sscs.exception.AuthorisationException;
-import uk.gov.hmcts.reform.sscs.exception.ClientAuthorisationException;
+import uk.gov.hmcts.reform.sscs.tyanotifications.exception.AuthorisationException;
+import uk.gov.hmcts.reform.sscs.tyanotifications.exception.ClientAuthorisationException;
 
 @Service
 public class AuthorisationService {

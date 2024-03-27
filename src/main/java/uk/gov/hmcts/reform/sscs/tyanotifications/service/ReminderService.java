@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.factory.NotificationWrapper;
-import uk.gov.hmcts.reform.sscs.service.reminder.ReminderHandler;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder.ReminderHandler;
 
 @Service
 public class ReminderService {

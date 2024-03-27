@@ -1,14 +1,14 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.factory;
 
 import static java.util.Objects.isNull;
-import static uk.gov.hmcts.reform.sscs.config.NotificationEventTypeLists.*;
-import static uk.gov.hmcts.reform.sscs.domain.notify.NotificationEventType.SUBSCRIPTION_UPDATED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SUBSCRIPTION_UPDATED;
 
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.domain.notify.NotificationEventType;
-import uk.gov.hmcts.reform.sscs.personalisation.*;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.*;
 
 @Component
 public class PersonalisationFactory implements Function<NotificationEventType, Personalisation> {

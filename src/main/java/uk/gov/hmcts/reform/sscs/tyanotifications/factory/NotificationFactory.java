@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
-import uk.gov.hmcts.reform.sscs.domain.SubscriptionWithType;
-import uk.gov.hmcts.reform.sscs.domain.notify.*;
-import uk.gov.hmcts.reform.sscs.personalisation.Personalisation;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.*;
+import uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.Personalisation;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Component

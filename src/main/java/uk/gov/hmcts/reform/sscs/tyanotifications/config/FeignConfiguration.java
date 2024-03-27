@@ -10,11 +10,12 @@ import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import uk.gov.hmcts.reform.sscs.TrackYourAppealNotificationsApplication;
+import uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication;
+
 
 @Configuration
 @EnableFeignClients(
-    basePackageClasses = TrackYourAppealNotificationsApplication.class
+    basePackageClasses = TribunalsCaseApiApplication.class
 )
 public class FeignConfiguration {
 

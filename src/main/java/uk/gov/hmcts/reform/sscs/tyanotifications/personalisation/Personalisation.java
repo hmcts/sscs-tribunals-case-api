@@ -11,17 +11,20 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getLongBenefitNameDesc
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PanelComposition.JUDGE_DOCTOR_AND_DISABILITY_EXPERT_IF_APPLICABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
-import static uk.gov.hmcts.reform.sscs.config.AppConstants.*;
-import static uk.gov.hmcts.reform.sscs.config.NotificationEventTypeLists.EVENTS_WITH_SUBSCRIPTION_TYPE_DOCMOSIS_TEMPLATES;
-import static uk.gov.hmcts.reform.sscs.config.NotificationEventTypeLists.EVENTS_WITH_SUBSCRIPTION_TYPE_EMAIL_TEMPLATES;
-import static uk.gov.hmcts.reform.sscs.config.PersonalisationConfiguration.PersonalisationKey.*;
-import static uk.gov.hmcts.reform.sscs.config.PersonalisationMappingConstants.*;
-import static uk.gov.hmcts.reform.sscs.config.SubscriptionType.*;
-import static uk.gov.hmcts.reform.sscs.domain.notify.NotificationEventType.*;
-import static uk.gov.hmcts.reform.sscs.personalisation.SyaAppealCreatedAndReceivedPersonalisation.TWO_NEW_LINES;
-import static uk.gov.hmcts.reform.sscs.personalisation.SyaAppealCreatedAndReceivedPersonalisation.getOptionalField;
-import static uk.gov.hmcts.reform.sscs.service.LetterUtils.getNameForOtherParty;
-import static uk.gov.hmcts.reform.sscs.service.NotificationUtils.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENTS_WITH_SUBSCRIPTION_TYPE_DOCMOSIS_TEMPLATES;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENTS_WITH_SUBSCRIPTION_TYPE_EMAIL_TEMPLATES;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration.PersonalisationKey.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.JOINT_PARTY;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.OTHER_PARTY;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.REPRESENTATIVE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.SyaAppealCreatedAndReceivedPersonalisation.TWO_NEW_LINES;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.SyaAppealCreatedAndReceivedPersonalisation.getOptionalField;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getNameForOtherParty;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.*;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -40,19 +43,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.config.*;
-import uk.gov.hmcts.reform.sscs.config.properties.EvidenceProperties;
-import uk.gov.hmcts.reform.sscs.domain.SscsCaseDataWrapper;
-import uk.gov.hmcts.reform.sscs.domain.SubscriptionWithType;
-import uk.gov.hmcts.reform.sscs.domain.notify.NotificationEventType;
-import uk.gov.hmcts.reform.sscs.domain.notify.Template;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.*;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.properties.EvidenceProperties;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Template;
 import uk.gov.hmcts.reform.sscs.exception.BenefitMappingException;
-import uk.gov.hmcts.reform.sscs.extractor.HearingContactDateExtractor;
-import uk.gov.hmcts.reform.sscs.factory.NotificationWrapper;
-import uk.gov.hmcts.reform.sscs.service.LetterUtils;
-import uk.gov.hmcts.reform.sscs.service.MessageAuthenticationServiceImpl;
+import uk.gov.hmcts.reform.sscs.tyanotifications.extractor.HearingContactDateExtractor;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.MessageAuthenticationServiceImpl;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
-import uk.gov.hmcts.reform.sscs.service.SendNotificationHelper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationHelper;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 
 @Component
@@ -193,7 +196,7 @@ public class Personalisation<E extends NotificationWrapper> {
 
         personalisation.put(APPEAL_REF, getAppealReference(ccdResponse));
         personalisation.put(APPELLANT_NAME, ccdResponse.getAppeal().getAppellant().getName().getFullNameNoTitle());
-        personalisation.put(NAME, getName(subscriptionWithType, ccdResponse, responseWrapper));
+        personalisation.put(PersonalisationMappingConstants.NAME, getName(subscriptionWithType, ccdResponse, responseWrapper));
         personalisation.put(CCD_ID, defaultIfBlank(ccdResponse.getCcdCaseId(), EMPTY));
         personalisation.put(REPRESENTEE_NAME, subscriptionWithType.getParty().getName().getFullNameNoTitle());
 
@@ -276,7 +279,7 @@ public class Personalisation<E extends NotificationWrapper> {
 
         setHelplineTelephone(ccdResponse, personalisation);
         if (subscriptionWithType.getSubscriptionType() == OTHER_PARTY) {
-            personalisation.put(PersonalisationMappingConstants.OTHER_PARTY, personalisation.get(NAME));
+            personalisation.put(PersonalisationMappingConstants.OTHER_PARTY, personalisation.get(PersonalisationMappingConstants.NAME));
         }
 
         personalisation.put(PARTY_TYPE, subscriptionWithType.getParty().getClass().getSimpleName());

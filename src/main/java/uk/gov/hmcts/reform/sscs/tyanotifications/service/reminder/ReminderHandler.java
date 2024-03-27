@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder;
 
-import uk.gov.hmcts.reform.sscs.factory.NotificationWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 
 public interface ReminderHandler {
 

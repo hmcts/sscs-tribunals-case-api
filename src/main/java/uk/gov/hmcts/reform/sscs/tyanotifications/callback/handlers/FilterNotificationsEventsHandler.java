@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.callback.handlers;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.GAPS;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENTS_TO_HANDLE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.tyanotifications.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationService;
 
 
 @Service
