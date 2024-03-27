@@ -20,10 +20,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -47,6 +50,17 @@ public class CancelTranslationsSubmittedHandlerTest {
     @Mock
     private UpdateCcdCaseService updateCcdCaseService;
 
+    @Mock
+    private CcdClient ccdClient;
+
+    @Mock
+    private SscsCcdConvertService sscsCcdConvertService;
+
+    @Mock
+    private uk.gov.hmcts.reform.ccd.client.model.CaseDetails ccdCaseDetails;
+    @Mock
+    private StartEventResponse startEventResponse;
+
     private SscsCaseData sscsCaseData;
 
     @Captor
@@ -55,13 +69,20 @@ public class CancelTranslationsSubmittedHandlerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        handler = new CancelTranslationsSubmittedHandler(idamService, updateCcdCaseService);
+        handler = new CancelTranslationsSubmittedHandler(
+                idamService, ccdClient, sscsCcdConvertService, updateCcdCaseService);
+
         when(callback.getEvent()).thenReturn(EventType.CANCEL_TRANSLATIONS);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build())
             .sscsWelshPreviewNextEvent("sendToDwp")
             .build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(ccdClient.startEvent(any(IdamTokens.class), anyLong(), eq(EventType.UPDATE_CASE_ONLY.getCcdType())))
+                .thenReturn(startEventResponse);
+        when(startEventResponse.getCaseDetails()).thenReturn(ccdCaseDetails);
+        when(ccdCaseDetails.getData()).thenReturn(Map.of());
+        when(sscsCcdConvertService.getCaseData(anyMap())).thenReturn(sscsCaseData);
 
     }
 

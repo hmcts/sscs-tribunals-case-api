@@ -11,14 +11,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @Service
 @Slf4j
@@ -26,10 +30,16 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
 
     private final IdamService idamService;
     private final UpdateCcdCaseService updateCcdCaseService;
+    private final CcdClient ccdClient;
+    private final SscsCcdConvertService sscsCcdConvertService;
 
     public CancelTranslationsSubmittedHandler(IdamService idamService,
+                                              CcdClient ccdClient,
+                                              SscsCcdConvertService sscsCcdConvertService,
                                               UpdateCcdCaseService updateCcdCaseService) {
         this.idamService = idamService;
+        this.ccdClient = ccdClient;
+        this.sscsCcdConvertService = sscsCcdConvertService;
         this.updateCcdCaseService = updateCcdCaseService;
     }
 
@@ -47,7 +57,11 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        IdamTokens idamTokens = idamService.getIdamTokens();
+        StartEventResponse startEventResponse = ccdClient.startEvent(
+                idamTokens, callback.getCaseDetails().getId(), EventType.UPDATE_CASE_ONLY.getCcdType());
+        SscsCaseData caseData = sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData());
+
         String sscsWelshPreviewNextEvent = caseData.getSscsWelshPreviewNextEvent();
         log.info("sscsWelshPreviewNextEvent is {}  for case id : {}",
                 sscsWelshPreviewNextEvent, caseData.getCcdCaseId());
