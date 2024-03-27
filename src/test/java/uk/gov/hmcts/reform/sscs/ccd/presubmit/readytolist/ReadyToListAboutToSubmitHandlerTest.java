@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.readytolist;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
@@ -10,10 +11,14 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -151,6 +156,7 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.isIgnoreWarnings()).thenReturn(true);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
             USER_AUTHORISATION);
 
@@ -208,6 +214,93 @@ public class ReadyToListAboutToSubmitHandlerTest {
 
         assertThat(response.getData().getSchedulingAndListingFields().getHearingRoute()).isNull();
         assertThat(response.getData().getSchedulingAndListingFields().getHearingState()).isNull();
+    }
+
+    @Test
+    public void givenAGapsCaseOnSubmitReturnWarning() {
+        SchedulingAndListingFields schedulingAndListingFields = SchedulingAndListingFields.builder()
+                .hearingRoute(HearingRoute.GAPS)
+                .build();
+        sscsCaseData = sscsCaseData.toBuilder()
+                .schedulingAndListingFields(schedulingAndListingFields)
+                .region("TEST")
+                .build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        handler = new ReadyToListAboutToSubmitHandler(false, regionalProcessingCenterService,
+                hearingMessagingServiceFactory);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT,
+                callback, USER_AUTHORISATION);
+
+        MatcherAssert.assertThat(response.getErrors().size(), is(0));
+        MatcherAssert.assertThat(response.getWarnings().size(), is(1));
+        MatcherAssert.assertThat(response.getWarnings().iterator().next(), is("This is a GAPS case, If you do want to proceed, then please change the hearing route to List Assist"));
+    }
+
+    @Test
+    public void givenAListAssistCaseIfAHearingExistsInTheFutureThenReturnWarning() {
+        HearingDetails hearingDetails1 = HearingDetails.builder()
+                .hearingDate(LocalDate.now().minusDays(10).toString())
+                .start(LocalDateTime.now().minusDays(10))
+                .hearingId(String.valueOf(1))
+                .venue(Venue.builder().name("Venue 1").build())
+                .time("12:00")
+                .build();
+        Hearing hearing1 = Hearing.builder().value(hearingDetails1).build();
+
+        HearingDetails hearingDetails2 = HearingDetails.builder()
+                .hearingDate(LocalDate.now().plusDays(5).toString())
+                .start(LocalDateTime.now().plusDays(5))
+                .hearingId(String.valueOf(1))
+                .venue(Venue.builder().name("Venue 1").build())
+                .time("12:00")
+                .build();
+        Hearing hearing2 = Hearing.builder().value(hearingDetails2).build();
+
+        sscsCaseData = sscsCaseData.toBuilder()
+                .hearings(List.of(hearing1, hearing2))
+                .region("TEST")
+                .build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        handler = new ReadyToListAboutToSubmitHandler(false, regionalProcessingCenterService, hearingMessagingServiceFactory);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        MatcherAssert.assertThat(response.getErrors().size(), is(0));
+        MatcherAssert.assertThat(response.getWarnings().size(), is(1));
+        MatcherAssert.assertThat(response.getWarnings().iterator().next(), is("There is already a hearing request in List assist, are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first"));
+    }
+
+    @Test
+    public void givenAListAssistCaseIfAHearingExistsInTheFutureAndUserProceedsThenSendAHearingRequestMessage() {
+        HearingDetails hearingDetails1 = HearingDetails.builder()
+                .hearingDate(LocalDate.now().minusDays(10).toString())
+                .start(LocalDateTime.now().minusDays(10))
+                .hearingId(String.valueOf(1))
+                .venue(Venue.builder().name("Venue 1").build())
+                .time("12:00")
+                .build();
+        Hearing hearing1 = Hearing.builder().value(hearingDetails1).build();
+
+        HearingDetails hearingDetails2 = HearingDetails.builder()
+                .hearingDate(LocalDate.now().plusDays(5).toString())
+                .start(LocalDateTime.now().plusDays(5))
+                .hearingId(String.valueOf(1))
+                .venue(Venue.builder().name("Venue 1").build())
+                .time("12:00")
+                .build();
+        Hearing hearing2 = Hearing.builder().value(hearingDetails2).build();
+
+        sscsCaseData = sscsCaseData.toBuilder()
+                .hearings(List.of(hearing1, hearing2))
+                .region("TEST")
+                .build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.isIgnoreWarnings()).thenReturn(true);
+        handler = new ReadyToListAboutToSubmitHandler(false, regionalProcessingCenterService, hearingMessagingServiceFactory);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        MatcherAssert.assertThat(response.getErrors().size(), is(0));
+        MatcherAssert.assertThat(response.getWarnings().size(), is(0));
     }
 
     private void verifyMessagingServiceCalled() {
