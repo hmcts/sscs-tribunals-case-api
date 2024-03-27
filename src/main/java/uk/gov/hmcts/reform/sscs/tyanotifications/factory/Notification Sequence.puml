@@ -1,0 +1,6 @@
+@startuml
+NotificationFactory -> Personalisation: getTemplate()
+Personalisation --> NotificationConfig: getTemplate(templateName,languagePreference)
+NotificationConfig --> Personalisation : template
+Personalisation --> NotificationFactory : template
+@enduml
