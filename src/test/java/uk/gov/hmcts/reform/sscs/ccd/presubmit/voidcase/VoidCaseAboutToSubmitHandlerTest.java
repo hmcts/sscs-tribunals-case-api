@@ -126,6 +126,9 @@ public class VoidCaseAboutToSubmitHandlerTest {
         sscsCaseData.setPoAttendanceConfirmed(YES);
         sscsCaseData.setPresentingOfficersDetails(PoDetails.builder().name(Name.builder().build()).build());
         sscsCaseData.setPresentingOfficersHearingLink("link");
+        when(callback.getEvent()).thenReturn(ADMIN_SEND_TO_VOID_STATE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
