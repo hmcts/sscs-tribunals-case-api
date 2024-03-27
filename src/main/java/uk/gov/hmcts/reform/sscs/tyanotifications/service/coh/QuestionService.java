@@ -21,20 +21,20 @@ public class QuestionService {
         IdamTokens idamTokens = idamService.getIdamTokens();
 
         QuestionRounds questionRounds = cohClient.getQuestionRounds(
-                idamTokens.getIdamOauth2Token(),
-                idamTokens.getServiceAuthorization(),
-                onlineHearingId
+            idamTokens.getIdamOauth2Token(),
+            idamTokens.getServiceAuthorization(),
+            onlineHearingId
         );
 
         int currentQuestionRound = questionRounds.getCurrentQuestionRound();
 
         List<QuestionReferences> questionRefsForCurrentRound =
-                questionRounds.getQuestionRounds().get(currentQuestionRound - 1).getQuestionReferences();
+            questionRounds.getQuestionRounds().get(currentQuestionRound - 1).getQuestionReferences();
         if (questionRefsForCurrentRound != null && !questionRefsForCurrentRound.isEmpty()) {
             return questionRefsForCurrentRound.get(0).getDeadlineExpiryDate();
         } else {
             throw new IllegalStateException(
-                    "Cannot get questions required by date as question round has been published with no questions in it"
+                "Cannot get questions required by date as question round has been published with no questions in it"
             );
         }
     }
@@ -43,9 +43,9 @@ public class QuestionService {
         IdamTokens idamTokens = idamService.getIdamTokens();
 
         return cohClient.getQuestionRounds(
-                    idamTokens.getIdamOauth2Token(),
-                    idamTokens.getServiceAuthorization(),
-                    onlineHearingId
-            );
+            idamTokens.getIdamOauth2Token(),
+            idamTokens.getServiceAuthorization(),
+            onlineHearingId
+        );
     }
 }

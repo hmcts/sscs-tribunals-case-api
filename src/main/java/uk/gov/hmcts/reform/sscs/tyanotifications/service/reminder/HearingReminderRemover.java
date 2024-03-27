@@ -6,9 +6,9 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobNotFoundException;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobRemover;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 
 @Component
 public class HearingReminderRemover implements ReminderHandler {

@@ -10,9 +10,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.model.LetterType;
 import uk.gov.hmcts.reform.sscs.service.CcdNotificationsPdfService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
-import uk.gov.hmcts.reform.sscs.model.LetterType;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -60,7 +60,7 @@ public class SaveCorrespondenceAsyncService {
     public void saveEmailOrSms(final Correspondence correspondence, final SscsCaseData sscsCaseData) {
         int retry = (RetrySynchronizationManager.getContext() != null) ? RetrySynchronizationManager.getContext().getRetryCount() + 1 : 1;
         log.info("Retry number {} : to upload correspondence for {}, case reference {}",
-                retry, correspondence.getValue().getCorrespondenceType().name(), sscsCaseData.getCcdCaseId());
+            retry, correspondence.getValue().getCorrespondenceType().name(), sscsCaseData.getCcdCaseId());
 
         ccdNotificationsPdfService.mergeCorrespondenceIntoCcdV2(Long.valueOf(sscsCaseData.getCcdCaseId()), correspondence);
     }

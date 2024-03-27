@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.tyanotifications.extractor.DwpResponseReceivedDateExtractor;
-import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.jobscheduler.model.Job;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobScheduler;
+import uk.gov.hmcts.reform.sscs.tyanotifications.extractor.DwpResponseReceivedDateExtractor;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 
 @Component
 public class EvidenceReminder implements ReminderHandler {
@@ -43,7 +43,7 @@ public class EvidenceReminder implements ReminderHandler {
         return wrapper
             .getNotificationType()
             .equals(DWP_RESPONSE_RECEIVED)
-                || wrapper.getNotificationType().equals(DWP_UPLOAD_RESPONSE);
+            || wrapper.getNotificationType().equals(DWP_UPLOAD_RESPONSE);
     }
 
     public boolean canSchedule(NotificationWrapper wrapper) {
@@ -52,7 +52,7 @@ public class EvidenceReminder implements ReminderHandler {
             isReminderDatePresent = calculateReminderDate(wrapper.getNewSscsCaseData()) != null;
         } catch (Exception e) {
             LOG.error("Error while calculating reminder date for case id {} with exception {}",
-                    wrapper.getNewSscsCaseData().getCcdCaseId(), e);
+                wrapper.getNewSscsCaseData().getCcdCaseId(), e);
         }
         if (!isReminderDatePresent) {
             LOG.info("Could not find reminder date for case id {}", wrapper.getNewSscsCaseData().getCcdCaseId());
@@ -73,10 +73,10 @@ public class EvidenceReminder implements ReminderHandler {
 
         if (reminderDate != null) {
             jobScheduler.schedule(new Job<>(
-                    jobGroup,
-                    eventId,
-                    caseId,
-                    reminderDate
+                jobGroup,
+                eventId,
+                caseId,
+                reminderDate
             ));
 
             LOG.info("Scheduled evidence reminder for case id: {} @ {}", caseId, reminderDate);

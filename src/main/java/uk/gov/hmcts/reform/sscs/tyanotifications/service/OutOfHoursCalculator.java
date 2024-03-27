@@ -19,9 +19,9 @@ public class OutOfHoursCalculator {
     private Random rand = SecureRandom.getInstanceStrong();
 
     public OutOfHoursCalculator(
-            @Autowired DateTimeProvider dateTimeProvider,
-            @Value("${outOfHours.startHour}") int startHour,
-            @Value("${outOfHours.endHour}") int endHour) throws NoSuchAlgorithmException {
+        @Autowired DateTimeProvider dateTimeProvider,
+        @Value("${outOfHours.startHour}") int startHour,
+        @Value("${outOfHours.endHour}") int endHour) throws NoSuchAlgorithmException {
         this.dateTimeProvider = dateTimeProvider;
         this.startTime = startHour;
         this.endTime = endHour;

@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
 
 @Service
-public class DocmosisPdfService  {
+public class DocmosisPdfService {
     private final DocmosisPdfGenerationService docmosisPdfGenerationService;
 
     public DocmosisPdfService(DocmosisPdfGenerationService docmosisPdfGenerationService) {
@@ -20,17 +20,17 @@ public class DocmosisPdfService  {
         ObjectMapper objectMapper = new ObjectMapper();
 
         Map<String, Object> placeholders = objectMapper.convertValue(
-                pdfSummary,
-                new TypeReference<Map<String, Object>>() {
-                }
+            pdfSummary,
+            new TypeReference<Map<String, Object>>() {
+            }
         );
         return createPdfFromMap(placeholders, templatePath);
     }
 
     public byte[] createPdfFromMap(Map<String, Object> placeholders, String templatePath) {
         return docmosisPdfGenerationService.generatePdf(DocumentHolder.builder()
-                .template(new Template(templatePath, ""))
-                .placeholders(placeholders)
-                .build());
+            .template(new Template(templatePath, ""))
+            .placeholders(placeholders)
+            .build());
     }
 }

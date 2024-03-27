@@ -15,13 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.PartyItemList;
+import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityPartyMembers;
+import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
-import uk.gov.hmcts.reform.sscs.model.PartyItemList;
-import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityPartyMembers;
-import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.CcdActionSerializer;
 
 @Slf4j
@@ -75,9 +75,9 @@ public class CcdNotificationWrapper implements NotificationWrapper {
     @Override
     public List<SubscriptionWithType> getOtherPartySubscriptions(SscsCaseData newSscsCaseData, NotificationEventType notificationEventType) {
         return emptyIfNull(newSscsCaseData.getOtherParties()).stream()
-                .map(CcdValue::getValue)
-                .flatMap(o -> filterOtherPartySubscription(newSscsCaseData, notificationEventType, o).stream())
-                .collect(Collectors.toList());
+            .map(CcdValue::getValue)
+            .flatMap(o -> filterOtherPartySubscription(newSscsCaseData, notificationEventType, o).stream())
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -153,7 +153,7 @@ public class CcdNotificationWrapper implements NotificationWrapper {
         boolean isSendNewOtherPartyNotification = YesNo.isYes(otherParty.getSendNewOtherPartyNotification());
 
         if (hasAppointee(otherParty.getAppointee(), otherParty.getIsAppointee())
-                && isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartyAppointeeSubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY_APPOINTEE.getCode())) {
+            && isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartyAppointeeSubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY_APPOINTEE.getCode())) {
             otherPartySubscription.add(new SubscriptionWithType(otherParty.getOtherPartyAppointeeSubscription(),
                 OTHER_PARTY, otherParty, otherParty.getAppointee(), otherParty.getAppointee().getId()));
         } else if (isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartySubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY.getCode())) {
@@ -162,7 +162,7 @@ public class CcdNotificationWrapper implements NotificationWrapper {
         }
 
         if (hasRepresentative(otherParty)
-                && isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartyRepresentativeSubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY_REP.getCode())) {
+            && isNotificationEventValidToSendToOtherPartySubscription(otherParty.getOtherPartyRepresentativeSubscription(), isSendNewOtherPartyNotification, newSscsCaseData, notificationEventType, ConfidentialityPartyMembers.OTHER_PARTY_REP.getCode())) {
             otherPartySubscription.add(new SubscriptionWithType(otherParty.getOtherPartyRepresentativeSubscription(),
                 OTHER_PARTY, otherParty, otherParty.getRep(), otherParty.getRep().getId()));
         }
@@ -177,7 +177,7 @@ public class CcdNotificationWrapper implements NotificationWrapper {
     }
 
     private List<String> getEligiblePartyMembersInTheCaseToSendNotification(SscsCaseData caseData) {
-        List<String> eligiblePartyMembers =  new ArrayList<>();
+        List<String> eligiblePartyMembers = new ArrayList<>();
         // the party members must exist in the case and the user has selected to send the notification via the radio button in issue direction notice.
         if (YesNo.isYes(caseData.getSendDirectionNoticeToAppellantOrAppointee())) {
             eligiblePartyMembers.add(ConfidentialityPartyMembers.APPELLANT_OR_APPOINTEE.getCode());
@@ -219,8 +219,8 @@ public class CcdNotificationWrapper implements NotificationWrapper {
             return true;
         }
 
-        List<String> eligiblePartyMembers =  getEligiblePartyMembersInTheCaseToSendNotification(newSscsCaseData);
-        log.info("For caseID: {}, canSendNotificationBasedOnConfidentiality, notificationEventType: {}, partyMember: {}, eligiblePartyMembers: {}", newSscsCaseData.getCcdCaseId(), notificationEventType.getId(), partyMember,  String.join(", ", eligiblePartyMembers));
+        List<String> eligiblePartyMembers = getEligiblePartyMembersInTheCaseToSendNotification(newSscsCaseData);
+        log.info("For caseID: {}, canSendNotificationBasedOnConfidentiality, notificationEventType: {}, partyMember: {}, eligiblePartyMembers: {}", newSscsCaseData.getCcdCaseId(), notificationEventType.getId(), partyMember, String.join(", ", eligiblePartyMembers));
         return eligiblePartyMembers.contains(partyMember);
     }
 
@@ -234,7 +234,7 @@ public class CcdNotificationWrapper implements NotificationWrapper {
     }
 
     private boolean isNotificationEventValidToSendToAppellant(SscsCaseData newSscsCaseData, SscsCaseData oldSscsCaseData, NotificationEventType notificationEventType) {
-        boolean isValid =  (oldSscsCaseData != null && isValidReviewConfidentialityRequest(notificationEventType, oldSscsCaseData.getConfidentialityRequestOutcomeAppellant(), newSscsCaseData.getConfidentialityRequestOutcomeAppellant()))
+        boolean isValid = (oldSscsCaseData != null && isValidReviewConfidentialityRequest(notificationEventType, oldSscsCaseData.getConfidentialityRequestOutcomeAppellant(), newSscsCaseData.getConfidentialityRequestOutcomeAppellant()))
             || isValidProcessHearingRequestEventForParty(newSscsCaseData, oldSscsCaseData, notificationEventType, PartyItemList.APPELLANT)
             || isValidRequestForInformationEventForParty(newSscsCaseData, notificationEventType, PartyItemList.APPELLANT)
             || !EVENTS_MAYBE_INVALID_FOR_APPELLANT.contains(notificationEventType);
@@ -249,17 +249,17 @@ public class CcdNotificationWrapper implements NotificationWrapper {
         List<HearingRecordingRequest> oldReleasedRecordings = new ArrayList<>();
         if (oldSscsCaseData != null && oldSscsCaseData.getSscsHearingRecordingCaseData() != null) {
             oldReleasedRecordings = Optional.ofNullable(oldSscsCaseData.getSscsHearingRecordingCaseData().getCitizenReleasedHearings())
-                    .orElse(new ArrayList<>());
+                .orElse(new ArrayList<>());
         }
         return hasNewReleasedHearingRecordingForParty(newSscsCaseData, oldReleasedRecordings).stream()
-                .anyMatch(v -> partyItemList.getCode().equals(v.getValue().getRequestingParty()));
+            .anyMatch(v -> partyItemList.getCode().equals(v.getValue().getRequestingParty()));
     }
 
     @NotNull
     private List<HearingRecordingRequest> hasNewReleasedHearingRecordingForParty(SscsCaseData newSscsCaseData, List<HearingRecordingRequest> oldReleasedRecordings) {
         return newSscsCaseData.getSscsHearingRecordingCaseData().getCitizenReleasedHearings().stream()
-                .filter(e -> !oldReleasedRecordings.contains(e))
-                .collect(Collectors.toList());
+            .filter(e -> !oldReleasedRecordings.contains(e))
+            .collect(Collectors.toList());
     }
 
     private boolean isNotificationEventValidToSendToRep(SscsCaseData newSscsCaseData, SscsCaseData oldSscsCaseData, NotificationEventType notificationEventType) {
@@ -292,14 +292,14 @@ public class CcdNotificationWrapper implements NotificationWrapper {
 
     private boolean isValidRequestForInformationEventForParty(SscsCaseData newSscsCaseData, NotificationEventType notificationEventType, PartyItemList partyItem) {
         return REQUEST_FOR_INFORMATION.equals(notificationEventType)
-                && newSscsCaseData.getInformationFromPartySelected() != null
-                && newSscsCaseData.getInformationFromPartySelected().getValue() != null
-                && partyItem.getCode().equals(newSscsCaseData.getInformationFromPartySelected().getValue().getCode());
+            && newSscsCaseData.getInformationFromPartySelected() != null
+            && newSscsCaseData.getInformationFromPartySelected().getValue() != null
+            && partyItem.getCode().equals(newSscsCaseData.getInformationFromPartySelected().getValue().getCode());
     }
 
     private boolean isValidReviewConfidentialityRequest(NotificationEventType notificationEventType, DatedRequestOutcome previousRequestOutcome, DatedRequestOutcome latestRequestOutcome) {
         return REVIEW_CONFIDENTIALITY_REQUEST.equals(notificationEventType)
-                && checkConfidentialityRequestOutcomeIsValidToSend(previousRequestOutcome, latestRequestOutcome);
+            && checkConfidentialityRequestOutcomeIsValidToSend(previousRequestOutcome, latestRequestOutcome);
     }
 
     private boolean checkConfidentialityRequestOutcomeIsValidToSend(DatedRequestOutcome previousRequestOutcome, DatedRequestOutcome latestRequestOutcome) {
@@ -308,7 +308,7 @@ public class CcdNotificationWrapper implements NotificationWrapper {
 
     private boolean checkConfidentialityRequestOutcomeIsValidToSend(DatedRequestOutcome previousRequestOutcome, RequestOutcome latestRequestOutcome) {
         return (RequestOutcome.GRANTED.equals(latestRequestOutcome) && !isMatchingOutcome(previousRequestOutcome, RequestOutcome.GRANTED))
-                || (RequestOutcome.REFUSED.equals(latestRequestOutcome) && !isMatchingOutcome(previousRequestOutcome, RequestOutcome.REFUSED));
+            || (RequestOutcome.REFUSED.equals(latestRequestOutcome) && !isMatchingOutcome(previousRequestOutcome, RequestOutcome.REFUSED));
     }
 
     private boolean isMatchingOutcome(DatedRequestOutcome datedRequestOutcome, RequestOutcome requestOutcome) {

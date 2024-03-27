@@ -25,7 +25,7 @@ public class NotificationUtils {
         return wrapper.getNewSscsCaseData().getAppeal() != null
             && wrapper.getNewSscsCaseData().getAppeal().getAppellant() != null
             && hasAppointee(wrapper.getNewSscsCaseData().getAppeal().getAppellant().getAppointee(),
-                wrapper.getNewSscsCaseData().getAppeal().getAppellant().getIsAppointee());
+            wrapper.getNewSscsCaseData().getAppeal().getAppellant().getIsAppointee());
     }
 
     public static boolean hasAppointee(Appointee appointee, String isAppointee) {
@@ -47,13 +47,13 @@ public class NotificationUtils {
 
     public static boolean hasRepresentative(OtherParty otherParty) {
         return otherParty.getRep() != null
-                && otherParty.getRep().getHasRepresentative() != null
-                && otherParty.getRep().getHasRepresentative().equalsIgnoreCase("yes");
+            && otherParty.getRep().getHasRepresentative() != null
+            && otherParty.getRep().getHasRepresentative().equalsIgnoreCase("yes");
     }
 
     public static boolean hasJointParty(SscsCaseData caseData) {
         return caseData.isThereAJointParty()
-                && isNotBlank(trimToNull(caseData.getJointParty().getName().getFullName()));
+            && isNotBlank(trimToNull(caseData.getJointParty().getName().getFullName()));
     }
 
     public static boolean hasAppointeeSubscriptionOrIsMandatoryAppointeeLetter(SscsCaseDataWrapper wrapper) {
@@ -76,7 +76,7 @@ public class NotificationUtils {
 
     public static boolean hasJointPartySubscription(SscsCaseDataWrapper wrapper) {
         Subscription subscription = getSubscription(wrapper.getNewSscsCaseData(), JOINT_PARTY);
-        return ((null != subscription && subscription.doesCaseHaveSubscriptions()  && hasJointParty(wrapper.getNewSscsCaseData()))
+        return ((null != subscription && subscription.doesCaseHaveSubscriptions() && hasJointParty(wrapper.getNewSscsCaseData()))
             || (hasJointParty(wrapper.getNewSscsCaseData())
             && EVENT_TYPES_FOR_MANDATORY_LETTERS.contains(wrapper.getNotificationEventType())));
     }
@@ -119,7 +119,7 @@ public class NotificationUtils {
                                           Subscription subscription,
                                           NotificationValidService notificationValidService) {
         return ((subscription != null
-                && subscription.doesCaseHaveSubscriptions()))
+            && subscription.doesCaseHaveSubscriptions()))
             && notificationValidService.isNotificationStillValidToSend(wrapper.getNewSscsCaseData().getHearings(), notificationType)
             && notificationValidService.isHearingTypeValidToSendNotification(wrapper.getNewSscsCaseData(), notificationType);
     }
@@ -163,9 +163,9 @@ public class NotificationUtils {
 
     public static SscsCaseDataWrapper buildSscsCaseDataWrapper(SscsCaseData caseData, SscsCaseData caseDataBefore, NotificationEventType event, State state) {
         return SscsCaseDataWrapper.builder()
-                .newSscsCaseData(caseData)
-                .oldSscsCaseData(caseDataBefore)
-                .notificationEventType(event)
-                .state(state).build();
+            .newSscsCaseData(caseData)
+            .oldSscsCaseData(caseDataBefore)
+            .notificationEventType(event)
+            .state(state).build();
     }
 }

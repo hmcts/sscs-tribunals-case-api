@@ -33,7 +33,7 @@ public final class GetAllTemplatesFromNotify {
 
             int count = 0;
 
-            for (Template template: templates.getTemplates()) {
+            for (Template template : templates.getTemplates()) {
                 Map<String, Object> personalisation = template.getPersonalisation().orElse(new HashMap<String, Object>());
 
                 if (personalisation.keySet().contains(var)) {

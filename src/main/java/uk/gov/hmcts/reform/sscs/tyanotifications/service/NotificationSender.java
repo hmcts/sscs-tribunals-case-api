@@ -56,7 +56,7 @@ public class NotificationSender {
         NotificationClient client;
 
         if (notificationTestRecipients.getEmails().contains(emailAddress)
-                || emailAddress.matches("test[\\d]+@hmcts.net")) {
+            || emailAddress.matches("test[\\d]+@hmcts.net")) {
             log.info(USING_TEST_GOV_NOTIFY_KEY_FOR, testNotificationClient.getApiKey(), emailAddress);
             client = testNotificationClient;
         } else {
@@ -72,7 +72,7 @@ public class NotificationSender {
         }
 
         log.info("Email Notification send for case id : {}, Gov notify id: {} ", sscsCaseData.getCcdCaseId(),
-                (sendEmailResponse != null) ? sendEmailResponse.getNotificationId() : null);
+            (sendEmailResponse != null) ? sendEmailResponse.getNotificationId() : null);
     }
 
     @Retryable
@@ -89,13 +89,13 @@ public class NotificationSender {
     }
 
     public void sendSms(
-            String templateId,
-            String phoneNumber,
-            Map<String, Object> personalisation,
-            String reference,
-            String smsSender,
-            NotificationEventType notificationEventType,
-            SscsCaseData sscsCaseData
+        String templateId,
+        String phoneNumber,
+        Map<String, Object> personalisation,
+        String reference,
+        String smsSender,
+        NotificationEventType notificationEventType,
+        SscsCaseData sscsCaseData
     ) throws NotificationClientException {
 
         NotificationClient client;
@@ -116,7 +116,7 @@ public class NotificationSender {
         }
 
         log.info("Sms Notification send for case id : {}, Gov notify id: {} ", sscsCaseData.getCcdCaseId(),
-                (sendSmsResponse != null) ? sendSmsResponse.getNotificationId() : null);
+            (sendSmsResponse != null) ? sendSmsResponse.getNotificationId() : null);
     }
 
     @Retryable
@@ -124,11 +124,11 @@ public class NotificationSender {
         final SendSmsResponse sendSmsResponse;
         try {
             sendSmsResponse = client.sendSms(
-                    templateId,
-                    phoneNumber,
-                    personalisation,
-                    reference,
-                    smsSender
+                templateId,
+                phoneNumber,
+                personalisation,
+                reference,
+                smsSender
             );
         } catch (NotificationClientException e) {
             throw e;
@@ -208,29 +208,29 @@ public class NotificationSender {
 
     private Correspondence getEmailCorrespondence(final SendEmailResponse sendEmailResponse, final String emailAddress, final NotificationEventType notificationEventType) {
         return Correspondence.builder().value(
-                CorrespondenceDetails.builder()
-                        .body(markdownTransformationService.toHtml(sendEmailResponse.getBody()))
-                        .subject(sendEmailResponse.getSubject())
-                        .from(sendEmailResponse.getFromEmail().orElse(""))
-                        .to(emailAddress)
-                        .eventType(notificationEventType.getId())
-                        .correspondenceType(CorrespondenceType.Email)
-                        .sentOn(LocalDateTime.now(ZONE_ID_LONDON).format(DATE_TIME_FORMATTER))
-                        .build()
+            CorrespondenceDetails.builder()
+                .body(markdownTransformationService.toHtml(sendEmailResponse.getBody()))
+                .subject(sendEmailResponse.getSubject())
+                .from(sendEmailResponse.getFromEmail().orElse(""))
+                .to(emailAddress)
+                .eventType(notificationEventType.getId())
+                .correspondenceType(CorrespondenceType.Email)
+                .sentOn(LocalDateTime.now(ZONE_ID_LONDON).format(DATE_TIME_FORMATTER))
+                .build()
         ).build();
     }
 
     private Correspondence getSmsCorrespondence(final SendSmsResponse sendSmsResponse, final String phoneNumber, final NotificationEventType notificationEventType) {
         return Correspondence.builder().value(
-                CorrespondenceDetails.builder()
-                        .body(markdownTransformationService.toHtml(sendSmsResponse.getBody()))
-                        .subject("SMS correspondence")
-                        .from(sendSmsResponse.getFromNumber().orElse(""))
-                        .to(phoneNumber)
-                        .eventType(notificationEventType.getId())
-                        .correspondenceType(CorrespondenceType.Sms)
-                        .sentOn(LocalDateTime.now(ZONE_ID_LONDON).format(DATE_TIME_FORMATTER))
-                        .build()
+            CorrespondenceDetails.builder()
+                .body(markdownTransformationService.toHtml(sendSmsResponse.getBody()))
+                .subject("SMS correspondence")
+                .from(sendSmsResponse.getFromNumber().orElse(""))
+                .to(phoneNumber)
+                .eventType(notificationEventType.getId())
+                .correspondenceType(CorrespondenceType.Sms)
+                .sentOn(LocalDateTime.now(ZONE_ID_LONDON).format(DATE_TIME_FORMATTER))
+                .build()
         ).build();
     }
 
@@ -240,13 +240,13 @@ public class NotificationSender {
 
     private Correspondence getLetterCorrespondence(NotificationEventType notificationEventType, String name, ReasonableAdjustmentStatus status) {
         return Correspondence.builder().value(
-                CorrespondenceDetails.builder()
-                        .eventType(notificationEventType.getId())
-                        .to(name)
-                        .correspondenceType(CorrespondenceType.Letter)
-                        .sentOn(LocalDateTime.now(ZONE_ID_LONDON).format(DATE_TIME_FORMATTER))
-                        .reasonableAdjustmentStatus(status)
-                        .build()
+            CorrespondenceDetails.builder()
+                .eventType(notificationEventType.getId())
+                .to(name)
+                .correspondenceType(CorrespondenceType.Letter)
+                .sentOn(LocalDateTime.now(ZONE_ID_LONDON).format(DATE_TIME_FORMATTER))
+                .reasonableAdjustmentStatus(status)
+                .build()
         ).build();
     }
 

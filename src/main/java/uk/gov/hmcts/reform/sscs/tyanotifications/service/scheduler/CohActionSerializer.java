@@ -16,7 +16,7 @@ public class CohActionSerializer implements JobPayloadSerializer<CohJobPayload> 
             return objectMapper.writeValueAsString(payload);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Cannot serialize CohJobPayload for case id "
-                    + "[" + payload.getCaseId() + "] online hearing id [" + payload.getOnlineHearingId() + "]");
+                + "[" + payload.getCaseId() + "] online hearing id [" + payload.getOnlineHearingId() + "]");
         }
     }
 }

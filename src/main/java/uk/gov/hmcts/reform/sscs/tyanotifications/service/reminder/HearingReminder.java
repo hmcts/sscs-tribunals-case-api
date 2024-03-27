@@ -12,11 +12,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.jobscheduler.model.Job;
+import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobScheduler;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
-import uk.gov.hmcts.reform.sscs.jobscheduler.model.Job;
-import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobScheduler;
 
 @Component
 public class HearingReminder implements ReminderHandler {
@@ -50,7 +50,7 @@ public class HearingReminder implements ReminderHandler {
 
     private boolean isAllowedForHearingType(AppealHearingType hearingType) {
         return ((AppealHearingType.PAPER.equals(hearingType) && HEARING_REMINDER.isSendForPaperCase())
-                || (AppealHearingType.ORAL.equals(hearingType) && HEARING_REMINDER.isSendForOralCase()));
+            || (AppealHearingType.ORAL.equals(hearingType) && HEARING_REMINDER.isSendForOralCase()));
     }
 
     public boolean canSchedule(NotificationWrapper wrapper) {
@@ -59,7 +59,7 @@ public class HearingReminder implements ReminderHandler {
             isReminderDatePresent = calculateReminderDate(wrapper.getNewSscsCaseData(), beforeFirstHearingReminder) != null;
         } catch (Exception e) {
             LOG.error("Error while calculating reminder date for case id {} with exception {}",
-                    wrapper.getNewSscsCaseData().getCcdCaseId(), e);
+                wrapper.getNewSscsCaseData().getCcdCaseId(), e);
         }
         if (!isReminderDatePresent) {
             LOG.info("Could not find reminder date for case id {}", wrapper.getNewSscsCaseData().getCcdCaseId());
@@ -85,10 +85,10 @@ public class HearingReminder implements ReminderHandler {
 
         if (reminderDate != null) {
             jobScheduler.schedule(new Job<>(
-                    jobGroup,
-                    eventId,
-                    caseId,
-                    reminderDate
+                jobGroup,
+                eventId,
+                caseId,
+                reminderDate
             ));
 
 

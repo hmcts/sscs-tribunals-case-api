@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface CohClient {
     @GetMapping(value = "/continuous-online-hearings/{onlineHearingId}/questionrounds")
     QuestionRounds getQuestionRounds(
-            @RequestHeader(AUTHORIZATION) String authorisation,
-            @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
-            @PathVariable("onlineHearingId") String onlineHearingId
+        @RequestHeader(AUTHORIZATION) String authorisation,
+        @RequestHeader(SERVICE_AUTHORIZATION) String serviceAuthorization,
+        @PathVariable("onlineHearingId") String onlineHearingId
     );
 
 }

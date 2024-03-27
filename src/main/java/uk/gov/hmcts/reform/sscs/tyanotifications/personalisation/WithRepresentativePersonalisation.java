@@ -28,7 +28,7 @@ public class WithRepresentativePersonalisation extends Personalisation<CcdNotifi
     public Map<String, Object> setRepresentativeName(Map<String, Object> personalisation, SscsCaseData sscsCaseData) {
         if (NotificationUtils.hasRepresentative(sscsCaseData.getAppeal())) {
             personalisation.put(REPRESENTATIVE_NAME,
-                    SendNotificationHelper.getRepSalutation(sscsCaseData.getAppeal().getRep(), true));
+                SendNotificationHelper.getRepSalutation(sscsCaseData.getAppeal().getRep(), true));
         }
         overrideRepNameIfNotificationIsForAnOtherParty(personalisation);
 

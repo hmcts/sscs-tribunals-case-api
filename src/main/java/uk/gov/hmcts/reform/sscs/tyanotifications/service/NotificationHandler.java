@@ -5,12 +5,12 @@ import java.time.ZonedDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.jobscheduler.model.Job;
+import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobScheduler;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRuntimeException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
-import uk.gov.hmcts.reform.sscs.jobscheduler.model.Job;
-import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobScheduler;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder.JobGroupGenerator;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -55,10 +55,10 @@ public class NotificationHandler {
         log.info("Scheduled retry {} - {} for case id: {} @ {}", retry, eventId, caseId, dateTime);
 
         jobScheduler.schedule(new Job<>(
-                jobGroup,
-                eventId,
-                wrapper.getSchedulerPayload() + "," + retry,
-                dateTime
+            jobGroup,
+            eventId,
+            wrapper.getSchedulerPayload() + "," + retry,
+            dateTime
         ));
     }
 
@@ -69,10 +69,10 @@ public class NotificationHandler {
         log.info("Scheduled {} for case id: {} @ {}", eventId, caseId, dateTime);
 
         jobScheduler.schedule(new Job<>(
-                jobGroup,
-                eventId,
-                wrapper.getSchedulerPayload(),
-                dateTime
+            jobGroup,
+            eventId,
+            wrapper.getSchedulerPayload(),
+            dateTime
         ));
     }
 

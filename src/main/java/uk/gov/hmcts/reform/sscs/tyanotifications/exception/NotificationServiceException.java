@@ -14,7 +14,7 @@ public class NotificationServiceException extends RuntimeException {
     public NotificationServiceException(String caseId, Exception ex) {
         super(format("Exception thrown for case [%s]", caseId), ex);
         if (ex.getClass().isAssignableFrom(NotificationClientException.class)) {
-            govNotifyErrorCode = String.valueOf(((NotificationClientException)ex).getHttpResult());
+            govNotifyErrorCode = String.valueOf(((NotificationClientException) ex).getHttpResult());
         }
     }
 

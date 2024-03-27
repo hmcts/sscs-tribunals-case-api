@@ -7,21 +7,21 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobNotFoundException;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobRemover;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 
 @Component
 @Slf4j
 public class AllReminderRemover implements ReminderHandler {
 
     private static final List<NotificationEventType> NOTIFICATION_EVENT_TYPES =
-            Arrays.asList(APPEAL_LAPSED, HMCTS_APPEAL_LAPSED, DWP_APPEAL_LAPSED, APPEAL_WITHDRAWN,
-                    ADMIN_APPEAL_WITHDRAWN, APPEAL_DORMANT, DECISION_ISSUED, ISSUE_FINAL_DECISION);
+        Arrays.asList(APPEAL_LAPSED, HMCTS_APPEAL_LAPSED, DWP_APPEAL_LAPSED, APPEAL_WITHDRAWN,
+            ADMIN_APPEAL_WITHDRAWN, APPEAL_DORMANT, DECISION_ISSUED, ISSUE_FINAL_DECISION);
 
     private static final List<NotificationEventType> REMINDERS_TO_REMOVE =
-            Arrays.asList(HEARING_REMINDER, EVIDENCE_RECEIVED);
+        Arrays.asList(HEARING_REMINDER, EVIDENCE_RECEIVED);
     private final JobGroupGenerator jobGroupGenerator;
     private final JobRemover jobRemover;
 
@@ -48,7 +48,7 @@ public class AllReminderRemover implements ReminderHandler {
         }
 
         String caseId = wrapper.getCaseId();
-        for (NotificationEventType eventType: REMINDERS_TO_REMOVE) {
+        for (NotificationEventType eventType : REMINDERS_TO_REMOVE) {
             removeReminder(caseId, eventType);
         }
     }

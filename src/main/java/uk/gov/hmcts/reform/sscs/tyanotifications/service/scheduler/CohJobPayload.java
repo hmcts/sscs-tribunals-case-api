@@ -14,7 +14,7 @@ public class CohJobPayload {
     private long caseId;
     private String onlineHearingId;
 
-    public CohJobPayload(@JsonProperty("case_id")long caseId, @JsonProperty("online_hearing_id")String onlineHearingId) {
+    public CohJobPayload(@JsonProperty("case_id") long caseId, @JsonProperty("online_hearing_id") String onlineHearingId) {
         this.caseId = caseId;
         this.onlineHearingId = onlineHearingId;
     }

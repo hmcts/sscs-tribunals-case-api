@@ -118,9 +118,9 @@ public class NotificationConfig {
         }
         return Template.builder()
             .emailTemplateId(getTemplateId(appealHearingType, hearingRoute, emailTemplateName, "emailId", languagePreference))
-            .smsTemplateId(getSmsTemplates(appealHearingType, hearingRoute, smsTemplateName, "smsId",languagePreference))
+            .smsTemplateId(getSmsTemplates(appealHearingType, hearingRoute, smsTemplateName, "smsId", languagePreference))
             .smsSenderTemplateId(benefit == null ? "" : env.getProperty("smsSender." + benefit.toString().toLowerCase(Locale.ENGLISH)))
-            .letterTemplateId(getTemplateId(appealHearingType, hearingRoute, letterTemplateName, "letterId",languagePreference))
+            .letterTemplateId(getTemplateId(appealHearingType, hearingRoute, letterTemplateName, "letterId", languagePreference))
             .docmosisTemplateId(docmosisTemplateId)
             .build();
     }

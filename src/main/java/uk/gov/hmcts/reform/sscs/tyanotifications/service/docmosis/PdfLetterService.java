@@ -39,7 +39,7 @@ public class PdfLetterService {
     protected static final String GENERATED_DATE_LITERAL = "generated_date";
     protected static final String WELSH_GENERATED_DATE_LITERAL = "welsh_generated_date";
     private static final List<NotificationEventType> REQUIRES_TWO_COVERSHEET =
-            Collections.singletonList(APPEAL_RECEIVED);
+        Collections.singletonList(APPEAL_RECEIVED);
 
     private final DocmosisPdfService docmosisPdfService;
     private final DocmosisTemplatesConfig docmosisTemplatesConfig;
@@ -56,14 +56,14 @@ public class PdfLetterService {
         try {
             byte[] coversheet = generateCoversheet(wrapper, subscriptionWithType);
             if (REQUIRES_TWO_COVERSHEET.contains(wrapper.getNotificationType())
-                    && ArrayUtils.isNotEmpty(coversheet)) {
+                && ArrayUtils.isNotEmpty(coversheet)) {
                 return buildBundledLetter(addBlankPageAtTheEndIfOddPage(coversheet), coversheet);
             }
             return coversheet;
         } catch (IOException e) {
             String message = String.format("Cannot '%s' generate evidence coversheet to %s.",
-                    wrapper.getNotificationType().getId(),
-                    subscriptionWithType.getSubscriptionType().name());
+                wrapper.getNotificationType().getId(),
+                subscriptionWithType.getSubscriptionType().name());
             log.error(message, e);
             throw new NotificationClientRuntimeException(message);
         }
@@ -73,25 +73,25 @@ public class PdfLetterService {
         Address addressToUse = getAddressToUseForLetter(wrapper, subscriptionWithType);
         String name = getNameToUseForLetter(wrapper, subscriptionWithType);
         PdfCoverSheet pdfCoverSheet = new PdfCoverSheet(
-                wrapper.getCaseId(),
-                name,
-                addressToUse.getLine1(),
-                addressToUse.getLine2(),
-                addressToUse.getTown(),
-                addressToUse.getCounty(),
-                addressToUse.getPostcode(),
-                evidenceProperties.getAddress().getLine2(),
-                evidenceProperties.getAddress().getLine3(wrapper.getNewSscsCaseData()),
-                evidenceProperties.getAddress().getTown(),
-                evidenceProperties.getAddress().getPostcode(wrapper.getNewSscsCaseData()),
-                docmosisTemplatesConfig.getHmctsImgVal(),
-                docmosisTemplatesConfig.getHmctsWelshImgVal());
+            wrapper.getCaseId(),
+            name,
+            addressToUse.getLine1(),
+            addressToUse.getLine2(),
+            addressToUse.getTown(),
+            addressToUse.getCounty(),
+            addressToUse.getPostcode(),
+            evidenceProperties.getAddress().getLine2(),
+            evidenceProperties.getAddress().getLine3(wrapper.getNewSscsCaseData()),
+            evidenceProperties.getAddress().getTown(),
+            evidenceProperties.getAddress().getPostcode(wrapper.getNewSscsCaseData()),
+            docmosisTemplatesConfig.getHmctsImgVal(),
+            docmosisTemplatesConfig.getHmctsWelshImgVal());
 
         LanguagePreference languagePreference =
-                wrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getLanguagePreference();
+            wrapper.getSscsCaseDataWrapper().getNewSscsCaseData().getLanguagePreference();
 
         String templatePath = docmosisTemplatesConfig.getCoversheets().get(languagePreference)
-                .get(wrapper.getNotificationType().getId());
+            .get(wrapper.getNotificationType().getId());
         if (StringUtils.isBlank(templatePath)) {
             log.info("There is no template for notificationType " + wrapper.getNotificationType().getId());
             return null;
@@ -119,7 +119,7 @@ public class PdfLetterService {
 
             if (wrapper.getNewSscsCaseData().isLanguagePreferenceWelsh()) {
                 placeholders.put(docmosisTemplatesConfig.getHmctsWelshImgKey(),
-                        docmosisTemplatesConfig.getHmctsWelshImgVal());
+                    docmosisTemplatesConfig.getHmctsWelshImgVal());
                 placeholders.put(WELSH_GENERATED_DATE_LITERAL, LocalDateToWelshStringConverter.convert(LocalDate.now()));
             }
             return docmosisPdfService.createPdfFromMap(placeholders, notification.getDocmosisLetterTemplate());
@@ -149,8 +149,8 @@ public class PdfLetterService {
 
     private static String[] lines(Address address) {
         return Stream.of(address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode())
-                .filter(x -> x != null)
-                .toArray(String[]::new);
+            .filter(x -> x != null)
+            .toArray(String[]::new);
     }
 
     private static String defaultToEmptyStringIfNull(String value) {
@@ -158,7 +158,7 @@ public class PdfLetterService {
     }
 
     private static String truncateAddressLine(String addressLine) {
-        return addressLine != null && addressLine.length() > 45  ? addressLine.substring(0, 45) : addressLine;
+        return addressLine != null && addressLine.length() > 45 ? addressLine.substring(0, 45) : addressLine;
     }
 
 }

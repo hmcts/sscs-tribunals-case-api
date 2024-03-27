@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler;
 
 import static org.slf4j.LoggerFactory.getLogger;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.getNotificationByEvent;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.buildSscsCaseDataWrapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,12 +16,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
-import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobExecutor;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
+import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationService;
 
@@ -63,10 +63,10 @@ public abstract class BaseActionExecutor<T> implements JobExecutor<T> {
                 Callback<SscsCaseData> callback = deserializer.deserialize(buildCcdNode(caseDetails, eventId));
 
                 SscsCaseDataWrapper wrapper = buildSscsCaseDataWrapper(
-                        callback.getCaseDetails().getCaseData(),
-                        null,
-                        getNotificationByEvent(eventId),
-                        callback.getCaseDetails().getState());
+                    callback.getCaseDetails().getCaseData(),
+                    null,
+                    getNotificationByEvent(eventId),
+                    callback.getCaseDetails().getState());
 
                 NotificationWrapper notificationWrapper = getWrapper(wrapper, payload);
 
@@ -90,6 +90,7 @@ public abstract class BaseActionExecutor<T> implements JobExecutor<T> {
 
     private String buildCcdNode(SscsCaseDetails caseDetails, String jobName) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         JsonNode jsonNode = mapper.valueToTree(caseDetails);
         ObjectNode node2 = (ObjectNode) jsonNode;
         ObjectNode node = JsonNodeFactory.instance.objectNode();

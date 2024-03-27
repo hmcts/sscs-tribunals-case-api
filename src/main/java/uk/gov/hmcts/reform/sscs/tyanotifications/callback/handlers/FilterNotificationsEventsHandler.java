@@ -69,32 +69,32 @@ public class FilterNotificationsEventsHandler implements CallbackHandler {
 
     private boolean shouldActionPostponementBeNotified(SscsCaseDataWrapper callback) {
         return ACTION_POSTPONEMENT_REQUEST.equals(callback.getNotificationEventType())
-                && !ProcessRequestAction.SEND_TO_JUDGE.getValue().equals(
-                callback.getOldSscsCaseData().getPostponementRequest().getActionPostponementRequestSelected());
+            && !ProcessRequestAction.SEND_TO_JUDGE.getValue().equals(
+            callback.getOldSscsCaseData().getPostponementRequest().getActionPostponementRequestSelected());
     }
 
     private boolean hasNewAppointeeAddedForAppellantDeceasedCase(SscsCaseDataWrapper callback) {
         if (!(DEATH_OF_APPELLANT.equals(callback.getNotificationEventType())
-                || PROVIDE_APPOINTEE_DETAILS.equals(callback.getNotificationEventType()))) {
+            || PROVIDE_APPOINTEE_DETAILS.equals(callback.getNotificationEventType()))) {
             return false;
         }
 
         Appointee appointeeBefore = null;
         if (callback.getOldSscsCaseData() != null
-                && "yes".equalsIgnoreCase(callback.getOldSscsCaseData().getAppeal().getAppellant().getIsAppointee())
-                && callback.getOldSscsCaseData().getAppeal().getAppellant().getAppointee() != null) {
+            && "yes".equalsIgnoreCase(callback.getOldSscsCaseData().getAppeal().getAppellant().getIsAppointee())
+            && callback.getOldSscsCaseData().getAppeal().getAppellant().getAppointee() != null) {
             appointeeBefore = callback.getOldSscsCaseData().getAppeal().getAppellant().getAppointee();
         }
 
         Appointee appointeeAfter = null;
         if ("yes".equalsIgnoreCase(callback.getNewSscsCaseData().getAppeal().getAppellant().getIsAppointee())
-                && callback.getNewSscsCaseData().getAppeal().getAppellant().getAppointee() != null) {
+            && callback.getNewSscsCaseData().getAppeal().getAppellant().getAppointee() != null) {
             appointeeAfter = callback.getNewSscsCaseData().getAppeal().getAppellant().getAppointee();
         }
 
 
         return ((appointeeBefore == null && appointeeAfter != null)
-                || (appointeeBefore != null && appointeeAfter != null && !appointeeBefore.equals(appointeeAfter)));
+            || (appointeeBefore != null && appointeeAfter != null && !appointeeBefore.equals(appointeeAfter)));
     }
 
     private boolean shouldHandleForHearingRoute(SscsCaseDataWrapper callback) {

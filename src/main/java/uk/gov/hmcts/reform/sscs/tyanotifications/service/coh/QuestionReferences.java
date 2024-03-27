@@ -11,7 +11,7 @@ import lombok.Data;
 public class QuestionReferences {
     private String deadlineExpiryDate;
 
-    public QuestionReferences(@JsonProperty(value = "deadline_expiry_date")String deadlineExpiryDate) {
+    public QuestionReferences(@JsonProperty(value = "deadline_expiry_date") String deadlineExpiryDate) {
         this.deadlineExpiryDate = deadlineExpiryDate;
     }
 }

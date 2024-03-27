@@ -105,7 +105,7 @@ public final class NotificationEventTypeLists {
         LIBERTY_TO_APPLY_REFUSED,
         SET_ASIDE_REFUSED,
         SOR_REFUSED
-        );
+    );
 
     public static final Set<NotificationEventType> EVENT_TYPES_NOT_FOR_WELSH_CASES = EnumSet.of(
         ACTION_POSTPONEMENT_REQUEST,

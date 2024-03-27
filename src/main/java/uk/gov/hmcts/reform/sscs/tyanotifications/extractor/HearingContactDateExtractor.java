@@ -21,10 +21,10 @@ public class HearingContactDateExtractor {
 
     @Autowired
     HearingContactDateExtractor(
-            DwpResponseReceivedDateExtractor dwpResponseReceivedDateExtractor,
-            @Value("${reminder.hearingContactDate.initialDelay.seconds}") long initialDelay,
-            @Value("${reminder.hearingContactDate.subsequentDelay.seconds}") long subsequentDelay,
-            @Value("${reminder.paperCases.decisionDate.initialDelay.seconds}") long paperCaseDecisionDateInitialDelay) {
+        DwpResponseReceivedDateExtractor dwpResponseReceivedDateExtractor,
+        @Value("${reminder.hearingContactDate.initialDelay.seconds}") long initialDelay,
+        @Value("${reminder.hearingContactDate.subsequentDelay.seconds}") long subsequentDelay,
+        @Value("${reminder.paperCases.decisionDate.initialDelay.seconds}") long paperCaseDecisionDateInitialDelay) {
         this.dwpResponseReceivedDateExtractor = dwpResponseReceivedDateExtractor;
         this.initialDelay = initialDelay;
         this.subsequentDelay = subsequentDelay;
@@ -58,7 +58,7 @@ public class HearingContactDateExtractor {
         Optional<ZonedDateTime> optionalDwpResponseReceivedDate = dwpResponseReceivedDateExtractor.extract(sscsCaseData);
 
         return optionalDwpResponseReceivedDate
-                .map(dwpResponseReceivedDate -> dwpResponseReceivedDate.plusSeconds(delay));
+            .map(dwpResponseReceivedDate -> dwpResponseReceivedDate.plusSeconds(delay));
     }
 
     private long getDwpResponseReceivedNotificationDelay(SscsCaseData sscsCaseData) {

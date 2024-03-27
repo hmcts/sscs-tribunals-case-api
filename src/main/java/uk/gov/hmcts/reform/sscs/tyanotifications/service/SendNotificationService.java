@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
@@ -38,7 +39,6 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notification;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
-import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -58,11 +58,11 @@ public class SendNotificationService {
 
     @Autowired
     public SendNotificationService(
-            NotificationSender notificationSender,
-            NotificationHandler notificationHandler,
-            NotificationValidService notificationValidService,
-            PdfLetterService pdfLetterService,
-            PdfStoreService pdfStoreService
+        NotificationSender notificationSender,
+        NotificationHandler notificationHandler,
+        NotificationValidService notificationValidService,
+        PdfLetterService pdfLetterService,
+        PdfStoreService pdfStoreService
     ) {
         this.notificationSender = notificationSender;
         this.notificationHandler = notificationHandler;
@@ -72,10 +72,10 @@ public class SendNotificationService {
     }
 
     boolean sendEmailSmsLetterNotification(
-            NotificationWrapper wrapper,
-            Notification notification,
-            SubscriptionWithType subscriptionWithType,
-            NotificationEventType eventType) {
+        NotificationWrapper wrapper,
+        Notification notification,
+        SubscriptionWithType subscriptionWithType,
+        NotificationEventType eventType) {
         boolean emailSent = sendEmailNotification(wrapper, subscriptionWithType.getSubscription(), notification);
         notificationSuccessLog(wrapper, "Email", notification, notification.getEmailTemplate(), emailSent);
 
@@ -152,22 +152,22 @@ public class SendNotificationService {
     private boolean sendSmsNotification(NotificationWrapper wrapper, Subscription subscription, Notification notification, NotificationEventType eventType) {
         if (isOkToSendSmsNotification(wrapper, subscription, notification, eventType, notificationValidService)) {
             return Optional.ofNullable(notification.getSmsTemplate()).map(Collection::stream).orElseGet(Stream::empty)
-                    .map(smsTemplateId -> sendSmsNotification(wrapper, notification, smsTemplateId)).reduce((previous, current) -> previous && current).orElse(false);
+                .map(smsTemplateId -> sendSmsNotification(wrapper, notification, smsTemplateId)).reduce((previous, current) -> previous && current).orElse(false);
         }
         return false;
     }
 
     private boolean sendSmsNotification(NotificationWrapper wrapper, Notification notification, String smsTemplateId) {
         NotificationHandler.SendNotification sendNotification = () ->
-                notificationSender.sendSms(
-                        smsTemplateId,
-                        notification.getMobile(),
-                        notification.getPlaceholders(),
-                        notification.getReference(),
-                        notification.getSmsSenderTemplate(),
-                        wrapper.getNotificationType(),
-                        wrapper.getNewSscsCaseData()
-                );
+            notificationSender.sendSms(
+                smsTemplateId,
+                notification.getMobile(),
+                notification.getPlaceholders(),
+                notification.getReference(),
+                notification.getSmsSenderTemplate(),
+                wrapper.getNotificationType(),
+                wrapper.getNewSscsCaseData()
+            );
         log.info("In sendSmsNotification method notificationSender is available {} ", notificationSender != null);
 
         notificationLog(notification, "sms", notification.getMobile(), wrapper);
@@ -179,14 +179,14 @@ public class SendNotificationService {
         if (isOkToSendEmailNotification(wrapper, subscription, notification, notificationValidService)) {
 
             NotificationHandler.SendNotification sendNotification = () ->
-                    notificationSender.sendEmail(
-                            notification.getEmailTemplate(),
-                            notification.getEmail(),
-                            notification.getPlaceholders(),
-                            notification.getReference(),
-                            wrapper.getNotificationType(),
-                            wrapper.getNewSscsCaseData()
-                    );
+                notificationSender.sendEmail(
+                    notification.getEmailTemplate(),
+                    notification.getEmail(),
+                    notification.getPlaceholders(),
+                    notification.getReference(),
+                    wrapper.getNotificationType(),
+                    wrapper.getNewSscsCaseData()
+                );
 
             log.info("In sendEmailNotification method notificationSender is available {} ", notificationSender != null);
 
@@ -216,7 +216,7 @@ public class SendNotificationService {
                 return sendBundledAndDocmosisLetterNotification(wrapper, notification, getNameToUseForLetter(wrapper, subscriptionWithType), subscriptionWithType);
             } else if (hasLetterTemplate(notification)) {
                 NotificationHandler.SendNotification sendNotification = () ->
-                        sendLetterNotificationToAddress(wrapper, notification, addressToUse, subscriptionWithType);
+                    sendLetterNotificationToAddress(wrapper, notification, addressToUse, subscriptionWithType);
 
                 return notificationHandler.sendNotification(wrapper, notification.getLetterTemplate(), NOTIFICATION_TYPE_LETTER, sendNotification);
             }
@@ -254,20 +254,20 @@ public class SendNotificationService {
             notificationLog(notification, "GovNotify letter", addressToUse.getPostcode(), wrapper);
 
             notificationSender.sendLetter(
-                    notification.getLetterTemplate(),
-                    addressToUse,
-                    notification.getPlaceholders(),
-                    wrapper.getNotificationType(),
-                    fullNameNoTitle,
-                    wrapper.getCaseId()
+                notification.getLetterTemplate(),
+                addressToUse,
+                notification.getPlaceholders(),
+                wrapper.getNotificationType(),
+                fullNameNoTitle,
+                wrapper.getCaseId()
             );
         }
     }
 
     private static boolean isValidLetterAddress(Address addressToUse) {
         return null != addressToUse
-                && isNotBlank(addressToUse.getLine1())
-                && isNotBlank(addressToUse.getPostcode());
+            && isNotBlank(addressToUse.getLine1())
+            && isNotBlank(addressToUse.getPostcode());
     }
 
     private boolean sendBundledAndDocmosisLetterNotification(NotificationWrapper wrapper, Notification notification, String nameToUse, SubscriptionWithType subscriptionWithType) {
@@ -288,17 +288,17 @@ public class SendNotificationService {
 
                 boolean alternativeLetterFormat = isAlternativeLetterFormatRequired(wrapper, subscriptionWithType);
                 NotificationHandler.SendNotification sendNotification = alternativeLetterFormat
-                        ? () -> notificationSender.saveLettersToReasonableAdjustment(bundledLetter,
-                        wrapper.getNotificationType(),
-                        nameToUse,
-                        wrapper.getCaseId(),
-                        subscriptionWithType.getSubscriptionType())
-                        : () -> notificationSender.sendBundledLetter(
-                        wrapper.getNewSscsCaseData().getAppeal().getAppellant().getAddress().getPostcode(),   // Used for whitelisting only
-                        bundledLetter,
-                        wrapper.getNotificationType(),
-                        nameToUse,
-                        wrapper.getCaseId());
+                    ? () -> notificationSender.saveLettersToReasonableAdjustment(bundledLetter,
+                    wrapper.getNotificationType(),
+                    nameToUse,
+                    wrapper.getCaseId(),
+                    subscriptionWithType.getSubscriptionType())
+                    : () -> notificationSender.sendBundledLetter(
+                    wrapper.getNewSscsCaseData().getAppeal().getAppellant().getAddress().getPostcode(),   // Used for whitelisting only
+                    bundledLetter,
+                    wrapper.getNotificationType(),
+                    nameToUse,
+                    wrapper.getCaseId());
 
                 log.info("In sendBundledAndDocmosisLetterNotification method notificationSender is available {} ", notificationSender != null);
 

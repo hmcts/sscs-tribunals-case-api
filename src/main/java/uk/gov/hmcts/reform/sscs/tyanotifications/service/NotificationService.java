@@ -47,14 +47,14 @@ public class NotificationService {
     @SuppressWarnings("squid:S107")
     @Autowired
     public NotificationService(
-            NotificationFactory notificationFactory,
-            ReminderService reminderService,
-            NotificationValidService notificationValidService,
-            NotificationHandler notificationHandler,
-            OutOfHoursCalculator outOfHoursCalculator,
-            NotificationConfig notificationConfig,
-            SendNotificationService sendNotificationService,
-            @Value("${feature.covid19}") boolean covid19Feature) {
+        NotificationFactory notificationFactory,
+        ReminderService reminderService,
+        NotificationValidService notificationValidService,
+        NotificationHandler notificationHandler,
+        OutOfHoursCalculator outOfHoursCalculator,
+        NotificationConfig notificationConfig,
+        SendNotificationService sendNotificationService,
+        @Value("${feature.covid19}") boolean covid19Feature) {
 
         this.notificationFactory = notificationFactory;
         this.reminderService = reminderService;
@@ -83,8 +83,8 @@ public class NotificationService {
 
         if (notificationType.isAllowOutOfHours() || !outOfHoursCalculator.isItOutOfHours()) {
             if (notificationType.isToBeDelayed()
-                    && !fromReminderService
-                    && !functionalTest(notificationWrapper.getNewSscsCaseData())) {
+                && !fromReminderService
+                && !functionalTest(notificationWrapper.getNewSscsCaseData())) {
                 log.info("Notification event {} is delayed and scheduled for case id {}", notificationType.getId(), caseId);
                 notificationHandler.scheduleNotification(notificationWrapper, ZonedDateTime.now().plusSeconds(notificationType.getDelayInSeconds()));
             } else {
@@ -134,12 +134,12 @@ public class NotificationService {
 
         for (SubscriptionWithType subscriptionWithType : notificationWrapper.getSubscriptionsBasedOnNotificationType()) {
             if (isSubscriptionValidToSendAfterOverride(notificationWrapper, subscriptionWithType)
-                    && isValidNotification(notificationWrapper, subscriptionWithType)) {
+                && isValidNotification(notificationWrapper, subscriptionWithType)) {
                 sendNotification(notificationWrapper, subscriptionWithType);
                 resendLastNotification(notificationWrapper, subscriptionWithType);
             } else {
                 log.error("Is not a valid notification event {} for case id {}, not sending notification.",
-                        notificationWrapper.getNotificationType().getId(), notificationWrapper.getCaseId());
+                    notificationWrapper.getNotificationType().getId(), notificationWrapper.getCaseId());
             }
         }
     }
@@ -147,7 +147,7 @@ public class NotificationService {
     private void resendLastNotification(NotificationWrapper notificationWrapper, SubscriptionWithType subscriptionWithType) {
         if (subscriptionWithType.getSubscription() != null && shouldProcessLastNotification(notificationWrapper, subscriptionWithType)) {
             NotificationEventType lastEvent = NotificationEventType.getNotificationByCcdEvent(notificationWrapper.getNewSscsCaseData().getEvents().get(0)
-                    .getValue().getEventType());
+                .getValue().getEventType());
             log.info("Resending the last notification for event {} and case id {}.", lastEvent.getId(), notificationWrapper.getCaseId());
             scrubEmailAndSmsIfSubscribedBefore(notificationWrapper, subscriptionWithType);
             notificationWrapper.getSscsCaseDataWrapper().setNotificationEventType(lastEvent);
@@ -195,12 +195,12 @@ public class NotificationService {
     private static boolean isSubscriptionValidToSendAfterOverride(NotificationWrapper wrapper, SubscriptionWithType subscriptionWithType) {
         if (wrapper.hasNotificationEventBeenOverridden()) {
             if ((APPELLANT.equals(subscriptionWithType.getSubscriptionType()) || APPOINTEE.equals(subscriptionWithType.getSubscriptionType()))
-                    && !YesNo.YES.equals(wrapper.getNewSscsCaseData().getReissueArtifactUi().getResendToAppellant())) {
+                && !YesNo.YES.equals(wrapper.getNewSscsCaseData().getReissueArtifactUi().getResendToAppellant())) {
                 return false;
             }
 
             if (REPRESENTATIVE.equals(subscriptionWithType.getSubscriptionType())
-                    && !YesNo.YES.equals(wrapper.getNewSscsCaseData().getReissueArtifactUi().getResendToRepresentative())) {
+                && !YesNo.YES.equals(wrapper.getNewSscsCaseData().getReissueArtifactUi().getResendToRepresentative())) {
                 return false;
             }
 
@@ -211,10 +211,10 @@ public class NotificationService {
 
     private static boolean isResendTo(String partyId, SscsCaseData sscsCaseData) {
         return nonNull(partyId)
-                && emptyIfNull(sscsCaseData.getReissueArtifactUi().getOtherPartyOptions()).stream()
-                        .map(OtherPartyOption::getValue)
-                        .filter(otherPartyOptionDetails -> String.valueOf(partyId).equals(otherPartyOptionDetails.getOtherPartyOptionId()))
-                        .anyMatch(otherPartyOptionDetails -> isYes(otherPartyOptionDetails.getResendToOtherParty()));
+            && emptyIfNull(sscsCaseData.getReissueArtifactUi().getOtherPartyOptions()).stream()
+            .map(OtherPartyOption::getValue)
+            .filter(otherPartyOptionDetails -> String.valueOf(partyId).equals(otherPartyOptionDetails.getOtherPartyOptionId()))
+            .anyMatch(otherPartyOptionDetails -> isYes(otherPartyOptionDetails.getResendToOtherParty()));
     }
 
     private void scrubEmailAndSmsIfSubscribedBefore(NotificationWrapper notificationWrapper, SubscriptionWithType subscriptionWithType) {
@@ -227,20 +227,20 @@ public class NotificationService {
 
     private boolean shouldProcessLastNotification(NotificationWrapper notificationWrapper, SubscriptionWithType subscriptionWithType) {
         return NotificationEventType.SUBSCRIPTION_UPDATED.equals(notificationWrapper.getSscsCaseDataWrapper().getNotificationEventType())
-                && hasCaseJustSubscribed(subscriptionWithType.getSubscription(), getSubscription(notificationWrapper.getOldSscsCaseData(), subscriptionWithType.getSubscriptionType()))
-                && thereIsALastEventThatIsNotSubscriptionUpdated(notificationWrapper.getNewSscsCaseData());
+            && hasCaseJustSubscribed(subscriptionWithType.getSubscription(), getSubscription(notificationWrapper.getOldSscsCaseData(), subscriptionWithType.getSubscriptionType()))
+            && thereIsALastEventThatIsNotSubscriptionUpdated(notificationWrapper.getNewSscsCaseData());
     }
 
     static Boolean hasCaseJustSubscribed(Subscription newSubscription, Subscription oldSubscription) {
         return ((oldSubscription == null || !oldSubscription.isEmailSubscribed()) && newSubscription.isEmailSubscribed()
-                || ((oldSubscription == null || !oldSubscription.isSmsSubscribed()) && newSubscription.isSmsSubscribed()));
+            || ((oldSubscription == null || !oldSubscription.isSmsSubscribed()) && newSubscription.isSmsSubscribed()));
     }
 
     private static boolean thereIsALastEventThatIsNotSubscriptionUpdated(final SscsCaseData newSscsCaseData) {
         boolean thereIsALastEventThatIsNotSubscriptionUpdated = newSscsCaseData.getEvents() != null
-                && !newSscsCaseData.getEvents().isEmpty()
-                && newSscsCaseData.getEvents().get(0).getValue().getEventType() != null
-                && !SUBSCRIPTION_UPDATED.equals(newSscsCaseData.getEvents().get(0).getValue().getEventType());
+            && !newSscsCaseData.getEvents().isEmpty()
+            && newSscsCaseData.getEvents().get(0).getValue().getEventType() != null
+            && !SUBSCRIPTION_UPDATED.equals(newSscsCaseData.getEvents().get(0).getValue().getEventType());
         if (!thereIsALastEventThatIsNotSubscriptionUpdated) {
             log.info("Not re-sending the last subscription as there is no last event for ccdCaseId {}.", newSscsCaseData.getCcdCaseId());
         }
@@ -257,10 +257,10 @@ public class NotificationService {
         Subscription subscription = subscriptionWithType.getSubscription();
 
         return (isMandatoryLetterEventType(wrapper.getNotificationType())
-                || isOkToSendNotification(wrapper, wrapper.getNotificationType(), subscription, notificationValidService));
+            || isOkToSendNotification(wrapper, wrapper.getNotificationType(), subscription, notificationValidService));
     }
 
-    private void  processOldSubscriptionNotifications(NotificationWrapper wrapper, Notification notification, SubscriptionWithType subscriptionWithType, NotificationEventType eventType) {
+    private void processOldSubscriptionNotifications(NotificationWrapper wrapper, Notification notification, SubscriptionWithType subscriptionWithType, NotificationEventType eventType) {
         if (wrapper.getNotificationType() == NotificationEventType.SUBSCRIPTION_UPDATED) {
             Subscription newSubscription;
             Subscription oldSubscription;
@@ -279,20 +279,20 @@ public class NotificationService {
             String smsNumber = getSubscriptionDetails(newSubscription.getMobile(), oldSubscription.getMobile());
 
             Destination destination = Destination.builder().email(emailAddress)
-                    .sms(PhoneNumbersUtil.cleanPhoneNumber(smsNumber).orElse(smsNumber)).build();
+                .sms(PhoneNumbersUtil.cleanPhoneNumber(smsNumber).orElse(smsNumber)).build();
 
             Benefit benefit = getBenefitByCodeOrThrowException(wrapper.getSscsCaseDataWrapper()
-                    .getNewSscsCaseData().getAppeal().getBenefitType().getCode());
+                .getNewSscsCaseData().getAppeal().getBenefitType().getCode());
 
             Template template = notificationConfig.getTemplate(
                 SUBSCRIPTION_OLD_ID, SUBSCRIPTION_OLD_ID, SUBSCRIPTION_OLD_ID, SUBSCRIPTION_OLD_ID,
                 benefit, wrapper, "validAppeal");
 
             Notification oldNotification = Notification.builder().template(template).appealNumber(notification.getAppealNumber())
-                    .destination(destination)
-                    .reference(new Reference(wrapper.getOldSscsCaseData().getCaseReference()))
-                    .appealNumber(notification.getAppealNumber())
-                    .placeholders(notification.getPlaceholders()).build();
+                .destination(destination)
+                .reference(new Reference(wrapper.getOldSscsCaseData().getCaseReference()))
+                .appealNumber(notification.getAppealNumber())
+                .placeholders(notification.getPlaceholders()).build();
 
             SubscriptionWithType updatedSubscriptionWithType = new SubscriptionWithType(oldSubscription,
                 subscriptionWithType.getSubscriptionType(), subscriptionWithType.getParty(), subscriptionWithType.getEntity());
@@ -314,7 +314,7 @@ public class NotificationService {
         List<String> originalSenders = Arrays.asList("dwp", "hmcts");
         if (EVENTS_FOR_ACTION_FURTHER_EVIDENCE.contains(eventType)) {
             return nonNull(caseData.getOriginalSender())
-                    && !originalSenders.contains(caseData.getOriginalSender().getValue().getCode());
+                && !originalSenders.contains(caseData.getOriginalSender().getValue().getCode());
         }
         return true;
     }
@@ -330,7 +330,7 @@ public class NotificationService {
 
         if (!isNotificationStillValidToSendSetAsideRequest(notificationWrapper.getNewSscsCaseData(), notificationType)) {
             log.info("Incomplete Information with empty or no Information regarding sender for event {}.",
-                    notificationType.getId());
+                notificationType.getId());
             return false;
         }
 
@@ -345,30 +345,30 @@ public class NotificationService {
         if (notificationWrapper.getNewSscsCaseData().isLanguagePreferenceWelsh()
             && (EVENT_TYPES_NOT_FOR_WELSH_CASES.contains(notificationType))) {
             log.info("Cannot complete notification {} as the appeal is Welsh for caseId {}.",
-                    notificationType.getId(), notificationWrapper.getCaseId());
+                notificationType.getId(), notificationWrapper.getCaseId());
             return false;
         }
         final String processAudioVisualAction = ofNullable(notificationWrapper.getNewSscsCaseData().getProcessAudioVideoAction())
-                        .map(f -> f.getValue().getCode()).orElse(null);
+            .map(f -> f.getValue().getCode()).orElse(null);
 
         if (notificationType.equals(PROCESS_AUDIO_VIDEO)
-                && !PROCESS_AUDIO_VIDEO_ACTIONS_THAT_REQUIRES_NOTICE.contains(processAudioVisualAction)) {
+            && !PROCESS_AUDIO_VIDEO_ACTIONS_THAT_REQUIRES_NOTICE.contains(processAudioVisualAction)) {
             log.info("Cannot complete notification {} since the action {} does not require a notice to be sent for caseId {}.",
-                    notificationType.getId(), processAudioVisualAction, notificationWrapper.getCaseId());
+                notificationType.getId(), processAudioVisualAction, notificationWrapper.getCaseId());
             return false;
         }
 
         if (!isDigitalCase(notificationWrapper)
             && DWP_UPLOAD_RESPONSE.equals(notificationType)) {
             log.info("Cannot complete notification {} as the appeal was dwpUploadResponse for caseId {}.",
-                    notificationType.getId(), notificationWrapper.getCaseId());
+                notificationType.getId(), notificationWrapper.getCaseId());
             return false;
         }
 
         if (DWP_RESPONSE_RECEIVED.equals(notificationType)
             && isDigitalCase(notificationWrapper)) {
             log.info("Cannot complete notification {} as the appeal was digital for caseId {}.",
-                    notificationType.getId(), notificationWrapper.getCaseId());
+                notificationType.getId(), notificationWrapper.getCaseId());
             return false;
         }
 

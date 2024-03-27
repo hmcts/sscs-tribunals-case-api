@@ -48,12 +48,12 @@ public class MessageAuthenticationServiceImpl {
         }
     }
 
-    public String generateToken(String appealNumber, String benefitType)  {
+    public String generateToken(String appealNumber, String benefitType) {
         try {
             long timestamp = now(of(AppConstants.ZONE_ID)).toInstant().toEpochMilli() / 1000;
             String originalMessage = format("%s|%s|%d", appealNumber, benefitType, timestamp);
             byte[] digest = mac.doFinal(originalMessage.getBytes(CHARSET));
-            String macSubString =  printBase64Binary(digest).substring(0,10);
+            String macSubString = printBase64Binary(digest).substring(0, 10);
             String macToken = format("%s|%s", originalMessage, macSubString);
             return getEncoder().withoutPadding().encodeToString(macToken.getBytes(CHARSET));
         } catch (Exception ex) {
