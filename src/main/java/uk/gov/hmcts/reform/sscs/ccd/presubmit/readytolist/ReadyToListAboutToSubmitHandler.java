@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.helper.SscsHelper;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.servicebus.HearingMessagingServiceFactory;
 
@@ -52,8 +53,26 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         if (HearingRoute.GAPS == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()) {
+
+            if (!callback.isIgnoreWarnings()) {
+                PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+                String gapsProceedWarning = "This is a GAPS case, If you do want to proceed, "
+                    + "then please change the hearing route to List Assist";
+                response.addWarning(gapsProceedWarning);
+                return response;
+            }
+
             return HearingHandler.GAPS.handle(sscsCaseData, gapsSwitchOverFeature,
                 hearingMessagingServiceFactory.getMessagingService(HearingRoute.GAPS));
+        }
+
+        if (SscsHelper.hasHearingScheduledInTheFuture(sscsCaseData)
+                && !callback.isIgnoreWarnings()) {
+            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+            String listAssistExistsWarning = "There is already a hearing request in List assist, "
+                + "are you sure you want to send another request? If you do proceed, then please cancel the existing hearing request first";
+            response.addWarning(listAssistExistsWarning);
+            return response;
         }
         
         String region = sscsCaseData.getRegion();

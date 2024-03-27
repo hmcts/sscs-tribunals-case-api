@@ -1704,27 +1704,6 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         assertNull(appeal.getHearingOptions().getLanguages());
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "Spanish", "Chittagonain", "Czech", "Danish", "Dinka", "Maldivian", "Toura", "Douala", "Dutch", "Dioula",
-        "Efik", "Estonian", "Ewe", "Ewondo", "Farsi", "Fanti", "Fijian", "French"
-    })
-    public void givenAnyCaseAndLanguageIsSet_thenSetTheLanguageValue(String language) {
-        Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
-        appeal.getBenefitType().setCode("PIP");
-        appeal.setHearingType("paper");
-        HearingOptions hearingOptions = HearingOptions.builder()
-                .wantsToAttend("Yes")
-                .languages(language)
-                .build();
-        appeal.setHearingOptions(hearingOptions);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(0, response.getWarnings().size());
-        assertEquals(language, appeal.getHearingOptions().getLanguages());
-    }
-
     @Test
     void givenNewBenefitTypeAndCodeIsSelected_thenCaseCodeShouldChange() {
         DynamicListItem item = new DynamicListItem("088", "");
@@ -1749,5 +1728,43 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
+    }
+
+    @Test
+    public void givenInvalidHearingVideoEmail_thenValidateAndReturnErrorMessage() {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+
+        HearingSubtype hearingSubType = HearingSubtype.builder()
+            .hearingVideoEmail("12345")
+            .wantsHearingTypeVideo(YES.getValue())
+            .build();
+
+        sscsCaseData.getAppeal().setHearingSubtype(hearingSubType);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().stream().allMatch(e -> e.equals("Hearing video email address must be valid email address")));
+    }
+
+    @Test
+    public void givenInterpreterLanguage_thenSetInterpreterLanguageFromLanguageList() {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+
+        DynamicListItem item = new DynamicListItem("ENG", "english");
+        DynamicList languagesList = new DynamicList(item, null);
+
+        HearingOptions hearingOptions = HearingOptions.builder()
+            .wantsToAttend(YES.getValue())
+            .languageInterpreter(YES.getValue())
+            .languagesList(languagesList)
+            .build();
+
+        sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String language = sscsCaseData.getAppeal().getHearingOptions().getLanguages();
+
+        assertEquals(language, item.getLabel());
     }
 }
