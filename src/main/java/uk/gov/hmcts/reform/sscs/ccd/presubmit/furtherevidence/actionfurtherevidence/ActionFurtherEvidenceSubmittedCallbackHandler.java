@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 import java.time.LocalDate;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,18 +33,19 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     public static final String TCW_REVIEW_POSTPONEMENT_REQUEST = "Review hearing postponement request";
     public static final String TCW_REVIEW_SEND_TO_JUDGE = "Send a case to a judge for review";
 
     private final CcdService ccdService;
-  
+
     private final UpdateCcdCaseService updateCcdCaseService;
 
     private final CcdClient ccdClient;
 
     private final SscsCcdConvertService sscsCcdConvertService;
-  
+
     private final IdamService idamService;
 
     @Value("${feature.postHearings.enabled}")
@@ -109,12 +111,14 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                     EventType.CORRECTION_REQUEST, "Admin action correction");
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
+
             return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseData -> sscsCaseData.setInterlocReferralDate(LocalDate.now()),
                     callback.getCaseDetails().getId(),
                     REVIEW_BY_JUDGE, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
                     EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_TCW)) {
+
             return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseData -> sscsCaseData.setInterlocReferralDate(LocalDate.now()),
                     callback.getCaseDetails().getId(),
                     REVIEW_BY_TCW, INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
@@ -122,11 +126,16 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_JUDGE)) {
             PostHearingRequestType postHearingRequestType = caseData.getPostHearing().getRequestType();
+
             if (isPostHearingsEnabled && nonNull(postHearingRequestType)) {
                 return handlePostHearing(callback, caseData, postHearingRequestType);
             }
 
             if (isPostHearingsBEnabled && isPostHearingOtherRequest(caseData)) {
+                log.info("Updating case using updateCaseV2 to trigger '{}' for caseId: {}, interlocReviewState: {}",
+                        EventType.POST_HEARING_OTHER.getCcdType(),
+                        callback.getCaseDetails().getId(),
+                        REVIEW_BY_JUDGE.getCcdDefinition());
                 return updateCcdCaseService.updateCaseV2(callback.getCaseDetails().getId(),
                         EventType.POST_HEARING_OTHER.getCcdType(), "Post hearing application 'Other'",
                         "Post hearing application 'Other'", idamService.getIdamTokens(),
@@ -157,11 +166,18 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                     OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Send a case to urgent hearing");
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, OTHER_DOCUMENT_MANUAL)) {
+            log.info("Updating case using triggerCaseEventV2 for event {}, caseId {}",
+                    EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(),
+                    callback.getCaseDetails().getId());
             return updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
                     EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Actioned manually",
                     "Actioned manually", idamService.getIdamTokens());
         }
-      
+
+        log.info("Updating case using triggerCaseEventV2 for event: {}, event description: {}, caseId: {}",
+                EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(),
+                "Issue to all parties",
+                callback.getCaseDetails().getId());
         return updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
                 EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
                 "Issue to all parties", idamService.getIdamTokens());
@@ -170,6 +186,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     private SscsCaseDetails handlePostHearing(Callback<SscsCaseData> callback, SscsCaseData caseData, PostHearingRequestType postHearingRequestType) {
         switch (postHearingRequestType) {
             case SET_ASIDE -> {
+
                 return setInterlocReviewStateFieldAndTriggerEvent(
                         sscsCaseData -> {
                         },
@@ -178,6 +195,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                         EventType.SET_ASIDE_REQUEST, "Set aside request");
             }
             case CORRECTION -> {
+
                 return setInterlocReviewStateFieldAndTriggerEvent(
                         sscsCaseData -> {
                         },
@@ -186,6 +204,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                         EventType.CORRECTION_REQUEST, "Correction request");
             }
             case STATEMENT_OF_REASONS -> {
+
                 return setInterlocReviewStateFieldAndTriggerEvent(
                         sscsCaseData -> {
                         },
@@ -194,6 +213,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                         EventType.SOR_REQUEST, "Statement of reasons request");
             }
             case LIBERTY_TO_APPLY -> {
+
                 if (isPostHearingsBEnabled) {
                     return setInterlocReviewStateFieldAndTriggerEvent(
                             sscsCaseData -> {
@@ -205,6 +225,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                 throw new IllegalStateException("Post hearings B is not enabled");
             }
             case PERMISSION_TO_APPEAL -> {
+
                 if (isPostHearingsBEnabled) {
                     return setInterlocReviewStateFieldAndTriggerEvent(
                             sscsCaseData -> {
@@ -253,6 +274,12 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             FurtherEvidenceActionDynamicListItems interlocType,
             EventType eventType,
             String summary) {
+
+        log.info(
+                "Updating case using updateCaseV2 to trigger '{}' for caseId: {}, "
+                        + "interlocReviewState: {}, interlocType: {}",
+                eventType.getCcdType(), caseId, interlocReviewState.getCcdDefinition(),
+                interlocType.getLabel());
         return updateCcdCaseService.updateCaseV2(
                 caseId,
                 eventType.getCcdType(),
@@ -268,6 +295,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     private SscsCaseDetails setMakeCaseUrgentTriggerEvent(
             Long caseId,
             FurtherEvidenceActionDynamicListItems interlocType, EventType eventType, String summary) {
+        log.info("Updating case using updateCaseV2 to trigger '{}' for caseId {}", eventType.getCcdType(), caseId);
         return updateCcdCaseService.triggerCaseEventV2(
                 caseId,
                 eventType.getCcdType(), summary,
