@@ -128,7 +128,8 @@ public class CitizenRequestService {
     }
 
     private boolean submitHearingRecordingRequest(Long ccdCaseId, List<String> hearingIds, String idamEmail) {
-
+        log.info("Updating ccd case using v2 for {} with event {}", ccdCaseId,
+                EventType.CITIZEN_REQUEST_HEARING_RECORDING.getCcdType());
         updateCcdCaseService.updateCaseV2(ccdCaseId, CITIZEN_REQUEST_HEARING_RECORDING.getCcdType(),
                 "SSCS - hearing recording request from MYA",
                 "Requested hearing recordings", idamService.getIdamTokens(),
