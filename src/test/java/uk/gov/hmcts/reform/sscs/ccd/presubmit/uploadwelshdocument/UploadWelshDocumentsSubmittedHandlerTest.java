@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -47,15 +46,12 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
-    @Mock
-    private UpdateCcdCaseService updateCcdCaseService;
-
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        handler = new UploadWelshDocumentsSubmittedHandler(ccdService, idamService, updateCcdCaseService);
+        handler = new UploadWelshDocumentsSubmittedHandler(ccdService, idamService);
         when(callback.getEvent()).thenReturn(EventType.UPLOAD_WELSH_DOCUMENT);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build())
             .sscsWelshPreviewNextEvent("sendToDwp")
@@ -95,15 +91,21 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
     @Test
     public void shouldCallUpdateCaseWithUrgentCaseEvent() {
+        SscsCaseData caseData = buildDataWithUrgentRequestDocument();
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
-        buildDataWithUrgentRequestDocument();
+
+        when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                EventType.MAKE_CASE_URGENT.getCcdType(), "Send a case to urgent hearing",
+                OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens))
+                .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verify(updateCcdCaseService).triggerCaseEventV2(eq(callback.getCaseDetails().getId()),
-                eq(EventType.MAKE_CASE_URGENT.getCcdType()), eq("Send a case to urgent hearing"),
-                eq(OTHER_DOCUMENT_MANUAL.getLabel()), any());
+        verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.MAKE_CASE_URGENT.getCcdType(),
+                "Send a case to urgent hearing", OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens);
+        assertNull(caseData.getSscsWelshPreviewNextEvent());
+
     }
 
     @Test
@@ -123,10 +125,16 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
+        when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                EventType.MAKE_CASE_URGENT.getCcdType(), "Send a case to urgent hearing",
+                OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens))
+                .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verify(updateCcdCaseService).triggerCaseEventV2(eq(callback.getCaseDetails().getId()), eq(EventType.MAKE_CASE_URGENT.getCcdType()),
-                eq("Send a case to urgent hearing"), eq(OTHER_DOCUMENT_MANUAL.getLabel()), any());
+        verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.MAKE_CASE_URGENT.getCcdType(),
+                "Send a case to urgent hearing", OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens);
+        assertNull(caseData.getSscsWelshPreviewNextEvent());
     }
 
     @Test
