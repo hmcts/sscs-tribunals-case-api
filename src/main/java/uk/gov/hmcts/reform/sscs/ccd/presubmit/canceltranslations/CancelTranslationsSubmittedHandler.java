@@ -6,31 +6,41 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
 import java.time.LocalDate;
+import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @Service
 @Slf4j
 public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final CcdService ccdService;
     private final IdamService idamService;
+    private final UpdateCcdCaseService updateCcdCaseService;
+    private final CcdClient ccdClient;
+    private final SscsCcdConvertService sscsCcdConvertService;
 
-    public CancelTranslationsSubmittedHandler(CcdService ccdService,
-                                              IdamService idamService) {
-        this.ccdService = ccdService;
+    public CancelTranslationsSubmittedHandler(IdamService idamService,
+                                              CcdClient ccdClient,
+                                              SscsCcdConvertService sscsCcdConvertService,
+                                              UpdateCcdCaseService updateCcdCaseService) {
         this.idamService = idamService;
+        this.ccdClient = ccdClient;
+        this.sscsCcdConvertService = sscsCcdConvertService;
+        this.updateCcdCaseService = updateCcdCaseService;
     }
 
     @Override
@@ -47,22 +57,35 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        IdamTokens idamTokens = idamService.getIdamTokens();
+        StartEventResponse startEventResponse = ccdClient.startEvent(
+                idamTokens, callback.getCaseDetails().getId(), EventType.UPDATE_CASE_ONLY.getCcdType());
+        SscsCaseData caseData = sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData());
+
         String sscsWelshPreviewNextEvent = caseData.getSscsWelshPreviewNextEvent();
-        log.info("sscsWelshPreviewNextEvent is {}  for case id : {}", sscsWelshPreviewNextEvent, caseData.getCcdCaseId());
-        caseData.setSscsWelshPreviewNextEvent(null);
+        log.info("sscsWelshPreviewNextEvent is {}  for case id : {}",
+                sscsWelshPreviewNextEvent, caseData.getCcdCaseId());
+
+        Consumer<SscsCaseData> caseDataConsumer = sscsCaseData -> sscsCaseData.setSscsWelshPreviewNextEvent(null);
 
         if (isValidUrgentDocument(callback.getCaseDetails().getCaseData())) {
-            setMakeCaseUrgentTriggerEvent(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(),
-                    OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Send a case to urgent hearing");
+            setMakeCaseUrgentTriggerEvent(callback.getCaseDetails().getId(), caseDataConsumer);
+
         } else if (isValidResinstatementRequestDocument(callback.getCaseDetails().getCaseData())) {
 
-            updateForReinstatementRequestEvent(caseData, callback.getCaseDetails().getId(), sscsWelshPreviewNextEvent);
+            updateForReinstatementRequestEvent(callback.getCaseDetails().getId(), sscsWelshPreviewNextEvent);
 
         } else {
-            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                            sscsWelshPreviewNextEvent, "Cancel welsh translations", "Cancel welsh translations",
-                            idamService.getIdamTokens());
+            log.info("Using updateCaseV2 to trigger SscsWelshPreviewNextEvent '{}' for {}",
+                    sscsWelshPreviewNextEvent, callback.getCaseDetails().getId());
+
+            updateCcdCaseService.updateCaseV2(
+                    callback.getCaseDetails().getId(),
+                    sscsWelshPreviewNextEvent,
+                    "Cancel welsh translations",
+                    "Cancel welsh translations",
+                    idamService.getIdamTokens(),
+                    sscsCaseData -> sscsCaseData.setSscsWelshPreviewNextEvent(null));
         }
 
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
@@ -80,23 +103,35 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
                 && (!CollectionUtils.isEmpty(caseData.getSscsDocument()) && caseData.getSscsDocument().stream().anyMatch(d -> REINSTATEMENT_REQUEST.getValue().equals(d.getValue().getDocumentType())));
     }
 
-    private SscsCaseDetails setMakeCaseUrgentTriggerEvent(
-            SscsCaseData caseData, Long caseId,
-            FurtherEvidenceActionDynamicListItems interlocType, EventType eventType, String summary) {
-        return ccdService.updateCase(caseData, caseId,
-                eventType.getCcdType(), summary,
-                interlocType.getLabel(), idamService.getIdamTokens());
+    private SscsCaseDetails setMakeCaseUrgentTriggerEvent(Long caseId, Consumer<SscsCaseData> caseDataConsumer) {
+        log.info("Using updateCaseV2 to trigger 'makeCaseUrgent' event for {}", caseId);
+        return updateCcdCaseService.updateCaseV2(
+                caseId,
+                EventType.MAKE_CASE_URGENT.getCcdType(),
+                "Send a case to urgent hearing",
+                OTHER_DOCUMENT_MANUAL.getLabel(),
+                idamService.getIdamTokens(),
+                caseDataConsumer
+        );
     }
 
-    private SscsCaseDetails updateForReinstatementRequestEvent(
-            SscsCaseData caseData, Long caseId,
-            String sscsWelshPreviewNextEvent) {
+    private SscsCaseDetails updateForReinstatementRequestEvent(Long caseId, String sscsWelshPreviewNextEvent) {
+        log.info("Using updateCaseV2 to trigger SscsWelshPreviewNextEvent '{}' for {}",
+                sscsWelshPreviewNextEvent, caseId);
 
-        caseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
-        caseData.setReinstatementRegistered(LocalDate.now());
-        caseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
+        Consumer<SscsCaseData> mutator = caseData -> {
+            caseData.setSscsWelshPreviewNextEvent(null);
+            caseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
+            caseData.setReinstatementRegistered(LocalDate.now());
+            caseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
+        };
 
-        return  ccdService.updateCase(caseData, caseId, sscsWelshPreviewNextEvent, "Set Reinstatement Request", "Set Reinstatement Request",
-                idamService.getIdamTokens());
+        return updateCcdCaseService.updateCaseV2(
+            caseId,
+            sscsWelshPreviewNextEvent,
+            "Set Reinstatement Request",
+            "Set Reinstatement Request",
+            idamService.getIdamTokens(),
+            mutator);
     }
 }
