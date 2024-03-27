@@ -17,8 +17,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Service
@@ -27,13 +27,11 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
 
     private final CcdService ccdService;
     private final IdamService idamService;
-    private final UpdateCcdCaseService updateCcdCaseService;
 
     @Autowired
-    public UploadWelshDocumentsSubmittedHandler(CcdService ccdService, IdamService idamService, UpdateCcdCaseService updateCcdCaseService) {
+    public UploadWelshDocumentsSubmittedHandler(CcdService ccdService, IdamService idamService) {
         this.ccdService = ccdService;
         this.idamService = idamService;
-        this.updateCcdCaseService = updateCcdCaseService;
     }
 
     @Override
@@ -57,7 +55,8 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
         sscsCaseData.setSscsWelshPreviewNextEvent(null);
 
         if (isValidUrgentHearingDocument(sscsCaseData)) {
-            setMakeCaseUrgentTriggerEvent(callback.getCaseDetails().getId());
+            setMakeCaseUrgentTriggerEvent(sscsCaseData, callback.getCaseDetails().getId(),
+                    OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Send a case to urgent hearing");
         } else if (isReinstatementRequest(sscsCaseData)) {
             sscsCaseData = setReinstatementRequest(sscsCaseData, callback.getCaseDetails().getId(), nextEvent);
         } else {
@@ -86,15 +85,12 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
         return (isTranslationsOutstanding && (isDocReinstatement || isWelshReinstatement));
     }
 
-    private void setMakeCaseUrgentTriggerEvent(Long caseId) {
-        log.info("Triggering makeCaseUrgent event using triggerCaseEventV2 for {}", caseId);
-        updateCcdCaseService.triggerCaseEventV2(
-                caseId,
-                EventType.MAKE_CASE_URGENT.getCcdType(),
-                "Send a case to urgent hearing",
-                OTHER_DOCUMENT_MANUAL.getLabel(),
-                idamService.getIdamTokens()
-        );
+    private SscsCaseDetails setMakeCaseUrgentTriggerEvent(
+            SscsCaseData caseData, Long caseId,
+            FurtherEvidenceActionDynamicListItems interlocType, EventType eventType, String summary) {
+        return ccdService.updateCase(caseData, caseId,
+                eventType.getCcdType(), summary,
+                interlocType.getLabel(), idamService.getIdamTokens());
     }
 
     private SscsCaseData setReinstatementRequest(SscsCaseData sscsCaseData, Long caseId, String nextEvent) {
