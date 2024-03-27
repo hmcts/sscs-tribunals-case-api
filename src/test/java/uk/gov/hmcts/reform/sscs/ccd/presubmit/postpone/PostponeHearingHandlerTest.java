@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NOT_LISTABLE;
@@ -127,8 +126,7 @@ public class PostponeHearingHandlerTest {
     public void handleReadyToListPostponementRelistEventType() {
         caseData.getPostponement().setPostponementEvent(READY_TO_LIST);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler
-            .handle(SUBMITTED, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
 
@@ -154,8 +152,7 @@ public class PostponeHearingHandlerTest {
     public void handleNotListablePostponementRelistEventType() {
         caseData.getPostponement().setPostponementEvent(NOT_LISTABLE);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler
-            .handle(SUBMITTED, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
 
@@ -181,8 +178,7 @@ public class PostponeHearingHandlerTest {
     public void handleInvalidPostponementRelistEventType() {
         caseData.getPostponement().setPostponementEvent(APPEAL_RECEIVED);
 
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors())
             .hasSize(1)
@@ -202,8 +198,7 @@ public class PostponeHearingHandlerTest {
     public void handleAlreadyHandled() {
         caseData.getPostponement().setUnprocessedPostponement(NO);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler
-            .handle(SUBMITTED, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors())
             .hasSize(1)
@@ -226,8 +221,7 @@ public class PostponeHearingHandlerTest {
         caseData.setSchedulingAndListingFields(SchedulingAndListingFields.builder()
             .hearingRoute(HearingRoute.GAPS).build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors())
             .hasSize(1)
