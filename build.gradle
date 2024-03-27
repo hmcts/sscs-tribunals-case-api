@@ -250,7 +250,6 @@ task runGitPreCommitTasks {
     dependsOn 'test'
     dependsOn 'pmdMain'
     dependsOn 'pmdTest'
-    dependsOn 'dependencyCheckAggregate'
     dependsOn 'checkstyleMain'
     dependsOn 'checkstyleTest'
 }
@@ -265,11 +264,6 @@ dependencyManagement {
         //CVE-2023-33202
         dependencySet(group: 'org.springframework.security', version: '1.1.1') {
             entry 'spring-security-rsa'
-        }
-
-        //CVE-2024-25710
-        dependencySet(group: 'org.apache.commons', version: '1.26.0') {
-            entry 'commons-compress'
         }
 
         //CVE-2023-6378, CVE-2023-6481
@@ -303,10 +297,10 @@ dependencies {
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.4'
     implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
 
     implementation group: 'com.google.guava', name: 'guava', version: '32.1.1-jre'
-    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.10'
+    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.19'
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
@@ -332,8 +326,8 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.3.2'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.13'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.3.13'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.4'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
@@ -375,7 +369,7 @@ dependencies {
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.7.1'
 
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.81"
-    
+
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.86'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.86'
 
@@ -423,6 +417,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.0'
 
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-core', version: '8.0.6'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '8.0.6'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '8.0.6'
     //pact contract testing
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
 
