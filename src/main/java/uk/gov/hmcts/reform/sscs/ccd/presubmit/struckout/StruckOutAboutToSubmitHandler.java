@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.struckout;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -48,6 +49,7 @@ public class StruckOutAboutToSubmitHandler extends DormantEventsAboutToSubmitHan
         log.info(String.format("Handling struckOut event for caseId %s", sscsCaseData.getCcdCaseId()));
 
         sscsCaseData.setDwpState(DwpState.STRIKE_OUT_ACTIONED);
+        clearPostponementTransientFields(sscsCaseData);
         cancelHearing(callback);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);

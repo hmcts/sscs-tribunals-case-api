@@ -59,6 +59,15 @@ public class SscsUtil {
         return allowedStates.contains(state);
     }
 
+    public static void clearPostponementTransientFields(SscsCaseData sscsCaseData) {
+        if (!isNull(sscsCaseData.getPostponement())) {
+            sscsCaseData.setPostponement(null);
+        }
+        if (!isNull(sscsCaseData.getPostponementRequest())) {
+            sscsCaseData.setPostponementRequest(null);
+        }
+    }
+
     public static void clearAdjournmentTransientFields(SscsCaseData caseData) {
         log.info("Clearing transient adjournment case fields for caseId {}", caseData.getCcdCaseId());
 

@@ -2,42 +2,37 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.voidcase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.Optional;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SchedulingAndListingFields;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.model.PoDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 
-@RunWith(JUnitParamsRunner.class)
+@Slf4j
+@ExtendWith(MockitoExtension.class)
 public class VoidCaseAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private VoidCaseAboutToSubmitHandler handler;
@@ -52,14 +47,10 @@ public class VoidCaseAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        openMocks(this);
         handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, false);
 
-        when(callback.getEvent()).thenReturn(EventType.ADMIN_SEND_TO_VOID_STATE);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetails));
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
             .interlocReviewState(InterlocReviewState.REVIEW_BY_TCW)
@@ -70,8 +61,6 @@ public class VoidCaseAboutToSubmitHandlerTest {
                         .hearingRoute(HearingRoute.LIST_ASSIST)
                         .build())
                 .build();
-        when(caseDetails.getState()).thenReturn(HEARING);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
     @Test
@@ -80,53 +69,55 @@ public class VoidCaseAboutToSubmitHandlerTest {
         assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
-    @Test
-    @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
+    @ParameterizedTest
+    @EnumSource(value = CallbackType.class, names = {"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
     @Test
-    @Parameters({"VOID_CASE"})
-    public void givenAVoidCaseEventAndSnLFeatureEnabled_thenActionsAndHearingCancel(EventType eventType) {
+    public void givenAVoidCaseEventAndSnLFeatureEnabled_thenActionsAndHearingCancel() {
         handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, true);
-        when(callback.getEvent()).thenReturn(eventType);
+        when(callback.getEvent()).thenReturn(VOID_CASE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetails));
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(caseDetails.getState()).thenReturn(HEARING);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getInterlocReviewState());
-        Assert.assertNull(response.getData().getDirectionDueDate());
+        assertNull(response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDirectionDueDate());
         verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()),
                 eq(CancellationReason.OTHER));
         verifyNoMoreInteractions(hearingMessageHelper);
     }
 
     @Test
-    @Parameters({"VOID_CASE"})
-    public void givenAVoidCaseEventAndSnLFeatureNotEnabled_thenActionsButNoHearingCancel(EventType eventType) {
+    public void givenAVoidCaseEventAndSnLFeatureNotEnabled_thenActionsButNoHearingCancel() {
         handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, false);
-        when(callback.getEvent()).thenReturn(eventType);
+        when(callback.getEvent()).thenReturn(VOID_CASE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getInterlocReviewState());
-        Assert.assertNull(response.getData().getDirectionDueDate());
+        assertNull(response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDirectionDueDate());
         verifyNoInteractions(hearingMessageHelper);
     }
 
     @Test
-    @Parameters({"ADMIN_SEND_TO_VOID_STATE"})
-    public void givenAdminVoidCaseEventAndSnLFeatureEnabled_thenActionsButNoHearingCancel(EventType eventType) {
+    public void givenAdminVoidCaseEventAndSnLFeatureEnabled_thenActionsButNoHearingCancel() {
         handler = new VoidCaseAboutToSubmitHandler(hearingMessageHelper, true);
-        when(callback.getEvent()).thenReturn(eventType);
+        when(callback.getEvent()).thenReturn(ADMIN_SEND_TO_VOID_STATE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getInterlocReviewState());
-        Assert.assertNull(response.getData().getDirectionDueDate());
+        assertNull(response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDirectionDueDate());
         verifyNoInteractions(hearingMessageHelper);
     }
 
@@ -135,6 +126,9 @@ public class VoidCaseAboutToSubmitHandlerTest {
         sscsCaseData.setPoAttendanceConfirmed(YES);
         sscsCaseData.setPresentingOfficersDetails(PoDetails.builder().name(Name.builder().build()).build());
         sscsCaseData.setPresentingOfficersHearingLink("link");
+        when(callback.getEvent()).thenReturn(ADMIN_SEND_TO_VOID_STATE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -143,9 +137,9 @@ public class VoidCaseAboutToSubmitHandlerTest {
         assertThat(sscsCaseData.getPresentingOfficersHearingLink()).isNull();
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
 }

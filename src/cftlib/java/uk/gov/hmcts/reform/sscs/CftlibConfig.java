@@ -15,7 +15,6 @@ import uk.gov.hmcts.rse.ccd.lib.api.CFTLibConfigurer;
 @Slf4j
 @Component
 public class CftlibConfig implements CFTLibConfigurer {
-
     @Override
     public void configure(CFTLib lib) throws Exception {
         lib.createIdamUser("system.update@hmcts.net",
@@ -35,7 +34,8 @@ public class CftlibConfig implements CFTLibConfigurer {
         lib.createIdamUser("super-user@example.com",
             "caseworker",
             "caseworker-sscs",
-            "caseworker-sscs-superuser"
+            "caseworker-sscs-superuser",
+            "hearing-manager"
         );
         lib.createIdamUser("sscs-citizen2@hmcts.net",
             "citizen"
@@ -49,7 +49,8 @@ public class CftlibConfig implements CFTLibConfigurer {
         lib.createIdamUser("clerk@example.com",
             "caseworker",
             "caseworker-sscs",
-            "caseworker-sscs-clerk"
+            "caseworker-sscs-clerk",
+            "hearing-manager"
         );
         lib.createIdamUser("registrar@example.com",
             "caseworker",
@@ -94,7 +95,9 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-sscs-pcqextractor",
                 "citizen",
                 "caseworker-sscs",
-                "caseworker"
+                "caseworker",
+                "hearing-manager",
+                "hearing-viewer"
         );
         var def = Files.readAllBytes(Path.of("../sscs-ccd-definitions/releases/CCD_SSCSDefinition_vdev_LOCAL.xlsx"));
         lib.importDefinition(def);

@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/refdata/location/court-venues/venue-search",
+    "queryParameters": {
+      "search-string": {
+        "contains": "manch",
+        "caseInsensitive": true
+      },
+      "court-type-id": {
+        "equalTo": "31"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {"court_venue_id":"19860","epimms_id":"783803","site_name":"Manchester Magistrates'\'' Court","region_id":"4","region":"North West","court_type":"Immigration and Asylum Tribunal","court_type_id":"23","cluster_id":"8","cluster_name":"Greater Manchester","open_for_public":"YES","court_address":"Crown Square, Manchester, Greater Manchester","postcode":"M60 1PR","phone_number":"","closed_date":null,"court_location_code":"","dx_address":"","welsh_site_name":"","welsh_court_address":"","court_status":"Open","court_open_date":null,"court_name":"Manchester Magistrates Court","venue_name":"Manchester Mags","is_case_management_location":"N","is_hearing_location":"Y","welsh_venue_name":"","is_temporary_location":"N","is_nightingale_court":"N","location_type":"COURT","parent_location":"512401","welsh_court_name":"","uprn":"","venue_ou_code":"","mrd_building_location_id":"","mrd_venue_id":"","service_url":"","fact_url":""}
+    ]
+  }
+}

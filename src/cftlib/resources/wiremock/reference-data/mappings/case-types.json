@@ -1,0 +1,51 @@
+{
+  "request":{
+    "method":"GET",
+    "urlPath":"/refdata/commondata/lov/categories/caseType",
+    "queryParameters": {
+      "serviceId": {
+        "equalTo": "BBA3"
+      },
+      "isChildRequired": {
+        "equalTo": "Y"
+      }
+    }
+  },
+  "response":{
+    "status":200,
+    "headers":{
+      "Content-Type":"application/json"
+    },
+    "jsonBody":{
+      "list_of_values": [
+        {
+          "category_key": "caseType",
+          "key": "BBA3-001",
+          "value_en": "UNIVERSAL CREDIT",
+          "value_cy": "",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": [
+            {
+              "category_key": "caseSubType",
+              "key": "BBA3-001AD",
+              "value_en": "ADVANCE PAYMENT",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "caseType",
+              "parent_key": "BBA3-001",
+              "active_flag": "Y",
+              "child_nodes": null
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
