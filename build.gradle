@@ -1,3 +1,5 @@
+import uk.gov.hmcts.rse.AuthMode
+
 plugins {
     id 'application'
     id 'pmd'
@@ -10,7 +12,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.9.11'
     id 'org.owasp.dependencycheck' version '9.0.6'
     id 'au.com.dius.pact' version '4.3.15'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.771'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.1135'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -529,8 +531,7 @@ task generateXls(type: Exec) {
 }
 
 bootWithCCD {
-    dependsOn generateXls
-    authMode = uk.gov.hmcts.rse.AuthMode.Local
+    authMode = AuthMode.Local
 
     //---Debug-----
     //Uncomment to launch with debug
@@ -553,15 +554,15 @@ bootWithCCD {
     environment 'XUI_PORT', '3455'
     environment 'RSE_LIB_S2S_PORT', '4502'
     //URLs for services running in Docker require host.docker.internal to resolve properly
-    environment 'XUI_DOCUMENTS_API', 'http://host.docker.internal:5005'
-    environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
-    environment 'IDAM_SIMULATOR_BASE_URL', 'http://rse-idam-simulator:5062'
+//    environment 'XUI_DOCUMENTS_API', 'http://host.docker.internal:5005'
+//    environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
+//    environment 'IDAM_SIMULATOR_BASE_URL', 'http://rse-idam-simulator:5062'
     //URLs for other services can resolve localhost
-    environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
-    environment 'S2S_URL', 'http://localhost:4502'
-    environment 'DOC_ASSEMBLY_URL', 'http://localhost:4631'
+//    environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
+//    environment 'S2S_URL', 'http://localhost:4502'
+//    environment 'DOC_ASSEMBLY_URL', 'http://localhost:4631'
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'emstitch,ccd_data,camunda,cft_task_db,sscsjobscheduler,evidence,wa_case_event_messages_db,wa_workflow_api'
-    environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
+//    environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs,wa_task_management_api,wa_task_monitor,camunda_bpm,wa_workflow_api,wa_case_event_handler,em_stitching_api'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service,em_ccd_orchestrator,em_stitching_api,wa_task_management_api,wa_task_monitor,camunda_bpm,wa_workflow_api,wa_case_event_handler'
 
