@@ -57,6 +57,8 @@ public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<Ssc
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setDwpState(WITHDRAWAL_RECEIVED);
 
+        caseData.clearPoDetails();
+
         DocumentLink documentDetails = caseData.getDocumentStaging().getPreviewDocument();
         if (nonNull(documentDetails)) {
             addToSscsDocuments(caseData, documentDetails);

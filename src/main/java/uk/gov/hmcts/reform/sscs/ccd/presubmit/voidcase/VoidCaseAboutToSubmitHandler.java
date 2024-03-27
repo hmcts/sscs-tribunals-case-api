@@ -57,6 +57,7 @@ public class VoidCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
         sscsCaseData.setDirectionDueDate(null);
         sscsCaseData.setInterlocReviewState(null);
         clearPostponementTransientFields(sscsCaseData);
+        sscsCaseData.clearPoDetails();
         cancelHearing(callback);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);

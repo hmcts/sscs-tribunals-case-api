@@ -41,6 +41,8 @@ java:
     ELASTIC_SEARCH_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
     DUMMY: true
+    CITIZEN_LOGIN_SERVICE_V2: true
+    ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: true
     TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
@@ -144,6 +146,7 @@ xui-webapp:
           - mc-idam-client-secret
           - system-user-name
           - system-user-password
+
 
 ccd:
   enabled: true
@@ -516,7 +519,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:6.3.12nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:6.3.14nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -535,7 +538,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: 6.3.12nonProd
+      CCD_DEF_VERSION: 6.3.14nonProd
     secrets: []
     userRoles:
       - citizen
