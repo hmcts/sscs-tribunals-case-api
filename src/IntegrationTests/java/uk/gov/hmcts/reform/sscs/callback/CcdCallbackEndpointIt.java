@@ -175,7 +175,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
 
         given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
                 eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
-                eq("actionFurtherEvidence")))
+                eq("updateCaseOnly")))
                 .willReturn(StartEventResponse.builder()
                         .caseDetails(CaseDetails.builder()
                                 .id(12345656789L)
@@ -223,7 +223,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
 
         given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
                 eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
-                eq("actionFurtherEvidence")))
+                eq("updateCaseOnly")))
                 .willReturn(StartEventResponse.builder()
                         .caseDetails(CaseDetails.builder()
                                 .id(12345656789L)
