@@ -134,7 +134,7 @@ public class VoidCaseAboutToSubmitHandlerTest {
         assertThat(sscsCaseData.getPresentingOfficersHearingLink()).isNull();
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         assertThrows(IllegalStateException.class, () -> handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
