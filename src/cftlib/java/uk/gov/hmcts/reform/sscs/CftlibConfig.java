@@ -96,15 +96,15 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-sscs",
                 "caseworker"
         );
-//        var def = Files.readAllBytes(Path.of("../sscs-ccd-definitions/releases/CCD_SSCSDefinition_vdev_LOCAL.xlsx"));
-//        lib.importDefinition(def);
-//
-//        var roleAssignments = Resources.toString(Resources.getResource("am-role-assignments.json"), StandardCharsets.UTF_8);
-//        lib.configureRoleAssignments(roleAssignments);
-//
-//        if (parseBoolean(System.getenv("ENABLE_WORK_ALLOCATION"))) {
-//            loadCamundaFiles();
-//        }
+        var def = Files.readAllBytes(Path.of("definitions/releases/CCD_SSCSDefinition_vdev_LOCAL.xlsx"));
+        lib.importDefinition(def);
+
+        var roleAssignments = Resources.toString(Resources.getResource("am-role-assignments.json"), StandardCharsets.UTF_8);
+        lib.configureRoleAssignments(roleAssignments);
+
+        if (parseBoolean(System.getenv("ENABLE_WORK_ALLOCATION"))) {
+            loadCamundaFiles();
+        }
     }
 
     @SneakyThrows

@@ -521,17 +521,17 @@ run {
     }
 }
 
-
 task generateXls(type: Exec) {
-    commandLine project.file('../sscs-ccd-definitions/bin/create-xlsx.sh').path, 'benefit', 'dev', 'local'
-    inputs.dir project.file('../sscs-ccd-definitions/benefit')
-    outputs.dir project.file('../sscs-ccd-definitions/releases')
+    commandLine file('definitions/bin/create-xlsx.sh').path, 'benefit', 'dev', 'local'
+    workingDir project.file('definitions')
+    inputs.dir project.file('definitions/benefit')
+    outputs.dir project.file('definitions/releases')
     environment "TRIBUNALS_API_URL", "http://localhost:8080"
-    workingDir project.file('../sscs-ccd-definitions').path
 }
 
 bootWithCCD {
     authMode = AuthMode.Local
+    inputs.files generateXls
 
     //---Debug-----
     //Uncomment to launch with debug
@@ -554,15 +554,13 @@ bootWithCCD {
     environment 'XUI_PORT', '3455'
     environment 'RSE_LIB_S2S_PORT', '4502'
     //URLs for services running in Docker require host.docker.internal to resolve properly
-//    environment 'XUI_DOCUMENTS_API', 'http://host.docker.internal:5005'
-//    environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
-//    environment 'IDAM_SIMULATOR_BASE_URL', 'http://rse-idam-simulator:5062'
+    environment 'XUI_DOCUMENTS_API', 'http://host.docker.internal:5005'
+    environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
     //URLs for other services can resolve localhost
-//    environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
-//    environment 'S2S_URL', 'http://localhost:4502'
-//    environment 'DOC_ASSEMBLY_URL', 'http://localhost:4631'
+    environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
+    environment 'DOC_ASSEMBLY_URL', 'http://localhost:4631'
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'emstitch,ccd_data,camunda,cft_task_db,sscsjobscheduler,evidence,wa_case_event_messages_db,wa_workflow_api'
-//    environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
+    environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs,wa_task_management_api,wa_task_monitor,camunda_bpm,wa_workflow_api,wa_case_event_handler,em_stitching_api'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service,em_ccd_orchestrator,em_stitching_api,wa_task_management_api,wa_task_monitor,camunda_bpm,wa_workflow_api,wa_case_event_handler'
 
@@ -597,6 +595,8 @@ bootWithCCD {
     }
 }
 
+// Remap the Cftlib's docassembly port which collides with ours.
+// TODO: Replace this with Cftlib APIs when ready
 tasks.'writeManifestrpa-dg-docassembly' {
     doLast  {
         def f = file('build/cftlib/rpa-dg-docassembly')
