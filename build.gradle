@@ -596,3 +596,12 @@ bootWithCCD {
         }
     }
 }
+
+tasks.'writeManifestrpa-dg-docassembly' {
+    doLast  {
+        def f = file('build/cftlib/rpa-dg-docassembly')
+        def lines = f.readLines()
+        lines[0] = lines[0] + ' --server.port=9090'
+        f.text = lines.join('\n')
+    }
+}
