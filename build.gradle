@@ -1,3 +1,5 @@
+import uk.gov.hmcts.rse.AuthMode
+
 plugins {
     id 'application'
     id 'pmd'
@@ -10,7 +12,7 @@ plugins {
     id "info.solidsoft.pitest" version '1.9.11'
     id 'org.owasp.dependencycheck' version '9.0.6'
     id 'au.com.dius.pact' version '4.3.15'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.771'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.1135'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -519,18 +521,17 @@ run {
     }
 }
 
-
 task generateXls(type: Exec) {
-    commandLine project.file('../sscs-ccd-definitions/bin/create-xlsx.sh').path, 'benefit', 'dev', 'local'
-    inputs.dir project.file('../sscs-ccd-definitions/benefit')
-    outputs.dir project.file('../sscs-ccd-definitions/releases')
+    commandLine file('definitions/bin/create-xlsx.sh').path, 'benefit', 'dev', 'local'
+    workingDir project.file('definitions')
+    inputs.dir project.file('definitions/benefit')
+    outputs.dir project.file('definitions/releases')
     environment "TRIBUNALS_API_URL", "http://localhost:8080"
-    workingDir project.file('../sscs-ccd-definitions').path
 }
 
 bootWithCCD {
-    dependsOn generateXls
-    authMode = uk.gov.hmcts.rse.AuthMode.Local
+    authMode = AuthMode.Local
+    inputs.files generateXls
 
     //---Debug-----
     //Uncomment to launch with debug
@@ -555,10 +556,8 @@ bootWithCCD {
     //URLs for services running in Docker require host.docker.internal to resolve properly
     environment 'XUI_DOCUMENTS_API', 'http://host.docker.internal:5005'
     environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
-    environment 'IDAM_SIMULATOR_BASE_URL', 'http://rse-idam-simulator:5062'
     //URLs for other services can resolve localhost
     environment 'DM_STORE_BASE_URL', 'http://localhost:5005'
-    environment 'S2S_URL', 'http://localhost:4502'
     environment 'DOC_ASSEMBLY_URL', 'http://localhost:4631'
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'emstitch,ccd_data,camunda,cft_task_db,sscsjobscheduler,evidence,wa_case_event_messages_db,wa_workflow_api'
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
@@ -593,5 +592,16 @@ bootWithCCD {
                 logging.addStandardOutputListener(fileLogger)
             }
         }
+    }
+}
+
+// Remap the Cftlib's docassembly port which collides with ours.
+// TODO: Replace this with Cftlib APIs when ready
+tasks.'writeManifestrpa-dg-docassembly' {
+    doLast  {
+        def f = file('build/cftlib/rpa-dg-docassembly')
+        def lines = f.readLines()
+        lines[0] = lines[0] + ' --server.port=9090'
+        f.text = lines.join('\n')
     }
 }

@@ -1,0 +1,3 @@
+[submodule "definitions"]
+	path = definitions
+	url = git@github.com:hmcts/sscs-ccd-definitions.git
