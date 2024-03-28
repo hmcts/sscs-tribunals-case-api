@@ -153,22 +153,22 @@ xui-webapp:
 
 
 ccd:
-  enabled: ${LOCAL_CCD_ENABLED}
+  enabled: ${PREVIEW_CCD_ENABLED}
   ccd:
     adminWeb:
-      enabled: ${LOCAL_CCD_ENABLED}
+      enabled: ${PREVIEW_CCD_ENABLED}
     definitionImporter:
-      enabled: ${LOCAL_CCD_ENABLED}
+      enabled: ${PREVIEW_CCD_ENABLED}
     userProfileImporter:
-      enabled: ${LOCAL_CCD_ENABLED}
+      enabled: ${PREVIEW_CCD_ENABLED}
     apiGatewayWeb:
-      enabled: ${LOCAL_CCD_ENABLED}
+      enabled: ${PREVIEW_CCD_ENABLED}
     postgresql:
-      enabled: ${LOCAL_CCD_ENABLED}
+      enabled: ${PREVIEW_CCD_ENABLED}
     s2s:
       enabled: false
     elastic:
-      enabled: ${LOCAL_CCD_ENABLED}
+      enabled: ${PREVIEW_CCD_ENABLED}
 
   postgresql:
     primary:

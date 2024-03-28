@@ -90,12 +90,12 @@ withPipeline(type, product, component) {
     def githubApi = new GithubAPI(this)
     if (env.BRANCH_NAME.startsWith("PR")) {
         loadVaultSecrets(secretsForPR)
-        env.LOCAL_CCD_ENABLED = true
+        env.PREVIEW_CCD_ENABLED = true
         env.CASE_TYPE = "Benefit"
         env.CORE_CASE_DATA_API_URL = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-data-store-api"
         env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
         for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_hearings") ) {
-            env.LOCAL_CCD_ENABLED = false
+            env.PREVIEW_CCD_ENABLED = false
             env.CASE_TYPE = "Benefit-${CHANGE_ID}"
             env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
             env.CCD_GW_API = "https://gateway-ccd.aat.platform.hmcts.net"
