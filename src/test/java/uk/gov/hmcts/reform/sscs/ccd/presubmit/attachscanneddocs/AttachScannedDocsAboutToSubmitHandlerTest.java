@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.attachscanneddocs;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -139,5 +140,62 @@ public class AttachScannedDocsAboutToSubmitHandlerTest {
         assertEquals(List.of(document1, document3, documentWithoutEditedUrl), response.getData().getScannedDocuments());
         assertEquals(document1.getValue().getEditedUrl(), response.getData().getScannedDocuments().get(0).getValue().getEditedUrl());
         assertEquals(document3.getValue().getEditedUrl(), response.getData().getScannedDocuments().get(1).getValue().getEditedUrl());
+    }
+
+    @Test
+    public void givenNoScannedDocsInitiallyOnCase_thenAssertNotNullForWhenFirstScannedDocIsSubmitted() {
+        ReflectionTestUtils.setField(handler, "deletedRedactedDocEnabled", true);
+
+        ScannedDocument firstDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .editedUrl(DocumentLink.builder().documentUrl("edited url")
+                                .documentBinaryUrl("edited binary url").documentFilename("edited scanned doc").documentHash("hash edited").build())
+                        .url(DocumentLink.builder().documentUrl("original url")
+                                .documentBinaryUrl("original binary url").documentFilename("original scanned doc").documentHash("hash original").build())
+                        .type("Other")
+                        .scannedDate("20 Jun 2023")
+                        .build()
+        ).build();
+
+        CaseData caseData = SscsCaseData.builder().scannedDocuments(List.of(firstDocument)).build();
+        CaseData caseDataBefore = SscsCaseData.builder().scannedDocuments(null).build();
+
+        CaseDetails<? extends CaseData> caseDetails = new CaseDetails<>(1L, "", null, caseData, null, null);
+        CaseDetails<? extends CaseData> caseDetailsBefore = new CaseDetails<>(1L, "", null, caseDataBefore, null, null);
+
+        Callback<SscsCaseData> testCallback = new Callback(caseDetails, Optional.of(caseDetailsBefore), EventType.ATTACH_SCANNED_DOCS, false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, testCallback, USER_AUTHORISATION);
+
+        assertNotNull("Scanned document in case data should not be null, after passing through firstDocument", response.getData().getScannedDocuments());
+    }
+
+    @Test
+    public void givenScannedDocIsInitiallyOnCase_thenAssertThatNoErrorsShowForWhenNoScannedDocIsSubmitted() {
+        ReflectionTestUtils.setField(handler, "deletedRedactedDocEnabled", true);
+
+        ScannedDocument initialDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .editedUrl(DocumentLink.builder().documentUrl("edited url")
+                                .documentBinaryUrl("edited binary url").documentFilename("edited scanned doc").documentHash("hash edited").build())
+                        .url(DocumentLink.builder().documentUrl("original url")
+                                .documentBinaryUrl("original binary url").documentFilename("original scanned doc").documentHash("hash original").build())
+                        .type("Other")
+                        .scannedDate("20 Jun 2023")
+                        .build()
+        ).build();
+
+        CaseData caseData = SscsCaseData.builder().scannedDocuments(null).build();
+        CaseData caseDataBefore = SscsCaseData.builder().scannedDocuments(List.of(initialDocument)).build();
+
+        CaseDetails<? extends CaseData> caseDetails = new CaseDetails<>(1L, "", null, caseData, null, null);
+        CaseDetails<? extends CaseData> caseDetailsBefore = new CaseDetails<>(1L, "", null, caseDataBefore, null, null);
+
+
+        Callback<SscsCaseData> testCallback = new Callback(caseDetails, Optional.of(caseDetailsBefore), EventType.ATTACH_SCANNED_DOCS, false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, testCallback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
     }
 }
