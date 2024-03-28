@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
@@ -16,6 +17,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 
 @Component
@@ -25,6 +28,8 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
     private final SscsPdfService sscsPdfService;
     private final EmailHelper emailHelper;
+
+    private final VerbalLanguagesService verbalLanguagesService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -54,6 +59,7 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         caseData.setTribunalDirectPoToAttend(YesNo.NO);
 
         handleBenefitType(caseData);
+        updateLanguage(caseData);
 
         if (isNull(caseData.getDwpIsOfficerAttending())) {
             caseData.setDwpIsOfficerAttending(NO.toString());
@@ -74,6 +80,22 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         }
 
         return preSubmitCallbackResponse;
+    }
+
+    private void updateLanguage(SscsCaseData caseData) {
+        Appeal appeal = caseData.getAppeal();
+        if (nonNull(appeal)) {
+            HearingOptions hearingOptions = appeal.getHearingOptions();
+
+            if (nonNull(hearingOptions)) {
+                String syaSelectedLanguage = hearingOptions.getLanguages();
+                Language language = verbalLanguagesService.getVerbalLanguage(syaSelectedLanguage);
+
+                if (nonNull(language)) {
+                    hearingOptions.setLanguages(language.getNameEn());
+                }
+            }
+        }
     }
 
     private void createAppealPdf(SscsCaseData caseData) {

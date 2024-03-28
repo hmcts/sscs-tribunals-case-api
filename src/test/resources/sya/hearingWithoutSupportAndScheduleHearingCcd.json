@@ -62,7 +62,8 @@
     "hearingOptions": {
       "wantsToAttend": "Yes",
       "wantsSupport": "No",
-      "scheduleHearing": "No"
+      "scheduleHearing": "No",
+      "languages": null
     },
     "appealReasons": {
       "reasons": [
