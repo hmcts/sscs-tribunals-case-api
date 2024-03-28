@@ -8,9 +8,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION_I
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse.DwpUploadResponseAboutToSubmitHandler.NEW_OTHER_PARTY_RESPONSE_DUE_DAYS;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.generateDwpResponseDueDate;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.getLocalDateTime;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isValidBenefitTypeForConfidentiality;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,12 +21,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 @Slf4j
 public class SscsHelper {
@@ -97,5 +95,28 @@ public class SscsHelper {
             }
         }
         return errors;
+    }
+
+    private static boolean isValidHearing(HearingDetails hearingDetails) {
+        return hearingDetails != null
+            && StringUtils.isNotBlank(hearingDetails.getHearingDate())
+            && hearingDetails.getVenue() != null
+            && StringUtils.isNotBlank(hearingDetails.getVenue().getName());
+    }
+
+    private static boolean getValidHearing(Hearing hearing) {
+        HearingDetails hearingDetails = hearing.getValue();
+        if (isValidHearing(hearingDetails)) {
+            LocalDateTime hearingDateTime = getLocalDateTime(hearingDetails.getHearingDate(), hearingDetails.getTime());
+            return Optional.of(hearingDateTime).filter(d -> d.isAfter(LocalDateTime.now())).isPresent();
+        }
+        return false;
+    }
+
+    public static boolean hasHearingScheduledInTheFuture(SscsCaseData caseData) {
+        Optional<Hearing> futureHearing = Optional.ofNullable(caseData.getHearings())
+            .orElse(Collections.emptyList())
+            .stream().filter(SscsHelper::getValidHearing).findFirst();
+        return futureHearing.isPresent();
     }
 }

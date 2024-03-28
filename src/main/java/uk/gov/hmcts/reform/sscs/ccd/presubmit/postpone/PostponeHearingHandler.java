@@ -46,6 +46,10 @@ public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCase
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback.");
+        }
+
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData caseData = caseDetails.getCaseData();
 
@@ -85,13 +89,12 @@ public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCase
         }
 
         caseData.setDwpState(DwpState.HEARING_POSTPONED);
+        caseData.setPostponement(Postponement.builder()
+                .unprocessedPostponement(NO)
+                .build());
 
         ccdService.updateCase(caseData, caseId, postponementEvent.getCcdType(),
             summary, description, idamService.getIdamTokens());
-
-        caseData.setPostponement(Postponement.builder()
-            .unprocessedPostponement(NO)
-            .build());
 
         return response;
     }
