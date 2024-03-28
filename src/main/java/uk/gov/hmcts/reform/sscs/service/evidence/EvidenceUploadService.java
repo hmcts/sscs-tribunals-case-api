@@ -149,29 +149,30 @@ public class EvidenceUploadService {
     public boolean submitSingleHearingEvidence(String identifier, EvidenceDescription description, MultipartFile file) {
 
         return onlineHearingService.getCcdCaseByIdentifier(identifier)
-                .map(() -> {
+                .map(caseDetails -> {
                     Long caseId = Long.parseLong(identifier);
+
+                    String sha512HashChecksum = "";
+                    String filename = "";
+                    try {
+                        sha512HashChecksum = Arrays.toString(MessageDigest.getInstance("SHA-512").digest(file.getBytes())).toUpperCase();
+                        filename = file.getOriginalFilename();
+                        log.info("uploadEvidence: for case ID Case({}): User has uploaded the file ({}) with a checksum of ({})", caseId, filename, sha512HashChecksum);
+                    } catch (IOException | NoSuchAlgorithmException e) {
+                        log.error(e.getMessage()
+                                + ". Something has gone wrong for caseId: ", caseId
+                                + " when logging uploadEvidence for file (" + filename
+                                + ") with a checksum of (" + sha512HashChecksum + ")");
+                        return false;
+                    }
+
                     updateCcdCaseService.updateCaseV2(caseId, UPLOAD_DOCUMENT.getCcdType(),
                             "SSCS - upload evidence from MYA",
                             "Uploaded a further evidence document", idamService.getIdamTokens(),
                             sscsCaseDetails -> {
                                 SscsCaseData caseData = sscsCaseDetails.getData();
 
-                                String sha512HashChecksum = "";
                                 addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(caseData);
-                                String filename = "";
-                                try {
-                                    sha512HashChecksum = Arrays.toString(MessageDigest.getInstance("SHA-512").digest(file.getBytes())).toUpperCase();
-                                    filename = file.getOriginalFilename();
-                                    log.info("uploadEvidence: for case ID Case({}): User has uploaded the file ({}) with a checksum of ({})", caseId, filename, sha512HashChecksum);
-                                } catch (IOException | NoSuchAlgorithmException e) {
-                                    log.error(e.getMessage()
-                                            + ". Something has gone wrong for caseId: ", caseId
-                                            + " when logging uploadEvidence for file (" + filename
-                                            + ") with a checksum of (" + sha512HashChecksum + ")");
-                                    // Somehow this return value needs to be propogated out of the updateCaseV2 method and into the map outside it
-                                    return false;
-                                }
 
                                 List<MultipartFile> convertedFiles = fileToPdfConversionService.convert(singletonList(file));
 
