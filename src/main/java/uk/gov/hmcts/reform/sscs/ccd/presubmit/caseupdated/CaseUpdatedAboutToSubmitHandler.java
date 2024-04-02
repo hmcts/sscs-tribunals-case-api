@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 import static java.util.Objects.*;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
