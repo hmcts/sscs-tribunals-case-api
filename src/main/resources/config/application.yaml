@@ -1907,5 +1907,21 @@ ccd-callback-orchestrator:
         url: ${CCD_CALLBACK_ORCHESTRATOR_API_URL:http://localhost:8070}
 
 
-
+---
+# tya-integration profile
+spring:
+    config:
+        activate:
+            on-profile: integration, functional
+    autoconfigure.exclude:
+        - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+    flyway.enabled: false
+job.scheduler:
+    autoStart: false
+    quartzProperties:
+        org.quartz:
+            scheduler:
+                instanceId: AUTO
+            jobStore:
+                class: org.quartz.simpl.RAMJobStore
 
