@@ -59,7 +59,7 @@ public class PdfLetterServiceIt {
     @Test
     public void canGenerateACoversheetOnAppealReceived() throws IOException {
         byte[] pdfbytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream(
-                "pdfs/direction-notice-coversheet-sample.pdf"));
+                "pdf/direction-notice-coversheet-sample.pdf"));
         when(docmosisPdfService.createPdf(any(Object.class), anyString())).thenReturn(pdfbytes);
         SscsCaseData sscsCaseData = getSscsCaseData();
         NotificationSscsCaseDataWrapper dataWrapper = NotificationSscsCaseDataWrapper.builder()
@@ -93,7 +93,7 @@ public class PdfLetterServiceIt {
     @Test
     public void canGenerateACoversheetOnUpdateOtherPartyData() throws IOException {
         byte[] pdfbytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream(
-                "pdfs/direction-notice-coversheet-sample.pdf"));
+                "pdf/direction-notice-coversheet-sample.pdf"));
         when(docmosisPdfService.createPdf(any(Object.class), anyString())).thenReturn(pdfbytes);
         SscsCaseData sscsCaseData = getSscsCaseData();
         NotificationSscsCaseDataWrapper dataWrapper = NotificationSscsCaseDataWrapper.builder()

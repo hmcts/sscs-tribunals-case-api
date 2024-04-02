@@ -204,7 +204,7 @@ public class NotificationsIt extends NotificationsItBase {
     public void shouldSendRepsBundledLetterNotificationsForAnEventForAnOralOrPaperHearingAndForEachSubscription(
         NotificationEventType notificationEventType, String hearingType, String hearingRoute, boolean hasRep, boolean hasAppointee, int wantedNumberOfSendLetterInvocations) throws Exception {
 
-        byte[] sampleDirectionNotice = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdfs/direction-text.pdf"));
+        byte[] sampleDirectionNotice = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/direction-text.pdf"));
         when(pdfStoreService.download(any())).thenReturn(sampleDirectionNotice);
 
         String filename = "json/ccdResponse_"
@@ -222,47 +222,6 @@ public class NotificationsIt extends NotificationsItBase {
         assertHttpStatus(response, HttpStatus.OK);
 
         verify(notificationClient, times(wantedNumberOfSendLetterInvocations)).sendPrecompiledLetterWithInputStream(any(), any());
-    }
-
-    @Test
-    @Parameters(method = "generateAppointeeNotificationScenarios")
-    @Ignore
-    // SSCS-11586
-    @SuppressWarnings("unchecked")
-    public void shouldSendAppointeeNotificationsForAnEventForAnOralOrPaperHearingAndForEachSubscription(
-        NotificationEventType notificationEventType, String hearingType, String hearingRoute, List<String> expectedEmailTemplateIds,
-        List<String> expectedSmsTemplateIds, List<String> expectedLetterTemplateIds, String appointeeEmailSubs,
-        String appointeeSmsSubs, int wantedNumberOfSendEmailInvocations, int wantedNumberOfSendSmsInvocations,
-        int wantedNumberOfSendLetterInvocations, String expectedName) throws Exception {
-
-        String path = getClass().getClassLoader().getResource("json/ccdResponseWithAppointee.json").getFile();
-        String jsonAppointee = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-        jsonAppointee = updateEmbeddedJson(jsonAppointee, hearingType, "case_details", "case_data", "appeal", "hearingType");
-        jsonAppointee = jsonAppointee.replace(HEARING_ROUTE_FIELD, hearingRoute);
-        jsonAppointee = updateCommonJsonData(notificationEventType, jsonAppointee);
-        jsonAppointee = updateEmbeddedJson(jsonAppointee, appointeeEmailSubs, "case_details", "case_data", "subscriptions",
-            "appointeeSubscription", "subscribeEmail");
-        jsonAppointee = updateEmbeddedJson(jsonAppointee, appointeeSmsSubs, "case_details", "case_data", "subscriptions",
-            "appointeeSubscription", "subscribeSms");
-
-        if (notificationEventType.equals(HEARING_BOOKED)) {
-            jsonAppointee = jsonAppointee.replace("appealReceived", "hearingBooked");
-            jsonAppointee = jsonAppointee.replace("2018-01-12", LocalDate.now().plusDays(2).toString());
-        }
-
-        if (notificationEventType.equals(REQUEST_FOR_INFORMATION)) {
-            jsonAppointee = updateEmbeddedJson(jsonAppointee, "Yes", "case_details", "case_data", "informationFromAppellant");
-        }
-
-        jsonAppointee = updateEmbeddedJson(jsonAppointee, notificationEventType.getId(), "event_id");
-
-        HttpServletResponse response = getResponse(getRequestWithAuthHeader(jsonAppointee));
-
-        assertHttpStatus(response, HttpStatus.OK);
-
-        validateEmailNotifications(expectedEmailTemplateIds, wantedNumberOfSendEmailInvocations, expectedName);
-        validateSmsNotifications(expectedSmsTemplateIds, wantedNumberOfSendSmsInvocations);
-        validateLetterNotifications(expectedLetterTemplateIds, wantedNumberOfSendLetterInvocations, expectedName);
     }
 
     private String updateCommonJsonData(final NotificationEventType notificationEventType, String json) throws IOException {
@@ -287,44 +246,6 @@ public class NotificationsIt extends NotificationsItBase {
         }
         return json;
     }
-
-    @Test
-    @Parameters(method = "generateJointPartyNotificationScenarios")
-    @Ignore
-    // SSCS-11586
-    public void shouldSendJointPartyNotificationsForAnEventForAnOralOrPaperHearingAndForEachSubscription(
-        NotificationEventType notificationEventType, String hearingType, String hearingRoute, List<String> expectedEmailTemplateIds,
-        List<String> expectedSmsTemplateIds, List<String> expectedLetterTemplateIds, String jointPartyEmailSubs,
-        String jointPartySmsSubs, int wantedNumberOfSendEmailInvocations, int wantedNumberOfSendSmsInvocations, int wantedNumberOfSendLetterInvocations) throws Exception {
-        String path = getClass().getClassLoader().getResource("json/ccdResponseWithJointParty.json").getFile();
-        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-
-        json = updateEmbeddedJson(json, hearingType, "case_details", "case_data", "appeal", "hearingType");
-        json = json.replace(HEARING_ROUTE_FIELD, hearingRoute);
-        json = updateEmbeddedJson(json, "no", "case_details", "case_data", "subscriptions",
-            "appellantSubscription", "subscribeEmail");
-        json = updateEmbeddedJson(json, "no", "case_details", "case_data", "subscriptions",
-            "appellantSubscription", "subscribeSms");
-        json = updateEmbeddedJson(json, jointPartyEmailSubs, "case_details", "case_data", "subscriptions",
-            "jointPartySubscription", "subscribeEmail");
-        json = updateEmbeddedJson(json, jointPartySmsSubs, "case_details", "case_data", "subscriptions",
-            "jointPartySubscription", "subscribeSms");
-        json = updateEmbeddedJson(json, notificationEventType.getId(), "event_id");
-
-        json = updateCommonJsonData(notificationEventType, json);
-        if (notificationEventType.equals(REQUEST_FOR_INFORMATION)) {
-            json = updateEmbeddedJson(json, "Yes", "case_details", "case_data", "informationFromAppellant");
-        }
-
-        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
-        assertHttpStatus(response, HttpStatus.OK);
-
-        String expectedName = "Joint Party";
-        validateEmailNotifications(expectedEmailTemplateIds, wantedNumberOfSendEmailInvocations, expectedName);
-        validateSmsNotifications(expectedSmsTemplateIds, wantedNumberOfSendSmsInvocations);
-        validateLetterNotifications(expectedLetterTemplateIds, wantedNumberOfSendLetterInvocations, expectedName);
-    }
-
 
     @SuppressWarnings({"Indentation", "unused"})
     private Object[] generateJointPartyNotificationScenarios() {
@@ -4756,20 +4677,6 @@ public class NotificationsIt extends NotificationsItBase {
         };
     }
 
-    @Test
-    @Ignore
-    // SSCS-11586
-    public void shouldSendNotificationForHearingBookedRequestForAnOralHearing() throws Exception {
-        json = json.replace("appealReceived", "hearingBooked");
-        json = json.replace(HEARING_ROUTE_FIELD, LIST_ASSIST_ROUTE);
-        json = json.replace("2018-01-12", LocalDate.now().plusDays(2).toString());
-
-        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
-
-        assertHttpStatus(response, HttpStatus.OK);
-        verify(notificationClient).sendEmail(any(), any(), any(), any());
-        verify(notificationClient, times(2)).sendSms(any(), any(), any(), any(), any());
-    }
 
     @Test
     public void shouldNotSendNotificationForHearingBookedRequestForAPaperHearing() throws Exception {
@@ -4817,21 +4724,6 @@ public class NotificationsIt extends NotificationsItBase {
         assertHttpStatus(response, HttpStatus.OK);
         verify(notificationClient).sendEmail(eq("c507a630-9e6a-43c9-8e39-dcabdcffaf53"), any(), any(), any());
         verify(notificationClient).sendSms(eq("56a6c0c8-a251-482d-be83-95a7a1bf528c"), any(), any(), any(), any());
-    }
-
-    @Test
-    @Ignore
-    // SSCS-11586
-    public void shouldSendNotificationForHearingReminderForAnOralHearing() throws Exception {
-        json = json.replace("appealReceived", "hearingReminder");
-        json = json.replace(HEARING_ROUTE_FIELD, LIST_ASSIST_ROUTE);
-        json = json.replace("2018-01-12", LocalDate.now().plusDays(2).toString());
-
-        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
-
-        assertHttpStatus(response, HttpStatus.OK);
-        verify(notificationClient).sendEmail(any(), any(), any(), any());
-        verify(notificationClient, times(2)).sendSms(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -5029,7 +4921,7 @@ public class NotificationsIt extends NotificationsItBase {
 
         json = json.replace("appealCreated", State.DORMANT_APPEAL_STATE.toString());
 
-        byte[] sampleDirectionNotice = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdfs/direction-text.pdf"));
+        byte[] sampleDirectionNotice = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/direction-text.pdf"));
         when(pdfStoreService.download(any())).thenReturn(sampleDirectionNotice);
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
@@ -5052,7 +4944,7 @@ public class NotificationsIt extends NotificationsItBase {
         json = json.replace("appealCreated", State.DORMANT_APPEAL_STATE.toString());
         json = json.replace("REISSUE_DOCUMENT", furtherEvidenceType);
 
-        byte[] sampleDirectionNotice = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdfs/direction-text.pdf"));
+        byte[] sampleDirectionNotice = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/direction-text.pdf"));
         when(pdfStoreService.download(any())).thenReturn(sampleDirectionNotice);
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));

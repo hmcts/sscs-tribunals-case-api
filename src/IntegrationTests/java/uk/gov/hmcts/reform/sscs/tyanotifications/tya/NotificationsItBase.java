@@ -50,6 +50,7 @@ import uk.gov.service.notify.*;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
+@ActiveProfiles("tya-integration")
 @AutoConfigureMockMvc
 public class NotificationsItBase {
     // Below rules are needed to use the junitParamsRunner together with SpringRunner
