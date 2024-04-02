@@ -42,7 +42,7 @@ public class IntegrationTestHelper {
 
     public static MockHttpServletRequestBuilder getRequestWithoutAuthHeader(String json) {
 
-        return getRequestWithoutAuthHeader(json, "/send");
+        return getRequestWithoutAuthHeader(json, "/sendNotification");
     }
 
     private static MockHttpServletRequestBuilder getRequestWithoutAuthHeader(String json, String url) {
