@@ -47,7 +47,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfigura
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.properties.EvidenceProperties;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Link;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
@@ -203,7 +203,7 @@ public class PersonalisationTest {
                                                                                  String templateConfig,
                                                                                  SubscriptionType subscriptionType) {
 
-        NotificationWrapper notificationWrapper = new CcdNotificationWrapper(SscsCaseDataWrapper.builder()
+        NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(SscsCaseData.builder()
                 .directionTypeDl(new DynamicList(directionType.toString()))
                 .appeal(Appeal.builder()
@@ -234,7 +234,7 @@ public class PersonalisationTest {
         "APPOINTEE, refuseUrgentHearing, directionIssued.refuseUrgentHearing"})
     public void whenDirectionIssuedAndGrantOrRefuseUrgentHearingShouldGenerateCorrectTemplate(SubscriptionType subscriptionType, String directionTypeString, String templateConfig) {
 
-        NotificationWrapper notificationWrapper = new CcdNotificationWrapper(SscsCaseDataWrapper.builder()
+        NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(SscsCaseData.builder()
                 .directionTypeDl(new DynamicList("grantUrgentHearing"))
                 .appeal(Appeal.builder()
@@ -269,7 +269,7 @@ public class PersonalisationTest {
                                                                                       String templateConfig,
                                                                                       SubscriptionType subscriptionType) {
 
-        NotificationWrapper notificationWrapper = new CcdNotificationWrapper(SscsCaseDataWrapper.builder()
+        NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(SscsCaseData.builder()
                 .directionTypeDl(new DynamicList(directionType.toString()))
                 .languagePreferenceWelsh("Yes")
@@ -295,7 +295,7 @@ public class PersonalisationTest {
     public void givenSubscriptionType_shouldGenerateEmailAndSmsAndLetterTemplateNamesPerSubscription(
         NotificationEventType notificationEventType, SubscriptionType subscriptionType, HearingType hearingType,
         boolean hasEmailTemplate, boolean hasSmsTemplate, boolean hasLetterTemplate, boolean hasDocmosisTemplate) {
-        NotificationWrapper notificationWrapper = new CcdNotificationWrapper(SscsCaseDataWrapper.builder()
+        NotificationWrapper notificationWrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(SscsCaseData.builder()
                 .directionTypeDl(new DynamicList(DirectionType.PROVIDE_INFORMATION.toString()))
                 .appeal(Appeal.builder()
@@ -486,7 +486,7 @@ public class PersonalisationTest {
             .events(events)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
                 .notificationEventType(APPEAL_RECEIVED).build(),
             new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
                 response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
@@ -561,7 +561,7 @@ public class PersonalisationTest {
             .events(events)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(APPEAL_RECEIVED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
@@ -626,7 +626,7 @@ public class PersonalisationTest {
             .events(events)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(APPEAL_RECEIVED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertEquals("0300 999 8888", result.get(PHONE_NUMBER));
@@ -657,7 +657,7 @@ public class PersonalisationTest {
             .events(events)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(APPEAL_RECEIVED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertEquals(phone, result.get(PHONE_NUMBER));
@@ -675,7 +675,7 @@ public class PersonalisationTest {
             .subscriptions(subscriptions)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(APPEAL_RECEIVED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertEquals(CASE_ID, result.get(APPEAL_REF));
@@ -693,7 +693,7 @@ public class PersonalisationTest {
             .subscriptions(subscriptions)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(APPEAL_RECEIVED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertEquals(true, result.get(IS_GRANTED));
@@ -710,7 +710,7 @@ public class PersonalisationTest {
             .subscriptions(subscriptions)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(APPEAL_RECEIVED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertEquals(false, result.get(IS_GRANTED));
@@ -729,7 +729,7 @@ public class PersonalisationTest {
             .createdInGapsFrom("readyToList")
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(APPEAL_RECEIVED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertEquals(CASE_ID, result.get(APPEAL_REF));
@@ -749,7 +749,7 @@ public class PersonalisationTest {
             .createdInGapsFrom("validAppeal")
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(APPEAL_RECEIVED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertEquals("SC/1234/5", result.get(APPEAL_REF));
@@ -792,7 +792,7 @@ public class PersonalisationTest {
             .evidence(evidence)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder()
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(response).notificationEventType(EVIDENCE_RECEIVED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertEquals("1 July 2018", result.get(EVIDENCE_RECEIVED_DATE_LITERAL));
@@ -837,7 +837,7 @@ public class PersonalisationTest {
             .languagePreferenceWelsh("Yes")
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder()
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(response).notificationEventType(EVIDENCE_RECEIVED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertEquals("1 July 2018", result.get(EVIDENCE_RECEIVED_DATE_LITERAL));
@@ -933,7 +933,7 @@ public class PersonalisationTest {
             .caseCreated(LocalDate.now().minusDays(1).toString())
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder()
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
                 .newSscsCaseData(response).notificationEventType(APPEAL_RECEIVED).build(),
             new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
@@ -951,7 +951,7 @@ public class PersonalisationTest {
             .caseCreated(null)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder()
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
                 .newSscsCaseData(response).notificationEventType(APPEAL_RECEIVED).build(),
             new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
@@ -1052,7 +1052,7 @@ public class PersonalisationTest {
             .hearings(hearingList)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder()
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
                 .newSscsCaseData(response).notificationEventType(hearingNotificationEventType).build(),
             new SubscriptionWithType(subscriptions.getAppellantSubscription(), subscriptionType, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
@@ -1084,7 +1084,7 @@ public class PersonalisationTest {
             .languagePreferenceWelsh("Yes")
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder()
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
                 .newSscsCaseData(response).notificationEventType(hearingNotificationEventType).build(),
             new SubscriptionWithType(subscriptions.getAppellantSubscription(), subscriptionType, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
@@ -1125,7 +1125,7 @@ public class PersonalisationTest {
             .hearings(hearingList)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertEquals("tomorrow", result.get(DAYS_TO_HEARING_LITERAL));
@@ -1150,7 +1150,7 @@ public class PersonalisationTest {
             .languagePreferenceWelsh("Yes")
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
         assertEquals("Welsh current date is set", LocalDateToWelshStringConverter.convert(LocalDate.now()), result.get(CURRENT_DATE_WELSH));
         assertEquals("Welsh decision posted receive date", getWelshDate().apply(result.get(DECISION_POSTED_RECEIVE_DATE), dateTimeFormatter), result.get(DECISION_POSTED_RECEIVE_DATE_WELSH));
@@ -1175,7 +1175,7 @@ public class PersonalisationTest {
             .hearings(hearingList)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
         assertNull("Welsh current date is not set", result.get(CURRENT_DATE_WELSH));
         assertNull("Welsh decision posted receive date is not set", result.get(DECISION_POSTED_RECEIVE_DATE_WELSH));
@@ -1203,7 +1203,7 @@ public class PersonalisationTest {
                 .build())
             .build();
 
-        Map<String, Object> result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map<String, Object> result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(HEARING_BOOKED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertThat(result.get(HEARING)).isNotNull();
@@ -1315,7 +1315,7 @@ public class PersonalisationTest {
     @Test
     public void shouldPopulateHearingContactDateFromCcdCaseIfPresent() {
 
-        SscsCaseDataWrapper wrapper = SscsCaseDataWrapper.builder().newSscsCaseData(SscsCaseData.builder().build()).build();
+        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder().newSscsCaseData(SscsCaseData.builder().build()).build();
 
         ZonedDateTime now = ZonedDateTime.ofInstant(Instant.ofEpochSecond(1528907807), ZoneId.of("UTC"));
         when(hearingContactDateExtractor.extract(wrapper)).thenReturn(Optional.of(now));
@@ -1329,7 +1329,7 @@ public class PersonalisationTest {
     @Test
     public void shouldNotPopulateHearingContactDateFromCcdCaseIfNotPresent() {
 
-        SscsCaseDataWrapper wrapper = SscsCaseDataWrapper.builder().newSscsCaseData(SscsCaseData.builder().build()).build();
+        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder().newSscsCaseData(SscsCaseData.builder().build()).build();
 
         when(hearingContactDateExtractor.extract(wrapper)).thenReturn(Optional.empty());
 
@@ -1374,7 +1374,7 @@ public class PersonalisationTest {
                 .build())
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder()
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(sscsCaseData)
             .notificationEventType(SUBSCRIPTION_CREATED)
             .build(), new SubscriptionWithType(sscsCaseData.getSubscriptions().getAppointeeSubscription(), APPOINTEE, sscsCaseData.getAppeal().getAppellant(), sscsCaseData.getAppeal().getAppellant().getAppointee()));
@@ -1426,7 +1426,7 @@ public class PersonalisationTest {
                 .build())
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder()
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
                 .newSscsCaseData(sscsCaseData)
                 .notificationEventType(SUBSCRIPTION_CREATED)
                 .build(),
@@ -1483,7 +1483,7 @@ public class PersonalisationTest {
                 .build())
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder()
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
                 .newSscsCaseData(sscsCaseData)
                 .notificationEventType(SUBSCRIPTION_CREATED)
                 .build(),
@@ -1545,7 +1545,7 @@ public class PersonalisationTest {
             .build();
 
         OtherParty otherParty = sscsCaseData.getOtherParties().get(0).getValue();
-        Map result = personalisation.create(SscsCaseDataWrapper.builder()
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
                 .newSscsCaseData(sscsCaseData)
                 .notificationEventType(SUBSCRIPTION_CREATED)
                 .build(),
@@ -1572,7 +1572,7 @@ public class PersonalisationTest {
                 .build())
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(APPEAL_RECEIVED).build(), new SubscriptionWithType(null,
             APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
@@ -1659,7 +1659,7 @@ public class PersonalisationTest {
             .createdInGapsFrom("readyToList")
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(APPEAL_RECEIVED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertEquals("http://myalink.com/GLSCRR", result.get(TRACK_APPEAL_LINK_LITERAL));
@@ -1682,7 +1682,7 @@ public class PersonalisationTest {
             .createdInGapsFrom("validAppeal")
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(APPEAL_RECEIVED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertEquals("http://tyalink.com/GLSCRR", result.get(TRACK_APPEAL_LINK_LITERAL));
@@ -1706,7 +1706,7 @@ public class PersonalisationTest {
             .confidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder().requestOutcome(requestOutcome).build())
             .build();
 
-        Map<String, String> result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map<String, String> result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(REVIEW_CONFIDENTIALITY_REQUEST).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertEquals("Jeff Stelling", result.get(OTHER_PARTY_NAME));
@@ -1727,7 +1727,7 @@ public class PersonalisationTest {
             .confidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder().requestOutcome(requestOutcome).build())
             .build();
 
-        Map<String, String> result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map<String, String> result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
                 .notificationEventType(REVIEW_CONFIDENTIALITY_REQUEST).build(),
             new SubscriptionWithType(subscriptions.getJointPartySubscription(),
                 JOINT_PARTY, response.getJointParty(), response.getJointParty()));
@@ -1747,7 +1747,7 @@ public class PersonalisationTest {
             .isScottishCase(isScottish)
             .build();
 
-        Map<String, String> result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map<String, String> result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(VALID_APPEAL_CREATED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertEquals(helpLineTelephone, result.get(HELPLINE_PHONE_NUMBER));
@@ -1770,7 +1770,7 @@ public class PersonalisationTest {
                 .build())
             .build();
 
-        Map<String, String> result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map<String, String> result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
                 .notificationEventType(VALID_APPEAL_CREATED).build(),
             new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPOINTEE,
                 response.getAppeal().getAppellant(), response.getAppeal().getAppellant().getAppointee()));
@@ -1816,7 +1816,7 @@ public class PersonalisationTest {
 
         SubscriptionWithType subscription = new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
             appellant, appellant);
-        SscsCaseDataWrapper caseDataWrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper caseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(response)
             .notificationEventType(PERMISSION_TO_APPEAL_GRANTED).build();
         var result = personalisation.create(caseDataWrapper, subscription);
@@ -1849,7 +1849,7 @@ public class PersonalisationTest {
             .build();
         SubscriptionWithType subscription = new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
             appellant, appellant);
-        SscsCaseDataWrapper caseDataWrapper = SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        NotificationSscsCaseDataWrapper caseDataWrapper = NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(PERMISSION_TO_APPEAL_REFUSED).build();
         var result = personalisation.create(caseDataWrapper, subscription);
 
@@ -1935,7 +1935,7 @@ public class PersonalisationTest {
             .subscriptions(subscriptions)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(APPEAL_RECEIVED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertEquals(true, result.get(IS_GRANTED));
@@ -1963,7 +1963,7 @@ public class PersonalisationTest {
             .build();
         SubscriptionWithType subscription = new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
             appellant, appellant);
-        SscsCaseDataWrapper caseDataWrapper = SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        NotificationSscsCaseDataWrapper caseDataWrapper = NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(BUNDLE_CREATED_FOR_UPPER_TRIBUNAL).build();
         var result = personalisation.create(caseDataWrapper, subscription);
 
@@ -2007,7 +2007,7 @@ public class PersonalisationTest {
                 .build())
             .build();
 
-        Map<String, String> result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map<String, String> result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
                 .notificationEventType(REVIEW_AND_SET_ASIDE).build(),
             new SubscriptionWithType(subscriptions.getAppellantSubscription(),
                 APPOINTEE,
@@ -2035,7 +2035,7 @@ public class PersonalisationTest {
                 .build())
             .build();
 
-        Map<String, String> result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map<String, String> result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
                 .notificationEventType(REVIEW_AND_SET_ASIDE).build(),
             new SubscriptionWithType(subscriptions.getAppellantSubscription(),
                 APPOINTEE, response.getAppeal().getAppellant(),
@@ -2059,7 +2059,7 @@ public class PersonalisationTest {
             .dwpState(DwpState.LIBERTY_TO_APPLY_GRANTED)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(LIBERTY_TO_APPLY_GRANTED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertTrue((boolean) result.get(IS_GRANTED));
@@ -2079,7 +2079,7 @@ public class PersonalisationTest {
             .dwpState(DwpState.LIBERTY_TO_APPLY_REFUSED)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(LIBERTY_TO_APPLY_REFUSED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertFalse((boolean) result.get(IS_GRANTED));
@@ -2099,7 +2099,7 @@ public class PersonalisationTest {
             .dwpState(DwpState.CORRECTED_DECISION_NOTICE_ISSUED)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(LIBERTY_TO_APPLY_GRANTED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertTrue((boolean) result.get(IS_GRANTED));
@@ -2121,7 +2121,7 @@ public class PersonalisationTest {
             .finalDecisionCaseData(SscsFinalDecisionCaseData.builder().finalDecisionIssuedDate(LocalDate.now()).build())
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(CORRECTION_GRANTED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertTrue((boolean) result.get(IS_GRANTED));
@@ -2143,7 +2143,7 @@ public class PersonalisationTest {
             .dwpState(DwpState.CORRECTION_GRANTED)
             .build();
 
-        Map result = personalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
             .notificationEventType(CORRECTION_GRANTED).build(), new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT, response.getAppeal().getAppellant(), response.getAppeal().getAppellant()));
 
         assertTrue((boolean) result.get(IS_GRANTED));

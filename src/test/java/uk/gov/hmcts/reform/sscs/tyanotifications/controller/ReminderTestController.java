@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
 
@@ -57,17 +57,17 @@ public class ReminderTestController {
 
             CaseDetails<SscsCaseData> caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
 
-            SscsCaseDataWrapper sscsCaseDataWrapper = buildSscsCaseDataWrapper(
+            NotificationSscsCaseDataWrapper notificationSscsCaseDataWrapper = buildSscsCaseDataWrapper(
                 callback.getCaseDetails().getCaseData(),
                 caseDetailsBefore != null ? caseDetailsBefore.getCaseData() : null,
                 getNotificationByCcdEvent(callback.getEvent()),
                 callback.getCaseDetails().getState());
 
-            log.info("Test endpoint: Ccd Response received for case id: {} , {}", sscsCaseDataWrapper.getNewSscsCaseData().getCcdCaseId(), sscsCaseDataWrapper.getNotificationEventType());
+            log.info("Test endpoint: Ccd Response received for case id: {} , {}", notificationSscsCaseDataWrapper.getNewSscsCaseData().getCcdCaseId(), notificationSscsCaseDataWrapper.getNotificationEventType());
 
             callback.getCaseDetails().getCreatedDate();
             authorisationService.authorise(serviceAuthHeader);
-            notificationService.manageNotificationAndSubscription(new CcdNotificationWrapper(sscsCaseDataWrapper), true);
+            notificationService.manageNotificationAndSubscription(new CcdNotificationWrapper(notificationSscsCaseDataWrapper), true);
         } catch (Exception e) {
             log.info("Exception thrown", e);
             throw e;

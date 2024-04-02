@@ -27,7 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationService;
@@ -57,7 +57,7 @@ public class CcdActionExecutorTest {
 
     private SscsCaseData newSscsCaseData;
     private SscsCaseDetails caseDetails;
-    private SscsCaseDataWrapper wrapper;
+    private NotificationSscsCaseDataWrapper wrapper;
 
     private IdamTokens idamTokens;
 
@@ -100,7 +100,7 @@ public class CcdActionExecutorTest {
 
     @Test
     public void givenAReminderIsTriggeredAndNotificationIsNotAReminderType_thenActionExecutorShouldProcessTheJobButNotWriteBackToCcd() {
-        wrapper = SscsCaseDataWrapper.builder().state(State.APPEAL_CREATED).newSscsCaseData(newSscsCaseData).notificationEventType(SYA_APPEAL_CREATED).build();
+        wrapper = NotificationSscsCaseDataWrapper.builder().state(State.APPEAL_CREATED).newSscsCaseData(newSscsCaseData).notificationEventType(SYA_APPEAL_CREATED).build();
         when(ccdService.getByCaseId(eq(123456L), eq(idamTokens))).thenReturn(caseDetails);
 
         ccdActionExecutor.execute(JOB_ID, JOB_GROUP, SYA_APPEAL_CREATED.getId(), "123456");

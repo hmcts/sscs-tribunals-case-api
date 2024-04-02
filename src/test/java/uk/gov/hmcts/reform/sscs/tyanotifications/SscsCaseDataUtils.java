@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 
@@ -188,7 +188,7 @@ public final class SscsCaseDataUtils {
 
     public static CcdNotificationWrapper buildBasicCcdNotificationWrapper(NotificationEventType notificationType,
                                                                           String hearingType) {
-        return new CcdNotificationWrapper(SscsCaseDataWrapper.builder()
+        return new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
             .notificationEventType(notificationType)
             .newSscsCaseData(
                 SscsCaseData.builder()
@@ -216,7 +216,7 @@ public final class SscsCaseDataUtils {
             )
             .build();
 
-        return new CcdNotificationWrapper(SscsCaseDataWrapper.builder()
+        return new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
             .notificationEventType(notificationType)
             .newSscsCaseData(
                 SscsCaseData.builder()
@@ -242,7 +242,7 @@ public final class SscsCaseDataUtils {
             )
             .build();
 
-        return new CcdNotificationWrapper(SscsCaseDataWrapper.builder()
+        return new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
             .notificationEventType(notificationType)
             .newSscsCaseData(SscsCaseData.builder()
                 .ccdCaseId(CASE_ID)
@@ -255,7 +255,7 @@ public final class SscsCaseDataUtils {
     public static CcdNotificationWrapper buildBasicCcdNotificationWrapperWithHearingList(
         NotificationEventType notificationType, List<Hearing> hearings
     ) {
-        return new CcdNotificationWrapper(SscsCaseDataWrapper.builder()
+        return new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
             .notificationEventType(notificationType)
             .newSscsCaseData(SscsCaseData.builder()
                 .ccdCaseId(CASE_ID)
@@ -281,7 +281,7 @@ public final class SscsCaseDataUtils {
             )
             .build();
 
-        return new CcdNotificationWrapper(SscsCaseDataWrapper.builder()
+        return new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
             .notificationEventType(notificationType)
             .newSscsCaseData(SscsCaseData.builder()
                 .ccdCaseId(CASE_ID).appeal(Appeal.builder().hearingType(hearingType.getValue()).build())

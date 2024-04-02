@@ -48,7 +48,7 @@ import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.properties.EvidenceProperties;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Template;
@@ -154,7 +154,7 @@ public class Personalisation<E extends NotificationWrapper> {
         return create(notificationWrapper.getSscsCaseDataWrapper(), subscriptionWithType);
     }
 
-    protected Map<String, Object> create(final SscsCaseDataWrapper responseWrapper, final SubscriptionWithType subscriptionWithType) {
+    protected Map<String, Object> create(final NotificationSscsCaseDataWrapper responseWrapper, final SubscriptionWithType subscriptionWithType) {
 
         SscsCaseData ccdResponse = responseWrapper.getNewSscsCaseData();
         Map<String, Object> personalisation = new HashMap<>();
@@ -389,7 +389,7 @@ public class Personalisation<E extends NotificationWrapper> {
             ? ccdResponse.getCcdCaseId() : caseReference;
     }
 
-    private String getName(SubscriptionType subscriptionType, SscsCaseData sscsCaseData, SscsCaseDataWrapper wrapper) {
+    private String getName(SubscriptionType subscriptionType, SscsCaseData sscsCaseData, NotificationSscsCaseDataWrapper wrapper) {
         if (sscsCaseData.getAppeal() == null) {
             return EMPTY;
         }
@@ -411,7 +411,7 @@ public class Personalisation<E extends NotificationWrapper> {
         return EMPTY;
     }
 
-    private String getName(SubscriptionWithType subscriptionWithType, SscsCaseData sscsCaseData, SscsCaseDataWrapper wrapper) {
+    private String getName(SubscriptionWithType subscriptionWithType, SscsCaseData sscsCaseData, NotificationSscsCaseDataWrapper wrapper) {
         if (nonNull(sscsCaseData.getAppeal()) && nonNull(subscriptionWithType.getPartyId())) {
             return getDefaultName(getNameForOtherParty(sscsCaseData, subscriptionWithType.getPartyId()).orElse(null));
         }
@@ -461,7 +461,7 @@ public class Personalisation<E extends NotificationWrapper> {
         }
     }
 
-    void setHearingContactDate(Map<String, Object> personalisation, SscsCaseDataWrapper wrapper) {
+    void setHearingContactDate(Map<String, Object> personalisation, NotificationSscsCaseDataWrapper wrapper) {
         Optional<ZonedDateTime> hearingContactDate = hearingContactDateExtractor.extract(wrapper);
         hearingContactDate.ifPresent(zonedDateTime -> personalisation.put(HEARING_CONTACT_DATE,
             formatLocalDate(zonedDateTime.toLocalDate())

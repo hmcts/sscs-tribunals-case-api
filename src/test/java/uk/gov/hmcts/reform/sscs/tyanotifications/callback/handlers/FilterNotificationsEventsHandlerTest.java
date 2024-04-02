@@ -23,7 +23,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
@@ -41,7 +41,7 @@ public class FilterNotificationsEventsHandlerTest {
     @InjectMocks
     private FilterNotificationsEventsHandler handler;
 
-    private SscsCaseDataWrapper callback;
+    private NotificationSscsCaseDataWrapper callback;
     private SscsCaseData newCaseData;
     private SscsCaseData oldCaseData;
     private AutoCloseable autoCloseable;
@@ -63,7 +63,7 @@ public class FilterNotificationsEventsHandlerTest {
                 .build())
             .build();
 
-        callback = SscsCaseDataWrapper.builder()
+        callback = NotificationSscsCaseDataWrapper.builder()
             .notificationEventType(VALID_APPEAL_CREATED)
             .oldSscsCaseData(oldCaseData)
             .newSscsCaseData(newCaseData)
@@ -232,14 +232,14 @@ public class FilterNotificationsEventsHandlerTest {
         verifyNoInteractions(retryNotificationService);
     }
 
-    private void willHandle(SscsCaseDataWrapper callback) {
+    private void willHandle(NotificationSscsCaseDataWrapper callback) {
         assertThat(handler.canHandle(callback)).isTrue();
         handler.handle(callback);
         verify(notificationService).manageNotificationAndSubscription(new CcdNotificationWrapper(callback), false);
         verifyNoInteractions(retryNotificationService);
     }
 
-    private void willNotHandle(SscsCaseDataWrapper callback) {
+    private void willNotHandle(NotificationSscsCaseDataWrapper callback) {
         assertThat(handler.canHandle(callback)).isFalse();
         assertThatExceptionOfType(IllegalStateException.class)
             .isThrownBy(() -> handler.handle(callback))

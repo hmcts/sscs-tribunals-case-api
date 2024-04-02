@@ -5,7 +5,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMa
 import java.util.Map;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils;
@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationHelper;
 public class WithRepresentativePersonalisation extends Personalisation<CcdNotificationWrapper> {
 
     @Override
-    protected Map<String, Object> create(SscsCaseDataWrapper responseWrapper, SubscriptionWithType subscriptionWithType) {
+    protected Map<String, Object> create(NotificationSscsCaseDataWrapper responseWrapper, SubscriptionWithType subscriptionWithType) {
         Map<String, Object> personalisation = super.create(responseWrapper, subscriptionWithType);
         SscsCaseData ccdResponse = responseWrapper.getNewSscsCaseData();
 

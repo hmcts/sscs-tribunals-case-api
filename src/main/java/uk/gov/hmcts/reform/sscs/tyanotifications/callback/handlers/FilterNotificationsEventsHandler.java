@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ProcessRequestAction;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.tyanotifications.callback.CallbackHandler;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
@@ -37,7 +37,7 @@ public class FilterNotificationsEventsHandler implements CallbackHandler {
     private boolean isPostHearingsBEnabled;
 
     @Override
-    public boolean canHandle(SscsCaseDataWrapper callback) {
+    public boolean canHandle(NotificationSscsCaseDataWrapper callback) {
         return nonNull(callback.getNotificationEventType())
             && EVENTS_TO_HANDLE.contains(callback.getNotificationEventType())
             || (isPostHearingsEnabled && EVENTS_TO_HANDLE_POSTHEARINGS_A.contains(callback.getNotificationEventType()))
@@ -48,7 +48,7 @@ public class FilterNotificationsEventsHandler implements CallbackHandler {
     }
 
     @Override
-    public void handle(SscsCaseDataWrapper callback) {
+    public void handle(NotificationSscsCaseDataWrapper callback) {
         if (!canHandle(callback)) {
             IllegalStateException illegalStateException = new IllegalStateException("Cannot handle callback");
             String caseId = Optional.ofNullable(callback.getOldSscsCaseData())
@@ -67,13 +67,13 @@ public class FilterNotificationsEventsHandler implements CallbackHandler {
         }
     }
 
-    private boolean shouldActionPostponementBeNotified(SscsCaseDataWrapper callback) {
+    private boolean shouldActionPostponementBeNotified(NotificationSscsCaseDataWrapper callback) {
         return ACTION_POSTPONEMENT_REQUEST.equals(callback.getNotificationEventType())
             && !ProcessRequestAction.SEND_TO_JUDGE.getValue().equals(
             callback.getOldSscsCaseData().getPostponementRequest().getActionPostponementRequestSelected());
     }
 
-    private boolean hasNewAppointeeAddedForAppellantDeceasedCase(SscsCaseDataWrapper callback) {
+    private boolean hasNewAppointeeAddedForAppellantDeceasedCase(NotificationSscsCaseDataWrapper callback) {
         if (!(DEATH_OF_APPELLANT.equals(callback.getNotificationEventType())
             || PROVIDE_APPOINTEE_DETAILS.equals(callback.getNotificationEventType()))) {
             return false;
@@ -97,7 +97,7 @@ public class FilterNotificationsEventsHandler implements CallbackHandler {
             || (appointeeBefore != null && appointeeAfter != null && !appointeeBefore.equals(appointeeAfter)));
     }
 
-    private boolean shouldHandleForHearingRoute(SscsCaseDataWrapper callback) {
+    private boolean shouldHandleForHearingRoute(NotificationSscsCaseDataWrapper callback) {
         return HEARING_BOOKED == callback.getNotificationEventType()
             && GAPS != callback.getNewSscsCaseData().getSchedulingAndListingFields().getHearingRoute();
     }

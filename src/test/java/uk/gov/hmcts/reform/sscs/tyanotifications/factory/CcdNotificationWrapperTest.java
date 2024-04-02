@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityPartyMembers
 import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 
@@ -43,7 +43,7 @@ public class CcdNotificationWrapperTest {
 
     private CcdNotificationWrapper buildCcdNotificationWrapper(String hearingType) {
         return new CcdNotificationWrapper(
-            SscsCaseDataWrapper.builder()
+            NotificationSscsCaseDataWrapper.builder()
                 .newSscsCaseData(SscsCaseData.builder()
                     .appeal(Appeal.builder()
                         .hearingType(hearingType)
@@ -121,7 +121,7 @@ public class CcdNotificationWrapperTest {
         }
 
         return new CcdNotificationWrapper(
-            SscsCaseDataWrapper.builder()
+            NotificationSscsCaseDataWrapper.builder()
                 .oldSscsCaseData(SscsCaseData.builder().build())
                 .newSscsCaseData(SscsCaseData.builder()
                     .jointParty(JointParty.builder()
@@ -165,7 +165,7 @@ public class CcdNotificationWrapperTest {
         }
 
         return new CcdNotificationWrapper(
-            SscsCaseDataWrapper.builder()
+            NotificationSscsCaseDataWrapper.builder()
                 .newSscsCaseData(SscsCaseData.builder()
                     .jointParty(JointParty.builder()
                         .hasJointParty(YES)
@@ -210,7 +210,7 @@ public class CcdNotificationWrapperTest {
             .address(Address.builder().line1("Appointee Line 1").town("Appointee Town").county("Appointee County").postcode("AP9 0IN").build())
             .build();
         return new CcdNotificationWrapper(
-            SscsCaseDataWrapper.builder()
+            NotificationSscsCaseDataWrapper.builder()
                 .newSscsCaseData(SscsCaseData.builder().otherParties(otherParties)
                     .appeal(Appeal.builder()
                         .hearingType(ORAL)

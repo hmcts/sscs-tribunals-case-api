@@ -15,7 +15,7 @@ import org.springframework.core.env.Environment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Template;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 
@@ -43,7 +43,7 @@ public class NotificationConfigTest {
         when(env.getProperty(docmosisTemplateKey)).thenReturn(docmosisTemplateId);
         when(env.containsProperty(letterTemplateKey)).thenReturn(true);
 
-        CcdNotificationWrapper wrapper = new CcdNotificationWrapper(SscsCaseDataWrapper.builder().newSscsCaseData(SscsCaseData.builder().appeal(Appeal.builder().hearingType(ORAL.name()).build()).build()).build());
+        CcdNotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(SscsCaseData.builder().appeal(Appeal.builder().hearingType(ORAL.name()).build()).build()).build());
 
         Template template = new NotificationConfig(env).getTemplate(emailTemplateName, smsTemplateName, letterTemplateName, letterTemplateName, Benefit.PIP, wrapper, createdInGapsFrom);
 
@@ -74,7 +74,7 @@ public class NotificationConfigTest {
         when(env.getProperty(docmosisTemplateKey)).thenReturn(docmosisTemplateId);
         when(env.containsProperty(letterTemplateKey)).thenReturn(true);
 
-        CcdNotificationWrapper wrapper = new CcdNotificationWrapper(SscsCaseDataWrapper.builder().newSscsCaseData(SscsCaseData.builder().languagePreferenceWelsh("Yes").appeal(Appeal.builder().hearingType(ORAL.name()).build()).build()).build());
+        CcdNotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(SscsCaseData.builder().languagePreferenceWelsh("Yes").appeal(Appeal.builder().hearingType(ORAL.name()).build()).build()).build());
 
         Template template = new NotificationConfig(env).getTemplate(emailTemplateName, smsTemplateName, letterTemplateName, letterTemplateName, Benefit.PIP, wrapper, createdInGapsFrom);
 
@@ -98,7 +98,7 @@ public class NotificationConfigTest {
         when(env.getProperty(switchedDocmosisTemplateKey)).thenReturn(docmosisTemplateId);
         when(env.containsProperty(letterTemplateKey)).thenReturn(true);
 
-        CcdNotificationWrapper wrapper = new CcdNotificationWrapper(SscsCaseDataWrapper.builder().newSscsCaseData(SscsCaseData.builder().languagePreferenceWelsh("Yes").appeal(Appeal.builder().hearingType(ORAL.name()).build()).build()).build());
+        CcdNotificationWrapper wrapper = new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(SscsCaseData.builder().languagePreferenceWelsh("Yes").appeal(Appeal.builder().hearingType(ORAL.name()).build()).build()).build());
         wrapper.setSwitchLanguageType(true);
 
         Template template = new NotificationConfig(env).getTemplate("emailTemplateName", "smsTemplateName", "letterTemplateName", "letterTemplateName", Benefit.PIP, wrapper, "validAppeal");

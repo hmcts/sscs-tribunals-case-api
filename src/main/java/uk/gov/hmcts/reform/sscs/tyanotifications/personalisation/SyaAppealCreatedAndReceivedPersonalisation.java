@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 
 @Component
@@ -33,7 +33,7 @@ public class SyaAppealCreatedAndReceivedPersonalisation extends WithRepresentati
     private PersonalisationConfiguration syaAppealCreatedPersonalisationConfiguration;
 
     @Override
-    protected Map<String, Object> create(SscsCaseDataWrapper responseWrapper, SubscriptionWithType subscriptionWithType) {
+    protected Map<String, Object> create(NotificationSscsCaseDataWrapper responseWrapper, SubscriptionWithType subscriptionWithType) {
         Map<String, Object> personalisation = super.create(responseWrapper, subscriptionWithType);
         SscsCaseData ccdResponse = responseWrapper.getNewSscsCaseData();
 

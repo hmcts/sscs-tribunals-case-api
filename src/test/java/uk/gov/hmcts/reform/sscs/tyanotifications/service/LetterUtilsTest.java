@@ -34,7 +34,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRuntimeException;
@@ -252,7 +252,7 @@ public class LetterUtilsTest {
 
         SscsCaseData caseData = SscsCaseData.builder()
             .otherParties(otherPartyList).build();
-        SscsCaseDataWrapper caseDataWrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper caseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(caseData)
             .oldSscsCaseData(caseData)
             .notificationEventType(APPEAL_RECEIVED)
@@ -278,7 +278,7 @@ public class LetterUtilsTest {
 
         SscsCaseData caseData = SscsCaseData.builder()
             .otherParties(otherPartyList).build();
-        SscsCaseDataWrapper caseDataWrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper caseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(caseData)
             .oldSscsCaseData(caseData)
             .notificationEventType(APPEAL_RECEIVED)
@@ -303,7 +303,7 @@ public class LetterUtilsTest {
 
         SscsCaseData caseData = SscsCaseData.builder()
             .otherParties(otherPartyList).build();
-        SscsCaseDataWrapper caseDataWrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper caseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(caseData)
             .oldSscsCaseData(caseData)
             .notificationEventType(APPEAL_RECEIVED)
@@ -326,7 +326,7 @@ public class LetterUtilsTest {
 
         SscsCaseData caseData = SscsCaseData.builder()
             .otherParties(otherPartyList).build();
-        SscsCaseDataWrapper caseDataWrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper caseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(caseData)
             .oldSscsCaseData(caseData)
             .notificationEventType(APPEAL_RECEIVED)
@@ -349,7 +349,7 @@ public class LetterUtilsTest {
 
         SscsCaseData caseData = SscsCaseData.builder()
             .otherParties(otherPartyList).build();
-        SscsCaseDataWrapper caseDataWrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper caseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(caseData)
             .oldSscsCaseData(caseData)
             .notificationEventType(APPEAL_RECEIVED)
@@ -530,7 +530,7 @@ public class LetterUtilsTest {
     public void getNotificationTypeForActionFurtherEvidence_InvalidActionType_returnEmpty() {
         DynamicList sender = new DynamicList(new DynamicListItem("appellant", "Other party 1 - Representative - R Basker R Nadar"), new ArrayList<>());
         caseData.setOriginalSender(sender);
-        SscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, SYA_APPEAL_CREATED);
+        NotificationSscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, SYA_APPEAL_CREATED);
 
         assertEquals("", LetterUtils.getNotificationTypeForActionFurtherEvidence(wrapper, SubscriptionWithType.builder().build()));
     }
@@ -541,7 +541,7 @@ public class LetterUtilsTest {
     public void getNotificationTypeForActionFurtherEvidence_ValidActionTypeAndValidSubscriber_returnConfirmation(NotificationEventType eventType) {
         DynamicList sender = new DynamicList(new DynamicListItem("appellant", "Appellant"), new ArrayList<>());
         caseData.setOriginalSender(sender);
-        SscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
+        NotificationSscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
         SubscriptionWithType type = SubscriptionWithType.builder().party(appellantWithId).build();
         assertEquals("confirmation", LetterUtils.getNotificationTypeForActionFurtherEvidence(wrapper, type));
     }
@@ -553,7 +553,7 @@ public class LetterUtilsTest {
     public void getNotificationTypeForActionFurtherEvidence_ValidActionTypeAndInValidSubscriber_returnNotice(String requester) {
         DynamicList sender = new DynamicList(new DynamicListItem(requester, requester), new ArrayList<>());
         caseData.setOriginalSender(sender);
-        SscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, LIBERTY_TO_APPLY_REQUEST);
+        NotificationSscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, LIBERTY_TO_APPLY_REQUEST);
         Appellant appellant = Appellant.builder()
             .name(Name.builder().firstName("Tom").lastName("Cat").build())
             .address(Address.builder().line1("Appellant Line 1")
@@ -572,7 +572,7 @@ public class LetterUtilsTest {
     public void getNotificationTypeForActionFurtherEvidence_ValidJointPartySub_returnConfirmation(NotificationEventType eventType) {
         DynamicList sender = new DynamicList(new DynamicListItem("jointParty", "jointParty"), new ArrayList<>());
         caseData.setOriginalSender(sender);
-        SscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
+        NotificationSscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
         SubscriptionWithType type = SubscriptionWithType.builder().party(jointPartyWithId).build();
         assertEquals("confirmation", LetterUtils.getNotificationTypeForActionFurtherEvidence(wrapper, type));
     }
@@ -583,7 +583,7 @@ public class LetterUtilsTest {
     public void getNotificationTypeForActionFurtherEvidence_InValidOtherPartySubscriber_returnNotice(NotificationEventType eventType) {
         DynamicList sender = new DynamicList(new DynamicListItem("otherParty", "otherParty"), new ArrayList<>());
         caseData.setOriginalSender(sender);
-        SscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
+        NotificationSscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
         SubscriptionWithType type = SubscriptionWithType.builder().partyId("Invalid").build();
 
         assertEquals("notice", LetterUtils.getNotificationTypeForActionFurtherEvidence(wrapper, type));
@@ -596,7 +596,7 @@ public class LetterUtilsTest {
     public void getNotificationTypeForActionFurtherEvidence_ValidOtherPartyAndRepSub_returnConfirmation(String senderType, String subscriber) {
         DynamicList sender = new DynamicList(new DynamicListItem(senderType, senderType), new ArrayList<>());
         caseData.setOriginalSender(sender);
-        SscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, LIBERTY_TO_APPLY_REQUEST);
+        NotificationSscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, LIBERTY_TO_APPLY_REQUEST);
         SubscriptionWithType type = SubscriptionWithType.builder().partyId(subscriber).build();
         assertEquals("confirmation", LetterUtils.getNotificationTypeForActionFurtherEvidence(wrapper, type));
     }
@@ -616,7 +616,7 @@ public class LetterUtilsTest {
     public void isValidAppellantRepresentativeForSetAsideRequest_givenNonRepresentative_thenReturnFalse(NotificationEventType eventType) {
         DynamicList sender = new DynamicList(new DynamicListItem("otherPartyOP123456", "OPREP123456"), new ArrayList<>());
         caseData.setOriginalSender(sender);
-        SscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
+        NotificationSscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, eventType);
         SubscriptionWithType type = SubscriptionWithType.builder().partyId("otherPartyOPREP123456").build();
         assertFalse(LetterUtils.isValidAppellantRepresentativeForSetAsideRequest(wrapper, type));
     }
@@ -628,7 +628,7 @@ public class LetterUtilsTest {
     public void isValidAppellantRepresentativeForSetAsideRequest_givenValidRepresentative_thenReturnTrue(String partyId) {
         DynamicList sender = new DynamicList(new DynamicListItem("representative", "representative"), new ArrayList<>());
         caseData.setOriginalSender(sender);
-        SscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, LIBERTY_TO_APPLY_REQUEST);
+        NotificationSscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, LIBERTY_TO_APPLY_REQUEST);
         Appellant party = Appellant.builder().id(partyId).build();
         SubscriptionWithType type = SubscriptionWithType.builder().party(party).build();
         assertTrue(LetterUtils.isValidAppellantRepresentativeForSetAsideRequest(wrapper, type));
@@ -639,7 +639,7 @@ public class LetterUtilsTest {
     public void isValidOtherParty_givenSubscriberIsNull_thenReturnFalse() {
         DynamicList sender = new DynamicList(new DynamicListItem("otherPartyOPREP123456", "OPREP123456"), new ArrayList<>());
         caseData.setOriginalSender(sender);
-        SscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, LIBERTY_TO_APPLY_REQUEST);
+        NotificationSscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, LIBERTY_TO_APPLY_REQUEST);
         SubscriptionWithType type = SubscriptionWithType.builder().build();
         assertFalse(LetterUtils.isValidOtherParty(wrapper, type));
     }
@@ -650,7 +650,7 @@ public class LetterUtilsTest {
     public void isValidOtherParty_givenSubscriberIsInValid_thenReturnFalse(String senderType) {
         DynamicList sender = new DynamicList(new DynamicListItem(senderType, senderType), new ArrayList<>());
         caseData.setOriginalSender(sender);
-        SscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, LIBERTY_TO_APPLY_REQUEST);
+        NotificationSscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, LIBERTY_TO_APPLY_REQUEST);
         SubscriptionWithType type = SubscriptionWithType.builder().partyId("test").build();
         assertFalse(LetterUtils.isValidOtherParty(wrapper, type));
     }
@@ -660,13 +660,13 @@ public class LetterUtilsTest {
     public void isValidOtherParty_givenSubscriberIsValid_thenReturnTrue() {
         DynamicList sender = new DynamicList(new DynamicListItem("otherPartyOP123456", "otherParty"), new ArrayList<>());
         caseData.setOriginalSender(sender);
-        SscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, LIBERTY_TO_APPLY_REQUEST);
+        NotificationSscsCaseDataWrapper wrapper = buildBaseWrapperWithCaseData(caseData, LIBERTY_TO_APPLY_REQUEST);
         SubscriptionWithType type = SubscriptionWithType.builder().partyId("OP123456").build();
         assertTrue(LetterUtils.isValidOtherParty(wrapper, type));
     }
 
-    public SscsCaseDataWrapper buildBaseWrapperWithCaseData(SscsCaseData caseData, NotificationEventType type) {
-        SscsCaseDataWrapper caseDataWrapper = SscsCaseDataWrapper.builder()
+    public NotificationSscsCaseDataWrapper buildBaseWrapperWithCaseData(SscsCaseData caseData, NotificationEventType type) {
+        NotificationSscsCaseDataWrapper caseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(caseData)
             .notificationEventType(type)
             .build();

@@ -21,7 +21,7 @@ import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.RetryConfig;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
@@ -40,7 +40,7 @@ public class RetryNotificationServiceTest {
         }};
     private final RetryConfig retryConfig = new RetryConfig();
     private SscsCaseData newSscsCaseData = SscsCaseData.builder().ccdCaseId("456").build();
-    private final SscsCaseDataWrapper wrapper = SscsCaseDataWrapper.builder().state(State.APPEAL_CREATED).newSscsCaseData(newSscsCaseData).notificationEventType(SYA_APPEAL_CREATED).build();
+    private final NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder().state(State.APPEAL_CREATED).newSscsCaseData(newSscsCaseData).notificationEventType(SYA_APPEAL_CREATED).build();
     private final NotificationWrapper notificationWrapper = new CcdNotificationWrapper(wrapper);
     @Mock
     private NotificationHandler notificationHandler;

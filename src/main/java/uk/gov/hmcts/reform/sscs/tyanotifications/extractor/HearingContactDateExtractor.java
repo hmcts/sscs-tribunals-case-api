@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 
 @Component
@@ -31,7 +31,7 @@ public class HearingContactDateExtractor {
         this.paperCaseDecisionDateInitialDelay = paperCaseDecisionDateInitialDelay;
     }
 
-    public Optional<ZonedDateTime> extract(SscsCaseDataWrapper wrapper) {
+    public Optional<ZonedDateTime> extract(NotificationSscsCaseDataWrapper wrapper) {
         return extractForReferenceEvent(wrapper.getNewSscsCaseData(), wrapper.getNotificationEventType());
     }
 

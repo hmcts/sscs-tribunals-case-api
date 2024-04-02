@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
@@ -29,13 +29,13 @@ public class CcdActionExecutor extends BaseActionExecutor<String> {
     }
 
     @Override
-    protected void updateCase(Long caseId, SscsCaseDataWrapper wrapper, IdamTokens idamTokens) {
+    protected void updateCase(Long caseId, NotificationSscsCaseDataWrapper wrapper, IdamTokens idamTokens) {
         updateCcdCaseService.updateCaseV2(caseId, wrapper.getNotificationEventType().getId(), "CCD Case", "Notification Service updated case", idamTokens, sscsCaseData -> {
         });
     }
 
     @Override
-    protected NotificationWrapper getWrapper(SscsCaseDataWrapper wrapper, String payload) {
+    protected NotificationWrapper getWrapper(NotificationSscsCaseDataWrapper wrapper, String payload) {
         return new CcdNotificationWrapper(wrapper);
     }
 

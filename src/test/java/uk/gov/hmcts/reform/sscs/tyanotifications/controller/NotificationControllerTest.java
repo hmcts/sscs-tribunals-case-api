@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
 
-@ActiveProfiles("integration")
+@ActiveProfiles("tya-integration")
 public class NotificationControllerTest {
 
     private NotificationController notificationController;

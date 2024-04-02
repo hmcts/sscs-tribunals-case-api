@@ -39,7 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Destination;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notification;
@@ -538,7 +538,7 @@ public class SendNotificationServiceTest {
                 .address(jointPartyAddress)
                 .build())
             .build();
-        SscsCaseDataWrapper wraper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper wraper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(sscsCaseData)
             .oldSscsCaseData(sscsCaseData)
             .notificationEventType(eventType)
@@ -558,7 +558,7 @@ public class SendNotificationServiceTest {
                 .jointPartyAddressSameAsAppellant(YesNo.YES)
                 .build())
             .build();
-        SscsCaseDataWrapper wraper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper wraper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(sscsCaseData)
             .oldSscsCaseData(sscsCaseData)
             .notificationEventType(eventType)
@@ -789,12 +789,12 @@ public class SendNotificationServiceTest {
             .sscsStrikeOutDocument(SscsStrikeOutDocument.builder().documentLink(DocumentLink.builder().documentUrl("testUrl").build()).build())
             .build();
 
-        SscsCaseDataWrapper struckOutSscsCaseDataWrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper struckOutNotificationSscsCaseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(sscsCaseDataWithDocuments)
             .oldSscsCaseData(sscsCaseDataWithDocuments)
             .notificationEventType(eventType)
             .build();
-        return new CcdNotificationWrapper(struckOutSscsCaseDataWrapper);
+        return new CcdNotificationWrapper(struckOutNotificationSscsCaseDataWrapper);
     }
 
     public Object[] bundledLetterTemplates() {

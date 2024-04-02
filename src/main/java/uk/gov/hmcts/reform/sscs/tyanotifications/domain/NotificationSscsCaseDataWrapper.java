@@ -2,16 +2,14 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.domain;
 
 import lombok.Builder;
 import lombok.Data;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.model.AbstractCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 
 @Data
-@Builder(toBuilder = true)
-public class SscsCaseDataWrapper {
-
-    private SscsCaseData newSscsCaseData;
-    private SscsCaseData oldSscsCaseData;
+@SuperBuilder(toBuilder = true)
+public class NotificationSscsCaseDataWrapper extends AbstractCaseDataWrapper<NotificationEventType> {
     private NotificationEventType notificationEventType;
     private State state;
 

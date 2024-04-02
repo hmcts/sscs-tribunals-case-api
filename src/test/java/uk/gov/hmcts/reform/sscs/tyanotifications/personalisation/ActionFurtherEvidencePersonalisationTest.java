@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationConfig;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.properties.EvidenceProperties;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Link;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
@@ -63,7 +63,7 @@ class ActionFurtherEvidencePersonalisationTest {
     @InjectMocks
     ActionFurtherEvidencePersonalisation actionFurtherEvidencePersonalisation;
 
-    SscsCaseDataWrapper responseWrapper;
+    NotificationSscsCaseDataWrapper responseWrapper;
 
     SubscriptionWithType subscriptionWithType;
 
@@ -97,7 +97,7 @@ class ActionFurtherEvidencePersonalisationTest {
         DynamicList sender = new DynamicList(new DynamicListItem("appellant", "Appellant (or Appointee)"), new ArrayList<>());
         caseData.setOriginalSender(sender);
 
-        responseWrapper = SscsCaseDataWrapper.builder()
+        responseWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(caseData)
             .build();
 

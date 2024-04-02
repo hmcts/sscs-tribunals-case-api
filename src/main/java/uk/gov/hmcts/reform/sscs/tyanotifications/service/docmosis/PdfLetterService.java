@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
+import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.DocmosisTemplatesConfig;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.properties.EvidenceProperties;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
@@ -29,7 +30,6 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notification;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRuntimeException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.DocmosisPdfService;
 
 @Service
 @Slf4j

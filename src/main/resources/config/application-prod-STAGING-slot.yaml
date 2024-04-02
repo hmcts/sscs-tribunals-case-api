@@ -1,0 +1,3 @@
+---
+job.scheduler:
+  autoStart: false

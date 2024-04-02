@@ -20,7 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 
 public class SyaAppealCreatedAndReceivedPersonalisationTest extends PersonalisationTest {
@@ -504,7 +504,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
                 .hearingOptions(HearingOptions.builder().arrangements(new ArrayList<>()).build()).build())
             .build();
 
-        Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
                 .notificationEventType(APPEAL_RECEIVED).build(),
             new SubscriptionWithType(subscriptions.getRepresentativeSubscription(), REPRESENTATIVE,
                 response.getAppeal().getAppellant(), response.getAppeal().getRep()));
@@ -544,7 +544,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
             .childMaintenanceNumber("123456")
             .build();
 
-        Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
                 .notificationEventType(APPEAL_RECEIVED).build(),
             new SubscriptionWithType(subscriptions.getRepresentativeSubscription(), REPRESENTATIVE,
                 response.getAppeal().getAppellant(), response.getAppeal().getRep()));
@@ -591,7 +591,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
             .childMaintenanceNumber("123456")
             .build();
 
-        Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
                 .notificationEventType(APPEAL_RECEIVED).build(),
             new SubscriptionWithType(subscriptions.getRepresentativeSubscription(), REPRESENTATIVE,
                 response.getAppeal().getAppellant(), response.getAppeal().getRep()));
@@ -635,7 +635,7 @@ public class SyaAppealCreatedAndReceivedPersonalisationTest extends Personalisat
             .childMaintenanceNumber("123456")
             .build();
 
-        Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.create(SscsCaseDataWrapper.builder().newSscsCaseData(response)
+        Map<String, Object> result = syaAppealCreatedAndReceivedPersonalisation.create(NotificationSscsCaseDataWrapper.builder().newSscsCaseData(response)
                 .notificationEventType(APPEAL_RECEIVED).build(),
             new SubscriptionWithType(subscriptions.getRepresentativeSubscription(), REPRESENTATIVE,
                 response.getAppeal().getAppellant(), response.getAppeal().getRep()));

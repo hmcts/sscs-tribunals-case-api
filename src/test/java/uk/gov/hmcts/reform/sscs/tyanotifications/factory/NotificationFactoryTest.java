@@ -32,7 +32,7 @@ import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationConfig;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.properties.EvidenceProperties;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.extractor.HearingContactDateExtractor;
@@ -50,7 +50,7 @@ public class NotificationFactoryTest {
 
     private NotificationFactory factory;
 
-    private SscsCaseDataWrapper wrapper;
+    private NotificationSscsCaseDataWrapper wrapper;
 
     private SscsCaseData ccdResponse;
 
@@ -101,7 +101,7 @@ public class NotificationFactoryTest {
                 .benefitType(BenefitType.builder().code("PIP").build()).build())
             .subscriptions(Subscriptions.builder().appellantSubscription(subscription).build()).build();
 
-        wrapper = SscsCaseDataWrapper.builder().newSscsCaseData(ccdResponse).notificationEventType(APPEAL_RECEIVED).build();
+        wrapper = NotificationSscsCaseDataWrapper.builder().newSscsCaseData(ccdResponse).notificationEventType(APPEAL_RECEIVED).build();
 
         when(config.getManageEmailsLink()).thenReturn(Link.builder().linkUrl("http://manageemails.com/mac").build());
         when(config.getTrackAppealLink()).thenReturn(Link.builder().linkUrl("http://tyalink.com/appeal_id").build());
@@ -125,7 +125,7 @@ public class NotificationFactoryTest {
     @Parameters({"APPELLANT, appellantEmail", "REPRESENTATIVE, repsEmail"})
     public void givenAppealLapsedEventAndSubscriptionType_shouldInferRightSubscriptionToCreateNotification(
         SubscriptionType subscriptionType, String expectedEmail) {
-        SscsCaseDataWrapper sscsCaseDataWrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper notificationSscsCaseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(SscsCaseData.builder()
                 .appeal(Appeal.builder()
                     .benefitType(BenefitType.builder()
@@ -143,12 +143,12 @@ public class NotificationFactoryTest {
                 .build())
             .notificationEventType(APPEAL_LAPSED)
             .build();
-        CcdNotificationWrapper notificationWrapper = new CcdNotificationWrapper(sscsCaseDataWrapper);
+        CcdNotificationWrapper notificationWrapper = new CcdNotificationWrapper(notificationSscsCaseDataWrapper);
 
         given(personalisationFactory.apply(any(NotificationEventType.class)))
             .willReturn(withRepresentativePersonalisation);
 
-        Notification notification = factory.create(notificationWrapper, getSubscriptionWithType(sscsCaseDataWrapper, subscriptionType,
+        Notification notification = factory.create(notificationWrapper, getSubscriptionWithType(notificationSscsCaseDataWrapper, subscriptionType,
             wrapper.getNewSscsCaseData().getAppeal().getAppellant(), wrapper.getNewSscsCaseData().getAppeal().getAppellant()));
         assertEquals(expectedEmail, notification.getEmail());
 
@@ -161,7 +161,7 @@ public class NotificationFactoryTest {
     @Parameters({"APPELLANT, appellantEmail", "REPRESENTATIVE, repsEmail"})
     public void givenAppealDwpLapsedEventAndSubscriptionType_shouldInferRightSubscriptionToCreateNotification(
         SubscriptionType subscriptionType, String expectedEmail) {
-        SscsCaseDataWrapper sscsCaseDataWrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper notificationSscsCaseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(SscsCaseData.builder()
                 .appeal(Appeal.builder()
                     .benefitType(BenefitType.builder()
@@ -179,12 +179,12 @@ public class NotificationFactoryTest {
                 .build())
             .notificationEventType(DWP_APPEAL_LAPSED)
             .build();
-        CcdNotificationWrapper notificationWrapper = new CcdNotificationWrapper(sscsCaseDataWrapper);
+        CcdNotificationWrapper notificationWrapper = new CcdNotificationWrapper(notificationSscsCaseDataWrapper);
 
         given(personalisationFactory.apply(any(NotificationEventType.class)))
             .willReturn(withRepresentativePersonalisation);
 
-        Notification notification = factory.create(notificationWrapper, getSubscriptionWithType(sscsCaseDataWrapper, subscriptionType,
+        Notification notification = factory.create(notificationWrapper, getSubscriptionWithType(notificationSscsCaseDataWrapper, subscriptionType,
             wrapper.getNewSscsCaseData().getAppeal().getAppellant(), wrapper.getNewSscsCaseData().getAppeal().getAppellant()));
         assertEquals(expectedEmail, notification.getEmail());
 
@@ -197,7 +197,7 @@ public class NotificationFactoryTest {
     @Parameters({"APPOINTEE, appointeeEmail", "REPRESENTATIVE, repsEmail"})
     public void givenAppealCreatedEventAndSubscriptionType_shouldInferRightSubscriptionToCreateNotification(
         SubscriptionType subscriptionType, String expectedEmail) {
-        SscsCaseDataWrapper wrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(SscsCaseData.builder()
                 .appeal(Appeal.builder().appellant(Appellant.builder().appointee(Appointee.builder().build()).build())
                     .benefitType(BenefitType.builder()
@@ -236,7 +236,7 @@ public class NotificationFactoryTest {
     @Parameters({"APPOINTEE, appointeeEmail", "REPRESENTATIVE, repsEmail"})
     public void givenValidAppealCreatedEventAndSubscriptionType_shouldInferRightSubscriptionToCreateNotification(
         SubscriptionType subscriptionType, String expectedEmail) {
-        SscsCaseDataWrapper wrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(SscsCaseData.builder()
                 .appeal(Appeal.builder().appellant(Appellant.builder().appointee(Appointee.builder().build()).build())
                     .benefitType(BenefitType.builder()
@@ -277,7 +277,7 @@ public class NotificationFactoryTest {
         when(config.getTemplate(eq(SUBSCRIPTION_UPDATED.getId()), eq(SUBSCRIPTION_CREATED.getId() + ".appellant"), eq(SUBSCRIPTION_UPDATED.getId()),
             eq(SUBSCRIPTION_UPDATED.getId()), eq(PIP), any(NotificationWrapper.class), any())).thenReturn(Template.builder().emailTemplateId(null).smsTemplateId(Arrays.asList("123")).build());
 
-        wrapper = SscsCaseDataWrapper.builder()
+        wrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(
                 ccdResponse.toBuilder()
                     .subscriptions(Subscriptions.builder().appellantSubscription(subscription.toBuilder().subscribeSms("Yes").wantSmsNotifications("Yes").subscribeEmail("No").build()).build())
@@ -301,7 +301,7 @@ public class NotificationFactoryTest {
         when(config.getTemplate(eq(SUBSCRIPTION_UPDATED.getId()), eq(SUBSCRIPTION_UPDATED.getId()), eq(SUBSCRIPTION_UPDATED.getId()), eq(SUBSCRIPTION_UPDATED.getId()),
             eq(PIP), any(NotificationWrapper.class), any())).thenReturn(Template.builder().emailTemplateId("123").smsTemplateId(Arrays.asList("123")).build());
 
-        wrapper = SscsCaseDataWrapper.builder()
+        wrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(
                 ccdResponse.toBuilder()
                     .subscriptions(Subscriptions.builder().appellantSubscription(subscription.toBuilder().subscribeSms("Yes").wantSmsNotifications("Yes").subscribeEmail("No").build()).build())
@@ -328,7 +328,7 @@ public class NotificationFactoryTest {
         List<Event> event = new ArrayList<>();
         event.add(Event.builder().value(EventDetails.builder().date(DATE).type(APPEAL_RECEIVED.getId()).build()).build());
 
-        SscsCaseDataWrapper wrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(
                 ccdResponse.toBuilder()
                     .subscriptions(Subscriptions.builder().appellantSubscription(subscription.toBuilder().subscribeSms("Yes").wantSmsNotifications("Yes").subscribeEmail("Yes").build()).build())
@@ -360,7 +360,7 @@ public class NotificationFactoryTest {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(APPEAL_RECEIVED.getId()).build()).build());
 
-        SscsCaseDataWrapper wrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(
                 ccdResponse.toBuilder()
                     .subscriptions(Subscriptions.builder().appellantSubscription(subscription.toBuilder().subscribeSms("Yes").wantSmsNotifications("Yes").subscribeEmail("Yes").build()).build())
@@ -391,7 +391,7 @@ public class NotificationFactoryTest {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(APPEAL_RECEIVED.getId()).build()).build());
 
-        wrapper = SscsCaseDataWrapper.builder()
+        wrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(
                 ccdResponse.toBuilder()
                     .subscriptions(Subscriptions.builder().appellantSubscription(subscription.toBuilder().email("changed@testing.com").subscribeSms("Yes").wantSmsNotifications("Yes").subscribeEmail("Yes").build()).build())
@@ -426,7 +426,7 @@ public class NotificationFactoryTest {
     @Parameters({"null", ""})
     public void givenAnEmptyBenefitType_shouldNotThrowExceptionAndGenerateTemplate(@Nullable String benefitType) {
 
-        SscsCaseDataWrapper sscsCaseDataWrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper notificationSscsCaseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(SscsCaseData.builder()
                 .appeal(Appeal.builder()
                     .benefitType(BenefitType.builder()
@@ -440,7 +440,7 @@ public class NotificationFactoryTest {
         given(personalisationFactory.apply(any(NotificationEventType.class)))
             .willReturn(withRepresentativePersonalisation);
 
-        CcdNotificationWrapper notificationWrapper = new CcdNotificationWrapper(sscsCaseDataWrapper);
+        CcdNotificationWrapper notificationWrapper = new CcdNotificationWrapper(notificationSscsCaseDataWrapper);
 
         factory.create(notificationWrapper, new SubscriptionWithType(null, APPELLANT, null, null));
 
@@ -450,7 +450,7 @@ public class NotificationFactoryTest {
 
     @Test
     public void shouldHandleNoSubscription() {
-        SscsCaseDataWrapper sscsCaseDataWrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper notificationSscsCaseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(SscsCaseData.builder()
                 .appeal(Appeal.builder()
                     .benefitType(BenefitType.builder()
@@ -460,7 +460,7 @@ public class NotificationFactoryTest {
                 .build())
             .notificationEventType(APPEAL_RECEIVED)
             .build();
-        CcdNotificationWrapper notificationWrapper = new CcdNotificationWrapper(sscsCaseDataWrapper);
+        CcdNotificationWrapper notificationWrapper = new CcdNotificationWrapper(notificationSscsCaseDataWrapper);
 
         given(personalisationFactory.apply(any(NotificationEventType.class)))
             .willReturn(withRepresentativePersonalisation);
@@ -472,9 +472,9 @@ public class NotificationFactoryTest {
         assertEquals(Destination.builder().build(), notification.getDestination());
     }
 
-    private SubscriptionWithType getSubscriptionWithType(SscsCaseDataWrapper sscsCaseDataWrapper, SubscriptionType subscriptionType,
+    private SubscriptionWithType getSubscriptionWithType(NotificationSscsCaseDataWrapper notificationSscsCaseDataWrapper, SubscriptionType subscriptionType,
                                                          Party party, Entity entity) {
-        return new SubscriptionWithType(getSubscription(sscsCaseDataWrapper.getNewSscsCaseData(), subscriptionType),
+        return new SubscriptionWithType(getSubscription(notificationSscsCaseDataWrapper.getNewSscsCaseData(), subscriptionType),
             subscriptionType, party, entity);
     }
 }

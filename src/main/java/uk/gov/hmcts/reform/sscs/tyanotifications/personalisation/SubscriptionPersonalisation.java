@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 
 @Component
@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 public class SubscriptionPersonalisation extends WithRepresentativePersonalisation {
 
     @Override
-    protected Map<String, Object> create(SscsCaseDataWrapper responseWrapper, SubscriptionWithType subscriptionWithType) {
+    protected Map<String, Object> create(NotificationSscsCaseDataWrapper responseWrapper, SubscriptionWithType subscriptionWithType) {
         Subscription newSubscription = subscriptionWithType.getSubscription();
         Subscription oldSubscription = getSubscription(responseWrapper.getOldSscsCaseData(), subscriptionWithType.getSubscriptionType());
         setSendSmsSubscriptionConfirmation(shouldSendSmsSubscriptionConfirmation(newSubscription, oldSubscription));

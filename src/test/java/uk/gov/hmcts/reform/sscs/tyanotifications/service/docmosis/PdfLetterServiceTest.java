@@ -26,6 +26,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.DocmosisTemplatesConfig;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.properties.EvidenceProperties;
@@ -35,7 +36,6 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notification;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Template;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRuntimeException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.DocmosisPdfService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationServiceTest;
 
 @RunWith(JUnitParamsRunner.class)

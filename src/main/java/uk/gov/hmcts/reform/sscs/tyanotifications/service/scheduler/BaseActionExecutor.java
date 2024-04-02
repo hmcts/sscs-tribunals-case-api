@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.JobExecutor;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
@@ -62,7 +62,7 @@ public abstract class BaseActionExecutor<T> implements JobExecutor<T> {
                 // the notification should refer to the latest one.
                 Callback<SscsCaseData> callback = deserializer.deserialize(buildCcdNode(caseDetails, eventId));
 
-                SscsCaseDataWrapper wrapper = buildSscsCaseDataWrapper(
+                NotificationSscsCaseDataWrapper wrapper = buildSscsCaseDataWrapper(
                     callback.getCaseDetails().getCaseData(),
                     null,
                     getNotificationByEvent(eventId),
@@ -104,9 +104,9 @@ public abstract class BaseActionExecutor<T> implements JobExecutor<T> {
         return mapper.writeValueAsString(node);
     }
 
-    protected abstract void updateCase(Long caseId, SscsCaseDataWrapper wrapper, IdamTokens idamTokens);
+    protected abstract void updateCase(Long caseId, NotificationSscsCaseDataWrapper wrapper, IdamTokens idamTokens);
 
-    protected abstract NotificationWrapper getWrapper(SscsCaseDataWrapper wrapper, T payload);
+    protected abstract NotificationWrapper getWrapper(NotificationSscsCaseDataWrapper wrapper, T payload);
 
     protected abstract long getCaseId(T payload);
 

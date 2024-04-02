@@ -26,7 +26,7 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationClientRuntimeException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
@@ -239,7 +239,7 @@ public class LetterUtils {
         }
     }
 
-    public static String getNotificationTypeForActionFurtherEvidence(SscsCaseDataWrapper caseDataWrapper, SubscriptionWithType subscriptionWithType) {
+    public static String getNotificationTypeForActionFurtherEvidence(NotificationSscsCaseDataWrapper caseDataWrapper, SubscriptionWithType subscriptionWithType) {
         boolean isValidActionForNotification = EVENTS_FOR_ACTION_FURTHER_EVIDENCE.contains(caseDataWrapper.getNotificationEventType());
         if (isValidActionForNotification) {
             if (isValidForSetAsideRequest(caseDataWrapper, subscriptionWithType)) {
@@ -251,14 +251,14 @@ public class LetterUtils {
         return "";
     }
 
-    static boolean isValidForSetAsideRequest(SscsCaseDataWrapper caseDataWrapper, SubscriptionWithType subscriptionWithType) {
+    static boolean isValidForSetAsideRequest(NotificationSscsCaseDataWrapper caseDataWrapper, SubscriptionWithType subscriptionWithType) {
         return isValidAppellantForSetAsideRequest(caseDataWrapper, subscriptionWithType)
             || isValidAppellantRepresentativeForSetAsideRequest(caseDataWrapper, subscriptionWithType)
             || isValidJointPartyForSetAsideRequest(caseDataWrapper, subscriptionWithType)
             || isValidOtherParty(caseDataWrapper, subscriptionWithType);
     }
 
-    static boolean isValidAppellantRepresentativeForSetAsideRequest(SscsCaseDataWrapper caseDataWrapper, SubscriptionWithType subscriptionWithType) {
+    static boolean isValidAppellantRepresentativeForSetAsideRequest(NotificationSscsCaseDataWrapper caseDataWrapper, SubscriptionWithType subscriptionWithType) {
         boolean senderIsRepresentative = caseDataWrapper.getNewSscsCaseData().getOriginalSender().getValue().getCode().equalsIgnoreCase("representative");
         if (senderIsRepresentative) {
             boolean isValidAppellant = subscriptionWithType.getParty().getId().equalsIgnoreCase(caseDataWrapper.getNewSscsCaseData().getAppeal().getAppellant().getId());
@@ -268,7 +268,7 @@ public class LetterUtils {
         return false;
     }
 
-    private static boolean isValidAppellantForSetAsideRequest(SscsCaseDataWrapper caseDataWrapper, SubscriptionWithType subscriptionWithType) {
+    private static boolean isValidAppellantForSetAsideRequest(NotificationSscsCaseDataWrapper caseDataWrapper, SubscriptionWithType subscriptionWithType) {
         boolean senderIsAppellant = caseDataWrapper.getNewSscsCaseData().getOriginalSender().getValue().getCode().equalsIgnoreCase("appellant");
         if (senderIsAppellant) {
             return subscriptionWithType.getParty().getId().equalsIgnoreCase(caseDataWrapper.getNewSscsCaseData().getAppeal().getAppellant().getId());
@@ -276,7 +276,7 @@ public class LetterUtils {
         return false;
     }
 
-    private static boolean isValidJointPartyForSetAsideRequest(SscsCaseDataWrapper caseDataWrapper, SubscriptionWithType subscriptionWithType) {
+    private static boolean isValidJointPartyForSetAsideRequest(NotificationSscsCaseDataWrapper caseDataWrapper, SubscriptionWithType subscriptionWithType) {
         boolean isJointParty = caseDataWrapper.getNewSscsCaseData().getOriginalSender().getValue().getCode().equalsIgnoreCase("jointParty");
         if (isJointParty) {
             return subscriptionWithType.getParty().getId().equalsIgnoreCase(caseDataWrapper.getNewSscsCaseData().getJointParty().getId());
@@ -284,7 +284,7 @@ public class LetterUtils {
         return false;
     }
 
-    static boolean isValidOtherParty(SscsCaseDataWrapper caseDataWrapper, SubscriptionWithType subscriptionWithType) {
+    static boolean isValidOtherParty(NotificationSscsCaseDataWrapper caseDataWrapper, SubscriptionWithType subscriptionWithType) {
         String subscriptionPartyId = subscriptionWithType.getPartyId();
         String requesterId = caseDataWrapper.getNewSscsCaseData().getOriginalSender().getValue().getCode();
 

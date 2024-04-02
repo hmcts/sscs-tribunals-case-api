@@ -23,7 +23,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
@@ -255,7 +255,7 @@ public class NotificationUtilsTest {
         addHearing(sscsCaseData, 1);
         addHearingOptions(sscsCaseData, "Yes");
 
-        SscsCaseDataWrapper caseDataWrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper caseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(sscsCaseData)
             .oldSscsCaseData(sscsCaseData)
             .notificationEventType(eventType)
@@ -478,7 +478,7 @@ public class NotificationUtilsTest {
                 .build())
             .subscriptions(Subscriptions.builder().appellantSubscription(subscription).jointPartySubscription(subscription).build())
             .build();
-        return new CcdNotificationWrapper(SscsCaseDataWrapper.builder()
+        return new CcdNotificationWrapper(NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(sscsCaseData)
             .oldSscsCaseData(sscsCaseData)
             .notificationEventType(eventType)
@@ -503,12 +503,12 @@ public class NotificationUtilsTest {
             .ccdCaseId(CASE_ID)
             .build();
 
-        SscsCaseDataWrapper sscsCaseDataWrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper notificationSscsCaseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(sscsCaseDataWithDocuments)
             .oldSscsCaseData(sscsCaseDataWithDocuments)
             .notificationEventType(eventType)
             .build();
-        return new CcdNotificationWrapper(sscsCaseDataWrapper);
+        return new CcdNotificationWrapper(notificationSscsCaseDataWrapper);
     }
 
     public Object[] isNotOkToSendSmsNotificationScenarios() {

@@ -48,7 +48,7 @@ import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationConfig;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
@@ -117,7 +117,7 @@ public class NotificationServiceTest {
 
     private SscsCaseData sscsCaseData;
     private CcdNotificationWrapper ccdNotificationWrapper;
-    private SscsCaseDataWrapper sscsCaseDataWrapper;
+    private NotificationSscsCaseDataWrapper notificationSscsCaseDataWrapper;
     private final Subscription subscription = Subscription.builder()
         .tya(APPEAL_NUMBER)
         .email(EMAIL)
@@ -152,8 +152,8 @@ public class NotificationServiceTest {
             .caseReference(CASE_REFERENCE)
             .createdInGapsFrom(READY_TO_LIST.getId())
             .build();
-        sscsCaseDataWrapper = SscsCaseDataWrapper.builder().newSscsCaseData(sscsCaseData).oldSscsCaseData(sscsCaseData).notificationEventType(APPEAL_WITHDRAWN).build();
-        ccdNotificationWrapper = new CcdNotificationWrapper(sscsCaseDataWrapper);
+        notificationSscsCaseDataWrapper = NotificationSscsCaseDataWrapper.builder().newSscsCaseData(sscsCaseData).oldSscsCaseData(sscsCaseData).notificationEventType(APPEAL_WITHDRAWN).build();
+        ccdNotificationWrapper = new CcdNotificationWrapper(notificationSscsCaseDataWrapper);
         when(outOfHoursCalculator.isItOutOfHours()).thenReturn(false);
 
         String authHeader = "authHeader";
@@ -894,13 +894,13 @@ public class NotificationServiceTest {
             .createdInGapsFrom(READY_TO_LIST.getId())
             .build();
 
-        sscsCaseDataWrapper = SscsCaseDataWrapper.builder()
+        notificationSscsCaseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .oldSscsCaseData(oldCaseData)
             .newSscsCaseData(sscsCaseData)
             .notificationEventType(notificationEventType)
             .build();
 
-        return new CcdNotificationWrapper(sscsCaseDataWrapper);
+        return new CcdNotificationWrapper(notificationSscsCaseDataWrapper);
     }
 
     @NotNull
@@ -957,13 +957,13 @@ public class NotificationServiceTest {
             .hearings(singletonList(Hearing.builder().build()))
             .build();
 
-        sscsCaseDataWrapper = SscsCaseDataWrapper.builder()
+        notificationSscsCaseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .oldSscsCaseData(oldCaseData)
             .newSscsCaseData(sscsCaseData)
             .notificationEventType(notificationEventType)
             .build();
 
-        return new CcdNotificationWrapper(sscsCaseDataWrapper);
+        return new CcdNotificationWrapper(notificationSscsCaseDataWrapper);
     }
 
     @Test
@@ -1019,7 +1019,7 @@ public class NotificationServiceTest {
         when(factory.create(ccdNotificationWrapper, getSubscriptionWithType(ccdNotificationWrapper))).thenReturn(notification);
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        verify(notificationSender, never()).sendEmail(notification.getEmailTemplate(), notification.getEmail(), notification.getPlaceholders(), notification.getReference(), sscsCaseDataWrapper.getNotificationEventType(), ccdNotificationWrapper.getNewSscsCaseData());
+        verify(notificationSender, never()).sendEmail(notification.getEmailTemplate(), notification.getEmail(), notification.getPlaceholders(), notification.getReference(), notificationSscsCaseDataWrapper.getNotificationEventType(), ccdNotificationWrapper.getNewSscsCaseData());
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
     }
@@ -1030,7 +1030,7 @@ public class NotificationServiceTest {
         when(factory.create(ccdNotificationWrapper, getSubscriptionWithType(ccdNotificationWrapper))).thenReturn(notification);
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        verify(notificationSender, never()).sendSms(notification.getSmsTemplate().get(0), notification.getMobile(), notification.getPlaceholders(), notification.getReference(), notification.getSmsSenderTemplate(), sscsCaseDataWrapper.getNotificationEventType(), ccdNotificationWrapper.getNewSscsCaseData());
+        verify(notificationSender, never()).sendSms(notification.getSmsTemplate().get(0), notification.getMobile(), notification.getPlaceholders(), notification.getReference(), notification.getSmsSenderTemplate(), notificationSscsCaseDataWrapper.getNotificationEventType(), ccdNotificationWrapper.getNewSscsCaseData());
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
     }
@@ -1041,7 +1041,7 @@ public class NotificationServiceTest {
         when(factory.create(ccdNotificationWrapper, getSubscriptionWithType(ccdNotificationWrapper))).thenReturn(notification);
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        verify(notificationSender, never()).sendEmail(notification.getEmailTemplate(), notification.getEmail(), notification.getPlaceholders(), notification.getReference(), sscsCaseDataWrapper.getNotificationEventType(), ccdNotificationWrapper.getNewSscsCaseData());
+        verify(notificationSender, never()).sendEmail(notification.getEmailTemplate(), notification.getEmail(), notification.getPlaceholders(), notification.getReference(), notificationSscsCaseDataWrapper.getNotificationEventType(), ccdNotificationWrapper.getNewSscsCaseData());
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
     }
 
@@ -1052,7 +1052,7 @@ public class NotificationServiceTest {
         when(factory.create(ccdNotificationWrapper, getSubscriptionWithType(ccdNotificationWrapper))).thenReturn(notification);
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        verify(notificationSender, never()).sendSms(anyString(), eq(notification.getMobile()), eq(notification.getPlaceholders()), eq(notification.getReference()), eq(notification.getSmsSenderTemplate()), eq(sscsCaseDataWrapper.getNotificationEventType()), eq(ccdNotificationWrapper.getNewSscsCaseData()));
+        verify(notificationSender, never()).sendSms(anyString(), eq(notification.getMobile()), eq(notification.getPlaceholders()), eq(notification.getReference()), eq(notification.getSmsSenderTemplate()), eq(notificationSscsCaseDataWrapper.getNotificationEventType()), eq(ccdNotificationWrapper.getNewSscsCaseData()));
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
     }
@@ -1064,7 +1064,7 @@ public class NotificationServiceTest {
             .mobile(MOBILE_NUMBER_1).subscribeEmail("No").subscribeSms("No").build();
 
         sscsCaseData = SscsCaseData.builder().appeal(appeal).subscriptions(Subscriptions.builder().appellantSubscription(appellantSubscription).build()).caseReference(CASE_REFERENCE).build();
-        SscsCaseDataWrapper wrapper = SscsCaseDataWrapper.builder().newSscsCaseData(sscsCaseData).oldSscsCaseData(sscsCaseData).notificationEventType(APPEAL_WITHDRAWN).build();
+        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder().newSscsCaseData(sscsCaseData).oldSscsCaseData(sscsCaseData).notificationEventType(APPEAL_WITHDRAWN).build();
         ccdNotificationWrapper = new CcdNotificationWrapper(wrapper);
 
         Notification notification = new Notification(Template.builder().emailTemplateId(null).smsTemplateId(Arrays.asList("123")).build(), Destination.builder().email(null).sms("07823456746").build(), new HashMap<>(), new Reference(), null);
@@ -1072,8 +1072,8 @@ public class NotificationServiceTest {
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        verify(notificationSender, never()).sendSms(anyString(), eq(notification.getMobile()), eq(notification.getPlaceholders()), eq(notification.getReference()), eq(notification.getSmsSenderTemplate()), eq(sscsCaseDataWrapper.getNotificationEventType()), eq(ccdNotificationWrapper.getNewSscsCaseData()));
-        verify(notificationSender, never()).sendEmail(notification.getEmailTemplate(), notification.getEmail(), notification.getPlaceholders(), notification.getReference(), sscsCaseDataWrapper.getNotificationEventType(), ccdNotificationWrapper.getNewSscsCaseData());
+        verify(notificationSender, never()).sendSms(anyString(), eq(notification.getMobile()), eq(notification.getPlaceholders()), eq(notification.getReference()), eq(notification.getSmsSenderTemplate()), eq(notificationSscsCaseDataWrapper.getNotificationEventType()), eq(ccdNotificationWrapper.getNewSscsCaseData()));
+        verify(notificationSender, never()).sendEmail(notification.getEmailTemplate(), notification.getEmail(), notification.getPlaceholders(), notification.getReference(), notificationSscsCaseDataWrapper.getNotificationEventType(), ccdNotificationWrapper.getNewSscsCaseData());
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
     }
@@ -1102,7 +1102,7 @@ public class NotificationServiceTest {
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        verify(notificationSender, never()).sendEmail(notification.getEmailTemplate(), notification.getEmail(), notification.getPlaceholders(), notification.getReference(), sscsCaseDataWrapper.getNotificationEventType(), ccdNotificationWrapper.getNewSscsCaseData());
+        verify(notificationSender, never()).sendEmail(notification.getEmailTemplate(), notification.getEmail(), notification.getPlaceholders(), notification.getReference(), notificationSscsCaseDataWrapper.getNotificationEventType(), ccdNotificationWrapper.getNewSscsCaseData());
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
     }
@@ -1115,14 +1115,14 @@ public class NotificationServiceTest {
 
         notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
 
-        verify(notificationSender, never()).sendEmail(notification.getEmailTemplate(), notification.getEmail(), notification.getPlaceholders(), notification.getReference(), sscsCaseDataWrapper.getNotificationEventType(), ccdNotificationWrapper.getNewSscsCaseData());
+        verify(notificationSender, never()).sendEmail(notification.getEmailTemplate(), notification.getEmail(), notification.getPlaceholders(), notification.getReference(), notificationSscsCaseDataWrapper.getNotificationEventType(), ccdNotificationWrapper.getNewSscsCaseData());
 
         verifyNoErrorsLogged(mockAppender, captorLoggingEvent);
     }
 
     @Test
     public void doNotSendNotificationsOutOfHours() {
-        SscsCaseDataWrapper wrapper = SscsCaseDataWrapper.builder().newSscsCaseData(sscsCaseData).oldSscsCaseData(sscsCaseData).notificationEventType(HEARING_REMINDER).build();
+        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder().newSscsCaseData(sscsCaseData).oldSscsCaseData(sscsCaseData).notificationEventType(HEARING_REMINDER).build();
         ccdNotificationWrapper = new CcdNotificationWrapper(wrapper);
         when(notificationValidService.isNotificationStillValidToSend(any(), any())).thenReturn(true);
         when(notificationValidService.isHearingTypeValidToSendNotification(any(), any())).thenReturn(true);
@@ -1144,7 +1144,7 @@ public class NotificationServiceTest {
         "DWP_UPLOAD_RESPONSE"})
     public void delayScheduleOfEvents(NotificationEventType eventType) {
         sscsCaseData.setCaseCreated(LocalDate.now().toString());
-        SscsCaseDataWrapper wrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(sscsCaseData).oldSscsCaseData(sscsCaseData)
             .notificationEventType(eventType)
             .build();
@@ -1184,7 +1184,7 @@ public class NotificationServiceTest {
             .subscriptions(Subscriptions.builder().appellantSubscription(appellantOldSubscription).build())
             .caseReference(CASE_REFERENCE).build();
 
-        SscsCaseDataWrapper wrapper = SscsCaseDataWrapper.builder().newSscsCaseData(newSscsCaseData).oldSscsCaseData(oldSscsCaseData).notificationEventType(SUBSCRIPTION_UPDATED).build();
+        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder().newSscsCaseData(newSscsCaseData).oldSscsCaseData(oldSscsCaseData).notificationEventType(SUBSCRIPTION_UPDATED).build();
         ccdNotificationWrapper = new CcdNotificationWrapper(wrapper);
 
         Notification notification = new Notification(
@@ -1224,7 +1224,7 @@ public class NotificationServiceTest {
             .subscriptions(Subscriptions.builder().appellantSubscription(appellantOldSubscription).build())
             .caseReference(CASE_REFERENCE).build();
 
-        SscsCaseDataWrapper wrapper = SscsCaseDataWrapper.builder().newSscsCaseData(newSscsCaseData)
+        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder().newSscsCaseData(newSscsCaseData)
             .oldSscsCaseData(oldSscsCaseData).notificationEventType(SUBSCRIPTION_UPDATED).build();
         ccdNotificationWrapper = new CcdNotificationWrapper(wrapper);
 
@@ -1284,7 +1284,7 @@ public class NotificationServiceTest {
                 .appellantSubscription(appellantOldSubscription).build())
             .caseReference(CASE_REFERENCE).build();
 
-        SscsCaseDataWrapper wrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(newSscsCaseData)
             .oldSscsCaseData(oldSscsCaseData)
             .notificationEventType(SUBSCRIPTION_UPDATED)
@@ -2023,7 +2023,7 @@ public class NotificationServiceTest {
     }
 
     public static CcdNotificationWrapper buildBaseWrapperWithCaseData(SscsCaseData sscsCaseDataWithDocuments, NotificationEventType eventType) {
-        SscsCaseDataWrapper caseDataWrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper caseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(sscsCaseDataWithDocuments)
             .oldSscsCaseData(sscsCaseDataWithDocuments)
             .notificationEventType(eventType)
@@ -2039,7 +2039,7 @@ public class NotificationServiceTest {
                 .representative(ReasonableAdjustmentDetails.builder().wantsReasonableAdjustment(YesNo.YES).build())
                 .jointParty(ReasonableAdjustmentDetails.builder().wantsReasonableAdjustment(YesNo.YES).build())
                 .build()).build();
-        SscsCaseDataWrapper caseDataWrapper = SscsCaseDataWrapper.builder()
+        NotificationSscsCaseDataWrapper caseDataWrapper = NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(caseData)
             .oldSscsCaseData(caseData)
             .notificationEventType(APPEAL_RECEIVED)
@@ -2182,7 +2182,7 @@ public class NotificationServiceTest {
         DynamicList sender = new DynamicList(new DynamicListItem("dwp", "dwp"), new ArrayList<>());
         SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("1234").originalSender(sender).build();
         CcdNotificationWrapper notificationWrapper = new CcdNotificationWrapper(
-            SscsCaseDataWrapper.builder().notificationEventType(eventType).newSscsCaseData(caseData).build());
+            NotificationSscsCaseDataWrapper.builder().notificationEventType(eventType).newSscsCaseData(caseData).build());
 
         notificationService.manageNotificationAndSubscription(notificationWrapper, false);
         verifyExpectedLogMessage(mockAppender, captorLoggingEvent, notificationWrapper.getNewSscsCaseData().getCcdCaseId(),

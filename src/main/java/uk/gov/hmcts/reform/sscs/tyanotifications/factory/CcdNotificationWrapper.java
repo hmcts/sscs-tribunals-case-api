@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.sscs.model.PartyItemList;
 import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityPartyMembers;
 import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.CcdActionSerializer;
@@ -27,13 +27,13 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.CcdActionSeri
 @Slf4j
 public class CcdNotificationWrapper implements NotificationWrapper {
 
-    private final SscsCaseDataWrapper responseWrapper;
+    private final NotificationSscsCaseDataWrapper responseWrapper;
 
     private boolean notificationEventTypeOverridden = false;
 
     private boolean languageSwitched = false;
 
-    public CcdNotificationWrapper(SscsCaseDataWrapper responseWrapper) {
+    public CcdNotificationWrapper(NotificationSscsCaseDataWrapper responseWrapper) {
         this.responseWrapper = responseWrapper;
     }
 
@@ -81,7 +81,7 @@ public class CcdNotificationWrapper implements NotificationWrapper {
     }
 
     @Override
-    public SscsCaseDataWrapper getSscsCaseDataWrapper() {
+    public NotificationSscsCaseDataWrapper getSscsCaseDataWrapper() {
         return responseWrapper;
     }
 

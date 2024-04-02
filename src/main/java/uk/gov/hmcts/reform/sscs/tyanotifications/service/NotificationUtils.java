@@ -8,7 +8,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notification;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
@@ -21,7 +21,7 @@ public class NotificationUtils {
     }
 
     /* Sometimes the data for the appointee comes in with null populated objects */
-    public static boolean hasAppointee(SscsCaseDataWrapper wrapper) {
+    public static boolean hasAppointee(NotificationSscsCaseDataWrapper wrapper) {
         return wrapper.getNewSscsCaseData().getAppeal() != null
             && wrapper.getNewSscsCaseData().getAppeal().getAppellant() != null
             && hasAppointee(wrapper.getNewSscsCaseData().getAppeal().getAppellant().getAppointee(),
@@ -34,7 +34,7 @@ public class NotificationUtils {
     }
 
     /* Sometimes the data for the appointee comes in with null populated objects */
-    public static boolean hasRepresentative(SscsCaseDataWrapper wrapper) {
+    public static boolean hasRepresentative(NotificationSscsCaseDataWrapper wrapper) {
         return wrapper.getNewSscsCaseData().getAppeal() != null
             && hasRepresentative(wrapper.getNewSscsCaseData().getAppeal());
     }
@@ -56,7 +56,7 @@ public class NotificationUtils {
             && isNotBlank(trimToNull(caseData.getJointParty().getName().getFullName()));
     }
 
-    public static boolean hasAppointeeSubscriptionOrIsMandatoryAppointeeLetter(SscsCaseDataWrapper wrapper) {
+    public static boolean hasAppointeeSubscriptionOrIsMandatoryAppointeeLetter(NotificationSscsCaseDataWrapper wrapper) {
         Subscription subscription = getSubscription(wrapper.getNewSscsCaseData(), APPOINTEE);
         return hasAppointee(wrapper.getNewSscsCaseData().getAppeal().getAppellant().getAppointee(),
             wrapper.getNewSscsCaseData().getAppeal().getAppellant().getIsAppointee())
@@ -64,7 +64,7 @@ public class NotificationUtils {
             || EVENT_TYPES_FOR_MANDATORY_LETTERS.contains(wrapper.getNotificationEventType()));
     }
 
-    public static boolean hasRepSubscriptionOrIsMandatoryRepLetter(SscsCaseDataWrapper wrapper) {
+    public static boolean hasRepSubscriptionOrIsMandatoryRepLetter(NotificationSscsCaseDataWrapper wrapper) {
         Subscription subscription = getSubscription(wrapper.getNewSscsCaseData(), REPRESENTATIVE);
         boolean hasRepresentative = hasRepresentative(wrapper.getNewSscsCaseData().getAppeal());
         boolean hasRepSubscription = hasRepresentative && (null != subscription && subscription.doesCaseHaveSubscriptions());
@@ -74,7 +74,7 @@ public class NotificationUtils {
         return (hasRepSubscription || hasMandatoryLetter);
     }
 
-    public static boolean hasJointPartySubscription(SscsCaseDataWrapper wrapper) {
+    public static boolean hasJointPartySubscription(NotificationSscsCaseDataWrapper wrapper) {
         Subscription subscription = getSubscription(wrapper.getNewSscsCaseData(), JOINT_PARTY);
         return ((null != subscription && subscription.doesCaseHaveSubscriptions() && hasJointParty(wrapper.getNewSscsCaseData()))
             || (hasJointParty(wrapper.getNewSscsCaseData())
@@ -161,8 +161,8 @@ public class NotificationUtils {
             || (REPRESENTATIVE.equals(subscriptionType) && null != wrapper.getNewSscsCaseData().getAppeal().getRep());
     }
 
-    public static SscsCaseDataWrapper buildSscsCaseDataWrapper(SscsCaseData caseData, SscsCaseData caseDataBefore, NotificationEventType event, State state) {
-        return SscsCaseDataWrapper.builder()
+    public static NotificationSscsCaseDataWrapper buildSscsCaseDataWrapper(SscsCaseData caseData, SscsCaseData caseDataBefore, NotificationEventType event, State state) {
+        return NotificationSscsCaseDataWrapper.builder()
             .newSscsCaseData(caseData)
             .oldSscsCaseData(caseDataBefore)
             .notificationEventType(event)

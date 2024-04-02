@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationConfig;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationConfiguration;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.properties.EvidenceProperties;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SubscriptionWithType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Link;
 import uk.gov.hmcts.reform.sscs.tyanotifications.extractor.HearingContactDateExtractor;
@@ -37,7 +37,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.MessageAuthenticationSe
 
 public class SubscriptionPersonalisationTest {
 
-    private SscsCaseDataWrapper wrapper;
+    private NotificationSscsCaseDataWrapper wrapper;
 
     @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
@@ -272,6 +272,6 @@ public class SubscriptionPersonalisationTest {
             .caseReference("5432")
             .subscriptions(Subscriptions.builder().appellantSubscription(oldSubscription).build()).build();
 
-        wrapper = SscsCaseDataWrapper.builder().newSscsCaseData(newSscsCaseData).oldSscsCaseData(oldSscsCaseData).notificationEventType(SUBSCRIPTION_UPDATED).build();
+        wrapper = NotificationSscsCaseDataWrapper.builder().newSscsCaseData(newSscsCaseData).oldSscsCaseData(oldSscsCaseData).notificationEventType(SUBSCRIPTION_UPDATED).build();
     }
 }

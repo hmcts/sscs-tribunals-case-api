@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.SscsCaseDataWrapper;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 
 @Component
 public class CallbackDispatcher {
@@ -21,10 +21,10 @@ public class CallbackDispatcher {
         this.callbackHandlers = callbackHandlers;
     }
 
-    public void handle(SscsCaseDataWrapper sscsCaseDataWrapper) {
+    public void handle(NotificationSscsCaseDataWrapper notificationSscsCaseDataWrapper) {
         Stream.of(DispatchPriority.values())
             .forEach(dispatchPriority ->
-                dispatchToHandlers(sscsCaseDataWrapper, getCallbackHandlersByPriority(dispatchPriority)));
+                dispatchToHandlers(notificationSscsCaseDataWrapper, getCallbackHandlersByPriority(dispatchPriority)));
     }
 
     private List<CallbackHandler> getCallbackHandlersByPriority(DispatchPriority dispatchPriority) {
@@ -33,10 +33,10 @@ public class CallbackDispatcher {
             .collect(Collectors.toList());
     }
 
-    private void dispatchToHandlers(SscsCaseDataWrapper sscsCaseDataWrapper,
+    private void dispatchToHandlers(NotificationSscsCaseDataWrapper notificationSscsCaseDataWrapper,
                                     List<CallbackHandler> callbackHandlers) {
         callbackHandlers.stream()
-            .filter(handler -> handler.canHandle(sscsCaseDataWrapper))
-            .forEach(handler -> handler.handle(sscsCaseDataWrapper));
+            .filter(handler -> handler.canHandle(notificationSscsCaseDataWrapper))
+            .forEach(handler -> handler.handle(notificationSscsCaseDataWrapper));
     }
 }
