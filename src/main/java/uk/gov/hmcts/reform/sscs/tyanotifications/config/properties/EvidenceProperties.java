@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 
 @Configuration
-@ConfigurationProperties(prefix = "evidence")
+@ConfigurationProperties(prefix = "tya.evidence")
 @Getter
 public class EvidenceProperties {
     @Getter

@@ -45,7 +45,7 @@ public class NotificationController {
         this.idamService = idamService;
     }
 
-    @PostMapping(value = "/send", produces = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/sendNotification", produces = APPLICATION_JSON_VALUE)
     public void sendNotification(
         @RequestHeader(AuthorisationService.SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestBody String message) {

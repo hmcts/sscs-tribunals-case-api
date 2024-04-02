@@ -22,7 +22,7 @@ public class NotificationConfig {
     private String manageEmailsLink;
     @Value("${track.appeal.link}")
     private String trackAppealLink;
-    @Value("${evidence.submission.info.link}")
+    @Value("${tya.evidence.submission.info.link}")
     private String evidenceSubmissionInfoLink;
     @Value("${claiming.expenses.link}")
     private String claimingExpensesLink;

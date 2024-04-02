@@ -350,7 +350,7 @@ gov:
 
 
 subscription.hmac.secret.text: ${EMAIL_MAC_SECRET_TEXT:our-big-secret}
-evidence.submission.info.link: ${EVIDENCE_SUBMISSION_INFO_LINK:http://localhost:3000/evidence/appeal_id}
+tya.evidence.submission.info.link: ${EVIDENCE_SUBMISSION_INFO_LINK:http://localhost:3000/evidence/appeal_id}
 manage.emails.link: ${SSCS_MANAGE_EMAILS_LINK:http://localhost:3000/manage-email-notifications/mac}
 track.appeal.link: ${SSCS_TRACK_YOUR_APPEAL_LINK:http://localhost:3000/trackyourappeal/appeal_id}
 hearing.info.link: ${HEARING_INFO_LINK:http://localhost:3000/abouthearing/appeal_id}
@@ -363,17 +363,17 @@ mya:
     hearing.info.link: ${MYA_HEARING_LINK:http://localhost:8081/support-hearing}
     claiming.expenses.link: ${MYA_EXPENSES_LINK:http://localhost:8081/support-hearing-expenses}
 
-evidence.address.line1:
-evidence.address.line2: HMCTS SSCS
-evidence.address.line3: PO BOX 12626
-evidence.address.town: Harlow
-evidence.address.county: Essex
-evidence.address.postcode: CM20 9QF
-evidence.address.scottishLine3: PO BOX 13150
-evidence.address.scottishPostcode: CM20 9TT
-evidence.address.telephone: 0300 123 1142
-evidence.address.telephoneWelsh: 0300 303 5170
-evidence.address.scottishPoBoxFeatureEnabled: ${SCOTTISH_PO_BOX_ENABLED:false}
+tya.evidence.address.line1:
+tya.evidence.address.line2: HMCTS SSCS
+tya.evidence.address.line3: PO BOX 12626
+tya.evidence.address.town: Harlow
+tya.evidence.address.county: Essex
+tya.evidence.address.postcode: CM20 9QF
+tya.evidence.address.scottishLine3: PO BOX 13150
+tya.evidence.address.scottishPostcode: CM20 9TT
+tya.evidence.address.telephone: 0300 123 1142
+tya.evidence.address.telephoneWelsh: 0300 303 5170
+tya.evidence.address.scottishPoBoxFeatureEnabled: ${SCOTTISH_PO_BOX_ENABLED:false}
 
 helpline:
     telephone: 0300 123 1142
