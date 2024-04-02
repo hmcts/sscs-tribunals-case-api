@@ -149,7 +149,6 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
             sscsCaseData.setDwpState(null);
             sscsCaseData.setInterlocReviewState(null);
             sscsCaseData.setState(State.HEARING);
-            sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(NO);
         }
         sscsCaseData.getPostponementRequest().setUnprocessedPostponementRequest(NO);
     }
