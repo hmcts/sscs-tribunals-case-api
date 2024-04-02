@@ -1,0 +1,232 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/refdata/commondata/lov/categories/Facilities",
+    "queryParameters": {
+      "serviceId": {
+        "equalTo": "BBA3"
+      },
+      "isChildRequired": {
+        "equalTo": "N"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "list_of_values": [
+        {
+          "category_key": "Facilities",
+          "key": "5",
+          "value_en": "Common Area Restriction",
+          "value_cy": "Cyfyngiad Ardal Gyffredin",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "Facilities",
+          "key": "6",
+          "value_en": "Linked to Cells",
+          "value_cy": "Cyswllt ir Celloedd",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "Facilities",
+          "key": "7",
+          "value_en": "Linked Rooms",
+          "value_cy": "Ystafelloedd Cyswllt",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "Facilities",
+          "key": "9",
+          "value_en": "Witness Room",
+          "value_cy": "Ystafell i Dystion",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "Facilities",
+          "key": "1",
+          "value_en": "Custody Cell",
+          "value_cy": "Cell yn y Ddalfa",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "Facilities",
+          "key": "11",
+          "value_en": "Secure Dock",
+          "value_cy": "Doc Diogel",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "Facilities",
+          "key": "10",
+          "value_en": "Witness Screen",
+          "value_cy": "Sgrin i Dystion",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "Facilities",
+          "key": "12",
+          "value_en": "Private Interior Room",
+          "value_cy": "Ystafell Fewnol Breifat",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "Facilities",
+          "key": "14",
+          "value_en": "Childrens Room",
+          "value_cy": "Ystafell i Blant",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "Facilities",
+          "key": "17",
+          "value_en": "Wireless Internet Access",
+          "value_cy": "Mynediad Di-wifr i’r Rhyngrwyd",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "Facilities",
+          "key": "22",
+          "value_en": "Projector",
+          "value_cy": "Taflunydd",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "Facilities",
+          "key": "23",
+          "value_en": "Evidence Camera",
+          "value_cy": "Camera Tystiolaeth",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "Facilities",
+          "key": "26",
+          "value_en": "Laptop",
+          "value_cy": "Gliniadur",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "Facilities",
+          "key": "25",
+          "value_en": "Video Conference Trolley",
+          "value_cy": "Troli Cynhadledd Fideo",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "Facilities",
+          "key": "27",
+          "value_en": "DVD/CD Player",
+          "value_cy": "Chwaraewr DVD/CD",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "Facilities",
+          "key": "33",
+          "value_en": "IAC Type-C Conference Equipment",
+          "value_cy": "IAC Type-C Conference Equipment",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        }
+      ]
+    }
+  }
+}
