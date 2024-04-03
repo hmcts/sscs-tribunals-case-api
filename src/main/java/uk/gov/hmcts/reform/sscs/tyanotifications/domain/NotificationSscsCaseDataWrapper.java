@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.domain;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;

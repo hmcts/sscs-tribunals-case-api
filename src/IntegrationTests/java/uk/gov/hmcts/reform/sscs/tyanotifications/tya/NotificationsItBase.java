@@ -35,17 +35,18 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationConfig;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationTestRecipients;
 import uk.gov.hmcts.reform.sscs.tyanotifications.controller.NotificationController;
 import uk.gov.hmcts.reform.sscs.tyanotifications.controller.ReminderTestController;
-import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationFactory;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.service.*;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.*;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterService;
 import uk.gov.service.notify.*;
 
 @RunWith(JUnitParamsRunner.class)
