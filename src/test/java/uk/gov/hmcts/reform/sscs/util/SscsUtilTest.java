@@ -2,10 +2,12 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.*;
 
@@ -212,6 +214,26 @@ class SscsUtilTest {
         assertThat(caseData.getPostHearing().getRequestType()).isNull();
         assertThat(caseData.getDocumentGeneration().getGenerateNotice()).isNull();
         assertThat(caseData.getDocumentStaging().getDateAdded()).isNull();
+    }
+
+    @Test
+    void givenPostponement_thenClearPostponementFieldsOn() {
+        SscsCaseData caseData = SscsCaseData.builder()
+            .postponement(Postponement.builder()
+                .postponementEvent(READY_TO_LIST)
+                .unprocessedPostponement(YesNo.YES)
+                .build())
+            .postponementRequest(PostponementRequest.builder()
+                .unprocessedPostponementRequest(YesNo.YES)
+                .actionPostponementRequestSelected("TEST")
+                .build())
+            .build();
+
+        clearPostponementTransientFields(caseData);
+        assertNull(caseData.getPostponement().getPostponementEvent());
+        assertNull(caseData.getPostponement().getUnprocessedPostponement());
+        assertNull(caseData.getPostponementRequest().getUnprocessedPostponementRequest());
+        assertNull(caseData.getPostponementRequest().getActionPostponementRequestSelected());
     }
 
     @Test
