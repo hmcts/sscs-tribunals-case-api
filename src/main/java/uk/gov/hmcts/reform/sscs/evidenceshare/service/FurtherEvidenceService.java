@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUt
 
 @Service
 @Slf4j
+@SuppressWarnings("squid:S2201")
 public class FurtherEvidenceService {
 
     private DocmosisTemplateConfig docmosisTemplateConfig;
@@ -32,6 +33,7 @@ public class FurtherEvidenceService {
     private SscsDocumentService sscsDocumentService;
 
     private PrintService bulkPrintService;
+
 
     public FurtherEvidenceService(@Autowired CoverLetterService coverLetterService,
                                   @Autowired SscsDocumentService sscsDocumentService,
