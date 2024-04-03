@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.WITHDRAWAL_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.WITHDRAWAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -62,6 +63,7 @@ public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<Ssc
         if (nonNull(documentDetails)) {
             addToSscsDocuments(caseData, documentDetails);
         }
+        clearPostponementTransientFields(caseData);
         cancelHearing(callback);
         return new PreSubmitCallbackResponse<>(caseData);
     }

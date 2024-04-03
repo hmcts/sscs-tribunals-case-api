@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.APPOINTEE_DETAILS_NEEDED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome.GRANTED;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
 
 import java.util.List;
 import java.util.Optional;
@@ -110,6 +111,7 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
         if (!shouldKeepConfidentialCaseFlag(caseDataAfter)) {
             preSubmitCallbackResponse.getData().setIsConfidentialCase(null);
         }
+        clearPostponementTransientFields(sscsCaseData);
         cancelHearing(callback);
 
         return preSubmitCallbackResponse;
