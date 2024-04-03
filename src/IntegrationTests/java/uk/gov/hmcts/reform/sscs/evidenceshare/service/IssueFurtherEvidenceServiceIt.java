@@ -150,7 +150,7 @@ public class IssueFurtherEvidenceServiceIt {
 
         message = new MimeMessage(session);
 
-        fileContent = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
+        fileContent = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("evidenceshare/myPdf.pdf"));
 
         when(evidenceManagementSecureDocStoreService.download(any(), any())).thenReturn(fileContent);
     }
@@ -168,7 +168,7 @@ public class IssueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallback.json")).getFile();
+            .getResource("evidenceshare/issueFurtherEvidenceCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");
@@ -197,7 +197,7 @@ public class IssueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource(String.format("issueFurtherEvidenceCallbackWith%s.json", party))).getFile();
+            .getResource(String.format("evidenceshare/issueFurtherEvidenceCallbackWith%s.json", party))).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");
@@ -230,7 +230,7 @@ public class IssueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithRepEvidence.json")).getFile();
+            .getResource("evidenceshare/issueFurtherEvidenceCallbackWithRepEvidence.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");
@@ -263,7 +263,7 @@ public class IssueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithAppellantEvidenceAndRepEvidence.json")).getFile();
+            .getResource("evidenceshare/issueFurtherEvidenceCallbackWithAppellantEvidenceAndRepEvidence.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");
@@ -306,7 +306,7 @@ public class IssueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithDwpEvidence.json")).getFile();
+            .getResource("evidenceshare/issueFurtherEvidenceCallbackWithDwpEvidence.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");
@@ -335,7 +335,7 @@ public class IssueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource(String.format("issueFurtherEvidenceCallbackWith%sAndEvidenceFromDwp.json", party))).getFile();
+            .getResource(String.format("evidenceshare/issueFurtherEvidenceCallbackWith%sAndEvidenceFromDwp.json", party))).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");
@@ -369,7 +369,7 @@ public class IssueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource(String.format("issueFurtherEvidenceCallbackWith%sEvidence.json", otherPartyType))).getFile();
+            .getResource(String.format("evidenceshare/issueFurtherEvidenceCallbackWith%sEvidence.json", otherPartyType))).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");
@@ -403,7 +403,7 @@ public class IssueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithOtherPartyRepEvidence.json")).getFile();
+            .getResource("evidenceshare/issueFurtherEvidenceCallbackWithOtherPartyRepEvidence.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");
@@ -441,7 +441,7 @@ public class IssueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json")).getFile();
+            .getResource("evidenceshare/issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");
@@ -514,7 +514,7 @@ public class IssueFurtherEvidenceServiceIt {
                 .jointParty(Collections.emptyList()).build()).build()).build());
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackReasonableAdjustment.json")).getFile();
+            .getResource("evidenceshare/issueFurtherEvidenceCallbackReasonableAdjustment.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");

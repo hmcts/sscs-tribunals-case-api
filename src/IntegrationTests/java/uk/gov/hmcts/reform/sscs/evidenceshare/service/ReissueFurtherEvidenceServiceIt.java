@@ -147,7 +147,7 @@ public class ReissueFurtherEvidenceServiceIt {
         MimeMessage message = new MimeMessage(session);
         assertNotNull("ReissueFurtherEvidenceHandler must be autowired", handler);
 
-        fileContent = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
+        fileContent = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("evidenceshare/myPdf.pdf"));
 
         when(evidenceManagementSecureDocStoreService.download(any(), any())).thenReturn(fileContent);
     }
@@ -166,7 +166,7 @@ public class ReissueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallback.json")).getFile();
+            .getResource("evidenceshare/issueFurtherEvidenceCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");
@@ -193,7 +193,7 @@ public class ReissueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithRep.json")).getFile();
+            .getResource("evidenceshare/issueFurtherEvidenceCallbackWithRep.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");
@@ -225,7 +225,7 @@ public class ReissueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithRepEvidence.json")).getFile();
+            .getResource("evidenceshare/issueFurtherEvidenceCallbackWithRepEvidence.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");
@@ -257,7 +257,7 @@ public class ReissueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithAppellantEvidenceAndRepEvidence.json")).getFile();
+            .getResource("evidenceshare/issueFurtherEvidenceCallbackWithAppellantEvidenceAndRepEvidence.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");
@@ -299,7 +299,7 @@ public class ReissueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithDwpEvidence.json")).getFile();
+            .getResource("evidenceshare/issueFurtherEvidenceCallbackWithDwpEvidence.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");
@@ -326,7 +326,7 @@ public class ReissueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithRepAndEvidenceFromDwp.json")).getFile();
+            .getResource("evidenceshare/issueFurtherEvidenceCallbackWithRepAndEvidenceFromDwp.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");

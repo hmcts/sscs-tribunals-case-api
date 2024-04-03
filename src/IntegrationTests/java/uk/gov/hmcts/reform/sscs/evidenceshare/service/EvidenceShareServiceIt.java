@@ -151,7 +151,7 @@ public class EvidenceShareServiceIt {
     @Test
     public void givenDigitalCaseWithMrnDateWithin30Days_shouldGenerateDL6TemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrintInCorrectOrder() throws IOException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("validAppealCreatedCallbackWithMrn.json")).getFile();
+            .getResource("evidenceshare/validAppealCreatedCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = updateMrnDate(json, LocalDate.now().toString());
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
@@ -169,7 +169,7 @@ public class EvidenceShareServiceIt {
     @Test
     public void givenDigitalCaseWithMrnDateOlderThan30Days_shouldGenerateDL16TemplateAndAndAddToCaseInCcdAndTriggerSentToDwpEvent() throws IOException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("validAppealCreatedCallbackWithMrn.json")).getFile();
+            .getResource("evidenceshare/validAppealCreatedCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().minusDays(31).toString());
         json = json.replace("CASE_STATE", "validAppeal");
@@ -189,7 +189,7 @@ public class EvidenceShareServiceIt {
         ReflectionTestUtils.setField(pdfStoreService, "secureDocStoreEnabled", false);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("validAppealCreatedCallbackWithMrn.json")).getFile();
+            .getResource("evidenceshare/validAppealCreatedCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().minusDays(31).toString());
         json = json.replace("CASE_STATE", "validAppeal");
@@ -229,7 +229,7 @@ public class EvidenceShareServiceIt {
         ReflectionTestUtils.setField(pdfStoreService, "secureDocStoreEnabled", true);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("validAppealCreatedCallbackWithMrn.json")).getFile();
+            .getResource("evidenceshare/validAppealCreatedCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().minusDays(31).toString());
         json = json.replace("CASE_STATE", "validAppeal");
@@ -267,7 +267,7 @@ public class EvidenceShareServiceIt {
     @Test
     public void givenDigitalCaseInReadyToListState_shouldSendToRoboticsAndUpdateDwpOffice() throws IOException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("validAppealCreatedCallbackWithMrn.json")).getFile();
+            .getResource("evidenceshare/validAppealCreatedCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().minusDays(31).toString());
         json = json.replace("CASE_STATE", "readyToList");
@@ -286,7 +286,7 @@ public class EvidenceShareServiceIt {
     public void appealWithNoMrnDate_shouldNotGenerateTemplateOrAddToCcdAndShouldUpdateCaseWithSecondaryState()
         throws IOException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("validAppealCreatedCallback.json")).getFile();
+            .getResource("evidenceshare/validAppealCreatedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
 
@@ -308,7 +308,7 @@ public class EvidenceShareServiceIt {
     @Test
     public void nonReceivedViaPaper_shouldNotBeBulkPrintedAndStateShouldBeUpdated() throws IOException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("validAppealCreatedCallback.json")).getFile();
+            .getResource("evidenceshare/validAppealCreatedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("PAPER", "ONLINE");
         json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
@@ -324,7 +324,7 @@ public class EvidenceShareServiceIt {
     @Test
     public void givenADigitalCase_shouldNotBeBulkPrintedAndStateShouldBeUpdatedAndNotSentToRobotics() throws IOException {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("validAppealCreatedCallback.json")).getFile();
+            .getResource("evidenceshare/validAppealCreatedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
 
