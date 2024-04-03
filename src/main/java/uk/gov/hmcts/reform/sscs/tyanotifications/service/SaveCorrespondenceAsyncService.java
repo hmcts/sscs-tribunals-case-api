@@ -18,6 +18,7 @@ import uk.gov.service.notify.NotificationClientException;
 
 @Slf4j
 @Component
+@SuppressWarnings("squid:S6857")
 public class SaveCorrespondenceAsyncService {
     private final CcdNotificationsPdfService ccdNotificationsPdfService;
 
