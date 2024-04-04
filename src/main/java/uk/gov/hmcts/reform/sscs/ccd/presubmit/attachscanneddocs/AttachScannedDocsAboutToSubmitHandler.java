@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
+@Slf4j
 public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Value("${feature.deleted-redacted-doc.enabled}")
@@ -40,22 +42,29 @@ public class AttachScannedDocsAboutToSubmitHandler implements PreSubmitCallbackH
         if (deletedRedactedDocEnabled) {
             var scannedDocuments = callback.getCaseDetails().getCaseData().getScannedDocuments();
 
-            callback.getCaseDetailsBefore().ifPresent(
-                    sscsCaseDataCaseDetailsBefore -> {
-                        sscsCaseDataCaseDetailsBefore.getCaseData().getScannedDocuments()
-                                .stream()
-                                .filter(scannedDocumentBefore -> scannedDocumentBefore.getValue().getEditedUrl() != null)
-                                .forEach(scannedDocumentBefore -> {
-                                    scannedDocuments
-                                            .stream()
-                                            .forEach(scannedDocument -> {
-                                                if (compare(scannedDocumentBefore, scannedDocument)) {
-                                                    scannedDocument.getValue().setEditedUrl(scannedDocumentBefore.getValue().getEditedUrl());
-                                                }
-                                            });
-                                });
+            if (scannedDocuments != null) {
+                callback.getCaseDetailsBefore().ifPresent(
+                        sscsCaseDataCaseDetailsBefore -> {
+                            var scannedDocumentsBefore = sscsCaseDataCaseDetailsBefore.getCaseData().getScannedDocuments();
 
-                    });
+                            if (scannedDocumentsBefore != null) {
+                                scannedDocumentsBefore.stream()
+                                        .filter(scannedDocumentBefore -> scannedDocumentBefore.getValue().getEditedUrl() != null)
+                                        .forEach(scannedDocumentBefore -> {
+                                            scannedDocuments
+                                                    .stream()
+                                                    .forEach(scannedDocument -> {
+                                                        if (compare(scannedDocumentBefore, scannedDocument)) {
+                                                            scannedDocument.getValue().setEditedUrl(scannedDocumentBefore.getValue().getEditedUrl());
+                                                        }
+                                                    });
+                                        });
+
+                            }
+                        });
+            } else {
+                log.error("There are no scanned documents in this case");
+            }
         }
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
