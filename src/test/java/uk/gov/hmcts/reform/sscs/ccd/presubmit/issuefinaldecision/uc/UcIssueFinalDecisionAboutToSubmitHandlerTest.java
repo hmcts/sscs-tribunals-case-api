@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.uc;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
+import uk.gov.hmcts.reform.sscs.model.PoDetails;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.service.*;
 
@@ -43,8 +45,6 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private IssueFinalDecisionAboutToSubmitHandler handler;
-
-    private UcDecisionNoticeOutcomeService ucDecisionNoticeOutcomeService;
 
     private DecisionNoticeService decisionNoticeService;
 
@@ -68,8 +68,6 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    private SscsDocument document;
-
     protected static Validator validator = Validation.byDefaultProvider()
             .configure()
             .messageInterpolator(new ParameterMessageInterpolator())
@@ -79,9 +77,9 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        ucDecisionNoticeOutcomeService = new UcDecisionNoticeOutcomeService(new UcDecisionNoticeQuestionService());
+        UcDecisionNoticeOutcomeService ucDecisionNoticeOutcomeService = new UcDecisionNoticeOutcomeService(new UcDecisionNoticeQuestionService());
 
-        decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), Arrays.asList(ucDecisionNoticeOutcomeService), new ArrayList<>());
+        decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), List.of(ucDecisionNoticeOutcomeService), new ArrayList<>());
 
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, userDetailsService,
                 validator, hearingMessageHelper, venueDataLoader, false);
@@ -418,6 +416,19 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
         verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+    }
+
+    @Test
+    public void givenFinalDecisionIsIssued_thenClearPoFields() {
+        sscsCaseData.setPoAttendanceConfirmed(YES);
+        sscsCaseData.setPresentingOfficersDetails(PoDetails.builder().name(Name.builder().build()).build());
+        sscsCaseData.setPresentingOfficersHearingLink("link");
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getPoAttendanceConfirmed()).isEqualTo(NO);
+        assertThat(sscsCaseData.getPresentingOfficersDetails()).isEqualTo(PoDetails.builder().build());
+        assertThat(sscsCaseData.getPresentingOfficersHearingLink()).isNull();
     }
 
     private SscsDocument buildSscsDocumentWithDocumentType(String documentType) {

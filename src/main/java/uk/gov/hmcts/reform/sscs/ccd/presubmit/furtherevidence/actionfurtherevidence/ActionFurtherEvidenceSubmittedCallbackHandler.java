@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     public static final String TCW_REVIEW_POSTPONEMENT_REQUEST = "Review hearing postponement request";
     public static final String TCW_REVIEW_SEND_TO_JUDGE = "Send a case to a judge for review";
     private final CcdService ccdService;
+    private final UpdateCcdCaseService updateCcdCaseService;
     private final IdamService idamService;
 
     @Value("${feature.postHearings.enabled}")
@@ -84,8 +86,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         if (isPostHearingsEnabled && isFurtherEvidenceActionOptionValid(furtherEvidenceAction, ADMIN_ACTION_CORRECTION)) {
             // TODO 10581 navigate user to Admin correction screen
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
-                AWAITING_ADMIN_ACTION, ADMIN_ACTION_CORRECTION,
-                EventType.CORRECTION_REQUEST, "Admin action correction");
+                    AWAITING_ADMIN_ACTION, ADMIN_ACTION_CORRECTION,
+                    EventType.CORRECTION_REQUEST, "Admin action correction");
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
             caseData.setInterlocReferralDate(LocalDate.now());
@@ -136,9 +138,11 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                     EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Actioned manually",
                     "Actioned manually", idamService.getIdamTokens());
         }
-        return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+
+        return updateCcdCaseService.updateCaseV2(callback.getCaseDetails().getId(),
                 EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
-                "Issue to all parties", idamService.getIdamTokens());
+                "Issue to all parties", idamService.getIdamTokens(), sscsCaseData -> {
+                });
     }
 
     private SscsCaseDetails handlePostHearing(Callback<SscsCaseData> callback, SscsCaseData caseData, PostHearingRequestType postHearingRequestType) {

@@ -41,6 +41,8 @@ java:
           alias: app-insights-connection-string
         - name: sscs-servicebus-connection-string-tf
           alias: HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING
+        - name: evidence-share-topic-shared-access-key
+          alias: AMQP_PASSWORD
   environment:
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
@@ -77,6 +79,12 @@ java:
     ELINKS_V2_FEATURE_ENABLED: false
     DELETED_REDACTED_DOC_ENABLED: false
     UPLOAD_HEARING_FILTER_ENABLED: false
+    CITIZEN_LOGIN_SERVICE_V2: false
+    ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: false
+    SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-{{ .Values.global.environment }}"
+    TOPIC_NAME: "sscs-evidenceshare-topic-{{ .Values.global.environment }}"
+    AMQP_HOST: "sscs-servicebus-{{ .Values.global.environment }}.servicebus.windows.net"
+    AMQP_USERNAME: "SendAndListenSharedAccessKey"
 
 idam-pr:
   enabled: false

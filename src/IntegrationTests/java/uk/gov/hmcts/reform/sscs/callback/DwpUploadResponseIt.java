@@ -22,7 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -36,7 +36,7 @@ public class DwpUploadResponseIt extends AbstractEventIt {
     private IdamClient idamClient;
 
     @MockBean
-    private UserDetails userDetails;
+    private UserInfo userInfo;
 
     @Before
     public void setup() throws IOException {
@@ -93,7 +93,7 @@ public class DwpUploadResponseIt extends AbstractEventIt {
     public void callToAboutToSubmit_willSetPheRequestIfPhmeIsSelected_AndAddAudioVideoEvidenceWithRip1Doc() throws Exception {
         setup("callback/dwpUploadResponsePhe.json");
 
-        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
         json = json.replace("BENEFIT_CODE_PLACEHOLDER", "PIP");
         json = json.replace("BENEFIT_DESCRIPTION_PLACEHOLDER", "Personal Independence Payment");
 

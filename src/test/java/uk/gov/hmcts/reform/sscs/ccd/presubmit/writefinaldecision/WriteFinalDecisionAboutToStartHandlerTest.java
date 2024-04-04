@@ -1,23 +1,24 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -25,7 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class WriteFinalDecisionAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private WriteFinalDecisionAboutToStartHandler handler;
@@ -38,13 +39,9 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
   
     private SscsCaseData sscsCaseData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        openMocks(this);
         sscsCaseData = new SscsCaseData();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
 
         sscsCaseData.setSscsDocument(List.of(SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
@@ -102,20 +99,21 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
         handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, false);
     }
 
-    @Test
-    @Parameters({"MID_EVENT", "ABOUT_TO_SUBMIT", "SUBMITTED"})
+    @ParameterizedTest
+    @EnumSource(CallbackType.class)
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void throwsExceptionIfItCannotHandleTheAppeal() {
-        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThrows(IllegalStateException.class, () ->
+                handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
 
     @Test
     public void givenNullCaseDetails_thenReturnFalse() {
+        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(null);
         assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
@@ -123,24 +121,31 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     @Test
     public void givenNullCaseData_thenReturnFalse() {
         when(caseDetails.getCaseData()).thenReturn(null);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
 
     @Test
     public void givenPostHearingsFalse_thenErrorsShouldBeEmpty() {
-        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, false);
-
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(response.getErrors().size(), 0);
     }
 
-    @Test
-    @Parameters({"POST_HEARING", "DORMANT_APPEAL_STATE"})
+    @ParameterizedTest
+    @EnumSource(names = {"POST_HEARING", "DORMANT_APPEAL_STATE"})
     public void givenStateIsDormantOrPostHearingsAndIsSalariedJudge_thenErrorsShouldBeEmpty(State state) {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(caseDetails.getState()).thenReturn(state);
         when(userDetailsService.getUserRoles(USER_AUTHORISATION)).thenReturn(List.of(UserRole.SALARIED_JUDGE.getValue()));
 
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(response.getErrors().size(), 0);
@@ -148,6 +153,9 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
 
     @Test
     public void givenStateIsNorDormantOrPostHearings_thenErrorsShouldBeEmpty() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(caseDetails.getState()).thenReturn(State.VALID_APPEAL);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -158,6 +166,9 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     @Test
     public void givenStateIsDormantAndIsntSalariedJudge_thenThrowError() {
         handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
         when(userDetailsService.getUserRoles(USER_AUTHORISATION)).thenReturn(List.of(UserRole.JUDGE.getValue()));
 
@@ -168,9 +179,29 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     }
 
     @Test
-    @Parameters({"POST_HEARING", "DORMANT_APPEAL_STATE"})
+    public void givenStateIsDormantAndSalariedJudge_thenNoErrors() {
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
+        List<String> userRoles = List.of(
+                UserRole.JUDGE.getValue(),
+                UserRole.SALARIED_JUDGE.getValue()
+        );
+        when(userDetailsService.getUserRoles(USER_AUTHORISATION)).thenReturn(userRoles);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @ParameterizedTest
+    @EnumSource(names = {"POST_HEARING", "DORMANT_APPEAL_STATE"})
     public void givenAWriteFinalDecisionEventForCorrectionWithPostHearingsEnabled_thenKeepData(State state) {
         handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(caseDetails.getState()).thenReturn(state);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -181,6 +212,9 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
     @Test
     public void givenAWriteFinalDecisionEventNotForCorrectionWithPostHearingsEnabled_thenDeleteData() {
         handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(caseDetails.getState()).thenReturn(State.VALID_APPEAL);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -190,6 +224,10 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
 
     @Test
     public void givenAWriteFinalDecisionEventForCorrectionWithPostHearingsNotEnabled_thenDeleteData() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertDataDeleted(response);
@@ -202,10 +240,26 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
                         .documentType(DRAFT_DECISION_NOTICE.getValue())
                         .build())
                 .build()));
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         sscsCaseData.setState(State.VALID_APPEAL);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertDataRetained(response);
+    }
+
+    @Test
+    public void giveCorrectionInProgressAndDecisionIsUploaded_thenClearUploadedDecision() {
+        sscsCaseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(NO);
+        handler = new WriteFinalDecisionAboutToStartHandler(userDetailsService, true);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
+        when(caseDetails.getState()).thenReturn(State.DORMANT_APPEAL_STATE);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertNull(response.getData().getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
     }
 
     private void assertDataRetained(PreSubmitCallbackResponse<SscsCaseData> response) {
@@ -247,7 +301,6 @@ public class WriteFinalDecisionAboutToStartHandlerTest {
         assertNotNull(sscsCaseData.getDwpReassessTheAward());
         assertNotNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionReasons());
         assertNotNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPageSectionReference());
-        assertNotNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionPreviewDocument());
         assertNotNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGeneratedDate());
         assertNotNull(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionIsDescriptorFlow());
         assertNotNull(sscsCaseData.getWcaAppeal());

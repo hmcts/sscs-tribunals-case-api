@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.lang.String.join;
 import static java.util.Objects.isNull;
 
 import java.util.List;
@@ -7,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.idam.UserRole;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
@@ -20,13 +20,12 @@ public class UserDetailsService {
     protected final JudicialRefDataService judicialRefDataService;
 
     public String buildLoggedInUserName(String userAuthorisation) {
-        UserDetails userDetails = getUserDetails(userAuthorisation);
-        return userDetails.getFullName();
+        UserInfo userInfo = getUserInfo(userAuthorisation);
+        return join(" ", userInfo.getGivenName(), userInfo.getFamilyName());
     }
 
     public String buildLoggedInUserSurname(String userAuthorisation) {
-        UserDetails userDetails = getUserDetails(userAuthorisation);
-        return userDetails.getSurname().orElse("");
+        return getUserInfo(userAuthorisation).getFamilyName();
     }
 
     public List<String> getUserRoles(String userAuthorisation) {
@@ -51,14 +50,6 @@ public class UserDetailsService {
             throw new IllegalStateException("Unable to obtain signed in user info");
         }
         return userInfo;
-    }
-
-    private UserDetails getUserDetails(String userAuthorisation) throws IllegalStateException {
-        UserDetails userDetails = idamClient.getUserDetails(userAuthorisation);
-        if (userDetails == null) {
-            throw new IllegalStateException("Unable to obtain signed in user details");
-        }
-        return userDetails;
     }
 
     public JudicialUserBase getLoggedInUserAsJudicialUser(String userAuthorisation) {

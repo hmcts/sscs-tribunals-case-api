@@ -111,6 +111,8 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             adjournCaseBuilder.reasonsForDecision(null);
         }
 
+        adjournCaseBuilder.tribunalDirectPoToAttend(caseData.getTribunalDirectPoToAttend());
+
         if (adjournment.getAdditionalDirections() != null) {
             adjournCaseBuilder.additionalDirections(adjournment.getAdditionalDirections().stream()
                 .map(CollectionItem::getValue).toList());

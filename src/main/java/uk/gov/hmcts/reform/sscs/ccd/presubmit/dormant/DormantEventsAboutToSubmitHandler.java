@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.HMCTS_LAPSE_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FINAL_DECISION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.LAPSED_REVISED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.WITHDRAWN;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -72,6 +73,7 @@ public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandl
 
         caseData.setInterlocReviewState(null);
         caseData.setDirectionDueDate(null);
+        caseData.clearPoDetails();
         callback.getCaseDetailsBefore().ifPresent(f -> caseData.setPreviousState(f.getState()));
 
         String caseID = callback.getCaseDetails().getCaseData().getCcdCaseId();
@@ -88,6 +90,7 @@ public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandl
 
             log.info("CaseID: {} - Event: {}. HearingRoute is List Assist - Sending cancellation message",
                     caseID, callback.getEvent());
+            clearPostponementTransientFields(caseData);
             hearingMessageHelper.sendListAssistCancelHearingMessage(caseID, cancellationReason);
         }
 

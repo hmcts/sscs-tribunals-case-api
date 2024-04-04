@@ -2,25 +2,26 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.addhearing;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
-import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.model.PoDetails;
 
 @RunWith(JUnitParamsRunner.class)
 public class AddHearingAboutToSubmitHandlerTest {
@@ -53,21 +54,14 @@ public class AddHearingAboutToSubmitHandlerTest {
 
     @Test
     public void givenAddHearingEventWithValidTime_thenDontThrowError() {
-        Hearing hearing = Hearing.builder().value(HearingDetails.builder().time("11:35").build()).build();
-        sscsCaseData.setHearings(List.of(hearing));
+        sscsCaseData.setPoAttendanceConfirmed(YesNo.YES);
+        sscsCaseData.setPresentingOfficersDetails(PoDetails.builder().name(Name.builder().firstName("bane").build())
+                .contact(Contact.builder().email("emails").build()).build());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(0, response.getErrors().size());
-    }
-
-    @Test
-    public void givenAddHearingEventWithInvalidTime_thenThrowError() {
-        Hearing hearing = Hearing.builder().value(HearingDetails.builder().time("raggvdrag").build()).build();
-        sscsCaseData.setHearings(List.of(hearing));
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(1, response.getErrors().size());
+        assertEquals(sscsCaseData.getPoAttendanceConfirmed(), YesNo.NO);
+        assertNull(sscsCaseData.getPresentingOfficersDetails().getName().getFirstName());
+        assertNull(sscsCaseData.getPresentingOfficersDetails().getContact().getEmail());
     }
 }

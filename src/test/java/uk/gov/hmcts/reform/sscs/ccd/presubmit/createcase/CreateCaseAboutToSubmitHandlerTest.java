@@ -22,6 +22,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,6 +44,9 @@ public class CreateCaseAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private VerbalLanguagesService verbalLanguagesService;
+
     private CreateCaseAboutToSubmitHandler createCaseAboutToSubmitHandler;
 
     @BeforeEach
@@ -52,7 +57,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
-        createCaseAboutToSubmitHandler = new CreateCaseAboutToSubmitHandler(sscsPdfService, emailHelper);
+        createCaseAboutToSubmitHandler = new CreateCaseAboutToSubmitHandler(sscsPdfService, emailHelper, verbalLanguagesService);
     }
 
     @ParameterizedTest
@@ -122,6 +127,18 @@ public class CreateCaseAboutToSubmitHandlerTest {
     }
 
     @Test
+    void whenCaseCreated_shouldUpdatePoAttendingAndTribinalDirectPoAttendToNo() throws CcdException {
+        when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
+        caseDetails.getCaseData().getAppeal().getAppellant().getAppointee().setName(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(response.getData().getPoAttendanceConfirmed(), YesNo.NO);
+        assertEquals(response.getData().getTribunalDirectPoToAttend(), YesNo.NO);
+
+    }
+
+    @Test
     void shouldCallPdfServiceWhenSscsDocumentIsNull() {
         SscsCaseData caseDataWithNullSscsDocument = buildCaseDataWithNullSscsDocument();
 
@@ -138,7 +155,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void shouldCallPdfServiceWhenSscsDocumentIsPopulated() {
+    void shouldCallPdfServiceWhenSscsDocumentIsPopulated() {
         SscsCaseData caseDataWithSscsDocument = buildCaseDataWithPdf();
 
         when(caseDetails.getCaseData()).thenReturn(caseDataWithSscsDocument);
@@ -180,6 +197,19 @@ public class CreateCaseAboutToSubmitHandlerTest {
     }
 
     @Test
+    void givenLanguageHasBeenSet_thenConfirmCorrectLanguageNameAndSetIt() {
+        String oldLanguageName = "Putonghue";
+        String newLanguageName = "Mandarin";
+
+        caseDetails.getCaseData().getAppeal().getHearingOptions().setLanguages(oldLanguageName);
+        when(verbalLanguagesService.getVerbalLanguage(oldLanguageName)).thenReturn(Language.builder()
+                .nameEn(newLanguageName).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(newLanguageName, response.getData().getAppeal().getHearingOptions().getLanguages());
+    }
+
+    @Test
     void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         assertThrows(IllegalStateException.class, () ->
@@ -193,6 +223,32 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
         assertEquals(1, response.getErrors().size());
     }
+
+    @Test
+    void shouldPreserveDwpIsOfficerAttendingValue() {
+        caseDetails.getCaseData().setDwpIsOfficerAttending(YesNo.YES.toString());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertTrue(YesNo.isYes(response.getData().getDwpIsOfficerAttending()));
+    }
+
+    @Test
+    void whenBenefitCodeIsNotNull_shouldSetCorrectCaseCode() {
+        caseDetails.getCaseData().setBenefitCode("001");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals("001DD", response.getData().getCaseCode());
+    }
+
+    @Test
+    void whenBenefitAndIssueCodeIsNotNull_shouldSetCorrectCaseCode() {
+        caseDetails.getCaseData().setBenefitCode("001");
+        caseDetails.getCaseData().setIssueCode("US");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals("001US", response.getData().getCaseCode());
+    }
+
 
     private SscsCaseData buildCaseDataWithoutPdf() {
         SscsCaseData caseData = CaseDataUtils.buildCaseData();
