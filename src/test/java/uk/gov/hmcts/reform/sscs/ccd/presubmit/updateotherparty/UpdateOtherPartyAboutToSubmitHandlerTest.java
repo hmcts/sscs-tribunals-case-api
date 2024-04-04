@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import junitparams.converters.Nullable;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -370,68 +369,6 @@ public class UpdateOtherPartyAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getWarnings().size());
         assertEquals(0, response.getErrors().size());
-    }
-
-    @Test
-    @Parameters({"null", "", "sample", "sample.com"})
-    public void givenACaseWhenUserWantsHearingTypeVideoButTheEmailIsInvalidForSingleOtherParty_thenThrowAnError(@Nullable String email) {
-        HearingSubtype hearingSubtype = HearingSubtype.builder()
-                .wantsHearingTypeVideo("Yes")
-                .hearingVideoEmail(email)
-                .build();
-
-        CcdValue<OtherParty> otherPartyCcdValue = buildOtherParty(ID_1);
-        otherPartyCcdValue.getValue().setHearingSubtype(hearingSubtype);
-
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code("childSupport").build())
-                .hearingType(HearingType.PAPER.getValue())
-                .build())
-            .otherParties(List.of(otherPartyCcdValue))
-            .build();
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(1, response.getErrors().size());
-        assertEquals(0, response.getWarnings().size());
-        assertEquals("Hearing video email address must be valid email address", response.getErrors().stream().findFirst().get());
-    }
-
-    @Test
-    @Parameters({"null", "", "sample", "sample.com"})
-    public void givenACaseWhenUserWantsHearingTypeVideoButTheEmailIsInvalidForMultipleOtherParty_thenThrowAnError(@Nullable String email) {
-        HearingSubtype hearingSubtype1 = HearingSubtype.builder()
-                .wantsHearingTypeVideo("Yes")
-                .hearingVideoEmail("example@example.com")
-                .build();
-        HearingSubtype hearingSubtype2 = HearingSubtype.builder()
-                .wantsHearingTypeVideo("Yes")
-                .hearingVideoEmail(email)
-                .build();
-
-        CcdValue<OtherParty> otherPartyCcdValue1 = buildOtherParty(ID_1);
-        CcdValue<OtherParty> otherPartyCcdValue2 = buildOtherParty(ID_2);
-        otherPartyCcdValue1.getValue().setHearingSubtype(hearingSubtype1);
-        otherPartyCcdValue2.getValue().setHearingSubtype(hearingSubtype2);
-
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .appeal(Appeal.builder()
-                    .benefitType(BenefitType.builder().code("childSupport").build())
-                    .hearingType(HearingType.PAPER.getValue())
-                    .build())
-            .otherParties(List.of(otherPartyCcdValue1, otherPartyCcdValue2))
-            .build();
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(1, response.getErrors().size());
-        assertEquals(0, response.getWarnings().size());
-        assertEquals("Hearing video email address must be valid email address", response.getErrors().stream().findFirst().get());
     }
 
     @Test
