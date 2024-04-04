@@ -132,21 +132,20 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
-        ArgumentCaptor<Consumer<SscsCaseData>> captor = ArgumentCaptor.forClass(Consumer.class);
-
-        var sscsCaseData = SscsCaseData.builder().build();
+        ArgumentCaptor<Consumer<SscsCaseDetails>> captor = ArgumentCaptor.forClass(Consumer.class);
+        var sscsCaseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build();
         given(updateCcdCaseService.updateCaseV2(anyLong(), eq("issueFurtherEvidence"),
                 anyString(), anyString(), any(IdamTokens.class), captor.capture()))
-                .willReturn(SscsCaseDetails.builder().data(sscsCaseData).build());
+                .willReturn(SscsCaseDetails.builder().data(sscsCaseDetails.getData()).build());
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         verify(updateCcdCaseService).updateCaseV2(anyLong(), eq("issueFurtherEvidence"),
                 anyString(), anyString(), any(IdamTokens.class), captor.capture());
 
-        captor.getValue().accept(sscsCaseData);
+        captor.getValue().accept(sscsCaseDetails);
 
-        assertNull(sscsCaseData.getInterlocReviewState());
+        assertNull(sscsCaseDetails.getData().getInterlocReviewState());
     }
 
     @Test

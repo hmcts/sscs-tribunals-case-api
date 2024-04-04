@@ -63,7 +63,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.EvidenceDescription;
@@ -84,7 +83,6 @@ import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
 @Service
 public class EvidenceUploadService {
     private final DocumentManagementService documentManagementService;
-    private final CcdService ccdService;
     private final IdamService idamService;
     private final OnlineHearingService onlineHearingService;
     private final StoreEvidenceDescriptionService storeEvidenceDescriptionService;
@@ -100,14 +98,12 @@ public class EvidenceUploadService {
 
     @Autowired
     public EvidenceUploadService(DocumentManagementService documentManagementService,
-                                 CcdService ccdService,
                                  IdamService idamService, OnlineHearingService onlineHearingService,
                                  StoreEvidenceDescriptionService storeEvidenceDescriptionService,
                                  FileToPdfConversionService fileToPdfConversionService,
                                  EvidenceManagementService evidenceManagementService,
                                  PdfStoreService pdfStoreService, UpdateCcdCaseService updateCcdCaseService, AddedDocumentsUtil addedDocumentsUtil) {
         this.documentManagementService = documentManagementService;
-        this.ccdService = ccdService;
         this.idamService = idamService;
         this.onlineHearingService = onlineHearingService;
         this.storeEvidenceDescriptionService = storeEvidenceDescriptionService;
@@ -286,9 +282,10 @@ public class EvidenceUploadService {
                                             .collect(toList());
                                     documentExtract.setDocuments().accept(caseData, newDocuments);
 
-                                    // The line below used to be triggered after the updateCase, does it pose business impact that it is now call as part of the updateCase?
-                                    // should this be outside the updateCaseV2 call and if so how can this be implemented as the check it is dependent on is changed in the updateCaseV2
                                     documentManagementService.delete(evidenceId);
+                                } else {
+                                    log.info("Throwing runtime exception no draft evidence found for case ID {}", identifier);
+                                    throw new RuntimeException("No draft evidence found for case ID " + identifier);
                                 }
                             });
                     return true;

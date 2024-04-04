@@ -104,12 +104,13 @@ public class AssociatedCaseLinkHelper {
                 log.info("Linking case {} to case {} using V2", currentCaseId, caseId);
                 updateCcdCaseService.updateCaseV2(currentCaseId, EventType.UPDATE_CASE_ONLY.getCcdType(),
                         "updated case only", "Auto linked case added",
-                        idamService.getIdamTokens(), caseData -> mutator(caseData, caseId));
+                        idamService.getIdamTokens(), mutatorSscsCaseDetails -> mutator(mutatorSscsCaseDetails, caseId));
             }
         }
     }
 
-    private void mutator(SscsCaseData sscsCaseData, String caseId) {
+    private void mutator(SscsCaseDetails sscsCaseDetails, String caseId) {
+        SscsCaseData sscsCaseData = sscsCaseDetails.getData();
         List<CaseLink> linkList = Optional.ofNullable(sscsCaseData.getAssociatedCase()).orElse(new ArrayList<>());
         linkList.add(CaseLink.builder().value(
                 CaseLinkDetails.builder().caseReference(caseId).build()).build());

@@ -10,12 +10,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.AdditionalMatchers.and;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT;
@@ -35,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -43,6 +42,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.core.io.ByteArrayResource;
@@ -50,9 +51,8 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.EvidenceDescription;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -80,7 +80,7 @@ public class EvidenceUploadServiceTest {
     private static final String OTHER_PARTY_REP_EMAIL = "op-rep@gmail.com";
     private static final String OTHER_PARTY_APPOINTEE_EMAIL = "op-appointee@gmail.com";
     private EvidenceUploadService evidenceUploadService;
-    private CcdService ccdService;
+    private UpdateCcdCaseService updateCcdCaseService;
     private OnlineHearingService onlineHearingService;
     private String someOnlineHearingId;
     private String someQuestionId;
@@ -98,15 +98,17 @@ public class EvidenceUploadServiceTest {
     private PdfStoreService pdfStoreService;
     private IdamService idamService;
     private FileToPdfConversionService fileToPdfConversionService;
+    @Captor
+    private ArgumentCaptor<Consumer<SscsCaseDetails>> captor;
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Before
     public void setUp() {
-        ccdService = mock(CcdService.class);
+        updateCcdCaseService = mock(UpdateCcdCaseService.class);
         onlineHearingService = mock(OnlineHearingService.class);
-        someOnlineHearingId = "someOnlinehearingId";
+        someOnlineHearingId = "123";
         someQuestionId = "someQuestionId";
         someEvidenceId = "someEvidenceId";
 
@@ -138,13 +140,13 @@ public class EvidenceUploadServiceTest {
     private void evidenceUploadService(AddedDocumentsUtil addedDocumentsUtil) {
         evidenceUploadService = new EvidenceUploadService(
             mock(DocumentManagementService.class),
-            ccdService,
             idamService,
             onlineHearingService,
             storeEvidenceDescriptionService,
             fileToPdfConversionService,
             evidenceManagementService,
             pdfStoreService,
+            updateCcdCaseService,
             addedDocumentsUtil);
     }
 
@@ -163,13 +165,13 @@ public class EvidenceUploadServiceTest {
         Evidence evidence = evidenceOptional.get();
         assertThat(evidence, is(new Evidence(documentUrl, fileName, convertCreatedOnDate(evidenceCreatedOn))));
 
-        verify(ccdService).updateCase(
-                hasDraftSscsDocument(originalNumberOfSscsDocuments, documentUrl, fileName),
+        verify(updateCcdCaseService).updateCaseV2(
                 eq(someCcdCaseId),
                 eq("uploadDraftDocument"),
                 eq("SSCS - upload document from MYA"),
                 eq("Uploaded a further evidence document"),
-                eq(idamTokens)
+                eq(idamTokens),
+                any(Consumer.class)
         );
     }
 
@@ -185,13 +187,13 @@ public class EvidenceUploadServiceTest {
         assertThat(evidenceOptional.isPresent(), is(true));
         Evidence evidence = evidenceOptional.get();
         assertThat(evidence, is(new Evidence(documentUrl, fileName, convertCreatedOnDate(evidenceCreatedOn))));
-        verify(ccdService).updateCase(
-                hasDraftSscsDocument(0, documentUrl, fileName),
+        verify(updateCcdCaseService).updateCaseV2(
                 eq(someCcdCaseId),
                 eq("uploadDraftDocument"),
                 eq("SSCS - upload document from MYA"),
                 eq("Uploaded a further evidence document"),
-                eq(idamTokens)
+                eq(idamTokens),
+                any(Consumer.class)
         );
     }
 
@@ -246,14 +248,13 @@ public class EvidenceUploadServiceTest {
 
         assertThat(submittedEvidence, is(true));
 
-        verify(ccdService).updateCase(
-                and(hasSscsScannedDocumentAndSscsDocuments(expectedEvidenceUploadFilename),
-                        doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo()),
+        verify(updateCcdCaseService).updateCaseV2(
                 eq(someCcdCaseId),
                 eq(UPLOAD_DOCUMENT.getCcdType()),
                 eq("SSCS - upload evidence from MYA"),
                 eq("Uploaded a further evidence document"),
-                eq(idamTokens)
+                eq(idamTokens),
+                any(Consumer.class)
         );
     }
 
@@ -293,14 +294,13 @@ public class EvidenceUploadServiceTest {
 
         assertThat(submittedEvidence, is(true));
 
-        verify(ccdService).updateCase(
-                and(hasSscsScannedDocumentAndSscsDocuments(expectedEvidenceUploadFilename),
-                        doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo(YesNo.NO)),
+        verify(updateCcdCaseService).updateCaseV2(
                 eq(someCcdCaseId),
                 eq(UPLOAD_DOCUMENT.getCcdType()),
                 eq("SSCS - upload evidence from MYA"),
                 eq("Uploaded a further evidence document"),
-                eq(idamTokens)
+                eq(idamTokens),
+                any(Consumer.class)
         );
     }
 
@@ -352,17 +352,13 @@ public class EvidenceUploadServiceTest {
 
         assertThat(submittedEvidence, is(true));
 
-        verify(ccdService).updateCase(
-                and(and(and(and(hasAudioVideoDocumentAndSscsDocuments(avFileName, "http://dm-store/112"),
-                        doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo()),
-                        argThat(argument -> argument.getInterlocReviewState().equals(expectedInterlocReviewState))),
-                        argThat(argument ->  argument.getInterlocReferralReason().equals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE))),
-                        argThat(argument ->  argument.getHasUnprocessedAudioVideoEvidence().equals(YesNo.YES))),
+        verify(updateCcdCaseService).updateCaseV2(
                 eq(someCcdCaseId),
                 eq(UPLOAD_DOCUMENT.getCcdType()),
                 eq("SSCS - upload evidence from MYA"),
                 eq("Uploaded a further evidence document"),
-                eq(idamTokens)
+                eq(idamTokens),
+                any(Consumer.class)
         );
     }
 
@@ -374,13 +370,13 @@ public class EvidenceUploadServiceTest {
         boolean hearingFound = evidenceUploadService.deleteDraftEvidence(someOnlineHearingId, someEvidenceId);
 
         assertThat(hearingFound, is(true));
-        verify(ccdService).updateCase(
-                doesNotHaveDraftSscsDocuments(),
+        verify(updateCcdCaseService).updateCaseV2(
                 eq(someCcdCaseId),
                 eq("uploadDraftDocument"),
                 eq("SSCS - evidence deleted"),
                 eq("Uploaded a draft evidence deleted"),
-                eq(idamTokens)
+                eq(idamTokens),
+                any(Consumer.class)
         );
     }
 
@@ -392,7 +388,9 @@ public class EvidenceUploadServiceTest {
         boolean hearingFound = evidenceUploadService.deleteDraftEvidence(someOnlineHearingId, someEvidenceId);
 
         assertThat(hearingFound, is(true));
-        verify(ccdService, never()).updateCase(any(), any(), any(), any(), any(), any());
+        verify(updateCcdCaseService).updateCaseV2(any(), any(), any(), any(), any(), captor.capture());
+        Consumer<SscsCaseDetails> consumer = captor.getValue();
+        assertThrows(RuntimeException.class, () -> consumer.accept(sscsCaseDetails));
     }
 
     @Test
@@ -543,6 +541,17 @@ public class EvidenceUploadServiceTest {
 
         evidenceUploadService.submitSingleHearingEvidence(someOnlineHearingId, someDescription, file);
 
+        verify(updateCcdCaseService).updateCaseV2(
+            eq(someCcdCaseId),
+            eq(UPLOAD_DOCUMENT.getCcdType()),
+            eq("SSCS - upload evidence from MYA"),
+            eq("Uploaded a further evidence document"),
+            eq(idamTokens),
+            captor.capture()
+        );
+
+        captor.getValue().accept(sscsCaseDetails);
+
         Map<String, Integer> addedDocuments = new ObjectMapper().readerFor(Map.class)
             .readValue(sscsCaseDetails.getData().getWorkAllocationFields().getAddedDocuments());
 
@@ -592,6 +601,17 @@ public class EvidenceUploadServiceTest {
             .thenReturn(Collections.singletonList(combinedEvidenceDoc));
 
         evidenceUploadService.submitSingleHearingEvidence(someOnlineHearingId, someDescription, file);
+
+        verify(updateCcdCaseService).updateCaseV2(
+            eq(someCcdCaseId),
+            eq(UPLOAD_DOCUMENT.getCcdType()),
+            eq("SSCS - upload evidence from MYA"),
+            eq("Uploaded a further evidence document"),
+            eq(idamTokens),
+            captor.capture()
+        );
+
+        captor.getValue().accept(sscsCaseDetails);
 
         org.assertj.core.api.Assertions.assertThat(sscsCaseDetails.getData().getWorkAllocationFields().getAddedDocuments())
             .as("Added documents should be cleared each event.")
@@ -914,7 +934,7 @@ public class EvidenceUploadServiceTest {
     }
 
     private void initCommonParams(String fileName) {
-        someOnlineHearingId = "someOnlinehearingId";
+        someOnlineHearingId = "123";
         someQuestionId = "someQuestionId";
         someEvidenceId = "someEvidenceId";
         someCcdCaseId = 123L;
