@@ -177,9 +177,7 @@ public class EvidenceUploadServiceTest {
         captor.getValue().accept(sscsCaseDetails);
 
         List<SscsDocument> sscsDocument = sscsCaseDetails.getData().getDraftSscsDocument();
-        assertThat(sscsDocument.size(), is(originalNumberOfSscsDocuments + 1));
-        assertThat(sscsDocument.get(originalNumberOfSscsDocuments).getValue().getDocumentLink().getDocumentUrl(), is(documentUrl));
-        assertThat(sscsDocument.get(originalNumberOfSscsDocuments).getValue().getDocumentLink().getDocumentFilename(), is(fileName));
+        assertTrue(hasDraftSscsDocument(sscsDocument, originalNumberOfSscsDocuments, documentUrl, fileName));
     }
 
     @Test
@@ -200,8 +198,13 @@ public class EvidenceUploadServiceTest {
                 eq("SSCS - upload document from MYA"),
                 eq("Uploaded a further evidence document"),
                 eq(idamTokens),
-                any(Consumer.class)
+                captor.capture()
         );
+
+        captor.getValue().accept(sscsCaseDetails);
+
+        List<SscsDocument> sscsDocument = sscsCaseDetails.getData().getDraftSscsDocument();
+        assertTrue(hasDraftSscsDocument(sscsDocument, 0, documentUrl, fileName));
     }
 
     @Test
@@ -261,7 +264,15 @@ public class EvidenceUploadServiceTest {
                 eq("SSCS - upload evidence from MYA"),
                 eq("Uploaded a further evidence document"),
                 eq(idamTokens),
-                any(Consumer.class)
+                captor.capture()
+        );
+
+        captor.getValue().accept(sscsCaseDetails);
+
+        SscsCaseData sscsCaseData = sscsCaseDetails.getData();
+        assertTrue(
+            hasSscsScannedDocumentAndSscsDocuments(sscsCaseData, expectedEvidenceUploadFilename)
+                    && doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo(sscsCaseData)
         );
     }
 
@@ -307,7 +318,15 @@ public class EvidenceUploadServiceTest {
                 eq("SSCS - upload evidence from MYA"),
                 eq("Uploaded a further evidence document"),
                 eq(idamTokens),
-                any(Consumer.class)
+                captor.capture()
+        );
+
+        captor.getValue().accept(sscsCaseDetails);
+
+        SscsCaseData sscsCaseData = sscsCaseDetails.getData();
+        assertTrue(
+                hasSscsScannedDocumentAndSscsDocuments(sscsCaseData, expectedEvidenceUploadFilename)
+                        && doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo(sscsCaseData, YesNo.NO)
         );
     }
 
@@ -365,8 +384,17 @@ public class EvidenceUploadServiceTest {
                 eq("SSCS - upload evidence from MYA"),
                 eq("Uploaded a further evidence document"),
                 eq(idamTokens),
-                any(Consumer.class)
+                captor.capture()
         );
+
+        captor.getValue().accept(sscsCaseDetails);
+
+        SscsCaseData sscsCaseData = sscsCaseDetails.getData();
+        assertTrue(hasAudioVideoDocumentAndSscsDocuments(sscsCaseData, avFileName, "http://dm-store/112")
+                && doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo(sscsCaseData)
+                && sscsCaseData.getInterlocReviewState().equals(expectedInterlocReviewState)
+                && sscsCaseData.getInterlocReferralReason().equals(InterlocReferralReason.REVIEW_AUDIO_VIDEO_EVIDENCE)
+                && sscsCaseData.getHasUnprocessedAudioVideoEvidence().equals(YesNo.YES));
     }
 
     @Test
@@ -383,8 +411,13 @@ public class EvidenceUploadServiceTest {
                 eq("SSCS - evidence deleted"),
                 eq("Uploaded a draft evidence deleted"),
                 eq(idamTokens),
-                any(Consumer.class)
+                captor.capture()
         );
+
+        captor.getValue().accept(sscsCaseDetails);
+
+        SscsCaseData sscsCaseData = sscsCaseDetails.getData();
+        assertTrue(doesNotHaveDraftSscsDocuments(sscsCaseData));
     }
 
     @Test
@@ -983,14 +1016,14 @@ public class EvidenceUploadServiceTest {
                 .count() == 1;
     }
 
-    private SscsCaseData hasSscsScannedDocumentAndSscsDocuments(String expectedStatementPrefix) {
-        return argThat(argument -> checkSscsScannedDocument(expectedStatementPrefix,
-                argument.getScannedDocuments()) && checkSscsDocuments(argument.getSscsDocument()));
+    private boolean hasSscsScannedDocumentAndSscsDocuments(SscsCaseData sscsCaseData, String expectedStatementPrefix) {
+        return checkSscsScannedDocument(expectedStatementPrefix,
+                sscsCaseData.getScannedDocuments()) && checkSscsDocuments(sscsCaseData.getSscsDocument());
     }
 
-    private SscsCaseData hasAudioVideoDocumentAndSscsDocuments(String expectedFileName, String expectedStatementPrefix) {
-        return argThat(argument -> checkSscsAudioVideoDocument(expectedFileName, expectedStatementPrefix,
-                argument.getAudioVideoEvidence()) && checkSscsDocuments(argument.getSscsDocument()));
+    private boolean hasAudioVideoDocumentAndSscsDocuments(SscsCaseData sscsCaseData, String expectedFileName, String expectedStatementPrefix) {
+        return checkSscsAudioVideoDocument(expectedFileName, expectedStatementPrefix,
+                sscsCaseData.getAudioVideoEvidence()) && checkSscsDocuments(sscsCaseData.getSscsDocument());
     }
 
     private boolean checkSscsDocuments(List<SscsDocument> sscsDocument) {
@@ -1017,35 +1050,23 @@ public class EvidenceUploadServiceTest {
         return  isExpectedNumberOfAppellantStatements && isExpectedAvFileName && isExpectedNumberOfAvDocs;
     }
 
-    private SscsCaseData hasDraftSscsDocument(int originalNumberOfDocuments, String documentUrl, String fileName) {
-        return argThat(argument -> {
-            List<SscsDocument> sscsDocument = argument.getDraftSscsDocument();
-            return sscsDocument.size() == originalNumberOfDocuments + 1
-                    && sscsDocument.get(originalNumberOfDocuments).getValue().getDocumentLink().getDocumentUrl().equals(documentUrl)
-                    && sscsDocument.get(originalNumberOfDocuments).getValue().getDocumentFileName().equals(fileName);
-        });
+    private boolean hasDraftSscsDocument(List<SscsDocument> sscsDocuments, int originalNumberOfDocuments, String documentUrl, String fileName) {
+        return sscsDocuments.size() == originalNumberOfDocuments + 1
+                && sscsDocuments.get(originalNumberOfDocuments).getValue().getDocumentLink().getDocumentUrl().equals(documentUrl)
+                && sscsDocuments.get(originalNumberOfDocuments).getValue().getDocumentFileName().equals(fileName);
     }
 
-    private SscsCaseData doesNotHaveDraftSscsDocuments() {
-        return argThat(argument -> {
-            List<SscsDocument> sscsDocument = argument.getDraftSscsDocument();
-            return sscsDocument.isEmpty();
-        });
+    private boolean doesNotHaveDraftSscsDocuments(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getDraftSscsDocument().isEmpty();
     }
 
-    private SscsCaseData doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo() {
-        return argThat(argument -> {
-            List<SscsDocument> sscsDocument = argument.getDraftSscsDocument();
-            return sscsDocument.isEmpty() && argument.getEvidenceHandled().equals("No");
-        });
+    private boolean doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getDraftSscsDocument().isEmpty() && sscsCaseData.getEvidenceHandled().equals("No");
     }
 
-    private SscsCaseData doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo(YesNo hasUnprocessedAudioVideoEvidence) {
-        return argThat(argument -> {
-            List<SscsDocument> sscsDocument = argument.getDraftSscsDocument();
-            return sscsDocument.isEmpty() && argument.getEvidenceHandled().equals("No")
-                    && argument.getHasUnprocessedAudioVideoEvidence().equals(hasUnprocessedAudioVideoEvidence);
-        });
+    private boolean doesHaveEmptyDraftSscsDocumentsAndEvidenceHandledFlagEqualToNo(SscsCaseData sscsCaseData, YesNo hasUnprocessedAudioVideoEvidence) {
+        return sscsCaseData.getDraftSscsDocument().isEmpty() && sscsCaseData.getEvidenceHandled().equals("No")
+                && sscsCaseData.getHasUnprocessedAudioVideoEvidence().equals(hasUnprocessedAudioVideoEvidence);
     }
 
     private SscsCaseData interlocReviewStateSetToReviewByTcw() {
