@@ -171,8 +171,15 @@ public class EvidenceUploadServiceTest {
                 eq("SSCS - upload document from MYA"),
                 eq("Uploaded a further evidence document"),
                 eq(idamTokens),
-                any(Consumer.class)
+                captor.capture()
         );
+
+        captor.getValue().accept(sscsCaseDetails);
+
+        List<SscsDocument> sscsDocument = sscsCaseDetails.getData().getDraftSscsDocument();
+        assertThat(sscsDocument.size(), is(originalNumberOfSscsDocuments + 1));
+        assertThat(sscsDocument.get(originalNumberOfSscsDocuments).getValue().getDocumentLink().getDocumentUrl(), is(documentUrl));
+        assertThat(sscsDocument.get(originalNumberOfSscsDocuments).getValue().getDocumentLink().getDocumentFilename(), is(fileName));
     }
 
     @Test
