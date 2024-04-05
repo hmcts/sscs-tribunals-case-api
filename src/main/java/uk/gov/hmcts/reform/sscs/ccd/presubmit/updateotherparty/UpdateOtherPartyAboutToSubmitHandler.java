@@ -7,26 +7,21 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_D
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.clearOtherPartiesIfEmpty;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartiesWithClearedRoles;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyUcb;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isConfidential;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.otherPartyWantsToAttendHearing;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.roleAbsentForOtherParties;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.roleExistsForOtherParties;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.sendNewOtherPartyNotification;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -35,10 +30,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil;
+import uk.gov.hmcts.reform.sscs.utility.EmailUtil;
 
 
 @Component
 @Slf4j
+@AllArgsConstructor
 public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private static final String WARN_NON_SSCS1_PAPER_TO_ORAL = "The hearing type will be changed from Paper to Oral as "
@@ -49,12 +47,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private static final String ERR_ROLE_REQUIRED = "Role is required for the selected case";
 
-    private IdamService idamService;
-
-    @Autowired
-    UpdateOtherPartyAboutToSubmitHandler(IdamService idamService) {
-        this.idamService = idamService;
-    }
+    private final IdamService idamService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -67,7 +60,9 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType,
+                                                          Callback<SscsCaseData> callback,
+                                                          String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -81,6 +76,13 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
         response.addErrors(verifyHearingUnavailableDates(sscsCaseData.getOtherParties()));
+
+        final UserDetails userDetails = idamService.getUserDetails(userAuthorisation);
+        final boolean hasSystemUserRole = userDetails.hasRole(SYSTEM_USER);
+        updateHearingTypeForNonSscs1Case(sscsCaseData, response, hasSystemUserRole);
+        if (!hasSystemUserRole) {
+            validateHearingVideoEmail(sscsCaseData, response);
+        }
 
         if (isNonSscs1Case(sscsCaseData, response)) {
             response.getData().getAppeal().setHearingType(HearingType.ORAL.getValue());
@@ -108,6 +110,43 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
             response.addError(ERR_ROLE_REQUIRED);
         }
         return response;
+    }
+
+    private boolean isBenefitTypeValidForOtherPartyValidation(Optional<Benefit> benefitType) {
+        return benefitType.filter(benefit -> SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
+    }
+
+    private void validateHearingVideoEmail(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        List<CcdValue<OtherParty>> otherParties = Optional.ofNullable(sscsCaseData.getOtherParties()).orElse(Collections.emptyList());
+
+        for (CcdValue<OtherParty> otherParty : otherParties) {
+            HearingSubtype hearingSubtype = otherParty.getValue().getHearingSubtype();
+
+            if (hearingSubtype != null
+                && YesNo.isYes(hearingSubtype.getWantsHearingTypeVideo())) {
+
+                String hearingVideoEmail = hearingSubtype.getHearingVideoEmail();
+                if (!EmailUtil.isEmailValid(hearingVideoEmail)) {
+                    response.addError("Hearing video email address must be valid email address");
+                }
+            }
+        }
+    }
+
+    private void updateHearingTypeForNonSscs1Case(SscsCaseData sscsCaseData,
+                                                  PreSubmitCallbackResponse<SscsCaseData> response,
+                                                  boolean hasSystemUserRole) {
+        if (sscsCaseData.getAppeal().getHearingType() != null
+            && HearingType.PAPER.getValue().equals(sscsCaseData.getAppeal().getHearingType())
+            && isBenefitTypeValidForHearingTypeValidation(response.getData().getBenefitType())
+            && OtherPartyDataUtil.otherPartyWantsToAttendHearing(response.getData().getOtherParties())) {
+
+            response.getData().getAppeal().setHearingType(HearingType.ORAL.getValue());
+            if (!hasSystemUserRole) {
+                response.addWarning("The hearing type will be changed from Paper to Oral as at least one of the"
+                    + " parties to the case would like to attend the hearing");
+            }
+        }
     }
 
     private List<String> verifyHearingUnavailableDates(final List<CcdValue<OtherParty>> otherParties) {
@@ -140,9 +179,5 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
     private boolean isBenefitTypeValidForHearingTypeValidation(final Optional<Benefit> benefitType) {
         return benefitType.filter(benefit -> SscsType.SSCS2.equals(benefit.getSscsType())
                 || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
-    }
-
-    private boolean isBenefitTypeValidForOtherPartyValidation(final Optional<Benefit> benefitType) {
-        return benefitType.filter(benefit -> SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
     }
 }
