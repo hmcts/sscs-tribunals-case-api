@@ -95,6 +95,7 @@ public class EvidenceUploadService {
     private static final Enum<EventType> EVENT_TYPE = EventType.UPLOAD_DOCUMENT;
     private final AddedDocumentsUtil addedDocumentsUtil;
     private static final DraftHearingDocumentExtractor draftHearingDocumentExtractor = new DraftHearingDocumentExtractor();
+    private static final String UPLOAD_DOCUMENT_DESCRIPTION = "Uploaded a further evidence document";
 
     @Autowired
     public EvidenceUploadService(DocumentManagementService documentManagementService,
@@ -164,7 +165,7 @@ public class EvidenceUploadService {
 
                     updateCcdCaseService.updateCaseV2(caseId, UPLOAD_DOCUMENT.getCcdType(),
                             "SSCS - upload evidence from MYA",
-                            "Uploaded a further evidence document", idamService.getIdamTokens(),
+                            UPLOAD_DOCUMENT_DESCRIPTION, idamService.getIdamTokens(),
                             sscsCaseDetails -> {
                                 SscsCaseData caseData = sscsCaseDetails.getData();
 
@@ -208,7 +209,7 @@ public class EvidenceUploadService {
                     Document document = evidenceManagementService.upload(convertedFiles, DM_STORE_USER_ID).getEmbedded().getDocuments().get(0);
 
                     updateCcdCaseService.updateCaseV2(caseId, eventType.getCcdType(), summary,
-                            "Uploaded a further evidence document", idamService.getIdamTokens(),
+                            UPLOAD_DOCUMENT_DESCRIPTION, idamService.getIdamTokens(),
                             sscsCaseDetails -> {
                                 SscsCaseData caseData = sscsCaseDetails.getData();
                                 addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(caseData);
@@ -243,7 +244,7 @@ public class EvidenceUploadService {
                     Long caseId = Long.parseLong(identifier);
                     updateCcdCaseService.updateCaseV2(caseId, UPLOAD_DOCUMENT.getCcdType(),
                             "SSCS - upload evidence from MYA",
-                            "Uploaded a further evidence document", idamService.getIdamTokens(),
+                            UPLOAD_DOCUMENT_DESCRIPTION, idamService.getIdamTokens(),
                             sscsCaseDetails -> {
                                 SscsCaseData sscsCaseData = sscsCaseDetails.getData();
                                 addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(sscsCaseData);
@@ -284,8 +285,8 @@ public class EvidenceUploadService {
 
                                     documentManagementService.delete(evidenceId);
                                 } else {
-                                    log.info("Throwing runtime exception no draft evidence found for case ID {}", identifier);
-                                    throw new RuntimeException("No draft evidence found for case ID " + identifier);
+                                    log.info("Throwing evidence upload exception no draft evidence found for case ID {}", identifier);
+                                    throw new EvidenceUploadException("No draft evidence found for case ID: " + identifier);
                                 }
                             });
                     return true;

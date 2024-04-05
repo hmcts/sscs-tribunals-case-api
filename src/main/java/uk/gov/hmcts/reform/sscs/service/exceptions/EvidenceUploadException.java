@@ -6,4 +6,8 @@ public class EvidenceUploadException extends RuntimeException {
         super(message, cause);
 
     }
+
+    public EvidenceUploadException(String message) {
+        super(message);
+    }
 }

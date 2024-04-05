@@ -430,7 +430,7 @@ public class EvidenceUploadServiceTest {
         assertThat(hearingFound, is(true));
         verify(updateCcdCaseService).updateCaseV2(any(), any(), any(), any(), any(), captor.capture());
         Consumer<SscsCaseDetails> consumer = captor.getValue();
-        assertThrows(RuntimeException.class, () -> consumer.accept(sscsCaseDetails));
+        assertThrows(EvidenceUploadException.class, () -> consumer.accept(sscsCaseDetails));
     }
 
     @Test
