@@ -3,11 +3,13 @@ package uk.gov.hmcts.reform.sscs;
 import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
+@ConditionalOnProperty("feature.log-selected-properties.enabled")
 public class EnvironmentPropertiesPrinter {
 
     @Autowired
