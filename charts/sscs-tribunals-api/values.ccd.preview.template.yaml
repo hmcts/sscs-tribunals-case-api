@@ -568,7 +568,7 @@ elastic:
 sscs-evidence-share:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/evidence-share:latest
+    image: hmctspublic.azurecr.io/sscs/evidence-share:pr-1618
     releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
     environment:
       SEND_LETTER_SERVICE_ENABLED: "true"
@@ -586,6 +586,7 @@ sscs-evidence-share:
       ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
       CASE_ACCESS_MANAGEMENT_FEATURE: true
       ISSUE_GENERIC_LETTER: true
+      BYPASS_EVIDENCE_SHARE_SERVICE: true
     secrets:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview

@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 
 
 @RunWith(SpringRunner.class)
@@ -61,6 +62,9 @@ public class TyaEndpointsIt {
 
     @MockBean
     AuthTokenGenerator authTokenGenerator;
+
+    @MockBean
+    AirLookupService airLookupService;
 
     IdamTokens idamTokens;
 
