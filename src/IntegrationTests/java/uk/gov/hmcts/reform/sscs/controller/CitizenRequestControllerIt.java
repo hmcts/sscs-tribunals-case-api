@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 
 @ExtendWith(SpringExtension.class)
@@ -40,6 +41,8 @@ import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 @AutoConfigureMockMvc(addFilters = false)
 class CitizenRequestControllerIt {
 
+    @MockBean
+    protected AirLookupService airLookupService;
     private static final String CASE_ID = "1625080769409918";
     private static final String AUTHORIZATION = "Bearer 1203912-39012-=391231";
     private static final String E_MAIL = "sscs-citizen2@hmcts.net";
