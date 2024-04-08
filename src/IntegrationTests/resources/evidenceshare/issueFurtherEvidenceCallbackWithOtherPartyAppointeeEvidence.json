@@ -1,0 +1,384 @@
+{
+  "case_details": {
+    "id": "12345656789",
+    "jurisdiction": "SSCS",
+    "state": "withDwp",
+    "case_type_id": "Benefit",
+    "created_date": [
+      2019,
+      7,
+      17,
+      17,
+      1,
+      39,
+      614000000
+    ],
+    "last_modified": [
+      2019,
+      7,
+      26,
+      11,
+      18,
+      33,
+      4000000
+    ],
+    "security_classification": "PUBLIC",
+    "case_data": {
+      "evidencePresent": "No",
+      "generatedNino": "JJ123457A",
+      "subscriptions": {
+        "appellantSubscription": {
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeSms": null,
+          "subscribeEmail": null,
+          "wantSmsNotifications": null
+        },
+        "appointeeSubscription": {
+          "tya": "iVPl7R80aM",
+          "email": null,
+          "mobile": "07832882849",
+          "reason": null,
+          "subscribeSms": "No",
+          "subscribeEmail": null,
+          "wantSmsNotifications": "No"
+        },
+        "supporterSubscription": {
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeSms": null,
+          "subscribeEmail": null,
+          "wantSmsNotifications": null
+        },
+        "representativeSubscription": {
+          "tya": "eQXYuw4veR",
+          "email": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeSms": "No",
+          "subscribeEmail": null,
+          "wantSmsNotifications": "No"
+        }
+      },
+      "originalSender": {
+        "value": {
+          "code": "appellant",
+          "label": "Appellant (or Appointee)"
+        },
+        "list_items": [
+          {
+            "code": "appellant",
+            "label": "Appellant (or Appointee)"
+          },
+          {
+            "code": "representative",
+            "label": "Representative"
+          }
+        ]
+      },
+      "bulkScanCaseReference": "12222",
+      "generatedSurname": "Smith",
+      "appeal": {
+        "signer": "Sarah Smith",
+        "appellant": {
+          "name": {
+            "title": "Mrs",
+            "lastName": "Smith",
+            "firstName": "Sarah"
+          },
+          "address": {
+            "town": "Brentwood",
+            "line1": "109 Drake Close",
+            "line2": "Hutton",
+            "county": "Essex",
+            "postcode": "SE166RS"
+          },
+          "contact": {
+            "email": null,
+            "phone": null,
+            "mobile": null
+          },
+          "identity": {
+            "dob": "1979-12-09",
+            "nino": "JJ123457A"
+          },
+          "appointee": {
+            "name": {
+              "title": "Dr",
+              "lastName": "Falafel",
+              "firstName": "Frederick"
+            },
+            "address": {
+              "town": "Newbury",
+              "line1": "1 New Street",
+              "line2": "Smallville",
+              "county": "Berkshire",
+              "postcode": "RG141LT"
+            },
+            "contact": {
+              "email": null,
+              "phone": "01895733303",
+              "mobile": "07832882849"
+            },
+            "identity": {
+              "dob": "1976-11-11",
+              "nino": "JJ123457A"
+            }
+          },
+          "isAppointee": "No",
+          "isAddressSameAsAppointee": null
+        },
+        "mrnDetails": {
+          "mrnDate": "2018-12-09",
+          "mrnLateReason": "see scanned SSCS1 form",
+          "dwpIssuingOffice": "1",
+          "mrnMissingReason": null
+        },
+        "benefitType": {
+          "code": "PIP",
+          "description": "Personal Independence Payment"
+        },
+        "hearingType": "paper",
+        "receivedVia": "Paper",
+        "appealReasons": {
+          "reasons": [
+            {
+              "id": "071bdaf6-13ef-40ce-b074-ba0cf681cdda",
+              "value": {
+                "reason": null,
+                "description": "see scanned SSCS1 form"
+              }
+            }
+          ]
+        },
+        "hearingOptions": {
+          "other": "Wheelchair access",
+          "languages": "Spanish",
+          "arrangements": [],
+          "excludeDates": [
+            {
+              "id": "e9984486-9fba-4cc7-b0ec-0026595088e2",
+              "value": {
+                "end": null,
+                "start": "2030-11-01"
+              }
+            },
+            {
+              "id": "ae502d79-5239-4f01-879a-97465d289b19",
+              "value": {
+                "end": null,
+                "start": "2030-12-01"
+              }
+            }
+          ],
+          "wantsSupport": "No",
+          "wantsToAttend": "No",
+          "agreeLessNotice": "Yes",
+          "scheduleHearing": "No",
+          "languageInterpreter": "Yes"
+        }
+      },
+      "evidenceHandled": "Yes",
+      "otherParties": [
+        {
+          "value": {
+            "confidentialityRequired": "No",
+            "isAppointee": "No",
+            "id": "1",
+            "name": {
+              "title": "Mr",
+              "firstName": "John",
+              "lastName": "Lewis",
+              "middleName": null
+            },
+            "address": {
+              "line1": "12, Highstreet, Test",
+              "line2": "Highstreet",
+              "town": "Camden",
+              "county": "Hertfordshire",
+              "postcode": "TS1 1ST",
+              "line3": null,
+              "country": null,
+              "postcodeLookup": null,
+              "postcodeAddress": null
+            },
+            "contact": {
+              "phone": "07534744199",
+              "mobile": null,
+              "email": null
+            },
+            "role": {
+              "name": "receivingParent",
+              "description": "Papa"
+            },
+            "isAppointee": "Yes",
+            "appointee": {
+              "id": "2",
+              "name": {
+                "title": "Mrs",
+                "firstName": "Wendy",
+                "lastName": "Smith",
+                "middleName": null
+              },
+              "address": {
+                "line1": "16, Wheatleys",
+                "line2": "test",
+                "town": "St. Albans",
+                "county": "Hertfordshire",
+                "postcode": "TS1 1ST",
+                "line3": null,
+                "country": null,
+                "postcodeLookup": null,
+                "postcodeAddress": null
+              },
+              "contact": {
+                "phone": "07534744199",
+                "mobile": null,
+                "email": "sscs-citizen2@hmcts.net"
+              },
+              "identity": {
+                "dob": null,
+                "nino": null
+              }
+            },
+            "hearingSubtype": {
+              "wantsHearingTypeTelephone": null,
+              "hearingTelephoneNumber": null,
+              "wantsHearingTypeVideo": null,
+              "hearingVideoEmail": null,
+              "wantsHearingTypeFaceToFace": null
+            },
+            "hearingOptions": {
+              "wantsToAttend": "Yes",
+              "wantsSupport": "No",
+              "languageInterpreter": null,
+              "languages": null,
+              "signLanguageType": null,
+              "other": null,
+              "agreeLessNotice": "Yes",
+              "scheduleHearing": "Yes",
+              "arrangements": [],
+              "excludeDates": [
+                {
+                  "value": {
+                    "start": "2022-12-12",
+                    "end": "2022-12-23"
+                  },
+                  "id": "b5e5a204-4784-429b-bbc9-ad6ae39dcfde"
+                }
+              ]
+            }
+          },
+          "id": "c516a1e8-c34b-4c82-84fe-e51b7b7c9008"
+        }
+      ],
+      "sscsDocument": [
+        {
+          "id": "202c33d8-455a-4eb4-958f-6857f2500a7f",
+          "value": {
+            "documentLink": {
+              "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465",
+              "document_filename": "dl16-1563382899630221.pdf",
+              "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465/binary"
+            },
+            "documentType": "dl16",
+            "documentFileName": "dl16-1563382899630221.pdf",
+            "documentDateAdded": "2019-07-17"
+          }
+        },
+        {
+          "id": "636030ca-243f-4a96-8c81-813ab44c1ac7",
+          "value": {
+            "documentLink": {
+              "document_url": "http://bla.com/",
+              "document_filename": "evidence-document.pdf",
+              "document_binary_url": "http://bla.com/binary"
+            },
+            "documentType": "otherPartyEvidence",
+            "controlNumber": "4",
+            "evidenceIssued": "No",
+            "documentFileName": "evidence-document",
+            "documentDateAdded": "2019-01-01",
+            "originalSenderOtherPartyId": "2"
+          }
+        },
+        {
+          "id": "636030ca-243f-4a96-8c81-813ab44c1ac9",
+          "value": {
+            "documentLink": {
+              "document_url": "http://bla.com/",
+              "document_filename": "evidence-document-issued.pdf",
+              "document_binary_url": "http://bla.com/binary"
+            },
+            "documentType": "otherPartyEvidence",
+            "controlNumber": "4",
+            "evidenceIssued": "Yes",
+            "documentFileName": "evidence-document-issued",
+            "documentDateAdded": "2019-01-01"
+          }
+        },
+        {
+          "id": "98f4cb7a-18bd-487a-aa7e-bb6355dfe1be",
+          "value": {
+            "documentLink": {
+              "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/2266abe2-38e0-4d1d-9aca-4419f6c82eb7",
+              "document_filename": "Screenshot 2019-07-19 at 13.45.04.pdf",
+              "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/2266abe2-38e0-4d1d-9aca-4419f6c82eb7/binary"
+            },
+            "documentType": "Other document",
+            "controlNumber": "4",
+            "evidenceIssued": "No",
+            "documentFileName": "test_doc",
+            "documentDateAdded": "2019-01-01"
+          }
+        }
+      ],
+      "dateSentToDwp": "2019-07-17",
+      "furtherEvidenceAction": {
+        "value": {
+          "code": "otherDocumentManual",
+          "label": "Other document type - action manually"
+        },
+        "list_items": [
+          {
+            "code": "issueFurtherEvidence",
+            "label": "Issue further evidence to all parties"
+          },
+          {
+            "code": "otherDocumentManual",
+            "label": "Other document type - action manually"
+          }
+        ]
+      },
+      "caseCreated": "2019-07-17",
+      "regionalProcessingCenter": {
+        "city": "BIRMINGHAM",
+        "name": "BIRMINGHAM",
+        "email": "Birmingham-SYA-Receipts@justice.gov.uk",
+        "address1": "HM Courts & Tribunals Service",
+        "address2": "Social Security & Child Support Appeals",
+        "address3": "Administrative Support Centre",
+        "address4": "PO Box 14620",
+        "postcode": "B16 6FR",
+        "faxNumber": "0126 434 7983",
+        "phoneNumber": "0300 123 1142"
+      },
+      "region": "BIRMINGHAM",
+      "generatedDOB": "1979-12-09"
+    },
+    "data_classification": {},
+    "after_submit_callback_response": null,
+    "callback_response_status_code": null,
+    "callback_response_status": null,
+    "delete_draft_response_status_code": null,
+    "delete_draft_response_status": null,
+    "security_classifications": {}
+  },
+  "case_details_before": {},
+  "event_id": "issueFurtherEvidence",
+  "ignore_warning": null
+}
