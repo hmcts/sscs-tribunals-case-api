@@ -108,7 +108,7 @@ java:
     EMAIL_SERVER_PORT: "25"
     EMAIL_SMTP_TLS_ENABLED: "true"
     EMAIL_SMTP_SSL_TRUST: "*"
-    BYPASS_EVIDENCE_SHARE_SERVICE: true
+    BYPASS_EVIDENCE_SHARE_SERVICE: false
 
 idam-pr:
   enabled: false
