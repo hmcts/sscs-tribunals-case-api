@@ -162,7 +162,7 @@ public class EvidenceUploadService {
                                 + ") with a checksum of (" + sha512HashChecksum + ")");
                         return false;
                     }
-
+                    log.info("submitSingleHearingEvidence: for case ID Case({})", caseId);
                     updateCcdCaseService.updateCaseV2(caseId, UPLOAD_DOCUMENT.getCcdType(),
                             "SSCS - upload evidence from MYA",
                             UPLOAD_DOCUMENT_DESCRIPTION, idamService.getIdamTokens(),
@@ -207,7 +207,7 @@ public class EvidenceUploadService {
 
                     List<MultipartFile> convertedFiles = fileToPdfConversionService.convert(singletonList(file));
                     Document document = evidenceManagementService.upload(convertedFiles, DM_STORE_USER_ID).getEmbedded().getDocuments().get(0);
-
+                    log.info("uploadEvidence: for case ID Case({})", identifier);
                     updateCcdCaseService.updateCaseV2(caseId, eventType.getCcdType(), summary,
                             UPLOAD_DOCUMENT_DESCRIPTION, idamService.getIdamTokens(),
                             sscsCaseDetails -> {
@@ -242,6 +242,7 @@ public class EvidenceUploadService {
         return onlineHearingService.getCcdCaseByIdentifier(identifier)
                 .map(caseDetails -> {
                     Long caseId = Long.parseLong(identifier);
+                    log.info("submitHearingEvidence: for case ID Case({})", caseId);
                     updateCcdCaseService.updateCaseV2(caseId, UPLOAD_DOCUMENT.getCcdType(),
                             "SSCS - upload evidence from MYA",
                             UPLOAD_DOCUMENT_DESCRIPTION, idamService.getIdamTokens(),
@@ -271,6 +272,7 @@ public class EvidenceUploadService {
         return onlineHearingService.getCcdCaseByIdentifier(identifier)
                 .map(caseDetails -> {
                     Long caseId = Long.parseLong(identifier);
+                    log.info("deleteEvidence: for case ID Case({})", caseId);
                     updateCcdCaseService.updateCaseV2(caseId, UPLOAD_DRAFT_DOCUMENT.getCcdType(), "SSCS - evidence deleted",
                             "Uploaded a draft evidence deleted", idamService.getIdamTokens(),
                             sscsCaseDetails -> {
