@@ -13,6 +13,9 @@ java:
           alias: SUBSCRIPTIONS_MAC_SECRET
         - name: idam-oauth-user
           alias: IDAM_OAUTH2_CLIENT_ID
+        - name: idam-redirect
+        - name: ccd-api
+          alias: CORE_CASE_DATA_API_URL
         - name: ccd-jid
           alias: CORE_CASE_DATA_JURISDICTION_ID
         - name: ccd-tid
@@ -43,6 +46,13 @@ java:
           alias: HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING
         - name: evidence-share-topic-shared-access-key
           alias: AMQP_PASSWORD
+        - robotics-email-to
+        - robotics-email-from
+        - robotics-email-scottish-to
+        - robotics-email-pip-ae-to
+        - ld-sdk-key
+        - sendgrid-api-key
+
   environment:
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
@@ -81,10 +91,24 @@ java:
     UPLOAD_HEARING_FILTER_ENABLED: false
     CITIZEN_LOGIN_SERVICE_V2: false
     ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: false
+    IDAM_OAUTH2_CLIENT_ID: "sscs"
+    CORE_CASE_DATA_JURISDICTION_ID: SSCS
+    CORE_CASE_DATA_CASE_TYPE_ID: Benefit
+    SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    SEND_LETTER_SERVICE_ENABLED: "true"
+    TRUST_ALL_CERTS: "true"
     SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-{{ .Values.global.environment }}"
     TOPIC_NAME: "sscs-evidenceshare-topic-{{ .Values.global.environment }}"
     AMQP_HOST: "sscs-servicebus-{{ .Values.global.environment }}.servicebus.windows.net"
     AMQP_USERNAME: "SendAndListenSharedAccessKey"
+    MAX_RETRY_ATTEMPTS: 3
+    PDF_SERVICE_BASE_URL: https://docmosis.aat.platform.hmcts.net/rs/render
+    ROBOTICS_EMAIL_MESSAGE: "Please find attached the robotics json file \nPlease do not respond to this email"
+    EMAIL_SERVER_HOST: "mta.reform.hmcts.net"
+    EMAIL_SERVER_PORT: "25"
+    EMAIL_SMTP_TLS_ENABLED: "true"
+    EMAIL_SMTP_SSL_TRUST: "*"
+    BYPASS_EVIDENCE_SHARE_SERVICE: false
 
 idam-pr:
   enabled: false
