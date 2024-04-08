@@ -32,9 +32,6 @@ java:
           alias: IDAM_S2S_AUTH_TOTP_SECRET
         - name: s2s-micro
           alias: IDAM_S2S_AUTH_MICROSERVICE
-        - robotics-email-to
-        - robotics-email-from
-        - robotics-email-scottish-to
         - appeal-email-to
         - appeal-email-from
         - docmosis-endpoint
