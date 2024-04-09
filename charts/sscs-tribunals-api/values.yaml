@@ -32,9 +32,6 @@ java:
           alias: IDAM_S2S_AUTH_TOTP_SECRET
         - name: s2s-micro
           alias: IDAM_S2S_AUTH_MICROSERVICE
-        - robotics-email-to
-        - robotics-email-from
-        - robotics-email-scottish-to
         - appeal-email-to
         - appeal-email-from
         - docmosis-endpoint
@@ -46,12 +43,18 @@ java:
           alias: HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING
         - name: evidence-share-topic-shared-access-key
           alias: AMQP_PASSWORD
-        - robotics-email-to
-        - robotics-email-from
-        - robotics-email-scottish-to
-        - robotics-email-pip-ae-to
-        - ld-sdk-key
-        - sendgrid-api-key
+        - name: robotics-email-to
+          alias: ROBOTICS_EMAIL_TO
+        - name: robotics-email-from
+          alias: ROBOTICS_EMAIL_FROM
+        - name: robotics-email-scottish-to
+          alias: ROBOTICS_EMAIL_SCOTTISH_TO
+        - name: robotics-email-pip-ae-to
+          alias: ROBOTICS_EMAIL_PIP_AE_TO
+        - name: ld-sdk-key
+          alias: ld.sdk-key
+        - name: sendgrid-api-key
+          alias: send-grid.apiKey
 
   environment:
     SERVER_PORT: 8080
