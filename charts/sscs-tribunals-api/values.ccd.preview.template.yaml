@@ -623,11 +623,11 @@ sscs-tya-notif:
       AMQP_USERNAME: "RootManageSharedAccessKey"
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
-      JOB_SCHEDULER_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
-      JOB_SCHEDULER_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
-      JOB_SCHEDULER_DB_NAME: "{{ .Values.postgresql.auth.database}}"
-      JOB_SCHEDULER_DB_HOST: "{{ .Release.Name }}-postgresql"
+      JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
+      JOB_SCHEDULER_DB_HOST: ${SERVICE_NAME}-postgresql
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+      JOB_SCHEDULER_DB_USERNAME: hmcts
+      JOB_SCHEDULER_DB_PASSWORD: "${JOB_SCHEDULER:hmcts}"
       HOURS_START_TIME: 0
       HOURS_END_TIME: 23
       RUN_DB_MIGRATION_ON_STARTUP: true
@@ -655,8 +655,6 @@ sscs-tya-notif:
           - docmosis-api-key
           - notification-key
           - notification-test-key
-    postgresql:
-      enabled: true
 
 sscs-ccd-callback-orchestrator:
   enabled: true
