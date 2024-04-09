@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service.citizenrequest;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -28,7 +30,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -55,6 +59,8 @@ class CitizenRequestServiceTest {
     @Mock
     private IdamTokens idamTokens;
     @Mock
+    private CcdService ccdService;
+    @Mock
     private UpdateCcdCaseService updateCcdCaseService;
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseData>> sscsCaseDataCaptor;
@@ -65,7 +71,7 @@ class CitizenRequestServiceTest {
     @BeforeEach
     void setup() {
         UserDetails user = new UserDetails("id", E_MAIL, "first last", "first", "last", List.of("citizen"));
-        citizenRequestService = new CitizenRequestService(onlineHearingService, idamService, updateCcdCaseService);
+        citizenRequestService = new CitizenRequestService(onlineHearingService, ccdService, idamService, updateCcdCaseService);
 
         when(onlineHearingService.getCcdCaseByIdentifier(IDENTIFIER)).thenReturn(Optional.of(caseDetails));
         when(idamService.getUserDetails(AUTHORISATION)).thenReturn(user);
@@ -707,8 +713,10 @@ class CitizenRequestServiceTest {
         assertThat(response, is(false));
     }
 
-    @Test
-    void testRequestHearingRecordings_addARequestForHearingId() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testRequestHearingRecordings_addARequestForHearingId(boolean caseUpdateV2Enabled) {
+        ReflectionTestUtils.setField(citizenRequestService, "hearingsRecordingReqCaseUpdateV2Enabled", caseUpdateV2Enabled);
         when(caseData.getSscsHearingRecordingCaseData()).thenReturn(SscsHearingRecordingCaseData.builder()
                 .sscsHearingRecordings(List.of(
                         SscsHearingRecording.builder()
@@ -731,7 +739,18 @@ class CitizenRequestServiceTest {
         boolean response = citizenRequestService.requestHearingRecordings(IDENTIFIER, List.of("id_1"), AUTHORISATION);
         assertThat(response, is(true));
 
-        verifyUpdateCaseV2AndApplyCaseDataConsumerChanges(Long.parseLong(IDENTIFIER));
+        if (caseUpdateV2Enabled) {
+            verifyUpdateCaseV2AndApplyCaseDataConsumerChanges(Long.parseLong(IDENTIFIER));
+        } else {
+            verify(ccdService).updateCase(
+                    argThat(argument -> argument.getSscsHearingRecordingCaseData().getRequestedHearings().size() == 1),
+                    eq(Long.parseLong(IDENTIFIER)),
+                    eq(CITIZEN_REQUEST_HEARING_RECORDING.getCcdType()),
+                    eq("SSCS - hearing recording request from MYA"),
+                    eq("Requested hearing recordings"),
+                    eq(idamTokens)
+            );
+        }
 
         assertThat(caseData.getSscsHearingRecordingCaseData().getRequestedHearings().size(), is(1));
         assertThat(caseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding(), is(YesNo.YES));
@@ -745,6 +764,41 @@ class CitizenRequestServiceTest {
     @ParameterizedTest
     @MethodSource("buildOtherParty")
     void testRequestHearingRecordings_addARequestForHearingId_OtherParty(CcdValue<OtherParty> otherParty, String otherPartyId, String code) {
+        ReflectionTestUtils.setField(citizenRequestService, "hearingsRecordingReqCaseUpdateV2Enabled", false);
+        when(caseData.getSscsHearingRecordingCaseData()).thenReturn(SscsHearingRecordingCaseData.builder()
+                .sscsHearingRecordings(List.of(
+                        SscsHearingRecording.builder()
+                                .value(SscsHearingRecordingDetails.builder()
+                                        .hearingId("id_1")
+                                        .venue("Town House")
+                                        .build())
+                                .build(),
+                        SscsHearingRecording.builder()
+                                .value(SscsHearingRecordingDetails.builder()
+                                        .hearingId("id_2")
+                                        .venue("City Center")
+                                        .build())
+                                .build()))
+                .build());
+
+        when(caseData.getOtherParties()).thenReturn(List.of(otherParty));
+
+        boolean response = citizenRequestService.requestHearingRecordings(IDENTIFIER, List.of("id_1"), AUTHORISATION);
+        assertThat(response, is(true));
+        assertThat(caseData.getSscsHearingRecordingCaseData().getRequestedHearings().size(), is(1));
+        assertThat(caseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding(), is(YesNo.YES));
+        HearingRecordingRequest hearingRecordingRequest = caseData.getSscsHearingRecordingCaseData().getRequestedHearings().get(0);
+        assertThat(hearingRecordingRequest.getValue().getRequestingParty(), is(code));
+        assertThat(hearingRecordingRequest.getValue().getOtherPartyId(), is(otherPartyId));
+        assertThat(hearingRecordingRequest.getValue().getDateRequested(), is(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))));
+        assertThat(hearingRecordingRequest.getValue().getSscsHearingRecording().getHearingId(), is("id_1"));
+        assertThat(hearingRecordingRequest.getValue().getSscsHearingRecording().getVenue(), is("Town House"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("buildOtherParty")
+    void testRequestHearingRecordingsUpdateCaseV2_addARequestForHearingId_OtherParty(CcdValue<OtherParty> otherParty, String otherPartyId, String code) {
+        ReflectionTestUtils.setField(citizenRequestService, "hearingsRecordingReqCaseUpdateV2Enabled", true);
         when(caseData.getSscsHearingRecordingCaseData()).thenReturn(SscsHearingRecordingCaseData.builder()
                 .sscsHearingRecordings(List.of(
                         SscsHearingRecording.builder()
@@ -801,8 +855,10 @@ class CitizenRequestServiceTest {
         );
     }
 
-    @Test
-    void testRequestHearingRecordings_addARequestToExistingList() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testRequestHearingRecordings_addARequestToExistingList(boolean caseUpdateV2Enabled) {
+        ReflectionTestUtils.setField(citizenRequestService, "hearingsRecordingReqCaseUpdateV2Enabled", caseUpdateV2Enabled);
         List<HearingRecordingRequest> exitingRequests = new ArrayList<>();
         exitingRequests.add(HearingRecordingRequest.builder().build());
         when(caseData.getSscsHearingRecordingCaseData()).thenReturn(SscsHearingRecordingCaseData.builder()
@@ -818,13 +874,26 @@ class CitizenRequestServiceTest {
         boolean response = citizenRequestService.requestHearingRecordings(IDENTIFIER, List.of("id_1"), AUTHORISATION);
         assertThat(response, is(true));
 
-        verifyUpdateCaseV2AndApplyCaseDataConsumerChanges(Long.parseLong(IDENTIFIER));
+        if (caseUpdateV2Enabled) {
+            verifyUpdateCaseV2AndApplyCaseDataConsumerChanges(Long.parseLong(IDENTIFIER));
+        } else {
+            verify(ccdService).updateCase(
+                    eq(caseData),
+                    eq(Long.parseLong(IDENTIFIER)),
+                    eq(CITIZEN_REQUEST_HEARING_RECORDING.getCcdType()),
+                    eq("SSCS - hearing recording request from MYA"),
+                    eq("Requested hearing recordings"),
+                    eq(idamTokens)
+            );
+        }
 
         assertThat(exitingRequests.size(), is(2));
     }
 
-    @Test
-    void testRequestHearingRecordings_verifyUpdateCase() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void testRequestHearingRecordings_verifyUpdateCase(boolean caseUpdateV2Enabled) {
+        ReflectionTestUtils.setField(citizenRequestService, "hearingsRecordingReqCaseUpdateV2Enabled", caseUpdateV2Enabled);
         when(caseDetails.getId()).thenReturn(1L);
         when(caseData.getSscsHearingRecordingCaseData()).thenReturn(SscsHearingRecordingCaseData.builder()
                 .sscsHearingRecordings(List.of(
@@ -838,7 +907,19 @@ class CitizenRequestServiceTest {
         boolean response = citizenRequestService.requestHearingRecordings(IDENTIFIER, List.of("id_1"), AUTHORISATION);
         assertThat(response, is(true));
 
-        verifyUpdateCaseV2AndApplyCaseDataConsumerChanges(1L);
+        if (caseUpdateV2Enabled) {
+            verifyUpdateCaseV2AndApplyCaseDataConsumerChanges(1L);
+        } else {
+            verify(ccdService).updateCase(
+                    argThat(argument -> argument.getSscsHearingRecordingCaseData().getRequestedHearings().size() == 1),
+                    eq(1L),
+                    eq(CITIZEN_REQUEST_HEARING_RECORDING.getCcdType()),
+                    eq("SSCS - hearing recording request from MYA"),
+                    eq("Requested hearing recordings"),
+                    eq(idamTokens)
+            );
+        }
+
         assertThat(caseData.getSscsHearingRecordingCaseData().getRequestedHearings().size(), is(1));
         assertThat(caseData.getSscsHearingRecordingCaseData().getHearingRecordingRequestOutstanding(), is(YesNo.YES));
     }

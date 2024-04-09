@@ -112,6 +112,7 @@ java:
     EMAIL_SMTP_TLS_ENABLED: "true"
     EMAIL_SMTP_SSL_TRUST: "*"
     BYPASS_EVIDENCE_SHARE_SERVICE: false
+    HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: false
 
 idam-pr:
   enabled: false
