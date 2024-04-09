@@ -53,7 +53,7 @@ java:
           alias: ROBOTICS_EMAIL_PIP_AE_TO
         - name: ld-sdk-key
           alias: ld.sdk-key
-        - name: sendgrid-api-key
+        - name: sscs-sendgrid-api-key
           alias: send-grid.apiKey
 
   environment:
