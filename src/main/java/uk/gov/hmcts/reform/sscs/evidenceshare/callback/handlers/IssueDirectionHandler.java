@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Slf4j
@@ -26,15 +26,15 @@ public class IssueDirectionHandler implements CallbackHandler<SscsCaseData> {
 
     private final DispatchPriority dispatchPriority;
 
-    private final CcdService ccdService;
+    private final UpdateCcdCaseService updateCcdCaseService;
 
     private final IdamService idamService;
 
     @Autowired
-    public IssueDirectionHandler(CcdService ccdService,
+    public IssueDirectionHandler(UpdateCcdCaseService ccdService,
                                  IdamService idamService) {
         this.dispatchPriority = DispatchPriority.EARLY;
-        this.ccdService = ccdService;
+        this.updateCcdCaseService = ccdService;
         this.idamService = idamService;
     }
 
@@ -57,13 +57,16 @@ public class IssueDirectionHandler implements CallbackHandler<SscsCaseData> {
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-
-        caseData.setDirectionTypeDl(null);
-
         log.info("About to update case with appealToProceed event for id {}", callback.getCaseDetails().getId());
         try {
-            ccdService.updateCase(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(), APPEAL_TO_PROCEED.getCcdType(), "Appeal to proceed", "Appeal proceed event triggered", idamService.getIdamTokens());
+            updateCcdCaseService.updateCaseV2(
+                    callback.getCaseDetails().getId(),
+                    APPEAL_TO_PROCEED.getCcdType(),
+                    "Appeal to proceed",
+                    "Appeal proceed event triggered",
+                    idamService.getIdamTokens(),
+                    sscsCaseData -> sscsCaseData.setDirectionTypeDl(null)
+            );
         } catch (FeignException.UnprocessableEntity e) {
             log.error(format("appealToProceed event failed for caseId %s, root cause is %s", callback.getCaseDetails().getId(), getRootCauseMessage(e)), e);
             throw e;
