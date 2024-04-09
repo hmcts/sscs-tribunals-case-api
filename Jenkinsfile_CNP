@@ -91,7 +91,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   ]
 }
 
-def branchesToSync = ['demo']
+def branchesToSync = ['demo', 'ithc', 'perftest']
 
 withPipeline(type, product, component) {
     def githubApi = new GithubAPI(this)
