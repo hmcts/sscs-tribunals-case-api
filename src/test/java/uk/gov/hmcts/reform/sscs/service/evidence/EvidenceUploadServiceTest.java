@@ -66,7 +66,7 @@ import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.UploadedEvidence;
-import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.DocumentStoreService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 
 @RunWith(JUnitParamsRunner.class)
@@ -137,7 +137,7 @@ public class EvidenceUploadServiceTest {
 
     private void evidenceUploadService(AddedDocumentsUtil addedDocumentsUtil) {
         evidenceUploadService = new EvidenceUploadService(
-            mock(DocumentManagementService.class),
+            mock(DocumentStoreService.class),
             ccdService,
             idamService,
             onlineHearingService,
