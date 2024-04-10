@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Classification;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -36,7 +37,8 @@ import uk.gov.hmcts.reform.document.domain.UploadResponse;
 @AutoConfigureMockMvc
 public class EvidenceDocumentUploadEndpointIt {
 
-
+    @MockBean
+    protected AirLookupService airLookupService;
     public static final String AUTH_TOKEN = "authToken";
 
     public static final String DUMMY_OAUTH_2_TOKEN = "oauth2Token";
