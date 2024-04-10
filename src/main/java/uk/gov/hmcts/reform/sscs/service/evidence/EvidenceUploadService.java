@@ -64,6 +64,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService.ConditionalUpdateResult;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.EvidenceDescription;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -273,8 +274,7 @@ public class EvidenceUploadService {
                 .map(caseDetails -> {
                     Long caseId = Long.parseLong(identifier);
                     log.info("deleteEvidence: for case ID Case({})", caseId);
-                    updateCcdCaseService.updateCaseV2(caseId, UPLOAD_DRAFT_DOCUMENT.getCcdType(), "SSCS - evidence deleted",
-                            "Uploaded a draft evidence deleted", idamService.getIdamTokens(),
+                    Optional<SscsCaseDetails> returnedSscsCaseDetails = updateCcdCaseService.updateCaseV2Conditional(caseId, UPLOAD_DRAFT_DOCUMENT.getCcdType(), idamService.getIdamTokens(),
                             sscsCaseDetails -> {
                                 SscsCaseData caseData = sscsCaseDetails.getData();
                                 List<E> documents = documentExtract.getDocuments().apply(caseData);
@@ -285,12 +285,18 @@ public class EvidenceUploadService {
                                             .collect(toList());
                                     documentExtract.setDocuments().accept(caseData, newDocuments);
 
-                                    documentManagementService.delete(evidenceId);
-                                } else {
-                                    log.info("Throwing evidence upload exception no draft evidence found for case ID {}", identifier);
-                                    throw new EvidenceUploadException("No draft evidence found for case ID: " + identifier);
+                                    return new ConditionalUpdateResult("SSCS - evidence deleted",
+                                            "Uploaded a draft evidence deleted",
+                                            true);
                                 }
+
+                                return new ConditionalUpdateResult("", "", false);
                             });
+
+                    if (returnedSscsCaseDetails.isPresent()) {
+                        documentManagementService.delete(evidenceId);
+                    }
+
                     return true;
                 }).orElse(false);
     }

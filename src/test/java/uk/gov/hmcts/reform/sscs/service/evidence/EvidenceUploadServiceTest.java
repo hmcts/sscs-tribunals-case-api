@@ -13,9 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,10 +46,15 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.web.multipart.MultipartFile;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.EvidenceDescription;
@@ -81,6 +84,7 @@ public class EvidenceUploadServiceTest {
     private static final String OTHER_PARTY_APPOINTEE_EMAIL = "op-appointee@gmail.com";
     private EvidenceUploadService evidenceUploadService;
     private UpdateCcdCaseService updateCcdCaseService;
+    private DocumentManagementService documentManagementService;
     private OnlineHearingService onlineHearingService;
     private String someOnlineHearingId;
     private String someQuestionId;
@@ -97,6 +101,8 @@ public class EvidenceUploadServiceTest {
     private EvidenceManagementService evidenceManagementService;
     private PdfStoreService pdfStoreService;
     private IdamService idamService;
+    private SscsCcdConvertService sscsCcdConvertService;
+    private CcdClient ccdClient;
     private FileToPdfConversionService fileToPdfConversionService;
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> captor;
@@ -124,6 +130,7 @@ public class EvidenceUploadServiceTest {
         fileToPdfConversionService = mock(FileToPdfConversionService.class);
         evidenceManagementService = mock(EvidenceManagementService.class);
         pdfStoreService = mock(PdfStoreService.class);
+        documentManagementService = mock(DocumentManagementService.class);
 
         evidenceUploadService(new AddedDocumentsUtil(false));
 
@@ -139,7 +146,7 @@ public class EvidenceUploadServiceTest {
 
     private void evidenceUploadService(AddedDocumentsUtil addedDocumentsUtil) {
         evidenceUploadService = new EvidenceUploadService(
-            mock(DocumentManagementService.class),
+            documentManagementService,
             idamService,
             onlineHearingService,
             storeEvidenceDescriptionService,
@@ -402,19 +409,36 @@ public class EvidenceUploadServiceTest {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
 
+        sscsCcdConvertService = mock(SscsCcdConvertService.class);
+        ccdClient = mock(CcdClient.class);
+
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+        updateCcdCaseService = new UpdateCcdCaseService(idamService, sscsCcdConvertService, ccdClient);
+
+        evidenceUploadService = new EvidenceUploadService(
+                documentManagementService,
+                idamService,
+                onlineHearingService,
+                storeEvidenceDescriptionService,
+                fileToPdfConversionService,
+                evidenceManagementService,
+                pdfStoreService,
+                updateCcdCaseService,
+                new AddedDocumentsUtil(false)
+        );
+
+        StartEventResponse startEventResponse = StartEventResponse.builder().build();
+        CaseDataContent caseDataContent = CaseDataContent.builder().build();
+
+        when(ccdClient.startEvent(any(IdamTokens.class), eq(sscsCaseDetails.getId()), any())).thenReturn(startEventResponse);
+        when(sscsCcdConvertService.getCaseDetails(startEventResponse)).thenReturn(sscsCaseDetails);
+        when(sscsCcdConvertService.getCaseDataContent(any(), any(), any(), any())).thenReturn(caseDataContent);
+        when(ccdClient.submitEventForCaseworker(any(), any(), eq(caseDataContent))).thenReturn(CaseDetails.builder().build());
+        when(sscsCcdConvertService.getCaseDetails(any(CaseDetails.class))).thenReturn(sscsCaseDetails);
+
         boolean hearingFound = evidenceUploadService.deleteDraftEvidence(someOnlineHearingId, someEvidenceId);
 
         assertThat(hearingFound, is(true));
-        verify(updateCcdCaseService).updateCaseV2(
-                eq(someCcdCaseId),
-                eq("uploadDraftDocument"),
-                eq("SSCS - evidence deleted"),
-                eq("Uploaded a draft evidence deleted"),
-                eq(idamTokens),
-                captor.capture()
-        );
-
-        captor.getValue().accept(sscsCaseDetails);
 
         SscsCaseData sscsCaseData = sscsCaseDetails.getData();
         assertTrue(doesNotHaveDraftSscsDocuments(sscsCaseData));
@@ -422,15 +446,38 @@ public class EvidenceUploadServiceTest {
 
     @Test
     public void deleteEvidenceIfCaseHadNoEvidence() {
+        sscsCcdConvertService = mock(SscsCcdConvertService.class);
+        ccdClient = mock(CcdClient.class);
+
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
+
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+        updateCcdCaseService = new UpdateCcdCaseService(idamService, sscsCcdConvertService, ccdClient);
+
+        evidenceUploadService = new EvidenceUploadService(
+            documentManagementService,
+            idamService,
+            onlineHearingService,
+            storeEvidenceDescriptionService,
+            fileToPdfConversionService,
+            evidenceManagementService,
+            pdfStoreService,
+            updateCcdCaseService,
+            new AddedDocumentsUtil(false)
+        );
+
+        StartEventResponse startEventResponse = StartEventResponse.builder().build();
+        CaseDataContent caseDataContent = CaseDataContent.builder().build();
+
+        when(ccdClient.startEvent(any(IdamTokens.class), eq(sscsCaseDetails.getId()), any())).thenReturn(startEventResponse);
+        when(sscsCcdConvertService.getCaseDetails(startEventResponse)).thenReturn(sscsCaseDetails);
+        when(sscsCcdConvertService.getCaseDataContent(any(), any(), any(), any())).thenReturn(caseDataContent);
+        when(ccdClient.submitEventForCaseworker(any(), any(), eq(caseDataContent))).thenReturn(CaseDetails.builder().build());
+        when(sscsCcdConvertService.getCaseDetails(any(CaseDetails.class))).thenReturn(sscsCaseDetails);
 
         boolean hearingFound = evidenceUploadService.deleteDraftEvidence(someOnlineHearingId, someEvidenceId);
 
         assertThat(hearingFound, is(true));
-        verify(updateCcdCaseService).updateCaseV2(any(), any(), any(), any(), any(), captor.capture());
-        Consumer<SscsCaseDetails> consumer = captor.getValue();
-        assertThrows(EvidenceUploadException.class, () -> consumer.accept(sscsCaseDetails));
     }
 
     @Test
