@@ -2,7 +2,12 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createwelshnotice;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
@@ -13,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +32,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -38,7 +44,8 @@ public class CreateWelshNoticeSubmittedHandlerTest {
     private CreateWelshNoticeSubmittedHandler handler;
 
     @Mock
-    private CcdService ccdService;
+    private UpdateCcdCaseService updateCcdCaseService;
+
     @Mock
     private IdamService idamService;
 
@@ -48,16 +55,23 @@ public class CreateWelshNoticeSubmittedHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    private AutoCloseable openedMocks;
+
     @Before
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
-        handler = new CreateWelshNoticeSubmittedHandler(ccdService, idamService);
-        when(callback.getEvent()).thenReturn(CREATE_WELSH_NOTICE);
+        openedMocks = MockitoAnnotations.openMocks(this);
+        handler = new CreateWelshNoticeSubmittedHandler(updateCcdCaseService, idamService);
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build())
             .sscsWelshPreviewNextEvent(EventType.DIRECTION_ISSUED_WELSH.getCcdType())
             .build();
+        when(callback.getEvent()).thenReturn(CREATE_WELSH_NOTICE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        openedMocks.close();
     }
 
     @Test
@@ -74,14 +88,17 @@ public class CreateWelshNoticeSubmittedHandlerTest {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
-        when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(), EventType.DIRECTION_ISSUED_WELSH.getCcdType(),
-            "Create Welsh notice",
-            "Create Welsh notice", idamTokens))
-            .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        given(updateCcdCaseService.triggerCaseEventV2(anyLong(), eq(DIRECTION_ISSUED_WELSH.getCcdType()), anyString(),
+            anyString(), eq(idamTokens)))
+            .willReturn(SscsCaseDetails.builder().data(caseData).build());
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-        verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.DIRECTION_ISSUED_WELSH.getCcdType(),
-            "Create Welsh notice", "Create Welsh notice", idamTokens);
+
+        then(updateCcdCaseService).should(times(1))
+            .triggerCaseEventV2(anyLong(), eq(DIRECTION_ISSUED_WELSH.getCcdType()), anyString(),
+                anyString(), eq(idamTokens));
+
         assertNull(caseData.getSscsWelshPreviewNextEvent());
 
     }
