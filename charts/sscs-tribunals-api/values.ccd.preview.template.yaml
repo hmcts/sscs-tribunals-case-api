@@ -26,7 +26,6 @@ java:
     IDAM_S2S-AUTH_MICROSERVICE: ${IDAM_S2S_AUTH_MICROSERVICE}
     IDAM_SSCS_SYSTEMUPDATE_USER: ${IDAM_SSCS_SYSTEMUPDATE_USER}
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
-    CCD_CALLBACK_ORCHESTRATOR_API_URL: http://${SERVICE_NAME}-sscs-ccd-callback-orchestrator
     CORE_CASE_DATA_JURISDICTION_ID: SSCS
     CORE_CASE_DATA_CASE_TYPE_ID: Benefit
     TEST_URL: http://${SERVICE_NAME}
@@ -526,7 +525,6 @@ ccd:
     environment:
       CCD_ENVIRONMENT: 'PROD'
       CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
-      CCD_DEF_SSCS_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-sscs-ccd-callback-orchestrator
       CCD_DEF_TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
       CCD_DEF_TYA_NOTIFICATIONS_API_URL: http://${SERVICE_NAME}-tya-notification
       CCD_DEF_BULK_SCAN_API_URL: http://${SERVICE_NAME}-bulk-scan-api
@@ -645,23 +643,6 @@ sscs-tya-notif:
           - docmosis-api-key
           - notification-key
           - notification-test-key
-
-sscs-ccd-callback-orchestrator:
-  enabled: true
-  java:
-    image: hmctspublic.azurecr.io/sscs/ccd-callback-orchestrator:latest
-    releaseNameOverride: ${SERVICE_NAME}-sscs-ccd-callback-orchestrator
-    readinessDelay: 90
-    environment:
-      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
-      TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
-      AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
-      AMQP_USERNAME: "RootManageSharedAccessKey"
-    secrets:
-      AMQP_PASSWORD:
-        secretRef: sscs-sb-preview
-        key: primaryKey
-
 
 #Enable for SYA
 sscs-tribunals-frontend:
