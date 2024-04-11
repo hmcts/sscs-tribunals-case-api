@@ -26,6 +26,7 @@ To build the project execute the following command:
 
 Run the application by executing:
 
+
 ```
 ./src/cftlib/resources/scripts/start.sh
 ```
