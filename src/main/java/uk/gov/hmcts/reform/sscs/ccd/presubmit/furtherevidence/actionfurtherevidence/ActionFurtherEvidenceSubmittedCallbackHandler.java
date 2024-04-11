@@ -112,14 +112,14 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
 
-            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseData -> sscsCaseData.setInterlocReferralDate(LocalDate.now()),
+            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseDetails -> sscsCaseDetails.getData().setInterlocReferralDate(LocalDate.now()),
                     callback.getCaseDetails().getId(),
                     REVIEW_BY_JUDGE, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
                     EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_TCW)) {
 
-            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseData -> sscsCaseData.setInterlocReferralDate(LocalDate.now()),
+            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseDetails -> sscsCaseDetails.getData().setInterlocReferralDate(LocalDate.now()),
                     callback.getCaseDetails().getId(),
                     REVIEW_BY_TCW, INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
                     EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
@@ -139,17 +139,18 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                 return updateCcdCaseService.updateCaseV2(callback.getCaseDetails().getId(),
                         EventType.POST_HEARING_OTHER.getCcdType(), "Post hearing application 'Other'",
                         "Post hearing application 'Other'", idamService.getIdamTokens(),
-                        sscsCaseData -> sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE)
+                        sscsCaseDetails -> sscsCaseDetails.getData().setInterlocReviewState(REVIEW_BY_JUDGE)
                 );
             }
 
-            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseData -> setSelectWhoReviewsCaseField(sscsCaseData, REVIEW_BY_JUDGE),
+            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseDetails -> setSelectWhoReviewsCaseField(sscsCaseDetails.getData(), REVIEW_BY_JUDGE),
                     callback.getCaseDetails().getId(),
                     REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
                     EventType.VALID_SEND_TO_INTERLOC, TCW_REVIEW_SEND_TO_JUDGE);
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_TCW)) {
-            Consumer<SscsCaseData> caseDataConsumer = sscsCaseData -> {
+            Consumer<SscsCaseDetails> caseDataConsumer = sscsCaseDetails -> {
+                SscsCaseData sscsCaseData = sscsCaseDetails.getData();
                 setSelectWhoReviewsCaseField(sscsCaseData, REVIEW_BY_TCW);
                 if (isPostponementRequest(sscsCaseData)) {
                     sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
@@ -268,7 +269,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     }
 
     private SscsCaseDetails setInterlocReviewStateFieldAndTriggerEvent(
-            Consumer<SscsCaseData> sscsCaseDataConsumer,
+            Consumer<SscsCaseDetails> sscsCaseDataConsumer,
             Long caseId,
             InterlocReviewState interlocReviewState,
             FurtherEvidenceActionDynamicListItems interlocType,
@@ -287,7 +288,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                 interlocType.getLabel(),
                 idamService.getIdamTokens(),
                 sscsCaseDataConsumer.andThen(
-                        sscsCaseData -> sscsCaseData.setInterlocReviewState(interlocReviewState)
+                        sscsCaseDetails -> sscsCaseDetails.getData().setInterlocReviewState(interlocReviewState)
                 )
         );
     }

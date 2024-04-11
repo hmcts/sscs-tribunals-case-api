@@ -180,7 +180,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         given(ccdClient.startEvent(idamTokens, 123L, UPDATE_CASE_ONLY.getCcdType())).willReturn(startEventResponse);
 
         Callback<SscsCaseData> callback = buildCallback(furtherEvidenceActionSelectedOption, ACTION_FURTHER_EVIDENCE);
-        var sscsCaseData = callback.getCaseDetails().getCaseData();
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
 
         given(updateCcdCaseService.updateCaseV2(anyLong(), eq(eventType), anyString(), anyString(),
@@ -191,13 +191,14 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        ArgumentCaptor<Consumer<SscsCaseData>> captor = ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<SscsCaseDetails>> captor = ArgumentCaptor.forClass(Consumer.class);
 
         then(updateCcdCaseService).should(times(1))
             .updateCaseV2(eq(123L), eq(eventType), anyString(),
                 anyString(), eq(idamTokens), captor.capture());
 
-        captor.getValue().accept(sscsCaseData);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        captor.getValue().accept(sscsCaseDetails);
 
         assertEquals(interlocReviewState, sscsCaseData.getInterlocReviewState());
 
@@ -230,6 +231,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         given(ccdClient.startEvent(idamTokens, 123L, UPDATE_CASE_ONLY.getCcdType())).willReturn(startEventResponse);
         var sscsCaseData = callback.getCaseDetails().getCaseData();
+
         sscsCaseData.setPostHearing(PostHearing.builder().requestType(requestType).build());
 
         given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
@@ -242,13 +244,14 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        ArgumentCaptor<Consumer<SscsCaseData>> captor = ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<SscsCaseDetails>> captor = ArgumentCaptor.forClass(Consumer.class);
 
         then(updateCcdCaseService).should(times(1))
             .updateCaseV2(eq(123L), eq(eventType), anyString(),
                 anyString(), eq(idamTokens), captor.capture());
 
-        captor.getValue().accept(sscsCaseData);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        captor.getValue().accept(sscsCaseDetails);
 
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
     }
@@ -278,7 +281,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         given(idamService.getIdamTokens()).willReturn(idamTokens);
 
-        ArgumentCaptor<Consumer<SscsCaseData>> captor = ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<SscsCaseDetails>> captor = ArgumentCaptor.forClass(Consumer.class);
 
         given(updateCcdCaseService.updateCaseV2(anyLong(), eq(eventType), anyString(), anyString(),
             eq(idamTokens), captor.capture()))
@@ -450,7 +453,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
 
-        ArgumentCaptor<Consumer<SscsCaseData>> captor = ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<SscsCaseDetails>> captor = ArgumentCaptor.forClass(Consumer.class);
 
         String eventType = "validSendToInterloc";
         given(updateCcdCaseService.updateCaseV2(anyLong(), eq(eventType), anyString(), anyString(),
@@ -463,7 +466,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             .updateCaseV2(eq(123L), eq(eventType), eq(ActionFurtherEvidenceSubmittedCallbackHandler.TCW_REVIEW_SEND_TO_JUDGE),
                 anyString(), eq(idamTokens), captor.capture());
 
-        captor.getValue().accept(sscsCaseData);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        captor.getValue().accept(sscsCaseDetails);
         assertEquals(InterlocReviewState.REVIEW_BY_TCW, sscsCaseData.getInterlocReviewState());
         assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST, sscsCaseData.getInterlocReferralReason());
     }
@@ -500,13 +504,14 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        ArgumentCaptor<Consumer<SscsCaseData>> captor = ArgumentCaptor.forClass(Consumer.class);
+        ArgumentCaptor<Consumer<SscsCaseDetails>> captor = ArgumentCaptor.forClass(Consumer.class);
 
         then(updateCcdCaseService).should(times(1))
             .updateCaseV2(eq(123L), eq(POST_HEARING_OTHER.getCcdType()), anyString(),
                 anyString(), eq(idamTokens), captor.capture());
 
-        captor.getValue().accept(sscsCaseData);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        captor.getValue().accept(sscsCaseDetails);
         assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
     }
 
