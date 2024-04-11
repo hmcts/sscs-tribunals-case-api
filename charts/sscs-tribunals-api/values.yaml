@@ -70,7 +70,6 @@ java:
     PDF_SERVICE_CONVERT_URL: https://docmosis.aat.platform.hmcts.net/rs/convert
     PDF_SERVICE_HEALTH_URL: https://docmosis.aat.platform.hmcts.net/rs/status
     DOCMOSIS_SERVICE_BASE_URL: https://docmosis.aat.platform.hmcts.net/rs/render
-    CCD_CALLBACK_ORCHESTRATOR_API_URL: "http://sscs-ccd-callback-orchestrator-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     DOC_ASSEMBLY_URL: "http://dg-docassembly-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_OAUTH2_REDIRECT_URL: "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
     PDF_API_URL: "http://rpe-pdf-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
@@ -123,8 +122,6 @@ elastic:
 sscs-evidence-share:
   enabled: false
 sscs-tya-notif:
-  enabled: false
-sscs-ccd-callback-orchestrator:
   enabled: false
 sscs-tribunals-frontend:
   enabled: false
