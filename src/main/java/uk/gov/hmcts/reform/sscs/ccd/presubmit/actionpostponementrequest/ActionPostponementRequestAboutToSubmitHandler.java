@@ -114,6 +114,7 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
         sscsCaseData.setInterlocReferralReason(null);
         sscsCaseData.setInterlocReviewState(null);
         sscsCaseData.setDwpState(DwpState.HEARING_POSTPONED);
+        sscsCaseData.clearPoDetails();
         addDirectionNotice(sscsCaseData);
 
         String listingOption = sscsCaseData.getPostponementRequest().getListingOption();

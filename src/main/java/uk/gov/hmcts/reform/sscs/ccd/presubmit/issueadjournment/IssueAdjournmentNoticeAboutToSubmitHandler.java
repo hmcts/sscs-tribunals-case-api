@@ -84,6 +84,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        sscsCaseData.clearPoDetails();
+
         Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
         for (ConstraintViolation<SscsCaseData> violation : violations) {
             preSubmitCallbackResponse.addError(violation.getMessage());

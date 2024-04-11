@@ -15,7 +15,6 @@ import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpStatus;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +22,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
@@ -34,12 +36,12 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest extends BaseHandl
 
     @ClassRule
     public static final SpringClassRule scr = new SpringClassRule();
+    protected static final String CASE_ID_TO_BE_REPLACED = "12345678";
 
     @Rule
     public final SpringMethodRule smr = new SpringMethodRule();
 
     @Test
-    @Ignore
     @Parameters({
         "NON_COMPLIANT, informationReceivedForInterlocJudge, interlocutoryReviewState, reviewByJudge",
         "CREATE_WITH_DWP_TEST_CASE, sendToInterlocReviewByJudge, withDwp, reviewByJudge",
@@ -51,14 +53,15 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest extends BaseHandl
         String expectedState,
         String expectedReviewedBy) throws Exception {
 
-        Long caseId = createCaseTriggeringGivenEvent(eventType).getId();
-
+        Callback<SscsCaseData> callback = getSscsCaseDataCallback(furtherEvidenceActionSelectedOption);
+        Long caseId = createCaseTriggeringGivenEvent(eventType, callback.getCaseDetails().getCaseData()).getId();
+        callback = addCaseIdtoCallback(callback, caseId.toString());
         RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
             .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(getJsonCallbackForTest(caseId, furtherEvidenceActionSelectedOption))
+            .body(callback)
             .post("/ccdSubmittedEvent")
             .then()
             .statusCode(HttpStatus.SC_OK)
@@ -68,18 +71,26 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest extends BaseHandl
         assertEquals(expectedState, ccdService.getByCaseId(caseId, idamTokens).getState());
     }
 
-    private SscsCaseDetails createCaseTriggeringGivenEvent(EventType eventType) {
-        return ccdService.createCase(buildSscsCaseDataForTesting("Bowie", "AB 44 88 12 Y"),
+    private SscsCaseDetails createCaseTriggeringGivenEvent(EventType eventType, SscsCaseData caseData) {
+        SscsCaseData sscsCaseData = buildSscsCaseDataForTesting("Bowie", "AB 44 88 12 Y", caseData);
+        return ccdService.createCase(sscsCaseData,
             eventType.getCcdType(), CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
     }
 
-    private String getJsonCallbackForTest(Long caseId, String furtherEvidenceActionSelectedOption) throws IOException {
+    private Callback<SscsCaseData> getSscsCaseDataCallback(String furtherEvidenceActionSelectedOption) throws IOException {
         String path = Objects.requireNonNull(getClass().getClassLoader()
             .getResource("handlers/actionfurtherevidence/actionFurtherEvidenceSubmittedCallback.json")).getFile();
         String jsonCallback = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-        jsonCallback = jsonCallback.replace("FURTHER_EVIDENCE_ACTION_SELECTED_OPTION",
-            furtherEvidenceActionSelectedOption);
-        return jsonCallback.replace("CASE_ID_TO_BE_REPLACED", caseId.toString());
+        Callback<SscsCaseData> sscsCaseDataCallback = deserializer.deserialize(jsonCallback);
+        sscsCaseDataCallback.getCaseDetails().getCaseData().getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionSelectedOption, "Information received for Interloc - send to Judge"));
+        return sscsCaseDataCallback;
+    }
+
+
+    private Callback<SscsCaseData> addCaseIdtoCallback(Callback<SscsCaseData> sscsCaseDataCallback, String id) {
+        String jsonCallback = serializeSscsCallback(sscsCaseDataCallback);
+        jsonCallback = jsonCallback.replace(CASE_ID_TO_BE_REPLACED, id);
+        return deserializer.deserialize(jsonCallback);
     }
 }
 

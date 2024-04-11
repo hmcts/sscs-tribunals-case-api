@@ -20,16 +20,23 @@ def secrets = [
     'sscs-${env}'      : [
         secret('idam-api', 'IDAM_API_URL'),
         secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
-        secret('ccd-api', 'CORE_CASE_DATA_API_URL'),
         secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
         secret('idam-sscs-systemupdate-user', 'IDAM_SSCS_SYSTEMUPDATE_USER'),
         secret('idam-sscs-systemupdate-password', 'IDAM_SSCS_SYSTEMUPDATE_PASSWORD'),
         secret('idam-sscs-oauth2-client-secret', 'IDAM_OAUTH2_CLIENT_SECRET'),
         secret('idam-s2s-api', 'IDAM_S2S_AUTH'),
+        secret('ccd-api', 'CORE_CASE_DATA_API_URL'),
+        secret('ccd-jid', 'CORE_CASE_DATA_JURISDICTION_ID'),
+        secret('ccd-tid', 'CORE_CASE_DATA_CASE_TYPE_ID'),
         secret('sscs-s2s-secret', 'IDAM_S2S_AUTH_TOTP_SECRET'),
         secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
         secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
         secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
+        secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
+        secret('robotics-email-from', 'ROBOTICS_EMAIL_FROM'),
+        secret('robotics-email-to', 'ROBOTICS_EMAIL_TO'),
+        secret('robotics-email-scottish-to', 'ROBOTICS_EMAIL_SCOTTISH_TO'),
+        secret('robotics-email-pip-ae-to', 'ROBOTICS_EMAIL_PIP_AE_TO'),
         secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
     ],
     's2s-${env}'      : [
@@ -84,7 +91,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   ]
 }
 
-def branchesToSync = ['demo']
+def branchesToSync = ['demo', 'ithc', 'perftest']
 
 withPipeline(type, product, component) {
     if (env.BRANCH_NAME.startsWith("PR")) {
@@ -101,11 +108,13 @@ withPipeline(type, product, component) {
         // Vars needed for AKS testing
         env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
         env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+        env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
         if (env.BRANCH_NAME.startsWith("PR")) {
             def githubApi = new GithubAPI(this)
             for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
                 env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
                 println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
+                env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
             }
         }
         println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}. - The branch name is ${env.BRANCH_NAME}""".stripIndent()

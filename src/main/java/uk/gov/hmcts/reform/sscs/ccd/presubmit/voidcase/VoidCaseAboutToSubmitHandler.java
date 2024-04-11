@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.voidcase;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -55,11 +56,11 @@ public class VoidCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
 
         sscsCaseData.setDirectionDueDate(null);
         sscsCaseData.setInterlocReviewState(null);
+        clearPostponementTransientFields(sscsCaseData);
+        sscsCaseData.clearPoDetails();
         cancelHearing(callback);
 
-        PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
-        return callbackResponse;
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
     private void cancelHearing(Callback<SscsCaseData> callback) {
