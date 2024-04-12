@@ -43,7 +43,7 @@ public class TopicConsumer {
         containerFactory = "topicJmsListenerContainerFactory",
         subscription = "${amqp.subscription}"
     )
-    @ConditionalOnProperty(name = "feature.bypass-evidence-share-service.enabled", havingValue = "true")
+    @ConditionalOnProperty(name = "feature.bypass-evidence-share-service.enabled", havingValue = "true", matchIfMissing = true)
     public void onMessage(String message, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
         processMessageWithRetry(message, 1, messageId);
     }
