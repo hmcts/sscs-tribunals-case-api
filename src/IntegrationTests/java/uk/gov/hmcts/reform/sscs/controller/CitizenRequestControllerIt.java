@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -15,29 +15,34 @@ import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HEARING_
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import java.util.function.Consumer;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 
-
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
-public class CitizenRequestControllerIt {
+@TestPropertySource(locations = "classpath:config/application_it.properties")
+class CitizenRequestControllerIt {
 
     @MockBean
     protected AirLookupService airLookupService;
@@ -50,18 +55,20 @@ public class CitizenRequestControllerIt {
     @MockBean
     private CcdService ccdService;
     @MockBean
+    private UpdateCcdCaseService updateCcdCaseService;
+    @MockBean
     private IdamService idamService;
-
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     protected ObjectMapper mapper;
 
+    @Captor
+    private ArgumentCaptor<Consumer<SscsCaseData>> captor;
     private SscsCaseData caseData;
     private IdamTokens idamTokens;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         idamTokens = IdamTokens.builder().build();
         caseData = HEARING_RECORDING_CCD.getDeserializeMessage();
@@ -90,14 +97,16 @@ public class CitizenRequestControllerIt {
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
-        assertEquals(caseData.getSscsHearingRecordingCaseData().getRequestedHearings().size(), 2);
-        verify(ccdService).updateCase(
-                argThat(argument -> argument.getSscsHearingRecordingCaseData().getRequestedHearings().size() == 2),
+        verify(updateCcdCaseService).updateCaseV2(
                 eq(Long.parseLong(CASE_ID)),
                 eq(CITIZEN_REQUEST_HEARING_RECORDING.getCcdType()),
                 eq("SSCS - hearing recording request from MYA"),
                 eq("Requested hearing recordings"),
-                eq(idamTokens)
+                eq(idamTokens),
+                captor.capture()
         );
+        Consumer<SscsCaseData> captorValue = captor.getValue();
+        captorValue.accept(caseData);
+        assertEquals(2, caseData.getSscsHearingRecordingCaseData().getRequestedHearings().size());
     }
 }

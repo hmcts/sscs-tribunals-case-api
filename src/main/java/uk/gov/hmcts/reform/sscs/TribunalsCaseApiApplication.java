@@ -120,7 +120,7 @@ public class TribunalsCaseApiApplication {
         javaMailSender.setHost(emailHost);
         javaMailSender.setPort(emailPort);
         Properties properties = new Properties();
-        properties.setProperty("mail.transport.protocol","smtp");
+        properties.setProperty("mail.transport.protocol", "smtp");
         properties.setProperty("mail.smtp.starttls.enable", smtpTlsEnabled);
         properties.put("mail.smtp.ssl.trust", "*");
         javaMailSender.setJavaMailProperties(properties);
