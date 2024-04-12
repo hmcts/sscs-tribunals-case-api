@@ -62,6 +62,9 @@ amqp:
     topic: ${TOPIC_NAME:test.topic}
     trustAllCerts: ${TRUST_ALL_CERTS:true}
     username: ${AMQP_USERNAME:guest}
+    clientId: sscs-evidence-share
+    amqp-connection-string-template: ${JMS_AMQP_CONNECTION_TEMPLATE:amqps://%1s?amqp.idleTimeout=%2d}
+    idleTimeout: ${JMS_IDLE_TIMEOUT:3600000}
 
 answer:
     html:
@@ -152,10 +155,49 @@ docmosis:
     health:
         endpoint: ${PDF_SERVICE_HEALTH_URL:https://docmosis.aat.platform.hmcts.net/rs/status}
     uri: ${DOCMOSIS_SERVICE_BASE_URL:https://docmosis.aat.platform.hmcts.net/rs/render}
+    #Evidence share templates
+    template:
+        english:
+            d609-97:
+                name: TB-SCS-GNO-ENG-00068.doc
+            d609-98:
+                name: TB-SCS-GNO-ENG-00069.doc
+            dl16:
+                name: TB-SCS-GNO-ENG-00011.doc
+            dl6:
+                name: TB-SCS-GNO-ENG-00010.doc
+            generic-letter:
+                cover: TB-SCS-LET-ENG-Cover-Sheet.docx
+                name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
+            postHearingAppSorWritten:
+                cover: TB-SCS-GNO-ENG-00012.docx
+                name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
+        welsh:
+            d609-97:
+                name: TB-SCS-GNO-WEL-00469.docx
+            d609-98:
+                name: TB-SCS-GNO-WEL-00470.docx
+            dl16:
+                name: TB-SCS-GNO-ENG-00011.doc
+            dl6:
+                name: TB-SCS-GNO-ENG-00010.doc
+            generic-letter:
+                cover: TB-SCS-LET-ENG-Cover-Sheet.docx
+                name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
+            postHearingAppSorWritten:
+                cover: TB-SCS-GNO-WEL-00479.docx
+                name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
+
 document:
     bilingual:
         notice:
             template: TB-SCS-GNO-WEL-00473.docx
+    pdf:
+        hmctsImgKey: hmcts2
+        hmctsImgVal: '[userImage:hmcts.png]'
+        hmctsWelshImgKey: welshhmcts2
+        hmctsWelshImgVal: '[userImage:welshhmcts.png]'
+
 document_management:
     url: ${DOCUMENT_MANAGEMENT_URL:http://localhost:5005}
 documents:
@@ -228,6 +270,15 @@ feature:
         enabled: ${UPLOAD_AUDIO_VIDEO_EVIDENCE_FEATURE:true}
     work-allocation:
         enabled: ${WORK_ALLOCATION_FEATURE:false}
+    bypass-evidence-share-service:
+        enabled: ${BYPASS_EVIDENCE_SHARE_SERVICE:false}
+    issue-generic-letter:
+        enabled: ${ISSUE_GENERIC_LETTER:false}
+    scottish-po-box:
+        enabled: ${SCOTTISH_PO_BOX_ENABLED:false}
+    urgent-hearing:
+        enabled: ${URGENT_HEARING_ENABLED:false}
+
 idam:
     api:
         url: ${IDAM_API_URL:http://localhost:5062}
@@ -312,6 +363,16 @@ robotics:
     schema:
         resource:
             location: /schema/sscs-robotics.json
+    email:
+        from: ${ROBOTICS_EMAIL_FROM:sscs@hmcts.net}
+        from-send-grid: noreply@mail-sscs-nonprod.platform.hmcts.net
+        message: "${ROBOTICS_EMAIL_MESSAGE:Please find attached the robotics json\
+            \ file \nPlease do not respond to this email}"
+        pipAeTo: ${ROBOTICS_EMAIL_PIP_AE_TO:receiver3@hmcts.net}
+        scottishTo: ${ROBOTICS_EMAIL_SCOTTISH_TO:receiver2@hmcts.net}
+        to: ${ROBOTICS_EMAIL_TO:receiver@hmcts.net}
+    englishCount: 3
+    scottishCount: 1
 rpc:
     testScotlandPostcode: SC1 1CS
 security:
@@ -1779,8 +1840,6 @@ pdf-service:
             libertyToApplyGranted: 'TB-SCS-GNO-WEL-00479.docx'
             libertyToApplyRefused: 'TB-SCS-GNO-WEL-00479.docx'
 
-
-
 text:
     personalisation:
         english:
@@ -1847,6 +1906,56 @@ text:
             NOT_REQUIRED: "Dim yn ofynnol"
             OTHER: "Arall"
             CHILD_MAINTENANCE_NUMBER: "Child maintenance number: "
+
+### Evidence Share config
+
+evidence-share:
+    submit-types: PAPER
+exela:
+    addressLine1: HMCTS SSCS
+    addressLine2: PO BOX 12626
+    addressLine3: Harlow
+    addressPostcode: CM20 9QF
+    scottishAddressLine2: PO BOX 13150
+    scottishPostcode: CM20 9TT
+
+http:
+    connect:
+        read:
+            timeout: 5000
+        request:
+            timeout: 5000
+        timeout: 5000
+
+ld:
+    sdk-key: AAAAAAAAAAAAA
+    user-key: sscs-evidence-share
+
+send-grid:
+    apiKey: AAAAAAAAAAAAAAAAAAAa
+    host: smtp.sendgrid.net
+    port: 587
+send-letter:
+    enabled: ${SEND_LETTER_SERVICE_ENABLED:true}
+    maxRetryAttempts: ${MAX_RETRY_ATTEMPTS:3}
+    url: ${SEND_LETTER_SERVICE_BASEURL:http://localhost:4021}
+service:
+    pdf-service:
+        accessKey: ${PDF_SERVICE_ACCESS_KEY:}
+        health:
+            uri: ${PDF_SERVICE_HEALTH_URL:https://docmosis.aat.platform.hmcts.net/rs/status}
+        uri: ${PDF_SERVICE_CONVERT_URL.:https://docmosis.aat.platform.hmcts.net/rs/render}
+wlu:
+    email:
+        dateOfReturn: ${WLU_RETURN_DATE:24 hours from requested date.}
+        from: ${WLU_EMAIL_FROM:noreply@mail-sscs-nonprod.platform.hmcts.net}
+        from-send-grid: noreply@mail-sscs-nonprod.platform.hmcts.net
+        message: |-
+            ${WLU_EMAIL_MESSAGE:Please find attached the files along with request translation form.
+            Thank you very much}
+        subject: ${WLU_EMAIL_SUBJECT:Welsh translation –}
+        to: ${WLU_EMAIL_TO:sscs-tests@HMCTS.NET}
+
 
 ---
 # default profile (development, production etc.)

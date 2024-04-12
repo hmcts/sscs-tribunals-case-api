@@ -66,9 +66,13 @@ import uk.gov.service.notify.NotificationClient;
     "uk.gov.hmcts.reform.sscs.thirdparty",
     "uk.gov.hmcts.reform.idam",
     "uk.gov.hmcts.reform.sscs.client",
+    "uk.gov.hmcts.reform.sendletter",
+    "uk.gov.hmcts.reform.ccd.client",
+    "uk.gov.hmcts.reform.sscs.client",
     "uk.gov.hmcts.reform.sscs.tyanotifications.service.coh"
 })
-@ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
+
+@ComponentScan(basePackages = {"uk.gov.hmcts.reform", "uk.gov.hmcts.reform.sscs", "uk.gov.hmcts.reform.ccd.document.am"})
 @EnableScheduling
 @EnableRetry
 public class TribunalsCaseApiApplication {
@@ -116,7 +120,7 @@ public class TribunalsCaseApiApplication {
         javaMailSender.setHost(emailHost);
         javaMailSender.setPort(emailPort);
         Properties properties = new Properties();
-        properties.setProperty("mail.transport.protocol", "smtp");
+        properties.setProperty("mail.transport.protocol","smtp");
         properties.setProperty("mail.smtp.starttls.enable", smtpTlsEnabled);
         properties.put("mail.smtp.ssl.trust", "*");
         javaMailSender.setJavaMailProperties(properties);

@@ -20,7 +20,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.tyanotifications.config.RetryConfig;
+import uk.gov.hmcts.reform.sscs.tyanotifications.config.TyanRetryConfig;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.NotificationSscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.NotificationServiceException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
@@ -38,7 +38,7 @@ public class RetryNotificationServiceTest {
             put(2, 200);
             put(3, 300);
         }};
-    private final RetryConfig retryConfig = new RetryConfig();
+    private final TyanRetryConfig tyanRetryConfig = new TyanRetryConfig();
     private SscsCaseData newSscsCaseData = SscsCaseData.builder().ccdCaseId("456").build();
     private final NotificationSscsCaseDataWrapper wrapper = NotificationSscsCaseDataWrapper.builder().state(State.APPEAL_CREATED).newSscsCaseData(newSscsCaseData).notificationEventType(SYA_APPEAL_CREATED).build();
     private final NotificationWrapper notificationWrapper = new CcdNotificationWrapper(wrapper);
@@ -48,9 +48,9 @@ public class RetryNotificationServiceTest {
 
     @Before
     public void setUp() {
-        service = new RetryNotificationService(notificationHandler, retryConfig);
-        retryConfig.setMax(MAX_RETRY);
-        retryConfig.setDelayInSeconds(delayInSecondsMap);
+        service = new RetryNotificationService(notificationHandler, tyanRetryConfig);
+        tyanRetryConfig.setMax(MAX_RETRY);
+        tyanRetryConfig.setDelayInSeconds(delayInSecondsMap);
     }
 
     @Test
