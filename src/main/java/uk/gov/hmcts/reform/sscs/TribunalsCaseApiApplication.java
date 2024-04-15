@@ -40,9 +40,12 @@ import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
     "uk.gov.hmcts.reform.docassembly",
     "uk.gov.hmcts.reform.sscs.thirdparty",
     "uk.gov.hmcts.reform.idam",
-    "uk.gov.hmcts.reform.sscs.client"
+    "uk.gov.hmcts.reform.sscs.client",
+    "uk.gov.hmcts.reform.sendletter",
+    "uk.gov.hmcts.reform.ccd.client"
 })
-@ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
+
+@ComponentScan(basePackages = {"uk.gov.hmcts.reform", "uk.gov.hmcts.reform.sscs", "uk.gov.hmcts.reform.ccd.document.am"})
 @EnableScheduling
 @EnableRetry
 public class TribunalsCaseApiApplication {
@@ -90,9 +93,9 @@ public class TribunalsCaseApiApplication {
         javaMailSender.setHost(emailHost);
         javaMailSender.setPort(emailPort);
         Properties properties = new Properties();
-        properties.setProperty("mail.transport.protocol","smtp");
+        properties.setProperty("mail.transport.protocol", "smtp");
         properties.setProperty("mail.smtp.starttls.enable", smtpTlsEnabled);
-        properties.put("mail.smtp.ssl.trust","*");
+        properties.put("mail.smtp.ssl.trust", "*");
         javaMailSender.setJavaMailProperties(properties);
         return javaMailSender;
     }
@@ -108,26 +111,26 @@ public class TribunalsCaseApiApplication {
     public OkHttpClient okHttpClient() {
         int timeout = 10;
         return new OkHttpClient.Builder()
-                .connectTimeout(timeout, TimeUnit.MINUTES)
-                .readTimeout(timeout, TimeUnit.MINUTES)
-                .retryOnConnectionFailure(true)
-                .build();
+            .connectTimeout(timeout, TimeUnit.MINUTES)
+            .readTimeout(timeout, TimeUnit.MINUTES)
+            .retryOnConnectionFailure(true)
+            .build();
     }
 
     @Bean
     public CcdRequestDetails getRequestDetails(@Value("${core_case_data.jurisdictionId}") String coreCaseDataJurisdictionId,
                                                @Value("${core_case_data.caseTypeId}") String coreCaseDataCaseTypeId) {
         return CcdRequestDetails.builder()
-                .caseTypeId(coreCaseDataCaseTypeId)
-                .jurisdictionId(coreCaseDataJurisdictionId)
-                .build();
+            .caseTypeId(coreCaseDataCaseTypeId)
+            .jurisdictionId(coreCaseDataJurisdictionId)
+            .build();
     }
 
     @Bean
     public DocmosisPdfGenerationService docmosisPdfGenerationService(
-            @Value("${docmosis.uri}") String docmosisServiceEndpoint,
-            @Value("${docmosis.accessKey}") String docmosisServiceAccessKey,
-            RestTemplate restTemplate
+        @Value("${docmosis.uri}") String docmosisServiceEndpoint,
+        @Value("${docmosis.accessKey}") String docmosisServiceAccessKey,
+        RestTemplate restTemplate
     ) {
         return new DocmosisPdfGenerationService(docmosisServiceEndpoint, docmosisServiceAccessKey, restTemplate);
     }

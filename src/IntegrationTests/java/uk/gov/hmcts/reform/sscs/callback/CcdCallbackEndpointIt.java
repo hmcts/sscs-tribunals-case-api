@@ -50,9 +50,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -168,8 +166,19 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
         given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
                 eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
                 eq("issueFurtherEvidence")))
-                .willReturn(StartEventResponse.builder().caseDetails(CaseDetails.builder()
-                                .id(123L)
+                .willReturn(StartEventResponse.builder()
+                        .caseDetails(CaseDetails.builder()
+                                .id(12345656789L)
+                                .data(new HashMap<>())
+                                .build())
+                        .build());
+
+        given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
+                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+                eq("updateCaseOnly")))
+                .willReturn(StartEventResponse.builder()
+                        .caseDetails(CaseDetails.builder()
+                                .id(12345656789L)
                                 .data(new HashMap<>())
                                 .build())
                         .build());
@@ -178,14 +187,13 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
                 eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
                 eq(true), any(CaseDataContent.class)))
                 .willReturn(CaseDetails.builder()
-                        .id(123L)
+                        .id(12345656789L)
                         .data(new HashMap<>())
                         .build());
 
         json = getJson("callback/actionFurtherEvidenceWithInterlocOptionCallback.json");
         json = json.replaceFirst("informationReceivedForInterlocJudge", "issueFurtherEvidence");
         json = json.replaceFirst("Information received for interlocutory review", "Issue further evidence to all parties");
-
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdSubmittedEvent"));
 
@@ -200,9 +208,28 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
     @Test
     public void givenSubmittedCallbackForActionFurtherEvidence_shouldUpdateFieldAndTriggerEvent() throws Exception {
         mockIdam();
+
         mockCcd();
 
         json = getJson("callback/actionFurtherEvidenceWithInterlocOptionCallback.json");
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("interlocReviewState", InterlocReviewState.WELSH_TRANSLATION);
+
+        DynamicListItem option = new DynamicListItem(ISSUE_FURTHER_EVIDENCE.getCode(), ISSUE_FURTHER_EVIDENCE.getLabel());
+        DynamicListItem value = new DynamicListItem("informationReceivedForInterlocJudge", "AInformation received for interlocutory review Judge");
+        DynamicList dynamicList = new DynamicList(value, Collections.singletonList(option));
+        data.put("furtherEvidenceAction", dynamicList);
+
+        given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
+                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+                eq("updateCaseOnly")))
+                .willReturn(StartEventResponse.builder()
+                        .caseDetails(CaseDetails.builder()
+                                .id(12345656789L)
+                                .data(data)
+                                .build())
+                        .build());
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdSubmittedEvent"));
 
@@ -214,13 +241,21 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
     }
 
     private void mockCcd() {
-        given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
-            eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
-            eq("interlocInformationReceivedActionFurtherEvidence")))
-            .willReturn(StartEventResponse.builder().build());
-
         Map<String, Object> data = new HashMap<>();
         data.put("interlocReviewState", InterlocReviewState.WELSH_TRANSLATION);
+
+        given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
+                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+                eq("interlocInformationReceivedActionFurtherEvidence")))
+                .willReturn(StartEventResponse.builder()
+                        .caseDetails(
+                                CaseDetails.builder()
+                                        .id(123L)
+                                        .data(data)
+                                        .build())
+                        .build()
+            );
+
         given(coreCaseDataApi.submitEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
             eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
             eq(true), any(CaseDataContent.class)))
