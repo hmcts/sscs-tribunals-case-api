@@ -57,7 +57,7 @@ public class IssueDirectionHandler implements CallbackHandler<SscsCaseData> {
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        log.info("About to update case with appealToProceed event for id {}", callback.getCaseDetails().getId());
+        log.info("About to update case v2 with appealToProceed event for id {}", callback.getCaseDetails().getId());
         try {
             updateCcdCaseService.updateCaseV2(
                     callback.getCaseDetails().getId(),
