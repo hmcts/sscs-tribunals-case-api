@@ -623,6 +623,7 @@ sscs-tya-notif:
       POST_HEARINGS_FEATURE: true
       POST_HEARINGS_B_FEATURE: true
       DUMMY: true
+      ROOT_LOGGING_LEVEL: DEBUG
     secrets:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
