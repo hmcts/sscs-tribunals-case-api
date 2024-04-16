@@ -264,13 +264,13 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     @Test
     void givenACaseUpdatedEventWithEmptyAppellantDetails_thenProvideAnError() {
         Representative representative = Representative.builder()
-                .name(Name.builder().firstName("").lastName("").build())
+                .name(Name.builder().firstName("Test").lastName("Test").build())
                 .address(Address.builder().line1("123 Lane").postcode(null).build())
                 .hasRepresentative(YES.getValue())
                 .build();
 
         JointParty jointParty = JointParty.builder()
-                .name(Name.builder().firstName("").lastName("").build())
+                .name(Name.builder().firstName("Test").lastName("Test").build())
                 .jointPartyAddressSameAsAppellant(NO)
                 .address(Address.builder().line1("123 Lane").postcode(null).build())
                 .hasJointParty(YES)
@@ -297,13 +297,13 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     @Test
     public void givenPartyTypeHasFirstLineOfAddressAndInvalidPostcode_thenProvideAnError() {
         Representative representative = Representative.builder()
-                .name(Name.builder().firstName("").lastName("").build())
+                .name(Name.builder().firstName("Test").lastName("Test").build())
                 .address(Address.builder().line1("123 Lane").postcode("73GH Y7U").build())
                 .hasRepresentative(YES.getValue())
                 .build();
 
         JointParty jointParty = JointParty.builder()
-                .name(Name.builder().firstName("").lastName("").build())
+                .name(Name.builder().firstName("Test").lastName("Test").build())
                 .jointPartyAddressSameAsAppellant(NO)
                 .address(Address.builder().line1("123 Lane").postcode("73GH Y7U").build())
                 .hasJointParty(YES)
@@ -330,13 +330,13 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     @Test
     public void givenPartyTypeHasNoFirstLineOfAddressAndValidPostcode_thenProvideAnError() {
         Representative representative = Representative.builder()
-                .name(Name.builder().firstName("").lastName("").build())
+                .name(Name.builder().firstName("Test").lastName("Test").build())
                 .address(Address.builder().line1(null).postcode("CM120NS").build())
                 .hasRepresentative(YES.getValue())
                 .build();
 
         JointParty jointParty = JointParty.builder()
-                .name(Name.builder().firstName("").lastName("").build())
+                .name(Name.builder().firstName("Test").lastName("Test").build())
                 .jointPartyAddressSameAsAppellant(NO)
                 .address(Address.builder().line1(null).postcode("CM120NS").build())
                 .hasJointParty(YES)
@@ -410,7 +410,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors().size(), is(6));
+        assertThat(response.getErrors().size(), is(10));
 
     }
 
@@ -420,7 +420,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("73GH Y7U");
 
         JointParty jointParty = JointParty.builder()
-                .name(Name.builder().firstName("").lastName("").build())
+                .name(Name.builder().firstName("Test").lastName("Test").build())
                 .jointPartyAddressSameAsAppellant(YES)
                 .address(Address.builder().line1("123 The Street").postcode("CM120NS").build())
                 .hasJointParty(YES)
@@ -442,7 +442,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("CM120NS");
 
         JointParty jointParty = JointParty.builder()
-                .name(Name.builder().firstName("").lastName("").build())
+                .name(Name.builder().firstName("Test").lastName("Test").build())
                 .jointPartyAddressSameAsAppellant(YES)
                 .address(Address.builder().line1(null).postcode(null).build())
                 .hasJointParty(YES)
@@ -482,7 +482,33 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getWarnings().size(), is(2));
+        assertThat(response.getErrors().size(), is(2));
+    }
+
+    @Test
+    void givenACaseUpdatedEventWithNullRepresentativeAddress_thenProvideAnError() {
+        Representative representative = Representative.builder()
+                .name(Name.builder().firstName("Test").lastName("Test").build())
+                .address(null)
+                .hasRepresentative(YES.getValue())
+                .build();
+        callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(2));
+    }
+
+    @Test
+    void givenACaseUpdatedEventWithNullRepresentativeDetails_thenProvideAnError() {
+        Representative representative = Representative.builder()
+                .name(null)
+                .address(Address.builder().line1("123 Lane").postcode("CM120NS").build())
+                .hasRepresentative(YES.getValue())
+                .build();
+        callback.getCaseDetails().getCaseData().getAppeal().setRep(representative);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
     }
 
     @Test
@@ -509,7 +535,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setJointParty(jointParty);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getWarnings().size(), is(2));
+        assertThat(response.getErrors().size(), is(3));
     }
 
 
@@ -1678,27 +1704,6 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         assertNull(appeal.getHearingOptions().getLanguages());
     }
 
-    @ParameterizedTest
-    @CsvSource({
-        "Spanish", "Chittagonain", "Czech", "Danish", "Dinka", "Maldivian", "Toura", "Douala", "Dutch", "Dioula",
-        "Efik", "Estonian", "Ewe", "Ewondo", "Farsi", "Fanti", "Fijian", "French"
-    })
-    public void givenAnyCaseAndLanguageIsSet_thenSetTheLanguageValue(String language) {
-        Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
-        appeal.getBenefitType().setCode("PIP");
-        appeal.setHearingType("paper");
-        HearingOptions hearingOptions = HearingOptions.builder()
-                .wantsToAttend("Yes")
-                .languages(language)
-                .build();
-        appeal.setHearingOptions(hearingOptions);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(0, response.getWarnings().size());
-        assertEquals(language, appeal.getHearingOptions().getLanguages());
-    }
-
     @Test
     void givenNewBenefitTypeAndCodeIsSelected_thenCaseCodeShouldChange() {
         DynamicListItem item = new DynamicListItem("088", "");
@@ -1723,5 +1728,43 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(1));
+    }
+
+    @Test
+    public void givenInvalidHearingVideoEmail_thenValidateAndReturnErrorMessage() {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+
+        HearingSubtype hearingSubType = HearingSubtype.builder()
+            .hearingVideoEmail("12345")
+            .wantsHearingTypeVideo(YES.getValue())
+            .build();
+
+        sscsCaseData.getAppeal().setHearingSubtype(hearingSubType);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().stream().allMatch(e -> e.equals("Hearing video email address must be valid email address")));
+    }
+
+    @Test
+    public void givenInterpreterLanguage_thenSetInterpreterLanguageFromLanguageList() {
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+
+        DynamicListItem item = new DynamicListItem("ENG", "english");
+        DynamicList languagesList = new DynamicList(item, null);
+
+        HearingOptions hearingOptions = HearingOptions.builder()
+            .wantsToAttend(YES.getValue())
+            .languageInterpreter(YES.getValue())
+            .languagesList(languagesList)
+            .build();
+
+        sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String language = sscsCaseData.getAppeal().getHearingOptions().getLanguages();
+
+        assertEquals(language, item.getLabel());
     }
 }

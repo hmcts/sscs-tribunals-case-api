@@ -4,6 +4,7 @@ import static java.util.Objects.*;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DecisionType.STRIKE_OUT;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -121,6 +122,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
         }
 
         log.info("Saved the new interloc decision document for case id: " + caseData.getCcdCaseId());
+        clearPostponementTransientFields(caseData);
         cancelHearing(callback);
 
         if (workAllocationFeature) {
