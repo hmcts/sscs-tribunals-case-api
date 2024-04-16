@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -33,7 +34,7 @@ public class AppealReceivedHandlerTest {
     public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
-    private CcdService ccdCaseService;
+    private UpdateCcdCaseService updateCcdCaseService;
 
     @Mock
     private IdamService idamService;
@@ -43,7 +44,7 @@ public class AppealReceivedHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new AppealReceivedHandler(ccdCaseService, idamService);
+        handler = new AppealReceivedHandler(updateCcdCaseService, idamService);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -80,13 +81,13 @@ public class AppealReceivedHandlerTest {
     public void givenValidEventAndDigitalCase_thenTriggerAppealReceivedEvent(EventType eventType) {
         handler.handle(SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(READY_TO_LIST.getId()).build(), INTERLOCUTORY_REVIEW_STATE, eventType));
 
-        verify(ccdCaseService).updateCase(any(), eq(1L), eq(EventType.APPEAL_RECEIVED.getCcdType()), eq("Appeal received"), eq("Appeal received event has been triggered from Evidence Share for digital case"), any());
+        verify(updateCcdCaseService).triggerCaseEventV2(eq(1L), eq(EventType.APPEAL_RECEIVED.getCcdType()), eq("Appeal received"), eq("Appeal received event has been triggered from Evidence Share for digital case"), any());
     }
 
     @Test(expected = IllegalStateException.class)
     public void givenValidEventAndNonDigitalCase_thenThrowException() {
         handler.handle(SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(VALID_APPEAL.getId()).build(), INTERLOCUTORY_REVIEW_STATE, EventType.VALID_APPEAL_CREATED));
 
-        verify(ccdCaseService, times(0)).updateCase(any(), eq(1L), eq(EventType.APPEAL_RECEIVED.getCcdType()), eq("Appeal received"), eq("Appeal received event has been triggered from Evidence Share for digital case"), any());
+        verify(updateCcdCaseService, times(0)).triggerCaseEventV2(eq(1L), eq(EventType.APPEAL_RECEIVED.getCcdType()), eq("Appeal received"), eq("Appeal received event has been triggered from Evidence Share for digital case"), any());
     }
 }
