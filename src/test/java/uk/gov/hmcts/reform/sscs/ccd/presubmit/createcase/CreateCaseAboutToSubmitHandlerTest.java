@@ -22,6 +22,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
+import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
+import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,6 +44,9 @@ public class CreateCaseAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private VerbalLanguagesService verbalLanguagesService;
+
     private CreateCaseAboutToSubmitHandler createCaseAboutToSubmitHandler;
 
     @BeforeEach
@@ -52,7 +57,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
-        createCaseAboutToSubmitHandler = new CreateCaseAboutToSubmitHandler(sscsPdfService, emailHelper);
+        createCaseAboutToSubmitHandler = new CreateCaseAboutToSubmitHandler(sscsPdfService, emailHelper, verbalLanguagesService);
     }
 
     @ParameterizedTest
@@ -189,6 +194,19 @@ public class CreateCaseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("1234567890", response.getData().getCcdCaseId());
+    }
+
+    @Test
+    void givenLanguageHasBeenSet_thenConfirmCorrectLanguageNameAndSetIt() {
+        String oldLanguageName = "Putonghue";
+        String newLanguageName = "Mandarin";
+
+        caseDetails.getCaseData().getAppeal().getHearingOptions().setLanguages(oldLanguageName);
+        when(verbalLanguagesService.getVerbalLanguage(oldLanguageName)).thenReturn(Language.builder()
+                .nameEn(newLanguageName).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(newLanguageName, response.getData().getAppeal().getHearingOptions().getLanguages());
     }
 
     @Test
