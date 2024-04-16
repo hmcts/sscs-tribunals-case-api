@@ -1,4 +1,4 @@
-java: &javavalues
+java: &javavalues #This is an anchor to reuse settings in Job mode.
   enabled: true
   image: 'hmctspublic.azurecr.io/sscs/tribunals-api:latest'
   applicationPort: 8080
@@ -140,5 +140,6 @@ ccd-case-document-am-api:
 ccd-def-cleanup:
   enabled: false
 job:
+  #DO NOT DELETE, Below linn is aliasing all values from Java settings above to job to avoid duplication.
   <<: *javavalues
   enabled: false
