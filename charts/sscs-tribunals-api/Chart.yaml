@@ -11,7 +11,7 @@ dependencies:
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
     condition: java.enabled
   - name: job
-    version: .0.0
+    version: 2.1.1
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
     condition: job.enabled
   - name: idam-pr
