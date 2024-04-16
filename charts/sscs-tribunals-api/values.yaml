@@ -1,7 +1,7 @@
-java:
+java: &javavalues
+  enabled: true
   image: 'hmctspublic.azurecr.io/sscs/tribunals-api:latest'
   applicationPort: 8080
-  readinessPath: '/health/readiness'
   aadIdentityName: sscs
   ingressHost: sscs-tribunals-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   memoryLimits: '4096Mi'
@@ -138,4 +138,6 @@ servicebus:
 ccd-case-document-am-api:
   enabled: false
 ccd-def-cleanup:
+job:
+  <<: *javavalues
   enabled: false

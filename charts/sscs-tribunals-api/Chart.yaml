@@ -9,6 +9,11 @@ dependencies:
   - name: java
     version: 5.0.0
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    condition: java.enabled
+  - name: job
+    version: .0.0
+    repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    condition: job.enabled
   - name: idam-pr
     version: 2.3.0
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
