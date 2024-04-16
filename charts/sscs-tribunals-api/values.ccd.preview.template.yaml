@@ -11,7 +11,7 @@ java:
   readinessDelay: 45
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
-    CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
+    CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
     BUNDLE_URL: http://${SERVICE_NAME}-em-ccdorc
     CCD_UI_BASE_URL: https://${SERVICE_NAME}-case-management-web
@@ -27,7 +27,7 @@ java:
     IDAM_SSCS_SYSTEMUPDATE_USER: ${IDAM_SSCS_SYSTEMUPDATE_USER}
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
     CORE_CASE_DATA_JURISDICTION_ID: SSCS
-    CORE_CASE_DATA_CASE_TYPE_ID: Benefit
+    CORE_CASE_DATA_CASE_TYPE_ID: ${CASE_TYPE}
     TEST_URL: http://${SERVICE_NAME}
     CREATE_CCD_ENDPOINT: true
     CASE_ACCESS_MANAGEMENT_FEATURE: true
@@ -47,10 +47,35 @@ java:
     SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
     AMQP_USERNAME: "RootManageSharedAccessKey"
+    HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
   secrets:
+    HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
+      secretRef: sscs-sb-preview
+      key: connectionString
     AMQP_PASSWORD:
       secretRef: sscs-sb-preview
       key: primaryKey
+  postgresql:
+    enabled: true
+    primary:
+      persistence:
+        enabled: false
+      initdb:
+        scripts:
+          init.sql: |
+            CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "draftstore" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "evidence" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "annotation" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "sscsjobscheduler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+    auth:
+      username: "hmcts"
+      password: "hmcts"
+
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -77,7 +102,7 @@ em-ccdorc:
       S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       EM_STITCHING_API_URL: http://em-stitching-aat.service.core-compute-aat.internal
       DM_STORE_APP_URL: http://dm-store-aat.service.core-compute-aat.internal
-      CCD_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
+      CCD_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
       CALLBACK_HTTP_SCHEME: https
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
 
@@ -87,7 +112,7 @@ ccd-case-document-am-api:
     image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
     environment:
-      CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
+      CCD_DATA_STORE_API_BASE_URL: ${CORE_CASE_DATA_API_URL}
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
       OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts
@@ -106,18 +131,18 @@ xui-webapp:
     image: hmctspublic.azurecr.io/xui/webapp:latest
     ingressHost: xui-${SERVICE_FQDN}
     environment:
-      HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
-      HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
+      HEALTH_CCD_COMPONENT_API: ${CCD_GW_API}/health
+      HEALTH_CCD_DATA_API: ${CORE_CASE_DATA_API_URL}/health
       HEALTH_TERMS_AND_CONDITIONS_API: http://${SERVICE_NAME}-xui-terms-and-conditions/health
-      SERVICES_EM_ANNO_API: http://${SERVICE_NAME}-ccd-api-gw
-      SERVICES_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw
-      SERVICES_CCD_DATA_STORE_API: http://${SERVICE_NAME}-ccd-data-store-api
+      SERVICES_EM_ANNO_API: ${CCD_GW_API}
+      SERVICES_CCD_COMPONENT_API: ${CCD_GW_API}
+      SERVICES_CCD_DATA_STORE_API: ${CORE_CASE_DATA_API_URL}
       SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac
       SERVICES_TERMS_AND_CONDITIONS: http://${SERVICE_NAME}-xui-terms-and-conditions
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       SERVICES_S2S: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       SERVICES_HEARINGS_COMPONENT_API: http://jurisdiction-hearings-api-aat.service.core-compute-aat.internal
-      SERVICES_HMC_HEARINGS_COMPONENT_API: http://${SERVICE_NAME}-hmc-cft-hearing-service
+      SERVICES_HEARINGS_COMPONENT_API_SSCS: http://${SERVICE_NAME}-sscs-hearings-api
       SERVICES_PRD_LOCATION_API: http://rd-location-ref-api-aat.service.core-compute-aat.internal
       SERVICES_PRD_JUDICIAL_API: http://rd-judicial-api-aat.service.core-compute-aat.internal
       SERVICES_PRD_COMMONDATA_API: http://rd-commondata-api-aat.service.core-compute-aat.internal
@@ -149,37 +174,22 @@ xui-webapp:
 
 
 ccd:
-  enabled: true
+  enabled: ${PREVIEW_CCD_ENABLED}
   ccd:
     adminWeb:
-      enabled: true
+      enabled: ${PREVIEW_CCD_ENABLED}
     definitionImporter:
-      enabled: true
+      enabled: ${PREVIEW_CCD_ENABLED}
     userProfileImporter:
-      enabled: true
+      enabled: ${PREVIEW_CCD_ENABLED}
     apiGatewayWeb:
-      enabled: true
+      enabled: ${PREVIEW_CCD_ENABLED}
     postgresql:
-      enabled: true
+      enabled: false
     s2s:
       enabled: false
     elastic:
-      enabled: true
-
-  postgresql:
-    primary:
-      initdb:
-        scripts:
-          init.sql: |
-            CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "draftstore" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "evidence" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "annotation" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "sscsjobscheduler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      enabled: ${PREVIEW_CCD_ENABLED}
 
   global:
     ccdApiGatewayIngress: ${SERVICE_NAME}-ccd-api-gw
@@ -573,7 +583,7 @@ sscs-evidence-share:
       SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
-      CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
+      CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
@@ -606,7 +616,7 @@ sscs-tya-notif:
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
-      CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
+      CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
       AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
       AMQP_USERNAME: "RootManageSharedAccessKey"
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
@@ -695,80 +705,55 @@ sscs-hearings-api:
   java:
     image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
+    ingressHost: hearings-${SERVICE_FQDN}
     environment:
       ROOT_LOGGING_LEVEL: INFO
-      SSCS_LOG_LEVEL: INFO #Switch to debug to see requests being sent.
+      SSCS_LOG_LEVEL: DEBUG #Switch to debug to see requests being sent.
       SERVICE_BUS_LOG_LEVEL: ERROR
       LOG_OUTPUT: single
       CREATE_CCD_ENDPOINT: false
       IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
       CASEWORKER_REF_API_URL: "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
       IDAM_API_URL: "https://idam-api.aat.platform.hmcts.net"
-      CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
+      CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
       COMMON_REF_API_URL: "http://rd-commondata-api-aat.service.core-compute-aat.internal"
       JUDICIAL_REF_API_URL: "http://rd-judicial-api-aat.service.core-compute-aat.internal"
       EXUI_API_URL: "https://${SERVICE_NAME}-xui"
-      HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+      HMC_API_URL: "http://hmc-cft-hearing-service-aat.service.core-compute-aat.internal"
       #Messaging
-      HMC_HEARING_LISTENING_ENABLED: false
-      HEARINGS_TOPIC_NAME: "hmc-to-cft"
-      HEARINGS_TOPIC_SUBSCRIPTION_NAME: "tribunals-to-hearing-api"
-      HMC_HEARINGS_TOPIC_POLICY_NAME: RootManageSharedAccessKey
-      TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
-      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
+      HMC_HEARINGS_LISTENING_ENABLED: true
+      HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
+      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-3575"
+      TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
+      TRIBUNALS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
+      TRIBUNALS_EVENT_QUEUE_NAMESPACE: sscs-sb-preview
+      HMC_HEARINGS_TOPIC_NAMESPACE: hmc-servicebus-aat
+      HMC_DEPLOYMENT_ID: deployment-${SERVICE_NAME}
+      HMC_DEPLOYMENT_FILTER_ENABLED: true
+      CORE_CASE_DATA_CASE_TYPE_ID: Benefit-${CHANGE_ID}
     secrets:
-      TRIBUNALS_EVENT_QUEUE_NAMESPACE:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
-        key: namespaceName
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
+        secretRef: sscs-sb-preview
         key: primaryKey
-      HMC_HEARINGS_TOPIC_NAMESPACE:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: namespaceName
-      HMC_HEARINGS_TOPIC_ACCESS_KEY:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: primaryKey
-
-hmc-cft-hearing-service:
-  enabled: false
-  java:
-    releaseNameOverride: ${SERVICE_NAME}-hmc-cft-hearing-service
-    image: "hmctspublic.azurecr.io/hmc/cft-hearing-service:latest"
-    environment:
-      HMC_SERVICE_BUS_TOPIC: "hmc-to-cft"
-      HMC_SERVICE_BUS_SUBSCRIPTION: "hmc-to-sscs-subscription"
-      HMC_SERVICE_BUS_QUEUE: hmc-from-hmi
-      HMC_OUTBOUND_SERVICE_BUS_QUEUE: hmc-to-hmi
-      CFT_HEARING_SERVICE_DB_HOST: "${SERVICE_NAME}-postgresql"
-      CFT_HEARING_SERVICE_DB_NAME: "hmc-cft-hearing-service"
-      CFT_HEARING_SERVICE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
-      CFT_HEARING_SERVICE_DB_PORT: 5432
-      HMC_ACCESS_CONTROL_ENABLED: false
-      ROLE_ASSIGNMENT_URL: "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
-      SPRING_CONFIG_IMPORT : "optional:configtree:/mnt/secrets/hmc/,optional:configtree:/mnt/secrets/sscs/"
-    secrets:
-      HMC_SERVICE_BUS_CONNECTION_STRING:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: connectionString
-      HMC_QUEUE_CONNECTION_STRING:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-from-hmi
-        key: connectionString
-      HMC_OUTBOUND_QUEUE_CONNECTION_STRING:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-hmc-to-hmi
-        key: connectionString
     keyVaults:
-      hmc:
-        resourceGroup: hmc-shared
-        secrets:
-          - name: AppInsightsInstrumentationKey
       sscs:
         secrets:
-          - name: preview-ccd-db-username
-            alias: CFT_HEARING_SERVICE_DB_USERNAME
-          - name: preview-ccd-db-password
-            alias: CFT_HEARING_SERVICE_DB_PASSWORD
+          - name: hmc-servicebus-shared-access-key-tf
+            alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
+          - name: sscs-hearing-manager-username
+            alias: IDAM_SSCS_SYSTEMUPDATE_USER
+          - name: sscs-hearing-manager-pass
+            alias: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
+          - name: app-insights-connection-string
+            alias: app-insights-connection-string
+          - name: sscs-s2s-secret
+            alias: IDAM_S2S_AUTH_TOTP_SECRET
+          - name: idam-oauth-user
+            alias: IDAM_OAUTH2_CLIENT_ID
+          - name: idam-sscs-oauth2-client-secret
+            alias: IDAM_OAUTH2_CLIENT_SECRET
+
 
 #Enable for queues/topics
 #If you need a subscription for a topic, topic name should be not longer than 10 characters
@@ -783,5 +768,5 @@ servicebus:
         subscriptionNeeded: yes
     queues:
       - name: sscs-orchestrator-queue-preview
-
+      - name: tribunals-to-hearing-api
 

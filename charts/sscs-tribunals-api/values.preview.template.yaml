@@ -28,3 +28,9 @@ java:
     ISSUE_GENERIC_LETTER: true
     BYPASS_EVIDENCE_SHARE_SERVICE: true
     HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: true
+
+ccd-def-cleanup:
+  enabled: true
+  change_id: ${CHANGE_ID}
+  case_type_ids:
+    - Benefit
