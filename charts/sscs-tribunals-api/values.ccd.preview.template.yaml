@@ -701,7 +701,7 @@ redis:
 #Turning either hearings api (with either listener on) or cft hearing service on requires
 #service bus to be turned on.
 sscs-hearings-api:
-  enabled: false
+  enabled: true
   java:
     image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-599-05b0bcb-20240415154954" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
