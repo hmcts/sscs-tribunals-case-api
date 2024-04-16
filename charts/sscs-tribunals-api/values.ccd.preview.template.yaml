@@ -529,7 +529,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:6.3.17nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S1549AnonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -576,7 +576,7 @@ elastic:
 sscs-evidence-share:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/evidence-share:latest
+    image: hmctspublic.azurecr.io/sscs/evidence-share:pr-1620-457b75b-20240408111415
     releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
     environment:
       SEND_LETTER_SERVICE_ENABLED: "true"
@@ -612,7 +612,7 @@ sscs-evidence-share:
 sscs-tya-notif:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
+    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2498-9aab009-20240415154909
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
@@ -660,7 +660,7 @@ sscs-tribunals-frontend:
   nodejs:
     memoryLimits: "2Gi"
     cpuLimits: 2000m
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:pr-1473-cec93fe-20240415164325
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
@@ -703,7 +703,7 @@ redis:
 sscs-hearings-api:
   enabled: false
   java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-599-05b0bcb-20240415154954" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     ingressHost: hearings-${SERVICE_FQDN}
     environment:
