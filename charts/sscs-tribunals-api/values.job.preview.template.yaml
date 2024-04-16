@@ -1,0 +1,6 @@
+job:
+  enabled: true
+  image: hmctspublic.azurecr.io/sscs/tribunals-api:pr-3739
+  environment:
+    TASK_NAME: MigrateCasesTask
+
