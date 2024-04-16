@@ -54,7 +54,7 @@ import uk.gov.service.notify.SendSmsResponse;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
-@ActiveProfiles("tya-integration")
+@ActiveProfiles("integration")
 @AutoConfigureMockMvc
 public class OutOfHoursIt {
 

@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 @Slf4j
 @Component
 @Lazy(false)
+@ConditionalOnProperty(name = "feature.jms.enabled", havingValue = "true", matchIfMissing = true)
 public class TopicConsumer {
 
     private final Integer maxRetryAttempts;

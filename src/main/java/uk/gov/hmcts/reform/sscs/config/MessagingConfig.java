@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.jms.JmsConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.EnableJms;
@@ -25,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.service.servicebus.messaging.JmsErrorHandler;
 @Configuration
 @Slf4j
 @EnableJms
+@ConditionalOnProperty(name = "feature.jms.enabled", havingValue = "true", matchIfMissing = true)
 public class MessagingConfig {
 
     @Bean

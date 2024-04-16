@@ -97,6 +97,7 @@ tasks.withType(Test) {
 
 task integration(type: Test) {
     jvmArgs = ['-Xms1024m', '-Xmx2048m']
+    maxParallelForks 3
     setTestClassesDirs(sourceSets.integrationTest.output.classesDirs)
     setClasspath(sourceSets.integrationTest.runtimeClasspath)
 }
@@ -429,6 +430,8 @@ dependencies {
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 
     testImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-quartz', version: '2.7.18'
+
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
     functionalTestImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
     functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'

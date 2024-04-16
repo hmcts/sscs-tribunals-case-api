@@ -35,7 +35,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ActiveProfiles("tya-integration")
+@ActiveProfiles("integration")
 @AutoConfigureMockMvc
 @Slf4j
 public class PdfLetterServiceIt {

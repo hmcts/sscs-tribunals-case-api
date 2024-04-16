@@ -11,7 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ActiveProfiles("tya-integration")
+@ActiveProfiles("integration")
 public class NotificationsTyaLinksIt {
     @Value("${manage.emails.link}")
     private String manageEmailsLink;

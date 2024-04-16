@@ -44,7 +44,7 @@ import uk.gov.service.notify.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ActiveProfiles("tya-integration")
+@ActiveProfiles("integration")
 @AutoConfigureMockMvc
 public class HearingReminderIt {
 

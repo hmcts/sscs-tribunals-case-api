@@ -34,7 +34,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis.PdfLetterServi
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
-@ActiveProfiles("tya-integration")
+@ActiveProfiles("integration")
 @AutoConfigureMockMvc
 @Getter
 public class NotificationServiceBase {

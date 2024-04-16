@@ -279,6 +279,7 @@ feature:
     urgent-hearing:
         enabled: ${URGENT_HEARING_ENABLED:false}
 
+
 idam:
     api:
         url: ${IDAM_API_URL:http://localhost:5062}
@@ -442,11 +443,6 @@ helpline:
 
 
 delayEvent.timeInSeconds: 300
-
-job.scheduler:
-    retryPolicy:
-        maxNumberOfJobExecutions: 2
-        delayBetweenAttemptsInMs: 1000
 
 notification:
     english:
@@ -1975,6 +1971,9 @@ spring:
             accept-case-insensitive-properties: true
 
 job.scheduler:
+    retryPolicy:
+        maxNumberOfJobExecutions: 2
+        delayBetweenAttemptsInMs: 1000
     quartzProperties:
         org.quartz:
             scheduler:
@@ -2021,12 +2020,15 @@ ccd-callback-orchestrator:
 spring:
     config:
         activate:
-            on-profile: tya-integration, functional
+            on-profile: integration, functional
     autoconfigure.exclude:
         - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
     flyway.enabled: false
 job.scheduler:
     autoStart: false
+    retryPolicy:
+        maxNumberOfJobExecutions: 2
+        delayBetweenAttemptsInMs: 1000
     quartzProperties:
         org.quartz:
             scheduler:
