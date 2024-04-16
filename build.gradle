@@ -97,7 +97,7 @@ tasks.withType(Test) {
 
 task integration(type: Test) {
     jvmArgs = ['-Xms1024m', '-Xmx2048m']
-    maxParallelForks = Runtime.runtime.availableProcessors() ?: 1
+    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
     forkEvery = 10
 
     setTestClassesDirs(sourceSets.integrationTest.output.classesDirs)
