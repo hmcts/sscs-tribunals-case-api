@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service.servicebus;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.getNotificationByCcdEvent;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.buildSscsCaseDataWrapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,6 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.support.JmsHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -55,16 +55,16 @@ public class NotificationsTopicConsumer {
             SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
             if (ISSUE_FINAL_DECISION.equals(event)
-                    && DwpState.CORRECTION_GRANTED.equals(caseData.getDwpState())) {
+                && DwpState.CORRECTION_GRANTED.equals(caseData.getDwpState())) {
                 return;
             }
 
 
             NotificationSscsCaseDataWrapper sscsCaseDataWrapper = buildSscsCaseDataWrapper(
-                    caseData,
-                    caseDetailsBefore != null ? caseDetailsBefore.getCaseData() : null,
-                    event,
-                    callback.getCaseDetails().getState());
+                caseData,
+                caseDetailsBefore != null ? caseDetailsBefore.getCaseData() : null,
+                event,
+                callback.getCaseDetails().getState());
 
             log.info("Ccd Response received for case id: {}, {} with message id {}",
                 sscsCaseDataWrapper.getNewSscsCaseData().getCcdCaseId(),
