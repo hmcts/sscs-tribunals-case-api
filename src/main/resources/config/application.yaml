@@ -2014,7 +2014,6 @@ ccd-callback-orchestrator:
     api:
         url: ${CCD_CALLBACK_ORCHESTRATOR_API_URL:http://localhost:8070}
 
-
 ---
 # tya-integration profile
 spring:
