@@ -201,8 +201,7 @@ project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
 check.dependsOn integration
 checkstyleMain.shouldRunAfter(compileJava)
 test.shouldRunAfter(checkstyleTest)
-integration.shouldRunAfter(checkstyleIntegrationTest)
-integration.shouldRunAfter(test)
+
 
 sonarqube {
     properties {
