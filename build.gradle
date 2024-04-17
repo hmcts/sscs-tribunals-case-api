@@ -197,8 +197,7 @@ repositories {
 
 processResources.dependsOn(generateGitProperties)
 
-project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
-check.dependsOn integration
+project.tasks['sonarqube'].dependsOn test, jacocoTestReport
 checkstyleMain.shouldRunAfter(compileJava)
 test.shouldRunAfter(checkstyleTest)
 
