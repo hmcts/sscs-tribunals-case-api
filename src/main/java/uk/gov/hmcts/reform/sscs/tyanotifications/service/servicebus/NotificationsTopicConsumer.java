@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtil
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.support.JmsHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
