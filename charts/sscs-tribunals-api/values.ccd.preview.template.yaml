@@ -612,7 +612,7 @@ sscs-evidence-share:
 sscs-tya-notif:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
+    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2490-93787be-20240417113801
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
@@ -701,7 +701,7 @@ redis:
 #Turning either hearings api (with either listener on) or cft hearing service on requires
 #service bus to be turned on.
 sscs-hearings-api:
-  enabled: false
+  enabled: true
   java:
     image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
