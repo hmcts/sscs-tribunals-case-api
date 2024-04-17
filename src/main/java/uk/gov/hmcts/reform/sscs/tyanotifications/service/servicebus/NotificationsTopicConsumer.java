@@ -35,11 +35,6 @@ public class NotificationsTopicConsumer {
         this.filterNotificationsEventsHandler = filterNotificationsEventsHandler;
     }
 
-    @JmsListener(
-        destination = "${amqp.topic}",
-        containerFactory = "topicJmsListenerContainerFactory",
-        subscription = "${amqp.subscription}"
-    )
     public void onMessage(String message, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
         processMessage(message, messageId);
     }
