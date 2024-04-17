@@ -7,6 +7,7 @@ java:
   memoryLimits: "8Gi"
   memoryRequests: "1Gi"
   cpuRequests: "2"
+  ingressHost: ${SERVICE_FQDN}
   cpuLimits: 2000m
   readinessDelay: 45
   environment:
@@ -606,7 +607,7 @@ sscs-evidence-share:
 # and when go to azure portal and search for sscs-sb-preview
 # click topics and select your PR topic
 # click subscriptions and click add subscription button (+ subscription)
-# into name field add name: sscs-tribunals-api-pr-##YOUR PR NUMBER ##-servicebus-tya (example: sscs-tribunals-api-pr-3290-servicebus-tya)
+# into name field add name: sscs-tribunals-api-pr-##YOUR PR NUMBER ##-servicebus-tya (example: sscs-tribunals-api-pr-3750-servicebus-tya)
 # click create
 # azure steps should be repeated every time PR is undeployed from preview
 sscs-tya-notif:
