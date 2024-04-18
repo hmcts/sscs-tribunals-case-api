@@ -138,6 +138,7 @@ public class IssueDocumentHandler {
         }
 
         String documentUrl = Optional.ofNullable(getDocumentFromCaseData(caseData)).map(DocumentLink::getDocumentUrl).orElse(null);
+        log.info("document url {}", documentUrl);
         LocalDate dateAdded = Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now());
         String documentTypeLabel = getDocumentTypeLabel(caseData, documentType, isPostHearingsEnabled);
         String embeddedDocumentTypeLabel = getEmbeddedDocumentTypeLabel(caseData, documentType, documentTypeLabel, isPostHearingsEnabled);
@@ -167,7 +168,7 @@ public class IssueDocumentHandler {
                 .documentBinaryUrl(generatedFileUrl + "/binary")
                 .documentUrl(generatedFileUrl)
                 .build();
-
+        log.info("preview filename {} preview file url {}",previewFile.getDocumentFilename(),previewFile.getDocumentUrl());
         setDocumentOnCaseData(caseData, previewFile);
 
         return response;
