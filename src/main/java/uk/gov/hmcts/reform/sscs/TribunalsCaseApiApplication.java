@@ -11,8 +11,8 @@ import javax.servlet.ServletContextListener;
 import javax.validation.ValidatorFactory;
 import okhttp3.OkHttpClient;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.quartz.spi.JobFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -54,11 +54,11 @@ import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobClassMapper;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobClassMapping;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobMapper;
 import uk.gov.hmcts.reform.sscs.jobscheduler.services.quartz.JobMapping;
+import uk.gov.hmcts.reform.sscs.service.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.*;
 import uk.gov.service.notify.NotificationClient;
-import uk.gov.hmcts.reform.sscs.service.ScheduledTaskRunner;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @EnableFeignClients(basePackages = {
