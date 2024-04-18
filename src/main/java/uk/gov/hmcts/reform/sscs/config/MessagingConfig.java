@@ -126,7 +126,7 @@ public class MessagingConfig {
 
 
     @Bean
-    public JmsListenerContainerFactory notificatonsTopicJmsListenerContainerFactory(ConnectionFactory connectionFactory) {
+    public JmsListenerContainerFactory notificationsTopicJmsListenerContainerFactory(ConnectionFactory connectionFactory) {
         log.info("Creating Notifications JMSListenerContainer bean for topics..");
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);
