@@ -124,4 +124,15 @@ public class MessagingConfig {
         return returnValue;
     }
 
+
+    @Bean
+    public JmsListenerContainerFactory notificatonsTopicJmsListenerContainerFactory(ConnectionFactory connectionFactory) {
+        log.info("Creating Notifications JMSListenerContainer bean for topics..");
+        DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
+        returnValue.setConnectionFactory(connectionFactory);
+        returnValue.setSubscriptionDurable(Boolean.TRUE);
+        returnValue.setErrorHandler(new JmsErrorHandler());
+        return returnValue;
+    }
+
 }

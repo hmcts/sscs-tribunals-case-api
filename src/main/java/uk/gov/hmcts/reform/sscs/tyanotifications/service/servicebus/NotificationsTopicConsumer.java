@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtil
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.support.JmsHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,12 @@ public class NotificationsTopicConsumer {
         this.filterNotificationsEventsHandler = filterNotificationsEventsHandler;
     }
 
+
+    @JmsListener(
+        destination = "${amqp.topic}",
+        containerFactory = "notificationsTopicJmsListenerContainerFactory",
+        subscription = "${amqp.subscription}"
+    )
     public void onMessage(String message, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
         processMessage(message, messageId);
     }
