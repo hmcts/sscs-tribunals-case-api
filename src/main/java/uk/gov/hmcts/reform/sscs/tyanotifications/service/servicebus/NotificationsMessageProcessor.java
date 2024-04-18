@@ -35,6 +35,7 @@ public class NotificationsMessageProcessor {
 
     public void processMessage(String message, String messageId) {
         try {
+            log.info("Notifications Message Id {} received from the service bus", messageId);
             Callback<SscsCaseData> callback = sscsDeserializer.deserialize(message);
             requireNonNull(callback, "callback must not be null");
             CaseDetails<SscsCaseData> caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
