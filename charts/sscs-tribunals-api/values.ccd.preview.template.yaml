@@ -703,7 +703,7 @@ redis:
 sscs-hearings-api:
   enabled: false
   java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-605" #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-606" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     ingressHost: hearings-${SERVICE_FQDN}
     environment:
