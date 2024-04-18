@@ -11,8 +11,10 @@ import javax.servlet.ServletContextListener;
 import javax.validation.ValidatorFactory;
 import okhttp3.OkHttpClient;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.quartz.spi.JobFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -56,6 +58,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.*;
 import uk.gov.service.notify.NotificationClient;
+import uk.gov.hmcts.reform.sscs.service.ScheduledTaskRunner;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @EnableFeignClients(basePackages = {
@@ -68,14 +71,14 @@ import uk.gov.service.notify.NotificationClient;
     "uk.gov.hmcts.reform.sscs.client",
     "uk.gov.hmcts.reform.sendletter",
     "uk.gov.hmcts.reform.ccd.client",
-    "uk.gov.hmcts.reform.sscs.client",
     "uk.gov.hmcts.reform.sscs.tyanotifications.service.coh"
 })
 
-@ComponentScan(basePackages = {"uk.gov.hmcts.reform", "uk.gov.hmcts.reform.sscs", "uk.gov.hmcts.reform.ccd.document.am"})
+@ComponentScan(basePackages = {"uk.gov.hmcts.reform", "uk.gov.hmcts.reform.sscs",
+    "uk.gov.hmcts.reform.ccd.document.am"})
 @EnableScheduling
 @EnableRetry
-public class TribunalsCaseApiApplication {
+public class TribunalsCaseApiApplication implements CommandLineRunner {
 
     @Value("${appeal.email.host}")
     private String emailHost;
@@ -86,8 +89,21 @@ public class TribunalsCaseApiApplication {
     @Value("${appeal.email.smtp.tls.enabled}")
     private String smtpTlsEnabled;
 
+    @Autowired
+    private ScheduledTaskRunner taskRunner;
+
     public static void main(String[] args) {
-        SpringApplication.run(TribunalsCaseApiApplication.class, args);
+        final var instance = SpringApplication.run(TribunalsCaseApiApplication.class, args);
+        if (System.getenv("TASK_NAME") != null) {
+            instance.close();
+        }
+    }
+
+    @Override
+    public void run(String... args) {
+        if (System.getenv("TASK_NAME") != null) {
+            taskRunner.run(System.getenv("TASK_NAME"));
+        }
     }
 
     @Bean
@@ -145,8 +161,9 @@ public class TribunalsCaseApiApplication {
     }
 
     @Bean
-    public CcdRequestDetails getRequestDetails(@Value("${core_case_data.jurisdictionId}") String coreCaseDataJurisdictionId,
-                                               @Value("${core_case_data.caseTypeId}") String coreCaseDataCaseTypeId) {
+    public CcdRequestDetails getRequestDetails(
+        @Value("${core_case_data.jurisdictionId}") String coreCaseDataJurisdictionId,
+        @Value("${core_case_data.caseTypeId}") String coreCaseDataCaseTypeId) {
         return CcdRequestDetails.builder()
             .caseTypeId(coreCaseDataCaseTypeId)
             .jurisdictionId(coreCaseDataJurisdictionId)
