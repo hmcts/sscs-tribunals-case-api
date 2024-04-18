@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.service.exceptions.ClientAuthorisationException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.callback.handlers.FilterNotificationsEventsHandler;
 
-public class NotificationsTopicConsumerTest {
+public class NotificationsMessageProcessorTest {
 
     private static final String MESSAGE = "message";
     private static final Exception EXCEPTION = new RuntimeException("blah");
@@ -29,13 +29,13 @@ public class NotificationsTopicConsumerTest {
     @Mock
     private SscsCaseCallbackDeserializer deserializer;
 
-    private NotificationsTopicConsumer topicConsumer;
+    private NotificationsMessageProcessor topicConsumer;
     private Exception exception;
 
     @Before
     public void setup() {
         openMocks(this);
-        topicConsumer = new NotificationsTopicConsumer(deserializer, filterNotificationsEventsHandler);
+        topicConsumer = new NotificationsMessageProcessor(deserializer, filterNotificationsEventsHandler);
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(
             123L,
             "jurisdiction",
@@ -52,7 +52,7 @@ public class NotificationsTopicConsumerTest {
     public void anExceptionWillBeCaught() {
         exception = EXCEPTION;
         doThrow(exception).when(filterNotificationsEventsHandler).handle(any());
-        topicConsumer.onMessage(MESSAGE, "1");
+        topicConsumer.processMessage(MESSAGE, "1");
         verify(filterNotificationsEventsHandler, atLeastOnce()).handle(any());
     }
 
@@ -61,7 +61,7 @@ public class NotificationsTopicConsumerTest {
     public void nullPointerExceptionWillBeCaught() {
         exception = new NullPointerException();
         doThrow(exception).when(filterNotificationsEventsHandler).handle(any());
-        topicConsumer.onMessage(MESSAGE, "1");
+        topicConsumer.processMessage(MESSAGE, "1");
         verify(filterNotificationsEventsHandler, atLeastOnce()).handle(any());
     }
 
@@ -69,13 +69,13 @@ public class NotificationsTopicConsumerTest {
     public void clientAuthorisationExceptionWillBeCaught() {
         exception = new ClientAuthorisationException(EXCEPTION);
         doThrow(exception).when(filterNotificationsEventsHandler).handle(any());
-        topicConsumer.onMessage(MESSAGE, "1");
+        topicConsumer.processMessage(MESSAGE, "1");
         verify(filterNotificationsEventsHandler, atLeastOnce()).handle(any());
     }
 
     @Test
     public void handleValidRequest() {
-        topicConsumer.onMessage(MESSAGE, "1");
+        topicConsumer.processMessage(MESSAGE, "1");
         verify(filterNotificationsEventsHandler).handle(any());
     }
 }

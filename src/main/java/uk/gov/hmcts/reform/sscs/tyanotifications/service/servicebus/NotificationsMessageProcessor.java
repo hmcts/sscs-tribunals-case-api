@@ -8,9 +8,6 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtil
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.jms.annotation.JmsListener;
-import org.springframework.jms.support.JmsHeaders;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
@@ -24,29 +21,19 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEvent
 @Slf4j
 @Component
 @Lazy(false)
-public class NotificationsTopicConsumer {
+public class NotificationsMessageProcessor {
 
     private final SscsCaseCallbackDeserializer sscsDeserializer;
 
     private final FilterNotificationsEventsHandler filterNotificationsEventsHandler;
 
-    public NotificationsTopicConsumer(SscsCaseCallbackDeserializer sscsDeserializer, FilterNotificationsEventsHandler filterNotificationsEventsHandler) {
+    public NotificationsMessageProcessor(SscsCaseCallbackDeserializer sscsDeserializer, FilterNotificationsEventsHandler filterNotificationsEventsHandler) {
         this.sscsDeserializer = sscsDeserializer;
         this.filterNotificationsEventsHandler = filterNotificationsEventsHandler;
     }
 
 
-    @JmsListener(
-        destination = "${amqp.topic}",
-        containerFactory = "notificationsTopicJmsListenerContainerFactory",
-        subscription = "${amqp.subscription}"
-    )
-    public void onMessage(String message, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
-        processMessage(message, messageId);
-    }
-
-
-    private void processMessage(String message, String messageId) {
+    public void processMessage(String message, String messageId) {
         try {
             Callback<SscsCaseData> callback = sscsDeserializer.deserialize(message);
             requireNonNull(callback, "callback must not be null");

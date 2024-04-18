@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.*;
 import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
 import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
+import uk.gov.hmcts.reform.sscs.tyanotifications.service.servicebus.NotificationsMessageProcessor;
 
 @Slf4j
 @Component
@@ -28,14 +29,19 @@ public class TopicConsumer {
     private final Integer maxRetryAttempts;
     private final CallbackDispatcher<SscsCaseData> dispatcher;
     private final SscsCaseCallbackDeserializer sscsDeserializer;
+    private final NotificationsMessageProcessor notificationsMessageProcessor;
+    private final boolean isNotificationServiceBypassed;
 
     public TopicConsumer(@Value("${send-letter.maxRetryAttempts}") Integer maxRetryAttempts,
                          CallbackDispatcher<SscsCaseData> dispatcher,
-                         SscsCaseCallbackDeserializer sscsDeserializer) {
+                         SscsCaseCallbackDeserializer sscsDeserializer, NotificationsMessageProcessor notificationsMessageProcessor,
+                         @Value("${feature.bypass-notifications-service.enabled:false}") boolean isNotificationServiceBypassed) {
         this.maxRetryAttempts = maxRetryAttempts;
         //noinspection unchecked
         this.dispatcher = dispatcher;
         this.sscsDeserializer = sscsDeserializer;
+        this.notificationsMessageProcessor = notificationsMessageProcessor;
+        this.isNotificationServiceBypassed = isNotificationServiceBypassed;
     }
 
 
@@ -44,15 +50,17 @@ public class TopicConsumer {
         containerFactory = "topicJmsListenerContainerFactory",
         subscription = "${amqp.subscription}"
     )
-    @ConditionalOnProperty(name = "feature.bypass-evidence-share-service.enabled", havingValue = "true")
     public void onMessage(String message, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
-        processMessageWithRetry(message, 1, messageId);
+        processEvidenceShareMessageWithRetry(message, 1, messageId);
+        if (isNotificationServiceBypassed) {
+            notificationsMessageProcessor.processMessage(message, messageId);
+        }
     }
 
-    private void processMessageWithRetry(String message, int retry, String messageId) {
+    private void processEvidenceShareMessageWithRetry(String message, int retry, String messageId) {
         try {
             log.info("Message Id {} received from the service bus by evidence share service", messageId);
-            processMessage(message, messageId);
+            processMessageForEvidenceShare(message, messageId);
         } catch (Exception e) {
             if (retry > maxRetryAttempts || isException(e)) {
                 log.error(format("Caught unknown unrecoverable error %s for message id %s", e.getMessage(), messageId), e);
@@ -61,7 +69,7 @@ public class TopicConsumer {
                 log.info(String.format("Caught recoverable error %s, retrying %s out of %s for message id %s",
                     e.getMessage(), retry, maxRetryAttempts, messageId));
 
-                processMessageWithRetry(message, retry + 1, messageId);
+                processEvidenceShareMessageWithRetry(message, retry + 1, messageId);
             }
         }
     }
@@ -70,7 +78,7 @@ public class TopicConsumer {
         return e instanceof IssueFurtherEvidenceException || e instanceof PostIssueFurtherEvidenceTasksException;
     }
 
-    private void processMessage(String message, String messageId) {
+    private void processMessageForEvidenceShare(String message, String messageId) {
         try {
             Callback<SscsCaseData> callback = sscsDeserializer.deserialize(message);
             dispatcher.handle(SUBMITTED, callback);
@@ -86,3 +94,5 @@ public class TopicConsumer {
         }
     }
 }
+
+
