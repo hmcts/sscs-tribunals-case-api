@@ -58,7 +58,6 @@ import uk.gov.hmcts.reform.sscs.service.ScheduledTaskRunner;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.*;
-import uk.gov.hmcts.reform.sscs.service.ScheduledTaskRunner;
 import uk.gov.service.notify.NotificationClient;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
