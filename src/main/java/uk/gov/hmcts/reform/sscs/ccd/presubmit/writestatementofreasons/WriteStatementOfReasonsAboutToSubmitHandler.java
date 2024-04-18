@@ -51,8 +51,6 @@ public class WriteStatementOfReasonsAboutToSubmitHandler implements PreSubmitCal
                 DocumentType.STATEMENT_OF_REASONS);
         }
 
-        caseData.getDocumentStaging().setPreviewDocument(null);
-
         return response;
     }
 
