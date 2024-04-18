@@ -194,7 +194,16 @@ If you need to run the CCD provider test against the Preview environment for a p
     @VersionSelector(tag = "feature_branch_name")})
 
 ```
+### Cron tasks
 
+- You can run a cron task locally by setting the `TASK_NAME` environment variable.
+
+   ```bash
+   #Example
+   TASK_NAME=MigrateCasesTask ./gradlew bootRun
+   ```
+- You can run a cron task in preview by adding `pr-labels:job` label on the PR in Github. Configure any additional configuration needed in [values.job.preview.template.yaml](charts/sscs-tribunals-api/values.job.preview.template.yaml)
+- Refer to [this sample](https://github.com/hmcts/cnp-flux-config/tree/8a819d0f5d1d35f5d8c1e8610d8662419f0a0d1b/apps/sscs/sscs-cron) for setting up cron task in flux.
 
 ## Gotchas
 
