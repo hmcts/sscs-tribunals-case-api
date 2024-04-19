@@ -55,6 +55,16 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
           alias: ld.sdk-key
         - name: sscs-sendgrid-api-key
           alias: send-grid.apiKey
+        - name: notification-key
+          alias: NOTIFICATION_API_KEY
+        - name: notification-test-key
+          alias: NOTIFICATION_API_TEST_KEY
+        - name: tya-notif-POSTGRES-PASS-FLEX-V15
+          alias: JOB_SCHEDULER_DB_PASSWORD
+        - name: sscs-email-mac-secret-text
+          alias: EMAIL_MAC_SECRET_TEXT
+        - name: tya-link
+          alias: SSCS_TRACK_YOUR_APPEAL_LINK
 
   environment:
     SERVER_PORT: 8080
@@ -72,6 +82,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     DOCMOSIS_SERVICE_BASE_URL: https://docmosis.aat.platform.hmcts.net/rs/render
     DOC_ASSEMBLY_URL: "http://dg-docassembly-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_OAUTH2_REDIRECT_URL: "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
+    IDAM_OAUTH2_CLIENT_ID: "sscs"
     PDF_API_URL: "http://rpe-pdf-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
@@ -93,9 +104,6 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     UPLOAD_HEARING_FILTER_ENABLED: false
     CITIZEN_LOGIN_SERVICE_V2: false
     ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: false
-    IDAM_OAUTH2_CLIENT_ID: "sscs"
-    CORE_CASE_DATA_JURISDICTION_ID: SSCS
-    CORE_CASE_DATA_CASE_TYPE_ID: Benefit
     SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     SEND_LETTER_SERVICE_ENABLED: "true"
     TRUST_ALL_CERTS: "true"
@@ -112,6 +120,31 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     EMAIL_SMTP_SSL_TRUST: "*"
     BYPASS_EVIDENCE_SHARE_SERVICE: false
     HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: false
+    INFRASTRUCTURE_ENV: preprod
+    CORE_CASE_DATA_JURISDICTION_ID: SSCS
+    CORE_CASE_DATA_CASE_TYPE_ID: Benefit
+    JOB_SCHEDULER_POLL_INTERVAL: "30000"
+    JOB_SCHEDULER_DB_PORT: "5432"
+    JOB_SCHEDULER_DB_USERNAME: pgadmin
+    JOB_SCHEDULER_DB_NAME: notification
+    JOB_SCHEDULER_DB_HOST: sscs-tya-notif-postgres-v15-db-{{ .Values.global.environment }}.postgres.database.azure.com
+    EVIDENCE_SUBMISSION_INFO_LINK: "https://track-appeal.{{ .Values.global.environment }}.platform.hmcts.net/evidence/appeal_id"
+    SSCS_MANAGE_EMAILS_LINK: "https://sscs-cor.{{ .Values.global.environment }}.platform.hmcts.net/manage-email-notifications/mac"
+    SSCS_TRACK_YOUR_APPEAL_LINK: "https://track-appeal.nonprod.platform.hmcts.net/trackyourappeal/appeal_id"
+    MYA_LINK: "https://sscs-cor.aat.platform.hmcts.net/sign-in?tya=appeal_id"
+    HEARING_INFO_LINK: "https://track-appeal.{{ .Values.global.environment }}.platform.hmcts.net/abouthearing/appeal_id"
+    CLAIMING_EXPENSES_LINK: "https://track-appeal.{{ .Values.global.environment }}.platform.hmcts.net/expenses/appeal_id"
+    MYA_EVIDENCE_LINK: "https://sscs-cor.aat.platform.hmcts.net/support-evidence"
+    MYA_HEARING_LINK: "https://sscs-cor.aat.platform.hmcts.net/support-hearing"
+    MYA_EXPENSES_LINK: "https://sscs-cor.aat.platform.hmcts.net/support-hearing-expenses"
+    COH_URL: "http://coh-cor-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    ONLINE_HEARING_LINK: "https://sscs-cor-frontend-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    JOB_SCHEDULER_DB_CONNECTION_OPTIONS: ?sslmode=require
+    MAX_ACTIVE_DB_CONNECTIONS: 70
+    HOURS_START_TIME: 5
+    HOURS_END_TIME: 17
+    RUN_DB_MIGRATION_ON_STARTUP: false
+
 
 idam-pr:
   enabled: false
