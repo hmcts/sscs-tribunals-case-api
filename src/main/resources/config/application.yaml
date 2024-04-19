@@ -436,6 +436,7 @@ tya.evidence.address.scottishPostcode: CM20 9TT
 tya.evidence.address.telephone: 0300 123 1142
 tya.evidence.address.telephoneWelsh: 0300 303 5170
 tya.evidence.address.scottishPoBoxFeatureEnabled: ${SCOTTISH_PO_BOX_ENABLED:false}
+tya.evidence.submission.info.link: ${EVIDENCE_SUBMISSION_INFO_LINK:http://localhost:3000/evidence/appeal_id}
 
 helpline:
     telephone: 0300 123 1142
