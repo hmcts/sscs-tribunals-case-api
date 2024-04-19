@@ -142,7 +142,7 @@ class WriteStatementOfReasonsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void verifyThatAfterStatementOfReasonsIsSubmitted_PreviewDocumentIsSetToNull() {
+    void assertThatAfterStatementOfReasonsIsSubmitted_PreviewDocumentIsSetToNull() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         DocumentLink documentLink = DocumentLink.builder()
