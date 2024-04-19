@@ -167,6 +167,7 @@ public class IssueDocumentHandler {
                 .documentBinaryUrl(generatedFileUrl + "/binary")
                 .documentUrl(generatedFileUrl)
                 .build();
+
         setDocumentOnCaseData(caseData, previewFile);
 
         return response;
