@@ -20,8 +20,7 @@
       {
         "date": "2017-03-08T12:01:47.620Z",
         "type": "APPEAL_RECEIVED",
-        "contentKey": "status.appealReceived",
-        "dwpResponseDate": "2017-04-12T11:01:47.620Z"
+        "contentKey": "status.appealReceived"
       }
     ],
     "regionalProcessingCenter": {
