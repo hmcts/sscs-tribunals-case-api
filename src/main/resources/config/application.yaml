@@ -420,22 +420,34 @@ online.hearing.link: ${ONLINE_HEARING_LINK:http://localhost:8081}
 
 mya:
     link: ${MYA_LINK:http://localhost:8081/sign-in/tya=appeal_id}
-    evidence.submission.info.link: ${MYA_EVIDENCE_LINK:http://localhost:8081/support-evidence}
-    hearing.info.link: ${MYA_HEARING_LINK:http://localhost:8081/support-hearing}
-    claiming.expenses.link: ${MYA_EXPENSES_LINK:http://localhost:8081/support-hearing-expenses}
+    evidence:
+        submission:
+            info:
+                link: ${MYA_EVIDENCE_LINK:http://localhost:8081/support-evidence}
+    hearing:
+        info:
+            link: ${MYA_HEARING_LINK:http://localhost:8081/support-hearing}
+    claiming:
+        expenses:
+            link: ${MYA_EXPENSES_LINK:http://localhost:8081/support-hearing-expenses}
 
-tya.evidence.address.line1:
-tya.evidence.address.line2: HMCTS SSCS
-tya.evidence.address.line3: PO BOX 12626
-tya.evidence.address.town: Harlow
-tya.evidence.address.county: Essex
-tya.evidence.address.postcode: CM20 9QF
-tya.evidence.address.scottishLine3: PO BOX 13150
-tya.evidence.address.scottishPostcode: CM20 9TT
-tya.evidence.address.telephone: 0300 123 1142
-tya.evidence.address.telephoneWelsh: 0300 303 5170
-tya.evidence.address.scottishPoBoxFeatureEnabled: ${SCOTTISH_PO_BOX_ENABLED:false}
-tya.evidence.submission.info.link: ${EVIDENCE_SUBMISSION_INFO_LINK:http://localhost:3000/evidence/appeal_id}
+tya:
+    evidence:
+        submission:
+            info:
+            link: ${EVIDENCE_SUBMISSION_INFO_LINK:http://localhost:8081/evidence/appeal_id}
+    address:
+        line1: 0
+        line2: HMCTS SSCS
+        line3: PO BOX 12626
+        town: Harlow
+        county: Essex
+        postcode: CM20 9QF
+        scottishLine3: PO BOX 13150
+        scottishPostcode: CM20 9TT
+        telephone: 0300 123 1142
+        telephoneWelsh: 0300 303 5170
+        scottishPoBoxFeatureEnabled: ${SCOTTISH_PO_BOX_ENABLED:false}
 
 helpline:
     telephone: 0300 123 1142
