@@ -217,6 +217,7 @@ public class IssueDocumentHandler {
      */
     protected void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file) {
         caseData.getDocumentStaging().setPreviewDocument(file);
+        log.info("set PreviewDocument is {}", caseData.getDocumentStaging().getPreviewDocument());
     }
 
     /**
@@ -225,6 +226,7 @@ public class IssueDocumentHandler {
      * @return DocumentLink
      */
     protected DocumentLink getDocumentFromCaseData(SscsCaseData caseData) {
+        log.info("PreviewDocument from case data {}", caseData.getDocumentStaging().getPreviewDocument());
         return caseData.getDocumentStaging().getPreviewDocument();
     }
 
