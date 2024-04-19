@@ -258,7 +258,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         if (nonNull(caseData.getDocumentStaging().getPreviewDocument()) && callback.getEvent() == EventType.DIRECTION_ISSUED) {
             url = caseData.getDocumentStaging().getPreviewDocument();
-            log.info("Direction issued filename = {} url = {}", caseData.getDocumentStaging().getPreviewDocument().getDocumentFilename(), caseData.getDocumentStaging().getPreviewDocument().getDocumentUrl());
         } else if (caseData.getSscsInterlocDirectionDocument() != null && callback.getEvent() == EventType.DIRECTION_ISSUED) {
 
             url = caseData.getSscsInterlocDirectionDocument().getDocumentLink();
