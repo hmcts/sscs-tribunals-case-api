@@ -354,7 +354,7 @@ public class TrackYourAppealJsonBuilder {
     }
 
     private boolean isDwpRespondOverdue(Event event, String benefitCode) {
-        return ADMIN_SEND_TO_WITH_DWP.equals(getEventType(event))
+        return APPEAL_RECEIVED.equals(getEventType(event))
             && LocalDateTime.now().isAfter(LocalDateTime.parse(event.getValue().getDate()).plusDays(
                 dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode)));
     }
