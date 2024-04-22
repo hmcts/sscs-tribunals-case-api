@@ -1970,7 +1970,9 @@ spring:
         mapper:
             accept-case-insensitive-enums: true
             accept-case-insensitive-properties: true
-
+    quartz:
+        jdbc:
+             initialize-schema: always
 job.scheduler:
     retryPolicy:
         maxNumberOfJobExecutions: 2
