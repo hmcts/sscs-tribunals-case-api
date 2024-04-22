@@ -282,6 +282,8 @@ feature:
         enabled: ${TRIGGER_EVENT_V2_ENABLED:false}
     bypass-notifications-service:
         enabled: ${BYPASS_NOTIFICATIONS_SERVICE:false}
+
+idam:
     api:
         url: ${IDAM_API_URL:http://localhost:5062}
     client:
