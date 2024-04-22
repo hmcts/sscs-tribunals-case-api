@@ -435,7 +435,7 @@ tya:
     evidence:
         submission:
             info:
-            link: ${EVIDENCE_SUBMISSION_INFO_LINK:http://localhost:8081/evidence/appeal_id}
+                 link: ${EVIDENCE_SUBMISSION_INFO_LINK:http://localhost:8081/evidence/appeal_id}
     address:
         line1: 0
         line2: HMCTS SSCS
