@@ -51,8 +51,12 @@ public class TopicConsumer {
         subscription = "${amqp.subscription}"
     )
     public void onMessage(String message, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
+        log.info("Message Id {} received from the service bus", messageId);
         processEvidenceShareMessageWithRetry(message, 1, messageId);
+
+        log.info("Determining if notification service should be bypassed {} ", isNotificationServiceBypassed ? "Yes" : "No");
         if (isNotificationServiceBypassed) {
+            log.info("Bypassing notification service for message id {}", messageId);
             notificationsMessageProcessor.processMessage(message, messageId);
         }
     }

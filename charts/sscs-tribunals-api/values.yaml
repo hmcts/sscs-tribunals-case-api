@@ -55,6 +55,16 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
           alias: ld.sdk-key
         - name: sscs-sendgrid-api-key
           alias: send-grid.apiKey
+        - name: notification-key
+          alias: NOTIFICATION_API_KEY
+        - name: notification-test-key
+          alias: NOTIFICATION_API_TEST_KEY
+        - name: tya-notif-POSTGRES-PASS-FLEX-V15
+          alias: JOB_SCHEDULER_DB_PASSWORD
+        - name: sscs-email-mac-secret-text
+          alias: EMAIL_MAC_SECRET_TEXT
+        - name: tya-link
+          alias: SSCS_TRACK_YOUR_APPEAL_LINK
 
   environment:
     SERVER_PORT: 8080
