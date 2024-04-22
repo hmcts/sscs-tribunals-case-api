@@ -280,8 +280,8 @@ feature:
         enabled: ${URGENT_HEARING_ENABLED:false}
     trigger-eventV2:
         enabled: ${TRIGGER_EVENT_V2_ENABLED:false}
-
-idam:
+    bypass-notifications-service:
+        enabled: ${BYPASS_NOTIFICATIONS_SERVICE:false}
     api:
         url: ${IDAM_API_URL:http://localhost:5062}
     client:
@@ -1750,6 +1750,7 @@ feature.secure-doc-store.enabled: ${SECURE_DOC_STORE_FEATURE:false}
 feature.postHearings.enabled: ${POST_HEARINGS_FEATURE:false}
 feature.postHearingsB.enabled: ${POST_HEARINGS_B_FEATURE:false}
 feature.elinksV2.enabled: false
+
 
 letterAsync:
     maxAttempts: ${LETTER_ASYNC_MAX_ATTEMPTS:5}
