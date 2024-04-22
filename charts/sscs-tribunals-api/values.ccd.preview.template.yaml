@@ -767,6 +767,5 @@ servicebus:
       - name: main-topic
         subscriptionNeeded: yes
     queues:
-      - name: sscs-orchestrator-queue-preview
       - name: tribunals-to-hearing-api
 
