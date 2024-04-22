@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.127
+version: 0.0.138
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -9,6 +9,11 @@ dependencies:
   - name: java
     version: 5.0.0
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    condition: java.enabled
+  - name: job
+    version: 2.1.1
+    repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    condition: job.enabled
   - name: idam-pr
     version: 2.3.0
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
@@ -25,10 +30,6 @@ dependencies:
     version: 0.0.42
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-tya-notif.enabled
-  - name: sscs-ccd-callback-orchestrator
-    version: 0.0.31
-    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-    condition: sscs-ccd-callback-orchestrator.enabled
   - name: ccd
     version: 8.0.29
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
@@ -55,11 +56,11 @@ dependencies:
     version: 0.0.31
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-hearings-api.enabled
-  - name: hmc-cft-hearing-service
-    version: 1.6.14
-    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-    condition: hmc-cft-hearing-service.enabled
   - name: servicebus
     version: 1.0.4
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: servicebus.enabled
+  - name: ccd-def-cleanup
+    version: ~9.0.3
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: ccd-def-cleanup.enabled

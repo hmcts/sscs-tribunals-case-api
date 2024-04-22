@@ -60,7 +60,8 @@
       "description": "Personal Independence Payment"
     },
     "hearingOptions": {
-      "wantsToAttend": "Yes"
+      "wantsToAttend": "Yes",
+      "languages": null
     },
     "appealReasons": {
       "reasons": [

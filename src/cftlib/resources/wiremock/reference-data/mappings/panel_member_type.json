@@ -1,0 +1,311 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/refdata/commondata/lov/categories/PanelMemberType",
+    "queryParameters": {
+      "serviceId": {
+        "equalTo": "BBA3"
+      },
+      "isChildRequired": {
+        "equalTo": "Y"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "list_of_values": [
+        {
+          "category_key": "PanelMemberType",
+          "key": "69",
+          "value_en": "Regional Medical Member",
+          "value_cy": "",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "PanelMemberType",
+          "key": "44",
+          "value_en": "Tribunal Member Disability",
+          "value_cy": "",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "PanelMemberType",
+          "key": "50",
+          "value_en": "Tribunal Member Financially Qualified",
+          "value_cy": "",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": null
+        },
+        {
+          "category_key": "PanelMemberType",
+          "key": "58",
+          "value_en": "Tribunal Member Medical",
+          "value_cy": "",
+          "hint_text_en": "",
+          "hint_text_cy": "",
+          "lov_order": null,
+          "parent_category": "",
+          "parent_key": "",
+          "active_flag": "Y",
+          "child_nodes": [
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "1",
+              "value_en": "Cardiologist",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "2",
+              "value_en": "Carer",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "13",
+              "value_en": "Chest Physician",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "15",
+              "value_en": "Chest Specialist",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "5",
+              "value_en": "Dermatologist",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "6",
+              "value_en": "ENT Surgeon",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "3",
+              "value_en": "Eye Surgeon",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "8",
+              "value_en": "General Physician",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "4",
+              "value_en": "General Practitioner",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "10",
+              "value_en": "General Surgeon",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "9",
+              "value_en": "Neurologist",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "11",
+              "value_en": "Orthopaedic Surgeon",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "16",
+              "value_en": "Paediatrician",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "12",
+              "value_en": "Plastic Surgeon",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "7",
+              "value_en": "Psychiatrist",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "18",
+              "value_en": "Renal Physician",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "17",
+              "value_en": "Rheumatic Physician",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            },
+            {
+              "category_key": "PanelMemberSpecialism",
+              "key": "14",
+              "value_en": "Urologist",
+              "value_cy": "",
+              "hint_text_en": "",
+              "hint_text_cy": "",
+              "lov_order": null,
+              "parent_category": "PanelMemberType",
+              "parent_key": "58",
+              "active_flag": "Y",
+              "child_nodes": null
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -112,6 +112,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandlerTest extends BaseH
                 "data.appeal.appellant.appointee.id",
                 "data.appeal.appellant.id",
                 "data.appeal.rep.id",
+                "data.appeal.hearingOptions",
                 "data.correction",
                 "data.correctionBodyContent",
                 "data.bodyContent",
