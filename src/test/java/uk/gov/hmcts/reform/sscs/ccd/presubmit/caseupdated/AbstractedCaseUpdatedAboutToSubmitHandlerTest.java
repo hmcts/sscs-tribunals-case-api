@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -28,6 +29,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -46,10 +49,9 @@ import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
 import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService;
 import uk.gov.hmcts.reform.sscs.service.*;
 
-
 @Slf4j
 @ExtendWith(MockitoExtension.class)
-public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
+public class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -85,6 +87,9 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     @Mock
     private SessionCategoryMapService categoryMapService;
 
+    @Captor
+    private ArgumentCaptor<Consumer<SscsCaseData>> caseDetailsCaptor;
+
     private CaseUpdatedAboutToSubmitHandler handler;
 
     private SscsCaseData sscsCaseData;
@@ -93,13 +98,9 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
 
     private Appeal appeal;
 
-    abstract boolean getAddLinkToOtherAssociatedCasesV2();
-
     @BeforeEach
     void setUp() {
-        Boolean addLinkToOtherAssociatedCasesV2Boolean = getAddLinkToOtherAssociatedCasesV2();
         AssociatedCaseLinkHelper associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService, updateCcdCaseService);
-        ReflectionTestUtils.setField(associatedCaseLinkHelper, "addLinkToOtherAssociatedCasesV2Enabled", addLinkToOtherAssociatedCasesV2Boolean);
 
         handler = new CaseUpdatedAboutToSubmitHandler(
             regionalProcessingCenterService,
@@ -555,8 +556,6 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         assertThrows(IllegalStateException.class, () ->
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION));
     }
-
-    abstract void verifyUpdateCcdCaseServiceIsCalledWithExpectedValues(UpdateCcdCaseService updateCcdCaseService, SscsCaseDetails matchingCase1, SscsCaseDetails matchingCase2);
 
     @Test
     void givenMultipleAssociatedCases_thenAddAllAssociatedCaseLinksToCase() {
@@ -1766,5 +1765,13 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         String language = sscsCaseData.getAppeal().getHearingOptions().getLanguages();
 
         assertEquals(language, item.getLabel());
+    }
+
+    void verifyUpdateCcdCaseServiceIsCalledWithExpectedValues(UpdateCcdCaseService updateCcdCaseService, SscsCaseDetails matchingCase1, SscsCaseDetails matchingCase2) {
+        verify(updateCcdCaseService).updateCaseV2(eq(12345678L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class), caseDetailsCaptor.capture());
+        caseDetailsCaptor.getValue().accept(matchingCase1.getData());
+
+        verify(updateCcdCaseService).updateCaseV2(eq(56765676L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class), caseDetailsCaptor.capture());
+        caseDetailsCaptor.getValue().accept(matchingCase2.getData());
     }
 }
