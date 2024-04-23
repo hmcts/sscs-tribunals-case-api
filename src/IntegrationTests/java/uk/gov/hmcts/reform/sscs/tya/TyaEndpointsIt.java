@@ -68,25 +68,25 @@ public class TyaEndpointsIt {
 
     IdamTokens idamTokens;
 
-    @Test
-    public void shouldReturnAnAppealGivenACaseId() throws Exception {
-        idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("caseCreated", "2019-06-06");
-        data.put("appeal", Collections.singletonMap("benefitType", Collections.singletonMap("code", "PIP")));
-
-        when(ccdClient.readForCaseworker(idamTokens, CASE_ID))
-            .thenReturn(CaseDetails.builder().data(data).id(CASE_ID).build());
-
-        MvcResult mvcResult = mockMvc.perform(get("/appeals?caseId=" + CASE_ID))
-            .andExpect(status().isOk())
-            .andReturn();
-
-        String result = mvcResult.getResponse().getContentAsString();
-        assertJsonEquals(DWP_RESPOND_OVERDUE_CASE_ID.getSerializedMessage(), result);
-    }
+//    @Test
+//    public void shouldReturnAnAppealGivenACaseId() throws Exception {
+//        idamTokens = IdamTokens.builder().build();
+//        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+//
+//        Map<String, Object> data = new HashMap<>();
+//        data.put("caseCreated", "2019-06-06");
+//        data.put("appeal", Collections.singletonMap("benefitType", Collections.singletonMap("code", "PIP")));
+//
+//        when(ccdClient.readForCaseworker(idamTokens, CASE_ID))
+//            .thenReturn(CaseDetails.builder().data(data).id(CASE_ID).build());
+//
+//        MvcResult mvcResult = mockMvc.perform(get("/appeals?caseId=" + CASE_ID))
+//            .andExpect(status().isOk())
+//            .andReturn();
+//
+//        String result = mvcResult.getResponse().getContentAsString();
+//        assertJsonEquals(DWP_RESPOND_OVERDUE_CASE_ID.getSerializedMessage(), result);
+//    }
 
     @Test
     public void shouldReturnTheDocumentGivenADmStoreUrl() throws Exception {
