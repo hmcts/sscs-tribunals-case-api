@@ -22,6 +22,10 @@ dependencies:
     version: 1.0.9
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: xui-webapp.enabled
+  - name: sscs-evidence-share
+    version: 0.0.49
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: sscs-evidence-share.enabled
   - name: sscs-tya-notif
     version: 0.0.42
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
