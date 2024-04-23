@@ -49,7 +49,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.service.event.PaperCaseEventFilterUtil;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
-import uk.gov.hmcts.reform.sscs.utility.dwpResponseUtil;
 
 @Slf4j
 @Service
@@ -356,7 +355,7 @@ public class TrackYourAppealJsonBuilder {
     private boolean isDwpRespondOverdue(Event event, String benefitCode) {
         return APPEAL_RECEIVED.equals(getEventType(event))
             && LocalDateTime.now().isAfter(LocalDateTime.parse(event.getValue().getDate()).plusDays(
-                dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode)));
+               35));
     }
 
     private ArrayNode buildEventArray(List<Event> events, Map<Event, Document> eventDocumentMap, Map<Event, Hearing> eventHearingMap, String benefitCode) {
@@ -418,7 +417,7 @@ public class TrackYourAppealJsonBuilder {
     private void buildEventNode(Event event, ObjectNode eventNode, Map<Event, Document> eventDocumentMap, Map<Event, Hearing> eventHearingMap, String benefitCode) {
         switch (getEventType(event)) {
             case SENT_TO_DWP, DWP_RESPOND_OVERDUE ->
-                    eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode), true));
+                    eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, 35, true));
             case EVIDENCE_RECEIVED -> {
                 Document document = eventDocumentMap.get(event);
                 if (document != null) {
