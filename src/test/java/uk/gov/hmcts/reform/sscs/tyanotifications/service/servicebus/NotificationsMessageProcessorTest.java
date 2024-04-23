@@ -51,6 +51,7 @@ public class NotificationsMessageProcessorTest {
     @Test
     public void anExceptionWillBeCaught() {
         exception = EXCEPTION;
+        when(filterNotificationsEventsHandler.canHandle(any())).thenReturn(Boolean.TRUE);
         doThrow(exception).when(filterNotificationsEventsHandler).handle(any());
         topicConsumer.processMessage(MESSAGE, "1");
         verify(filterNotificationsEventsHandler, atLeastOnce()).handle(any());
@@ -60,14 +61,17 @@ public class NotificationsMessageProcessorTest {
     @Test
     public void nullPointerExceptionWillBeCaught() {
         exception = new NullPointerException();
+        when(filterNotificationsEventsHandler.canHandle(any())).thenReturn(Boolean.TRUE);
         doThrow(exception).when(filterNotificationsEventsHandler).handle(any());
         topicConsumer.processMessage(MESSAGE, "1");
+
         verify(filterNotificationsEventsHandler, atLeastOnce()).handle(any());
     }
 
     @Test
     public void clientAuthorisationExceptionWillBeCaught() {
         exception = new ClientAuthorisationException(EXCEPTION);
+        when(filterNotificationsEventsHandler.canHandle(any())).thenReturn(Boolean.TRUE);
         doThrow(exception).when(filterNotificationsEventsHandler).handle(any());
         topicConsumer.processMessage(MESSAGE, "1");
         verify(filterNotificationsEventsHandler, atLeastOnce()).handle(any());
@@ -75,6 +79,7 @@ public class NotificationsMessageProcessorTest {
 
     @Test
     public void handleValidRequest() {
+        when(filterNotificationsEventsHandler.canHandle(any())).thenReturn(Boolean.TRUE);
         topicConsumer.processMessage(MESSAGE, "1");
         verify(filterNotificationsEventsHandler).handle(any());
     }

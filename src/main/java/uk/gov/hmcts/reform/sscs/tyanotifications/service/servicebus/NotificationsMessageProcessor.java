@@ -58,7 +58,15 @@ public class NotificationsMessageProcessor {
                 sscsCaseDataWrapper.getNewSscsCaseData().getCcdCaseId(),
                 sscsCaseDataWrapper.getNotificationEventType(),
                 messageId);
-            filterNotificationsEventsHandler.handle(sscsCaseDataWrapper);
+
+            if (filterNotificationsEventsHandler.canHandle(sscsCaseDataWrapper)) {
+                log.info("Handling notifications for Sscs Case CCD callback `{}` for Case ID `{}` with message id {}",
+                    callback.getEvent(),
+                    callback.getCaseDetails().getId(),
+                    messageId);
+                filterNotificationsEventsHandler.handle(sscsCaseDataWrapper);
+            }
+
             log.info("Sscs Case CCD callback `{}` handled for Case ID `{}` with message id {}", callback.getEvent(),
                 callback.getCaseDetails().getId(),
                 messageId);

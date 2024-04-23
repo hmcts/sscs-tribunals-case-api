@@ -19,28 +19,28 @@ spring:
             max-request-size: ${MAX_REQUEST_SIZE:10MB}
 
     datasource:
-            driverClassName: org.postgresql.Driver
-            url: jdbc:postgresql://${JOB_SCHEDULER_DB_HOST:localhost}:${JOB_SCHEDULER_DB_PORT:5432}/${JOB_SCHEDULER_DB_NAME:sscsjobscheduler}${JOB_SCHEDULER_DB_CONNECTION_OPTIONS:}
-            username: ${JOB_SCHEDULER_DB_USERNAME:sscsjobscheduler}
-            password: ${JOB_SCHEDULER_DB_PASSWORD:sscsjobscheduler}
-            properties:
-                charSet: UTF-8
-            tomcat:
-                max-active: 10
-                max-idle: 10
-                min-idle: 2
-                max-wait: 10000
-                test-on-borrow: true
-                test-on-connect: true
-                test-on-idle: true
-                validation-query: "SELECT 1"
-                time-between-eviction-runs-millis: 10000
-                test-while-idle: true
-                test-on-return: true
-                remove-abandoned: true
-                remove-abandoned-timeout: 60
-                log-abandoned: true
-                abandon-when-percentage-full: 0
+        driverClassName: org.postgresql.Driver
+        url: jdbc:postgresql://${JOB_SCHEDULER_DB_HOST:localhost}:${JOB_SCHEDULER_DB_PORT:5432}/${JOB_SCHEDULER_DB_NAM:sscsjobscheduler}${JOB_SCHEDULER_DB_CONNECTION_OPTIONS:}
+        username: ${JOB_SCHEDULER_DB_USERNAME:sscsjobscheduler}
+        password: ${JOB_SCHEDULER_DB_PASSWORD:sscsjobscheduler}
+        properties:
+            charSet: UTF-8
+        tomcat:
+            max-active: 10
+            max-idle: 10
+            min-idle: 2
+            max-wait: 10000
+            test-on-borrow: true
+            test-on-connect: true
+            test-on-idle: true
+            validation-query: "SELECT 1"
+            time-between-eviction-runs-millis: 10000
+            test-while-idle: true
+            test-on-return: true
+            remove-abandoned: true
+            remove-abandoned-timeout: 60
+            log-abandoned: true
+            abandon-when-percentage-full: 0
 
 spring.main.allow-bean-definition-overriding: true  # https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.1-Release-Notes#bean-overriding
 
@@ -1973,9 +1973,6 @@ spring:
         mapper:
             accept-case-insensitive-enums: true
             accept-case-insensitive-properties: true
-    quartz:
-        jdbc:
-             initialize-schema: always
 job.scheduler:
     retryPolicy:
         maxNumberOfJobExecutions: 2
