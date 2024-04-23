@@ -7,7 +7,9 @@ import java.util.concurrent.TimeUnit;
 import javax.validation.ValidatorFactory;
 import okhttp3.OkHttpClient;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -31,6 +33,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
+import uk.gov.hmcts.reform.sscs.service.ScheduledTaskRunner;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @EnableFeignClients(basePackages = {
@@ -40,12 +43,16 @@ import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
     "uk.gov.hmcts.reform.docassembly",
     "uk.gov.hmcts.reform.sscs.thirdparty",
     "uk.gov.hmcts.reform.idam",
-    "uk.gov.hmcts.reform.sscs.client"
+    "uk.gov.hmcts.reform.sscs.client",
+    "uk.gov.hmcts.reform.sendletter",
+    "uk.gov.hmcts.reform.ccd.client"
 })
-@ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
+
+@ComponentScan(basePackages = {"uk.gov.hmcts.reform", "uk.gov.hmcts.reform.sscs",
+    "uk.gov.hmcts.reform.ccd.document.am"})
 @EnableScheduling
 @EnableRetry
-public class TribunalsCaseApiApplication {
+public class TribunalsCaseApiApplication implements CommandLineRunner {
 
     @Value("${appeal.email.host}")
     private String emailHost;
@@ -56,8 +63,21 @@ public class TribunalsCaseApiApplication {
     @Value("${appeal.email.smtp.tls.enabled}")
     private String smtpTlsEnabled;
 
+    @Autowired
+    private ScheduledTaskRunner taskRunner;
+
     public static void main(String[] args) {
-        SpringApplication.run(TribunalsCaseApiApplication.class, args);
+        final var instance = SpringApplication.run(TribunalsCaseApiApplication.class, args);
+        if (System.getenv("TASK_NAME") != null) {
+            instance.close();
+        }
+    }
+
+    @Override
+    public void run(String... args) {
+        if (System.getenv("TASK_NAME") != null) {
+            taskRunner.run(System.getenv("TASK_NAME"));
+        }
     }
 
     @Bean
@@ -90,9 +110,9 @@ public class TribunalsCaseApiApplication {
         javaMailSender.setHost(emailHost);
         javaMailSender.setPort(emailPort);
         Properties properties = new Properties();
-        properties.setProperty("mail.transport.protocol","smtp");
+        properties.setProperty("mail.transport.protocol", "smtp");
         properties.setProperty("mail.smtp.starttls.enable", smtpTlsEnabled);
-        properties.put("mail.smtp.ssl.trust","*");
+        properties.put("mail.smtp.ssl.trust", "*");
         javaMailSender.setJavaMailProperties(properties);
         return javaMailSender;
     }
@@ -108,26 +128,27 @@ public class TribunalsCaseApiApplication {
     public OkHttpClient okHttpClient() {
         int timeout = 10;
         return new OkHttpClient.Builder()
-                .connectTimeout(timeout, TimeUnit.MINUTES)
-                .readTimeout(timeout, TimeUnit.MINUTES)
-                .retryOnConnectionFailure(true)
-                .build();
+            .connectTimeout(timeout, TimeUnit.MINUTES)
+            .readTimeout(timeout, TimeUnit.MINUTES)
+            .retryOnConnectionFailure(true)
+            .build();
     }
 
     @Bean
-    public CcdRequestDetails getRequestDetails(@Value("${core_case_data.jurisdictionId}") String coreCaseDataJurisdictionId,
-                                               @Value("${core_case_data.caseTypeId}") String coreCaseDataCaseTypeId) {
+    public CcdRequestDetails getRequestDetails(
+        @Value("${core_case_data.jurisdictionId}") String coreCaseDataJurisdictionId,
+        @Value("${core_case_data.caseTypeId}") String coreCaseDataCaseTypeId) {
         return CcdRequestDetails.builder()
-                .caseTypeId(coreCaseDataCaseTypeId)
-                .jurisdictionId(coreCaseDataJurisdictionId)
-                .build();
+            .caseTypeId(coreCaseDataCaseTypeId)
+            .jurisdictionId(coreCaseDataJurisdictionId)
+            .build();
     }
 
     @Bean
     public DocmosisPdfGenerationService docmosisPdfGenerationService(
-            @Value("${docmosis.uri}") String docmosisServiceEndpoint,
-            @Value("${docmosis.accessKey}") String docmosisServiceAccessKey,
-            RestTemplate restTemplate
+        @Value("${docmosis.uri}") String docmosisServiceEndpoint,
+        @Value("${docmosis.accessKey}") String docmosisServiceAccessKey,
+        RestTemplate restTemplate
     ) {
         return new DocmosisPdfGenerationService(docmosisServiceEndpoint, docmosisServiceAccessKey, restTemplate);
     }
