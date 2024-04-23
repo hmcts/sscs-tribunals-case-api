@@ -355,7 +355,7 @@ public class TrackYourAppealJsonBuilder {
     private boolean isDwpRespondOverdue(Event event, String benefitCode) {
         return APPEAL_RECEIVED.equals(getEventType(event))
             && LocalDateTime.now().isAfter(LocalDateTime.parse(event.getValue().getDate()).plusDays(
-               35));
+                dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode)));
     }
 
     private ArrayNode buildEventArray(List<Event> events, Map<Event, Document> eventDocumentMap, Map<Event, Hearing> eventHearingMap, String benefitCode) {
@@ -417,7 +417,7 @@ public class TrackYourAppealJsonBuilder {
     private void buildEventNode(Event event, ObjectNode eventNode, Map<Event, Document> eventDocumentMap, Map<Event, Hearing> eventHearingMap, String benefitCode) {
         switch (getEventType(event)) {
             case APPEAL_RECEIVED, DWP_RESPOND_OVERDUE ->
-                    eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, 35, true));
+                    eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode), true));
             case EVIDENCE_RECEIVED -> {
                 Document document = eventDocumentMap.get(event);
                 if (document != null) {
