@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.jms.JmsConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.EnableJms;
@@ -26,12 +25,13 @@ import uk.gov.hmcts.reform.sscs.service.servicebus.messaging.JmsErrorHandler;
 @Configuration
 @Slf4j
 @EnableJms
-@ConditionalOnProperty(name = "feature.jms.enabled", havingValue = "true", matchIfMissing = true)
 public class MessagingConfig {
 
     @Bean
-    public String jmsUrlString(@Value("${amqp.host}") final String host) {
-        return String.format("amqps://%1s?amqp.idleTimeout=3600000", host);
+    public String jmsUrlString(@Value("${amqp.amqp-connection-string-template}") final String amqpConnectionStringTemplate,
+                               @Value("${amqp.idleTimeout}") final Long idleTimeout,
+                               @Value("${amqp.host}") final String host) {
+        return String.format(amqpConnectionStringTemplate, host, idleTimeout);
     }
 
     @Bean
@@ -117,17 +117,6 @@ public class MessagingConfig {
     @Bean
     public JmsListenerContainerFactory topicJmsListenerContainerFactory(ConnectionFactory connectionFactory) {
         log.info("Creating JMSListenerContainer bean for topics..");
-        DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
-        returnValue.setConnectionFactory(connectionFactory);
-        returnValue.setSubscriptionDurable(Boolean.TRUE);
-        returnValue.setErrorHandler(new JmsErrorHandler());
-        return returnValue;
-    }
-
-
-    @Bean
-    public JmsListenerContainerFactory notificationsTopicJmsListenerContainerFactory(ConnectionFactory connectionFactory) {
-        log.info("Creating Notifications JMSListenerContainer bean for topics..");
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);
         returnValue.setSubscriptionDurable(Boolean.TRUE);
