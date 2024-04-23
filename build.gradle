@@ -333,7 +333,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
     
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'cf7d9d4'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '59cfe29'
 
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.4'
 
