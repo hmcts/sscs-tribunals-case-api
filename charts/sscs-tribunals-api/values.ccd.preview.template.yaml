@@ -1174,12 +1174,11 @@ sscs-cron-trigger:
     image: 'hmctspublic.azurecr.io/sscs/cron-trigger:pr-5'
     releaseNameOverride: ${SERVICE_NAME}-sscs-cron-trigger
     name: ${SERVICE_NAME}-sscs-cron-trigger
-    schedule: "0 10-17 * * *"
+    schedule: "0,15,30,45 10-17 * * *"
     keyVaults:
       sscs:
         secrets:
-          - name: app-insights-connection-string
-            alias: app_insights_connection_string
+          - app-insights-connection-string
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       IDAM_OAUTH2_CLIENT_ID: ${IDAM_OAUTH2_CLIENT_ID}
