@@ -56,10 +56,10 @@ ccd-callback-orchestrator:
         url=${CCD_CALLBACK_ORCHESTRATOR_API_URL:http://localhost:8070}:
 
 amqp:
-    host: ${AMQP_HOST:localhost}
+    host: ${AMQP_HOST:localhost:5672}
     password: ${AMQP_PASSWORD:guest}
     subscription: ${SUBSCRIPTION_NAME:test.queue}
-    topic: ${TOPIC_NAME:test.topic}
+    topic: ${TOPIC_NAME:sscs.topic}
     trustAllCerts: ${TRUST_ALL_CERTS:true}
     username: ${AMQP_USERNAME:guest}
     clientId: sscs-evidence-share
@@ -270,8 +270,6 @@ feature:
         enabled: ${UPLOAD_AUDIO_VIDEO_EVIDENCE_FEATURE:true}
     work-allocation:
         enabled: ${WORK_ALLOCATION_FEATURE:false}
-    bypass-evidence-share-service:
-        enabled: ${BYPASS_EVIDENCE_SHARE_SERVICE:false}
     issue-generic-letter:
         enabled: ${ISSUE_GENERIC_LETTER:false}
     scottish-po-box:
