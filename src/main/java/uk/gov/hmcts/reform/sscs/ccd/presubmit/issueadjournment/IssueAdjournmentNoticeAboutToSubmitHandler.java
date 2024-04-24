@@ -156,6 +156,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
             if (nonNull(adjournment)) {
                 adjournment.setPreviewDocument(null);
                 adjournment.setSignedInUser(null);
+                adjournment.setPanelMember1(JudicialUserBase.builder().build());
             }
         }
     }
