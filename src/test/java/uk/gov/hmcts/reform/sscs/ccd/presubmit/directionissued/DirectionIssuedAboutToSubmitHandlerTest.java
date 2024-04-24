@@ -710,4 +710,54 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getDateSentToDwp(), is(LocalDate.now().toString()));
         assertThat(response.getData().getDwpDueDate(), is(LocalDate.now().plusDays(expectedResponseDays).toString()));
     }
+
+    @Test
+    public void givenNoUploadedAndGeneratedDoc_thenReturnErrorAndThenReturnCaseDataPreviewDocWhenGenerateNoticeIsYes() {
+        sscsCaseData.getDocumentGeneration().setGenerateNotice(NO);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertFalse(response.getErrors().isEmpty());
+        assertNotNull(response.getData().getDocumentStaging().getPreviewDocument());
+    }
+
+    @Test
+    public void givenGenerateNoticeIsSetToNoAndInterlocDocIsNotNull_thenReturnRelevantDocLink() {
+        sscsCaseData.getDocumentGeneration().setGenerateNotice(NO);
+        assertFalse(sscsCaseData.getDocumentGeneration().getGenerateNotice().toBoolean());
+
+        SscsInterlocDirectionDocument interlocDoc = SscsInterlocDirectionDocument.builder()
+                .documentType("Doc type")
+                .documentFileName("Doc filename")
+                .documentLink(DocumentLink.builder()
+                        .documentFilename("testingDoc")
+                        .documentBinaryUrl(DOCUMENT_URL)
+                        .documentUrl(DOCUMENT_URL)
+                        .build()).build();
+
+        sscsCaseData.setSscsInterlocDirectionDocument(interlocDoc);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(interlocDoc.getDocumentLink(), response.getData().getSscsInterlocDirectionDocument().getDocumentLink());
+    }
+
+    public void givenGenerateNoticeIsSetToYesAndInterlocDocIsNotNull_thenReturnNull() {
+        assertTrue(sscsCaseData.getDocumentGeneration().getGenerateNotice().toBoolean());
+
+        SscsInterlocDirectionDocument interlocDoc = SscsInterlocDirectionDocument.builder()
+                .documentType("Doc type")
+                .documentFileName("Doc filename")
+                .documentLink(DocumentLink.builder()
+                        .documentFilename("testingDoc")
+                        .documentBinaryUrl(DOCUMENT_URL)
+                        .documentUrl(DOCUMENT_URL)
+                        .build()).build();
+
+        sscsCaseData.setSscsInterlocDirectionDocument(interlocDoc);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getSscsInterlocDirectionDocument());
+    }
 }

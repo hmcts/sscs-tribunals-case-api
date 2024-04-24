@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REJECT_
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
@@ -255,8 +256,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 new PreSubmitCallbackResponse<>(caseData);
 
         DocumentLink url = null;
-
-        if (nonNull(caseData.getDocumentStaging().getPreviewDocument()) && callback.getEvent() == EventType.DIRECTION_ISSUED) {
+        if (isYes(callback.getCaseDetails().getCaseData().getDocumentGeneration().getGenerateNotice()) && nonNull(caseData.getDocumentStaging().getPreviewDocument()) && callback.getEvent() == EventType.DIRECTION_ISSUED) {
             url = caseData.getDocumentStaging().getPreviewDocument();
         } else if (caseData.getSscsInterlocDirectionDocument() != null && callback.getEvent() == EventType.DIRECTION_ISSUED) {
 
