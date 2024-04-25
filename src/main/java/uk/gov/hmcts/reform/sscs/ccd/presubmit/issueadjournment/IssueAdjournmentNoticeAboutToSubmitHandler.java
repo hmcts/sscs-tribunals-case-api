@@ -152,12 +152,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
     private void clearAdjournmentTransientFields(SscsCaseData caseData) {
         if (isAdjournmentEnabled) {
-            Adjournment adjournment = caseData.getAdjournment();
-            if (nonNull(adjournment)) {
-                adjournment.setPreviewDocument(null);
-                adjournment.setSignedInUser(null);
-                adjournment.setPanelMember1(JudicialUserBase.builder().build());
-            }
+            caseData.setAdjournment(Adjournment.builder().build());
         }
     }
 
