@@ -18,7 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,7 +38,7 @@ public class ActionPostponementRequestSubmittedCallbackHandlerTest {
     @Mock SscsCaseDetails sscsCaseDetails;
 
     @Mock
-    CcdService ccdService;
+    UpdateCcdCaseService ccdService;
 
     @Mock
     IdamService idamService;
@@ -96,13 +96,13 @@ public class ActionPostponementRequestSubmittedCallbackHandlerTest {
         when(sscsCaseDetails.getData()).thenReturn(sscsCaseData);
         when(callback.getEvent()).thenReturn(EventType.ACTION_POSTPONEMENT_REQUEST);
         when(ccdService
-                .updateCase(any(), anyLong(), anyString(), anyString(), anyString(), any())
+                .triggerCaseEventV2(anyLong(), anyString(), anyString(), anyString(), any())
         ).thenReturn(sscsCaseDetails);
         sscsCaseData.getPostponementRequest().setActionPostponementRequestSelected(processRequestAction.getValue());
 
         var result = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertThat(result).isNotNull();
-        verify(ccdService, times(1)).updateCase(any(), any(), any(), any(), any(), any());
+        verify(ccdService, times(1)).triggerCaseEventV2(any(), any(), any(), any(), any());
     }
 }
