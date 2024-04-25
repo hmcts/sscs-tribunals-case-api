@@ -14,20 +14,20 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 
 @Service
 @Slf4j
 public class CaseUpdatedSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-    private CcdService ccdService;
     private IdamService idamService;
+    private final UpdateCcdCaseService updateCcdCaseService;
 
     @Autowired
-    public CaseUpdatedSubmittedHandler(CcdService ccdService, IdamService idamService) {
-        this.ccdService = ccdService;
+    public CaseUpdatedSubmittedHandler(IdamService idamService, UpdateCcdCaseService updateCcdCaseService) {
         this.idamService = idamService;
+        this.updateCcdCaseService = updateCcdCaseService;
     }
 
     @Override
@@ -62,10 +62,11 @@ public class CaseUpdatedSubmittedHandler implements PreSubmitCallbackHandler<Ssc
         log.info("Benefit type {} for case id {} ", benefitType, callback.getCaseDetails().getId());
 
         if (StringUtils.equalsIgnoreCase(benefitType.getCode(), "uc") && isANewJointParty(callback, caseData)) {
-            SscsCaseDetails sscsCaseDetails = ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+            log.info("Pre Calling JOINT_PARTY_ADDED event V2 for case id {}", callback.getCaseDetails().getId());
+            SscsCaseDetails sscsCaseDetails = updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
                     EventType.JOINT_PARTY_ADDED.getCcdType(), "Joint party added",
                     "", idamService.getIdamTokens());
-            log.info("jointPartyAdded event updated");
+            log.info("jointPartyAdded event updated V2 for case id {}", callback.getCaseDetails().getId());
             return new PreSubmitCallbackResponse<>(sscsCaseDetails.getData());
         }
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
