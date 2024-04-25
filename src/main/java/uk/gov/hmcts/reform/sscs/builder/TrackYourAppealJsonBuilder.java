@@ -624,8 +624,8 @@ public class TrackYourAppealJsonBuilder {
 
         EventDetails eventDetails = EventDetails.builder()
             .date(LocalDate.parse(caseData.getCaseCreated()).atStartOfDay().plusHours(1).toString())
-            .type(APPEAL_RECEIVED.getCcdType())
-            .description("Appeal Received")
+            .type(EventType.APPEAL_RECEIVED.getCcdType())
+            .description("Appeal received")
             .build();
 
         Event event = Event.builder()
