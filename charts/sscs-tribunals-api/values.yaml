@@ -137,7 +137,6 @@ servicebus:
   enabled: false
 ccd-case-document-am-api:
   enabled: false
-<<<<<<< HEAD
 aac-manage-case-assignment:
   enabled: false
 am-org-role-mapping-service:
@@ -150,11 +149,9 @@ wa:
     enabled: false
   terminationBatchCron:
     enabled: false
-=======
 ccd-def-cleanup:
   enabled: false
 job:
   #DO NOT DELETE, Below line is aliasing all values from Java settings above to job to avoid duplication.
   <<: *javavalues
   enabled: false
->>>>>>> origin/master
