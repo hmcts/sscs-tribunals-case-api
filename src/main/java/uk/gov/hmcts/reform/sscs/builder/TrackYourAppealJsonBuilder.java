@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.builder;
 
 import static java.time.LocalDateTime.of;
 import static java.time.LocalDateTime.parse;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_1;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_2;
@@ -80,7 +81,7 @@ public class TrackYourAppealJsonBuilder {
         caseData.getEvents().removeIf(a -> a.getValue().getDate() == null);
         eventList = caseData.getEvents();
         eventList.sort(Comparator.reverseOrder());
-        processExceptions(eventList, getHearingType(caseData).equals(PAPER), caseData.getBenefitCode());
+        processExceptions(eventList, getHearingType(caseData).equals(PAPER), caseData.getBenefitCode(), caseData.getDateSentToDwp());
 
         if (getHearingType(caseData).equals(PAPER)) {
             PaperCaseEventFilterUtil.removeNonPaperCaseEvents(eventList);
@@ -147,7 +148,7 @@ public class TrackYourAppealJsonBuilder {
         }
         caseNode.put("benefitType", caseData.getAppeal().getBenefitType().getCode().toLowerCase());
         caseNode.put("hearingType", getHearingType(caseData));
-        if (StringUtils.isNotBlank(caseData.getCreatedInGapsFrom())) {
+        if (isNotBlank(caseData.getCreatedInGapsFrom())) {
             caseNode.put("createdInGapsFrom", caseData.getCreatedInGapsFrom());
         }
 
@@ -161,14 +162,14 @@ public class TrackYourAppealJsonBuilder {
 
         boolean isDigitalCase = isCaseStateReadyToList(caseData);
         String benefitCode = caseData.getBenefitCode();
-        String dwpDueDate = caseData.getDwpDueDate();
+        String dateSentToDwp = caseData.getDateSentToDwp();
         List<Event> latestEvents = buildLatestEvents(caseData.getEvents());
         Map<Event, Document> eventDocumentMap = buildEventDocumentMap(caseData);
 
-        caseNode.set("latestEvents", buildEventArray(latestEvents, eventDocumentMap, eventHearingMap, benefitCode, dwpDueDate));
+        caseNode.set("latestEvents", buildEventArray(latestEvents, eventDocumentMap, eventHearingMap, benefitCode, dateSentToDwp));
         List<Event> historicalEvents = buildHistoricalEvents(caseData.getEvents(), latestEvents);
         if (!historicalEvents.isEmpty()) {
-            caseNode.set("historicalEvents", buildEventArray(historicalEvents, eventDocumentMap, eventHearingMap, benefitCode, dwpDueDate));
+            caseNode.set("historicalEvents", buildEventArray(historicalEvents, eventDocumentMap, eventHearingMap, benefitCode, dateSentToDwp));
         }
 
         ObjectNode root = JsonNodeFactory.instance.objectNode();
@@ -310,7 +311,7 @@ public class TrackYourAppealJsonBuilder {
         return ORAL;
     }
 
-    private void processExceptions(List<Event> eventList, Boolean isPaperCase, String benefitCode) {
+    private void processExceptions(List<Event> eventList, Boolean isPaperCase, String benefitCode, String dateSentToDwp) {
         if (null != eventList && !eventList.isEmpty()) {
 
             Event currentEvent = eventList.get(0);
@@ -321,7 +322,7 @@ public class TrackYourAppealJsonBuilder {
                 setLatestEventAs(eventList, currentEvent, NEW_HEARING_BOOKED);
             } else if (isAppealClosed(currentEvent)) {
                 setLatestEventAs(eventList, currentEvent, CLOSED);
-            } else if (isDwpRespondOverdue(currentEvent, benefitCode)) {
+            } else if (isDwpRespondOverdue(currentEvent, benefitCode, dateSentToDwp)) {
                 setLatestEventAs(eventList, currentEvent, DWP_RESPOND_OVERDUE);
             }
         }
@@ -354,13 +355,22 @@ public class TrackYourAppealJsonBuilder {
                 DORMANT_TO_CLOSED_DURATION_IN_MONTHS));
     }
 
-    private boolean isDwpRespondOverdue(Event event, String benefitCode) {
-        return APPEAL_RECEIVED.equals(getEventType(event))
-            && LocalDateTime.now().isAfter(LocalDateTime.parse(event.getValue().getDate()).plusDays(
-                dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode)));
+    private boolean isDwpRespondOverdue(Event event, String benefitCode, String dateSentToDwp) {
+        if (dateSentToDwp != null && isNotBlank(dateSentToDwp)) {
+            return LocalDateTime.now().isAfter(getDwpResponseDueDate(benefitCode, dateSentToDwp));
+        }
+        else {
+            return APPEAL_RECEIVED.equals(getEventType(event))
+                    && LocalDateTime.now().isAfter(LocalDateTime.parse(event.getValue().getDate()).plusDays(
+                    dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode)));
+        }
     }
 
-    private ArrayNode buildEventArray(List<Event> events, Map<Event, Document> eventDocumentMap, Map<Event, Hearing> eventHearingMap, String benefitCode, String dwpDueDate) {
+    private LocalDateTime getDwpResponseDueDate(String benefitCode, String dateSentToDwp) {
+        return LocalDateTime.parse(dateSentToDwp).plusDays(dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode));
+    }
+
+    private ArrayNode buildEventArray(List<Event> events, Map<Event, Document> eventDocumentMap, Map<Event, Hearing> eventHearingMap, String benefitCode, String dateSentToDwp) {
 
         ArrayNode eventsNode = JsonNodeFactory.instance.arrayNode();
 
@@ -371,7 +381,7 @@ public class TrackYourAppealJsonBuilder {
             eventNode.put(TYPE, getEventType(event).toString());
             eventNode.put(CONTENT_KEY, "status." + getEventType(event).getType());
 
-            buildEventNode(event, eventNode, eventDocumentMap, eventHearingMap, benefitCode, dwpDueDate);
+            buildEventNode(event, eventNode, eventDocumentMap, eventHearingMap, benefitCode, dateSentToDwp);
 
             eventsNode.add(eventNode);
         }
@@ -416,11 +426,11 @@ public class TrackYourAppealJsonBuilder {
         return appealStatus;
     }
 
-    private void buildEventNode(Event event, ObjectNode eventNode, Map<Event, Document> eventDocumentMap, Map<Event, Hearing> eventHearingMap, String benefitCode, String dwpDueDate) {
+    private void buildEventNode(Event event, ObjectNode eventNode, Map<Event, Document> eventDocumentMap, Map<Event, Hearing> eventHearingMap, String benefitCode, String dateSentToDwp) {
         switch (getEventType(event)) {
             case APPEAL_RECEIVED -> {
-                if (dwpDueDate != null) {
-                    eventNode.put(DWP_RESPONSE_DATE_LITERAL, dwpDueDate + "d");
+                if (dateSentToDwp != null && isNotBlank(dateSentToDwp)) {
+                    eventNode.put(DWP_RESPONSE_DATE_LITERAL, formatDateTime(getDwpResponseDueDate(benefitCode, dateSentToDwp)) + "d");
                 } else {
                     eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode), true));
                 }
