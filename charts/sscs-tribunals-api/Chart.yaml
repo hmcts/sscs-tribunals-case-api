@@ -60,7 +60,6 @@ dependencies:
     version: 1.0.4
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: servicebus.enabled
-<<<<<<< HEAD
   - name: aac-manage-case-assignment
     version: ~0.2.11
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
@@ -120,9 +119,7 @@ dependencies:
     version: 0.0.10
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wa.enabled
-=======
   - name: ccd-def-cleanup
     version: ~9.0.3
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd-def-cleanup.enabled
->>>>>>> origin/master
