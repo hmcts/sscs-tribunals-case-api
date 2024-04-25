@@ -116,7 +116,7 @@ withPipeline(type, product, component) {
         loadVaultSecrets(secretsForPR)
         env.PREVIEW_CCD_ENABLED = true
         env.CASE_TYPE = "Benefit"
-        env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+        env.CORE_CASE_DATA_API_URL = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-data-store-api"
         env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
         for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_hearings") ) {
             env.PREVIEW_CCD_ENABLED = false
@@ -140,6 +140,15 @@ withPipeline(type, product, component) {
         if (env.BRANCH_NAME.startsWith("PR") ) {
             for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
                 env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+                println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
+                env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
+            }
+            for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_hearings") ) {
+                env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+                env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
+            }
+            for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:wa") ) {
+                env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
                 env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
                 env.CAMUNDA_BASE_URL = "https://camunda-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
                 println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
@@ -149,10 +158,6 @@ withPipeline(type, product, component) {
                 ./bin/import-camunda-files.sh . sscs sscs
                 """
                 env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
-            }
-            for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_hearings") ) {
-                env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-                env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
             }
         }
         println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}. - The branch name is ${env.BRANCH_NAME}""".stripIndent()
