@@ -366,7 +366,7 @@ public class TrackYourAppealJsonBuilder {
     }
 
     private LocalDateTime getDwpResponseDueDate(String benefitCode, String dateSentToDwp) {
-        return LocalDate.parse(dateSentToDwp).atTime(23, 59).plusDays(dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode));
+        return LocalDate.parse(dateSentToDwp).plusDays(dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode)).atTime(23, 59);
     }
 
     private ArrayNode buildEventArray(List<Event> events, Map<Event, Document> eventDocumentMap, Map<Event, Hearing> eventHearingMap, String benefitCode, String dateSentToDwp) {
