@@ -48,7 +48,7 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         String nextEvent = callback.getCaseDetails().getCaseData().getSscsWelshPreviewNextEvent();
-        log.info("Next event to submit  {}", nextEvent);
+        log.info("Nexts event to submit  {}", nextEvent);
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
@@ -95,7 +95,7 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
 
     private SscsCaseData setReinstatementRequest(SscsCaseData sscsCaseData, Long caseId, String nextEvent) {
 
-        log.info("Setting Reinstatement Request for Welsh Case {}", caseId);
+        log.info("Setting Reinstatements Request for Welsh Case {}", caseId);
 
         sscsCaseData.setReinstatementRegistered(LocalDate.now());
         sscsCaseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
@@ -105,7 +105,7 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
         if (previousState != null
             && (previousState.equals(State.DORMANT_APPEAL_STATE) || previousState.equals(State.VOID_STATE))) {
             sscsCaseData.setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
-            log.info("{} setting previousState from {} to interlocutoryReviewState", sscsCaseData.getCcdCaseId(), previousState.getId());
+            log.info("{} setting previousStates from {} to interlocutoryReviewState", sscsCaseData.getCcdCaseId(), previousState.getId());
         }
 
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
