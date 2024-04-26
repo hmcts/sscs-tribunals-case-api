@@ -28,7 +28,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -57,8 +56,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     private final HearingDurationsService hearingDurationsService;
     private final VenueService venueService;
 
-    @Value("${feature.snl.adjournment.enabled}")
-    private boolean isAdjournmentEnabled;
 
     private static final int DURATION_SESSIONS_MULTIPLIER = 165;
     private static final int DURATION_DEFAULT = 60;
@@ -122,17 +119,16 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         Adjournment adjournment = sscsCaseData.getAdjournment();
 
-        if (isAdjournmentEnabled) {
-            updateHearingOptions(sscsCaseData);
-            updateRpc(sscsCaseData);
-            updatePanelMembers(sscsCaseData);
-            updateOverrideFields(sscsCaseData);
+        updateHearingOptions(sscsCaseData);
+        updateRpc(sscsCaseData);
+        updatePanelMembers(sscsCaseData);
+        updateOverrideFields(sscsCaseData);
 
-            if (SscsUtil.isSAndLCase(sscsCaseData) && State.READY_TO_LIST.equals(sscsCaseData.getState())) {
-                adjournment.setAdjournmentInProgress(YES);
-                hearingMessageHelper.sendListAssistCreateAdjournmentHearingMessage(sscsCaseData.getCcdCaseId());
-            }
+        if (SscsUtil.isSAndLCase(sscsCaseData) && State.READY_TO_LIST.equals(sscsCaseData.getState())) {
+            adjournment.setAdjournmentInProgress(YES);
+            hearingMessageHelper.sendListAssistCreateAdjournmentHearingMessage(sscsCaseData.getCcdCaseId());
         }
+
 
         clearBasicTransientFields(sscsCaseData);
         clearAdjournmentTransientFields(sscsCaseData);
@@ -151,9 +147,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
     }
 
     private void clearAdjournmentTransientFields(SscsCaseData caseData) {
-        if (isAdjournmentEnabled) {
-            caseData.setAdjournment(Adjournment.builder().build());
-        }
+        caseData.setAdjournment(Adjournment.builder().build());
     }
 
     private void calculateDueDate(SscsCaseData sscsCaseData) {
