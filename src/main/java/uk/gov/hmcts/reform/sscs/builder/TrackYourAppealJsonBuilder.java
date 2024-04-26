@@ -429,7 +429,7 @@ public class TrackYourAppealJsonBuilder {
         switch (getEventType(event)) {
             case APPEAL_RECEIVED -> {
                 if (dateSentToDwp != null && isNotBlank(dateSentToDwp)) {
-                    eventNode.put(DWP_RESPONSE_DATE_LITERAL, formatDateTime(getDwpResponseDueDate(benefitCode, dateSentToDwp)) + "d");
+                    eventNode.put(DWP_RESPONSE_DATE_LITERAL, dateSentToDwp + "d");
                 } else {
                     eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode), true));
                 }
