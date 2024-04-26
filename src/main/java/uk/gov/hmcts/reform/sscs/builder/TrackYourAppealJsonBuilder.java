@@ -23,6 +23,8 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.GOOGLE_MAP_URL;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.HEARING_CONTACT_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.HEARING_DATETIME;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.HEARING_DECISION_LETTER_RECEIVED_MAX_DAYS;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.MAX_DWP_RESPONSE_DAYS;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.PAST_HEARING_BOOKED_IN_WEEKS;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.POSTCODE;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.TYPE;
@@ -50,7 +52,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.service.event.PaperCaseEventFilterUtil;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
-import uk.gov.hmcts.reform.sscs.utility.dwpResponseUtil;
 
 @Slf4j
 @Service
@@ -361,12 +362,12 @@ public class TrackYourAppealJsonBuilder {
         } else {
             return APPEAL_RECEIVED.equals(getEventType(event))
                     && LocalDateTime.now().isAfter(LocalDateTime.parse(event.getValue().getDate()).plusDays(
-                    dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode)));
+                    calculateMaxDwpResponseDays(benefitCode)));
         }
     }
 
     private LocalDateTime getDwpResponseDueDate(String benefitCode, String dateSentToDwp) {
-        return LocalDate.parse(dateSentToDwp).plusDays(dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode)).atTime(23, 59);
+        return LocalDate.parse(dateSentToDwp).plusDays(calculateMaxDwpResponseDays(benefitCode)).atTime(23, 59);
     }
 
     private ArrayNode buildEventArray(List<Event> events, Map<Event, Document> eventDocumentMap, Map<Event, Hearing> eventHearingMap, String benefitCode, String dateSentToDwp) {
@@ -431,11 +432,11 @@ public class TrackYourAppealJsonBuilder {
                 if (dateSentToDwp != null && isNotBlank(dateSentToDwp)) {
                     eventNode.put(DWP_RESPONSE_DATE_LITERAL, formatDateTime(getDwpResponseDueDate(benefitCode, dateSentToDwp)));
                 } else {
-                    eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode), true));
+                    eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, calculateMaxDwpResponseDays(benefitCode), true));
                 }
             }
             case DWP_RESPOND_OVERDUE ->
-                    eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode), true));
+                    eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, calculateMaxDwpResponseDays(benefitCode), true));
             case EVIDENCE_RECEIVED -> {
                 Document document = eventDocumentMap.get(event);
                 if (document != null) {
@@ -498,6 +499,15 @@ public class TrackYourAppealJsonBuilder {
     private String formatDateTime(LocalDateTime localDateTime) {
         return DateTimeUtils.convertLocalDateTimetoUtc(localDateTime);
     }
+
+    public static int calculateMaxDwpResponseDays(String benefitCode) {
+        if (benefitCode == "childSupport" ) {
+            return MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT;
+        }
+        else {
+            return MAX_DWP_RESPONSE_DAYS;
+        }
+    };
 
     private void processRpcDetails(RegionalProcessingCenter regionalProcessingCenter, ObjectNode caseNode, boolean isDigitalCase) {
         if (null != regionalProcessingCenter) {
