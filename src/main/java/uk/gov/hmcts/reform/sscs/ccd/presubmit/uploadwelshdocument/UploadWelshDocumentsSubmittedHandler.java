@@ -109,12 +109,12 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
         }
 
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
 
-        ccdService.updateCase(sscsCaseData, caseId, nextEvent, "Upload Engl Document",
-                "Upload English Document", idamService.getIdamTokens());
-        //
-        ccdService.updateCase(sscsCaseData, caseId, nextEvent, "Upload Wel Document",
-            "Upload Welsh Document", idamService.getIdamTokens());
+
+        ccdService.updateCase(sscsCaseData, caseId, nextEvent, "Upload Welsh Document",
+                "Upload Welsh Document", idamService.getIdamTokens());
+
         return sscsCaseData;
     }
 }
