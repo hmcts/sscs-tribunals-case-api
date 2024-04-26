@@ -37,8 +37,7 @@ public class SaveCorrespondenceAsyncService {
             ccdNotificationsPdfService.mergeLetterCorrespondenceIntoCcdV2(pdfForLetter, Long.valueOf(ccdCaseId), correspondence);
         } catch (NotificationClientException e) {
             if (e.getMessage().contains("PDFNotReadyError")) {
-                e.printStackTrace();
-                log.info("Got a PDFNotReadyError back from gov.notify for case id: {}.", ccdCaseId);
+                log.info("Got a PDFNotReadyError back from gov.notify for case id: {}, with message", e.getMessage());
             } else {
                 log.warn("Got a strange error '{}' back from gov.notify for case id: {}.", e.getMessage(), ccdCaseId);
             }
