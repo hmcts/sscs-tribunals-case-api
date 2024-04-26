@@ -105,7 +105,7 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
         if (previousState != null
             && (previousState.equals(State.DORMANT_APPEAL_STATE) || previousState.equals(State.VOID_STATE))) {
             sscsCaseData.setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
-            log.info("{} settings previousState from {} to interlocutoryReviewState", sscsCaseData.getCcdCaseId(), previousState.getId());
+            log.info("{} setting previousState from {} to interlocutoryReviewState", sscsCaseData.getCcdCaseId(), previousState.getId());
         }
 
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE);
