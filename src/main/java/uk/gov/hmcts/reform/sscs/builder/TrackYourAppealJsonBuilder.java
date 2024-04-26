@@ -501,13 +501,12 @@ public class TrackYourAppealJsonBuilder {
     }
 
     public static int calculateMaxDwpResponseDays(String benefitCode) {
-        if (benefitCode == "childSupport" ) {
+        if (benefitCode == "childSupport") {
             return MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT;
-        }
-        else {
+        } else {
             return MAX_DWP_RESPONSE_DAYS;
         }
-    };
+    }
 
     private void processRpcDetails(RegionalProcessingCenter regionalProcessingCenter, ObjectNode caseNode, boolean isDigitalCase) {
         if (null != regionalProcessingCenter) {
