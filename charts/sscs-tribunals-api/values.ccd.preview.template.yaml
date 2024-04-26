@@ -8,7 +8,7 @@ java:
   memoryRequests: "1Gi"
   cpuRequests: "2"
   cpuLimits: 2000m
-  ingressHost: ${SERVICE_FQDN}
+  #ingressHost: ${SERVICE_FQDN}
   readinessDelay: 45
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
@@ -675,7 +675,7 @@ redis:
 #Turning either hearings api (with either listener on) or cft hearing service on requires
 #service bus to be turned on.
 sscs-hearings-api:
-  enabled: true
+  enabled: false
   java:
     image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
