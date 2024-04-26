@@ -48,7 +48,7 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         String nextEvent = callback.getCaseDetails().getCaseData().getSscsWelshPreviewNextEvent();
-        log.info("Next event to submit  {}", nextEvent);
+        log.info("Next event to submits  {}", nextEvent);
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
