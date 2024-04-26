@@ -110,6 +110,7 @@ public class BaseHandler {
     }
 
     public SscsCaseDetails runEvent(final SscsCaseData sscsCaseData, final EventType eventType) {
+        ccdService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()), eventType.getCcdType(), CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
         return ccdService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()), eventType.getCcdType(), CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
     }
 

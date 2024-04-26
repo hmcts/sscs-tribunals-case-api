@@ -112,7 +112,8 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
 
         ccdService.updateCase(sscsCaseData, caseId, nextEvent, "Upload Welsh Document",
                 "Upload Welsh Document", idamService.getIdamTokens());
-
+        ccdService.updateCase(sscsCaseData, caseId, nextEvent, "Upload Welsh Document",
+            "Upload Welsh Document", idamService.getIdamTokens());
         return sscsCaseData;
     }
 }
