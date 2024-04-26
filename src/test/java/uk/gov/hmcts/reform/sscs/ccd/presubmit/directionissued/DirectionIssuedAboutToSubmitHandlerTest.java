@@ -712,13 +712,21 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenNoUploadedAndGeneratedDoc_thenReturnErrorAndThenReturnCaseDataPreviewDocWhenGenerateNoticeIsYes() {
+    public void givenNoUploadedAndGeneratedDoc_thenReturnError() {
         sscsCaseData.getDocumentGeneration().setGenerateNotice(NO);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertFalse(response.getErrors().isEmpty());
-        assertNotNull(response.getData().getDocumentStaging().getPreviewDocument());
+    }
+
+    @Test
+    public void givenGenerateNoticeIsYes_thenReturnCaseDataPreviewDoc() {
+        DocumentLink url = sscsCaseData.getDocumentStaging().getPreviewDocument();
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(footerService).createFooterAndAddDocToCase(eq(url), any(), any(), any(), any(), any(), any());
     }
 
     @Test

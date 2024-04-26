@@ -256,7 +256,9 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 new PreSubmitCallbackResponse<>(caseData);
 
         DocumentLink url = null;
-        if (isYes(callback.getCaseDetails().getCaseData().getDocumentGeneration().getGenerateNotice()) && nonNull(caseData.getDocumentStaging().getPreviewDocument()) && callback.getEvent() == EventType.DIRECTION_ISSUED) {
+        if (isYes(callback.getCaseDetails().getCaseData().getDocumentGeneration().getGenerateNotice())
+                && nonNull(caseData.getDocumentStaging().getPreviewDocument())
+                && callback.getEvent() == EventType.DIRECTION_ISSUED) {
             url = caseData.getDocumentStaging().getPreviewDocument();
         } else if (caseData.getSscsInterlocDirectionDocument() != null && callback.getEvent() == EventType.DIRECTION_ISSUED) {
 
