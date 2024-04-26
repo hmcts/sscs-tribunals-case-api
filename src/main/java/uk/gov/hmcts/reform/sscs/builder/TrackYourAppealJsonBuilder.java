@@ -148,7 +148,7 @@ public class TrackYourAppealJsonBuilder {
         }
         caseNode.put("benefitType", caseData.getAppeal().getBenefitType().getCode().toLowerCase());
         caseNode.put("hearingType", getHearingType(caseData));
-        if (isNotBlank(caseData.getCreatedInGapsFrom())) {
+        if (StringUtils.isNotBlank(caseData.getCreatedInGapsFrom())) {
             caseNode.put("createdInGapsFrom", caseData.getCreatedInGapsFrom());
         }
 
@@ -358,8 +358,7 @@ public class TrackYourAppealJsonBuilder {
     private boolean isDwpRespondOverdue(Event event, String benefitCode, String dateSentToDwp) {
         if (dateSentToDwp != null && isNotBlank(dateSentToDwp)) {
             return LocalDateTime.now().isAfter(getDwpResponseDueDate(benefitCode, dateSentToDwp));
-        }
-        else {
+        } else {
             return APPEAL_RECEIVED.equals(getEventType(event))
                     && LocalDateTime.now().isAfter(LocalDateTime.parse(event.getValue().getDate()).plusDays(
                     dwpResponseUtil.calculateMaxDwpResponseDays(benefitCode)));
