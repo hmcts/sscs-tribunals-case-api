@@ -31,11 +31,13 @@ public class SaveCorrespondenceAsyncService {
     @Retryable(maxAttemptsExpression = "#{${letterAsync.maxAttempts}}", backoff = @Backoff(delayExpression = "#{${letterAsync.delay}}", multiplierExpression = "#{${letterAsync.multiplier}}", random = true))
     public void saveLetter(NotificationClient client, String notificationId, Correspondence correspondence, String ccdCaseId) throws NotificationClientException {
         try {
+            log.info("Getting PDF for letter correspondence for notification id {} ", notificationId);
             final byte[] pdfForLetter = client.getPdfForLetter(notificationId);
             log.info("Using merge letter correspondence V2 to upload letter correspondence for {} ", ccdCaseId);
             ccdNotificationsPdfService.mergeLetterCorrespondenceIntoCcdV2(pdfForLetter, Long.valueOf(ccdCaseId), correspondence);
         } catch (NotificationClientException e) {
             if (e.getMessage().contains("PDFNotReadyError")) {
+                e.printStackTrace();
                 log.info("Got a PDFNotReadyError back from gov.notify for case id: {}.", ccdCaseId);
             } else {
                 log.warn("Got a strange error '{}' back from gov.notify for case id: {}.", e.getMessage(), ccdCaseId);
