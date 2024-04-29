@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -146,7 +147,7 @@ public class UploadDocumentFurtherEvidenceAboutToSubmitHandler implements PreSub
         addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, newAudioVideoEvidence.stream()
             .map(audioVideoEvidence -> audioVideoEvidence.getValue().getDocumentType())
             .filter(Objects::nonNull)
-            .toList(), EVENT_TYPE);
+            .collect(Collectors.toList()), EVENT_TYPE);
 
         if (!newAudioVideoEvidence.isEmpty()) {
             if (sscsCaseData.getAudioVideoEvidence() == null) {
