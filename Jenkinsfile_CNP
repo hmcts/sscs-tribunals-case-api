@@ -91,11 +91,22 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   ]
 }
 
-def branchesToSync = ['demo']
+def branchesToSync = ['demo', 'ithc', 'perftest']
 
 withPipeline(type, product, component) {
+    def githubApi = new GithubAPI(this)
     if (env.BRANCH_NAME.startsWith("PR")) {
         loadVaultSecrets(secretsForPR)
+        env.PREVIEW_CCD_ENABLED = true
+        env.CASE_TYPE = "Benefit"
+        env.CORE_CASE_DATA_API_URL = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-data-store-api"
+        env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
+        for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_hearings") ) {
+            env.PREVIEW_CCD_ENABLED = false
+            env.CASE_TYPE = "Benefit-${CHANGE_ID}"
+            env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+            env.CCD_GW_API = "https://gateway-ccd.aat.platform.hmcts.net"
+        }
     } else {
         loadVaultSecrets(secrets)
     }
@@ -109,12 +120,15 @@ withPipeline(type, product, component) {
         env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
         env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
         env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
-        if (env.BRANCH_NAME.startsWith("PR")) {
-            def githubApi = new GithubAPI(this)
+        if (env.BRANCH_NAME.startsWith("PR") ) {
             for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
                 env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
                 println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
                 env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
+            }
+            for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_hearings") ) {
+                env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+                env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
             }
         }
         println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}. - The branch name is ${env.BRANCH_NAME}""".stripIndent()
