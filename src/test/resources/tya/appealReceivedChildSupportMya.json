@@ -1,0 +1,38 @@
+{
+  "appeal": {
+    "caseId" : "1",
+    "caseReference": "SC123/45/00001",
+    "name": "Mr Jason Mock",
+    "surname": "Mock",
+    "appealNumber": "abcde12345",
+    "benefitType": "childsupport",
+    "hearingType": "oral",
+    "status": "WITH_DWP",
+    "hideHearing": false,
+    "latestEvents": [
+      {
+        "evidenceType": "General",
+        "evidenceProvidedBy": "Appellant",
+        "date": "2017-03-10T01:00:00.000Z",
+        "type": "EVIDENCE_RECEIVED",
+        "contentKey": "status.evidenceReceived"
+      },
+      {
+        "date": "2017-03-08T12:01:47.620Z",
+        "type": "APPEAL_RECEIVED",
+        "dwpResponseDate": "2017-04-19T22:59:00.000Z",
+        "contentKey": "status.appealReceived"
+      }
+    ],
+    "regionalProcessingCenter": {
+      "name":"LIVERPOOL",
+      "addressLines":["HM Courts & Tribunals Service","Social Security & Child Support Appeals",
+        "Prudential Buildings","36 Dale Street"],
+      "city":"LIVERPOOL",
+      "postcode":"L2 5UZ",
+      "phoneNumber":"0300 123 1142",
+      "faxNumber":"0870 324 0109"
+    }
+  },
+  "subscriptions":{}
+}

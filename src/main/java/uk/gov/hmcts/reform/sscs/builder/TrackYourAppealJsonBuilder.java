@@ -82,7 +82,7 @@ public class TrackYourAppealJsonBuilder {
         caseData.getEvents().removeIf(a -> a.getValue().getDate() == null);
         eventList = caseData.getEvents();
         eventList.sort(Comparator.reverseOrder());
-        processExceptions(eventList, getHearingType(caseData).equals(PAPER), caseData.getBenefitCode(), caseData.getDateSentToDwp());
+        processExceptions(eventList, getHearingType(caseData).equals(PAPER), caseData.getAppeal().getBenefitType().getCode(), caseData.getDateSentToDwp());
 
         if (getHearingType(caseData).equals(PAPER)) {
             PaperCaseEventFilterUtil.removeNonPaperCaseEvents(eventList);
@@ -162,7 +162,7 @@ public class TrackYourAppealJsonBuilder {
         }
 
         boolean isDigitalCase = isCaseStateReadyToList(caseData);
-        String benefitCode = caseData.getBenefitCode();
+        String benefitCode = caseData.getAppeal().getBenefitType().getCode();
         String dateSentToDwp = caseData.getDateSentToDwp();
         List<Event> latestEvents = buildLatestEvents(caseData.getEvents());
         Map<Event, Document> eventDocumentMap = buildEventDocumentMap(caseData);
