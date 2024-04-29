@@ -3,7 +3,7 @@ plugins {
     id 'pmd'
     id 'org.sonarqube' version '4.3.0.3225'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.7.14'
+    id 'org.springframework.boot' version '2.7.18'
     id 'io.spring.dependency-management' version '1.1.3'
     id 'uk.gov.hmcts.java' version '0.12.43'
     id 'com.gorylenko.gradle-git-properties' version '2.4.1'
@@ -96,6 +96,7 @@ tasks.withType(Test) {
 }
 
 task integration(type: Test) {
+    jvmArgs = ['-Xms1024m', '-Xmx2048m']
     setTestClassesDirs(sourceSets.integrationTest.output.classesDirs)
     setClasspath(sourceSets.integrationTest.runtimeClasspath)
 }
@@ -207,10 +208,12 @@ sonarqube {
         property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
         property "sonar.exclusions", "**/CreateCaseException.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/domain/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/evidenceshare/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/TribunalsCaseApiApplication.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/email/Email.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/config/*," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/model/**/*.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/evidenceshare/model/**/*.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/EvidenceUploadService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/OnlineHearingService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/EvidenceDescriptionPdfData.java," +
@@ -221,7 +224,11 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/controllers/CreateCaseController.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/PdfData.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/esa/EsaWriteFinalDecisionMidEventValidationHandler.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/uc/UcWriteFinalDecisionMidEventValidationHandler.java"
+                "src/main/java/uk/gov/hmcts/reform/sscs/evidenceshare/config/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/servicebus/messaging/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/domain/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/config/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/EnvironmentPropertiesPrinter.java,"
         property "sonar.host.url", "https://sonar.reform.hmcts.net/"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
@@ -250,7 +257,6 @@ tasks.register('runGitPreCommitTasks') {
     dependsOn 'test'
     dependsOn 'pmdMain'
     dependsOn 'pmdTest'
-    dependsOn 'dependencyCheckAggregate'
     dependsOn 'checkstyleMain'
     dependsOn 'checkstyleTest'
 }
@@ -262,27 +268,15 @@ dependencyManagement {
             entry 'snakeyaml'
         }
 
-        // CVE-2022-41881, CVE-2022-41915
-        dependencySet(group: 'io.netty', version: '4.1.95.Final') {
-            entry 'netty-buffer'
-            entry 'netty-common'
-            entry 'netty-codec'
-            entry 'netty-codec-dns'
-            entry 'netty-codec-http'
-            entry 'netty-codec-http2'
-            entry 'netty-codec-socks'
-            entry 'netty-handler'
-            entry 'netty-handler-proxy'
-            entry 'netty-resolver'
-            entry 'netty-resolver-dns'
-            entry 'netty-resolver-dns-classes-macos'
-            entry 'netty-resolver-dns-native-macos'
-            entry 'netty-transport'
-            entry 'netty-transport-classes-epoll'
-            entry 'netty-transport-classes-kqueue'
-            entry 'netty-transport-native-epoll'
-            entry 'netty-transport-native-kqueue'
-            entry 'netty-transport-native-unix-common'
+        //CVE-2023-33202
+        dependencySet(group: 'org.springframework.security', version: '1.1.1') {
+            entry 'spring-security-rsa'
+        }
+
+        //CVE-2023-6378, CVE-2023-6481
+        dependencySet(group: 'ch.qos.logback', version: '1.2.13') {
+            entry 'logback-core'
+            entry 'logback-classic'
         }
 
         imports {
@@ -302,18 +296,18 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-activemq'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security'
 
-    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.8.5'
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.5'
-    implementation group: 'org.springframework.security', name: 'spring-security-config', version: '5.8.5'
-    implementation group: 'org.springframework.security', name: 'spring-security-web', version: '5.8.5'
+    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.8.10'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.10'
+    implementation group: 'org.springframework.security', name: 'spring-security-config', version: '5.8.10'
+    implementation group: 'org.springframework.security', name: 'spring-security-web', version: '5.8.10'
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.4'
     implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
 
     implementation group: 'com.google.guava', name: 'guava', version: '32.1.1-jre'
-    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.10'
+    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.19'
 
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
@@ -339,11 +333,11 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.3.1'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.10'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.4.0'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.5'
 
-    implementation group: 'com.azure', name: 'azure-core', version: '1.42.0'
-    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.2'
+    implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
+    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
 
     implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.5.8'
 
@@ -355,6 +349,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.3'
 
     implementation group:'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    implementation group: 'org.springframework', name: 'spring-jms'
     implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.10.0'
 
     implementation group: 'org.pitest', name: 'pitest', version:  '1.14.2'
@@ -382,9 +377,16 @@ dependencies {
     implementation group: 'com.opencsv', name: 'opencsv', version: '5.7.1'
 
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.81"
-    
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.80'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.80'
+
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.86'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.86'
+
+    //evidence-share depenedencies
+    implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
+    implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.23'
+    // Remove this dependency once the secure doc-store is in use
+    implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.13.0'
 
@@ -399,8 +401,8 @@ dependencies {
 
     testImplementation group: 'org.apache.httpcomponents', name: 'fluent-hc', version:  '4.5.14'
 
-    testImplementation group: 'com.azure', name: 'azure-core', version: '1.42.0'
-    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.14.2'
+    testImplementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
+    testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.37.0'
@@ -430,6 +432,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.0'
 
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-core', version: '8.0.6'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '8.0.6'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '8.0.6'
     //pact contract testing
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
 

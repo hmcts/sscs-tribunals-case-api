@@ -254,6 +254,7 @@
   "interlocReviewState" : "reviewByTcw",
   "isScottishCase" : "No",
   "workBasketHearingDate": null,
+  "workBasketHearingDateIssued": null,
   "workBasketHearingEpimsId": null,
   "postHearingRequestType": null,
   "postHearingReviewType": null,

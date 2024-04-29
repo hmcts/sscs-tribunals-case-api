@@ -22,7 +22,7 @@ import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -38,16 +38,16 @@ public class CaseUpdatedSubmittedHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     @Mock
-    private CcdService ccdService;
-    @Mock
     private IdamService idamService;
 
     private SscsCaseData sscsCaseData;
+    @Mock
+    private UpdateCcdCaseService updateCcdCaseService;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        handler = new CaseUpdatedSubmittedHandler(ccdService, idamService);
+        handler = new CaseUpdatedSubmittedHandler(idamService, updateCcdCaseService);
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         BenefitType benefitType = BenefitType.builder().code("UC").description("Universal credit").build();
         sscsCaseData = SscsCaseData.builder()
@@ -98,15 +98,15 @@ public class CaseUpdatedSubmittedHandlerTest {
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
-        when(ccdService.updateCase(any(), any(), any(),
+        when(updateCcdCaseService.triggerCaseEventV2(any(), any(), any(),
                 any(),
-                any(), any()))
+                any()))
                 .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verify(ccdService).updateCase(callback.getCaseDetails().getCaseData(),
-                Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId()), EventType.JOINT_PARTY_ADDED.getCcdType(), "Joint party added","", idamTokens);
+        verify(updateCcdCaseService).triggerCaseEventV2(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId()),
+                EventType.JOINT_PARTY_ADDED.getCcdType(), "Joint party added","", idamTokens);
     }
 
     @ParameterizedTest
@@ -126,7 +126,7 @@ public class CaseUpdatedSubmittedHandlerTest {
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verifyNoInteractions(ccdService);
+        verifyNoInteractions(updateCcdCaseService);
     }
 
     @Test
@@ -141,7 +141,7 @@ public class CaseUpdatedSubmittedHandlerTest {
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        verifyNoInteractions(ccdService);
+        verifyNoInteractions(updateCcdCaseService);
     }
 
     @Test

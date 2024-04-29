@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.subscriptionupdated;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.clearOtherPartyIfEmpty;
+import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.clearOtherPartiesIfEmpty;
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
 
 import java.util.List;
@@ -67,7 +67,7 @@ public class SubscriptionUpdatedAboutToSubmitHandler implements PreSubmitCallbac
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        clearOtherPartyIfEmpty(response.getData());
+        response.getData().setOtherParties(clearOtherPartiesIfEmpty(response.getData()));
 
         updateOtherParties(callback, response);
         return response;
