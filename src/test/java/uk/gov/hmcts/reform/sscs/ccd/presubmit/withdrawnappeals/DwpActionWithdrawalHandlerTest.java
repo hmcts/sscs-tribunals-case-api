@@ -85,7 +85,8 @@ public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
                 "signedRole",
                 "statementOfReasons",
                 "statementOfReasonsBodyContent",
-                "statementOfReasonsGenerateNotice")
+                "statementOfReasonsGenerateNotice",
+                "sscsDocument[0].id")
             .isEqualTo(expectedCaseData);
     }
 
