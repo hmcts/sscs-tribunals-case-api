@@ -576,7 +576,7 @@ elastic:
 sscs-evidence-share:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/evidence-share:pr-1620-457b75b-20240408111415
+    image: hmctspublic.azurecr.io/sscs/evidence-share:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
     environment:
       SEND_LETTER_SERVICE_ENABLED: "true"
@@ -612,7 +612,7 @@ sscs-evidence-share:
 sscs-tya-notif:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2498-9aab009-20240415154909
+    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2498
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
@@ -660,7 +660,7 @@ sscs-tribunals-frontend:
   nodejs:
     memoryLimits: "2Gi"
     cpuLimits: 2000m
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:pr-1473-cec93fe-20240415164325
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:pr-1473
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
@@ -703,7 +703,7 @@ redis:
 sscs-hearings-api:
   enabled: true
   java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-599-05b0bcb-20240415154954" #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-599" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     ingressHost: hearings-${SERVICE_FQDN}
     environment:
