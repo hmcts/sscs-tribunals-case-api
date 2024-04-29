@@ -113,6 +113,8 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: false
     TRIGGER_EVENT_V2_ENABLED: false
 
+postgresql:
+  enabled: false
 idam-pr:
   enabled: false
 xui-webapp:
@@ -135,6 +137,18 @@ servicebus:
   enabled: false
 ccd-case-document-am-api:
   enabled: false
+aac-manage-case-assignment:
+  enabled: false
+am-org-role-mapping-service:
+  enabled: false
+wa:
+  enabled: false
+  taskBatchCron:
+    enabled: false
+  reconfigurationBatchCron:
+    enabled: false
+  terminationBatchCron:
+    enabled: false
 ccd-def-cleanup:
   enabled: false
 job:
