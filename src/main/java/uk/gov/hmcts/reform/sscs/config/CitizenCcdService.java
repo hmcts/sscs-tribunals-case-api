@@ -4,10 +4,13 @@ import static java.util.stream.Stream.of;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_ARCHIVED;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -103,6 +106,54 @@ public class CitizenCcdService {
         CaseDataContent caseDataContent = sscsCcdConvertService.getCaseDataContent(caseData, startEventResponse, summary, description);
         caseDetails = citizenCcdClient.submitForCitizen(idamTokens, caseDataContent);
         return caseDetails;
+    }
+
+    @Retryable
+    public CaseDetails updateCaseV2(String caseId, String eventType, String summary, String description, IdamTokens idamTokens, Consumer<SscsCaseData> mutator) {
+        return updateCaseV2(caseId, eventType, idamTokens, data -> {
+            mutator.accept(data);
+            return new UpdateResult(summary, description);
+        });
+    }
+
+    @Retryable
+    public CaseDetails triggerCaseEventV2(String caseId, String eventType, String summary, String description, IdamTokens idamTokens) {
+        return updateCaseV2(caseId, eventType, idamTokens, data -> new UpdateResult(summary, description));
+    }
+
+    public record UpdateResult(String summary, String description) { }
+
+    /**
+     * Update a case while making correct use of CCD's optimistic locking.
+     * Changes can be made to case data by the provided consumer which will always be provided
+     * the current version of case data from CCD's start event.
+     */
+    @Retryable
+    public CaseDetails updateCaseV2(String caseId, String eventType, IdamTokens idamTokens, Function<SscsCaseData, UpdateResult> mutator) {
+        log.info("Updating a draft with caseId {} and eventType {}, using updateCaseV2 method", caseId, eventType);
+        StartEventResponse startEventResponse = citizenCcdClient.startEventForCitizen(idamTokens, caseId, eventType);
+        var data = sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData());
+
+        /**
+         * @see uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer#deserialize(String)
+         * setCcdCaseId & sortCollections are called above, so this functionality has been replicated here preserving existing logic
+         */
+        data.setCcdCaseId(caseId);
+        data.sortCollections();
+
+        var result = mutator.apply(data);
+        CaseDataContent caseDataContent = sscsCcdConvertService.getCaseDataContent(data, startEventResponse, result.summary, result.description);
+
+        return citizenCcdClient.submitEventForCitizen(idamTokens, caseId, caseDataContent);
+    }
+
+    /**
+     * Need to provide this so that recoverable/non-recoverable exception doesn't get wrapped in an IllegalArgumentException
+     */
+    @Recover
+    public SscsCaseDetails recoverUpdateCaseV2(RuntimeException exception, Long caseId, String eventType) {
+        log.error("In recover method (recoverUpdateCaseV2) for draft with caseId {} and eventType {}", caseId, eventType);
+        throw exception;
     }
 
     @Retryable
