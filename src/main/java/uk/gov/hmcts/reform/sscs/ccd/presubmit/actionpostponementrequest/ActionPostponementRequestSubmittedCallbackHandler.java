@@ -11,17 +11,17 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Slf4j
 @Service
 public class ActionPostponementRequestSubmittedCallbackHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-    private final CcdService ccdService;
+    private final UpdateCcdCaseService ccdService;
     private final IdamService idamService;
     private final boolean workAllocationFeature;
 
-    public ActionPostponementRequestSubmittedCallbackHandler(CcdService ccdService, IdamService idamService,
+    public ActionPostponementRequestSubmittedCallbackHandler(UpdateCcdCaseService ccdService, IdamService idamService,
                                                              @Value("${feature.work-allocation.enabled}") boolean workAllocationFeature) {
         this.ccdService = ccdService;
         this.idamService = idamService;
@@ -70,7 +70,7 @@ public class ActionPostponementRequestSubmittedCallbackHandler implements PreSub
     }
 
     private SscsCaseData updateCase(SscsCaseData caseData, long caseId, String eventType, String summary, String description) {
-        var caseDetails = ccdService.updateCase(caseData, caseId, eventType, summary, description, idamService.getIdamTokens());
+        var caseDetails = ccdService.triggerCaseEventV2(caseId, eventType, summary, description, idamService.getIdamTokens());
         return caseDetails.getData();
     }
 
