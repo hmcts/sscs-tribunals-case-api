@@ -128,6 +128,8 @@ withPipeline(type, product, component) {
             }
             for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_hearings") ) {
                 env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+                env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
+
                 env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
             }
         }
