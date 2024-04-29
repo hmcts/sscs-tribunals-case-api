@@ -501,7 +501,7 @@ public class TrackYourAppealJsonBuilder {
     }
 
     public static int calculateMaxDwpResponseDays(String benefitCode) {
-        if (benefitCode == "childSupport") {
+        if (benefitCode!= null && benefitCode.equals("childSupport")) {
             return MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT;
         } else {
             return MAX_DWP_RESPONSE_DAYS;
