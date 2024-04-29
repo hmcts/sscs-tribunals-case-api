@@ -5,7 +5,7 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
-import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
+import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseDataV1;
 
 import feign.FeignException;
 import java.time.LocalDate;
@@ -106,7 +106,7 @@ public class SubmitAppealService {
         }
 
         try {
-            return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal, caseAccessManagementFeature), idamTokens, forceCreate));
+            return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseDataV1(appeal, caseAccessManagementFeature), idamTokens, forceCreate));
         } catch (FeignException e) {
             if (e.status() == HttpStatus.SC_CONFLICT) {
                 logError(appeal, idamTokens);
@@ -127,7 +127,7 @@ public class SubmitAppealService {
         }
 
         try {
-            SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, caseAccessManagementFeature);
+            SscsCaseData sscsCaseData = convertSyaToCcdCaseDataV1(appeal, caseAccessManagementFeature);
 
             CaseDetails caseDetails = citizenCcdService.updateCase(sscsCaseData, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
                     "Update draft in CCD", idamTokens, appeal.getCcdCaseId());
@@ -167,7 +167,7 @@ public class SubmitAppealService {
             throw new ApplicationErrorException(new Exception(USER_HAS_A_INVALID_ROLE_MESSAGE));
         }
 
-        SscsCaseData sscsCaseData = convertSyaToCcdCaseData(appeal, caseAccessManagementFeature);
+        SscsCaseData sscsCaseData = convertSyaToCcdCaseDataV1(appeal, caseAccessManagementFeature);
         citizenCcdService.archiveDraft(sscsCaseData, idamTokens, ccdCaseId);
 
         return Optional.of(SaveCaseResult.builder()
@@ -248,8 +248,8 @@ public class SubmitAppealService {
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
 
         SscsCaseData sscsCaseData = rpc == null
-            ? convertSyaToCcdCaseData(appeal, caseAccessManagementFeature)
-            : convertSyaToCcdCaseData(appeal, rpc.getName(), rpc, caseAccessManagementFeature);
+            ? convertSyaToCcdCaseDataV1(appeal, caseAccessManagementFeature)
+            : convertSyaToCcdCaseDataV1(appeal, rpc.getName(), rpc, caseAccessManagementFeature);
 
         sscsCaseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
         String processingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());

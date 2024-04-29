@@ -41,6 +41,10 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             .build();
     }
 
+    public static SscsCaseData convertSyaToCcdCaseDataV1(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled) {
+        return convertSyaToCcdCaseDataGeneric(syaCaseWrapper, caseAccessManagementEnabled, SscsCaseData.builder());
+    }
+
     public static SscsCaseData convertSyaToCcdCaseDataV2(SyaCaseWrapper syaCaseWrapper,
                                                        String region,
                                                        RegionalProcessingCenter rpc,
@@ -51,10 +55,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             .region(region)
             .regionalProcessingCenter(rpc)
             .build();
-    }
-
-    public static SscsCaseData convertSyaToCcdCaseDataV1(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled) {
-        return convertSyaToCcdCaseDataGeneric(syaCaseWrapper, caseAccessManagementEnabled, SscsCaseData.builder());
     }
 
     public static SscsCaseData convertSyaToCcdCaseDataV2(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled, SscsCaseData sscsCaseData) {

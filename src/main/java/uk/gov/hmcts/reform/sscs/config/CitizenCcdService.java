@@ -109,14 +109,6 @@ public class CitizenCcdService {
     }
 
     @Retryable
-    public CaseDetails updateCaseV2(String caseId, String eventType, String summary, String description, IdamTokens idamTokens, Consumer<SscsCaseData> mutator) {
-        return updateCaseV2(caseId, eventType, idamTokens, data -> {
-            mutator.accept(data);
-            return new UpdateResult(summary, description);
-        });
-    }
-
-    @Retryable
     public CaseDetails triggerCaseEventV2(String caseId, String eventType, String summary, String description, IdamTokens idamTokens) {
         return updateCaseV2(caseId, eventType, idamTokens, data -> new UpdateResult(summary, description));
     }
@@ -147,8 +139,17 @@ public class CitizenCcdService {
         return citizenCcdClient.submitEventForCitizen(idamTokens, caseId, caseDataContent);
     }
 
+    @Retryable
+    public CaseDetails updateCaseV2(String caseId, String eventType, String summary, String description, IdamTokens idamTokens, Consumer<SscsCaseData> mutator) {
+        return updateCaseV2(caseId, eventType, idamTokens, data -> {
+            mutator.accept(data);
+            return new UpdateResult(summary, description);
+        });
+    }
+
     /**
-     * Need to provide this so that recoverable/non-recoverable exception doesn't get wrapped in an IllegalArgumentException
+     * Need to provide this so that recoverable/non-recoverable exception doesn't get wrapped in an IllegalArgumentException.
+     *
      */
     @Recover
     public SscsCaseDetails recoverUpdateCaseV2(RuntimeException exception, Long caseId, String eventType) {
