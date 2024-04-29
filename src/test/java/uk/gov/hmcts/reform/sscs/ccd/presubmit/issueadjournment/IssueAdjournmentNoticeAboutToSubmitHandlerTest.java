@@ -543,4 +543,11 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         assertThat(sscsCaseData.getPresentingOfficersDetails()).isEqualTo(PoDetails.builder().build());
         assertThat(sscsCaseData.getPresentingOfficersHearingLink()).isNull();
     }
+
+    @Test
+    void givenAdjournmentIsIssued_thenClearAdjournmentFields() {
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
+    }
+
 }
