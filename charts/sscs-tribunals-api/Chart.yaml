@@ -1,14 +1,23 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.137
+version: 0.0.141
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
 dependencies:
+  - name: postgresql
+    version: 1.0.2
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: postgresql.enabled
   - name: java
     version: 5.2.0
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    condition: java.enabled
+  - name: job
+    version: 2.1.1
+    repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    condition: job.enabled
   - name: idam-pr
     version: 2.3.0
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
@@ -17,22 +26,18 @@ dependencies:
     version: 1.0.9
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: xui-webapp.enabled
-  - name: sscs-evidence-share
-    version: 0.0.49
-    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-    condition: sscs-evidence-share.enabled
   - name: sscs-tya-notif
     version: 0.0.42
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-tya-notif.enabled
   - name: ccd
-    version: 8.0.29
+    version: 9.0.20
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd.enabled
     tags:
       - sscs-ccd-idam-pr
   - name: sscs-tribunals-frontend
-    version: 0.2.38
+    version: 0.2.40
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-tribunals-frontend.enabled
   - name: redis
@@ -55,6 +60,65 @@ dependencies:
     version: 1.0.4
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: servicebus.enabled
+  - name: aac-manage-case-assignment
+    version: ~0.2.11
+    repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    condition: aac-manage-case-assignment.enabled
+  - name: am-org-role-mapping-service
+    version: 0.0.50
+    repository: https://hmctspublic.azurecr.io/helm/v1/repo/
+    condition: am-org-role-mapping-service.enabled
+# WA
+  - name: camunda-bpm
+    version: 0.0.43
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: wa.enabled
+  - name: wa-task-management-api
+    version: 0.0.48
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: wa.enabled
+  - name: wa-task-monitor
+    version: ~0.0.27
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: wa.enabled
+  - name: wa-case-event-handler
+    version: 0.0.38
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: wa.enabled
+  - name: wa-workflow-api
+    version: 0.0.38
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: wa.enabled
+#    initiation
+  - name: wa-task-batch-service
+    version: ~0.0.15
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    alias: wa-initiation-batch
+    condition: wa.taskBatchCron.enabled
+#    reconfiguration
+  - name: wa-task-batch-service
+    version: ~0.0.16
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    alias: wa-reconfiguration-batch
+    condition: wa.reconfigurationBatchCron.enabled
+#    termination
+  - name: wa-task-batch-service
+    version: ~0.0.16
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    alias: wa-termination-batch
+    condition: wa.terminationBatchCron.enabled
+  - name: wa-message-cron-service
+    version: ~0.0.3
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: wa.enabled
+  - name: ccd-message-publisher
+    version: ~0.1.7
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: wa.enabled
+  - name: sscs-cron-trigger
+    version: 0.0.10
+    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
+    condition: wa.enabled
   - name: ccd-def-cleanup
     version: ~9.0.3
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
