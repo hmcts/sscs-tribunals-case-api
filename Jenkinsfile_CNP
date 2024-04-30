@@ -4,7 +4,7 @@ properties([
         pipelineTriggers([[$class: 'GitHubPushTrigger']])
 ])
 
-@Library("Infrastructure")
+@Library("Infrastructure@testsscs")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
@@ -67,7 +67,16 @@ def secretsForPR = [
                 secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
                 secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
                 secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
-                secret('sscs-servicebus-connection-string-tf', 'SERVICE_BUS_CONNECTION_STRING')
+                secret('sscs-servicebus-connection-string-tf', 'SERVICE_BUS_CONNECTION_STRING'),
+                secret('ccd-jid', 'CORE_CASE_DATA_JURISDICTION_ID'),
+                secret('ccd-tid', 'CORE_CASE_DATA_CASE_TYPE_ID'),
+                // Used by Kubernetes
+                secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD'),
+                secret('docmosis-endpoint', 'PDF_SERVICE_BASE_URL'),
+                secret('robotics-email-from', 'ROBOTICS_EMAIL_FROM'),
+                secret('robotics-email-to', 'ROBOTICS_EMAIL_TO'),
+                secret('robotics-email-scottish-to', 'ROBOTICS_EMAIL_SCOTTISH_TO'),
+                secret('robotics-email-pip-ae-to', 'ROBOTICS_EMAIL_PIP_AE_TO'),
         ],
         's2s-${env}'      : [
                 secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
