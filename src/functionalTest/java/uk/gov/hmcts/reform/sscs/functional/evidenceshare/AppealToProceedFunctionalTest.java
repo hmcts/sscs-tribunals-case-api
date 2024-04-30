@@ -1,15 +1,20 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static org.junit.Assert.assertEquals;
+import static org.slf4j.LoggerFactory.getLogger;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_TO_PROCEED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import org.junit.Test;
+import org.slf4j.Logger;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 
 public class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
+
+    private static final Logger log = getLogger(AppealToProceedFunctionalTest.class);
+
 
     public AppealToProceedFunctionalTest() {
         super();
@@ -28,6 +33,10 @@ public class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
         simulateCcdCallback(json);
 
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+
+        log.info("CseDetails {}", caseDetails);
+        log.info("CseDetails.getData {}", caseDetails.getData());
+        log.info("CseDetails.getState {}", caseDetails.getState());
 
         assertEquals("sentToDwp", caseDetails.getData().getHmctsDwpState());
         assertEquals("withDwp", caseDetails.getState());
