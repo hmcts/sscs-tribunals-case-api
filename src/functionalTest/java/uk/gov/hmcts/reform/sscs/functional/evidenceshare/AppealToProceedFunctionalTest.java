@@ -32,6 +32,12 @@ public class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
 
         simulateCcdCallback(json);
 
+        try {
+            Thread.sleep(30000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
 
         log.info("CseDetails {}", caseDetails);
