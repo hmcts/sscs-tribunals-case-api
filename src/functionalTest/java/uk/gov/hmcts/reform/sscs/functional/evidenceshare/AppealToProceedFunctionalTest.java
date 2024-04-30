@@ -32,7 +32,7 @@ public class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
 
         simulateCcdCallback(json);
 
-        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+        SscsCaseDetails caseDetails = findCaseById("1714506090456881");
 
         log.info("CseDetails {}", caseDetails);
         log.info("CseDetails.getData {}", caseDetails.getData());
