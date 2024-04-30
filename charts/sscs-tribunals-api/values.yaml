@@ -110,17 +110,16 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     EMAIL_SERVER_PORT: "25"
     EMAIL_SMTP_TLS_ENABLED: "true"
     EMAIL_SMTP_SSL_TRUST: "*"
-    BYPASS_EVIDENCE_SHARE_SERVICE: false
     HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: false
     TRIGGER_EVENT_V2_ENABLED: false
 
+postgresql:
+  enabled: false
 idam-pr:
   enabled: false
 xui-webapp:
   enabled: false
 elastic:
-  enabled: false
-sscs-evidence-share:
   enabled: false
 sscs-tya-notif:
   enabled: false
@@ -138,6 +137,18 @@ servicebus:
   enabled: false
 ccd-case-document-am-api:
   enabled: false
+aac-manage-case-assignment:
+  enabled: false
+am-org-role-mapping-service:
+  enabled: false
+wa:
+  enabled: false
+  taskBatchCron:
+    enabled: false
+  reconfigurationBatchCron:
+    enabled: false
+  terminationBatchCron:
+    enabled: false
 ccd-def-cleanup:
   enabled: false
 job:
