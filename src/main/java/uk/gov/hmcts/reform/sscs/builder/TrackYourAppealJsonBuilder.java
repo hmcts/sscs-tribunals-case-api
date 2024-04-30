@@ -500,7 +500,7 @@ public class TrackYourAppealJsonBuilder {
         return DateTimeUtils.convertLocalDateTimetoUtc(localDateTime);
     }
 
-    public static int calculateMaxDwpResponseDays(String benefitCode) {
+    public int calculateMaxDwpResponseDays(String benefitCode) {
         if (benefitCode != null && benefitCode.equals("childSupport")) {
             return MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT;
         } else {
