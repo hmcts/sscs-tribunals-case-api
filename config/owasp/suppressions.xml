@@ -3,6 +3,7 @@
   <suppress until = "2024-05-01">
     <cve>CVE-2023-35116</cve>
     <cve>CVE-2023-36052</cve>
+    <cve>CVE-2024-1597</cve>
   </suppress>
   <suppress>
     <notes><![CDATA[
