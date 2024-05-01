@@ -140,7 +140,7 @@ public abstract class AbstractFunctionalTest {
 
         baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : localInstance;
 
-        final String callbackUrl = baseURI + "/send";
+        final String callbackUrl = baseURI + "/testing-support/send";
 
         RestAssured.useRelaxedHTTPSValidation();
         RestAssured
@@ -152,11 +152,6 @@ public abstract class AbstractFunctionalTest {
             .post(callbackUrl)
             .then()
             .statusCode(HttpStatus.OK.value());
-        try {
-            Thread.sleep(15000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     protected String createTestData(String fileName) throws IOException {
