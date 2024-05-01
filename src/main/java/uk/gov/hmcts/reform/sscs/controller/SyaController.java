@@ -17,6 +17,7 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,16 +36,21 @@ import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.Draft;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
+import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceV2;
 
 @RestController
 @Slf4j
 public class SyaController {
 
     private final SubmitAppealService submitAppealService;
+    private final SubmitAppealServiceV2 submitAppealServiceV2;
+    @Value("${feature.submit-appeal-service-submit-draft-appeal-v2.enabled}")
+    private boolean isSubmitDraftAppealV2Enabled = false;
 
     @Autowired
-    SyaController(SubmitAppealService submitAppealService) {
+    SyaController(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2) {
         this.submitAppealService = submitAppealService;
+        this.submitAppealServiceV2 = submitAppealServiceV2;
     }
 
     @Operation(summary = "submitAppeal", description = "Creates a case from the SYA details")
@@ -164,7 +170,12 @@ public class SyaController {
 
         log.info("createDraftAppeal {} {}", forceCreateDraft, syaCaseWrapper.getCcdCaseId());
 
-        Optional<SaveCaseResult> submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper, forceCreateDraft);
+        Optional<SaveCaseResult> submitDraftResult;
+        if (isSubmitDraftAppealV2Enabled) {
+            submitDraftResult = submitAppealServiceV2.submitDraftAppeal(authorisation, syaCaseWrapper, forceCreateDraft);
+        } else {
+            submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper, forceCreateDraft);
+        }
         return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
     }
 

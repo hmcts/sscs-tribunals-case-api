@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -33,6 +34,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
@@ -65,9 +67,10 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionSendToNumber;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionTextReminders;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
+import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceV2;
 
 @RunWith(JUnitParamsRunner.class)
-public class SyaControllerTest {
+public abstract class AbstractSyaControllerTest {
 
     // being: it needed to run springRunner and junitParamsRunner
     @ClassRule
@@ -82,12 +85,19 @@ public class SyaControllerTest {
 
     @MockBean
     private SubmitAppealService submitAppealService;
+    @MockBean
+    private SubmitAppealServiceV2 submitAppealServiceV2;
 
     private SyaController controller;
 
+    abstract boolean v2IsEnabled();
+
+    abstract void mockSubmitAppealService(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2, Long caseId, SaveCaseOperation saveCaseOperation);
+
     @Before
     public void setUp() {
-        controller = new SyaController(submitAppealService);
+        controller = new SyaController(submitAppealService, submitAppealServiceV2);
+        ReflectionTestUtils.setField(controller, "isSubmitDraftAppealV2Enabled", v2IsEnabled());
         mockMvc = standaloneSetup(controller).build();
     }
 
@@ -105,11 +115,7 @@ public class SyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode201ForTheSubmittedDraft() throws Exception {
-        when(submitAppealService.submitDraftAppeal(any(), any(), any()))
-            .thenReturn(Optional.of(SaveCaseResult.builder()
-                .caseDetailsId(1L)
-                .saveCaseOperation(SaveCaseOperation.CREATE)
-                .build()));
+        mockSubmitAppealService(submitAppealService, submitAppealServiceV2, 1L, SaveCaseOperation.CREATE);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
 
@@ -122,11 +128,7 @@ public class SyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode201ForTheSubmittedDraftWhenForceCreateTrue() throws Exception {
-        when(submitAppealService.submitDraftAppeal(any(), any(), any()))
-                .thenReturn(Optional.of(SaveCaseResult.builder()
-                        .caseDetailsId(1L)
-                        .saveCaseOperation(SaveCaseOperation.CREATE)
-                        .build()));
+        mockSubmitAppealService(submitAppealService, submitAppealServiceV2, 1L, SaveCaseOperation.CREATE);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
 
@@ -139,11 +141,7 @@ public class SyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode201ForTheSubmittedDraftWhenForceCreateNotTrue() throws Exception {
-        when(submitAppealService.submitDraftAppeal(any(), any(), any()))
-                .thenReturn(Optional.of(SaveCaseResult.builder()
-                        .caseDetailsId(1L)
-                        .saveCaseOperation(SaveCaseOperation.CREATE)
-                        .build()));
+        mockSubmitAppealService(submitAppealService, submitAppealServiceV2, 1L, SaveCaseOperation.CREATE);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
 
