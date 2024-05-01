@@ -152,6 +152,11 @@ public abstract class AbstractFunctionalTest {
             .post(callbackUrl)
             .then()
             .statusCode(HttpStatus.OK.value());
+        try {
+            Thread.sleep(15000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected String createTestData(String fileName) throws IOException {
