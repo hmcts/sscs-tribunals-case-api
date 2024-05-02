@@ -741,16 +741,3 @@ servicebus:
         subscriptionNeeded: yes
     queues:
       - name: tribunals-to-hearing-api
-
-wa:
-  enabled: false
-  taskBatchCron:
-    enabled: false
-  reconfigurationBatchCron:
-    enabled: false
-  terminationBatchCron:
-    enabled: false
-aac-manage-case-assignment:
-  enabled: false
-am-org-role-mapping-service:
-  enabled: false
