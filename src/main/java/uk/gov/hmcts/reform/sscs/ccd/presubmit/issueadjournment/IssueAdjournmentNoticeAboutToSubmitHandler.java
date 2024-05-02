@@ -334,6 +334,14 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler extends IssueDocumentHan
 
         if (STANDARD.equals(durationType)) {
             OverrideFields defaultListingValues = caseData.getSchedulingAndListingFields().getDefaultListingValues();
+            OverrideFields overrideListingValues = caseData.getSchedulingAndListingFields().getOverrideFields();
+
+            if (nonNull(overrideListingValues)) {
+                Integer existingDuration = caseData.getSchedulingAndListingFields().getOverrideFields().getDuration();
+                if (nonNull(existingDuration)) {
+                    return existingDuration;
+                }
+            }
 
             if (nonNull(defaultListingValues)) {
                 Integer existingDuration = caseData.getSchedulingAndListingFields().getDefaultListingValues().getDuration();
