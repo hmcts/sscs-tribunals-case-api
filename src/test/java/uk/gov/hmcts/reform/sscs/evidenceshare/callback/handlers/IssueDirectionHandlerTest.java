@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STA
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
 
 import feign.FeignException;
+import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -24,11 +25,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -38,7 +36,7 @@ public class IssueDirectionHandlerTest {
     public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
-    private CcdService ccdCaseService;
+    private UpdateCcdCaseService updateCcdCaseService;
 
     @Mock
     private IdamService idamService;
@@ -46,11 +44,11 @@ public class IssueDirectionHandlerTest {
     private IssueDirectionHandler handler;
 
     @Captor
-    ArgumentCaptor<SscsCaseData> captor;
+    ArgumentCaptor<Consumer<SscsCaseDetails>> caseDataConsumerCaptor;
 
     @Before
     public void setUp() {
-        handler = new IssueDirectionHandler(ccdCaseService, idamService);
+        handler = new IssueDirectionHandler(updateCcdCaseService, idamService);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -87,16 +85,37 @@ public class IssueDirectionHandlerTest {
 
     @Test
     public void givenAnIssueDirectionEventForInterlocCase_thenTriggerAppealToProceedEvent() {
-        handler.handle(SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString())).build(), INTERLOCUTORY_REVIEW_STATE, DIRECTION_ISSUED));
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(
+                SscsCaseData.builder().directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString())).build()
+        ).build();
+        SscsCaseData sscsCaseData = sscsCaseDetails.getData();
+        handler.handle(SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(sscsCaseData, INTERLOCUTORY_REVIEW_STATE, DIRECTION_ISSUED));
 
-        verify(ccdCaseService).updateCase(captor.capture(), eq(1L), eq(EventType.APPEAL_TO_PROCEED.getCcdType()), eq("Appeal to proceed"), eq("Appeal proceed event triggered"), any());
+        verify(updateCcdCaseService).updateCaseV2(
+                eq(1L),
+                eq(EventType.APPEAL_TO_PROCEED.getCcdType()),
+                eq("Appeal to proceed"),
+                eq("Appeal proceed event triggered"),
+                any(),
+                caseDataConsumerCaptor.capture()
+        );
 
-        assertNull((captor.getValue().getDirectionTypeDl()));
+        caseDataConsumerCaptor.getValue().accept(sscsCaseDetails);
+
+        assertNull((sscsCaseData.getDirectionTypeDl()));
     }
 
     @Test(expected = FeignException.UnprocessableEntity.class)
-    public void unprocessableEntityErrorIsReThrown() {
-        when(ccdCaseService.updateCase(any(), eq(1L), eq(EventType.APPEAL_TO_PROCEED.getCcdType()), eq("Appeal to proceed"), eq("Appeal proceed event triggered"), any())).thenThrow(FeignException.UnprocessableEntity.class);
+    public void unProcessableEntityErrorIsReThrown() {
+        when(updateCcdCaseService.updateCaseV2(
+                        eq(1L),
+                        eq(EventType.APPEAL_TO_PROCEED.getCcdType()),
+                        eq("Appeal to proceed"),
+                        eq("Appeal proceed event triggered"),
+                        any(),
+                        any(Consumer.class)
+                )
+        ).thenThrow(FeignException.UnprocessableEntity.class);
 
         handler.handle(SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(SscsCaseData.builder().directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString())).build(), INTERLOCUTORY_REVIEW_STATE, DIRECTION_ISSUED));
     }
