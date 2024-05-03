@@ -742,4 +742,3 @@ servicebus:
         subscriptionNeeded: yes
     queues:
       - name: tribunals-to-hearing-api
-

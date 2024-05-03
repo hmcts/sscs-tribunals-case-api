@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.idam;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 
 import au.com.dius.pact.consumer.dsl.PactBuilder;
@@ -22,10 +22,8 @@ import uk.gov.hmcts.reform.idam.client.models.TokenResponse;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 public class IdamApiConsumerTest extends IdamConsumerTestBase {
-
     @Pact(provider = "idamApi_oidc", consumer = "sscs_tribunalsCaseApi")
     public V4Pact generatePactForUserInfo(PactBuilder builder) throws JSONException {
-
         return builder
             .usingLegacyDsl()
             .given("userinfo is requested")
@@ -41,7 +39,6 @@ public class IdamApiConsumerTest extends IdamConsumerTestBase {
 
     @Pact(provider = "idamApi_oidc", consumer = "sscs_tribunalsCaseApi")
     public V4Pact generatePactForToken(PactBuilder builder) {
-
         Map<String, String> responseheaders = ImmutableMap.<String, String>builder()
             .put("Content-Type", "application/json")
             .build();
@@ -76,14 +73,13 @@ public class IdamApiConsumerTest extends IdamConsumerTestBase {
         assertNotNull(userInfo.getGivenName());
         assertNotNull(userInfo.getFamilyName());
         assertNotNull(userInfo.getRoles());
-        assertTrue(userInfo.getRoles().size() > 0);
+        assertFalse(userInfo.getRoles().isEmpty());
 
     }
 
     @Test
     @PactTestFor(pactMethod = "generatePactForToken")
     public void verifyIdamUserDetailsRolesPactToken() {
-
         TokenResponse token = idamApi.generateOpenIdToken(buildTokenRequestMap());
         assertNotNull("Token is expected", token.accessToken);
     }
@@ -102,7 +98,6 @@ public class IdamApiConsumerTest extends IdamConsumerTestBase {
 
 
     private PactDslJsonBody createUserDetailsResponse() {
-
         return new PactDslJsonBody()
             .stringType("sub", "61")
             .stringType("uid", "sscs-citizen2@hmcts.net")
@@ -116,5 +111,4 @@ public class IdamApiConsumerTest extends IdamConsumerTestBase {
             .stringType("access_token", "eyJ0eXAiOiJKV1QiLCJraWQiOiJiL082T3ZWdjEre")
             .stringType("scope", "openid roles profile");
     }
-
 }
