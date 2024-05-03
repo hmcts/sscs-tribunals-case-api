@@ -81,6 +81,29 @@ public class CitizenCcdService {
         }
     }
 
+    public SaveCaseResult saveCaseV2(IdamTokens idamTokens, Consumer<SscsCaseData> mutator) {
+
+        List<CaseDetails> caseDetailsList = citizenCcdClient.searchForCitizen(idamTokens);
+
+        CaseDetails caseDetails;
+
+        if (CollectionUtils.isNotEmpty(caseDetailsList)) {
+
+            String caseId = caseDetailsList.get(0).getId().toString();
+            caseDetails = updateCaseV2(caseId, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
+                "Update draft in CCD", idamTokens, mutator);
+
+            return SaveCaseResult.builder()
+                .caseDetailsId(caseDetails.getId())
+                .saveCaseOperation(SaveCaseOperation.UPDATE)
+                .build();
+        } else {
+            SscsCaseData caseData = new SscsCaseData();
+            mutator.accept(caseData);
+            return createDraft(caseData, idamTokens);
+        }
+    }
+
     @Retryable
     public SaveCaseResult createDraft(SscsCaseData caseData, IdamTokens idamTokens) {
 
@@ -122,7 +145,7 @@ public class CitizenCcdService {
      */
     @Retryable
     public CaseDetails updateCaseV2(String caseId, String eventType, IdamTokens idamTokens, Function<SscsCaseData, UpdateResult> mutator) {
-        log.info("Updating a draft with caseId {} and eventType {}, using updateCaseV2 method", caseId, eventType);
+        log.info("Updating a draft with caseId {} and eventType {}, using updateCaseV2 method for citizen", caseId, eventType);
         StartEventResponse startEventResponse = citizenCcdClient.startEventForCitizen(idamTokens, caseId, eventType);
         var data = sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData());
 
