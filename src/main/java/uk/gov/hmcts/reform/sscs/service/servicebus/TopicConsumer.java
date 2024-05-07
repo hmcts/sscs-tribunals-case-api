@@ -42,6 +42,7 @@ public class TopicConsumer {
         containerFactory = "topicJmsListenerContainerFactory",
         subscription = "${amqp.subscription}"
     )
+
     public void onMessage(String message, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
         processMessageWithRetry(message, 1, messageId);
     }
