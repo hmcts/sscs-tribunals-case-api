@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseDataV1;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseDataV2;
 
 import feign.FeignException;
@@ -11,6 +12,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
@@ -19,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
@@ -83,6 +87,35 @@ public class SubmitAppealServiceV2 {
             }
         }
 
+    }
+
+    public Optional<SaveCaseResult> updateDraftAppeal(String oauth2Token, SyaCaseWrapper syaCaseWrapper) {
+        syaCaseWrapper.setCaseType(DRAFT);
+
+        IdamTokens idamTokens = getUserTokens(oauth2Token);
+        if (!hasValidCitizenRole(idamTokens)) {
+            throw new ApplicationErrorException(new Exception(USER_HAS_A_INVALID_ROLE_MESSAGE));
+        }
+
+        try {
+            Consumer<SscsCaseData> mutator = caseData -> convertSyaToCcdCaseDataV2(syaCaseWrapper, caseAccessManagementFeature, caseData);
+
+            CaseDetails caseDetails = citizenCcdService.updateCaseV2(syaCaseWrapper.getCcdCaseId(), EventType.UPDATE_DRAFT.getCcdType(),
+                    "Update draft", "Update draft in CCD", idamTokens, mutator);
+
+            return Optional.of(SaveCaseResult.builder()
+                    .caseDetailsId(caseDetails.getId())
+                    .saveCaseOperation(SaveCaseOperation.UPDATE)
+                    .build());
+
+        } catch (FeignException e) {
+            if (e.status() == HttpStatus.SC_CONFLICT) {
+                logError(syaCaseWrapper, idamTokens);
+                return Optional.empty();
+            } else {
+                throw e;
+            }
+        }
     }
 
     private void logError(SyaCaseWrapper appeal, IdamTokens idamTokens) {

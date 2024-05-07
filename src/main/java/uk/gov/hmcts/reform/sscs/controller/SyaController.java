@@ -46,6 +46,8 @@ public class SyaController {
     private final SubmitAppealServiceV2 submitAppealServiceV2;
     @Value("${feature.submit-appeal-service-submit-draft-appeal-v2.enabled}")
     private boolean isSubmitDraftAppealV2Enabled = false;
+    @Value("${feature.submit-appeal-service-update-appeal-v2.enabled}")
+    private boolean isUpdateAppealV2Enabled = false;
 
     @Autowired
     SyaController(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2) {
@@ -192,8 +194,13 @@ public class SyaController {
             log.info("Cannot proceed with update draft because the {} data is missing", getMissingDataInfo(syaCaseWrapper, authorisation));
             return ResponseEntity.noContent().build();
         }
-
-        Optional<SaveCaseResult> submitDraftResult = submitAppealService.updateDraftAppeal(authorisation, syaCaseWrapper);
+        log.info("SyaController updateDraftAppeal {}", syaCaseWrapper.getCcdCaseId());
+        Optional<SaveCaseResult> submitDraftResult;
+        if (isUpdateAppealV2Enabled) {
+            submitDraftResult = submitAppealServiceV2.updateDraftAppeal(authorisation, syaCaseWrapper);
+        } else {
+            submitDraftResult = submitAppealService.updateDraftAppeal(authorisation, syaCaseWrapper);
+        }
         return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
     }
 
