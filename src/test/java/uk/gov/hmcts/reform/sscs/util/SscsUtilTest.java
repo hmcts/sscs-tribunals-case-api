@@ -9,6 +9,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.TELEPHONE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.*;
 
 import java.time.LocalDate;
@@ -276,6 +278,41 @@ class SscsUtilTest {
         Appeal appeal = caseData.getAppeal();
         assertThat(appeal.getHearingType()).isEqualTo(HearingType.PAPER.getValue());
         assertThat(appeal.getHearingOptions().getWantsToAttend()).isEqualTo(YesNo.NO.getValue());
+
+        HearingSubtype hearingSubtype = appeal.getHearingSubtype();
+        assertThat(hearingSubtype.isWantsHearingTypeTelephone()).isFalse();
+        assertThat(hearingSubtype.isWantsHearingTypeFaceToFace()).isFalse();
+        assertThat(hearingSubtype.isWantsHearingTypeVideo()).isFalse();
+    }
+
+    @Test
+    void givenHearingChannelOfAttending_UpdateWantsToAttendToYesAndUpdateHearingSubtype() {
+        caseData.setAppeal(Appeal.builder().build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+
+        updateHearingChannel(caseData, TELEPHONE);
+
+        assertThat(caseData.getSchedulingAndListingFields().getOverrideFields().getAppellantHearingChannel()).isEqualTo(TELEPHONE);
+
+        Appeal appeal = caseData.getAppeal();
+        assertThat(appeal.getHearingType()).isEqualTo(HearingType.ORAL.getValue());
+        assertThat(appeal.getHearingOptions().getWantsToAttend()).isEqualTo(YesNo.YES.getValue());
+
+        HearingSubtype hearingSubtype = appeal.getHearingSubtype();
+        assertThat(hearingSubtype.isWantsHearingTypeTelephone()).isTrue();
+    }
+
+    @Test
+    void givenHearingChannelIsPaper_UpdateHearingSubtypeToNo() {
+        caseData.setAppeal(Appeal.builder().build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+
+        updateHearingChannel(caseData, PAPER);
+
+        assertThat(caseData.getSchedulingAndListingFields().getOverrideFields().getAppellantHearingChannel()).isEqualTo(PAPER);
+
+        Appeal appeal = caseData.getAppeal();
+        assertThat(appeal.getHearingType()).isEqualTo(HearingType.PAPER.getValue());
 
         HearingSubtype hearingSubtype = appeal.getHearingSubtype();
         assertThat(hearingSubtype.isWantsHearingTypeTelephone()).isFalse();

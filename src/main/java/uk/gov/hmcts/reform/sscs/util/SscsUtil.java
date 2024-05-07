@@ -452,9 +452,15 @@ public class SscsUtil {
             appeal.setHearingSubtype(hearingSubtype);
         }
 
-        hearingSubtype.setWantsHearingTypeFaceToFace(hearingChannelToYesNoString(FACE_TO_FACE, hearingChannel));
-        hearingSubtype.setWantsHearingTypeTelephone(hearingChannelToYesNoString(TELEPHONE, hearingChannel));
-        hearingSubtype.setWantsHearingTypeVideo(hearingChannelToYesNoString(VIDEO, hearingChannel));
+        if (hearingType == HearingType.PAPER) {
+            hearingSubtype.setWantsHearingTypeFaceToFace("No");
+            hearingSubtype.setWantsHearingTypeTelephone("No");
+            hearingSubtype.setWantsHearingTypeVideo("No");
+        } else {
+            hearingSubtype.setWantsHearingTypeFaceToFace(hearingChannelToYesNoString(FACE_TO_FACE, hearingChannel));
+            hearingSubtype.setWantsHearingTypeTelephone(hearingChannelToYesNoString(TELEPHONE, hearingChannel));
+            hearingSubtype.setWantsHearingTypeVideo(hearingChannelToYesNoString(VIDEO, hearingChannel));
+        }
 
         caseData.getSchedulingAndListingFields().getOverrideFields().setAppellantHearingChannel(hearingChannel);
     }
