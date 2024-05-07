@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.UPLOAD;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostHearingRequestFormatAndContentFields;
