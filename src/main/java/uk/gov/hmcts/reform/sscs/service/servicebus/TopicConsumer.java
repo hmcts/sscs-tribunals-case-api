@@ -48,6 +48,7 @@ public class TopicConsumer {
         containerFactory = "topicJmsListenerContainerFactory",
         subscription = "${amqp.subscription}"
     )
+
     public void onMessage(String message, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
         log.info("Message Id {} received from the service bus", messageId);
         processEvidenceShareMessageWithRetry(message, 1, messageId);
