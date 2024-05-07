@@ -12,5 +12,8 @@
     <packageUrl regex="true">^pkg:maven/org\.postgresql/postgresql@.*$</packageUrl>
     <cve>CVE-2024-1597</cve>
   </suppress>
-  <suppress><cve>CVE-2023-36052</cve></suppress>
+  <suppress>
+    <cve>CVE-2023-36052</cve>
+    <cve>CVE-2023-35116</cve>
+  </suppress>
 </suppressions>
