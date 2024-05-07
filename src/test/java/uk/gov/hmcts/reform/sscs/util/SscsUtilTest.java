@@ -3,15 +3,13 @@ package uk.gov.hmcts.reform.sscs.util;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_GRANTED;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.*;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,9 +23,7 @@ import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService
 
 @ExtendWith(MockitoExtension.class)
 class SscsUtilTest {
-    public static final String UNEXPECTED_POST_HEARING_REVIEW_TYPE_AND_ACTION = "getting the document type has an unexpected postHearingReviewType and action";
-  
-    private SessionCategoryMapService categoryMapService = new SessionCategoryMapService();
+    private final SessionCategoryMapService categoryMapService = new SessionCategoryMapService();
     private PostHearing postHearing;
     private SscsCaseData caseData;
 
@@ -281,5 +277,35 @@ class SscsUtilTest {
         assertThat(hearingSubtype.isWantsHearingTypeTelephone()).isFalse();
         assertThat(hearingSubtype.isWantsHearingTypeFaceToFace()).isFalse();
         assertThat(hearingSubtype.isWantsHearingTypeVideo()).isFalse();
+    }
+
+    @Test
+    void givenSorRequestInTime_thenSorRequestInTimeFieldIsYes() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        SscsDocumentDetails details = SscsDocumentDetails.builder()
+                .documentType(STATEMENT_OF_REASONS_APPLICATION.getValue())
+                .documentDateAdded(LocalDate.now().minusDays(25).format(formatter))
+                .build();
+        SscsDocument document = SscsDocument.builder()
+                .value(details)
+                .build();
+
+        YesNo sorRequestInTime = isSorRequestInTime(document);
+        assertThat(sorRequestInTime).isEqualTo(YesNo.YES);
+    }
+
+    @Test
+    void givenSorRequestNotInTime_thenSorRequestNotInTimeFieldIsNo() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        SscsDocumentDetails details = SscsDocumentDetails.builder()
+                .documentType(STATEMENT_OF_REASONS_APPLICATION.getValue())
+                .documentDateAdded(LocalDate.now().minusDays(35).format(formatter))
+                .build();
+        SscsDocument document = SscsDocument.builder()
+                .value(details)
+                .build();
+
+        YesNo sorRequestInTime = isSorRequestInTime(document);
+        assertThat(sorRequestInTime).isEqualTo(YesNo.NO);
     }
 }

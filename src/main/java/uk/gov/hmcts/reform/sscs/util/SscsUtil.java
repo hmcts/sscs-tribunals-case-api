@@ -517,5 +517,19 @@ public class SscsUtil {
             }
         }
     }
+
+    public static YesNo isSorRequestInTime(SscsDocument document) {
+        String documentDateAdded = document.getValue().getDocumentDateAdded();
+        if (isNull(documentDateAdded)) {
+            return null;
+        }
+
+        LocalDate documentDate = LocalDate.parse(documentDateAdded);
+        if (documentDate.isAfter(LocalDate.now().minusDays(30))) {
+            return YES;
+        }
+
+        return NO;
+    }
 }
 

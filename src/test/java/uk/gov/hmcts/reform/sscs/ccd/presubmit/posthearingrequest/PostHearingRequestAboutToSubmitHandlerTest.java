@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.UPLOAD;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -50,7 +51,7 @@ class PostHearingRequestAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingRequestAboutToSubmitHandler(true, footerService);
+        handler = new PostHearingRequestAboutToSubmitHandler(true, true, footerService);
 
         DocumentLink documentLink = DocumentLink.builder()
             .documentFilename(SET_ASIDE_APPLICATION_FROM_FTA_PDF)
@@ -99,7 +100,7 @@ class PostHearingRequestAboutToSubmitHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingRequestAboutToSubmitHandler(false, footerService);
+        handler = new PostHearingRequestAboutToSubmitHandler(false, false, footerService);
         when(callback.getEvent()).thenReturn(POST_HEARING_REQUEST);
         assertThat(handler.canHandle(ABOUT_TO_SUBMIT, callback)).isFalse();
     }
@@ -136,10 +137,7 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         "PERMISSION_TO_APPEAL,Permission to Appeal Application from FTA.pdf,PERMISSION_TO_APPEAL_APPLICATION"
     })
     void givenAPostHearingRequest_footerServiceIsCalledToCreateDocAndAddToBundle(
-        PostHearingRequestType requestType,
-        String filename,
-        DocumentType documentType
-    ) {
+            PostHearingRequestType requestType, String filename, DocumentType documentType) {
         when(callback.getEvent()).thenReturn(POST_HEARING_REQUEST);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
@@ -241,5 +239,27 @@ class PostHearingRequestAboutToSubmitHandlerTest {
             .documentFilename(expectedFileName)
             .build();
         assertThat(response.getData().getDocumentStaging().getPreviewDocument()).isEqualTo(expectedDocument);
+    }
+
+    @Disabled
+    @Test
+    void givenSorRequestInTime_whenSorRequestFieldIsYes() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        caseData.getPostHearing().setRequestType(PostHearingRequestType.STATEMENT_OF_REASONS);
+        caseData.getPostHearing().getStatementOfReasons().setRequestFormat(UPLOAD);
+        String dmUrl = "http://dm-store/documents/123";
+        DocumentLink uploadedDocument = DocumentLink.builder()
+                .documentFilename("A random filename.pdf")
+                .documentUrl(dmUrl)
+                .documentBinaryUrl(dmUrl + "/binary")
+                .build();
+        caseData.getDocumentStaging().setPreviewDocument(uploadedDocument);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        SscsCaseData data = response.getData();
+        assertThat(data.getPostHearing().getSorRequestInTime()).isEqualTo(YesNo.YES);
     }
 }

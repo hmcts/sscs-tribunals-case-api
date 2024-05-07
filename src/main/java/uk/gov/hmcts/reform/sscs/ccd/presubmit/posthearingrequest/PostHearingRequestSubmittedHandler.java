@@ -9,12 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdCallbackMap;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
@@ -30,7 +27,7 @@ public class PostHearingRequestSubmittedHandler implements PreSubmitCallbackHand
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        requireNonNull(callbackType, "callbacktype must not be null");
+        requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent() == EventType.POST_HEARING_REQUEST
@@ -41,6 +38,10 @@ public class PostHearingRequestSubmittedHandler implements PreSubmitCallbackHand
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+
+        if (!isNull(caseData.getSscsDocument())) {
+            log.info("Documents size is {}", caseData.getSscsDocument().size());
+        }
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
@@ -62,6 +63,16 @@ public class PostHearingRequestSubmittedHandler implements PreSubmitCallbackHand
         SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
 
         caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
+
+        if (!isNull(caseData.getSscsDocument()) && !caseData.getSscsDocument().isEmpty()) {
+            log.info("Document Is {}", caseData.getSscsDocument().get(caseData.getSscsDocument().size() - 1).getValue());
+
+            var doc = caseData.getLatestDocumentForDocumentType(DocumentType.STATEMENT_OF_REASONS_APPLICATION);
+
+            if (doc != null) {
+                log.info("Sor Document {}", doc.getValue());
+            }
+        }
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
