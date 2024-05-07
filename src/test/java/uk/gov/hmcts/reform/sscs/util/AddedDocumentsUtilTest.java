@@ -7,8 +7,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
@@ -88,4 +91,38 @@ public class AddedDocumentsUtilTest {
             .isNull();
     }
 
+    @Test
+    public void givenACaseWithNoScannedDocuments_shouldSetScannedDocumentTypesToEmptyList() {
+        addedDocumentsUtil.updateScannedDocumentTypes(sscsCaseData, new ArrayList<>());
+
+        org.assertj.core.api.Assertions.assertThat(sscsCaseData.getWorkAllocationFields().getScannedDocumentTypes())
+                .as("No documents have been attached - scannedDocumentTypes list should be empty.")
+                .isEmpty();
+    }
+
+    @Test
+    public void givenACaseWithMultipleScannedDocuments_shouldSetScannedDocumentTypesList() {
+        addedDocumentsUtil.updateScannedDocumentTypes(sscsCaseData, Arrays.asList("reinstatementRequest",
+                "reinstatementRequest", "appellantEvidence", "confidentialityRequest"));
+
+        org.assertj.core.api.Assertions.assertThat(sscsCaseData.getWorkAllocationFields().getScannedDocumentTypes())
+                .as("Documents have been attached - scannedDocumentTypes list should be a distinct list of types")
+                .isEqualTo(Arrays.asList("reinstatementRequest", "appellantEvidence", "confidentialityRequest"));
+    }
+
+    @Test
+    public void givenCurrentDocumentTypeIsNull_shouldReturnUpdatedDocumentType() {
+        Optional<String> currentType = Optional.empty();
+        Map<String, Optional<String>> currentDocumentTypeMap = Map.of("1", currentType);
+        AbstractDocumentDetails docDetails = AbstractDocumentDetails.builder().documentType("urgentHearingRequest").build();
+
+        List<String> documentTypes = addedDocumentsUtil.addedDocumentTypes(
+                currentDocumentTypeMap,
+                List.of(AbstractDocument.builder().id("1").value(docDetails).build())
+        );
+
+        org.assertj.core.api.Assertions.assertThat(documentTypes)
+                .as("Document type has been updated - should return new document type")
+                .isEqualTo(Arrays.asList("urgentHearingRequest"));
+    }
 }
