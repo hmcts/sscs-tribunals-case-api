@@ -60,15 +60,6 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
                 caseData.getDocumentStaging().getPreviewDocument(),
                     postHearingDocumentType,
                 callback.getEvent());
-
-            if (postHearingDocumentType.equals(DocumentType.STATEMENT_OF_REASONS_APPLICATION)) {
-                SscsDocument document = caseData.getLatestDocumentForDocumentType(DocumentType.STATEMENT_OF_REASONS_APPLICATION);
-
-                if (!isNull(document)) {
-                    YesNo sorRequestInTime = SscsUtil.isSorRequestInTime(document);
-                    caseData.getPostHearing().setSorRequestInTime(sorRequestInTime);
-                }
-            }
         }
         clearPostHearingRequestFormatAndContentFields(caseData, caseData.getPostHearing().getRequestType());
 
