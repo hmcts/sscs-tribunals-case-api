@@ -14,7 +14,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
@@ -45,8 +44,6 @@ public class CitizenLoginService {
     private final IdamService idamService;
     private final PostcodeUtil postcodeUtil;
     private final OnlineHearingService onlineHearingService;
-    @Value("${feature.citizen-login-service-v2.enabled}")
-    private boolean citizenLogicServiceV2Enabled;
 
 
     public CitizenLoginService(CitizenCcdService citizenCcdService, CcdService ccdService, UpdateCcdCaseService updateCcdCaseService, SscsCcdConvertService sscsCcdConvertService, IdamService idamService, PostcodeUtil postcodeUtil, OnlineHearingService onlineHearingService) {
@@ -172,17 +169,9 @@ public class CitizenLoginService {
     }
 
     private void updateCaseWithLastLoggedIntoMya(String email, SscsCaseDetails caseByAppealNumber) {
-        if (citizenLogicServiceV2Enabled) {
-            log.info("Updating case with last logged in MYA using V2, case id: {}, matching email: {}", caseByAppealNumber.getId(), email);
-            updateCcdCaseService.updateCaseV2(caseByAppealNumber.getId(), EventType.UPDATE_CASE_ONLY.getCcdType(), "SSCS - update last logged in MYA",
-                    UPDATED_SSCS, idamService.getIdamTokens(), caseData -> updateSubscriptionWithLastLoggedIntoMya(caseData, email));
-        } else {
-            log.info("Updating case with last logged in MYA using V1, case id: {}, matching email: {}", caseByAppealNumber.getId(), email);
-            updateSubscriptionWithLastLoggedIntoMya(caseByAppealNumber.getData(), email);
-            ccdService.updateCase(caseByAppealNumber.getData(), caseByAppealNumber.getId(), EventType.UPDATE_CASE_ONLY.getCcdType(),
-                    "SSCS - update last logged in MYA", UPDATED_SSCS, idamService.getIdamTokens()
-            );
-        }
+        log.info("Updating case with last logged in MYA using V2, case id: {}, matching email: {}", caseByAppealNumber.getId(), email);
+        updateCcdCaseService.updateCaseV2(caseByAppealNumber.getId(), EventType.UPDATE_CASE_ONLY.getCcdType(), "SSCS - update last logged in MYA",
+                UPDATED_SSCS, idamService.getIdamTokens(), caseData -> updateSubscriptionWithLastLoggedIntoMya(caseData, email));
     }
 
     private Predicate<SscsCaseDetails> casesWithSubscriptionMatchingTya(String tya) {
