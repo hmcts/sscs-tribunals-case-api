@@ -12,7 +12,12 @@ import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceV2;
 public class SyaControllerTestV1 extends AbstractSyaControllerTest {
 
     @Override
-    boolean v2IsEnabled() {
+    boolean v2SubmitDraftAppealIsEnable() {
+        return false;
+    }
+
+    @Override
+    boolean v2UpdateDraftAppealIsEnable() {
         return false;
     }
 
@@ -20,6 +25,15 @@ public class SyaControllerTestV1 extends AbstractSyaControllerTest {
     void mockSubmitAppealService(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2,
                                  Long caseId, SaveCaseOperation saveCaseOperation) {
         when(submitAppealService.submitDraftAppeal(any(), any(), any()))
+                .thenReturn(Optional.of(SaveCaseResult.builder()
+                        .caseDetailsId(caseId)
+                        .saveCaseOperation(saveCaseOperation)
+                        .build()));
+    }
+
+    @Override
+    public void mockSubmitAppealServiceUpdateDraftAppeal(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2, Long caseId, SaveCaseOperation saveCaseOperation) {
+        when(submitAppealService.updateDraftAppeal(any(), any()))
                 .thenReturn(Optional.of(SaveCaseResult.builder()
                         .caseDetailsId(caseId)
                         .saveCaseOperation(saveCaseOperation)
