@@ -14,8 +14,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.UPLOAD;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -241,12 +241,8 @@ class PostHearingRequestAboutToSubmitHandlerTest {
         assertThat(response.getData().getDocumentStaging().getPreviewDocument()).isEqualTo(expectedDocument);
     }
 
-    @Disabled
     @Test
     void givenSorRequestInTime_whenSorRequestFieldIsYes() {
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-
         caseData.getPostHearing().setRequestType(PostHearingRequestType.STATEMENT_OF_REASONS);
         caseData.getPostHearing().getStatementOfReasons().setRequestFormat(UPLOAD);
         String dmUrl = "http://dm-store/documents/123";
@@ -255,11 +251,53 @@ class PostHearingRequestAboutToSubmitHandlerTest {
                 .documentUrl(dmUrl)
                 .documentBinaryUrl(dmUrl + "/binary")
                 .build();
+        SscsDocumentDetails details = SscsDocumentDetails.builder()
+                .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
+                .documentType(DocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue())
+                .build();
+        SscsDocument document = SscsDocument.builder()
+                .value(details)
+                .build();
+
         caseData.getDocumentStaging().setPreviewDocument(uploadedDocument);
+        caseData.setSscsDocument(List.of(document));
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         SscsCaseData data = response.getData();
         assertThat(data.getPostHearing().getSorRequestInTime()).isEqualTo(YesNo.YES);
+    }
+
+    @Test
+    void givenSorRequestNotInTime_whenSorRequestFieldIsMo() {
+        caseData.getPostHearing().setRequestType(PostHearingRequestType.STATEMENT_OF_REASONS);
+        caseData.getPostHearing().getStatementOfReasons().setRequestFormat(UPLOAD);
+        String dmUrl = "http://dm-store/documents/123";
+        DocumentLink uploadedDocument = DocumentLink.builder()
+                .documentFilename("A random filename.pdf")
+                .documentUrl(dmUrl)
+                .documentBinaryUrl(dmUrl + "/binary")
+                .build();
+        SscsDocumentDetails details = SscsDocumentDetails.builder()
+                .documentDateAdded(LocalDate.now().minusDays(30).format(DateTimeFormatter.ISO_DATE))
+                .documentType(DocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue())
+                .build();
+        SscsDocument document = SscsDocument.builder()
+                .value(details)
+                .build();
+
+        caseData.getDocumentStaging().setPreviewDocument(uploadedDocument);
+        caseData.setSscsDocument(List.of(document));
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        SscsCaseData data = response.getData();
+        assertThat(data.getPostHearing().getSorRequestInTime()).isEqualTo(YesNo.NO);
     }
 }

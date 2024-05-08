@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -39,20 +38,14 @@ public class PostHearingRequestSubmittedHandler implements PreSubmitCallbackHand
                                                           String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        if (!isNull(caseData.getSscsDocument())) {
-            log.info("Documents size is {}", caseData.getSscsDocument().size());
-        }
-
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
-
         PostHearing postHearing = caseData.getPostHearing();
         PostHearingRequestType typeSelected = postHearing.getRequestType();
         log.info("Post Hearing Request: handling postHearing {} for case {}", typeSelected,  caseId);
 
         CcdCallbackMap callbackMap = postHearing.getRequestType();
-
         if (isNull(callbackMap)) {
             response.addError(String.format("Invalid Post Hearing Request Type Selected %s or request "
                     + "selected as callback is null",
@@ -61,18 +54,7 @@ public class PostHearingRequestSubmittedHandler implements PreSubmitCallbackHand
         }
 
         SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
-
         caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
-
-        if (!isNull(caseData.getSscsDocument()) && !caseData.getSscsDocument().isEmpty()) {
-            log.info("Document Is {}", caseData.getSscsDocument().get(caseData.getSscsDocument().size() - 1).getValue());
-
-            var doc = caseData.getLatestDocumentForDocumentType(DocumentType.STATEMENT_OF_REASONS_APPLICATION);
-
-            if (doc != null) {
-                log.info("Sor Document {}", doc.getValue());
-            }
-        }
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
