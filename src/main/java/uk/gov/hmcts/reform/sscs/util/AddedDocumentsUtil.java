@@ -64,7 +64,11 @@ public class AddedDocumentsUtil {
 
     public void updateScannedDocumentTypes(SscsCaseData sscsCaseData, List<String> documentsAddedThisEvent) {
         if (workAllocationFeature) {
-            sscsCaseData.getWorkAllocationFields().setScannedDocumentTypes(documentsAddedThisEvent.stream().distinct().collect(Collectors.toList()));
+            if(documentsAddedThisEvent!=null) {
+                sscsCaseData.getWorkAllocationFields().setScannedDocumentTypes(documentsAddedThisEvent.stream().distinct().collect(Collectors.toList()));
+            } else {
+                sscsCaseData.getWorkAllocationFields().setScannedDocumentTypes(null);
+            }
         }
     }
 
