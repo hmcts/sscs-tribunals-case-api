@@ -7,7 +7,7 @@ Tribunals case api is a spring boot based application to create new appeals for 
 
 For versions and complete list of dependencies see build.gradle
 
-* Java 17
+* Java 11
 * Spring Boot
 * Gradle
 
