@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
@@ -13,16 +14,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdCallbackMap;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SetAside;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService.ConditionalUpdateResult;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
@@ -32,7 +28,7 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final CcdCallbackMapService ccdCallbackMapService;
 
-    private final CcdService ccdService;
+    private final UpdateCcdCaseService updateCcdCaseService;
 
     private final IdamService idamService;
 
@@ -56,38 +52,46 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
+        PostHearingReviewType typeSelected = caseData.getPostHearing().getReviewType();
+
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
 
-        PostHearing postHearing = caseData.getPostHearing();
-        PostHearingReviewType typeSelected = postHearing.getReviewType();
-        log.info("Review Post Hearing App: handling actionPostHearing {} for case {}", typeSelected,  caseId);
+        log.info("Review Post Hearing App: handling actionPostHearing {} for case {}", typeSelected, caseId);
 
-        CcdCallbackMap callbackMap = getCcdCallbackMap(postHearing, typeSelected);
-
-        if (isNull(callbackMap)) {
+        if (isNull(typeSelected) || Arrays.stream(PostHearingReviewType.values()).noneMatch(typeSelected::equals)) {
             response.addError(String.format("Invalid Action Post Hearing Application Type Selected %s or action "
-                    + "selected as callback is null",
-                typeSelected));
+                            + "selected as callback is null",
+                    typeSelected));
             return response;
         }
 
-        boolean isSetAsideRefusedSor = isSetAsideRefusedSor(postHearing);
+        updateCcdCaseService.updateCaseV2Conditional(
+                caseId,
+                EventType.SOR_REQUEST.getCcdType(),
+                idamService.getIdamTokens(),
+                sscsCaseDetails -> {
+                    var sscsCaseData = sscsCaseDetails.getData();
+                    var postHearing = sscsCaseData.getPostHearing();
 
-        SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
+                    CcdCallbackMap callbackMap = getCcdCallbackMap(postHearing, typeSelected);
 
-        caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
+                    boolean isSetAsideRefusedSor = isSetAsideRefusedSor(postHearing);
 
-        if (isSetAsideRefusedSor) {
-            handleSetAsideRefusedSor(caseData);
-        }
+                    SscsUtil.clearPostHearingFields(sscsCaseData, isPostHearingsEnabled);
+
+                    ccdCallbackMapService.handleCcdCallbackMap(callbackMap, sscsCaseData);
+
+                    if (isSetAsideRefusedSor) {
+                        log.info("Review Post Hearing App - updateCaseV2Conditional triggered for case {} and type {} ", caseId, typeSelected);
+                        return new ConditionalUpdateResult("Send to hearing Judge for statement of reasons", "", true);
+                    }
+                    log.info("Review Post Hearing App - updateCaseV2Conditional not triggered for case {} and type {} ", caseId, typeSelected);
+                    return new ConditionalUpdateResult("Send to hearing Judge for statement of reasons", "", false);
+                }
+
+        );
 
         return new PreSubmitCallbackResponse<>(caseData);
-    }
-
-    private void handleSetAsideRefusedSor(SscsCaseData caseData) {
-        ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
-            EventType.SOR_REQUEST.getCcdType(), "Send to hearing Judge for statement of reasons", "",
-            idamService.getIdamTokens());
     }
 
     @Nullable

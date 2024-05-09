@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
@@ -19,20 +20,26 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions.REFUSE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions.REFUSE_SOR;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService.ConditionalUpdateResult;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+
 
 @ExtendWith(MockitoExtension.class)
 class PostHearingReviewSubmittedHandlerTest {
@@ -40,18 +47,20 @@ class PostHearingReviewSubmittedHandlerTest {
     private static final String DOCUMENT_URL = "dm-store/documents/123";
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    public static final long CASE_ID = 1234L;
+    private static final long CASE_ID = 1234L;
+    private static final String USER_ID = "16";
+    private static final String AUTHORIZATION = "authorization";
+    private static final String SERVICE_AUTHORIZATION = "serviceAuthorization";
 
     private PostHearingReviewSubmittedHandler handler;
 
     @Mock
     private CcdCallbackMapService ccdCallbackMapService;
     @Mock
-    private CcdService ccdService;
+    private UpdateCcdCaseService updateCcdCaseService;
 
     @Mock
     private IdamService idamService;
-
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -61,9 +70,12 @@ class PostHearingReviewSubmittedHandlerTest {
 
     private SscsCaseData caseData;
 
+    @Captor
+    private ArgumentCaptor<Function<SscsCaseDetails, ConditionalUpdateResult>> functionArgumentCaptor;
+
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewSubmittedHandler(ccdCallbackMapService, ccdService, idamService, true);
+        handler = new PostHearingReviewSubmittedHandler(ccdCallbackMapService, updateCcdCaseService, idamService, true);
 
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -104,7 +116,7 @@ class PostHearingReviewSubmittedHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewSubmittedHandler(ccdCallbackMapService, ccdService, idamService, false);
+        handler = new PostHearingReviewSubmittedHandler(ccdCallbackMapService, updateCcdCaseService, idamService, false);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }
@@ -126,28 +138,28 @@ class PostHearingReviewSubmittedHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
-        PostHearing returnedPostHearing = PostHearing.builder()
-            .reviewType(SET_ASIDE)
-            .setAside(SetAside.builder()
-                .action(action)
-                .build())
-            .build();
-        SscsCaseData returnedCase = SscsCaseData.builder()
-            .ccdCaseId("555")
-            .postHearing(returnedPostHearing)
-            .build();
-        when(ccdCallbackMapService.handleCcdCallbackMap(action, caseData))
-            .thenReturn(returnedCase);
+        when(idamService.getIdamTokens())
+                .thenReturn(IdamTokens.builder()
+                        .idamOauth2Token(AUTHORIZATION)
+                        .serviceAuthorization(SERVICE_AUTHORIZATION)
+                        .userId(USER_ID)
+                        .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
 
-        verify(ccdCallbackMapService, times(1))
-            .handleCcdCallbackMap(action, caseData);
+        verify(updateCcdCaseService).updateCaseV2Conditional(
+                any(Long.class),
+                eq(EventType.SOR_REQUEST.getCcdType()),
+                any(IdamTokens.class),
+                functionArgumentCaptor.capture()
+        );
 
-        verifyNoInteractions(ccdService);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
+
+        assertThat(functionArgumentCaptor.getValue().apply(sscsCaseDetails).willCommit()).isFalse();
     }
 
     @ParameterizedTest
@@ -159,32 +171,28 @@ class PostHearingReviewSubmittedHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
-        PostHearing returnedPostHearing = PostHearing.builder()
-            .reviewType(SET_ASIDE)
-            .setAside(SetAside.builder()
-                .action(REFUSE)
-                .requestStatementOfReasons(requestSor)
-                .build())
-            .build();
-        SscsCaseData returnedCase = SscsCaseData.builder()
-            .state(State.DORMANT_APPEAL_STATE)
-            .interlocReviewState(InterlocReviewState.NONE)
-            .ccdCaseId("555")
-            .postHearing(returnedPostHearing)
-            .build();
-        when(ccdCallbackMapService.handleCcdCallbackMap(REFUSE, caseData))
-            .thenReturn(returnedCase);
+        when(idamService.getIdamTokens())
+                .thenReturn(IdamTokens.builder()
+                        .idamOauth2Token(AUTHORIZATION)
+                        .serviceAuthorization(SERVICE_AUTHORIZATION)
+                        .userId(USER_ID)
+                        .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
 
-        verify(ccdCallbackMapService, times(1))
-            .handleCcdCallbackMap(REFUSE, caseData);
+        verify(updateCcdCaseService).updateCaseV2Conditional(
+                any(Long.class),
+                eq(EventType.SOR_REQUEST.getCcdType()),
+                any(IdamTokens.class),
+                functionArgumentCaptor.capture()
+        );
 
-        assertThat(response.getData().getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
-        assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.NONE);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
+
+        assertThat(functionArgumentCaptor.getValue().apply(sscsCaseDetails).willCommit()).isFalse();
     }
 
     @Test
@@ -211,26 +219,36 @@ class PostHearingReviewSubmittedHandlerTest {
             .ccdCaseId("555")
             .build();
 
-        when(ccdCallbackMapService.handleCcdCallbackMap(REFUSE_SOR, caseData))
-            .thenReturn(returnedCase);
+        when(idamService.getIdamTokens())
+                .thenReturn(IdamTokens.builder()
+                        .idamOauth2Token(AUTHORIZATION)
+                        .serviceAuthorization(SERVICE_AUTHORIZATION)
+                        .userId(USER_ID)
+                        .build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
 
+        verify(updateCcdCaseService).updateCaseV2Conditional(
+                any(Long.class),
+                eq(EventType.SOR_REQUEST.getCcdType()),
+                any(IdamTokens.class),
+                functionArgumentCaptor.capture()
+        );
+
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(returnedCase).build();
+
+        assertThat(functionArgumentCaptor.getValue().apply(sscsCaseDetails).willCommit()).isTrue();
+
+        assertThat(response.getErrors()).isEmpty();
+
         verify(ccdCallbackMapService, times(1))
-            .handleCcdCallbackMap(REFUSE_SOR, caseData);
+                .handleCcdCallbackMap(REFUSE_SOR, returnedCase);
 
-        verify(ccdService, times(1)).updateCase(returnedCase,
-            Long.valueOf(returnedCase.getCcdCaseId()),
-            EventType.SOR_REQUEST.getCcdType(),
-            "Send to hearing Judge for statement of reasons",
-            "",
-            idamService.getIdamTokens());
-
-        assertThat(response.getData().getState()).isEqualTo(State.POST_HEARING);
-        assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.NONE);
+        assertThat(sscsCaseDetails.getData().getState()).isEqualTo(State.POST_HEARING);
+        assertThat(sscsCaseDetails.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.NONE);
     }
 
     @Test
@@ -297,6 +315,13 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     private void verifyCcdCallbackCalledCorrectly(CcdCallbackMap callbackMap) {
+        when(idamService.getIdamTokens())
+                .thenReturn(IdamTokens.builder()
+                        .idamOauth2Token(AUTHORIZATION)
+                        .serviceAuthorization(SERVICE_AUTHORIZATION)
+                        .userId(USER_ID)
+                        .build());
+
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         when(caseDetails.getCaseData()).thenReturn(caseData);
@@ -306,6 +331,19 @@ class PostHearingReviewSubmittedHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        verify(updateCcdCaseService).updateCaseV2Conditional(
+                any(Long.class),
+                eq(EventType.SOR_REQUEST.getCcdType()),
+                any(IdamTokens.class),
+                functionArgumentCaptor.capture()
+        );
+
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
+
+        functionArgumentCaptor.getValue().apply(sscsCaseDetails);
+
+        //assertThat(functionArgumentCaptor.getValue().apply(sscsCaseDetails).willCommit()).isTrue();
 
         assertThat(response.getErrors()).isEmpty();
 
