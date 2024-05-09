@@ -52,61 +52,6 @@ public class MessagingConfig {
         return new CachingConnectionFactory(jmsConnectionFactory);
     }
 
-    /**
-     * DO NOT USE THIS IN PRODUCTION!.
-     * This was only used for testing unverified ssl certs locally!
-     *
-     * @deprecated Only used for testing.
-     */
-    @SuppressWarnings("squid:S4423")
-    @Bean
-    @Deprecated
-    public SSLContext jmsSslContext(@Value("${amqp.trustAllCerts}") final boolean trustAllCerts)
-        throws NoSuchAlgorithmException, KeyManagementException {
-
-        if (trustAllCerts) {
-            // https://stackoverflow.com/a/2893932
-            // DO NOT USE THIS IN PRODUCTION!
-            TrustManager[] trustCerts = getTrustManagers();
-
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustCerts, new SecureRandom());
-
-            return sc;
-        }
-        return null;
-    }
-
-    /*
-     * DO NOT USE THIS IN PRODUCTION!
-     * This was only used for testing unverified ssl certs locally!
-     */
-    @Deprecated
-    private TrustManager[] getTrustManagers() {
-        return new TrustManager[]{
-            new X509TrustManager() {
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[0];
-                }
-
-                @Override
-                @SuppressWarnings("squid:S4830")
-                public void checkClientTrusted(
-                    X509Certificate[] certs, String authType) {
-                    // Empty
-                }
-
-                @Override
-                @SuppressWarnings("squid:S4830")
-                public void checkServerTrusted(
-                    X509Certificate[] certs, String authType) {
-                    // Empty
-                }
-            }
-        };
-    }
-
     @Bean
     public JmsTemplate jmsTemplate(ConnectionFactory jmsConnectionFactory) {
         JmsTemplate returnValue = new JmsTemplate();
