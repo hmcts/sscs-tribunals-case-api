@@ -77,7 +77,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                                   PdfStoreService pdfStoreService,
                                   PrintService bulkPrintService,
                                   EvidenceShareConfig evidenceShareConfig,
-                                  UpdateCcdCaseService ccdService,
+                                  UpdateCcdCaseService updateCcdCaseService,
                                   IdamService idamService,
                                   @Value("${dwp.response.due.days}") int dwpResponseDueDays,
                                   @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport
@@ -88,7 +88,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         this.pdfStoreService = pdfStoreService;
         this.bulkPrintService = bulkPrintService;
         this.evidenceShareConfig = evidenceShareConfig;
-        this.updateCcdCaseService = ccdService;
+        this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
         this.dwpResponseDueDays = dwpResponseDueDays;
         this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
