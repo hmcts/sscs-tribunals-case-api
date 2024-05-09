@@ -341,9 +341,7 @@ class PostHearingReviewSubmittedHandlerTest {
 
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
 
-        functionArgumentCaptor.getValue().apply(sscsCaseDetails);
-
-        //assertThat(functionArgumentCaptor.getValue().apply(sscsCaseDetails).willCommit()).isTrue();
+        assertThat(functionArgumentCaptor.getValue().apply(sscsCaseDetails).willCommit()).isFalse();
 
         assertThat(response.getErrors()).isEmpty();
 

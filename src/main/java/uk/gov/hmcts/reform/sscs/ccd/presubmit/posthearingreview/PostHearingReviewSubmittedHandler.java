@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
-import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
@@ -58,7 +57,7 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
 
         log.info("Review Post Hearing App: handling actionPostHearing {} for case {}", typeSelected, caseId);
 
-        if (isNull(typeSelected) || Arrays.stream(PostHearingReviewType.values()).noneMatch(typeSelected::equals)) {
+        if (isNull(typeSelected)) {
             response.addError(String.format("Invalid Action Post Hearing Application Type Selected %s or action "
                             + "selected as callback is null",
                     typeSelected));
@@ -88,7 +87,6 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
                     log.info("Review Post Hearing App - updateCaseV2Conditional not triggered for case {} and type {} ", caseId, typeSelected);
                     return new ConditionalUpdateResult("Send to hearing Judge for statement of reasons", "", false);
                 }
-
         );
 
         return new PreSubmitCallbackResponse<>(caseData);
