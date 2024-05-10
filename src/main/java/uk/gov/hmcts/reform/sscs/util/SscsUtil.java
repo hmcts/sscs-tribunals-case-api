@@ -465,6 +465,17 @@ public class SscsUtil {
         caseData.getSchedulingAndListingFields().getOverrideFields().setAppellantHearingChannel(hearingChannel);
     }
 
+    public static void updateHearingInterpreter(SscsCaseData caseData, HearingInterpreter hearingInterpreter) {
+        Appeal appeal = caseData.getAppeal();
+
+        HearingOptions hearingOptions = appeal.getHearingOptions();
+
+        hearingOptions.setLanguageInterpreter(hearingInterpreter.getIsInterpreterWanted().getValue());
+        hearingOptions.setLanguages(hearingInterpreter.getInterpreterLanguage().getValue().getLabel());
+
+        caseData.getSchedulingAndListingFields().getOverrideFields().setAppellantInterpreter(hearingInterpreter);
+    }
+
     private static String hearingChannelToYesNoString(HearingChannel expectedHearingChannel, HearingChannel hearingChannel) {
         return expectedHearingChannel.equals(hearingChannel) ? YES.toString() : NO.toString();
     }
