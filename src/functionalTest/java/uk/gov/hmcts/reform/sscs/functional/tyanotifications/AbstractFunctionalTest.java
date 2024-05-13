@@ -264,7 +264,7 @@ public abstract class AbstractFunctionalTest {
 
     public void simulateCcdCallback(NotificationEventType eventType, String resource) throws IOException {
         final String callbackUrl = getEnvOrEmpty("TEST_URL") + "/sendNotification";
-
+        log.error("Callback URL for test{}", callbackUrl);
         String json;
         try {
             String path = Objects.requireNonNull(getClass().getClassLoader().getResource(resource)).getFile();
