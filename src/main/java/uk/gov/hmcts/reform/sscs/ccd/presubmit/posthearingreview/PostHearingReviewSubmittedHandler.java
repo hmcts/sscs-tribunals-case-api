@@ -21,6 +21,8 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService.ConditionalUpda
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -64,7 +66,7 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
             return response;
         }
 
-        updateCcdCaseService.updateCaseV2Conditional(
+        Optional<SscsCaseDetails> sscsCaseDetailsOptional = updateCcdCaseService.updateCaseV2Conditional(
                 caseId,
                 EventType.SOR_REQUEST.getCcdType(),
                 idamService.getIdamTokens(),
@@ -89,7 +91,7 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
                 }
         );
 
-        return new PreSubmitCallbackResponse<>(caseData);
+        return new PreSubmitCallbackResponse<>(sscsCaseDetailsOptional.isPresent() ? sscsCaseDetailsOptional.get().getData():caseData);
     }
 
     @Nullable
