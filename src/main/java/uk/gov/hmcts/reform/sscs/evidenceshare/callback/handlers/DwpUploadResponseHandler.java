@@ -178,7 +178,6 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private SscsCaseDetails updateEventDetails(Long caseId, EventType eventType, String summary, String description, Consumer<SscsCaseData> caseDataConsumer) {
-        log.info("About to update case v2 with dwp load response event {} for id {}", eventType.getCcdType(), caseId);
         return updateCcdCaseService.updateCaseV2(
                 caseId,
                 eventType.getCcdType(),
