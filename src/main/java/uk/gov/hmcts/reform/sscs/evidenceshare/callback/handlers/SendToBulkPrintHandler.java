@@ -140,7 +140,6 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     private void updateCaseToFlagError(SscsCaseData caseData, String description) {
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
 
-        log.info("About to update case v2 with send to bulk print event - error for id {}", caseId);
         updateCcdCaseService.updateCaseV2(
                 caseId,
                 EventType.SENT_TO_DWP_ERROR.getCcdType(),
@@ -158,7 +157,6 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                                        BulkPrintInfo bulkPrintInfo) {
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
         if (bulkPrintInfo != null) {
-            log.info("About to update case v2 with send to bulk print event - dwp for id {}", caseId);
             updateCcdCaseService.updateCaseV2(
                     caseId,
                     EventType.SENT_TO_DWP.getCcdType(),
