@@ -18,8 +18,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
@@ -28,10 +26,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Note;
 import uk.gov.hmcts.reform.sscs.ccd.domain.NoteDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.NotePad;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
@@ -94,8 +90,6 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                 caseId);
             response.addError(String.format("Unhandleable Postponement Request %s", actionRequested));
         }
-
-        clearTransientFields(sscsCaseData);
 
         return response;
     }
@@ -165,17 +159,5 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                 .noteDate(LocalDate.now().toString())
                 .build())
             .build();
-    }
-
-    private void clearTransientFields(SscsCaseData caseData) {
-        caseData.setDocumentGeneration(DocumentGeneration.builder().build());
-        caseData.setDocumentStaging(DocumentStaging.builder().build());
-        caseData.setTempNoteDetail(null);
-        caseData.setShowRip1DocPage(null);
-
-        YesNo unprocessedPostponementRequest = caseData.getPostponementRequest().getUnprocessedPostponementRequest();
-        caseData.setPostponementRequest(PostponementRequest.builder()
-            .unprocessedPostponementRequest(unprocessedPostponementRequest)
-            .build());
     }
 }
