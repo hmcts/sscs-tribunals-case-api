@@ -81,7 +81,7 @@ public class SendToBulkPrintHandlerTest {
     private String nowString = (DateTimeFormatter.ISO_LOCAL_DATE).format(now);
 
     @Captor
-    private ArgumentCaptor<Consumer<SscsCaseData>> consumerArgumentCaptor;
+    private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
     private final String docUrl = "my/1/url.pdf";
     private final Pdf docPdf = new Pdf(docUrl.getBytes(), "evidence1.pdf");
@@ -209,8 +209,10 @@ public class SendToBulkPrintHandlerTest {
 
         verify(updateCcdCaseService)
                 .updateCaseV2(eq(123L), eq(SENT_TO_DWP.getCcdType()), eq("Sent to FTA"), eq(documentList), any(), consumerArgumentCaptor.capture());
+
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        consumerArgumentCaptor.getValue().accept(sscsCaseData);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
 
         assertNull(sscsCaseData.getSscsDocument().get(0).getValue().getEvidenceIssued());
         assertEquals(SENT_TO_DWP.getCcdType(), sscsCaseData.getHmctsDwpState());
@@ -241,9 +243,10 @@ public class SendToBulkPrintHandlerTest {
         then(updateCcdCaseService)
                 .should(times(1))
                 .updateCaseV2(eq(123L), eq(EventType.SENT_TO_DWP_ERROR.getCcdType()), any(), any(), any(), consumerArgumentCaptor.capture());
-        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        consumerArgumentCaptor.getValue().accept(sscsCaseData);
 
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
     }
 
@@ -257,9 +260,10 @@ public class SendToBulkPrintHandlerTest {
         then(updateCcdCaseService)
                 .should(times(1))
                 .updateCaseV2(eq(123L), eq(EventType.SENT_TO_DWP_ERROR.getCcdType()), eq("Send to FTA Error"), eq("Triggered from Evidence Share – no DL6/16 present, please validate."), any(), consumerArgumentCaptor.capture());
-        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        consumerArgumentCaptor.getValue().accept(sscsCaseData);
 
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
         assertEquals("No", sscsCaseData.getSscsDocument().get(0).getValue().getEvidenceIssued());
     }
@@ -275,8 +279,10 @@ public class SendToBulkPrintHandlerTest {
         then(updateCcdCaseService)
                 .should(times(1))
                 .updateCaseV2(eq(123L), eq(EventType.SENT_TO_DWP_ERROR.getCcdType()), eq("Send to FTA Error"), eq("Send to FTA Error event has been triggered from Evidence Share service"), any(), consumerArgumentCaptor.capture());
+
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        consumerArgumentCaptor.getValue().accept(sscsCaseData);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
     }
 
@@ -294,7 +300,8 @@ public class SendToBulkPrintHandlerTest {
             .updateCaseV2(eq(123L), eq(EventType.SENT_TO_DWP_ERROR.getCcdType()), eq("Send to FTA Error"), eq("Send to FTA Error event has been triggered from Evidence Share service"), any(), consumerArgumentCaptor.capture());
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        consumerArgumentCaptor.getValue().accept(sscsCaseData);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
     }
 
@@ -314,7 +321,8 @@ public class SendToBulkPrintHandlerTest {
             .updateCaseV2(eq(123L), eq(EventType.SENT_TO_DWP_ERROR.getCcdType()), eq("Send to FTA Error"), eq("Unable to contact dm-store, please try again by running the \"Send to FTA\"."), any(), consumerArgumentCaptor.capture());
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        consumerArgumentCaptor.getValue().accept(sscsCaseData);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
     }
 
@@ -332,7 +340,8 @@ public class SendToBulkPrintHandlerTest {
                 .updateCaseV2(eq(123L), eq(EventType.SENT_TO_DWP_ERROR.getCcdType()), eq("Send to FTA Error"), eq("Non-PDFs/broken PDFs seen in list of documents, please correct."), any(), consumerArgumentCaptor.capture());
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        consumerArgumentCaptor.getValue().accept(sscsCaseData);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
     }
 
@@ -351,7 +360,8 @@ public class SendToBulkPrintHandlerTest {
                 .updateCaseV2(eq(123L), eq(EventType.SENT_TO_DWP_ERROR.getCcdType()), eq("Send to FTA Error"), eq("Unable to contact idam, please try again by running the \"Send to FTA\"."), any(), consumerArgumentCaptor.capture());
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        consumerArgumentCaptor.getValue().accept(sscsCaseData);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
     }
 
@@ -398,7 +408,8 @@ public class SendToBulkPrintHandlerTest {
                 .updateCaseV2(eq(123L), eq(SENT_TO_DWP.getCcdType()), eq("Sent to FTA"), eq("Case state is now sent to FTA"), any(), consumerArgumentCaptor.capture());
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        consumerArgumentCaptor.getValue().accept(sscsCaseData);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals(SENT_TO_DWP.getCcdType(), sscsCaseData.getHmctsDwpState());
         assertEquals(UNREGISTERED, sscsCaseData.getDwpState());
     }
@@ -433,7 +444,8 @@ public class SendToBulkPrintHandlerTest {
                 .updateCaseV2(eq(123L), eq(EventType.SENT_TO_DWP_ERROR.getCcdType()), eq("Send to FTA Error"), eq("Send to FTA Error event has been triggered from Evidence Share service"), any(), consumerArgumentCaptor.capture());
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        consumerArgumentCaptor.getValue().accept(sscsCaseData);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
     }
 

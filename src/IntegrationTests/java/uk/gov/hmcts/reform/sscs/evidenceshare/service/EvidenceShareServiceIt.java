@@ -133,7 +133,7 @@ public class EvidenceShareServiceIt {
     private ArgumentCaptor<SscsCaseData> caseDataCaptor;
 
     @Captor
-    private ArgumentCaptor<Consumer<SscsCaseData>> consumerArgumentCaptor;
+    private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
     @MockBean
     protected AirLookupService airLookupService;
@@ -317,7 +317,8 @@ public class EvidenceShareServiceIt {
             .updateCaseV2(any(), eq("sendToDwpError"), any(), any(), any(), consumerArgumentCaptor.capture());
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
         SscsCaseData sscsCaseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
-        consumerArgumentCaptor.getValue().accept(sscsCaseData);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertNull(sscsCaseData.getAppeal().getMrnDetails().getMrnDate());
         assertEquals("failedSending", sscsCaseData.getHmctsDwpState());
 
@@ -410,7 +411,8 @@ public class EvidenceShareServiceIt {
     private SscsCaseData verifySscsCaseData(String json) {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
         SscsCaseData sscsCaseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
-        consumerArgumentCaptor.getValue().accept(sscsCaseData);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertEquals(SENT_TO_DWP.getCcdType(), sscsCaseData.getHmctsDwpState());
         assertNotNull(sscsCaseData.getDateSentToDwp());
         assertNotNull(sscsCaseData.getDwpDueDate());

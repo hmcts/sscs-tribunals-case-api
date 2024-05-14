@@ -146,8 +146,8 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                 "Send to FTA Error",
                 description,
                 idamService.getIdamTokens(),
-                sscsCaseData -> {
-                    sscsCaseData.setHmctsDwpState("failedSending");
+                sscsCaseDetails -> {
+                    sscsCaseDetails.getData().setHmctsDwpState("failedSending");
                     log.info("Updated case v2 send to bulk print event -error for id {}", caseId);
                 }
         );
@@ -163,7 +163,8 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                     SENT_TO_FTA,
                     bulkPrintInfo.getDesc(),
                     idamService.getIdamTokens(),
-                    sscsCaseData -> {
+                    sscsCaseDetails -> {
+                        SscsCaseData sscsCaseData = sscsCaseDetails.getData();
                         if (State.READY_TO_LIST.getId().equals(sscsCaseData.getCreatedInGapsFrom())) {
                             sscsCaseData.setDwpState(UNREGISTERED);
                         }
