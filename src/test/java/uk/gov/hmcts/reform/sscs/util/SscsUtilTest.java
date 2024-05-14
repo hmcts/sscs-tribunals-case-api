@@ -286,11 +286,19 @@ class SscsUtilTest {
                 .documentType(STATEMENT_OF_REASONS_APPLICATION.getValue())
                 .documentDateAdded(LocalDate.now().minusDays(25).format(formatter))
                 .build();
-        SscsDocument document = SscsDocument.builder()
+        SscsDocument sorDocument = SscsDocument.builder()
                 .value(details)
                 .build();
 
-        YesNo sorRequestInTime = isSorRequestInTime(document);
+        SscsDocumentDetails decisionDetails = SscsDocumentDetails.builder()
+                .documentType(FINAL_DECISION_NOTICE.getValue())
+                .documentDateAdded(LocalDate.now().minusDays(31).format(formatter))
+                .build();
+        SscsDocument decisionDocument = SscsDocument.builder()
+                .value(decisionDetails)
+                .build();
+
+        YesNo sorRequestInTime = isSorRequestInTime(sorDocument, decisionDocument);
         assertThat(sorRequestInTime).isEqualTo(YesNo.YES);
     }
 
@@ -299,13 +307,21 @@ class SscsUtilTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         SscsDocumentDetails details = SscsDocumentDetails.builder()
                 .documentType(STATEMENT_OF_REASONS_APPLICATION.getValue())
-                .documentDateAdded(LocalDate.now().minusDays(35).format(formatter))
+                .documentDateAdded(LocalDate.now().format(formatter))
                 .build();
-        SscsDocument document = SscsDocument.builder()
+        SscsDocument sorDocument = SscsDocument.builder()
                 .value(details)
                 .build();
 
-        YesNo sorRequestInTime = isSorRequestInTime(document);
+        SscsDocumentDetails decisionDetails = SscsDocumentDetails.builder()
+                .documentType(FINAL_DECISION_NOTICE.getValue())
+                .documentDateAdded(LocalDate.now().minusDays(32).format(formatter))
+                .build();
+        SscsDocument decisionDocument = SscsDocument.builder()
+                .value(decisionDetails)
+                .build();
+
+        YesNo sorRequestInTime = isSorRequestInTime(sorDocument, decisionDocument);
         assertThat(sorRequestInTime).isEqualTo(YesNo.NO);
     }
 }

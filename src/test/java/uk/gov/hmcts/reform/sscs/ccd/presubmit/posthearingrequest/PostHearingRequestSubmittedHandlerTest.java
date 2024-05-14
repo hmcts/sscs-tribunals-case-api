@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POST_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType.SET_ASIDE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.UPLOAD;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,10 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,37 +82,50 @@ class PostHearingRequestSubmittedHandlerTest {
     @EnumSource(value = PostHearingRequestType.class)
     void givenRequestPostHearingTypes_shouldReturnCallCorrectCallback(PostHearingRequestType value) {
         caseData.getPostHearing().setRequestType(value);
-
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-
         when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(ccdCallbackMapService.handleCcdCallbackMap(value, caseData)).thenReturn(SscsCaseData.builder().build());
 
-        when(ccdCallbackMapService.handleCcdCallbackMap(value, caseData))
-            .thenReturn(SscsCaseData.builder().build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
-
-        verify(ccdCallbackMapService, times(1))
-            .handleCcdCallbackMap(value, caseData);
+        verify(ccdCallbackMapService, times(1)).handleCcdCallbackMap(value, caseData);
     }
 
 
     @Test
     void givenNoActionTypeSelected_shouldReturnWithTheCorrectErrorMessage() {
         caseData.getPostHearing().setRequestType(null);
-
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors())
             .hasSize(1)
             .containsOnly("Invalid Post Hearing Request Type Selected null "
                 + "or request selected as callback is null");
+    }
+
+    @Test
+    void test() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        caseData.getPostHearing().setRequestType(PostHearingRequestType.STATEMENT_OF_REASONS);
+        caseData.getPostHearing().getStatementOfReasons().setRequestFormat(UPLOAD);
+        String dmUrl = "http://dm-store/documents/123";
+        DocumentLink uploadedDocument = DocumentLink.builder()
+                .documentFilename("A random filename.pdf")
+                .documentUrl(dmUrl)
+                .documentBinaryUrl(dmUrl + "/binary")
+                .build();
+        caseData.getDocumentStaging().setPreviewDocument(uploadedDocument);
+        when(ccdCallbackMapService.handleCcdCallbackMap(PostHearingRequestType.STATEMENT_OF_REASONS, caseData))
+                .thenReturn(caseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
     }
 }

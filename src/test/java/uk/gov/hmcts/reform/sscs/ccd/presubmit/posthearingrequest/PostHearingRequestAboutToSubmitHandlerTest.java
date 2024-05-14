@@ -251,16 +251,25 @@ class PostHearingRequestAboutToSubmitHandlerTest {
                 .documentUrl(dmUrl)
                 .documentBinaryUrl(dmUrl + "/binary")
                 .build();
-        SscsDocumentDetails details = SscsDocumentDetails.builder()
+        SscsDocumentDetails sorDetails = SscsDocumentDetails.builder()
                 .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
                 .documentType(DocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue())
                 .build();
-        SscsDocument document = SscsDocument.builder()
-                .value(details)
+        SscsDocument sorDocument = SscsDocument.builder()
+                .value(sorDetails)
+                .build();
+
+
+        SscsDocumentDetails decisionDetails = SscsDocumentDetails.builder()
+                .documentDateAdded(LocalDate.now().minusDays(31).format(DateTimeFormatter.ISO_DATE))
+                .documentType(DocumentType.FINAL_DECISION_NOTICE.getValue())
+                .build();
+        SscsDocument decisionDocument = SscsDocument.builder()
+                .value(decisionDetails)
                 .build();
 
         caseData.getDocumentStaging().setPreviewDocument(uploadedDocument);
-        caseData.setSscsDocument(List.of(document));
+        caseData.setSscsDocument(List.of(decisionDocument, sorDocument));
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
@@ -281,16 +290,24 @@ class PostHearingRequestAboutToSubmitHandlerTest {
                 .documentUrl(dmUrl)
                 .documentBinaryUrl(dmUrl + "/binary")
                 .build();
-        SscsDocumentDetails details = SscsDocumentDetails.builder()
-                .documentDateAdded(LocalDate.now().minusDays(30).format(DateTimeFormatter.ISO_DATE))
+        SscsDocumentDetails sorDetails = SscsDocumentDetails.builder()
+                .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
                 .documentType(DocumentType.STATEMENT_OF_REASONS_APPLICATION.getValue())
                 .build();
-        SscsDocument document = SscsDocument.builder()
-                .value(details)
+        SscsDocument sorDocument = SscsDocument.builder()
+                .value(sorDetails)
+                .build();
+
+        SscsDocumentDetails decisionDetails = SscsDocumentDetails.builder()
+                .documentDateAdded(LocalDate.now().minusDays(60).format(DateTimeFormatter.ISO_DATE))
+                .documentType(DocumentType.FINAL_DECISION_NOTICE.getValue())
+                .build();
+        SscsDocument decisionDocument = SscsDocument.builder()
+                .value(decisionDetails)
                 .build();
 
         caseData.getDocumentStaging().setPreviewDocument(uploadedDocument);
-        caseData.setSscsDocument(List.of(document));
+        caseData.setSscsDocument(List.of(decisionDocument, sorDocument));
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);

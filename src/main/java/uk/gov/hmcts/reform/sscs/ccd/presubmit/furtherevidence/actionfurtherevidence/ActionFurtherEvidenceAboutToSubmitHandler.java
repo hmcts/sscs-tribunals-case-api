@@ -316,12 +316,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void setSorRequestInTime(SscsCaseData sscsCaseData) {
-        SscsDocument document = sscsCaseData.getLatestDocumentForDocumentType(DocumentType.STATEMENT_OF_REASONS_APPLICATION);
-
-        if (!isNull(document)) {
-            YesNo sorRequestInTime = SscsUtil.isSorRequestInTime(document);
-            sscsCaseData.getPostHearing().setSorRequestInTime(sorRequestInTime);
-        }
+        SscsDocument sorDocument = sscsCaseData.getLatestDocumentForDocumentType(DocumentType.STATEMENT_OF_REASONS_APPLICATION);
+        SscsDocument decisionDocument = sscsCaseData.getLatestDocumentForDocumentType(FINAL_DECISION_NOTICE);
+        YesNo sorRequestInTime = SscsUtil.isSorRequestInTime(sorDocument, decisionDocument);
+        sscsCaseData.getPostHearing().setSorRequestInTime(sorRequestInTime);
     }
 
     private static boolean isOriginalSenderDwp(SscsCaseData sscsCaseData) {

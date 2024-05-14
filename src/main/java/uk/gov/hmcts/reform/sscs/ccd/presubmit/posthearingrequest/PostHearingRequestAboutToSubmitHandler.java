@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.UPLOAD;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostHearingRequestFormatAndContentFields;
 
@@ -60,11 +61,10 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
                     caseData.getDocumentStaging().getPreviewDocument(), postHearingDocumentType, callback.getEvent());
 
             if (postHearingDocumentType.equals(DocumentType.STATEMENT_OF_REASONS_APPLICATION)) {
-                SscsDocument document = caseData.getLatestDocumentForDocumentType(DocumentType.STATEMENT_OF_REASONS_APPLICATION);
-                if (!isNull(document)) {
-                    YesNo sorRequestInTime = SscsUtil.isSorRequestInTime(document);
-                    caseData.getPostHearing().setSorRequestInTime(sorRequestInTime);
-                }
+                SscsDocument sorDocument = caseData.getLatestDocumentForDocumentType(DocumentType.STATEMENT_OF_REASONS_APPLICATION);
+                SscsDocument decisionDocument = caseData.getLatestDocumentForDocumentType(FINAL_DECISION_NOTICE);
+                YesNo sorRequestInTime = SscsUtil.isSorRequestInTime(sorDocument, decisionDocument);
+                caseData.getPostHearing().setSorRequestInTime(sorRequestInTime);
             }
         }
         clearPostHearingRequestFormatAndContentFields(caseData, caseData.getPostHearing().getRequestType());

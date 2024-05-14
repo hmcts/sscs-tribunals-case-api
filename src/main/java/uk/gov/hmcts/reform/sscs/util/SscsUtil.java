@@ -518,14 +518,26 @@ public class SscsUtil {
         }
     }
 
-    public static YesNo isSorRequestInTime(SscsDocument document) {
-        String documentDateAdded = document.getValue().getDocumentDateAdded();
-        if (isNull(documentDateAdded)) {
+    public static YesNo isSorRequestInTime(SscsDocument sorDocument, SscsDocument finalDecision) {
+        if (isNull(sorDocument) || isNull(finalDecision)) {
             return null;
         }
 
-        LocalDate documentDate = LocalDate.parse(documentDateAdded);
-        if (documentDate.isAfter(LocalDate.now().minusDays(30))) {
+        String decisionDateAdded = finalDecision.getValue().getDocumentDateAdded();
+        if (isNull(decisionDateAdded)) {
+            return null;
+        }
+        LocalDate decisionDate = LocalDate.parse(decisionDateAdded);
+
+        String sorDateAdded = sorDocument.getValue().getDocumentDateAdded();
+        if (isNull(sorDateAdded)) {
+            return null;
+        }
+        LocalDate sorDate = LocalDate.parse(sorDateAdded);
+
+        long diff = Math.abs(java.time.temporal.ChronoUnit.DAYS.between(sorDate, decisionDate));
+
+        if (diff <= 31) {
             return YES;
         }
 

@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -390,17 +391,26 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                 FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel());
         sscsCaseData.getFurtherEvidenceAction().setValue(sendToInterlocListItem);
 
-        ScannedDocumentDetails scannedDocDetails = ScannedDocumentDetails.builder()
+        ScannedDocumentDetails sorDetails = ScannedDocumentDetails.builder()
                 .type(STATEMENT_OF_REASONS_APPLICATION.getValue())
                 .fileName("Test.pdf")
-                .scannedDate(LocalDate.now().minusDays(5).atStartOfDay().toString())
+                .scannedDate(LocalDate.now().atStartOfDay().toString())
                 .url(DOC_LINK)
                 .build();
-        ScannedDocument scannedDocument = ScannedDocument.builder()
-                .value(scannedDocDetails)
+        ScannedDocument sorDocument = ScannedDocument.builder()
+                .value(sorDetails)
                 .build();
 
-        sscsCaseData.setScannedDocuments(Collections.singletonList(scannedDocument));
+        SscsDocumentDetails decisionDetails = SscsDocumentDetails.builder()
+                .documentType(FINAL_DECISION_NOTICE.getValue())
+                .documentDateAdded(LocalDate.now().minusDays(30).format(DateTimeFormatter.ISO_DATE))
+                .build();
+        SscsDocument decisionDocument = SscsDocument.builder()
+                .value(decisionDetails)
+                .build();
+
+        sscsCaseData.setSscsDocument(List.of(decisionDocument));
+        sscsCaseData.setScannedDocuments(Collections.singletonList(sorDocument));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(
