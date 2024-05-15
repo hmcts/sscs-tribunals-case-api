@@ -478,7 +478,7 @@ public class SscsUtil {
             String interpreterWanted = appellantInterpreter.getIsInterpreterWanted().getValue();
             hearingOptions.setLanguageInterpreter(interpreterWanted);
 
-            if (interpreterWanted.equals("Yes")) {
+            if (interpreterWanted.equals(YES.toString())) {
                 String interpreterLanguage = appellantInterpreter.getInterpreterLanguage().getValue().getLabel();
                 hearingOptions.setLanguages(interpreterLanguage);
             } else {
