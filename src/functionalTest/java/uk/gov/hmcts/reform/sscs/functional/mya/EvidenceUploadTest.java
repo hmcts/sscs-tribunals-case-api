@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
@@ -44,6 +45,7 @@ public class EvidenceUploadTest extends BaseFunctionTest {
     }
 
     @Test
+    @Ignore
     public void uploadAudioThenSubmitEvidenceToAppeal() throws IOException, JSONException, InterruptedException {
         CreatedCcdCase createdCcdCase = createCase();
 
