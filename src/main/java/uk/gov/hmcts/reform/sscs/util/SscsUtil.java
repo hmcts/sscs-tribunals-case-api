@@ -39,6 +39,7 @@ public class SscsUtil {
 
     public static final String INVALID_BENEFIT_ISSUE_CODE = "Incorrect benefit/issue code combination";
     public static final String BENEFIT_CODE_NOT_IN_USE = "The benefit code selected is not in use";
+    public static final int DAYS_AFTER_FINAL_DECISION = 31;
 
     private SscsUtil() {
         //
@@ -527,17 +528,17 @@ public class SscsUtil {
         if (isNull(decisionDateAdded)) {
             return null;
         }
-        LocalDate decisionDate = LocalDate.parse(decisionDateAdded);
 
         String sorDateAdded = sorDocument.getValue().getDocumentDateAdded();
         if (isNull(sorDateAdded)) {
             return null;
         }
-        LocalDate sorDate = LocalDate.parse(sorDateAdded);
 
+        LocalDate decisionDate = LocalDate.parse(decisionDateAdded);
+        LocalDate sorDate = LocalDate.parse(sorDateAdded);
         long diff = Math.abs(java.time.temporal.ChronoUnit.DAYS.between(sorDate, decisionDate));
 
-        if (diff <= 31) {
+        if (diff <= DAYS_AFTER_FINAL_DECISION) {
             return YES;
         }
 
