@@ -67,7 +67,7 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
     private SscsCaseData sscsCaseData;
 
     @Captor
-    private ArgumentCaptor<Consumer<SscsCaseData>> sscsCaseDataCaptor;
+    private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
     @InjectMocks
     private UploadWelshDocumentsSubmittedHandler handler;
@@ -279,9 +279,9 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
     private void verifyEventTrigger(EventType makeCaseUrgent, String summary, String description, SscsCaseData caseData) {
         verify(updateCcdCaseService).updateCaseV2(eq(callback.getCaseDetails().getId()), eq(makeCaseUrgent.getCcdType()),
-                eq(summary), eq(description), any(), sscsCaseDataCaptor.capture());
-        Consumer<SscsCaseData> consumerCaptorValue = sscsCaseDataCaptor.getValue();
-        consumerCaptorValue.accept(caseData);
+                eq(summary), eq(description), any(), consumerArgumentCaptor.capture());
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
         assertNull(caseData.getSscsWelshPreviewNextEvent());
     }
 

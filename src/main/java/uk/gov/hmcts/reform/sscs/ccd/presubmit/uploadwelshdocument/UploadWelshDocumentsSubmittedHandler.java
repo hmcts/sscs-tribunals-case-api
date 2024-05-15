@@ -67,14 +67,16 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
         String nextEvent = sscsCaseData.getSscsWelshPreviewNextEvent();
         log.info("Next event to submit  {} for case reference {}", nextEvent, sscsCaseData.getCcdCaseId());
 
-        Consumer<SscsCaseData> mutator = caseData -> caseData.setSscsWelshPreviewNextEvent(null);
+        Consumer<SscsCaseDetails> mutator = (SscsCaseDetails sscsCaseDetails) -> {
+            SscsCaseData caseData = sscsCaseDetails.getData();
+            caseData.setSscsWelshPreviewNextEvent(null);
+        };
 
         if (isValidUrgentHearingDocument(sscsCaseData)) {
             setMakeCaseUrgentTriggerEvent(callback.getCaseDetails().getId(), mutator);
         } else if (isReinstatementRequest(sscsCaseData)) {
             setReinstatementRequest(sscsCaseData, callback.getCaseDetails().getId(), nextEvent);
         } else {
-            log.info("Submitting Next Event {} using updateCaseV2 for {}", nextEvent, callback.getCaseDetails().getId());
             updateCcdCaseService.updateCaseV2(
                     callback.getCaseDetails().getId(),
                     nextEvent,
@@ -104,8 +106,7 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
         return (isTranslationsOutstanding && (isDocReinstatement || isWelshReinstatement));
     }
 
-    private SscsCaseDetails setMakeCaseUrgentTriggerEvent(Long caseId, Consumer<SscsCaseData> caseDataConsumer) {
-        log.info("Using updateCaseV2 to update case with 'makeCaseUrgent' event for {}", caseId);
+    private SscsCaseDetails setMakeCaseUrgentTriggerEvent(Long caseId, Consumer<SscsCaseDetails> caseDataConsumer) {
         return updateCcdCaseService.updateCaseV2(
                 caseId,
                 EventType.MAKE_CASE_URGENT.getCcdType(),
@@ -117,9 +118,8 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
     }
 
     private SscsCaseData setReinstatementRequest(SscsCaseData sscsCaseData, Long caseId, String nextEvent) {
-
-        log.info("Setting Reinstatement Request for Welsh Case {}", caseId);
-        Consumer<SscsCaseData> caseDataConsumer = data -> {
+        Consumer<SscsCaseDetails> caseDataConsumer = sscsCaseDetails -> {
+            SscsCaseData data = sscsCaseDetails.getData();
             data.setSscsWelshPreviewNextEvent(null);
             data.setReinstatementRegistered(LocalDate.now());
             data.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
