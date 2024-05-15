@@ -214,7 +214,7 @@ public abstract class AbstractFunctionalTest {
                 secondsLeft -= 5;
 
                 delayInSeconds(5);
-
+                log.info("Print API Key {}",client.getApiKey());
                 allNotifications = client.getNotifications("", "", caseReference, "").getNotifications();
 
                 matchingNotifications =
