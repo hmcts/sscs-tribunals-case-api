@@ -157,6 +157,9 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                                        BulkPrintInfo bulkPrintInfo) {
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
         if (bulkPrintInfo != null) {
+            log.info("remove this -- outside bulkPrintInfo.isAllowedTypeForBulkPrint() {} ", bulkPrintInfo.isAllowedTypeForBulkPrint());
+            log.info("remove this -- Case sent to fta for case id {} with returned value {}",
+                    caseId, bulkPrintInfo.getUuid());
             updateCcdCaseService.updateCaseV2(
                     caseId,
                     EventType.SENT_TO_DWP.getCcdType(),
@@ -171,7 +174,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                         sscsCaseData.setHmctsDwpState("sentToDwp");
                         sscsCaseData.setDateSentToDwp(LocalDate.now().toString());
                         sscsCaseData.setDwpDueDate(LocalDate.now().plusDays(getResponseDueDays(sscsCaseData)).toString());
-
+                        log.info("inside bulkPrintInfo.isAllowedTypeForBulkPrint() {} ", bulkPrintInfo.isAllowedTypeForBulkPrint());
                         if (bulkPrintInfo.isAllowedTypeForBulkPrint()) {
                             log.info("Case sent to fta for case id {} with returned value {}",
                                     caseId, bulkPrintInfo.getUuid());
