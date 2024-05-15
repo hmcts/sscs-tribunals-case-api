@@ -154,7 +154,8 @@ public class SubmitAppealTest {
                 "signedRole",
                 "statementOfReasons",
                 "statementOfReasonsBodyContent",
-                "statementOfReasonsGenerateNotice")
+                "statementOfReasonsGenerateNotice",
+                "preWorkAllocation")
             .isEqualTo(changeExpectedFields(expectedResponse, nino, mrnDate));
 
         assertEquals(expectedState, sscsCaseDetails.getState());

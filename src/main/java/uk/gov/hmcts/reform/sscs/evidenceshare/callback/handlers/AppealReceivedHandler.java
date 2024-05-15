@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Slf4j
@@ -24,13 +26,20 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
 
     private final CcdService ccdService;
 
+    private final UpdateCcdCaseService updateCcdCaseService;
+
     private final IdamService idamService;
+
+    @Value("${feature.trigger-eventV2.enabled}")
+    private boolean isTriggerEventV2Enabled;
 
     @Autowired
     public AppealReceivedHandler(CcdService ccdService,
+                                 UpdateCcdCaseService updateCcdCaseService,
                                  IdamService idamService) {
         this.dispatchPriority = DispatchPriority.LATEST;
         this.ccdService = ccdService;
+        this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
     }
 
@@ -62,8 +71,26 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
             log.error("Thread sleep interrupted: " + e.getMessage());
         }
 
-        log.info("About to update case with appealReceived event for id {}", callback.getCaseDetails().getId());
-        ccdService.updateCase(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(), APPEAL_RECEIVED.getCcdType(), "Appeal received", "Appeal received event has been triggered from Evidence Share for digital case",  idamService.getIdamTokens());
+        if (isTriggerEventV2Enabled) {
+            log.info("About to update case v2 with appealReceived event for id {}", callback.getCaseDetails().getId());
+            updateCcdCaseService.triggerCaseEventV2(
+                    callback.getCaseDetails().getId(),
+                    APPEAL_RECEIVED.getCcdType(),
+                    "Appeal received",
+                    "Appeal received event has been triggered from Tribunals API for digital case",
+                    idamService.getIdamTokens()
+            );
+        } else {
+            log.info("About to update case with appealReceived event for id {}", callback.getCaseDetails().getId());
+            ccdService.updateCase(
+                    callback.getCaseDetails().getCaseData(),
+                    callback.getCaseDetails().getId(),
+                    APPEAL_RECEIVED.getCcdType(),
+                    "Appeal received",
+                    "Appeal received event has been triggered from Evidence Share for digital case",
+                    idamService.getIdamTokens()
+            );
+        }
     }
 
     @Override

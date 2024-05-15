@@ -40,6 +40,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
@@ -529,9 +530,9 @@ public class EvidenceUploadService {
         }
 
         addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, audioVideoEvidence.stream()
-                .map(evidence -> evidence.getValue().getDocumentType())
-                .filter(Objects::nonNull)
-                .toList(), EVENT_TYPE);
+            .map(evidence -> evidence.getValue().getDocumentType())
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList()), EVENT_TYPE);
 
         if (!audioVideoEvidence.isEmpty()) {
             List<AudioVideoEvidence> newAudioVideoEvidenceList = union(emptyIfNull(sscsCaseData.getAudioVideoEvidence()),

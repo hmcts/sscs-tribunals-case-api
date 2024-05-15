@@ -529,7 +529,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:6.3.17nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S12472BnonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -547,7 +547,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: 6.3.17nonProd
+      CCD_DEF_VERSION: S12472BnonProd
     secrets: []
     userRoles:
       - citizen
@@ -572,33 +572,6 @@ ccd:
       - GS_profile
 elastic:
   enabled: true
-
-sscs-evidence-share:
-  enabled: true
-  java:
-    image: hmctspublic.azurecr.io/sscs/evidence-share:latest
-    releaseNameOverride: ${SERVICE_NAME}-sscs-evidence-share
-    environment:
-      SEND_LETTER_SERVICE_ENABLED: "true"
-      SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
-      IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
-      DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
-      CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
-      TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
-      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
-      AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
-      AMQP_USERNAME: "RootManageSharedAccessKey"
-      ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
-      ROBOTICS_EMAIL_TO: "fake"
-      ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
-      ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
-      CASE_ACCESS_MANAGEMENT_FEATURE: true
-      ISSUE_GENERIC_LETTER: true
-      BYPASS_EVIDENCE_SHARE_SERVICE: true
-    secrets:
-      AMQP_PASSWORD:
-        secretRef: sscs-sb-preview
-        key: primaryKey
 
 # tya disabled by default due of requirements of additional topic subscriptions which is not possible currently configure and should be done manually
 # if your PR requires tya-notif change enabled to true
@@ -768,4 +741,3 @@ servicebus:
         subscriptionNeeded: yes
     queues:
       - name: tribunals-to-hearing-api
-
