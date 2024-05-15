@@ -99,7 +99,7 @@ public class SubmitAppealServiceV2 {
         try {
             Consumer<SscsCaseData> mutator = caseData -> convertSyaToCcdCaseDataV2(syaCaseWrapper, caseAccessManagementFeature, caseData);
 
-            CaseDetails caseDetails = citizenCcdService.updateCaseV2(syaCaseWrapper.getCcdCaseId(), EventType.UPDATE_DRAFT.getCcdType(),
+            CaseDetails caseDetails = citizenCcdService.updateCaseCitizenV2(syaCaseWrapper.getCcdCaseId(), EventType.UPDATE_DRAFT.getCcdType(),
                     "Update draft", "Update draft in CCD", idamTokens, mutator);
 
             return Optional.of(SaveCaseResult.builder()
@@ -154,7 +154,7 @@ public class SubmitAppealServiceV2 {
         log.info("SubmitAppealServiceV2 saveDraftCaseInCcd {}", forceCreate);
 
         if (Boolean.TRUE.equals(forceCreate)) {
-            SscsCaseData caseData = convertSyaToCcdCaseDataV2(syaCaseWrapper, caseAccessManagementFeature, new SscsCaseData());
+            SscsCaseData caseData = convertSyaToCcdCaseDataV2(syaCaseWrapper, caseAccessManagementFeature, SscsCaseData.builder().build());
             log.info("SubmitAppealServiceV2 saveDraftCaseInCcd createDraft");
             result = citizenCcdService.createDraft(caseData, idamTokens);
         } else {
