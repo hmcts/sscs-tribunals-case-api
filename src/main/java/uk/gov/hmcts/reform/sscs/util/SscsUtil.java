@@ -474,9 +474,14 @@ public class SscsUtil {
             appeal.setHearingOptions(hearingOptions);
         }
 
-        if (nonNull(appellantInterpreter.getInterpreterLanguage()) && (appellantInterpreter.getIsInterpreterWanted().equals(YES))) {
-            hearingOptions.setLanguageInterpreter(appellantInterpreter.getIsInterpreterWanted().getValue());
-            hearingOptions.setLanguages(appellantInterpreter.getInterpreterLanguage().getValue().getLabel());
+        if (nonNull(appellantInterpreter.getIsInterpreterWanted())) {
+            if (appellantInterpreter.getIsInterpreterWanted().equals(YES)) {
+                hearingOptions.setLanguageInterpreter(appellantInterpreter.getIsInterpreterWanted().getValue());
+                hearingOptions.setLanguages(appellantInterpreter.getInterpreterLanguage().getValue().getLabel());
+            } else {
+                hearingOptions.setLanguageInterpreter(appellantInterpreter.getIsInterpreterWanted().getValue());
+                hearingOptions.setLanguages(null);
+            }
         }
 
         caseData.getSchedulingAndListingFields().getOverrideFields().setAppellantInterpreter(appellantInterpreter);

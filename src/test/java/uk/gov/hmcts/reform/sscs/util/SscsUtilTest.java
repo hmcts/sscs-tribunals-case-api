@@ -15,7 +15,6 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -345,7 +344,7 @@ class SscsUtilTest {
     }
 
     @Test
-    void givenAppellantInterpreterIsSetToNo_DontUpdateCaseDataInterpreter() {
+    void givenAppellantInterpreterIsSetToNo_ThenUpdateThisOnCaseData() {
         caseData.setAppeal(Appeal.builder().build());
         caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
 
@@ -356,7 +355,6 @@ class SscsUtilTest {
 
         HearingInterpreter appellantInterpreter = HearingInterpreter.builder()
                 .isInterpreterWanted(YesNo.NO)
-                .interpreterLanguage(null)
                 .build();
 
         updateHearingInterpreter(caseData, appellantInterpreter);
@@ -364,7 +362,7 @@ class SscsUtilTest {
         Appeal appeal = caseData.getAppeal();
 
         HearingOptions hearingOptions = appeal.getHearingOptions();
-        assertThat(hearingOptions.getLanguageInterpreter()).isEqualTo("Yes");
-        Assertions.assertNotNull(hearingOptions.getLanguages());
+        assertThat(hearingOptions.getLanguageInterpreter()).isEqualTo("No");
+        assertNull(hearingOptions.getLanguages());
     }
 }
