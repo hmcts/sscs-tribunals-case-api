@@ -14,6 +14,8 @@ import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.TELEP
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.*;
 
 import java.time.LocalDate;
+import java.util.List;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -318,5 +320,51 @@ class SscsUtilTest {
         assertThat(hearingSubtype.isWantsHearingTypeTelephone()).isFalse();
         assertThat(hearingSubtype.isWantsHearingTypeFaceToFace()).isFalse();
         assertThat(hearingSubtype.isWantsHearingTypeVideo()).isFalse();
+    }
+
+    @Test
+    void givenAppellantInterpreterIsSetToYes_UpdateCaseDataInterpreter() {
+        caseData.setAppeal(Appeal.builder().build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+
+        DynamicListItem interpreterLanguageItem = new DynamicListItem("test", "spanish");
+        DynamicList interpreterLanguage = new DynamicList(interpreterLanguageItem, List.of());
+
+        HearingInterpreter appellantInterpreter = HearingInterpreter.builder()
+                .isInterpreterWanted(YesNo.YES)
+                .interpreterLanguage(interpreterLanguage)
+                .build();
+
+        updateHearingInterpreter(caseData, appellantInterpreter);
+
+        Appeal appeal = caseData.getAppeal();
+
+        HearingOptions hearingOptions = appeal.getHearingOptions();
+        assertThat(hearingOptions.getLanguageInterpreter()).isEqualTo("Yes");
+        assertThat(hearingOptions.getLanguages()).isEqualTo("spanish");
+    }
+
+    @Test
+    void givenAppellantInterpreterIsSetToNo_DontUpdateCaseDataInterpreter() {
+        caseData.setAppeal(Appeal.builder().build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+
+        caseData.getAppeal().setHearingOptions(HearingOptions.builder()
+                .languageInterpreter("Yes")
+                .languages("French")
+                .build());
+
+        HearingInterpreter appellantInterpreter = HearingInterpreter.builder()
+                .isInterpreterWanted(YesNo.NO)
+                .interpreterLanguage(null)
+                .build();
+
+        updateHearingInterpreter(caseData, appellantInterpreter);
+
+        Appeal appeal = caseData.getAppeal();
+
+        HearingOptions hearingOptions = appeal.getHearingOptions();
+        assertThat(hearingOptions.getLanguageInterpreter()).isEqualTo("Yes");
+        Assertions.assertNotNull(hearingOptions.getLanguages());
     }
 }

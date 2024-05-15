@@ -465,15 +465,21 @@ public class SscsUtil {
         caseData.getSchedulingAndListingFields().getOverrideFields().setAppellantHearingChannel(hearingChannel);
     }
 
-    public static void updateHearingInterpreter(SscsCaseData caseData, HearingInterpreter hearingInterpreter) {
+    public static void updateHearingInterpreter(SscsCaseData caseData, HearingInterpreter appellantInterpreter) {
         Appeal appeal = caseData.getAppeal();
 
         HearingOptions hearingOptions = appeal.getHearingOptions();
+        if (isNull(hearingOptions)) {
+            hearingOptions = HearingOptions.builder().build();
+            appeal.setHearingOptions(hearingOptions);
+        }
 
-        hearingOptions.setLanguageInterpreter(hearingInterpreter.getIsInterpreterWanted().getValue());
-        hearingOptions.setLanguages(hearingInterpreter.getInterpreterLanguage().getValue().getLabel());
+        if (nonNull(appellantInterpreter.getInterpreterLanguage()) && (appellantInterpreter.getIsInterpreterWanted().equals(YES))) {
+            hearingOptions.setLanguageInterpreter(appellantInterpreter.getIsInterpreterWanted().getValue());
+            hearingOptions.setLanguages(appellantInterpreter.getInterpreterLanguage().getValue().getLabel());
+        }
 
-        caseData.getSchedulingAndListingFields().getOverrideFields().setAppellantInterpreter(hearingInterpreter);
+        caseData.getSchedulingAndListingFields().getOverrideFields().setAppellantInterpreter(appellantInterpreter);
     }
 
     private static String hearingChannelToYesNoString(HearingChannel expectedHearingChannel, HearingChannel hearingChannel) {
