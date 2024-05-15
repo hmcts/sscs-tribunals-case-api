@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.util.SscsUtil.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -334,7 +335,9 @@ class SscsUtilTest {
                 .interpreterLanguage(interpreterLanguage)
                 .build();
 
-        updateHearingInterpreter(caseData, appellantInterpreter);
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        updateHearingInterpreter(caseData, response, appellantInterpreter);
 
         Appeal appeal = caseData.getAppeal();
 
@@ -357,12 +360,32 @@ class SscsUtilTest {
                 .isInterpreterWanted(YesNo.NO)
                 .build();
 
-        updateHearingInterpreter(caseData, appellantInterpreter);
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        updateHearingInterpreter(caseData, response, appellantInterpreter);
 
         Appeal appeal = caseData.getAppeal();
 
         HearingOptions hearingOptions = appeal.getHearingOptions();
         assertThat(hearingOptions.getLanguageInterpreter()).isEqualTo("No");
         assertNull(hearingOptions.getLanguages());
+    }
+
+    @Test
+    void givenAppellantInterpreterIsSetToYesAndNoLanguageIsSelected_ThrowAnError() {
+        caseData.setAppeal(Appeal.builder().build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+
+        HearingInterpreter appellantInterpreter = HearingInterpreter.builder()
+                .isInterpreterWanted(YesNo.YES)
+                .interpreterLanguage(null)
+                .build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        updateHearingInterpreter(caseData, response, appellantInterpreter);
+
+        Assertions.assertEquals(1, response.getErrors().size());
+        Assertions.assertEquals("Interpreter language must be selected when interpreter is selected.", response.getErrors().toArray()[0]);
     }
 }

@@ -465,7 +465,8 @@ public class SscsUtil {
         caseData.getSchedulingAndListingFields().getOverrideFields().setAppellantHearingChannel(hearingChannel);
     }
 
-    public static void updateHearingInterpreter(SscsCaseData caseData, HearingInterpreter appellantInterpreter) {
+    public static void updateHearingInterpreter(SscsCaseData caseData,
+                                                PreSubmitCallbackResponse<SscsCaseData> response, HearingInterpreter appellantInterpreter) {
         Appeal appeal = caseData.getAppeal();
 
         HearingOptions hearingOptions = appeal.getHearingOptions();
@@ -479,8 +480,12 @@ public class SscsUtil {
             hearingOptions.setLanguageInterpreter(interpreterWanted);
 
             if (interpreterWanted.equals(YES.toString())) {
-                String interpreterLanguage = appellantInterpreter.getInterpreterLanguage().getValue().getLabel();
-                hearingOptions.setLanguages(interpreterLanguage);
+                if (nonNull(appellantInterpreter.getInterpreterLanguage()) && nonNull(appellantInterpreter.getInterpreterLanguage().getValue())) {
+                    String interpreterLanguage = appellantInterpreter.getInterpreterLanguage().getValue().getLabel();
+                    hearingOptions.setLanguages(interpreterLanguage);
+                } else {
+                    response.addError("Interpreter language must be selected when interpreter is selected.");
+                }
             } else {
                 hearingOptions.setLanguages(null);
             }

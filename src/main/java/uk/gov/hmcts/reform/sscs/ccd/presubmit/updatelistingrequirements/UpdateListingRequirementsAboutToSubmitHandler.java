@@ -74,7 +74,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
                     SscsUtil.updateHearingChannel(sscsCaseData, hearingChannel);
                 }
                 if (nonNull(appellantInterpreter)) {
-                    SscsUtil.updateHearingInterpreter(sscsCaseData, appellantInterpreter);
+                    SscsUtil.updateHearingInterpreter(sscsCaseData, callbackResponse, appellantInterpreter);
                 }
             }
         }
