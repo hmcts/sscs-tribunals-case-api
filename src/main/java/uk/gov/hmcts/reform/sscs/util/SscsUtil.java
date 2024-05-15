@@ -475,11 +475,13 @@ public class SscsUtil {
         }
 
         if (nonNull(appellantInterpreter.getIsInterpreterWanted())) {
-            if (appellantInterpreter.getIsInterpreterWanted().equals(YES)) {
-                hearingOptions.setLanguageInterpreter(appellantInterpreter.getIsInterpreterWanted().getValue());
-                hearingOptions.setLanguages(appellantInterpreter.getInterpreterLanguage().getValue().getLabel());
+            String interpreterWanted = appellantInterpreter.getIsInterpreterWanted().getValue();
+            hearingOptions.setLanguageInterpreter(interpreterWanted);
+
+            if (interpreterWanted.equals("Yes")) {
+                String interpreterLanguage = appellantInterpreter.getInterpreterLanguage().getValue().getLabel();
+                hearingOptions.setLanguages(interpreterLanguage);
             } else {
-                hearingOptions.setLanguageInterpreter(appellantInterpreter.getIsInterpreterWanted().getValue());
                 hearingOptions.setLanguages(null);
             }
         }
