@@ -122,7 +122,7 @@ public class SubmitAppealServiceV2 {
         log.info("SubmitAppealServiceV2 saveDraftCaseInCcd {}", forceCreate);
 
         if (Boolean.TRUE.equals(forceCreate)) {
-            SscsCaseData caseData = convertSyaToCcdCaseDataV2(syaCaseWrapper, caseAccessManagementFeature, new SscsCaseData());
+            SscsCaseData caseData = convertSyaToCcdCaseDataV2(syaCaseWrapper, caseAccessManagementFeature, SscsCaseData.builder().build());
             log.info("SubmitAppealServiceV2 saveDraftCaseInCcd createDraft");
             result = citizenCcdService.createDraft(caseData, idamTokens);
         } else {

@@ -90,7 +90,7 @@ public class CitizenCcdService {
         if (CollectionUtils.isNotEmpty(caseDetailsList)) {
 
             String caseId = caseDetailsList.get(0).getId().toString();
-            caseDetails = updateCaseV2(caseId, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
+            caseDetails = updateCaseCitizenV2(caseId, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
                 "Update draft in CCD", idamTokens, mutator);
 
             return SaveCaseResult.builder()
@@ -133,7 +133,7 @@ public class CitizenCcdService {
 
     @Retryable
     public CaseDetails triggerCaseEventV2(String caseId, String eventType, String summary, String description, IdamTokens idamTokens) {
-        return updateCaseV2(caseId, eventType, idamTokens, data -> new UpdateResult(summary, description));
+        return updateCaseCitizenV2(caseId, eventType, idamTokens, data -> new UpdateResult(summary, description));
     }
 
     public record UpdateResult(String summary, String description) { }
@@ -144,8 +144,8 @@ public class CitizenCcdService {
      * the current version of case data from CCD's start event.
      */
     @Retryable
-    public CaseDetails updateCaseV2(String caseId, String eventType, IdamTokens idamTokens, Function<SscsCaseData, UpdateResult> mutator) {
-        log.info("Updating a draft with caseId {} and eventType {}, using updateCaseV2 method for citizen", caseId, eventType);
+    public CaseDetails updateCaseCitizenV2(String caseId, String eventType, IdamTokens idamTokens, Function<SscsCaseData, UpdateResult> mutator) {
+        log.info("Updating a draft with caseId {} and eventType {}, using updateCaseCitizenV2 method for citizen", caseId, eventType);
         StartEventResponse startEventResponse = citizenCcdClient.startEventForCitizen(idamTokens, caseId, eventType);
         var data = sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData());
 
@@ -163,8 +163,8 @@ public class CitizenCcdService {
     }
 
     @Retryable
-    public CaseDetails updateCaseV2(String caseId, String eventType, String summary, String description, IdamTokens idamTokens, Consumer<SscsCaseData> mutator) {
-        return updateCaseV2(caseId, eventType, idamTokens, data -> {
+    public CaseDetails updateCaseCitizenV2(String caseId, String eventType, String summary, String description, IdamTokens idamTokens, Consumer<SscsCaseData> mutator) {
+        return updateCaseCitizenV2(caseId, eventType, idamTokens, data -> {
             mutator.accept(data);
             return new UpdateResult(summary, description);
         });
@@ -175,8 +175,8 @@ public class CitizenCcdService {
      *
      */
     @Recover
-    public SscsCaseDetails recoverUpdateCaseV2(RuntimeException exception, Long caseId, String eventType) {
-        log.error("In recover method (recoverUpdateCaseV2) for draft with caseId {} and eventType {}", caseId, eventType);
+    public SscsCaseDetails recoverUpdateCaseCitizenV2(RuntimeException exception, Long caseId, String eventType) {
+        log.error("In recover method (recoverUpdateCaseCitizenV2) for draft with caseId {} and eventType {}", caseId, eventType);
         throw exception;
     }
 
