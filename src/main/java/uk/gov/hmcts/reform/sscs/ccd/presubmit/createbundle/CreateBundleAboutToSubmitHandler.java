@@ -54,6 +54,6 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
 
         response.getData().setWorkAllocationFields(workAllocationFields);
 
-        return bundlingHandler.handle(callback);
+        return response;
     }
 }
