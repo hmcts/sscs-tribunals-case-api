@@ -81,7 +81,6 @@ Note: When you are finished with preview testing remember to delete the uploaded
 ccd-def-cleanup should delete the ccd def file you uploaded, given the enable_keep_helm label is not on your PR. 
 
 
-
 ### Running in Docker(Work in progress...)
 Create the image of the application by executing the following command:
 
