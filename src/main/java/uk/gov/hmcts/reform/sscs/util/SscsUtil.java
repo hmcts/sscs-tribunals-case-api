@@ -478,9 +478,10 @@ public class SscsUtil {
                     String interpreterLanguage = appellantInterpreter.getInterpreterLanguage().getValue().getLabel();
                     hearingOptions.setLanguages(interpreterLanguage);
                 } else {
-                    response.addError("Interpreter language must be selected when interpreter is selected.");
+                    response.addError("Interpreter language must be selected if an interpreter is wanted.");
                 }
             } else {
+                appellantInterpreter.setInterpreterLanguage(null);
                 hearingOptions.setLanguages(null);
             }
         }

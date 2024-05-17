@@ -348,7 +348,29 @@ class SscsUtilTest {
     }
 
     @Test
-    void givenAppellantInterpreterIsSetToNo_ThenUpdateThisOnCaseData() {
+    void givenAppellantInterpreterIsSetToNoAndLanguageFieldIsNotEmpty_ThenClearLanguageValueField() {
+        caseData.setAppeal(Appeal.builder().build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+
+        DynamicListItem interpreterLanguageItem = new DynamicListItem("test1", "Welsh");
+        DynamicList interpreterLanguage = new DynamicList(interpreterLanguageItem, List.of());
+
+        HearingInterpreter appellantInterpreter = HearingInterpreter.builder()
+                .isInterpreterWanted(YesNo.NO)
+                .interpreterLanguage(interpreterLanguage)
+                .build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        updateHearingInterpreter(caseData, response, appellantInterpreter);
+
+        assertEquals(0, response.getErrors().size());
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter().getInterpreterLanguage()).isNull();
+        assertNull(response.getData().getAppeal().getHearingOptions().getLanguages());
+    }
+
+    @Test
+    void givenAppellantInterpreterIsSetToNoAndLanguageFieldIsEmpty_ThenUpdateThisOnCaseData() {
         caseData.setAppeal(Appeal.builder().build());
         caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
 
@@ -387,6 +409,29 @@ class SscsUtilTest {
         updateHearingInterpreter(caseData, response, appellantInterpreter);
 
         assertEquals(1, response.getErrors().size());
-        assertEquals("Interpreter language must be selected when interpreter is selected.", response.getErrors().toArray()[0]);
+        assertEquals("Interpreter language must be selected if an interpreter is wanted.", response.getErrors().toArray()[0]);
+    }
+
+    @Test
+    void givenAppellantInterpreterIsSetToYesAndLanguageValueIsNull_ThrowAnError() {
+        caseData.setAppeal(Appeal.builder().build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+
+        DynamicListItem interpreterLanguageItem2 = new DynamicListItem("test", "Italian");
+        DynamicListItem interpreterLanguageItem3 = new DynamicListItem("test1", "Persian");
+        DynamicList interpreterLanguage = new DynamicList(null, List.of(interpreterLanguageItem2, interpreterLanguageItem3));
+
+        HearingInterpreter appellantInterpreter = HearingInterpreter.builder()
+                .isInterpreterWanted(YesNo.YES)
+                .interpreterLanguage(interpreterLanguage)
+                .build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        updateHearingInterpreter(caseData, response, appellantInterpreter);
+
+        assertEquals(1, response.getErrors().size());
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNull();
+        assertEquals("Interpreter language must be selected if an interpreter is wanted.", response.getErrors().toArray()[0]);
     }
 }
