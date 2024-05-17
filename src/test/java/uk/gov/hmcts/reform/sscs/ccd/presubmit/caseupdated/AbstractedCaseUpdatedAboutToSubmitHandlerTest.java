@@ -415,6 +415,21 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenIsThereAJointPartyHasBeenSetToNo_thenClearJointPartyFieldsOnCaseDetails() {
+        callback.getCaseDetails().getCaseData().setHasJointParty(YesNo.NO);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        JointParty jointParty = response.getData().getJointParty();
+
+        assertNull(jointParty.getIdentity());
+        assertNull(jointParty.getName());
+        assertNull(jointParty.getAddress());
+        assertNull(jointParty.getContact());
+        assertNull(jointParty.getJointPartyAddressSameAsAppellant());
+    }
+
+    @Test
     public void givenJointPartySameAddressAsAppeallantIsSetToYes_validateAppeallantAddressNotJointParty() {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1(null);
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("73GH Y7U");
