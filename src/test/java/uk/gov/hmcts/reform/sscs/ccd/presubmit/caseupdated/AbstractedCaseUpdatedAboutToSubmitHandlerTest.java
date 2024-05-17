@@ -430,6 +430,25 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenJointPartySameAddressAsAppellantIsNotNullButIsNo_validateJointPartyAddress() {
+        JointParty jointParty = JointParty.builder()
+                .name(Name.builder().firstName("Test").lastName("Test").build())
+                .jointPartyAddressSameAsAppellant(NO)
+                .address(Address.builder().line1(null).postcode(null).build())
+                .hasJointParty(YES)
+                .build();
+
+        callback.getCaseDetails().getCaseData().setJointParty(jointParty);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Set<String> expectedErrorMessages = Set.of("You must enter address line 1 for the joint party",
+                "You must enter a valid UK postcode for the joint party");
+
+        assertThat(response.getErrors(), is(expectedErrorMessages));
+    }
+
+    @Test
     public void givenJointPartySameAddressAsAppeallantIsSetToYes_validateAppeallantAddressNotJointParty() {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1(null);
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("73GH Y7U");
