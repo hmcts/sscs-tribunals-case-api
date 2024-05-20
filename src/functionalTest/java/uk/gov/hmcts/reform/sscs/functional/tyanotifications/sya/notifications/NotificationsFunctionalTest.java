@@ -198,7 +198,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
 
     @Test
     public void shouldSendAppealCreatedAppellantNotification() throws NotificationClientException, IOException {
-        simulateCcdCallback(SYA_APPEAL_CREATED, SYA_APPEAL_CREATED.getId() + "Callback.json");
+        simulateCcdCallback(SYA_APPEAL_CREATED, BASE_PATH_TYAN + SYA_APPEAL_CREATED.getId() + "Callback.json");
         List<Notification> notifications = tryFetchNotificationsForTestCase(appealCreatedAppellantEmailId, appealCreatedAppellantSmsId);
 
         assertNotificationBodyContains(notifications, appealCreatedAppellantEmailId, "appeal has been received");
@@ -206,7 +206,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
 
     @Test
     public void shouldSendValidAppealCreatedAppellantNotification() throws NotificationClientException, IOException {
-        simulateCcdCallback(VALID_APPEAL_CREATED, SYA_APPEAL_CREATED.getId() + "Callback.json");
+        simulateCcdCallback(VALID_APPEAL_CREATED, BASE_PATH_TYAN + SYA_APPEAL_CREATED.getId() + "Callback.json");
         List<Notification> notifications = tryFetchNotificationsForTestCase(appealCreatedAppellantEmailId, appealCreatedAppellantSmsId);
 
         assertNotificationBodyContains(notifications, appealCreatedAppellantEmailId, "appeal has been received");
@@ -214,7 +214,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
 
     @Test
     public void shouldSendAppealCreatedAppointeeNotification() throws NotificationClientException, IOException {
-        simulateCcdCallback(SYA_APPEAL_CREATED, SYA_APPEAL_CREATED.getId() + "AppointeeCallback.json");
+        simulateCcdCallback(SYA_APPEAL_CREATED, BASE_PATH_TYAN + SYA_APPEAL_CREATED.getId() + "AppointeeCallback.json");
         List<Notification> notifications = tryFetchNotificationsForTestCase(appealCreatedAppointeeEmailId, appealCreatedAppointeeSmsId);
 
         assertNotificationBodyContains(notifications, appealCreatedAppointeeEmailId, "appointee");
@@ -222,7 +222,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
 
     @Test
     public void shouldSendValidAppealCreatedAppointeeNotification() throws NotificationClientException, IOException {
-        simulateCcdCallback(VALID_APPEAL_CREATED, SYA_APPEAL_CREATED.getId() + "AppointeeCallback.json");
+        simulateCcdCallback(VALID_APPEAL_CREATED, BASE_PATH_TYAN + SYA_APPEAL_CREATED.getId() + "AppointeeCallback.json");
         List<Notification> notifications = tryFetchNotificationsForTestCase(appealCreatedAppointeeEmailId, appealCreatedAppointeeSmsId);
 
         assertNotificationBodyContains(notifications, appealCreatedAppointeeEmailId, "appointee");
@@ -238,7 +238,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     public void shouldSendPaperDwpResponseReceivedNotification(final String benefit, String expectedPanelComposition)
             throws Exception {
 
-        simulateCcdCallback(DWP_RESPONSE_RECEIVED, RESPONSE_RECEIVED_PAPER_PATH + benefit + "-paper-"
+        simulateCcdCallback(DWP_RESPONSE_RECEIVED, BASE_PATH_TYAN + RESPONSE_RECEIVED_PAPER_PATH + benefit + "-paper-"
                 + DWP_RESPONSE_RECEIVED.getId() + "Callback.json");
         List<Notification> notifications = tryFetchNotificationsForTestCase(
                 paperResponseReceivedEmailId, paperResponseReceivedSmsId);
@@ -252,7 +252,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
 
     @Test
     public void shouldNotSendPaperDwpResponseReceivedNotificationIfNotSubscribed() throws NotificationClientException, IOException {
-        simulateCcdCallback(DWP_RESPONSE_RECEIVED, RESPONSE_RECEIVED_PAPER_PATH + "paper-no-subscriptions-"
+        simulateCcdCallback(DWP_RESPONSE_RECEIVED, BASE_PATH_TYAN + RESPONSE_RECEIVED_PAPER_PATH + "paper-no-subscriptions-"
                 + DWP_RESPONSE_RECEIVED.getId() + "Callback.json");
 
         List<Notification> notifications = tryFetchNotificationsForTestCaseWithFlag(true,
@@ -264,7 +264,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void shouldSendAppointeeEvidenceReminderForOralCaseNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(EVIDENCE_REMINDER,
-                "tyanotifications/appointee/oral-" + EVIDENCE_REMINDER.getId() + "Callback.json");
+            BASE_PATH_TYAN + "appointee/oral-" + EVIDENCE_REMINDER.getId() + "Callback.json");
 
         List<Notification> notifications = tryFetchNotificationsForTestCase(
                 oralAppointeeEvidenceReminderEmailId,
@@ -283,7 +283,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void shouldSendAppointeeEvidenceReminderForPaperCaseNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(EVIDENCE_REMINDER,
-                "tyanotifications/appointee/paper-" + EVIDENCE_REMINDER.getId() + "Callback.json");
+            BASE_PATH_TYAN + "appointee/paper-" + EVIDENCE_REMINDER.getId() + "Callback.json");
 
         List<Notification> notifications = tryFetchNotificationsForTestCase(
                 paperAppointeeEvidenceReminderEmailId,
@@ -302,7 +302,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void shouldSendAppellantSubscriptionUpdateNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(SUBSCRIPTION_UPDATED,
-                "appellant-" + SUBSCRIPTION_UPDATED.getId() + "Callback.json");
+            BASE_PATH_TYAN + "appellant-" + SUBSCRIPTION_UPDATED.getId() + "Callback.json");
 
         List<Notification> notifications = tryFetchNotificationsForTestCase(
                 subscriptionUpdateEmailId,
@@ -319,7 +319,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void shouldSendAppointeeSubscriptionUpdateNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(SUBSCRIPTION_UPDATED,
-                "appointee-" + SUBSCRIPTION_UPDATED.getId() + "Callback.json");
+            BASE_PATH_TYAN + "appointee-" + SUBSCRIPTION_UPDATED.getId() + "Callback.json");
 
         List<Notification> notifications = tryFetchNotificationsForTestCase(
                 subscriptionUpdateEmailId,
@@ -334,7 +334,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void shouldSendAppointeeEvidenceReceivedPaperNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(EVIDENCE_RECEIVED,
-                "tyanotifications/appointee/paper-" + EVIDENCE_RECEIVED.getId() + "Callback.json");
+            BASE_PATH_TYAN + "appointee/paper-" + EVIDENCE_RECEIVED.getId() + "Callback.json");
 
         List<Notification> notifications = tryFetchNotificationsForTestCase(
                 paperAppointeeEvidenceReceivedEmailId,
@@ -348,7 +348,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void shouldSendAppointeeHearingAdjournedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(ADJOURNED,
-                "tyanotifications/appointee/" + ADJOURNED.getId() + "Callback.json");
+            BASE_PATH_TYAN + "appointee/" + ADJOURNED.getId() + "Callback.json");
 
         List<Notification> notifications = tryFetchNotificationsForTestCase(
                 hearingAdjournedAppointeeEmailId,
@@ -361,7 +361,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void shouldSendAppointeeAppealLapsedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(APPEAL_LAPSED,
-                "tyanotifications/appointee/" + APPEAL_LAPSED.getId() + "Callback.json");
+            BASE_PATH_TYAN + "appointee/" + APPEAL_LAPSED.getId() + "Callback.json");
         List<Notification> notifications = tryFetchNotificationsForTestCase(
                 appealLapsedAppointeeEmailTemplateId,
                 appealLapsedAppointeeSmsTemplateId
@@ -379,7 +379,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void shouldSendAppointeeDwpAppealLapsedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(APPEAL_LAPSED,
-                "tyanotifications/appointee/dwpAppealLapsedCallback.json");
+            BASE_PATH_TYAN + "appointee/dwpAppealLapsedCallback.json");
         List<Notification> notifications = tryFetchNotificationsForTestCase(
                 appealLapsedAppointeeEmailTemplateId,
                 appealLapsedAppointeeSmsTemplateId
@@ -393,7 +393,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void shouldSendAppointeeResponseReceivedForPaperCaseNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(DWP_RESPONSE_RECEIVED,
-                "tyanotifications/appointee/" + DWP_RESPONSE_RECEIVED.getId() + "Callback.json");
+            BASE_PATH_TYAN + "appointee/" + DWP_RESPONSE_RECEIVED.getId() + "Callback.json");
 
         List<Notification> notifications = tryFetchNotificationsForTestCase(
                 paperAppointeeResponseReceivedEmailId,
@@ -406,7 +406,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
 
     public void shouldSendAppointeeAppealWithdrawnNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(APPEAL_WITHDRAWN,
-                "tyanotifications/appointee/" + APPEAL_WITHDRAWN.getId() + "Callback.json");
+            BASE_PATH_TYAN + "appointee/" + APPEAL_WITHDRAWN.getId() + "Callback.json");
         List<Notification> notifications = tryFetchNotificationsForTestCase(
                 appointeeAppealWithdrawnEmailId, appointeeAppealWithdrawnSmsId);
         Notification emailNotification = notifications.stream()
@@ -421,7 +421,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Ignore
     public void shouldSendAppointeeHearingBookedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(HEARING_BOOKED,
-                "tyanotifications/appointee/" + HEARING_BOOKED.getId() + "Callback.json");
+            BASE_PATH_TYAN + "appointee/" + HEARING_BOOKED.getId() + "Callback.json");
 
         /*// SSCS-11586
         List<Notification> notifications = tryFetchNotificationsForTestCase(
@@ -437,7 +437,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void shouldSendAppointeeEvidenceReceivedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(EVIDENCE_RECEIVED,
-                "tyanotifications/appointee/" + EVIDENCE_RECEIVED.getId() + "Callback.json");
+            BASE_PATH_TYAN + "appointee/" + EVIDENCE_RECEIVED.getId() + "Callback.json");
         List<Notification> notifications = tryFetchNotificationsForTestCase(appointeeEvidenceReceivedEmailId, appointeeEvidenceReceivedSmsId);
         Notification emailNotification = notifications.stream().filter(f -> f.getTemplateId().toString().equals(appointeeEvidenceReceivedEmailId)).collect(Collectors.toList()).get(0);
         assertTrue(emailNotification.getBody().contains("Dear Appointee User"));
@@ -447,7 +447,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void shouldSendAppointeeHearingPostponedNotification() throws NotificationClientException, IOException {
         simulateCcdCallback(POSTPONEMENT,
-                "tyanotifications/appointee/" + POSTPONEMENT.getId() + "Callback.json");
+            BASE_PATH_TYAN + "appointee/" + POSTPONEMENT.getId() + "Callback.json");
         List<Notification> notifications = tryFetchNotificationsForTestCase(appointeeHearingPostponedEmailId);
         Notification emailNotification = notifications.get(0);
 
@@ -457,7 +457,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
 
     @Test
     public void shouldSaveReasonableAdjustmentNotificationForAppellant() throws IOException {
-        simulateCcdCallback(APPEAL_RECEIVED, APPEAL_RECEIVED.getId() + "AppellantReasonableAdjustmentCallback.json");
+        simulateCcdCallback(APPEAL_RECEIVED, BASE_PATH_TYAN + APPEAL_RECEIVED.getId() + "AppellantReasonableAdjustmentCallback.json");
 
         delayInSeconds(10);
 
@@ -471,7 +471,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
 
     @Test
     public void shouldSaveReasonableAdjustmentNotificationForAppellantAndRep() throws IOException {
-        simulateCcdCallback(APPEAL_RECEIVED, APPEAL_RECEIVED.getId() + "AppellantRepReasonableAdjustmentCallback.json");
+        simulateCcdCallback(APPEAL_RECEIVED, BASE_PATH_TYAN + APPEAL_RECEIVED.getId() + "AppellantRepReasonableAdjustmentCallback.json");
 
         delayInSeconds(10);
 

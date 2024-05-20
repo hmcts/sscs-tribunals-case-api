@@ -63,7 +63,7 @@ public abstract class AbstractFunctionalTest {
     // Below rules are needed to use the junitParamsRunner together with SpringRunner
     @ClassRule
     public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
-
+    protected static final String BASE_PATH_TYAN = "tyanotifications/";
     @Rule
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
     //end of rules needed for junitParamsRunner
@@ -252,12 +252,12 @@ public abstract class AbstractFunctionalTest {
     }
 
     protected void simulateWelshCcdCallback(NotificationEventType eventType) throws IOException {
-        String callbackJsonName = eventType.getId() + "CallbackWelsh.json";
+        String callbackJsonName = BASE_PATH_TYAN + eventType.getId() + "CallbackWelsh.json";
         simulateCcdCallback(eventType, callbackJsonName);
     }
 
     protected void simulateCcdCallback(NotificationEventType eventType) throws IOException {
-        String callbackJsonName = eventType.getId() + "Callback.json";
+        String callbackJsonName = BASE_PATH_TYAN + eventType.getId() + "Callback.json";
         simulateCcdCallback(eventType, callbackJsonName);
     }
 
@@ -266,6 +266,7 @@ public abstract class AbstractFunctionalTest {
 
         String json;
         try {
+            log.info("Getting file {}", resource);
             String path = Objects.requireNonNull(getClass().getClassLoader().getResource(resource)).getFile();
             json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         } catch (IOException | NullPointerException e) {

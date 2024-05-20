@@ -138,7 +138,7 @@ public class JointPartyFunctionalTest extends AbstractFunctionalTest {
         NotificationEventType notificationEventType = NotificationEventType.DIRECTION_ISSUED;
 
         simulateCcdCallback(notificationEventType,
-            notificationEventType.getId() + "ProvideInformationCallback.json");
+            BASE_PATH_TYAN + notificationEventType.getId() + "ProvideInformationCallback.json");
 
         List<Notification> notifications = fetchLetters();
 
