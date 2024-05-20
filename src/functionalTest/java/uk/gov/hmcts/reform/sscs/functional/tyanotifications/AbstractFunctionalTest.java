@@ -267,7 +267,7 @@ public abstract class AbstractFunctionalTest {
 
         String json;
         try {
-            String path = Objects.requireNonNull(getClass().getClassLoader().getResource(resource)).getFile();
+            String path = Objects.requireNonNull(getClass().getClassLoader().getResource("tyanotifications" +resource)).getFile();
             json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         } catch (IOException | NullPointerException e) {
             log.error("Callback file for the event {} is missing: {}", eventType, resource, e);
