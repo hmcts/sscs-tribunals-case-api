@@ -39,6 +39,7 @@ import org.springframework.http.converter.xml.SourceHttpMessageConverter;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.client.RestTemplate;
@@ -78,6 +79,7 @@ import uk.gov.service.notify.NotificationClient;
     "uk.gov.hmcts.reform.ccd.document.am"})
 @EnableScheduling
 @EnableRetry
+@EnableAsync
 public class TribunalsCaseApiApplication implements CommandLineRunner {
 
     @Value("${appeal.email.host}")
