@@ -38,6 +38,7 @@ java:
     HOURS_END_TIME: 23
     RUN_DB_MIGRATION_ON_STARTUP: true
     TEST_RECIPIENTS_POSTCODE: "*"
+    TESTING_SUPPORT_ENABLED: true
   postgresql:
     enabled: true
 
