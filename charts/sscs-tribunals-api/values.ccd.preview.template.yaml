@@ -107,7 +107,7 @@ em-ccdorc:
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
 
 ccd-case-document-am-api:
-  enabled: false
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
@@ -547,7 +547,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S12472BnonProd
+      CCD_DEF_VERSION: S1549AnonProd
     secrets: []
     userRoles:
       - citizen
