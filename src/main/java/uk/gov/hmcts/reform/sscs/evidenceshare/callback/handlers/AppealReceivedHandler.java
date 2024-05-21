@@ -25,6 +25,7 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
     private final DispatchPriority dispatchPriority;
 
     private final CcdService ccdService;
+
     private final UpdateCcdCaseService updateCcdCaseService;
 
     private final IdamService idamService;
