@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.decisionissued;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
+import static java.util.Objects.*;
+import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DecisionType.STRIKE_OUT;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -32,19 +33,25 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
     private final FooterService footerService;
     private final ListAssistHearingMessageHelper hearingMessageHelper;
     private boolean isScheduleListingEnabled;
-    private boolean isPostHearingsEnabled;
+    private final boolean isPostHearingsEnabled;
+    private final boolean workAllocationFeature;
 
     public DecisionIssuedAboutToSubmitHandler(FooterService footerService, ListAssistHearingMessageHelper
             hearingMessageHelper, @Value("${feature.snl.enabled}") boolean isScheduleListingEnabled,
-            @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
+            @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled,
+            @Value("${feature.work-allocation.enabled}") boolean workAllocationFeature) {
         this.footerService = footerService;
         this.hearingMessageHelper = hearingMessageHelper;
         this.isScheduleListingEnabled = isScheduleListingEnabled;
         this.isPostHearingsEnabled = isPostHearingsEnabled;
+        this.workAllocationFeature = workAllocationFeature;
     }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        requireNonNull(callback, "callback must not be null");
+        requireNonNull(callbackType, "callbackType must not be null");
+
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
                 && (callback.getEvent() == EventType.DECISION_ISSUED
                 || callback.getEvent() == EventType.DECISION_ISSUED_WELSH)
@@ -54,6 +61,9 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
+        }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
@@ -109,11 +119,16 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
             caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
             log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
             caseData.setTranslationWorkOutstanding("Yes");
-
         }
 
         log.info("Saved the new interloc decision document for case id: " + caseData.getCcdCaseId());
+        clearPostponementTransientFields(caseData);
         cancelHearing(callback);
+
+        if (workAllocationFeature) {
+            caseData.setIssueInterlocDecisionDate(LocalDate.now());
+        }
+
         return sscsCaseDataPreSubmitCallbackResponse;
     }
 
@@ -130,8 +145,8 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
     private final Predicate<Callback<SscsCaseData>> eligibleForHearingsCancel = callback -> isScheduleListingEnabled
             && EventType.DECISION_ISSUED.equals(callback.getEvent())
-            && SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState)
-            .       orElse(State.UNKNOWN), List.of(State.HEARING, State.READY_TO_LIST))
+            && SscsUtil.isValidCaseState(callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(State.UNKNOWN),
+                                         List.of(State.HEARING, State.READY_TO_LIST))
             && SscsUtil.isSAndLCase(callback.getCaseDetails().getCaseData());
 
     // SSCS-11486 AC4

@@ -28,8 +28,10 @@ import uk.gov.hmcts.reform.sscs.service.servicebus.messaging.JmsErrorHandler;
 public class MessagingConfig {
 
     @Bean
-    public String jmsUrlString(@Value("${amqp.host}") final String host) {
-        return String.format("amqps://%1s?amqp.idleTimeout=3600000", host);
+    public String jmsUrlString(@Value("${amqp.amqp-connection-string-template}") final String amqpConnectionStringTemplate,
+                               @Value("${amqp.idleTimeout}") final Long idleTimeout,
+                               @Value("${amqp.host}") final String host) {
+        return String.format(amqpConnectionStringTemplate, host, idleTimeout);
     }
 
     @Bean
@@ -75,6 +77,11 @@ public class MessagingConfig {
         return null;
     }
 
+    /*
+     * DO NOT USE THIS IN PRODUCTION!
+     * This was only used for testing unverified ssl certs locally!
+     */
+    @Deprecated
     private TrustManager[] getTrustManagers() {
         return new TrustManager[]{
             new X509TrustManager() {

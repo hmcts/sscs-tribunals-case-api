@@ -47,10 +47,16 @@ public class DynamicListLanguageUtil {
     public DynamicListItem getLanguageDynamicListItem(Language language) {
         String reference = language.getReference();
         String name = language.getNameEn();
+        String dialectReference = language.getDialectReference();
+        String mrdReference = language.getMrdReference();
 
-        if (nonNull(language.getDialectReference())) {
-            reference = String.format("%s-%s", language.getReference(), language.getDialectReference());
+        if (nonNull(dialectReference)) {
+            reference = String.format("%s-%s", reference, dialectReference);
             name = language.getDialectEn();
+        }
+
+        if (nonNull(mrdReference)) {
+            reference = mrdReference;
         }
         return new DynamicListItem(reference, name);
     }

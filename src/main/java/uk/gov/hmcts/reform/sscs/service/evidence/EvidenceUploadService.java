@@ -40,6 +40,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
@@ -75,14 +76,14 @@ import uk.gov.hmcts.reform.sscs.service.exceptions.EvidenceUploadException;
 import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
-import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.DocumentStoreService;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
 import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
 
 @Slf4j
 @Service
 public class EvidenceUploadService {
-    private final DocumentManagementService documentManagementService;
+    private final DocumentStoreService documentStoreService;
     private final CcdService ccdService;
     private final IdamService idamService;
     private final OnlineHearingService onlineHearingService;
@@ -97,14 +98,14 @@ public class EvidenceUploadService {
     private static final DraftHearingDocumentExtractor draftHearingDocumentExtractor = new DraftHearingDocumentExtractor();
 
     @Autowired
-    public EvidenceUploadService(DocumentManagementService documentManagementService,
+    public EvidenceUploadService(DocumentStoreService documentStoreService,
                                  CcdService ccdService,
                                  IdamService idamService, OnlineHearingService onlineHearingService,
                                  StoreEvidenceDescriptionService storeEvidenceDescriptionService,
                                  FileToPdfConversionService fileToPdfConversionService,
                                  EvidenceManagementService evidenceManagementService,
                                  PdfStoreService pdfStoreService, AddedDocumentsUtil addedDocumentsUtil) {
-        this.documentManagementService = documentManagementService;
+        this.documentStoreService = documentStoreService;
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.onlineHearingService = onlineHearingService;
@@ -258,7 +259,7 @@ public class EvidenceUploadService {
 
                         ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_DRAFT_DOCUMENT.getCcdType(), "SSCS - evidence deleted", "Uploaded a draft evidence deleted", idamService.getIdamTokens());
 
-                        documentManagementService.delete(evidenceId);
+                        documentStoreService.delete(evidenceId);
                     }
                     return true;
                 }).orElse(false);
@@ -497,7 +498,7 @@ public class EvidenceUploadService {
         addedDocumentsUtil.computeDocumentsAddedThisEvent(sscsCaseData, audioVideoEvidence.stream()
             .map(evidence -> evidence.getValue().getDocumentType())
             .filter(Objects::nonNull)
-            .toList(), EVENT_TYPE);
+            .collect(Collectors.toList()), EVENT_TYPE);
 
         if (!audioVideoEvidence.isEmpty()) {
             List<AudioVideoEvidence> newAudioVideoEvidenceList = union(emptyIfNull(sscsCaseData.getAudioVideoEvidence()),

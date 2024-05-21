@@ -93,6 +93,7 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
                 "appeal.appellant.appointee.id",
                 "appeal.appellant.id",
                 "appeal.rep.id",
+                "appeal.hearingOptions",
                 "correction",
                 "correctionBodyContent",
                 "bodyContent",
@@ -113,6 +114,7 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
                 "statementOfReasons",
                 "statementOfReasonsBodyContent",
                 "statementOfReasonsGenerateNotice",
+                "sscsDocument[0].id",
                 "poAttendanceConfirmed")
             .isEqualTo(expectedCaseData);
         verifyNoInteractions(hearingMessageHelper);
