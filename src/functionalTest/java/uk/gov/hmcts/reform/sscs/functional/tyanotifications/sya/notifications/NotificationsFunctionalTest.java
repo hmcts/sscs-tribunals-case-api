@@ -21,7 +21,7 @@ import uk.gov.service.notify.NotificationClientException;
 public class NotificationsFunctionalTest extends AbstractFunctionalTest {
 
     private static final String AS_APPOINTEE_FOR = "You are receiving this update as the appointee for";
-    private static final String RESPONSE_RECEIVED_PAPER_PATH = "tyanotifications/paper/responseReceived/";
+    private static final String RESPONSE_RECEIVED_PAPER_PATH = "paper/responseReceived/";
     private static final String DEAR_APPOINTEE_USER = "Dear Appointee User";
     private static final String APPEAL_ID = "appeal_id";
     private static final String TYA = "v8eg15XeZk";
