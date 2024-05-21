@@ -67,7 +67,8 @@ def secretsForPR = [
                 secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
                 secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
                 secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
-                secret('sscs-servicebus-connection-string-tf', 'SERVICE_BUS_CONNECTION_STRING')
+                secret('sscs-servicebus-connection-string-tf', 'SERVICE_BUS_CONNECTION_STRING'),
+                secret('preview-ccd-db-password-2', 'PREVIEW_DB_PASSWORD_2')
         ],
         's2s-${env}'      : [
                 secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
@@ -135,7 +136,9 @@ withPipeline(type, product, component) {
     afterSuccess('akschartsinstall'){
         // Vars needed for AKS testing
         env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
+        env.DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
         env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+        env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
         env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
         if (env.BRANCH_NAME.startsWith("PR") ) {
             for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
