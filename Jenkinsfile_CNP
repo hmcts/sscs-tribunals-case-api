@@ -13,6 +13,8 @@ import uk.gov.hmcts.contino.GradleBuilder
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
+def dmnBranch = "master"
+def waStandaloneBranch = "master"
 
 def gradleBuilder = new GradleBuilder(this, product)
 
@@ -65,6 +67,8 @@ def secretsForPR = [
                 secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
                 secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
                 secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
+                secret('sscs-servicebus-connection-string-tf', 'SERVICE_BUS_CONNECTION_STRING'),
+                secret('preview-ccd-db-password-2', 'PREVIEW_DB_PASSWORD_2')
         ],
         's2s-${env}'      : [
                 secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
@@ -79,6 +83,20 @@ def secretsForPR = [
                 secret('idam-data-store-system-user-password', 'IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
                 secret('idam-data-store-system-user-username', 'IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
                 secret('idam-data-store-client-secret', 'IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET')
+        ],
+        'wa-${env}'      : [
+                secret('app-insights-connection-string', 'WA_INSIGHT_CONNECTION_STRING'),
+                secret('ld-secret', 'WA_LAUNCH_DARKLY_SDK_KEY'),
+                secret('s2s-secret-case-event-handler', 'S2S_SECRET_CASE_EVENT_HANDLER'),
+                secret('s2s-secret-task-management-api', 'S2S_SECRET_TASK_MANAGEMENT_API'),
+                secret('s2s-secret-task-monitor', 'S2S_SECRET_TASK_MONITOR'),
+                secret('s2s-secret-workflow-api', 'S2S_SECRET_WORKFLOW_API'),
+                secret('wa-idam-client-secret', 'WA_IDAM_CLIENT_SECRET'),
+                secret('wa-system-username', 'WA_SYSTEM_USERNAME'),
+                secret('wa-system-password', 'WA_SYSTEM_PASSWORD')
+        ],
+        'am-${env}'      : [
+                secret('am-role-assignment-service-s2s-secret', 'AM_ROLE_ASSIGNMENT_SERVICE_SECRET')
         ]
 ]
 
@@ -118,7 +136,9 @@ withPipeline(type, product, component) {
     afterSuccess('akschartsinstall'){
         // Vars needed for AKS testing
         env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
+        env.DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
         env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+        env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
         env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
         if (env.BRANCH_NAME.startsWith("PR") ) {
             for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
@@ -129,6 +149,18 @@ withPipeline(type, product, component) {
             for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_hearings") ) {
                 env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
                 env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
+            }
+            for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:wa") ) {
+                env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+                env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+                env.CAMUNDA_BASE_URL = "https://camunda-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+                println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
+                sh """
+                ./bin/pull-camunda-dmn-files.sh ${dmnBranch}
+                ./bin/pull-camunda-bpmn-files.sh ${waStandaloneBranch}
+                ./bin/import-camunda-files.sh . sscs sscs
+                """
+                env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
             }
         }
         println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}. - The branch name is ${env.BRANCH_NAME}""".stripIndent()
