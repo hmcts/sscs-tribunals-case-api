@@ -14,6 +14,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -144,6 +145,27 @@ public class CitizenCcdServiceTest {
                 .thenReturn(CaseDetails.builder().build());
 
         CaseDetails caseDetails = citizenCcdService.archiveDraft(caseData, IDAM_TOKENS, caseId);
+
+        assertNotNull(caseDetails);
+    }
+
+    @Test
+    public void shouldArchiveADraftCaseV2() {
+        SscsCaseData caseData = SscsCaseData.builder().build();
+        Long caseId = 123L;
+
+        StartEventResponse eventResponse = Mockito.mock(StartEventResponse.class);
+        when(citizenCcdClient.startEventForCitizen(eq(IDAM_TOKENS), eq(caseId.toString()), eq(DRAFT_ARCHIVED.getCcdType())))
+                .thenReturn(eventResponse);
+
+        when(citizenCcdClient.submitEventForCitizen(eq(IDAM_TOKENS), eq(caseId.toString()), any()))
+                .thenReturn(CaseDetails.builder().build());
+
+        when(eventResponse.getCaseDetails()).thenReturn(CaseDetails.builder().build());
+
+        when(sscsCcdConvertService.getCaseData(any())).thenReturn(caseData);
+
+        CaseDetails caseDetails = citizenCcdService.archiveDraftV2(IDAM_TOKENS, caseId, sscsCaseData -> { });
 
         assertNotNull(caseDetails);
     }

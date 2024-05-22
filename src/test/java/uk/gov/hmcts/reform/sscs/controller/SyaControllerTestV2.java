@@ -17,9 +17,23 @@ public class SyaControllerTestV2 extends AbstractSyaControllerTest {
     }
 
     @Override
+    boolean isArchiveDraftAppealV2Enabled() {
+        return true;
+    }
+
+    @Override
     void mockSubmitAppealService(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2,
                                  Long caseId, SaveCaseOperation saveCaseOperation) {
         when(submitAppealServiceV2.submitDraftAppeal(any(), any(), any()))
+                .thenReturn(Optional.of(SaveCaseResult.builder()
+                        .caseDetailsId(caseId)
+                        .saveCaseOperation(saveCaseOperation)
+                        .build()));
+    }
+
+    @Override
+    void mockSubmitAppealArchiveDraftAppeal(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2, Long caseId, SaveCaseOperation saveCaseOperation) {
+        when(submitAppealServiceV2.archiveDraftAppeal(any(), any(), any()))
                 .thenReturn(Optional.of(SaveCaseResult.builder()
                         .caseDetailsId(caseId)
                         .saveCaseOperation(saveCaseOperation)

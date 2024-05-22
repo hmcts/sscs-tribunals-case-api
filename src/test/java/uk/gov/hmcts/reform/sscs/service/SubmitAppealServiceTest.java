@@ -8,6 +8,7 @@ import feign.FeignException;
 import java.util.*;
 import junitparams.JUnitParamsRunner;
 import org.junit.runner.RunWith;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
@@ -43,4 +44,33 @@ public class SubmitAppealServiceTest extends AbstractSubmitAppealServiceTest {
     public Optional<SaveCaseResult> callSubmitDraftAppeal(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2, String auth2Token, SyaCaseWrapper appealData, boolean forceCreate) {
         return submitAppealService.submitDraftAppeal(auth2Token, appealData, forceCreate);
     }
+
+    @Override
+    public Optional<SaveCaseResult> callArchiveDraftAppeal(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2, String auth2Token, SyaCaseWrapper appealData, Long caseId) {
+        return submitAppealService.archiveDraftAppeal(auth2Token, appealData, caseId);
+    }
+
+    @Override
+    public void verifyArchiveDraftAppeal(CitizenCcdService citizenCcdService) {
+        verify(citizenCcdService).archiveDraft(any(SscsCaseData.class), any(IdamTokens.class), any());
+    }
+
+    @Override
+    public void givenArchiveDraftAppealWillReturnCaseDetails(CitizenCcdService citizenCcdService, CaseDetails caseDetails) {
+        given(citizenCcdService.archiveDraft(any(SscsCaseData.class), any(IdamTokens.class), any()))
+                .willReturn(caseDetails);
+    }
+
+    @Override
+    public void givenArchiveDraftAppealWillThrow(CitizenCcdService citizenCcdService, FeignException feignException) {
+        given(citizenCcdService.archiveDraft(any(SscsCaseData.class), any(IdamTokens.class), any()))
+                .willThrow(feignException);
+    }
+
+    @Override
+    public void verifyArchiveDraft(CitizenCcdService citizenCcdService) {
+        verify(citizenCcdService).archiveDraft(any(SscsCaseData.class), any(IdamTokens.class), any());
+    }
+
+
 }
