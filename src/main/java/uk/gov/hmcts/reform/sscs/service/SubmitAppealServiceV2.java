@@ -151,12 +151,12 @@ public class SubmitAppealServiceV2 {
             result = citizenCcdService.saveCaseV2(idamTokens, mutator);
         }
 
-        log.info("SubmitAppealServiceV2 POST Draft case with CCD Id {} , IDAM id {} and roles {} ",
+        log.info("SubmitAppealServiceV2 Draft case with CCD Id {} successfully {}, IDAM id {} and roles {} ",
                 result.getCaseDetailsId(),
+                result.getSaveCaseOperation().name(),
                 idamTokens.getUserId(),
                 idamTokens.getRoles());
 
-        log.info("SubmitAppealServiceV2 Draft Case {} successfully {} in CCD", result.getCaseDetailsId(), result.getSaveCaseOperation().name());
         return result;
     }
 }
