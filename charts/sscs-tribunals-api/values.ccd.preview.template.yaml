@@ -9,6 +9,8 @@ java:
   cpuRequests: "2"
   cpuLimits: 2000m
   readinessDelay: 45
+  devmemoryRequests: 1Gi
+  devmemoryLimits: 2Gi
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
