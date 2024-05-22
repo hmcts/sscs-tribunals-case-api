@@ -45,7 +45,7 @@ public class SyaController {
     private final SubmitAppealService submitAppealService;
     private final SubmitAppealServiceV2 submitAppealServiceV2;
     @Value("${feature.submit-appeal-service-submit-draft-appeal-v2.enabled}")
-    private boolean isSubmitDraftAppealV2Enabled = false;
+    private boolean isSubmitDraftAppealV2Enabled;
 
     @Autowired
     SyaController(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2) {
