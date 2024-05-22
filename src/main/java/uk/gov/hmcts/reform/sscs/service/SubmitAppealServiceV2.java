@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
@@ -94,6 +95,25 @@ public class SubmitAppealServiceV2 {
             log.error("The case data has been altered outside of this transaction for idam id {}",
                     idamTokens.getUserId());
         }
+    }
+
+    public Optional<SaveCaseResult> archiveDraftAppeal(String oauth2Token, SyaCaseWrapper syaCaseWrapper, Long ccdCaseId) throws FeignException {
+        syaCaseWrapper.setCaseType(DRAFT);
+
+        IdamTokens idamTokens = getUserTokens(oauth2Token);
+
+        if (!hasValidCitizenRole(idamTokens)) {
+            throw new ApplicationErrorException(new Exception(USER_HAS_A_INVALID_ROLE_MESSAGE));
+        }
+
+        Consumer<SscsCaseData> mutator = caseData -> convertSyaToCcdCaseDataV2(syaCaseWrapper, caseAccessManagementFeature, caseData);
+
+        citizenCcdService.archiveDraftV2(idamTokens, ccdCaseId, mutator);
+
+        return Optional.of(SaveCaseResult.builder()
+                .caseDetailsId(ccdCaseId)
+                .saveCaseOperation(SaveCaseOperation.ARCHIVE)
+                .build());
     }
 
     private IdamTokens getUserTokens(String oauth2Token) {

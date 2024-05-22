@@ -113,6 +113,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: false
     TRIGGER_EVENT_V2_ENABLED: false
     SUBMIT_APPEAL_SERVICE_UPDATE_CASE_V2_ENABLED: false
+    SUBMIT_APPEAL_SERVICE_ARCHIVE_DRAFT_APPEAL_V2_ENABLED: false
 
 postgresql:
   enabled: false
