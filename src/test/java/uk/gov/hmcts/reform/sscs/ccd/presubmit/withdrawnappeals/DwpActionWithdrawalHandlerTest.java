@@ -65,6 +65,7 @@ public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
                 "appeal.appellant.appointee.id",
                 "appeal.appellant.id",
                 "appeal.rep.id",
+                "appeal.hearingOptions",
                 "correction",
                 "correctionBodyContent",
                 "bodyContent",
@@ -84,7 +85,8 @@ public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
                 "signedRole",
                 "statementOfReasons",
                 "statementOfReasonsBodyContent",
-                "statementOfReasonsGenerateNotice")
+                "statementOfReasonsGenerateNotice",
+                "sscsDocument[0].id")
             .isEqualTo(expectedCaseData);
     }
 

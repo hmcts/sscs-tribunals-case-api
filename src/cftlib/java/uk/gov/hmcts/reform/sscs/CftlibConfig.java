@@ -15,7 +15,6 @@ import uk.gov.hmcts.rse.ccd.lib.api.CFTLibConfigurer;
 @Slf4j
 @Component
 public class CftlibConfig implements CFTLibConfigurer {
-
     @Override
     public void configure(CFTLib lib) throws Exception {
         lib.createIdamUser("system.update@hmcts.net",
@@ -26,7 +25,8 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker-sscs-systemupdate",
             "caseworker-sscs-judge",
             "caseworker-sscs-dwpresponsewriter",
-            "caseworker-sscs-registrar"
+            "caseworker-sscs-registrar",
+            "caseworker-caa"
         );
         lib.createIdamUser("local.test@example.com",
             "caseworker",
@@ -35,7 +35,8 @@ public class CftlibConfig implements CFTLibConfigurer {
         lib.createIdamUser("super-user@example.com",
             "caseworker",
             "caseworker-sscs",
-            "caseworker-sscs-superuser"
+            "caseworker-sscs-superuser",
+            "hearing-manager"
         );
         lib.createIdamUser("sscs-citizen2@hmcts.net",
             "citizen"
@@ -49,7 +50,8 @@ public class CftlibConfig implements CFTLibConfigurer {
         lib.createIdamUser("clerk@example.com",
             "caseworker",
             "caseworker-sscs",
-            "caseworker-sscs-clerk"
+            "caseworker-sscs-clerk",
+            "hearing-manager"
         );
         lib.createIdamUser("registrar@example.com",
             "caseworker",
@@ -66,11 +68,31 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker-sscs",
             "caseworker-sscs-hmrcresponsewriter"
         );
+        lib.createIdamUser("ctsc-administrator@hmcts.net",
+            "caseworker",
+            "caseworker-sscs"
+        );
+        lib.createIdamUser("regional-centre-admin@fake.hmcts.net",
+                "caseworker",
+                "caseworker-sscs"
+        );
         lib.createIdamUser("data.store.idam.system.user@gmail.com",
                 "ccd-import", "manage-user", "caseworker");
         lib.createIdamUser("wa-system-user@fake.hmcts.net",
              "caseworker-wa",
-             "caseworker-wa-configuration"
+             "caseworker-wa-task-configuration"
+        );
+        lib.createIdamUser("tribunal-member-1@fake.hmcts.net",
+                "caseworker",
+                "caseworker-sscs"
+        );
+        lib.createIdamUser("tribunal-member-2@fake.hmcts.net",
+                "caseworker",
+                "caseworker-sscs"
+        );
+        lib.createIdamUser("tribunal-member-3@fake.hmcts.net",
+                "caseworker",
+                "caseworker-sscs"
         );
         lib.createIdamUser("judge-feepaid@example.com",
                 "caseworker",
@@ -94,7 +116,13 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-sscs-pcqextractor",
                 "citizen",
                 "caseworker-sscs",
-                "caseworker"
+                "caseworker",
+                "hearing-manager",
+                "hearing-viewer",
+                "caseworker-wa",
+                "caseworker-wa-task-configuration",
+                "caseworker-ras-validation",
+                "GS_profile"
         );
         var def = Files.readAllBytes(Path.of("../sscs-ccd-definitions/releases/CCD_SSCSDefinition_vdev_LOCAL.xlsx"));
         lib.importDefinition(def);
