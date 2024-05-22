@@ -94,14 +94,17 @@ public abstract class AbstractSyaControllerTest {
 
     private SyaController controller;
 
-    abstract boolean v2IsEnabled();
+    abstract boolean v2SubmitDraftAppealIsEnable();
+
+    abstract boolean v2UpdateDraftAppealIsEnable();
 
     abstract void mockSubmitAppealService(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2, Long caseId, SaveCaseOperation saveCaseOperation);
 
     @Before
     public void setUp() {
         controller = new SyaController(submitAppealService, submitAppealServiceV2);
-        ReflectionTestUtils.setField(controller, "isSubmitDraftAppealV2Enabled", v2IsEnabled());
+        ReflectionTestUtils.setField(controller, "isSubmitDraftAppealV2Enabled", v2SubmitDraftAppealIsEnable());
+        ReflectionTestUtils.setField(controller, "isUpdateAppealV2Enabled", v2UpdateDraftAppealIsEnable());
         mockMvc = standaloneSetup(controller).build();
     }
 
@@ -156,13 +159,11 @@ public abstract class AbstractSyaControllerTest {
                 .andExpect(status().isCreated());
     }
 
+    public abstract void mockSubmitAppealServiceUpdateDraftAppeal(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2, Long caseId, SaveCaseOperation saveCaseOperation);
+
     @Test
     public void shouldReturnHttpStatusCode200ForTheUpdatedDraft() throws Exception {
-        when(submitAppealService.updateDraftAppeal(any(), any()))
-                .thenReturn(Optional.of(SaveCaseResult.builder()
-                        .caseDetailsId(1L)
-                        .saveCaseOperation(SaveCaseOperation.UPDATE)
-                        .build()));
+        mockSubmitAppealServiceUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, 1L, SaveCaseOperation.UPDATE);
 
         String json = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
 
@@ -175,11 +176,7 @@ public abstract class AbstractSyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode400ForInvalidAuthDraftUpdate() throws Exception {
-        when(submitAppealService.updateDraftAppeal(any(), any()))
-                .thenReturn(Optional.of(SaveCaseResult.builder()
-                        .caseDetailsId(1L)
-                        .saveCaseOperation(SaveCaseOperation.UPDATE)
-                        .build()));
+        mockSubmitAppealServiceUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, 1L, SaveCaseOperation.UPDATE);
 
         String json = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
 
@@ -191,11 +188,7 @@ public abstract class AbstractSyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode204ForInvalidCcdIdDraftUpdate() throws Exception {
-        when(submitAppealService.updateDraftAppeal(any(), any()))
-                .thenReturn(Optional.of(SaveCaseResult.builder()
-                        .caseDetailsId(1L)
-                        .saveCaseOperation(SaveCaseOperation.UPDATE)
-                        .build()));
+        mockSubmitAppealServiceUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, 1L, SaveCaseOperation.UPDATE);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
 

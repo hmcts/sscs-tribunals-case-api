@@ -148,6 +148,7 @@ public class CitizenCcdService {
         log.info("Updating a draft with caseId {} and eventType {}, using updateCaseCitizenV2 method for citizen", caseId, eventType);
         StartEventResponse startEventResponse = citizenCcdClient.startEventForCitizen(idamTokens, caseId, eventType);
         var data = sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData());
+        data.setWorkBasketFields(null); // This has to be done as the work basket fields default to a null instantiation and ccd views that as a create / update of which one of the fields the citizen doesn't have the authorisation to change
 
         /**
          * @see uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer#deserialize(String)
