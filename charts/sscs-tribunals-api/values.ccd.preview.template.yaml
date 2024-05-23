@@ -633,7 +633,7 @@ sscs-tribunals-frontend:
   nodejs:
     memoryLimits: "2Gi"
     cpuLimits: 2000m
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:pr-1473
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:pr-1487
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
