@@ -122,6 +122,11 @@ public class CitizenCcdService {
         return updateCase(caseData, DRAFT_ARCHIVED.getCcdType(), "SSCS Archive Draft", "SSCS Archive Draft", userIdamTokens, caseId.toString());
     }
 
+    public CaseDetails archiveDraftV2(IdamTokens userIdamTokens, Long caseId, Consumer<SscsCaseData> mutator) {
+        log.info("Archiving Draft V2 for caseId {} with user roles {}", caseId, userIdamTokens.getRoles().toString());
+        return updateCaseCitizenV2(caseId.toString(), DRAFT_ARCHIVED.getCcdType(), "SSCS Archive Draft", "SSCS Archive Draft", userIdamTokens, mutator);
+    }
+
     private CaseDetails newCase(SscsCaseData caseData, String eventType, String summary, String description, IdamTokens idamTokens) {
         log.info("Creating a draft for a user.");
         CaseDetails caseDetails;
@@ -148,6 +153,7 @@ public class CitizenCcdService {
         log.info("Updating a draft with caseId {} and eventType {}, using updateCaseCitizenV2 method for citizen", caseId, eventType);
         StartEventResponse startEventResponse = citizenCcdClient.startEventForCitizen(idamTokens, caseId, eventType);
         var data = sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData());
+        data.setWorkBasketFields(null); // This has to be done as the work basket fields default to a null instantiation and ccd views that as a create / update of which one of the fields the citizen doesn't have the authorisation to change
 
         /**
          * @see uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer#deserialize(String)
