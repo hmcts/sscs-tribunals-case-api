@@ -5,7 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import feign.FeignException;
-import java.util.*;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
