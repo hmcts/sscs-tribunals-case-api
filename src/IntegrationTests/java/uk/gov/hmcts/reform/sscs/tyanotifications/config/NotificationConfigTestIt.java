@@ -10,15 +10,15 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 
 import java.util.Collections;
 import java.util.List;
-import junitparams.Parameters;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Template;
 
 public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
-    @Test
-    @Parameters(method = "templateIdsWithHearingAndEventTypes")
+    @ParameterizedTest
+    @MethodSource("templateIdsWithHearingAndEventTypes")
     public void given_templateNamesAndHearingType_should_getCorrectTemplate(
         NotificationEventType eventType, boolean welsh,
         SubscriptionType subscriptionType, AppealHearingType hearingType, HearingRoute hearingRoute, String createdInGapsFrom,
@@ -35,7 +35,7 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
 
 
     @SuppressWarnings({"unused"})
-    private Object[] templateIdsWithHearingAndEventTypes() {
+    private static Object[] templateIdsWithHearingAndEventTypes() {
         return new Object[]{
             // ------------------- GAPS -----------------------
             new Object[]{ADJOURNED, false, APPELLANT, ORAL, GAPS, null, "77ea995b-9744-4167-9250-e627c85e5eda", List.of("7455de19-aa3b-48f0-b765-ab2757ba6a88"), null, null},
@@ -596,21 +596,21 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{NON_COMPLIANT, true, null, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00663.docx"},
             new Object[]{NON_COMPLIANT, true, null, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00663.docx"},
 
-            new Object[]{POSTPONEMENT, false, APPELLANT, ORAL, LIST_ASSIST, null, "732ec1a2-243f-4047-b963-e8427cb007b8", Collections.emptyList(), null, "TB-SCS-LET-ENG-Hearing-Postponed.docx"},
+            new Object[]{POSTPONEMENT, false, APPELLANT, ORAL, LIST_ASSIST, null, "732ec1a2-243f-4047-b963-e8427cb007b8", Collections.emptyList(), null, null},
             new Object[]{POSTPONEMENT, false, APPELLANT, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
-            new Object[]{POSTPONEMENT, false, APPOINTEE, ORAL, LIST_ASSIST, null, "732ec1a2-243f-4047-b963-e8427cb007b8", Collections.emptyList(), null, "TB-SCS-LET-ENG-Hearing-Postponed.docx"},
+            new Object[]{POSTPONEMENT, false, APPOINTEE, ORAL, LIST_ASSIST, null, "732ec1a2-243f-4047-b963-e8427cb007b8", Collections.emptyList(), null, null},
             new Object[]{POSTPONEMENT, false, APPOINTEE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
-            new Object[]{POSTPONEMENT, false, JOINT_PARTY, ORAL, LIST_ASSIST, null, "732ec1a2-243f-4047-b963-e8427cb007b8", Collections.emptyList(), null, "TB-SCS-LET-ENG-Hearing-Postponed.docx"},
+            new Object[]{POSTPONEMENT, false, JOINT_PARTY, ORAL, LIST_ASSIST, null, "732ec1a2-243f-4047-b963-e8427cb007b8", Collections.emptyList(), null, null},
             new Object[]{POSTPONEMENT, false, JOINT_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
-            new Object[]{POSTPONEMENT, false, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "e07b7dba-f383-49ca-a0ba-b5b61be27da6", Collections.emptyList(), null, "TB-SCS-LET-ENG-Hearing-Postponed.docx"},
+            new Object[]{POSTPONEMENT, false, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "e07b7dba-f383-49ca-a0ba-b5b61be27da6", Collections.emptyList(), null, null},
             new Object[]{POSTPONEMENT, false, REPRESENTATIVE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
-            new Object[]{POSTPONEMENT, true, APPELLANT, ORAL, LIST_ASSIST, null, "ab60afc3-7ad4-4de4-84da-e095e90d6f37", Collections.emptyList(), null, "TB-SCS-LET-WEL-Hearing-Postponed.docx"},
+            new Object[]{POSTPONEMENT, true, APPELLANT, ORAL, LIST_ASSIST, null, "ab60afc3-7ad4-4de4-84da-e095e90d6f37", Collections.emptyList(), null, null},
             new Object[]{POSTPONEMENT, true, APPELLANT, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
-            new Object[]{POSTPONEMENT, true, APPOINTEE, ORAL, LIST_ASSIST, null, "ab60afc3-7ad4-4de4-84da-e095e90d6f37", Collections.emptyList(), null, "TB-SCS-LET-WEL-Hearing-Postponed.docx"},
+            new Object[]{POSTPONEMENT, true, APPOINTEE, ORAL, LIST_ASSIST, null, "ab60afc3-7ad4-4de4-84da-e095e90d6f37", Collections.emptyList(), null, null},
             new Object[]{POSTPONEMENT, true, APPOINTEE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
-            new Object[]{POSTPONEMENT, true, JOINT_PARTY, ORAL, LIST_ASSIST, null, "862590f1-3b36-4537-84c5-173dccea5db3", Collections.emptyList(), null, "TB-SCS-LET-WEL-Hearing-Postponed.docx"},
+            new Object[]{POSTPONEMENT, true, JOINT_PARTY, ORAL, LIST_ASSIST, null, "862590f1-3b36-4537-84c5-173dccea5db3", Collections.emptyList(), null, null},
             new Object[]{POSTPONEMENT, true, JOINT_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
-            new Object[]{POSTPONEMENT, true, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "d5bc541b-78c8-4a65-8e55-cfb20ccfed43", Collections.emptyList(), null, "TB-SCS-LET-WEL-Hearing-Postponed.docx"},
+            new Object[]{POSTPONEMENT, true, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "d5bc541b-78c8-4a65-8e55-cfb20ccfed43", Collections.emptyList(), null, null},
             new Object[]{POSTPONEMENT, true, REPRESENTATIVE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, null},
 
             new Object[]{REQUEST_FOR_INFORMATION, false, APPELLANT, ORAL, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-LET-ENG-Request-for-Information.docx"},

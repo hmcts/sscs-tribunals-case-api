@@ -51,10 +51,6 @@ subscriptions:
     mac:
         secret: ${SUBSCRIPTIONS_MAC_SECRET:our-big-secret}
 
-ccd-callback-orchestrator:
-    api:
-        url=${CCD_CALLBACK_ORCHESTRATOR_API_URL:http://localhost:8070}:
-
 amqp:
     host: ${AMQP_HOST:localhost}
     password: ${AMQP_PASSWORD:guest}
@@ -794,15 +790,15 @@ notification:
                     docmosisId: TB-SCS-GNO-ENG-00089.docx
         actionPostponementRequest:
             appellant:
-                docmosisId: TB-SCS-GNO-ENG-00067.docx
+              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request.docx
             appointee:
-                docmosisId: TB-SCS-GNO-ENG-00067.docx
+              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request.docx
             representative:
-                docmosisId: TB-SCS-GNO-ENG-00089.docx
+              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request.docx
             joint_party:
-                docmosisId: TB-SCS-GNO-ENG-00067.docx
+              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request.docx
             other_party:
-                docmosisId: TB-SCS-GNO-ENG-00089.docx
+              docmosisId: TB-SCS-LET-ENG-Action-Postponement-Request.docx
         decisionIssued:
             appellant:
                 docmosisId: TB-SCS-GNO-ENG-00094.docx
@@ -1042,19 +1038,14 @@ notification:
                 hearingPostponed:
                     appellant:
                         emailId: 732ec1a2-243f-4047-b963-e8427cb007b8
-                        docmosisId: TB-SCS-LET-ENG-Hearing-Postponed.docx
                     representative:
                         emailId: e07b7dba-f383-49ca-a0ba-b5b61be27da6
-                        docmosisId: TB-SCS-LET-ENG-Hearing-Postponed.docx
                     appointee:
                         emailId: 732ec1a2-243f-4047-b963-e8427cb007b8
-                        docmosisId: TB-SCS-LET-ENG-Hearing-Postponed.docx
                     joint_party:
                         emailId: 732ec1a2-243f-4047-b963-e8427cb007b8
-                        docmosisId: TB-SCS-LET-ENG-Hearing-Postponed.docx
                     other_party:
                         emailId: e07b7dba-f383-49ca-a0ba-b5b61be27da6
-                        docmosisId: TB-SCS-LET-ENG-Hearing-Postponed.docx
                 hearingBooked:
                     appellant:
                         # SSCS-11586 emailId: aa0930a3-e1bd-4b50-ac6b-34df73ec8378
@@ -1416,15 +1407,15 @@ notification:
                     docmosisId: TB-SCS-GNO-WEL-00472.docx
         actionPostponementRequestWelsh:
             appellant:
-                docmosisId: TB-SCS-GNO-WEL-00468.docx
+                docmosisId: TB-SCS-LET-WEL-Action-Postponement-Request.docx
             appointee:
-                docmosisId: TB-SCS-GNO-WEL-00468.docx
+                docmosisId: TB-SCS-LET-WEL-Action-Postponement-Request.docx
             representative:
-                docmosisId: TB-SCS-GNO-WEL-00472.docx
+                docmosisId: TB-SCS-LET-WEL-Action-Postponement-Request.docx
             joint_party:
-                docmosisId: TB-SCS-GNO-WEL-00468.docx
+                docmosisId: TB-SCS-LET-WEL-Action-Postponement-Request.docx
             other_party:
-                docmosisId: TB-SCS-GNO-WEL-00472.docx
+                docmosisId: TB-SCS-LET-WEL-Action-Postponement-Request.docx
         decisionIssuedWelsh:
             appellant:
                 docmosisId: TB-SCS-GNO-WEL-00474.docx
@@ -1656,19 +1647,14 @@ notification:
                 hearingPostponed:
                     appellant:
                         emailId: ab60afc3-7ad4-4de4-84da-e095e90d6f37
-                        docmosisId: TB-SCS-LET-WEL-Hearing-Postponed.docx
                     representative:
                         emailId: d5bc541b-78c8-4a65-8e55-cfb20ccfed43
-                        docmosisId: TB-SCS-LET-WEL-Hearing-Postponed.docx
                     appointee:
                         emailId: ab60afc3-7ad4-4de4-84da-e095e90d6f37
-                        docmosisId: TB-SCS-LET-WEL-Hearing-Postponed.docx
                     joint_party:
                         emailId: 862590f1-3b36-4537-84c5-173dccea5db3
-                        docmosisId: TB-SCS-LET-WEL-Hearing-Postponed.docx
                     other_party:
                         emailId: d5bc541b-78c8-4a65-8e55-cfb20ccfed43
-                        docmosisId: TB-SCS-LET-WEL-Hearing-Postponed.docx
                 hearingBooked:
                     appellant:
                         # SSCS-11586 emailId: aca83c9c-05c0-49d5-8ded-e581a0107408
@@ -2014,10 +2000,6 @@ judicial-ref:
     api:
         url: ${JUDICIAL_REF_API_URL:http://localhost:5555}
 
-ccd-callback-orchestrator:
-    api:
-        url: ${CCD_CALLBACK_ORCHESTRATOR_API_URL:http://localhost:8070}
-
 ---
 # tya-integration profile
 spring:
@@ -2039,7 +2021,4 @@ job.scheduler:
             jobStore:
                 class: org.quartz.simpl.RAMJobStore
 
-ccd-callback-orchestrator:
-    api:
-        url: ${CCD_CALLBACK_ORCHESTRATOR_API_URL:http://localhost:8070}
 

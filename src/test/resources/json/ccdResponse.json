@@ -116,6 +116,7 @@
         },
         "hearingType": ""
       },
+      "dwpState" : "responseSubmittedDwp",
       "informationFromAppellant": "No",
       "evidence": {
         "documents":[
@@ -214,7 +215,7 @@
           }
         }
       }],
-      "hearingRoute" : "hearingRouteReplace"
+      "hearingRoute" : "listAssist"
     },
     "case_type_id": "Benefit",
     "state": "appealCreated",
@@ -386,8 +387,8 @@
             },
             "googleMapLink": "https://www.google.com/theAddress"
           }
-          }
         }
+      }
       ]
     },
     "case_type_id": "Benefit",
