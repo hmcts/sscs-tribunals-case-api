@@ -2,7 +2,7 @@
   "case_details": {
     "id": "CASE_ID_TO_BE_REPLACED",
     "jurisdiction": "SSCS",
-    "state": "validAppeal",
+    "state": "appealDormant",
     "case_type_id": "Benefit",
     "created_date": [
       2018,
@@ -27,7 +27,7 @@
       "dwpTimeExtension": [
       ],
       "generatedNino": "NINO_TO_BE_REPLACED",
-      "createdInGapsFrom": "CREATED_IN_GAPS_FROM",
+      "createdInGapsFrom": "readyToList",
       "hearings": [
         {
           "value": {
@@ -150,6 +150,123 @@
         "signer": null,
         "hearingType": "paper"
       },
+      "otherParties": [
+        {
+          "value": {
+            "id": "520b0dc5-4562-45c3-a571-ec422b2203eb",
+            "name": {
+              "title": "ddssssxffffccchgh",
+              "firstName": "dsfdf",
+              "lastName": "fdfd"
+            },
+            "address": {
+              "line1": "fdfdss",
+              "line2": "fdf",
+              "town": "fdfdfd",
+              "county": "fdfds",
+              "postcode": "e42pi"
+            },
+            "contact": {
+              "email": null,
+              "phone": null,
+              "mobile": null
+            },
+            "appointee": {
+              "id": "bf686bdc-9fc3-46a3-822e-3c872b8cbab7",
+              "identity": {
+                "dob": null,
+                "nino": null
+              },
+              "name": {
+                "title": null,
+                "firstName": null,
+                "lastName": null
+              },
+              "address": {},
+              "contact": {
+                "email": null,
+                "phone": null,
+                "mobile": null
+              },
+              "organisation": null
+            },
+            "role": {
+              "name": "Receiving parent"
+            },
+            "confidentialityRequired": "No",
+            "unacceptableCustomerBehaviour": "No",
+            "hearingOptions": {
+              "arrangements": [],
+              "excludeDates": []
+            },
+            "hearingSubtype": {},
+            "rep": {
+              "id": "1035c115-621b-4bf5-8096-e341804d38ad",
+              "identity": {
+                "dob": null,
+                "nino": null
+              },
+              "name": {
+                "title": null,
+                "firstName": null,
+                "lastName": null
+              },
+              "address": {},
+              "contact": {
+                "email": null,
+                "phone": null,
+                "mobile": null
+              },
+              "organisation": null,
+              "hasRepresentative": null
+            },
+            "otherPartySubscription": {
+              "wantSmsNotifications": null,
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "subscribeEmail": null,
+              "subscribeSms": null,
+              "reason": null,
+              "lastLoggedIntoMya": null
+            },
+            "otherPartyAppointeeSubscription": {
+              "wantSmsNotifications": null,
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "subscribeEmail": null,
+              "subscribeSms": null,
+              "reason": null,
+              "lastLoggedIntoMya": null
+            },
+            "otherPartyRepresentativeSubscription": {
+              "wantSmsNotifications": null,
+              "tya": null,
+              "email": null,
+              "mobile": null,
+              "subscribeEmail": null,
+              "subscribeSms": null,
+              "reason": null,
+              "lastLoggedIntoMya": null
+            },
+            "sendNewOtherPartyNotification": "No",
+            "reasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "appointeeReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            },
+            "repReasonableAdjustment": {
+              "wantsReasonableAdjustment": null,
+              "reasonableAdjustmentRequirements": null
+            }
+          },
+          "id": "f09ffedb-7d2d-4474-812d-c6e02179888e"
+        }
+      ],
       "region": "BIRMINGHAM",
       "generatedDOB": "1900-01-01",
       "evidencePresent" : "No",
@@ -601,5 +718,5 @@
     }
   },
   "case_details_before": null,
-  "event_id": "validAppealCreated"
+  "event_id": "updateOtherPartyData"
 }
