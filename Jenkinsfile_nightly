@@ -48,6 +48,9 @@ withNightlyPipeline(type, product, component) {
     env.POST_HEARINGS_FEATURE = false
     env.Rules = params.SecurityRules
     env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
+    env.DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
+    env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
 
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
