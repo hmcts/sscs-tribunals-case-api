@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
@@ -9,8 +10,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Function;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
@@ -20,6 +26,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -33,10 +40,13 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.PdfDocumentRequest;
@@ -77,6 +87,9 @@ public class IssueFurtherEvidenceServiceIt {
     private CcdService ccdService;
 
     @MockBean
+    private SscsCcdConvertService sscsCcdConvertService;
+
+    @MockBean
     private UpdateCcdCaseService updateCcdCaseService;
 
     @MockBean
@@ -113,6 +126,8 @@ public class IssueFurtherEvidenceServiceIt {
     Optional<UUID> expectedOptionalUuid = Optional.of(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));
 
     Map<LanguagePreference, Map<String, Map<String, String>>> template = new HashMap<>();
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
     @Before
     public void setup() throws Exception {
@@ -155,6 +170,16 @@ public class IssueFurtherEvidenceServiceIt {
         when(evidenceManagementSecureDocStoreService.download(any(), any())).thenReturn(fileContent);
     }
 
+    @AfterEach
+    public void verifyUpdateCaseV2Call(){
+        verify(updateCcdCaseService, times(1)).updateCaseV2(
+                eq(12345656789L),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                any(IdamTokens.class),
+                any(Function.class)
+        );
+    }
+
     @Test
     public void appealWithAppellantAndFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAndNotSend609_98() throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
@@ -170,6 +195,8 @@ public class IssueFurtherEvidenceServiceIt {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("evidenceshare/issueFurtherEvidenceCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        mockCcdCaseDataForStartEvent(json);
 
         topicConsumer.onMessage(json, "1");
 
@@ -199,6 +226,8 @@ public class IssueFurtherEvidenceServiceIt {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource(String.format("evidenceshare/issueFurtherEvidenceCallbackWith%s.json", party))).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        mockCcdCaseDataForStartEvent(json);
 
         topicConsumer.onMessage(json, "1");
 
@@ -233,6 +262,8 @@ public class IssueFurtherEvidenceServiceIt {
             .getResource("evidenceshare/issueFurtherEvidenceCallbackWithRepEvidence.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
+        mockCcdCaseDataForStartEvent(json);
+
         topicConsumer.onMessage(json, "1");
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
@@ -265,6 +296,8 @@ public class IssueFurtherEvidenceServiceIt {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("evidenceshare/issueFurtherEvidenceCallbackWithAppellantEvidenceAndRepEvidence.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        mockCcdCaseDataForStartEvent(json);
 
         topicConsumer.onMessage(json, "1");
 
@@ -309,6 +342,8 @@ public class IssueFurtherEvidenceServiceIt {
             .getResource("evidenceshare/issueFurtherEvidenceCallbackWithDwpEvidence.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
+        mockCcdCaseDataForStartEvent(json);
+
         topicConsumer.onMessage(json, "1");
 
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any(), any());
@@ -337,6 +372,8 @@ public class IssueFurtherEvidenceServiceIt {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource(String.format("evidenceshare/issueFurtherEvidenceCallbackWith%sAndEvidenceFromDwp.json", party))).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        mockCcdCaseDataForStartEvent(json);
 
         topicConsumer.onMessage(json, "1");
 
@@ -372,6 +409,8 @@ public class IssueFurtherEvidenceServiceIt {
             .getResource(String.format("evidenceshare/issueFurtherEvidenceCallbackWith%sEvidence.json", otherPartyType))).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
+        mockCcdCaseDataForStartEvent(json);
+
         topicConsumer.onMessage(json, "1");
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
@@ -405,6 +444,8 @@ public class IssueFurtherEvidenceServiceIt {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("evidenceshare/issueFurtherEvidenceCallbackWithOtherPartyRepEvidence.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        mockCcdCaseDataForStartEvent(json);
 
         topicConsumer.onMessage(json, "1");
 
@@ -444,6 +485,8 @@ public class IssueFurtherEvidenceServiceIt {
             .getResource("evidenceshare/issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
+        mockCcdCaseDataForStartEvent(json);
+
         topicConsumer.onMessage(json, "1");
 
         verify(bulkPrintService, times(5)).sendToBulkPrint(any(), any(), any(), any(), any());
@@ -457,35 +500,35 @@ public class IssueFurtherEvidenceServiceIt {
 
         Integer pdfIndex = findPdfDocumentRequestIndex("Test Rep");
         assertNotNull(pdfIndex);
-        Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
+        assertThat(documentCaptor.getAllValues().get(pdfIndex))
             .hasSize(3)
             .extracting(Pdf::getName)
             .contains("609-97-template (original sender)", "evidence-document2", "evidence-document");
 
         pdfIndex = findPdfDocumentRequestIndex("Sarah Smith");
         assertNotNull(pdfIndex);
-        Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
+        assertThat(documentCaptor.getAllValues().get(pdfIndex))
             .hasSize(3)
             .extracting(Pdf::getName)
             .contains("609-98-template (other parties)", "evidence-document2", "evidence-document");
 
         pdfIndex = findPdfDocumentRequestIndex("Wendy Smith");
         assertNotNull(pdfIndex);
-        Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
+        assertThat(documentCaptor.getAllValues().get(pdfIndex))
             .hasSize(3)
             .extracting(Pdf::getName)
             .contains("609-98-template (other parties)", "evidence-document2", "evidence-document");
 
         pdfIndex = findPdfDocumentRequestIndex("Shelly Barat");
         assertNotNull(pdfIndex);
-        Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
+        assertThat(documentCaptor.getAllValues().get(pdfIndex))
             .hasSize(3)
             .extracting(Pdf::getName)
             .contains("609-98-template (other parties)", "evidence-document2", "evidence-document");
 
         pdfIndex = findPdfDocumentRequestIndex("Robert Brokenshire");
         assertNotNull(pdfIndex);
-        Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
+        assertThat(documentCaptor.getAllValues().get(pdfIndex))
             .hasSize(3)
             .extracting(Pdf::getName)
             .contains("609-98-template (other parties)", "evidence-document2", "evidence-document");
@@ -517,11 +560,11 @@ public class IssueFurtherEvidenceServiceIt {
             .getResource("evidenceshare/issueFurtherEvidenceCallbackReasonableAdjustment.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
+        mockCcdCaseDataForStartEvent(json);
+
         topicConsumer.onMessage(json, "1");
 
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any(), any());
-
-        verify(ccdService, times(1)).getByCaseId(any(), any());
     }
 
 
@@ -532,5 +575,17 @@ public class IssueFurtherEvidenceServiceIt {
             }
         }
         return null;
+    }
+
+    private void mockCcdCaseDataForStartEvent(String json) throws JsonProcessingException {
+        Map<String, Object> caseDataMap = OBJECT_MAPPER.convertValue(OBJECT_MAPPER.readTree(json).get("case_details").get("case_data"), Map.class);
+        caseDataMap.put("ccdCaseId", "12345656789");
+
+        var startEventResponse = StartEventResponse.builder().caseDetails(CaseDetails.builder().data(caseDataMap).build()).build();
+
+        when(ccdClient.startEvent(any(IdamTokens.class), any(), eq(EventType.ISSUE_FURTHER_EVIDENCE.getCcdType()))).thenReturn(startEventResponse);
+
+        var sscsCaseDetails = SscsCaseDetails.builder().data(OBJECT_MAPPER.convertValue(caseDataMap, SscsCaseData.class)).build();
+        when(sscsCcdConvertService.getCaseDetails(startEventResponse)).thenReturn(sscsCaseDetails);
     }
 }
