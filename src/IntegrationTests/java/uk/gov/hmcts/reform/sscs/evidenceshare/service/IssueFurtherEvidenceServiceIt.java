@@ -6,6 +6,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -13,15 +16,10 @@ import java.util.*;
 import java.util.function.Function;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -171,7 +169,7 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @AfterEach
-    public void verifyUpdateCaseV2Call(){
+    public void verifyUpdateCaseV2Call() {
         verify(updateCcdCaseService, times(1)).updateCaseV2(
                 eq(12345656789L),
                 eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
