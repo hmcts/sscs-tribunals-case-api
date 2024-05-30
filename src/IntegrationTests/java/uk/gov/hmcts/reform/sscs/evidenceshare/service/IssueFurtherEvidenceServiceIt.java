@@ -24,7 +24,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -168,16 +167,6 @@ public class IssueFurtherEvidenceServiceIt {
         when(evidenceManagementSecureDocStoreService.download(any(), any())).thenReturn(fileContent);
     }
 
-    @AfterEach
-    public void verifyUpdateCaseV2Call() {
-        verify(updateCcdCaseService, times(1)).updateCaseV2(
-                eq(12345656789L),
-                eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
-                any(IdamTokens.class),
-                any(Function.class)
-        );
-    }
-
     @Test
     public void appealWithAppellantAndFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAndNotSend609_98() throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
@@ -206,6 +195,13 @@ public class IssueFurtherEvidenceServiceIt {
         assertEquals("Sarah Smith", pdfDocumentRequest.getAllValues().get(0).getData().get("name"));
         assertEquals("609-97-template (original sender)", documentCaptor.getAllValues().get(0).get(0).getName());
         assertEquals("evidence-document", documentCaptor.getAllValues().get(0).get(1).getName());
+
+        verify(updateCcdCaseService, times(1)).updateCaseV2(
+                eq(12345656789L),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                any(IdamTokens.class),
+                any(Function.class)
+        );
     }
 
     @Test
@@ -242,6 +238,13 @@ public class IssueFurtherEvidenceServiceIt {
         assertEquals("Peter Hyland", pdfDocumentRequest.getAllValues().get(1).getData().get("name"));
         assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(1).get(0).getName());
         assertEquals("evidence-document", documentCaptor.getAllValues().get(1).get(1).getName());
+
+        verify(updateCcdCaseService, times(1)).updateCaseV2(
+                eq(12345656789L),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                any(IdamTokens.class),
+                any(Function.class)
+        );
     }
 
     @Test
@@ -277,6 +280,13 @@ public class IssueFurtherEvidenceServiceIt {
         assertEquals("Sarah Smith", pdfDocumentRequest.getAllValues().get(1).getData().get("name"));
         assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(1).get(0).getName());
         assertEquals("rep-document", documentCaptor.getAllValues().get(1).get(1).getName());
+
+        verify(updateCcdCaseService, times(1)).updateCaseV2(
+                eq(12345656789L),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                any(IdamTokens.class),
+                any(Function.class)
+        );
     }
 
     @Test
@@ -322,6 +332,13 @@ public class IssueFurtherEvidenceServiceIt {
         assertEquals("Sarah Smith", pdfDocumentRequest.getAllValues().get(3).getData().get("name"));
         assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(3).get(0).getName());
         assertEquals("rep-document", documentCaptor.getAllValues().get(3).get(1).getName());
+
+        verify(updateCcdCaseService, times(1)).updateCaseV2(
+                eq(12345656789L),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                any(IdamTokens.class),
+                any(Function.class)
+        );
     }
 
     @Test
@@ -352,6 +369,13 @@ public class IssueFurtherEvidenceServiceIt {
         assertEquals("Sarah Smith", pdfDocumentRequest.getAllValues().get(0).getData().get("name"));
         assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(0).get(0).getName());
         assertEquals("evidence-document", documentCaptor.getAllValues().get(0).get(1).getName());
+
+        verify(updateCcdCaseService, times(1)).updateCaseV2(
+                eq(12345656789L),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                any(IdamTokens.class),
+                any(Function.class)
+        );
     }
 
     @Test
@@ -388,6 +412,13 @@ public class IssueFurtherEvidenceServiceIt {
         assertEquals("Peter Hyland", pdfDocumentRequest.getAllValues().get(1).getData().get("name"));
         assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(1).get(0).getName());
         assertEquals("evidence-document", documentCaptor.getAllValues().get(1).get(1).getName());
+
+        verify(updateCcdCaseService, times(1)).updateCaseV2(
+                eq(12345656789L),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                any(IdamTokens.class),
+                any(Function.class)
+        );
     }
 
     @Test
@@ -425,6 +456,13 @@ public class IssueFurtherEvidenceServiceIt {
         assertEquals("Sarah Smith", pdfDocumentRequest.getAllValues().get(1).getData().get("name"));
         assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(1).get(0).getName());
         assertEquals("evidence-document", documentCaptor.getAllValues().get(1).get(1).getName());
+
+        verify(updateCcdCaseService, times(1)).updateCaseV2(
+                eq(12345656789L),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                any(IdamTokens.class),
+                any(Function.class)
+        );
     }
 
     @Test
@@ -465,6 +503,13 @@ public class IssueFurtherEvidenceServiceIt {
         assertEquals("Wendy Smith", pdfDocumentRequest.getAllValues().get(2).getData().get("name"));
         assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(2).get(0).getName());
         assertEquals("evidence-document", documentCaptor.getAllValues().get(2).get(1).getName());
+
+        verify(updateCcdCaseService, times(1)).updateCaseV2(
+                eq(12345656789L),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                any(IdamTokens.class),
+                any(Function.class)
+        );
     }
 
     @Test
@@ -530,6 +575,13 @@ public class IssueFurtherEvidenceServiceIt {
             .hasSize(3)
             .extracting(Pdf::getName)
             .contains("609-98-template (other parties)", "evidence-document2", "evidence-document");
+
+        verify(updateCcdCaseService, times(1)).updateCaseV2(
+                eq(12345656789L),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                any(IdamTokens.class),
+                any(Function.class)
+        );
     }
 
     @Test
@@ -563,6 +615,37 @@ public class IssueFurtherEvidenceServiceIt {
         topicConsumer.onMessage(json, "1");
 
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any(), any());
+
+        verify(updateCcdCaseService, times(1)).updateCaseV2(
+                eq(12345656789L),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                any(IdamTokens.class),
+                any(Function.class)
+        );
+    }
+
+    @Test
+    public void shouldFailSendingFurtherEvidenceWhenAppellantNameIsMissingAndBulkPrintServiceShouldNotBeInvoked() throws IOException {
+        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+
+        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
+                .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
+        // we are able to cause the issue further evidence to fail by setting to null the Appellant.Name in the issueFurtherEvidenceFaultyCallback.json
+        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
+                .getResource("evidenceshare/issueFurtherEvidenceFaultyCallback.json")).getFile();
+        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        mockCcdCaseDataForStartEvent(json);
+
+        topicConsumer.onMessage(json, "1");
+
+        verifyNoInteractions(bulkPrintService);
     }
 
 
