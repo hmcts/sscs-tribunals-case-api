@@ -532,6 +532,7 @@ ccd:
     image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S1549BnonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
+    imagePullPolicy: Always
     environment:
       CCD_ENVIRONMENT: 'PROD'
       CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
