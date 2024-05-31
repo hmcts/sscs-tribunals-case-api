@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +93,7 @@ public class AddedDocumentsUtil {
                     .distinct()
                     .collect(Collectors.toList());
         }
-        return null;
+        return new ArrayList<>();
     }
 
     private boolean isNewDocumentOrTypeChanged(Map<String, Optional<String>> existingDocumentTypes, AbstractDocument document) {

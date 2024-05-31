@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections.ListUtils.union;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
+import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
 
 @Service
 @Slf4j
@@ -43,11 +45,19 @@ public class UploadDocumentWorkAllocationHandler implements PreSubmitCallbackHan
         }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+
+        List<String> addedDocumentTypes = addedDocumentsUtil.addedDocumentTypes(
+            previousSscsDocuments(callback.getCaseDetailsBefore()),
+            caseData.getSscsDocument()
+        );
+
+        List<String> addedAudioVideoTypes = AudioVideoEvidenceUtil.addedEvidenceTypes(
+            previousEvidence(callback.getCaseDetailsBefore()),
+            caseData.getAudioVideoEvidence()
+        );
+
         addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(caseData);
-        addedDocumentsUtil.updateScannedDocumentTypes(caseData, addedDocumentsUtil.addedDocumentTypes(
-                previousSscsDocuments(callback.getCaseDetailsBefore()),
-                caseData.getSscsDocument()
-        ));
+        addedDocumentsUtil.updateScannedDocumentTypes(caseData, union(addedDocumentTypes, addedAudioVideoTypes));
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
@@ -55,4 +65,10 @@ public class UploadDocumentWorkAllocationHandler implements PreSubmitCallbackHan
     private List<? extends AbstractDocument> previousSscsDocuments(Optional<CaseDetails<SscsCaseData>> caseData) {
         return caseData.isPresent() ? caseData.get().getCaseData().getSscsDocument() : null;
     }
+
+    private List<AudioVideoEvidence> previousEvidence(Optional<CaseDetails<SscsCaseData>> caseData) {
+        return caseData.isPresent() ? caseData.get().getCaseData().getAudioVideoEvidence() : null;
+    }
+
+
 }
