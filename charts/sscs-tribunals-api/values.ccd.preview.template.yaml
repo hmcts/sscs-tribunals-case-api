@@ -714,9 +714,9 @@ sscs-hearings-api:
         secrets:
           - name: hmc-servicebus-shared-access-key-tf
             alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
-          - name: idam-sscs-systemupdate-user
+          - name: idam-sscs-hmc-systemupdate-user
             alias: IDAM_SSCS_SYSTEMUPDATE_USER
-          - name: idam-sscs-systemupdate-password
+          - name: idam-sscs-hmc-systemupdate-password
             alias: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
           - name: app-insights-connection-string
             alias: app-insights-connection-string
