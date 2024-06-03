@@ -80,36 +80,4 @@ public class AudioVideoEvidenceUtil {
             default: return "Appellant";
         }
     }
-
-    public static List<String> addedEvidenceTypes(List<AudioVideoEvidence> previousEvidence, List<AudioVideoEvidence> evidence) {
-        Map<String, Optional<String>> existingDocumentTypes = null;
-        if (previousEvidence != null) {
-            existingDocumentTypes = previousEvidence.stream().collect(
-                    Collectors.toMap(e -> e.getId(), e -> Optional.ofNullable(e.getValue().getDocumentType())));
-        }
-
-        return addedDocumentTypes(existingDocumentTypes, evidence);
-    }
-
-    public static List<String> addedDocumentTypes(Map<String, Optional<String>> existingEvidenceTypes, List<AudioVideoEvidence> evidence) {
-        if (evidence != null) {
-            return evidence.stream()
-                    .filter(e -> isNewDocumentOrTypeChanged(existingEvidenceTypes, e))
-                    .map(e -> e.getValue().getDocumentType())
-                    .filter(Objects::nonNull)
-                    .distinct()
-                    .collect(Collectors.toList());
-        }
-        return new ArrayList<>();
-    }
-
-    private static boolean isNewDocumentOrTypeChanged(Map<String, Optional<String>> existingEvidenceTypes, AudioVideoEvidence evidence) {
-        if (existingEvidenceTypes != null) {
-            if (existingEvidenceTypes.containsKey(evidence.getId())) {
-                return !StringUtils.equals(evidence.getValue().getDocumentType(),
-                        existingEvidenceTypes.get(evidence.getId()).orElse(null));
-            }
-        }
-        return true;
-    }
 }

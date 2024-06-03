@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.collections.ListUtils.union;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.AddedDocumentsUtil;
-import uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil;
 
 @Service
 @Slf4j
@@ -45,30 +46,41 @@ public class UploadDocumentWorkAllocationHandler implements PreSubmitCallbackHan
         }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(caseData);
 
         List<String> addedDocumentTypes = addedDocumentsUtil.addedDocumentTypes(
             previousSscsDocuments(callback.getCaseDetailsBefore()),
             caseData.getSscsDocument()
         );
 
-        List<String> addedAudioVideoTypes = AudioVideoEvidenceUtil.addedEvidenceTypes(
+        List<String> addedScannedDocumentTypes = addedDocumentsUtil.addedDocumentTypes(
+                previousScannedDocuments(callback.getCaseDetailsBefore()),
+                caseData.getScannedDocuments()
+        );
+
+        List<String> addedAudioVideoTypes = addedDocumentsUtil.addedDocumentTypes(
             previousEvidence(callback.getCaseDetailsBefore()),
             caseData.getAudioVideoEvidence()
         );
 
-        addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(caseData);
-        addedDocumentsUtil.updateScannedDocumentTypes(caseData, union(addedDocumentTypes, addedAudioVideoTypes));
+        addedDocumentsUtil.updateScannedDocumentTypes(caseData,
+                Stream.of(addedDocumentTypes, addedAudioVideoTypes, addedScannedDocumentTypes)
+                    .flatMap(Collection::stream)
+                    .distinct()
+                    .collect(Collectors.toList()));
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
-    private List<? extends AbstractDocument> previousSscsDocuments(Optional<CaseDetails<SscsCaseData>> caseData) {
+    private List<? extends TypedDocument> previousSscsDocuments(Optional<CaseDetails<SscsCaseData>> caseData) {
         return caseData.isPresent() ? caseData.get().getCaseData().getSscsDocument() : null;
     }
 
-    private List<AudioVideoEvidence> previousEvidence(Optional<CaseDetails<SscsCaseData>> caseData) {
-        return caseData.isPresent() ? caseData.get().getCaseData().getAudioVideoEvidence() : null;
+    private List<? extends TypedDocument> previousScannedDocuments(Optional<CaseDetails<SscsCaseData>> caseData) {
+        return caseData.isPresent() ? caseData.get().getCaseData().getScannedDocuments() : null;
     }
 
-
+    private List<? extends TypedDocument> previousEvidence(Optional<CaseDetails<SscsCaseData>> caseData) {
+        return caseData.isPresent() ? caseData.get().getCaseData().getAudioVideoEvidence() : null;
+    }
 }

@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 
 public class AddedDocumentsUtilTest {
 
@@ -114,11 +116,11 @@ public class AddedDocumentsUtilTest {
     public void givenCurrentDocumentTypeIsNull_shouldReturnUpdatedDocumentType() {
         Optional<String> currentType = Optional.empty();
         Map<String, Optional<String>> currentDocumentTypeMap = Map.of("1", currentType);
-        AbstractDocumentDetails docDetails = AbstractDocumentDetails.builder().documentType("urgentHearingRequest").build();
+        SscsDocumentDetails docDetails = SscsDocumentDetails.builder().documentType("urgentHearingRequest").build();
 
         List<String> documentTypes = addedDocumentsUtil.addedDocumentTypes(
-                currentDocumentTypeMap,
-                List.of(AbstractDocument.builder().id("1").value(docDetails).build())
+                currentDocumentTypeMap,git 
+                List.of(SscsDocument.builder().id("1").value(docDetails).build())
         );
 
         org.assertj.core.api.Assertions.assertThat(documentTypes)

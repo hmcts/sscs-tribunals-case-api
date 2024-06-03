@@ -20,6 +20,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -51,6 +53,10 @@ public class UploadDocumentWorkAllocationHandlerTest {
             .id("audio-111")
             .value(AudioVideoEvidenceDetails.builder().documentType("audioDocument").build()).build();
 
+    private static final ScannedDocument SCANNED_OTHER = ScannedDocument.builder()
+            .id("scanned-111")
+            .value(ScannedDocumentDetails.builder().type("other").build()).build();
+
     private UploadDocumentWorkAllocationHandler handler = new UploadDocumentWorkAllocationHandler(
             new AddedDocumentsUtil(true), true);
 
@@ -81,6 +87,17 @@ public class UploadDocumentWorkAllocationHandlerTest {
     }
 
     @Test
+    public void givenNewDocumentAddedToScannedDocuments_thenSetScannedDocumentTypes() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+                .scannedDocuments(Arrays.asList(SCANNED_OTHER))
+                .build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, createCallBack(null, sscsCaseData), USER_AUTHORISATION);
+
+        assertEquals(Arrays.asList(SCANNED_OTHER.getDocumentType()), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
+    }
+
+    @Test
     public void givenCaseHasNoExistingDocumentsNewDocumentAdded_thenSetScannedDocumentTypes() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .sscsDocument(Arrays.asList(DOC_CONFIDENTIALITY_REQUEST))
@@ -90,7 +107,7 @@ public class UploadDocumentWorkAllocationHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, createCallBack(sscsCaseDataBefore, sscsCaseData), USER_AUTHORISATION);
 
-        assertEquals(Arrays.asList("confidentialityRequest"), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
+        assertEquals(Arrays.asList(DOC_CONFIDENTIALITY_REQUEST.getDocumentType()), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
     }
 
     @Test
@@ -105,7 +122,7 @@ public class UploadDocumentWorkAllocationHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, createCallBack(sscsCaseDataBefore, sscsCaseData), USER_AUTHORISATION);
 
-        assertEquals(Arrays.asList("confidentialityRequest"), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
+        assertEquals(Arrays.asList(DOC_CONFIDENTIALITY_REQUEST.getDocumentType()), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
     }
 
     @Test
@@ -119,7 +136,7 @@ public class UploadDocumentWorkAllocationHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, createCallBack(sscsCaseDataBefore, sscsCaseData), USER_AUTHORISATION);
 
-        assertEquals(Arrays.asList("confidentialityRequest"), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
+        assertEquals(Arrays.asList(DOC_CONFIDENTIALITY_REQUEST.getDocumentType()), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
     }
 
     @Test
@@ -147,7 +164,7 @@ public class UploadDocumentWorkAllocationHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, createCallBack(sscsCaseDataBefore, sscsCaseData), USER_AUTHORISATION);
 
-        assertEquals(Arrays.asList("videoDocument"), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
+        assertEquals(Arrays.asList(EVIDENCE_VIDEO_DOCUMENT.getDocumentType()), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
     }
 
     @Test
@@ -164,7 +181,7 @@ public class UploadDocumentWorkAllocationHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, createCallBack(sscsCaseDataBefore, sscsCaseData), USER_AUTHORISATION);
 
-        assertEquals(Arrays.asList("audioDocument"), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
+        assertEquals(Arrays.asList(EVIDENCE_AUDIO_DOCUMENT.getDocumentType()), response.getData().getWorkAllocationFields().getScannedDocumentTypes());
     }
 
     private Callback<SscsCaseData> createCallBack(SscsCaseData sscsCaseDataBefore, SscsCaseData sscsCaseData) {
