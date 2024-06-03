@@ -25,7 +25,8 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker-sscs-systemupdate",
             "caseworker-sscs-judge",
             "caseworker-sscs-dwpresponsewriter",
-            "caseworker-sscs-registrar"
+            "caseworker-sscs-registrar",
+            "caseworker-caa"
         );
         lib.createIdamUser("local.test@example.com",
             "caseworker",
@@ -67,11 +68,31 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker-sscs",
             "caseworker-sscs-hmrcresponsewriter"
         );
+        lib.createIdamUser("ctsc-administrator@hmcts.net",
+            "caseworker",
+            "caseworker-sscs"
+        );
+        lib.createIdamUser("regional-centre-admin@fake.hmcts.net",
+                "caseworker",
+                "caseworker-sscs"
+        );
         lib.createIdamUser("data.store.idam.system.user@gmail.com",
                 "ccd-import", "manage-user", "caseworker");
         lib.createIdamUser("wa-system-user@fake.hmcts.net",
              "caseworker-wa",
-             "caseworker-wa-configuration"
+             "caseworker-wa-task-configuration"
+        );
+        lib.createIdamUser("tribunal-member-1@fake.hmcts.net",
+                "caseworker",
+                "caseworker-sscs"
+        );
+        lib.createIdamUser("tribunal-member-2@fake.hmcts.net",
+                "caseworker",
+                "caseworker-sscs"
+        );
+        lib.createIdamUser("tribunal-member-3@fake.hmcts.net",
+                "caseworker",
+                "caseworker-sscs"
         );
         lib.createIdamUser("judge-feepaid@example.com",
                 "caseworker",
@@ -97,7 +118,11 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-sscs",
                 "caseworker",
                 "hearing-manager",
-                "hearing-viewer"
+                "hearing-viewer",
+                "caseworker-wa",
+                "caseworker-wa-task-configuration",
+                "caseworker-ras-validation",
+                "GS_profile"
         );
         var def = Files.readAllBytes(Path.of("definitions/releases/CCD_SSCSDefinition_vdev_LOCAL.xlsx"));
         lib.importDefinition(def);

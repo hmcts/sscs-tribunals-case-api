@@ -98,6 +98,7 @@ tasks.withType(Test) {
 }
 
 task integration(type: Test) {
+    jvmArgs = ['-Xms1024m', '-Xmx2048m']
     setTestClassesDirs(sourceSets.integrationTest.output.classesDirs)
     setClasspath(sourceSets.integrationTest.runtimeClasspath)
 }
@@ -210,10 +211,12 @@ sonarqube {
         property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
         property "sonar.exclusions", "**/CreateCaseException.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/domain/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/evidenceshare/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/TribunalsCaseApiApplication.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/email/Email.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/config/*," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/model/**/*.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/evidenceshare/model/**/*.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/EvidenceUploadService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/OnlineHearingService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/EvidenceDescriptionPdfData.java," +
@@ -224,7 +227,12 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/controllers/CreateCaseController.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/PdfData.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/esa/EsaWriteFinalDecisionMidEventValidationHandler.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/writefinaldecision/uc/UcWriteFinalDecisionMidEventValidationHandler.java"
+                "src/main/java/uk/gov/hmcts/reform/sscs/evidenceshare/config/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/servicebus/messaging/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/domain/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/config/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/EnvironmentPropertiesPrinter.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/controller/FunctionalTestController.java,"
         property "sonar.host.url", "https://sonar.reform.hmcts.net/"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
@@ -328,8 +336,8 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.3.14'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.4'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.5.0'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.5'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
@@ -344,6 +352,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.3'
 
     implementation group:'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    implementation group: 'org.springframework', name: 'spring-jms'
     implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.10.0'
 
     implementation group: 'org.pitest', name: 'pitest', version:  '1.14.2'
@@ -374,6 +383,13 @@ dependencies {
 
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.86'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.86'
+
+    //evidence-share depenedencies
+    implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
+    implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.23'
+    // Remove this dependency once the secure doc-store is in use
+    implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.13.0'
 
@@ -546,7 +562,7 @@ bootWithCCD {
     //in the folder /src/cftlib/resources/docker/ and comma delimited.
     environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-activemq.yml,cft-lib-doc-stack.yml,cft-lib-doc-assembly.yml,cft-lib-ref-data-wiremock.yml,cft-lib-em-stack.yml'
     environment 'ADDITIONAL_COMPOSE_FILES_WA', 'cft-lib-work-allocation.yml'
-    environment 'ENABLE_WORK_ALLOCATION', 'false'
+    environment 'ENABLE_WORK_ALLOCATION', 'true'
 
     //Turn this on to automatically recreate containers above. Useful for debugging if you make changes.
     environment 'FORCE_RECREATE_ADDITIONAL_CONTAINERS', 'false'
@@ -563,6 +579,8 @@ bootWithCCD {
     environment 'CCD_DOCUMENT_URL_PATTERN', '.*'
     environment 'CASE_DOCUMENT_S2S_AUTHORISED_SERVICES', 'ccd_case_document_am_api,ccd_gw,xui_webapp,ccd_data,bulk_scan_processor,sscs,wa_task_management_api,wa_task_monitor,camunda_bpm,wa_workflow_api,wa_case_event_handler,em_stitching_api'
     environment 'DATA_STORE_S2S_AUTHORISED_SERVICES', 'ccd_gw,ccd_data,ccd_ps,payment-api,xui_webapp,sscs,ccd_case_document_am_api,am_role_assignment_service,em_ccd_orchestrator,em_stitching_api,wa_task_management_api,wa_task_monitor,camunda_bpm,wa_workflow_api,wa_case_event_handler'
+    environment 'ROLE_ASSIGNMENT_S2S_AUTHORISED_SERVICES', 'ccd_gw,am_role_assignment_service,am_org_role_mapping_service,am_role_assignment_refresh_batch,xui_webapp,aac_manage_case_assignment,ccd_data,wa_workflow_api,wa_task_management_api,wa_task_monitor,wa_case_event_handler,iac,hmc_cft_hearing_service,ccd_case_disposer,sscs,fis_hmc_api,fpl_case_service,disposer-idam-user,civil_service,prl_cos_api'
+    environment 'BYPASS_ORG_DROOL_RULE', 'true'
 
     //Wiremock
     environment 'RD_LOCATION_REF_API_URL', 'http://localhost:8084'
