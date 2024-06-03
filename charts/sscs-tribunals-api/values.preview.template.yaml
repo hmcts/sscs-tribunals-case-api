@@ -33,4 +33,4 @@ ccd-def-cleanup:
   enabled: true
   change_id: 3575
   case_type_ids:
-    - Benefit
+    - Benefit-sscs-pr
