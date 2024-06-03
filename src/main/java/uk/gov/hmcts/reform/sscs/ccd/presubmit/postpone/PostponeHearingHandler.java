@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -90,7 +89,7 @@ public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCase
         }
 
         log.info("About to update case v2 with postponed hearing event for id {}", caseId);
-        SscsCaseDetails sscsCaseDetails = updateCcdCaseService.updateCaseV2(
+        updateCcdCaseService.updateCaseV2(
                 caseId,
                 postponementEvent.getCcdType(),
                 summary,
@@ -104,8 +103,6 @@ public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCase
                     log.info("Updated case v2 with postponed hearing event for id {}", caseId);
                 }
         );
-        response.setData(sscsCaseDetails.getData());
-
         return response;
     }
 }
