@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
