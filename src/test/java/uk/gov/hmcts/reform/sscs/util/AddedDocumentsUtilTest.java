@@ -119,7 +119,7 @@ public class AddedDocumentsUtilTest {
         SscsDocumentDetails docDetails = SscsDocumentDetails.builder().documentType("urgentHearingRequest").build();
 
         List<String> documentTypes = addedDocumentsUtil.addedDocumentTypes(
-                currentDocumentTypeMap,git 
+                currentDocumentTypeMap,
                 List.of(SscsDocument.builder().id("1").value(docDetails).build())
         );
 
