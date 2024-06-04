@@ -49,8 +49,9 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback.");
         }
+
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-        log.info("Handling ABOUT_TO_SUBMIT - readytolist case id {} ", sscsCaseData.getCcdCaseId());
+
         if (HearingRoute.GAPS == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()) {
 
             if (!callback.isIgnoreWarnings()) {
@@ -65,9 +66,6 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
                 hearingMessagingServiceFactory.getMessagingService(HearingRoute.GAPS));
         }
 
-        log.info("Handling ABOUT_TO_SUBMIT - readytolist case id {} and hearing in the future {}",
-                sscsCaseData.getCcdCaseId(),
-                SscsHelper.hasHearingScheduledInTheFuture(sscsCaseData));
         if (SscsHelper.hasHearingScheduledInTheFuture(sscsCaseData)
                 && !callback.isIgnoreWarnings()) {
             PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
@@ -76,9 +74,6 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
             response.addWarning(listAssistExistsWarning);
             return response;
         }
-        log.info("Handling ABOUT_TO_SUBMIT - readytolist case id {} - gapsSwitchOverFeature {}",
-                sscsCaseData.getCcdCaseId(),
-                gapsSwitchOverFeature);
 
         String region = sscsCaseData.getRegion();
 
@@ -89,10 +84,6 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
             .filter(rpc -> rpc.getName().equalsIgnoreCase(region))
             .map(RegionalProcessingCenter::getHearingRoute)
             .findFirst().orElse(HearingRoute.LIST_ASSIST);
-
-        log.info("Handling ABOUT_TO_SUBMIT - readytolist case id {} - hearing route {}",
-                sscsCaseData.getCcdCaseId(),
-                route.getState());
 
         return HearingHandler.valueOf(route.name()).handle(sscsCaseData, gapsSwitchOverFeature,
             hearingMessagingServiceFactory.getMessagingService(route));
