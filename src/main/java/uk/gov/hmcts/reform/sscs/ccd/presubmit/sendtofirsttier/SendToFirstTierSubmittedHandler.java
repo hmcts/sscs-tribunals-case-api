@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -42,8 +44,11 @@ public class SendToFirstTierSubmittedHandler implements PreSubmitCallbackHandler
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        caseData = ccdCallbackMapService.handleCcdCallbackMap(caseData.getPostHearing().getSendToFirstTier().getAction(), caseData);
+        Optional<SscsCaseData> sscsCaseDataOptional = ccdCallbackMapService.handleCcdCallbackMapV2(
+                caseData.getPostHearing().getSendToFirstTier().getAction(),
+                callback.getCaseDetails().getId()
+        );
 
-        return new PreSubmitCallbackResponse<>(caseData);
+        return new PreSubmitCallbackResponse<>(sscsCaseDataOptional.orElse(caseData));
     }
 }

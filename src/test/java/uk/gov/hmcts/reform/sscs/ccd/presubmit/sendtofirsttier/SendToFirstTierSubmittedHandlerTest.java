@@ -20,6 +20,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 
+import java.util.Optional;
+
 @ExtendWith(MockitoExtension.class)
 public class SendToFirstTierSubmittedHandlerTest {
 
@@ -83,18 +85,19 @@ public class SendToFirstTierSubmittedHandlerTest {
                 .action(value)
                 .build());
 
+        when(caseDetails.getId()).thenReturn(CASE_ID);
         when(callback.getEvent()).thenReturn(SEND_TO_FIRST_TIER);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(ccdCallbackMapService.handleCcdCallbackMap(value, caseData))
-                .thenReturn(SscsCaseData.builder().build());
+        when(ccdCallbackMapService.handleCcdCallbackMapV2(value, CASE_ID))
+                .thenReturn(Optional.of(SscsCaseData.builder().build()));
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors()).isEmpty();
         verify(ccdCallbackMapService, times(1))
-                .handleCcdCallbackMap(value, caseData);
+                .handleCcdCallbackMapV2(value, CASE_ID);
     }
 
 }
