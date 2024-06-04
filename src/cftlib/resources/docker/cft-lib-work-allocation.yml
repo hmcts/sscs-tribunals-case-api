@@ -11,7 +11,7 @@ services:
       CAMUNDA_DB_HOST: shared-database-pg12
       CAMUNDA_DB_PORT: 5432
       CAMUNDA_DB_USER_NAME: postgres
-      CAMUNDA_DB_PASSWORD: "${CAMUNDA_DB_PASSWORD:admin}"
+      CAMUNDA_DB_PASSWORD: ${CAMUNDA_DB_PASSWORD:-admin}
       "camunda.bpm.database.schema-update": true
       CAMUNDA_API_AUTH_ENABLED: false
       S2S_URL: http://host.docker.internal:4502/
@@ -34,7 +34,7 @@ services:
       DATA_STORE_DB_NAME: datastore
       DATA_STORE_DB_OPTIONS: ?stringtype=unspecified&ssl=false
       DATA_STORE_DB_USERNAME: postgres
-      DATA_STORE_DB_PASSWORD: "${DATA_STORE_DB_PASSWORD:admin}"
+      DATA_STORE_DB_PASSWORD: ${DATA_STORE_DB_PASSWORD:-admin}
       SERVICE_BUS_CONNECTION_STRING: ${AZURE_SERVICE_BUS_CONNECTION_STRING:-Endpoint=sb://ccd-servicebus-demo.servicebus.windows.net/;SharedAccessKeyName=SendAndRecieveCCDMessage;SharedAccessKey=REPLACEME}
       CCD_CASE_EVENTS_DESTINATION: ${AZURE_SERVICE_BUS_TOPIC_NAME:-wa-case-event-handler-topic-sessions-ft}
     ports:
@@ -46,16 +46,16 @@ services:
     image: "hmctspublic.azurecr.io/wa/workflow-api:latest"
     container_name: wa-workflow-api
     environment:
-      CAMUNDA_URL: http://wa-camunda-bpm:8999/engine-rest
-      S2S_URL: http://host.docker.internal:4502/
-      S2S_SECRET_WORKFLOW_API: "AAAAAAAAAAAAAAAA"
-      POSTGRES_HOST: shared-database-pg12
-      POSTGRES_PORT: 5432
-      POSTGRES_NAME: wa_workflow_api
-      POSTGRES_USERNAME: postgres
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:admin}"
-      WA_S2S_AUTHORIZED_SERVICES: wa_workflow_api,wa_case_event_handler,camunda-bpm,xui_webapp
-      LAUNCH_DARKLY_SDK_KEY: "${LAUNCH_DARKLY_SDK_KEY}"
+      - CAMUNDA_URL=http://wa-camunda-bpm:8999/engine-rest
+      - S2S_URL=http://host.docker.internal:4502/
+      - S2S_SECRET_WORKFLOW_API=AAAAAAAAAAAAAAAA
+      - POSTGRES_HOST=shared-database-pg12
+      - POSTGRES_PORT=5432
+      - POSTGRES_NAME=wa_workflow_api
+      - POSTGRES_USERNAME=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-admin}
+      - WA_S2S_AUTHORIZED_SERVICES=wa_workflow_api,wa_case_event_handler,camunda-bpm,xui_webapp
+      - LAUNCH_DARKLY_SDK_KEY=${LAUNCH_DARKLY_SDK_KEY}
     ports:
       - 8099:8099
     extra_hosts:
@@ -69,23 +69,23 @@ services:
       image: "hmctspublic.azurecr.io/wa/task-management-api:latest"
       container_name: wa-task-management-api
       environment:
-        CAMUNDA_URL: http://wa-camunda-bpm:8999/engine-rest
-        S2S_URL: http://host.docker.internal:4502/
-        IDAM_URL: http://rse-idam-simulator:5062
-        CCD_URL: http://host.docker.internal:4452
-        OPEN_ID_IDAM_URL: http://rse-idam-simulator:5062
-        ROLE_ASSIGNMENT_URL: http://host.docker.internal:4096
-        POSTGRES_HOST: shared-database-pg12
-        POSTGRES_PORT: 5432
-        POSTGRES_NAME: cft_task_db
-        POSTGRES_USERNAME: postgres
-        POSTGRES_PASSWORD: admin
-        ALLOWED_JURISDICTIONS: wa,ia,sscs,civil
-        ALLOWED_CASE_TYPES: asylum,wacasetype,sscs,civil,benefit
-        WA_S2S_AUTHORIZED_SERVICES: ccd,ccd_data,ccd_gw,ccd_ps,iac,wa_task_management_api,xui_webapp,wa_task_monitor,camunda_bpm,wa_workflow_api,wa_case_event_handler
-        LAUNCH_DARKLY_SDK_KEY: "${LAUNCH_DARKLY_SDK_KEY}"
-        WA_SYSTEM_USERNAME: "${WA_SYSTEM_USERNAME}"
-        WA_SYSTEM_PASSWORD: "${WA_SYSTEM_PASSWORD}"
+        - CAMUNDA_URL=http://wa-camunda-bpm:8999/engine-rest
+        - S2S_URL=http://host.docker.internal:4502/
+        - IDAM_URL=http://rse-idam-simulator:5062
+        - CCD_URL=http://host.docker.internal:4452
+        - OPEN_ID_IDAM_URL=http://rse-idam-simulator:5062
+        - ROLE_ASSIGNMENT_URL=http://host.docker.internal:4096
+        - POSTGRES_HOST=shared-database-pg12
+        - POSTGRES_PORT=5432
+        - POSTGRES_NAME=cft_task_db
+        - POSTGRES_USERNAME=postgres
+        - POSTGRES_PASSWORD=admin
+        - ALLOWED_JURISDICTIONS=wa,ia,sscs,civil
+        - ALLOWED_CASE_TYPES=asylum,wacasetype,sscs,civil,benefit
+        - WA_S2S_AUTHORIZED_SERVICES=ccd,ccd_data,ccd_gw,ccd_ps,iac,wa_task_management_api,xui_webapp,wa_task_monitor,camunda_bpm,wa_workflow_api,wa_case_event_handler
+        - LAUNCH_DARKLY_SDK_KEY=${LAUNCH_DARKLY_SDK_KEY}
+        - WA_SYSTEM_USERNAME=${WA_SYSTEM_USERNAME}
+        - WA_SYSTEM_PASSWORD=${WA_SYSTEM_PASSWORD}
       ports:
         - 8087:8087
       extra_hosts:
@@ -101,12 +101,12 @@ services:
       environment:
         POSTGRES_HOST: shared-database-pg12
         POSTGRES_USERNAME: postgres
-        POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:admin}"
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
         POSTGRES_CONNECTION_OPTIONS: "?stringtype=unspecified&gssEncMode=disable"
-        AZURE_SERVICE_BUS_CONNECTION_STRING: "${AZURE_SERVICE_BUS_CONNECTION_STRING}"
-        AZURE_SERVICE_BUS_TOPIC_NAME: "${AZURE_SERVICE_BUS_TOPIC_NAME}"
-        AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: "${AZURE_SERVICE_BUS_SUBSCRIPTION_NAME}"
-        AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME: "${AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME}"
+        AZURE_SERVICE_BUS_CONNECTION_STRING: ${AZURE_SERVICE_BUS_CONNECTION_STRING}
+        AZURE_SERVICE_BUS_TOPIC_NAME: ${AZURE_SERVICE_BUS_TOPIC_NAME}
+        AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: ${AZURE_SERVICE_BUS_SUBSCRIPTION_NAME}
+        AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME: ${AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME}
         APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=00000000-0000-0000-0000-000000000000"
         ENVIRONMENT: "local"
         S2S_URL: http://host.docker.internal:4502/
@@ -117,7 +117,7 @@ services:
         CAMUNDA_URL: http://wa-camunda-bpm:8999/engine-rest
         CCD_URL: http://host.docker.internal:4452
         WA_TASK_MANAGEMENT_API_URL: http://wa-task-management-api:8087
-        AZURE_SERVICE_BUS_MESSAGE_AUTHOR: "${AZURE_SERVICE_BUS_MESSAGE_AUTHOR}"
+        AZURE_SERVICE_BUS_MESSAGE_AUTHOR: ${AZURE_SERVICE_BUS_MESSAGE_AUTHOR}
         AZURE_SERVICE_BUS_FEATURE_TOGGLE: "true"
         AZURE_SERVICE_BUS_DLQ_FEATURE_TOGGLE: "true"
         AZURE_SERVICE_BUS_CONCURRENT_SESSIONS: 2
@@ -125,7 +125,7 @@ services:
         MESSAGE_PROCESSING_THREAD_POOL_SIZE: 5
         MESSAGE_READINESS_POLL_INTERVAL_MILLISECONDS: 500
         MESSAGE_READINESS_THREAD_POOL_SIZE: 2
-        LAUNCH_DARKLY_SDK_KEY: "${LAUNCH_DARKLY_SDK_KEY}"
+        LAUNCH_DARKLY_SDK_KEY: ${LAUNCH_DARKLY_SDK_KEY}
       ports:
         - 8088:8088
       extra_hosts:
@@ -160,8 +160,8 @@ services:
       TERMINATION_TIME_LIMIT_FLAG: "true"
       TERMINATION_TIME_LIMIT: 120
       PENDING_TERMINATION_CAMUNDA_MAX_RESULTS: 1
-      WA_SYSTEM_USERNAME: "${WA_SYSTEM_USERNAME}"
-      WA_SYSTEM_PASSWORD: "${WA_SYSTEM_PASSWORD}"
+      WA_SYSTEM_USERNAME: ${WA_SYSTEM_USERNAME}
+      WA_SYSTEM_PASSWORD: ${WA_SYSTEM_PASSWORD}
     ports:
       - 8077:8077
     extra_hosts:
