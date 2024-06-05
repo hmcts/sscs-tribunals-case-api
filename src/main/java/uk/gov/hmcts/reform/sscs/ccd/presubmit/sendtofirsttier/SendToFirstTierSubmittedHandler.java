@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.sendtofirsttier;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,8 +14,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
-
-import java.util.Optional;
 
 @Service
 @Slf4j
