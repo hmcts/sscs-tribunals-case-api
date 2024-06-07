@@ -331,4 +331,19 @@ public class ReadyToListAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
+
+    @Test
+    public void givenRpcNotSet_HearingRouteShouldBeGaps() {
+
+        handler = new ReadyToListAboutToSubmitHandler(true, regionalProcessingCenterService,
+                hearingMessagingServiceFactory);
+
+        sscsCaseData = sscsCaseData.toBuilder().region("FakeRegion").build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT,
+                callback, USER_AUTHORISATION);
+
+        assertEquals(HearingRoute.GAPS, response.getData().getSchedulingAndListingFields().getHearingRoute());
+    }
 }
