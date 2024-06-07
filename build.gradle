@@ -564,6 +564,11 @@ bootWithCCD {
     environment 'ADDITIONAL_COMPOSE_FILES_WA', 'cft-lib-work-allocation.yml'
     environment 'ENABLE_WORK_ALLOCATION', 'false'
 
+
+    // Idam Simulator config fix
+    environment 'IDAM_SIMULATOR_BASE_URL', 'http://rse-idam-simulator:5062'
+    environment 'IDAM_SIMULATOR_BASE_URL_OUTSIDE_NETWORK', 'http://rse-idam-simulator:5062'
+
     //Turn this on to automatically recreate containers above. Useful for debugging if you make changes.
     environment 'FORCE_RECREATE_ADDITIONAL_CONTAINERS', 'false'
 
