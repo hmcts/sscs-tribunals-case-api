@@ -74,7 +74,7 @@ java:
             CREATE DATABASE "sscsjobscheduler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
     auth:
       username: "hmcts"
-      password: "hmcts"
+      password: "${SHARED_DB_PASSWORD:hmcts}"
 
 
 idam-pr:
