@@ -34,6 +34,32 @@ Run the application by executing:
 This repo is now integrated with the rse-cft-library. For more information see the bootWithCCD task in build.gradle.
 Extra compose files can be provided in src/cftlib/resources/docker.
 
+#### Cftlib - Docker Desktop v4.30
+
+**_First Time Setup_**
+
+As part of this setup the definitions repository has been added as a git submodule.
+1. `cd definitions`
+2. `git submodule init` & `git submodule update`
+4. `git checkout master` & `git pull`
+
+You should also run `docker pull hmctspublic.azurecr.io/hmcts/rse/rse-idam-simulator:latest`
+
+_Ensure you have removed all existing / leftover containers_
+
+**On Mac**
+
+1. `sudo nano /etc/hosts`
+2. Add the following line to the file: `127.0.0.1    rse-idam-simulator`
+3. To Save and exit `control + x` to exit, `y` to save, `enter` to confirm
+4. Run `sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder`
+
+NOTE: Currently local setup fails if `ENABLE_WORK_ALLOCATION` is set to true so change this to false in the build.gradle file.
+
+Run the `bootWithCCD` gradle task. Once you see `Closing the ES REST client`, the application is ready to use.
+
+Navigate to `http://localhost:3455/cases`
+
 ### Running Smoke Test locally
 Once the application running locally, please make sure
 1. Your local CCD is up and running with subscription id "7S9MxdSBpt"
