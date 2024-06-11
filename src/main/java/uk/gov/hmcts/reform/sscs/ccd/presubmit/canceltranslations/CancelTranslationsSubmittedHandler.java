@@ -66,7 +66,7 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
         log.info("sscsWelshPreviewNextEvent is {}  for case id : {}",
                 sscsWelshPreviewNextEvent, caseData.getCcdCaseId());
 
-        Consumer<SscsCaseData> caseDataConsumer = sscsCaseData -> sscsCaseData.setSscsWelshPreviewNextEvent(null);
+        Consumer<SscsCaseDetails> caseDataConsumer = sscsCaseDetails -> sscsCaseDetails.getData().setSscsWelshPreviewNextEvent(null);
 
         if (isValidUrgentDocument(callback.getCaseDetails().getCaseData())) {
             setMakeCaseUrgentTriggerEvent(callback.getCaseDetails().getId(), caseDataConsumer);
@@ -85,7 +85,7 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
                     "Cancel welsh translations",
                     "Cancel welsh translations",
                     idamService.getIdamTokens(),
-                    sscsCaseData -> sscsCaseData.setSscsWelshPreviewNextEvent(null));
+                    sscsCaseDetails -> sscsCaseDetails.getData().setSscsWelshPreviewNextEvent(null));
         }
 
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
@@ -103,7 +103,7 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
                 && (!CollectionUtils.isEmpty(caseData.getSscsDocument()) && caseData.getSscsDocument().stream().anyMatch(d -> REINSTATEMENT_REQUEST.getValue().equals(d.getValue().getDocumentType())));
     }
 
-    private SscsCaseDetails setMakeCaseUrgentTriggerEvent(Long caseId, Consumer<SscsCaseData> caseDataConsumer) {
+    private SscsCaseDetails setMakeCaseUrgentTriggerEvent(Long caseId, Consumer<SscsCaseDetails> caseDataConsumer) {
         log.info("Using updateCaseV2 to trigger 'makeCaseUrgent' event for {}", caseId);
         return updateCcdCaseService.updateCaseV2(
                 caseId,
@@ -119,7 +119,8 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
         log.info("Using updateCaseV2 to trigger SscsWelshPreviewNextEvent '{}' for {}",
                 sscsWelshPreviewNextEvent, caseId);
 
-        Consumer<SscsCaseData> mutator = caseData -> {
+        Consumer<SscsCaseDetails> mutator = sscsCaseDetails -> {
+            SscsCaseData caseData = sscsCaseDetails.getData();
             caseData.setSscsWelshPreviewNextEvent(null);
             caseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
             caseData.setReinstatementRegistered(LocalDate.now());

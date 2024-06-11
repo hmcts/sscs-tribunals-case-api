@@ -65,7 +65,7 @@ public class IssueDirectionHandler implements CallbackHandler<SscsCaseData> {
                     "Appeal to proceed",
                     "Appeal proceed event triggered",
                     idamService.getIdamTokens(),
-                    sscsCaseData -> sscsCaseData.setDirectionTypeDl(null)
+                    sscsCaseDetails -> sscsCaseDetails.getData().setDirectionTypeDl(null)
             );
         } catch (FeignException.UnprocessableEntity e) {
             log.error(format("appealToProceed event failed for caseId %s, root cause is %s", callback.getCaseDetails().getId(), getRootCauseMessage(e)), e);
