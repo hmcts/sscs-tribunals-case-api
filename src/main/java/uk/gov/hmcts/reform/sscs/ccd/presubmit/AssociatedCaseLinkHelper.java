@@ -80,7 +80,7 @@ public class AssociatedCaseLinkHelper {
         return caseData;
     }
 
-    private void addLinkToOtherAssociatedCases(List<SscsCaseDetails> matchedByNinoCases, String caseId) {
+    public void addLinkToOtherAssociatedCases(List<SscsCaseDetails> matchedByNinoCases, String caseId) {
         log.info("Adding link to other associated cases");
         if (!matchedByNinoCases.isEmpty() && !StringUtils.isEmpty(caseId)) {
             for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
