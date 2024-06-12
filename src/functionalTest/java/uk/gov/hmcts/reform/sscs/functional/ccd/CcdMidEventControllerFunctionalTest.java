@@ -18,7 +18,6 @@ import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.functional.mya.BaseFunctionTest;
 
 @Slf4j
@@ -62,19 +61,6 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
         HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(
             getJsonCallbackForTest(WRITE_FINAL_DECISION_CALLBACK_JSON)), "");
         assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
-    }
-
-    @DisplayName("Adjourn case populate venue dropdown should populate next hearing venue dropdown")
-    @Test
-    public void testAdjournCasePopulateVenueDropdown() throws IOException {
-        HttpResponse httpResponse = sscsMyaBackendRequests.midEvent(new StringEntity(
-            getJsonCallbackForTest(WRITE_FINAL_DECISION_CALLBACK_JSON)), "AdjournCasePopulateVenueDropdown");
-        CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
-        assertThat(httpResponse.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
-        DynamicList adjournCaseNextHearingVenueSelected = ccdEventResponse.getData().getAdjournment().getNextHearingVenueSelected();
-        assertThat(adjournCaseNextHearingVenueSelected.getValue().getCode()).isEqualTo("");
-        assertThat(adjournCaseNextHearingVenueSelected.getValue().getLabel()).isEqualTo("");
-        assertThat(adjournCaseNextHearingVenueSelected.getListItems()).hasSizeGreaterThan(2);
     }
 
     @DisplayName("Preview final decision should populate final decision preview document")

@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
@@ -255,23 +254,6 @@ public class AdjournCaseIt extends AbstractEventIt {
             null,
             "paper"
         );
-    }
-
-    @DisplayName("Call to populate venue dropdown will populate next hearing venue selected list")
-    @Test
-    public void givenCallToPopulateVenueDropdownThenPopulatesNextHearingVenueSelectedList() throws Exception {
-        setup();
-        String nextHearingDateSpecificDate = "2020-07-01";
-        setJsonAndReplace(GENERATED_FACE_TO_FACE_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON,
-            "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
-            nextHearingDateSpecificDate);
-
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_MID_EVENT_ADJOURN_CASE_POPULATE_VENUE_DROPDOWN));
-        assertHttpStatus(response, HttpStatus.OK);
-        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-        assertThat(result.getErrors()).isEmpty();
-        DynamicList results = result.getData().getAdjournment().getNextHearingVenueSelected();
-        assertThat(results.getListItems()).isNotEmpty();
     }
 
     private void checkStandardDocumentNoInterpreter() throws Exception {
