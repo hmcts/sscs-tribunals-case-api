@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toMap;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -9,6 +10,8 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLette
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,20 +80,23 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
         log.info("Handling with Issue Further Evidence Handler for caseId {}", caseId);
 
-        issueFurtherEvidence(caseId, idamTokens);
-        postIssueFurtherEvidenceTasks(caseId, idamTokens);
+        var updatedCaseData = issueFurtherEvidence(caseId, idamTokens);
+        postIssueFurtherEvidenceTasks(caseId, idamTokens, updatedCaseData);
     }
 
-    private void issueFurtherEvidence(long caseId, IdamTokens idamTokens) {
+    private SscsCaseData issueFurtherEvidence(long caseId, IdamTokens idamTokens) {
         log.info("Retrieving latest case date for caseId {} and submitted event type {} ", caseId, EventType.ISSUE_FURTHER_EVIDENCE.getCcdType());
         StartEventResponse startEventResponse = ccdClient.startEvent(idamTokens, caseId, EventType.ISSUE_FURTHER_EVIDENCE.getCcdType());
         SscsCaseDetails sscsCaseDetails = sscsCcdConvertService.getCaseDetails(startEventResponse);
 
+        var caseData = sscsCaseDetails.getData();
         List<DocumentType> documentTypes = Arrays.asList(APPELLANT_EVIDENCE, REPRESENTATIVE_EVIDENCE, DWP_EVIDENCE, JOINT_PARTY_EVIDENCE, HMCTS_EVIDENCE);
         List<FurtherEvidenceLetterType> allowedLetterTypes = Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER);
 
-        documentTypes.forEach(documentType -> issueEvidencePerDocumentType(sscsCaseDetails.getData(), allowedLetterTypes, documentType, null));
+        documentTypes.forEach(documentType -> issueEvidencePerDocumentType(caseData, allowedLetterTypes, documentType, null));
         issueFurtherEvidenceForEachOtherPartyThatIsOriginalSender(sscsCaseDetails.getData(), allowedLetterTypes);
+
+        return caseData;
     }
 
     private void issueFurtherEvidenceForEachOtherPartyThatIsOriginalSender(SscsCaseData caseData, List<FurtherEvidenceLetterType> allowedLetterTypes) {
@@ -125,19 +131,35 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         log.info("Issued for caseId {}", caseData.getCcdCaseId());
     }
 
-    private void postIssueFurtherEvidenceTasks(long caseId, IdamTokens idamTokens) {
+    private void postIssueFurtherEvidenceTasks(long caseId, IdamTokens idamTokens, SscsCaseData updatedCaseData) {
         log.debug("Post Issue Tasks for caseId {}", caseId);
+
+        Map<String, SscsDocument> binaryDocumentUrlLinkCaseDataMap = updatedCaseData.getSscsDocument()
+                .stream()
+                .collect(toMap(document -> document.getValue().getDocumentLink().getDocumentBinaryUrl(), Function.identity()));
+
         try {
             updateCcdCaseService.updateCaseV2(
                     caseId,
                     EventType.UPDATE_CASE_ONLY.getCcdType(),
                     idamTokens,
                     sscsCaseData -> {
+                        sscsCaseData.getSscsDocument().forEach(
+                                sscsDocument -> {
+                                    String documentBinaryUrl = sscsDocument.getValue().getDocumentLink().getDocumentBinaryUrl();
+                                    if (binaryDocumentUrlLinkCaseDataMap.containsKey(documentBinaryUrl)) {
+                                        sscsDocument.getValue().setResizedDocumentLink(
+                                                binaryDocumentUrlLinkCaseDataMap.get(documentBinaryUrl).getValue().getResizedDocumentLink()
+                                        );
+                                    }
+                                }
+                        );
+
                         final String description = determineDescription(sscsCaseData.getSscsDocument());
                         setEvidenceIssuedFlagToYes(sscsCaseData.getSscsDocument());
                         return new UpdateCcdCaseService.UpdateResult("Update case data", description);
-                    }
 
+                    }
             );
         } catch (Exception e) {
             String errorMsg = "Failed to update document evidence issued flags after issuing further evidence "
