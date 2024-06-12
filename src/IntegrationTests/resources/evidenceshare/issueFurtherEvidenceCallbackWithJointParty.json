@@ -206,9 +206,9 @@
           "id": "636030ca-243f-4a96-8c81-813ab44c1ac8",
           "value": {
             "documentLink": {
-              "document_url": "http://bla.com/",
+              "document_url": "http://bla.com/doc1",
               "document_filename": "evidence-document.pdf",
-              "document_binary_url": "http://bla.com/binary"
+              "document_binary_url": "http://bla.com/doc1/binary"
             },
             "documentType": "appellantEvidence",
             "controlNumber": "4",
@@ -221,9 +221,9 @@
           "id": "636030ca-243f-4a96-8c81-813ab44c1ac9",
           "value": {
             "documentLink": {
-              "document_url": "http://bla.com/",
+              "document_url": "http://bla.com/doc2",
               "document_filename": "evidence-document-issued.pdf",
-              "document_binary_url": "http://bla.com/binary"
+              "document_binary_url": "http://bla.com/doc2/binary"
             },
             "documentType": "appellantEvidence",
             "controlNumber": "4",
