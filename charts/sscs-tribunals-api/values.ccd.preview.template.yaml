@@ -532,7 +532,6 @@ ccd:
     image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:6.4.6nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
-    imagePullPolicy: Always
     environment:
       CCD_ENVIRONMENT: 'PROD'
       CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
@@ -548,7 +547,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S1549CnonProd
+      CCD_DEF_VERSION: 6.4.6nonProd
     secrets: []
     userRoles:
       - citizen
