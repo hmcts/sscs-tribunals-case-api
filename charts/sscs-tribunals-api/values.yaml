@@ -5,6 +5,8 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
   aadIdentityName: sscs
   ingressHost: sscs-tribunals-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   memoryLimits: '4096Mi'
+  autoscaling:
+    enabled: false
   keyVaults:
     sscs:
       resourceGroup: sscs
