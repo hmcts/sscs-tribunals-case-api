@@ -61,10 +61,20 @@ public class AssociateCaseAboutToSubmitHandler implements PreSubmitCallbackHandl
                     Long.parseLong(caseLink.getValue().getCaseReference()),
                     idamService.getIdamTokens());
             if (retrievedCase != null) {
-                cases.add(retrievedCase);
+                if (retrievedCase.getData().getAssociatedCase() != null) {
+                    Boolean otherCaseMatch = retrievedCase.getData().getAssociatedCase()
+                            .stream().anyMatch(c -> c.getValue().getCaseReference().equals(caseDetails.getCaseData().getCcdCaseId()));
+                    if (!otherCaseMatch) {
+                        cases.add(retrievedCase);
+                    }
+                } else {
+                    cases.add(retrievedCase);
+                }
             }
         }
-        associatedCaseLinkHelper.addLinkToOtherAssociatedCases(cases, caseDetails.getCaseData().getCcdCaseId());
+        if (!cases.isEmpty()) {
+            associatedCaseLinkHelper.addLinkToOtherAssociatedCases(cases, caseDetails.getCaseData().getCcdCaseId());
+        }
         return preSubmitCallbackResponse;
     }
 
