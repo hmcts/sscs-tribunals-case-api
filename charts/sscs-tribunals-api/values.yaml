@@ -127,6 +127,8 @@ sscs-tya-notif:
   enabled: false
 sscs-tribunals-frontend:
   enabled: false
+sscs-cor-frontend:
+  enabled: false
 redis:
   enabled: false
 ccd:
