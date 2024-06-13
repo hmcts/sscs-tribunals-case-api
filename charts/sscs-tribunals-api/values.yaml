@@ -4,6 +4,8 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
   applicationPort: 8080
   aadIdentityName: sscs
   ingressHost: sscs-tribunals-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  spotInstances:
+    enabled: false
   memoryLimits: '4096Mi'
   autoscaling:
     enabled: false
