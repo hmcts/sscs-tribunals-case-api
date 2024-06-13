@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.141
+version: 0.0.142
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -11,7 +11,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: postgresql.enabled
   - name: java
-    version: 5.0.0
+    version: 5.2.1
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
     condition: java.enabled
   - name: job
@@ -49,7 +49,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: em-ccdorc.enabled
   - name: ccd-case-document-am-api
-    version: 1.7.11
+    version: 1.7.14
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd-case-document-am-api.enabled
   - name: sscs-hearings-api
