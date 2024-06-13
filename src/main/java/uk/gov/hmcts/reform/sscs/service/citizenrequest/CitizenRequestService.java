@@ -156,9 +156,13 @@ public class CitizenRequestService {
         updateCcdCaseService.updateCaseV2(ccdCaseId, CITIZEN_REQUEST_HEARING_RECORDING.getCcdType(),
                 "SSCS - hearing recording request from MYA",
                 "Requested hearing recordings", idamService.getIdamTokens(),
-                caseData -> updateCaseDataWithHearingRecordingRequest(caseData, hearingIds, idamEmail));
+                sscsCaseDetails -> updateCaseDataWithHearingRecordingRequestV2(sscsCaseDetails, hearingIds, idamEmail));
 
         return true;
+    }
+
+    private void updateCaseDataWithHearingRecordingRequestV2(SscsCaseDetails sscsCaseDetails, List<String> hearingIds, String idamEmail) {
+        updateCaseDataWithHearingRecordingRequest(sscsCaseDetails.getData(), hearingIds, idamEmail);
     }
 
     private void updateCaseDataWithHearingRecordingRequest(SscsCaseData sscsCaseData, List<String> hearingIds, String idamEmail) {
