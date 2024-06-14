@@ -489,6 +489,11 @@ public class SscsUtil {
     }
 
     public static void clearPostHearingRequestFormatAndContentFields(SscsCaseData caseData, PostHearingRequestType requestType) {
+        if (isNull(requestType)) {
+            log.info("PostHearingRequestType is null during clearing of request format and body content fields for case id : {}", caseData.getCcdCaseId());
+            return;
+        }
+
         PostHearing postHearing = caseData.getPostHearing();
         DocumentGeneration docGen = caseData.getDocumentGeneration();
 
