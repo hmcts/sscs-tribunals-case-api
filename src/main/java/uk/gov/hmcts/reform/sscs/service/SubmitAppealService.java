@@ -233,7 +233,7 @@ public class SubmitAppealService {
         return hasRole;
     }
 
-    private void associateCase(IdamTokens idamTokens,
+    void associateCase(IdamTokens idamTokens,
                                SscsCaseDetails caseDetails,
                                String userToken) {
         if (null != caseDetails && StringUtils.isNotEmpty(userToken)) {
@@ -416,7 +416,7 @@ public class SubmitAppealService {
         return result;
     }
 
-    private EventType findEventType(SscsCaseData caseData, boolean saveAndReturnCase) {
+    EventType findEventType(SscsCaseData caseData, boolean saveAndReturnCase) {
 
         if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
             LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());

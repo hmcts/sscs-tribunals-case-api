@@ -19,18 +19,25 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Objects;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
+import uk.gov.hmcts.reform.sscs.service.SubmitTestAppealService;
 
 public class CreateCaseControllerTest {
 
@@ -39,13 +46,15 @@ public class CreateCaseControllerTest {
     private SubmitAppealService submitAppealService;
     private MockMvc mockMvc;
     private CreateCaseController controller;
+    private SubmitTestAppealService submitTestAppealService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ccdService = mock(CcdService.class);
         submitAppealService = mock(SubmitAppealService.class);
         idamService = mock(IdamService.class);
-        controller = new CreateCaseController(submitAppealService,ccdService, idamService);
+        submitTestAppealService = mock(SubmitTestAppealService.class);
+        controller = new CreateCaseController(submitAppealService,ccdService, idamService, submitTestAppealService);
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         mockMvc = standaloneSetup(controller).build();
     }
@@ -74,13 +83,14 @@ public class CreateCaseControllerTest {
         assertThat(createCaseResponse.getBody().get("appellant_tya"), is(someTyaValue));
     }
 
-    @Test
-    public void shouldReturnHttpStatusCode201ForTheSubmittedTestAppeal() throws Exception {
+    @ParameterizedTest
+    @ValueSource(strings = {"/api/appeals", "/api/appeals/caseTypeValue"})
+    public void shouldReturnHttpStatusCode201ForTheSubmittedTestAppeal(String url) throws Exception {
         when(submitAppealService.submitAppeal(any(SyaCaseWrapper.class), any(String.class))).thenReturn(1L);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
 
-        mockMvc.perform(post("/api/appeals")
+        mockMvc.perform(post(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
                 .andExpect(status().isCreated());

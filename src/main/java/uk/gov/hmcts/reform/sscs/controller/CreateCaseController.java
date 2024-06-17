@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.CreateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
+import uk.gov.hmcts.reform.sscs.service.SubmitTestAppealService;
 
 @RestController
 @ConditionalOnProperty("create_ccd_endpoint")
@@ -46,15 +47,18 @@ public class CreateCaseController {
     private final SubmitAppealService submitAppealService;
     private final CcdService ccdService;
     private final IdamService idamService;
+    private final SubmitTestAppealService submitTestAppealService;
 
     public CreateCaseController(
-        @Autowired SubmitAppealService submitAppealService,
-        @Autowired CcdService ccdService,
-        @Autowired IdamService idamService
+            @Autowired SubmitAppealService submitAppealService,
+            @Autowired CcdService ccdService,
+            @Autowired IdamService idamService,
+            SubmitTestAppealService submitTestAppealService
     ) {
         this.submitAppealService = submitAppealService;
         this.ccdService = ccdService;
         this.idamService = idamService;
+        this.submitTestAppealService = submitTestAppealService;
     }
 
     @Operation(summary = "Create a case",
@@ -150,9 +154,10 @@ public class CreateCaseController {
         @ApiResponse(responseCode = "201", description = "Submitted test appeal successfully", content = {
             @Content(schema = @Schema(implementation = String.class))})
     })
-    @PostMapping(value = "/api/appeals", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = {"/api/appeals", "/api/appeals/{caseType}"}, consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createAppeals(@RequestHeader(value = AUTHORIZATION, required = false)
-                                                        String authorisation, @RequestBody SyaCaseWrapper syaCaseWrapper) {
+                                                        String authorisation, @RequestBody SyaCaseWrapper syaCaseWrapper,
+                                                @PathVariable("caseType") Optional<String> caseType) {
 
         if (syaCaseWrapper.getAppellant() == null
             || syaCaseWrapper.getBenefitType() == null
@@ -163,7 +168,12 @@ public class CreateCaseController {
         syaCaseWrapper.getMrn().setDate(getRandomMrnDate());
         log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
             syaCaseWrapper.getBenefitType().getCode());
-        Long caseId = submitAppealService.submitAppeal(syaCaseWrapper, authorisation);
+        Long caseId;
+        if (caseType.isPresent()) {
+            caseId = submitTestAppealService.submitAppeal(syaCaseWrapper, authorisation, caseType.get());
+        } else {
+            caseId = submitAppealService.submitAppeal(syaCaseWrapper, authorisation);
+        }
 
         log.info("Case {} with benefit type - {} processed successfully",
             caseId,
