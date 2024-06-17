@@ -23,8 +23,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason;
@@ -33,7 +31,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Note;
 import uk.gov.hmcts.reform.sscs.ccd.domain.NoteDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.NotePad;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
-import uk.gov.hmcts.reform.sscs.ccd.domain.PostponementRequest;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -103,8 +100,6 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                 caseId);
             response.addError(String.format("Unhandleable Postponement Request %s", actionRequested));
         }
-
-        clearTransientFields(sscsCaseData);
 
         return response;
     }
