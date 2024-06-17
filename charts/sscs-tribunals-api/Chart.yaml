@@ -72,7 +72,7 @@ dependencies:
   - name: wa
     version: ~1.0.5
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-    condition: civil-wa.enabled
+    condition: wa.enabled
   - name: sscs-cron-trigger
     version: 0.0.10
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
