@@ -47,7 +47,7 @@ public class AssociateCaseAboutToSubmitHandler implements PreSubmitCallbackHandl
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
-            throw new IllegalStateException("Cannot handle callback");
+            throw new IllegalStateException("Cannot handle associate case about to submit callback");
         }
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
@@ -55,7 +55,7 @@ public class AssociateCaseAboutToSubmitHandler implements PreSubmitCallbackHandl
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         List<CaseLink> caseLinks = sscsCaseData.getAssociatedCase();
-        List<SscsCaseDetails> cases = new ArrayList<SscsCaseDetails>();
+        var cases = new ArrayList<SscsCaseDetails>();
         for (CaseLink caseLink : caseLinks) {
             SscsCaseDetails retrievedCase = ccdService.getByCaseId(
                     Long.parseLong(caseLink.getValue().getCaseReference()),
