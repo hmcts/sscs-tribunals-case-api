@@ -933,141 +933,6 @@ postgresql:
       - name: "pr-${CHANGE_ID}-cft_task_db"
       - name: "pr-${CHANGE_ID}-org_role_mapping"
 
-camunda-bpm:
-  enabled: true
-  java:
-    imagePullPolicy: Always
-    disableKeyVaults: true
-    ingressHost: camunda-${SERVICE_FQDN}
-    releaseNameOverride: ${SERVICE_NAME}-camunda
-    devcpuRequests: 500m
-    devmemoryRequests: 512Mi
-    devcpuLimits: 1
-    devmemoryLimits: 1Gi
-    readinessDelay: 90
-    secrets:
-      CAMUNDA_DB_PASSWORD:
-        secretRef: postgres
-        key: PASSWORD
-        disabled: false
-    environment:
-      CAMUNDA_API_AUTH_ENABLED: false
-      CAMUNDA_DB_HOST: sscs-preview.postgres.database.azure.com
-      CAMUNDA_DB_NAME: "pr-${CHANGE_ID}-camunda"
-      CAMUNDA_DB_USER_NAME: hmcts
-      CAMUNDA_BPM_DATABASE_SCHEMA_UPDATE: true
-      S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-      CAMUNDA_DB_CONN_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
-      RELEASE_REVISION: "{{ .Release.Revision }}"
-
-
-wa-task-management-api:
-  java:
-    releaseNameOverride: ${SERVICE_NAME}-wa-task-management-api
-    ingressHost: wa-task-management-api-${SERVICE_FQDN}
-    readinessDelay: 90
-    secrets:
-      POSTGRES_PASSWORD:
-        secretRef: postgres
-        key: PASSWORD
-        disabled: false
-    environment:
-      CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
-      ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
-      POSTGRES_HOST: sscs-preview.postgres.database.azure.com
-      POSTGRES_NAME: "pr-${CHANGE_ID}-cft_task_db"
-      POSTGRES_USERNAME: hmcts
-      POSTGRES_CONNECTION_OPTIONS: "?currentSchema=cft_task_db&stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
-      SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: cft_task_db
-      SPRING_FLYWAY_DEFAULT_SCHEMA: cft_task_db
-      SPRING_FLYWAY_SCHEMAS: cft_task_db
-      CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
-      S2S_SECRET_TASK_MANAGEMENT_API: ${S2S_SECRET_TASK_MANAGEMENT_API}
-      WA_IDAM_CLIENT_SECRET: ${WA_IDAM_CLIENT_SECRET}
-      WA_SYSTEM_USERNAME: ${WA_SYSTEM_USERNAME}
-      WA_SYSTEM_PASSWORD: ${WA_SYSTEM_PASSWORD}
-      ALLOWED_CASE_TYPES: "benefit"
-
-wa-task-monitor:
-  java:
-    ingressHost: wa-task-monitor-${SERVICE_FQDN}
-    releaseNameOverride: ${SERVICE_NAME}-wa-task-monitor
-    readinessDelay: 90
-    environment:
-      CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
-      WA_TASK_MANAGEMENT_API_URL: http://{{ .Release.Name }}-wa-task-management-api
-      CASE_EVENT_HANDLER_SERVICE_URL: http://{{ .Release.Name }}-wa-case-event-handler
-      CCD_SEARCH_URL: http://{{ .Release.Name }}-ccd-data-store-api
-      CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
-      ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
-      S2S_SECRET_TASK_MONITOR: ${S2S_SECRET_TASK_MONITOR}
-      WA_IDAM_CLIENT_SECRET: ${WA_IDAM_CLIENT_SECRET}
-      WA_SYSTEM_USERNAME: ${WA_SYSTEM_USERNAME}
-      WA_SYSTEM_PASSWORD: ${WA_SYSTEM_PASSWORD}
-
-wa-case-event-handler:
-  java:
-    ingressHost: wa-case-event-handler-${SERVICE_FQDN}
-    releaseNameOverride: ${SERVICE_NAME}-wa-case-event-handler
-    readinessDelay: 90
-    autoscaling:
-      enabled: false
-    secrets:
-      AZURE_SERVICE_BUS_CONNECTION_STRING:
-        secretRef: sscs-sb-preview
-        key: connectionString
-      POSTGRES_PASSWORD:
-        secretRef: postgres
-        key: PASSWORD
-        disabled: false
-    environment:
-      CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
-      CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
-      CCD_SEARCH_URL: http://{{ .Release.Name }}-ccd-data-store-api
-      ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
-      WA_WORKFLOW_API_URL: http://{{ .Release.Name }}-wa-workflow-api
-      WA_TASK_MANAGEMENT_API_URL: http://{{ .Release.Name }}-wa-task-management-api
-      AZURE_SERVICE_BUS_TOPIC_NAME: "${SERVICE_NAME}-servicebus-ccd-events"
-      AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-ccd-events"
-      AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-ccd-events"
-      POSTGRES_HOST: sscs-preview.postgres.database.azure.com
-      POSTGRES_NAME: "pr-${CHANGE_ID}-wa-case-event-handler"
-      POSTGRES_USERNAME: hmcts
-      POSTGRES_CONNECTION_OPTIONS: ""
-      WA_IDAM_CLIENT_SECRET: ${WA_IDAM_CLIENT_SECRET}
-      S2S_SECRET_CASE_EVENT_HANDLER: ${S2S_SECRET_CASE_EVENT_HANDLER}
-      LAUNCH_DARKLY_SDK_KEY: ${WA_LAUNCH_DARKLY_SDK_KEY}
-
-wa-workflow-api:
-  java:
-    ingressHost: wa-workflow-api-${SERVICE_FQDN}
-    releaseNameOverride: ${SERVICE_NAME}-wa-workflow-api
-    readinessDelay: 90
-    secrets:
-      POSTGRES_PASSWORD:
-        secretRef: postgres
-        key: PASSWORD
-        disabled: false
-    environment:
-      CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
-      POSTGRES_HOST: sscs-preview.postgres.database.azure.com
-      POSTGRES_NAME: "pr-${CHANGE_ID}-wa_workflow_api"
-      POSTGRES_USERNAME: hmcts
-      POSTGRES_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
-      DB_READER_USERNAME: hmcts
-      S2S_SECRET_WORKFLOW_API: ${S2S_SECRET_WORKFLOW_API}
-      TASK_MANAGEMENT_URL: http://{{ .Release.Name }}-wa-task-management-api
-      LAUNCH_DARKLY_SDK_KEY: ${WA_LAUNCH_DARKLY_SDK_KEY}
-      SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: wa_workflow_api
-      SPRING_FLYWAY_SCHEMAS: wa_workflow_api
-
-wa-message-cron-service:
-  job:
-    releaseNameOverride: ${SERVICE_NAME}-wa-message-cron-service
-    environment:
-      WA_CASE_EVENT_HANDLER_SERVICE_URL: http://{{ .Release.Name }}-wa-case-event-handler
-
-
 wa:
   enabled: true
   taskBatchCron:
@@ -1076,61 +941,196 @@ wa:
     enabled: true
   terminationBatchCron:
     enabled: true
+  postgresql:
+    enabled: true
 
-wa-initiation-batch:
-  job:
-    kind: CronJob
-    releaseNameOverride: ${SERVICE_NAME}-wa-initiation-batch
-    name: ${SERVICE_NAME}-wa-initiation-batch
-    schedule: "*/5 * * * *"
-    aadIdentityName: wa
-    keyVaults:
-      wa:
-        secrets:
-          - s2s-secret-task-monitor
-    environment:
-      S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-      S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
-      WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
-      JOB_NAME: "INITIATION"
-      ALLOW_CONFIG_MUTATIONS: true
+  camunda-bpm:
+    enabled: true
+    java:
+      imagePullPolicy: Always
+      disableKeyVaults: true
+      ingressHost: camunda-${SERVICE_FQDN}
+      releaseNameOverride: ${SERVICE_NAME}-camunda
+      devcpuRequests: 500m
+      devmemoryRequests: 512Mi
+      devcpuLimits: 1
+      devmemoryLimits: 1Gi
+      readinessDelay: 90
+      secrets:
+        CAMUNDA_DB_PASSWORD:
+          secretRef: postgres
+          key: PASSWORD
+          disabled: false
+      environment:
+        CAMUNDA_API_AUTH_ENABLED: false
+        CAMUNDA_DB_HOST: sscs-preview.postgres.database.azure.com
+        CAMUNDA_DB_NAME: "pr-${CHANGE_ID}-camunda"
+        CAMUNDA_DB_USER_NAME: hmcts
+        CAMUNDA_BPM_DATABASE_SCHEMA_UPDATE: true
+        S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+        CAMUNDA_DB_CONN_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
+        RELEASE_REVISION: "{{ .Release.Revision }}"
 
-wa-termination-batch:
-  job:
-    kind: CronJob
-    releaseNameOverride: ${SERVICE_NAME}-wa-termination-batch
-    name: ${SERVICE_NAME}-wa-termination-batch
-    schedule: "*/5 * * * *"
-    aadIdentityName: wa
-    keyVaults:
-      wa:
-        secrets:
-          - s2s-secret-task-monitor
-    environment:
-      S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-      S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
-      WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
-      JOB_NAME: "TERMINATION"
-      ALLOW_CONFIG_MUTATIONS: true
 
-wa-reconfiguration-batch:
-  job:
-    kind: CronJob
-    releaseNameOverride: ${SERVICE_NAME}-wa-job-reconfiguration
-    name: ${SERVICE_NAME}-wa-job-reconfiguration
-    schedule: "*/5 * * * *"
-    aadIdentityName: wa
-    keyVaults:
-      wa:
-        secrets:
-          - s2s-secret-task-monitor
-    environment:
-      S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-      S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
-      WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
-      JOB_NAME: "RECONFIGURATION"
-      ALLOW_CONFIG_MUTATIONS: true
+  wa-task-management-api:
+    java:
+      releaseNameOverride: ${SERVICE_NAME}-wa-task-management-api
+      ingressHost: wa-task-management-api-${SERVICE_FQDN}
+      readinessDelay: 90
+      secrets:
+        POSTGRES_PASSWORD:
+          secretRef: postgres
+          key: PASSWORD
+          disabled: false
+      environment:
+        CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
+        ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
+        POSTGRES_HOST: sscs-preview.postgres.database.azure.com
+        POSTGRES_NAME: "pr-${CHANGE_ID}-cft_task_db"
+        POSTGRES_USERNAME: hmcts
+        POSTGRES_CONNECTION_OPTIONS: "?currentSchema=cft_task_db&stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
+        SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: cft_task_db
+        SPRING_FLYWAY_DEFAULT_SCHEMA: cft_task_db
+        SPRING_FLYWAY_SCHEMAS: cft_task_db
+        CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
+        S2S_SECRET_TASK_MANAGEMENT_API: ${S2S_SECRET_TASK_MANAGEMENT_API}
+        WA_IDAM_CLIENT_SECRET: ${WA_IDAM_CLIENT_SECRET}
+        WA_SYSTEM_USERNAME: ${WA_SYSTEM_USERNAME}
+        WA_SYSTEM_PASSWORD: ${WA_SYSTEM_PASSWORD}
+        ALLOWED_CASE_TYPES: "benefit"
 
+  wa-task-monitor:
+    java:
+      ingressHost: wa-task-monitor-${SERVICE_FQDN}
+      releaseNameOverride: ${SERVICE_NAME}-wa-task-monitor
+      readinessDelay: 90
+      environment:
+        CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
+        WA_TASK_MANAGEMENT_API_URL: http://{{ .Release.Name }}-wa-task-management-api
+        CASE_EVENT_HANDLER_SERVICE_URL: http://{{ .Release.Name }}-wa-case-event-handler
+        CCD_SEARCH_URL: http://{{ .Release.Name }}-ccd-data-store-api
+        CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
+        ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
+        S2S_SECRET_TASK_MONITOR: ${S2S_SECRET_TASK_MONITOR}
+        WA_IDAM_CLIENT_SECRET: ${WA_IDAM_CLIENT_SECRET}
+        WA_SYSTEM_USERNAME: ${WA_SYSTEM_USERNAME}
+        WA_SYSTEM_PASSWORD: ${WA_SYSTEM_PASSWORD}
+
+  wa-case-event-handler:
+    java:
+      ingressHost: wa-case-event-handler-${SERVICE_FQDN}
+      releaseNameOverride: ${SERVICE_NAME}-wa-case-event-handler
+      readinessDelay: 90
+      autoscaling:
+        enabled: false
+      secrets:
+        AZURE_SERVICE_BUS_CONNECTION_STRING:
+          secretRef: sscs-sb-preview
+          key: connectionString
+        POSTGRES_PASSWORD:
+          secretRef: postgres
+          key: PASSWORD
+          disabled: false
+      environment:
+        CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
+        CCD_URL: http://{{ .Release.Name }}-ccd-data-store-api
+        CCD_SEARCH_URL: http://{{ .Release.Name }}-ccd-data-store-api
+        ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
+        WA_WORKFLOW_API_URL: http://{{ .Release.Name }}-wa-workflow-api
+        WA_TASK_MANAGEMENT_API_URL: http://{{ .Release.Name }}-wa-task-management-api
+        AZURE_SERVICE_BUS_TOPIC_NAME: "${SERVICE_NAME}-servicebus-ccd-events"
+        AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-ccd-events"
+        AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-ccd-events"
+        POSTGRES_HOST: sscs-preview.postgres.database.azure.com
+        POSTGRES_NAME: "pr-${CHANGE_ID}-wa-case-event-handler"
+        POSTGRES_USERNAME: hmcts
+        POSTGRES_CONNECTION_OPTIONS: ""
+        WA_IDAM_CLIENT_SECRET: ${WA_IDAM_CLIENT_SECRET}
+        S2S_SECRET_CASE_EVENT_HANDLER: ${S2S_SECRET_CASE_EVENT_HANDLER}
+        LAUNCH_DARKLY_SDK_KEY: ${WA_LAUNCH_DARKLY_SDK_KEY}
+
+  wa-workflow-api:
+    java:
+      ingressHost: wa-workflow-api-${SERVICE_FQDN}
+      releaseNameOverride: ${SERVICE_NAME}-wa-workflow-api
+      readinessDelay: 90
+      secrets:
+        POSTGRES_PASSWORD:
+          secretRef: postgres
+          key: PASSWORD
+          disabled: false
+      environment:
+        CAMUNDA_URL: http://{{ .Release.Name }}-camunda/engine-rest
+        POSTGRES_HOST: sscs-preview.postgres.database.azure.com
+        POSTGRES_NAME: "pr-${CHANGE_ID}-wa_workflow_api"
+        POSTGRES_USERNAME: hmcts
+        POSTGRES_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
+        DB_READER_USERNAME: hmcts
+        S2S_SECRET_WORKFLOW_API: ${S2S_SECRET_WORKFLOW_API}
+        TASK_MANAGEMENT_URL: http://{{ .Release.Name }}-wa-task-management-api
+        LAUNCH_DARKLY_SDK_KEY: ${WA_LAUNCH_DARKLY_SDK_KEY}
+        SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA: wa_workflow_api
+        SPRING_FLYWAY_SCHEMAS: wa_workflow_api
+
+  wa-message-cron-service:
+    job:
+      releaseNameOverride: ${SERVICE_NAME}-wa-message-cron-service
+      environment:
+        WA_CASE_EVENT_HANDLER_SERVICE_URL: http://{{ .Release.Name }}-wa-case-event-handler
+
+  wa-initiation-batch:
+    job:
+      kind: CronJob
+      releaseNameOverride: ${SERVICE_NAME}-wa-initiation-batch
+      name: ${SERVICE_NAME}-wa-initiation-batch
+      schedule: "*/5 * * * *"
+      aadIdentityName: wa
+      keyVaults:
+        wa:
+          secrets:
+            - s2s-secret-task-monitor
+      environment:
+        S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+        S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
+        WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
+        JOB_NAME: "INITIATION"
+        ALLOW_CONFIG_MUTATIONS: true
+
+  wa-termination-batch:
+    job:
+      kind: CronJob
+      releaseNameOverride: ${SERVICE_NAME}-wa-termination-batch
+      name: ${SERVICE_NAME}-wa-termination-batch
+      schedule: "*/5 * * * *"
+      aadIdentityName: wa
+      keyVaults:
+        wa:
+          secrets:
+            - s2s-secret-task-monitor
+      environment:
+        S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+        S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
+        WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
+        JOB_NAME: "TERMINATION"
+        ALLOW_CONFIG_MUTATIONS: true
+
+  wa-reconfiguration-batch:
+    job:
+      kind: CronJob
+      releaseNameOverride: ${SERVICE_NAME}-wa-job-reconfiguration
+      name: ${SERVICE_NAME}-wa-job-reconfiguration
+      schedule: "*/5 * * * *"
+      aadIdentityName: wa
+      keyVaults:
+        wa:
+          secrets:
+            - s2s-secret-task-monitor
+      environment:
+        S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+        S2S_MICROSERVICE_NAME_TASK_MONITOR: "wa_task_monitor"
+        WA_TASK_MONITOR_SERVICE_URL: http://{{ .Release.Name }}-wa-task-monitor
+        JOB_NAME: "RECONFIGURATION"
+        ALLOW_CONFIG_MUTATIONS: true
 
 ccd-message-publisher:
   java:
