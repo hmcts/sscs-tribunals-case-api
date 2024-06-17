@@ -2,7 +2,7 @@
   "case_details": {
     "id": "CASE_ID_TO_BE_REPLACED",
     "jurisdiction": "SSCS",
-    "state": "validAppeal",
+    "state": "withDwp",
     "case_type_id": "Benefit",
     "created_date": [
       2018,
@@ -24,33 +24,53 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "benefitCode": "099",
+      "issueCode": "TP",
+      "dwpFurtherInfo": "No",
+      "dwpAT38Document": {
+        "documentLink": {
+          "document_url": "DWP_AT38_DOCUMENT_URL",
+          "document_binary_url": "DWP_AT38_BINARY_DOCUMENT_URL",
+          "document_filename": "testAT38Document.pdf"
+        },
+        "documentFilename": "dwpAT38Document"
+      },
+      "dwpResponseDocument": {
+        "documentLink": {
+          "document_url": "DWP_RESPONSE_DOCUMENT_URL",
+          "document_binary_url": "DWP_RESPONSE_BINARY_DOCUMENT_URL",
+          "document_filename": "responseDocument.pdf"
+        },
+        "documentFilename": "responseDocument"
+      },
+      "dwpState": "noAction",
+      "dwpEvidenceBundleDocument": {
+        "documentLink": {
+          "document_url": "DWP_EVIDENCE_DOCUMENT_URL",
+          "document_binary_url": "DWP_EVIDENCE_BINARY_DOCUMENT_URL",
+          "document_filename": "evidenceDocument.pdf"
+        },
+        "documentFilename": "evidenceDocument"
+      },
+      "dwpFurtherEvidenceStates": "noAction",
+      "jointParty": "Yes",
+      "jointPartyName": {
+        "title": "mr",
+        "firstName": "Joint",
+        "lastName": "Party"
+      },
+      "jointPartyAddressSameAsAppellant": "No",
+      "jointPartyAddress": {
+        "line1": "30 Dale Street",
+        "line2": "Village",
+        "town": "Liverpool",
+        "county": "Merseyside",
+        "postcode": "TS1 1ST"
+      },
       "dwpTimeExtension": [
       ],
-      "generatedNino": "NINO_TO_BE_REPLACED",
-      "createdInGapsFrom": "CREATED_IN_GAPS_FROM",
-      "hearings": [
-        {
-          "value": {
-            "venue": {
-              "name": "Prudential House",
-              "address": {
-                "line1": "2-10 Topping Street",
-                "line2": "",
-                "town": "Blackpool",
-                "county": "",
-                "postcode": "FY1 3AB"
-              },
-              "googleMapLink": "https://www.google.com/maps/place/2-10+Topping+Street+Blackpool+FY1+3AB/@53.820175,-3.050717"
-            },
-            "hearingDate": "2018-06-01",
-            "time": "11:40:00",
-            "adjourned": "No",
-            "eventDate": null,
-            "hearingId": "3698764"
-          },
-          "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
-        }
-      ],
+      "generatedNino": "JT 12 34 56 D",
+      "createdInGapsFrom": "readyToList",
       "subscriptions": {
         "appellantSubscription": {
           "wantSmsNotifications": "Yes",
@@ -89,13 +109,13 @@
       },
       "appeal": {
         "mrnDetails": {
-          "dwpIssuingOffice": "5",
+          "dwpIssuingOffice": "test-hmcts-address",
           "mrnDate": "MRN_DATE_TO_BE_REPLACED"
         },
         "appellant": {
           "name": {
-            "title": "Miss",
-            "firstName": "AN",
+            "title": "Mr",
+            "firstName": "User",
             "lastName": "Test"
           },
           "address": {
@@ -103,49 +123,25 @@
             "line2": "Hutton",
             "town": "Brentwood",
             "county": "Essex",
-            "postcode": "CM13 1AQ"
+            "postcode": "TS1 1ST"
           },
           "contact": {
-            "email": null,
-            "phone": "01424 752419",
-            "mobile": null
+            "email": "mail@example.com",
+            "phone": "01234567890",
+            "mobile": "01234567890"
           },
           "identity": {
-            "dob": "1900-01-01",
-            "nino": "NINO_TO_BE_REPLACED"
+            "dob": "1904-03-10",
+            "nino": "AB 22 55 66 B"
           },
           "isAppointee": null
         },
         "benefitType": {
-          "code": "PIP",
-          "description": "Personal Independence Payment"
+          "code": "UC",
+          "description": "Universal Credit"
         },
         "receivedVia": "Paper",
-        "hearingOptions": {
-          "wantsToAttend": "No",
-          "other": "No"
-        },
         "appealReasons": {
-        },
-        "rep": {
-          "hasRepresentative": "Yes",
-          "name": {
-            "title": "Mr",
-            "firstName": "Harry",
-            "lastName": "Potter"
-          },
-          "address": {
-            "line1": "123 Hairy Lane",
-            "line2": "Off Hairy Park",
-            "town": "Town",
-            "county": "County",
-            "postcode": "TS3 3ST"
-          },
-          "contact": {
-            "email": "harry.potter@wizards.com",
-            "mobile": "07411999999"
-          },
-          "organisation": "HP Ltd"
         },
         "signer": null,
         "hearingType": "paper"
@@ -601,5 +597,5 @@
     }
   },
   "case_details_before": null,
-  "event_id": "validAppealCreated"
+  "event_id": "dwpUploadResponse"
 }
