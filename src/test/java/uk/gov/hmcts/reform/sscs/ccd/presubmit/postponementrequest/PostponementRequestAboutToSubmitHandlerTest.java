@@ -80,7 +80,7 @@ public class PostponementRequestAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new PostponementRequestAboutToSubmitHandler(new PostponementRequestService(), footerService);
+        handler = new PostponementRequestAboutToSubmitHandler(new PostponementRequestService(), footerService, idamService);
 
         Hearing hearing = Hearing.builder().value(HearingDetails.builder()
             .hearingDate(LocalDate.now().plusDays(1).toString())
@@ -162,9 +162,23 @@ public class PostponementRequestAboutToSubmitHandlerTest {
         assertThat(document.getValue().getDocumentType(), is(POSTPONEMENT_REQUEST.getValue()));
         assertThat(document.getValue().getDocumentLink().getDocumentFilename(), is("example.pdf"));
         assertThat(document.getValue().getOriginalPartySender(), is(UploadParty.DWP.getValue()));
+        assertThat(document.getValue().getPartyUploaded(), is(nullValue()));
         assertThat(sscsCaseData.getInterlocReviewState(), is(InterlocReviewState.REVIEW_BY_TCW));
         assertThat(sscsCaseData.getInterlocReferralReason(), is(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST));
         assertThat(sscsCaseData.getPostponementRequest().getUnprocessedPostponementRequest(), is(YES));
+    }
+
+    @Test
+    public void givenAPostponementRequestByDwp_setUploadPartyToDwp() {
+        UserDetails dwpUserDetails = UserDetails.builder().roles(new ArrayList<>(asList("dwp", UserRole.DWP.getValue()))).build();
+        when(idamService.getUserDetails(USER_AUTHORISATION)).thenReturn(dwpUserDetails);
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(sscsCaseData.getSscsDocument().size(), is(1));
+        final SscsDocument document = sscsCaseData.getSscsDocument().get(0);
+        assertThat(document.getValue().getDocumentType(), is(POSTPONEMENT_REQUEST.getValue()));
+        assertThat(document.getValue().getOriginalPartySender(), is(UploadParty.DWP.getValue()));
+        assertThat(document.getValue().getPartyUploaded(), is(UploadParty.DWP));
     }
 
     @Test
