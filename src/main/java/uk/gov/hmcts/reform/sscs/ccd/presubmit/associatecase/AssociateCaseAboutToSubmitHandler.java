@@ -73,7 +73,7 @@ public class AssociateCaseAboutToSubmitHandler implements PreSubmitCallbackHandl
             }
         }
         if (!cases.isEmpty()) {
-            associatedCaseLinkHelper.addLinkToOtherAssociatedCases(cases, caseDetails.getCaseData().getCcdCaseId());
+            associatedCaseLinkHelper.addLinkToOtherAssociatedCasesV2Enabled(cases, caseDetails.getCaseData().getCcdCaseId());
         }
         return preSubmitCallbackResponse;
     }

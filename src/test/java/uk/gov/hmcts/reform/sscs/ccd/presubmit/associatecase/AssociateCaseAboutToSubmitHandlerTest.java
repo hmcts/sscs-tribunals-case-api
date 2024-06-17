@@ -95,7 +95,7 @@ public class AssociateCaseAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(associatedCaseLinkHelper, times(1)).addLinkToOtherAssociatedCases(any(), eq("1"));
+        verify(associatedCaseLinkHelper, times(1)).addLinkToOtherAssociatedCasesV2Enabled(any(), eq("1"));
     }
 
     @Test
@@ -111,7 +111,7 @@ public class AssociateCaseAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(associatedCaseLinkHelper, times(0)).addLinkToOtherAssociatedCases(any(), any());
+        verify(associatedCaseLinkHelper, times(0)).addLinkToOtherAssociatedCasesV2Enabled(any(), any());
     }
 
     @Test(expected = IllegalStateException.class)
