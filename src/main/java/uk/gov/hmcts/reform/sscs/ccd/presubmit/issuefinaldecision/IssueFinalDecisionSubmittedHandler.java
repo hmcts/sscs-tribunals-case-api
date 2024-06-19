@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
@@ -19,6 +20,8 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 import uk.gov.hmcts.reform.sscs.service.event.EventPublisher;
 
+import java.util.Optional;
+
 @Component
 @Slf4j
 @AllArgsConstructor
@@ -27,6 +30,9 @@ public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
     private final EventPublisher eventPublisher;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
+
+    @Value("${feature.handle-ccd-callbackMap-v2.enabled}")
+    private boolean isHandleCcdCallbackMapV2Enabled;
 
 
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -50,10 +56,19 @@ public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
             Correction correction = caseData.getPostHearing().getCorrection();
 
             if (isYes(correction.getIsCorrectionFinalDecisionInProgress())) {
-                correction.setIsCorrectionFinalDecisionInProgress(NO);
-                caseData = ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, caseData);
+                if (isHandleCcdCallbackMapV2Enabled) {
+                    Optional<SscsCaseData> sscsCaseDataOptional = ccdCallbackMapService.handleCcdCallbackMapV2(
+                            CorrectionActions.GRANT,
+                            ccdCallbackMapService.getCcdCallbackMutator(CorrectionActions.GRANT,
+                                    caseData.getCcdCaseId(), isPostHearingsEnabled),
+                            callback.getCaseDetails().getId());
+                    return new PreSubmitCallbackResponse<>(sscsCaseDataOptional.orElse(caseData));
+                } else {
+                    correction.setIsCorrectionFinalDecisionInProgress(NO);
+                    caseData = ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, caseData);
 
-                return new PreSubmitCallbackResponse<>(caseData);
+                    return new PreSubmitCallbackResponse<>(caseData);
+                }
             }
         }
         log.info("Publishing message for the event {}", callback.getEvent());
