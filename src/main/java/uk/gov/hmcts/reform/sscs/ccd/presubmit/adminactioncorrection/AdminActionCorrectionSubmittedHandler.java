@@ -55,6 +55,7 @@ public class AdminActionCorrectionSubmittedHandler implements PreSubmitCallbackH
         }
 
         if (isHandleCcdCallbackMapV2Enabled) {
+            log.info("Admin Action Correction: handling adminActionCorrection v2 {} for case {}", adminCorrectionType, caseId);
             adminCorrectionType.setClearPostHearingFields(isPostHearingsEnabled);
             Optional<SscsCaseData> sscsCaseDataOptional = ccdCallbackMapService.handleCcdCallbackMapV2(
                     adminCorrectionType,
