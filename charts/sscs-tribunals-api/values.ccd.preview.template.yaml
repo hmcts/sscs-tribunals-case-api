@@ -211,7 +211,7 @@ ccd:
       readinessDelay: 240
       livenessDelay: 240
       environment:
-        ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
+        ROLE_ASSIGNMENT_DB_NAME: "pr-${CHANGE_ID}-role-assignment"
         ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
         ROLE_ASSIGNMENT_DB_USERNAME: hmcts
         CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
@@ -583,7 +583,7 @@ sscs-tya-notif:
       AMQP_USERNAME: "RootManageSharedAccessKey"
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
-      JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
+      JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscsjobscheduler"
       JOB_SCHEDULER_DB_HOST: sscs-preview.postgres.database.azure.com
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
       JOB_SCHEDULER_DB_USERNAME: hmcts
@@ -599,6 +599,10 @@ sscs-tya-notif:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
         key: primaryKey
+      JOB_SCHEDULER_DB_PASSWORD:
+        secretRef: "{{ .Values.global.postgresSecret }}"
+        key: PASSWORD
+        disabled: false
     keyVaults:
       sscs:
         secrets:
