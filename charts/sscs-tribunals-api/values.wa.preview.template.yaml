@@ -176,7 +176,6 @@ aac-manage-case-assignment:
           - name: notify-mca-api-key-secret
             alias: NOTIFY_MCA_API_KEY
 
-
 #Enable for queues/topics
 #If you need a subscription for a topic, topic name should be not longer than 10 characters
 servicebus:
@@ -203,15 +202,6 @@ postgresql:
   flexibleserver: sscs-preview
   setup:
     databases:
-      - name: "pr-${CHANGE_ID}-data-store"
-      - name: "pr-${CHANGE_ID}-definition-store"
-      - name: "pr-${CHANGE_ID}-user-profile"
-      - name: "pr-${CHANGE_ID}-draftstore"
-      - name: "pr-${CHANGE_ID}-evidence"
-      - name: "pr-${CHANGE_ID}-annotation"
-      - name: "pr-${CHANGE_ID}-role-assignment"
-      - name: "pr-${CHANGE_ID}-hmc-cft-hearing-service"
-      - name: "pr-${CHANGE_ID}-sscsjobscheduler"
       - name: "pr-${CHANGE_ID}-camunda"
       - name: "pr-${CHANGE_ID}-wa-task-management-api"
       - name: "pr-${CHANGE_ID}-wa-case-event-handler"
@@ -256,7 +246,6 @@ wa:
         S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
         CAMUNDA_DB_CONN_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
         RELEASE_REVISION: "{{ .Release.Revision }}"
-
 
   wa-task-management-api:
     java:
