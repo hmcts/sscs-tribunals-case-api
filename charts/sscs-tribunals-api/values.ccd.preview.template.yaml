@@ -600,7 +600,7 @@ sscs-tya-notif:
         secretRef: sscs-sb-preview
         key: primaryKey
       JOB_SCHEDULER_DB_PASSWORD:
-        secretRef: "{{ .Values.global.postgresSecret }}"
+        secretRef: postgres
         key: PASSWORD
         disabled: false
     keyVaults:
