@@ -56,27 +56,20 @@ java:
     AMQP_PASSWORD:
       secretRef: sscs-sb-preview
       key: primaryKey
-  postgresql:
-    enabled: true
-    primary:
-      persistence:
-        enabled: false
-      initdb:
-        scripts:
-          init.sql: |
-            CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "draftstore" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "evidence" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "annotation" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "hmc-cft-hearing-service" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "sscsjobscheduler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-    auth:
-      username: "hmcts"
-      password: ${SHARED_DB_PASSWORD}
 
+postgresql:
+  enabled: true
+  flexibleserver: sscs-preview
+  setup:
+    databases:
+      - name: "pr-${CHANGE_ID}-data-store"
+      - name: "pr-${CHANGE_ID}-definition-store"
+      - name: "pr-${CHANGE_ID}-user-profile"
+      - name: "pr-${CHANGE_ID}-evidence"
+      - name: "pr-${CHANGE_ID}-annotation"
+      - name: "pr-${CHANGE_ID}-role-assignment"
+      - name: "pr-${CHANGE_ID}-hmc-cft-hearing-service"
+      - name: "pr-${CHANGE_ID}-sscsjobscheduler"
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -218,7 +211,6 @@ ccd:
       readinessDelay: 240
       livenessDelay: 240
       environment:
-        ROLE_ASSIGNMENT_DB_HOST: ${SERVICE_NAME}-postgresql
         ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
         ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
         ROLE_ASSIGNMENT_DB_USERNAME: hmcts
@@ -449,7 +441,6 @@ ccd:
       image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
       imagePullPolicy: Always
       enviroment:
-        USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
         USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
         USER_PROFILE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_definition,ccd_admin,sscs
       keyVaults: [ ]
@@ -459,7 +450,6 @@ ccd:
       image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
       imagePullPolicy: Always
       environment:
-        DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator,ccd_case_document_am_api
@@ -477,7 +467,6 @@ ccd:
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
       environment:
-        DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
         DEFINITION_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
@@ -595,7 +584,7 @@ sscs-tya-notif:
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
       JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
-      JOB_SCHEDULER_DB_HOST: ${SERVICE_NAME}-postgresql
+      JOB_SCHEDULER_DB_HOST: sscs-preview.postgres.database.azure.com
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
       JOB_SCHEDULER_DB_USERNAME: hmcts
       JOB_SCHEDULER_DB_PASSWORD: ${SHARED_DB_PASSWORD}
