@@ -151,7 +151,7 @@ withPipeline(type, product, component) {
                 env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
                 env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
             }
-            for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd+wa") ) {
+            for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:wa") ) {
                 env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
                 env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
                 env.CAMUNDA_BASE_URL = "https://camunda-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
