@@ -10,13 +10,17 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_ACTION_CORRECT
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType.CORRECTION;
 
+import java.util.Optional;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdminCorrectionType;
@@ -117,4 +121,28 @@ class AdminActionCorrectionSubmittedHandlerTest {
                 .containsOnly("Invalid Admin Correction Type Selected or correction "
                         + "selected as callback is null");
     }
+
+    @ParameterizedTest
+    @EnumSource(value = AdminCorrectionType.class)
+    void givenAdminCorrection_shouldReturnCallCorrectCallback_whenCcdCallbackMapV2IsEnabled(AdminCorrectionType value) {
+        ReflectionTestUtils.setField(handler, "isHandleCcdCallbackMapV2Enabled", true);
+        caseData.getPostHearing().getCorrection().setAdminCorrectionType(value);
+        Consumer<SscsCaseData> mutator = Mockito.mock(Consumer.class);
+
+        when(caseDetails.getId()).thenReturn(CASE_ID);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(ccdCallbackMapService.handleCcdCallbackMapV2(value, mutator, CASE_ID))
+                .thenReturn(Optional.of(SscsCaseData.builder().build()));
+        when(ccdCallbackMapService.getCcdCallbackMutator(value, String.valueOf(CASE_ID), true))
+                .thenReturn(mutator);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        verify(ccdCallbackMapService, times(1))
+                .handleCcdCallbackMapV2(value, mutator, CASE_ID);
+    }
+
 }
