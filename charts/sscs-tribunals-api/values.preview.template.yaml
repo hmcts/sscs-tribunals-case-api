@@ -39,6 +39,7 @@ java:
     RUN_DB_MIGRATION_ON_STARTUP: true
     TEST_RECIPIENTS_POSTCODE: "*"
     TESTING_SUPPORT_ENABLED: true
+    HANDLE_CCD_CALLBACKMAP_V2: true
   postgresql:
     enabled: true
 
