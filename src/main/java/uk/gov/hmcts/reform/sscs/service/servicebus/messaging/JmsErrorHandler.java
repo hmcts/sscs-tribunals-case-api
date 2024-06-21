@@ -9,7 +9,23 @@ public class JmsErrorHandler implements ErrorHandler {
 
     @Override
     public void handleError(@NonNull Throwable throwable) {
-        log.warn("spring jms custom error handling example");
-        log.error(throwable.getCause().getMessage());
+        log.warn("Spring JMS custom error handling triggered");
+
+        // Log the full error message and stack trace
+        log.error("Error occurred: {}", throwable.getMessage(), throwable);
+
+        // Log the root cause if available
+        Throwable rootCause = getRootCause(throwable);
+        if (rootCause != null) {
+            log.error("Root cause: {}", rootCause.getMessage(), rootCause);
+        }
+    }
+
+    private Throwable getRootCause(Throwable throwable) {
+        Throwable cause = throwable;
+        while (cause.getCause() != null && cause != cause.getCause()) {
+            cause = cause.getCause();
+        }
+        return cause;
     }
 }
