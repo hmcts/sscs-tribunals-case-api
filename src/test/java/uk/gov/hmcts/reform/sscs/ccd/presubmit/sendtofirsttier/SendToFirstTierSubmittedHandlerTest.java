@@ -13,6 +13,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_FIRST_TIER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPPER_TRIBUNAL_DECISION;
 
 import java.util.Optional;
+import java.util.function.Consumer;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -94,7 +96,7 @@ public class SendToFirstTierSubmittedHandlerTest {
         when(callback.getEvent()).thenReturn(SEND_TO_FIRST_TIER);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(ccdCallbackMapService.handleCcdCallbackMapV2(eq(value), any(), eq(CASE_ID)))
+        when(ccdCallbackMapService.handleCcdCallbackMapV2(eq(value), any(Consumer.class), eq(CASE_ID)))
                 .thenReturn(Optional.of(SscsCaseData.builder().build()));
 
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -102,7 +104,7 @@ public class SendToFirstTierSubmittedHandlerTest {
 
         assertThat(response.getErrors()).isEmpty();
         verify(ccdCallbackMapService, times(1))
-                .handleCcdCallbackMapV2(eq(value), any(), eq(CASE_ID));
+                .handleCcdCallbackMapV2(eq(value), any(Consumer.class), eq(CASE_ID));
     }
 
     @ParameterizedTest
