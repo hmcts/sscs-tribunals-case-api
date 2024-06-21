@@ -69,10 +69,10 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
 
             if (nonNull(overrideFields)) {
                 HearingChannel hearingChannel = overrideFields.getAppellantHearingChannel();
-                HearingInterpreter appellantInterpreter = overrideFields.getAppellantInterpreter();
                 if (nonNull(hearingChannel)) {
                     SscsUtil.updateHearingChannel(sscsCaseData, hearingChannel);
                 }
+                HearingInterpreter appellantInterpreter = overrideFields.getAppellantInterpreter();
                 if (nonNull(appellantInterpreter)) {
                     SscsUtil.updateHearingInterpreter(sscsCaseData, callbackResponse, appellantInterpreter);
                 }

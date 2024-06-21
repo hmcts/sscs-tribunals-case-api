@@ -463,13 +463,14 @@ public class SscsUtil {
                                                 PreSubmitCallbackResponse<SscsCaseData> response, HearingInterpreter appellantInterpreter) {
         Appeal appeal = caseData.getAppeal();
 
-        HearingOptions hearingOptions = appeal.getHearingOptions();
-        if (isNull(hearingOptions)) {
-            hearingOptions = HearingOptions.builder().build();
-            appeal.setHearingOptions(hearingOptions);
-        }
-
         if (nonNull(appellantInterpreter.getIsInterpreterWanted())) {
+
+            HearingOptions hearingOptions = appeal.getHearingOptions();
+            if (isNull(hearingOptions)) {
+                hearingOptions = HearingOptions.builder().build();
+                appeal.setHearingOptions(hearingOptions);
+            }
+
             String interpreterWanted = appellantInterpreter.getIsInterpreterWanted().getValue();
             hearingOptions.setLanguageInterpreter(interpreterWanted);
 
