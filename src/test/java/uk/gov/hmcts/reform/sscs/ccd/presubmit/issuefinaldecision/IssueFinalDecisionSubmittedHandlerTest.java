@@ -50,7 +50,7 @@ public class IssueFinalDecisionSubmittedHandlerTest {
     public void setUp() {
         openMocks(this);
 
-        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, eventPublisher, true);
+        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, eventPublisher, true, false);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -78,7 +78,7 @@ public class IssueFinalDecisionSubmittedHandlerTest {
 
     @Test
     public void givenPostHearingsFlagIsFalse_thenOnlyCallCallback() {
-        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, eventPublisher, false);
+        handler = new IssueFinalDecisionSubmittedHandler(ccdCallbackMapService, eventPublisher, false, false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
