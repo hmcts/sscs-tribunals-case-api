@@ -59,7 +59,8 @@ public class MessagingConfig {
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);
         returnValue.setSubscriptionDurable(Boolean.TRUE);
-        returnValue.setErrorHandler(new JmsErrorHandler());
+        returnValue.setErrorHandler(t -> log.error("Error while processing JMS message", t));
+        returnValue.setExceptionListener(t -> log.error("Exception while processing JMS message", t));
         return returnValue;
     }
 
