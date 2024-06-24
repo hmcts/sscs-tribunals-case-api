@@ -2,7 +2,7 @@
   "case_details": {
     "id": "CASE_ID_TO_BE_REPLACED",
     "jurisdiction": "SSCS",
-    "state": "validAppeal",
+    "state": "validAppealCreated",
     "case_type_id": "Benefit",
     "created_date": [
       2018,
@@ -26,8 +26,8 @@
     "case_data": {
       "dwpTimeExtension": [
       ],
-      "generatedNino": "NINO_TO_BE_REPLACED",
-      "createdInGapsFrom": "CREATED_IN_GAPS_FROM",
+      "generatedNino": "JT 12 34 56 D",
+      "directionTypeDl": "appealToProceed",
       "hearings": [
         {
           "value": {
@@ -89,7 +89,7 @@
       },
       "appeal": {
         "mrnDetails": {
-          "dwpIssuingOffice": "5",
+          "dwpIssuingOffice": "test-hmcts-address",
           "mrnDate": "MRN_DATE_TO_BE_REPLACED"
         },
         "appellant": {
@@ -112,7 +112,7 @@
           },
           "identity": {
             "dob": "1900-01-01",
-            "nino": "NINO_TO_BE_REPLACED"
+            "nino": "JT 12 34 56 D"
           },
           "isAppointee": null
         },
@@ -601,5 +601,5 @@
     }
   },
   "case_details_before": null,
-  "event_id": "validAppealCreated"
+  "event_id": "directionIssued"
 }

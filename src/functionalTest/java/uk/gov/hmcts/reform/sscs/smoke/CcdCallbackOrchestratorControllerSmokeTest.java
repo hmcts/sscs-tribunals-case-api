@@ -58,7 +58,7 @@ public class CcdCallbackOrchestratorControllerSmokeTest {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("ServiceAuthorization", idamTokens.getServiceAuthorization());
-        String jsonCallbackForTest = getJsonCallbackForTest("validAppealCreatedCallback.json");
+        String jsonCallbackForTest = getJsonCallbackForTest("interlocutoryReviewStateCallback.json");
         HttpEntity<String> request = new HttpEntity<String>(jsonCallbackForTest, headers);
         ResponseEntity<String> response = restTemplate.exchange("/send", HttpMethod.POST, request, String.class);
 
