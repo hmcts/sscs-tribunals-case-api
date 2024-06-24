@@ -69,23 +69,23 @@ services:
       image: "hmctspublic.azurecr.io/wa/task-management-api:latest"
       container_name: wa-task-management-api
       environment:
-        - CAMUNDA_URL=http://wa-camunda-bpm:8999/engine-rest
-        - S2S_URL=http://host.docker.internal:4502/
-        - IDAM_URL=http://rse-idam-simulator:5062
-        - CCD_URL=http://host.docker.internal:4452
-        - OPEN_ID_IDAM_URL=http://rse-idam-simulator:5062
-        - ROLE_ASSIGNMENT_URL=http://host.docker.internal:4096
-        - POSTGRES_HOST=shared-database-pg12
-        - POSTGRES_PORT=5432
-        - POSTGRES_NAME=cft_task_db
-        - POSTGRES_USERNAME=postgres
-        - POSTGRES_PASSWORD=admin
-        - ALLOWED_JURISDICTIONS=wa,ia,sscs,civil
-        - ALLOWED_CASE_TYPES=asylum,wacasetype,sscs,civil,benefit
-        - WA_S2S_AUTHORIZED_SERVICES=ccd,ccd_data,ccd_gw,ccd_ps,iac,wa_task_management_api,xui_webapp,wa_task_monitor,camunda_bpm,wa_workflow_api,wa_case_event_handler
-        - LAUNCH_DARKLY_SDK_KEY=${LAUNCH_DARKLY_SDK_KEY}
-        - WA_SYSTEM_USERNAME=${WA_SYSTEM_USERNAME}
-        - WA_SYSTEM_PASSWORD=${WA_SYSTEM_PASSWORD}
+        CAMUNDA_URL: http://wa-camunda-bpm:8999/engine-rest
+        S2S_URL: http://host.docker.internal:4502/
+        IDAM_URL: http://rse-idam-simulator:5062
+        CCD_URL: http://host.docker.internal:4452
+        OPEN_ID_IDAM_URL: http://rse-idam-simulator:5062
+        ROLE_ASSIGNMENT_URL: http://host.docker.internal:4096
+        POSTGRES_HOST: shared-database-pg12
+        POSTGRES_PORT: 5432
+        POSTGRES_NAME: cft_task_db
+        POSTGRES_USERNAME: postgres
+        POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:admin}"
+        ALLOWED_JURISDICTIONS: wa,ia,sscs,civil
+        ALLOWED_CASE_TYPES: asylum,wacasetype,sscs,civil,benefit
+        WA_S2S_AUTHORIZED_SERVICES: ccd,ccd_data,ccd_gw,ccd_ps,iac,wa_task_management_api,xui_webapp,wa_task_monitor,camunda_bpm,wa_workflow_api,wa_case_event_handler
+        LAUNCH_DARKLY_SDK_KEY: "${LAUNCH_DARKLY_SDK_KEY}"
+        WA_SYSTEM_USERNAME: "${WA_SYSTEM_USERNAME}"
+        WA_SYSTEM_PASSWORD: "${WA_SYSTEM_PASSWORD}"
       ports:
         - 8087:8087
       extra_hosts:
