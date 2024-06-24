@@ -13,7 +13,7 @@ import uk.gov.hmcts.contino.GradleBuilder
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
-def dmnBranch = "SSCS-12480-challenged-access"
+def dmnBranch = "SSCS-12453_permissions_changes"
 def waStandaloneBranch = "master"
 
 def gradleBuilder = new GradleBuilder(this, product)
