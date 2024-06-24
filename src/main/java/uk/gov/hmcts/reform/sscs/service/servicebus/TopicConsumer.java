@@ -55,8 +55,8 @@ public class TopicConsumer {
             if (retry > maxRetryAttempts || isException(e)) {
                 log.error("Caught unknown unrecoverable error %s for message id {}", messageId, e);
             } else {
-                log.error("Caught recoverable error {}, retrying {} out of {} for message id {}",
-                    e.getMessage(), retry, maxRetryAttempts, messageId, e);
+                log.error("Caught recoverable error while retrying {} out of {} for message id {}",
+                    retry, maxRetryAttempts, messageId, e);
                 processMessageWithRetry(message, retry + 1, messageId);
             }
         }
