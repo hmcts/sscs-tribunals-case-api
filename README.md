@@ -36,17 +36,6 @@ Extra compose files can be provided in src/cftlib/resources/docker.
 
 #### Cftlib - Docker Desktop v4.30
 
-**_First Time Setup_**
-
-As part of this setup the definitions repository has been added as a git submodule.
-1. `cd definitions`
-2. `git submodule init` & `git submodule update`
-4. `git checkout master` & `git pull`
-
-You should also run `docker pull hmctspublic.azurecr.io/hmcts/rse/rse-idam-simulator:latest`
-
-_Ensure you have removed all existing / leftover containers_
-
 **On Mac**
 
 1. `sudo nano /etc/hosts`

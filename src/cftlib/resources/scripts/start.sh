@@ -15,4 +15,17 @@ loadSecret "LAUNCH_DARKLY_SDK_KEY" "wa-aat" "ld-secret"
 
 echo "Secret fetching complete"
 
+az acr login --name hmctspublic --subscription 8999dec3-0104-4a27-94ee-6588559729d1
+
+echo "Switch to definitions folder"
+cd definitions
+git submodule update --init
+git checkout master
+git pull
+echo "Switch to parent folder"
+cd ../
+
+echo "pull rse-idam-simulator..."
+docker pull hmctspublic.azurecr.io/hmcts/rse/rse-idam-simulator:latest
+
 ./gradlew bootWithCCD
