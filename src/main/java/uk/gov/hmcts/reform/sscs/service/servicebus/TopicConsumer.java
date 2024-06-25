@@ -62,16 +62,14 @@ public class TopicConsumer {
 
     private void processEvidenceShareMessageWithRetry(String message, int retry, String messageId) {
         try {
-            log.info("Message Id {} received from the service bus by evidence share service", messageId);
+            log.info("Message Id {} received from the service bus by evidence share service, attempt {}", messageId, retry);
             processMessageForEvidenceShare(message, messageId);
         } catch (Exception e) {
             if (retry > maxRetryAttempts || isException(e)) {
-                log.error(format("Caught unknown unrecoverable error %s for message id %s", e.getMessage(), messageId), e);
+                log.error("Caught unknown unrecoverable error %s for message id {}", messageId, e);
             } else {
-                log.info("Statcktrace is {}", e.getStackTrace());
-                log.info(String.format("Caught recoverable error %s, retrying %s out of %s for message id %s",
-                    e.getMessage(), retry, maxRetryAttempts, messageId));
-
+                log.error("Caught recoverable error while retrying {} out of {} for message id {}",
+                    retry, maxRetryAttempts, messageId, e);
                 processEvidenceShareMessageWithRetry(message, retry + 1, messageId);
             }
         }
