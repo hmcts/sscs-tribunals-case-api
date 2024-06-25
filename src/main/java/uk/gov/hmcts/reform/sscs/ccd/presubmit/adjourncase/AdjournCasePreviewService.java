@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +53,6 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     private static final String DOCUMENT_DATE_PATTERN = "dd/MM/yyyy";
     private final SignLanguagesService signLanguagesService;
     private final AirLookupService airLookupService;
-    @Value("${feature.snl.adjournment.enabled}")
-    private boolean adjournmentFeature;
 
     @Autowired
     public AdjournCasePreviewService(GenerateFile generateFile,
@@ -364,16 +361,8 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         Adjournment adjournment = caseData.getAdjournment();
 
-        if (adjournmentFeature) {
-            List<JudicialUserBase> panelMembers = adjournment.getPanelMembers();
-            names.addAll(judicialRefDataService.getAllJudicialUsersFullNames(panelMembers));
-        } else {
-            List<String> panelMembers = Stream.of(adjournment.getDisabilityQualifiedPanelMemberName(),
-                adjournment.getMedicallyQualifiedPanelMemberName(), adjournment.getOtherPanelMemberName())
-                .filter(org.apache.commons.lang3.StringUtils::isNotBlank).toList();
-
-            names.addAll(panelMembers);
-        }
+        List<JudicialUserBase> panelMembers = adjournment.getPanelMembers();
+        names.addAll(judicialRefDataService.getAllJudicialUsersFullNames(panelMembers));
 
         return StringUtils.getGramaticallyJoinedStrings(names);
     }
