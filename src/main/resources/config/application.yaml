@@ -20,7 +20,7 @@ spring:
 
     datasource:
         driverClassName: org.postgresql.Driver
-        url: jdbc:postgresql://${JOB_SCHEDULER_DB_HOST:localhost}:${JOB_SCHEDULER_DB_PORT:5432}/${JOB_SCHEDULER_DB_NAM:sscsjobscheduler}${JOB_SCHEDULER_DB_CONNECTION_OPTIONS:}
+        url: jdbc:postgresql://${JOB_SCHEDULER_DB_HOST:localhost}:${JOB_SCHEDULER_DB_PORT:5432}/${JOB_SCHEDULER_DB_NAME:sscsjobscheduler}${JOB_SCHEDULER_DB_CONNECTION_OPTIONS:}
         username: ${JOB_SCHEDULER_DB_USERNAME:sscsjobscheduler}
         password: ${JOB_SCHEDULER_DB_PASSWORD:sscsjobscheduler}
         properties:
