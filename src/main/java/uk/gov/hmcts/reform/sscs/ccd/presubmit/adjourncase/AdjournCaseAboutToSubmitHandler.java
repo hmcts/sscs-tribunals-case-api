@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNME
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -23,8 +22,6 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
     private final PreviewDocumentService previewDocumentService;
     private final UserDetailsService userDetailsService;
-    @Value("${feature.snl.adjournment.enabled}")
-    private boolean isAdjournmentEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -50,12 +47,10 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
             DRAFT_ADJOURNMENT_NOTICE,
             adjournment.getPreviewDocument());
 
-        if (isAdjournmentEnabled) {
-            try {
-                adjournment.setSignedInUser(userDetailsService.getLoggedInUserAsJudicialUser(userAuthorisation));
-            } catch (Exception e) {
-                log.error(e.getMessage());
-            }
+        try {
+            adjournment.setSignedInUser(userDetailsService.getLoggedInUserAsJudicialUser(userAuthorisation));
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
 
 
