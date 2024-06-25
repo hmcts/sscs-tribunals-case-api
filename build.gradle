@@ -334,8 +334,8 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'ef15b53'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: 'ef2e1dd'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'c0f04d1'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '3cd32fa'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
