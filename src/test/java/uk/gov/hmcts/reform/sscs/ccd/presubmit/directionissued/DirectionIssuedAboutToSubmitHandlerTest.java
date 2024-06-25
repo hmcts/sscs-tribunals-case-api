@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static java.util.Collections.emptySet;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
@@ -709,5 +710,64 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getHmctsDwpState(), is("sentToDwp"));
         assertThat(response.getData().getDateSentToDwp(), is(LocalDate.now().toString()));
         assertThat(response.getData().getDwpDueDate(), is(LocalDate.now().plusDays(expectedResponseDays).toString()));
+    }
+
+    @Test
+    public void givenNoUploadedAndGeneratedDoc_thenReturnError() {
+        sscsCaseData.getDocumentGeneration().setGenerateNotice(NO);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertFalse(response.getErrors().isEmpty());
+        assertThat(response.getErrors(), hasItem("You need to upload a PDF document"));
+    }
+
+    @Test
+    public void givenGenerateNoticeIsYes_thenReturnCaseDataPreviewDoc() {
+        DocumentLink url = sscsCaseData.getDocumentStaging().getPreviewDocument();
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(footerService).createFooterAndAddDocToCase(eq(url), any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void givenGenerateNoticeIsSetToNoAndInterlocDocIsNotNull_thenReturnRelevantDocLink() {
+        sscsCaseData.getDocumentGeneration().setGenerateNotice(NO);
+        assertFalse(sscsCaseData.getDocumentGeneration().getGenerateNotice().toBoolean());
+
+        SscsInterlocDirectionDocument interlocDoc = SscsInterlocDirectionDocument.builder()
+                .documentType("Doc type")
+                .documentFileName("Doc filename")
+                .documentLink(DocumentLink.builder()
+                        .documentFilename("testingDoc")
+                        .documentBinaryUrl(DOCUMENT_URL)
+                        .documentUrl(DOCUMENT_URL)
+                        .build()).build();
+
+        sscsCaseData.setSscsInterlocDirectionDocument(interlocDoc);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(interlocDoc.getDocumentLink(), response.getData().getSscsInterlocDirectionDocument().getDocumentLink());
+    }
+
+    public void givenGenerateNoticeIsSetToYesAndInterlocDocIsNotNull_thenReturnNull() {
+        assertTrue(sscsCaseData.getDocumentGeneration().getGenerateNotice().toBoolean());
+
+        SscsInterlocDirectionDocument interlocDoc = SscsInterlocDirectionDocument.builder()
+                .documentType("Doc type")
+                .documentFileName("Doc filename")
+                .documentLink(DocumentLink.builder()
+                        .documentFilename("testingDoc")
+                        .documentBinaryUrl(DOCUMENT_URL)
+                        .documentUrl(DOCUMENT_URL)
+                        .build()).build();
+
+        sscsCaseData.setSscsInterlocDirectionDocument(interlocDoc);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getSscsInterlocDirectionDocument());
     }
 }
