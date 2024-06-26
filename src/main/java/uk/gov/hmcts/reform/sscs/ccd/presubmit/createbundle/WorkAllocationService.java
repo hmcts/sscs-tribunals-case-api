@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,21 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 @Slf4j
 @RequiredArgsConstructor
 public class WorkAllocationService {
+
+    private static final List<String> VALID_CASE_ROLES = Arrays.asList(
+            "hearing-judge",
+            "tribunal-member-1",
+            "tribunal-member-2",
+            "tribunal-member-3",
+            "interloc-judge",
+            "appraiser-1",
+            "appraiser-2",
+            "post-hearing-judge",
+            "allocated-tribunal-caseworker",
+            "registrar",
+            "allocated-admin-caseworker",
+            "allocated-ctsc-caseworker"
+    );
 
     @Autowired
     private final CaseAssignmentApi caseAssignmentApi;
@@ -55,6 +71,7 @@ public class WorkAllocationService {
                     .map(CaseAssignmentUserRole::getCaseRole)
                     .distinct()
                     .filter(r -> !excludeRoles.contains(r))
+                    .filter(r -> VALID_CASE_ROLES.contains(r))
                     .collect(Collectors.toList());
         }
 
