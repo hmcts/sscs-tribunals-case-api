@@ -142,4 +142,22 @@ public class WorkAllocationServiceTest {
                 Arrays.asList("appraiser-2"),
                 response.getAssignedCaseRoles());
     }
+
+    @Test
+    public void unknownCaseRolesAdded_setAssignedCaseRolesField_withKnownCaseRolesOnly() {
+        when(caseAssignmentApi.getUserRoles("USER-TOKEN", "SERVICE-TOKEN",
+                Arrays.asList("1111222233334444"))).thenReturn(
+                CaseAssignmentUserRolesResource.builder()
+                        .caseAssignmentUserRoles(Arrays.asList(
+                                CaseAssignmentUserRole.builder().caseRole("tribunal-member-1").build(),
+                                CaseAssignmentUserRole.builder().caseRole("unknown-role").build(),
+                                CaseAssignmentUserRole.builder().caseRole("appraiser-1").build()))
+                        .build());
+
+        WorkAllocationFields response = handler.updateAssignedCaseRoles(caseDetails);
+
+        assertEquals(
+                Arrays.asList("tribunal-member-1", "appraiser-1"),
+                response.getAssignedCaseRoles());
+    }
 }
