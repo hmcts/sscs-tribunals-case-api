@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -46,8 +45,7 @@ abstract class AdjournCaseAboutToSubmitHandlerTestBase {
 
     @BeforeEach
     protected void setUp() {
-        handler = new AdjournCaseAboutToSubmitHandler(previewDocumentService, userDetailsService, true);
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
+        handler = new AdjournCaseAboutToSubmitHandler(previewDocumentService, userDetailsService);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
             .appeal(Appeal.builder().hearingOptions(HearingOptions.builder().build()).build())
             .schedulingAndListingFields(SchedulingAndListingFields.builder()

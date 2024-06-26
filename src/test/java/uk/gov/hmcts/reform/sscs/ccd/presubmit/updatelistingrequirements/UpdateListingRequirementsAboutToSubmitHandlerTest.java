@@ -63,7 +63,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
         sscsCaseData = SscsCaseData.builder()
             .appeal(Appeal.builder().build())
             .dwpIsOfficerAttending("Yes")

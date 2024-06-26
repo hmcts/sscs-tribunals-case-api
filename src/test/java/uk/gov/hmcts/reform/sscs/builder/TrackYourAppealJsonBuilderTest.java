@@ -29,6 +29,14 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
+    public void shouldReturnCaseIdInTheMyaChildSupportAppealResponseWithCorrectDate() {
+        SscsCaseData caseData = APPEAL_RECEIVED_CHILD_SUPPORT_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L, true, "appealCreated");
+        assertJsonEquals(APPEAL_RECEIVED_CHILD_SUPPORT_MYA.getSerializedMessage(), objectNode);
+    }
+
+    @Test
     public void shouldReturnCaseIdInTheMyaDwpResponse() {
         SscsCaseData caseData = DWP_RESPOND_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,

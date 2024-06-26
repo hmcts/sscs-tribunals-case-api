@@ -25,8 +25,6 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Value("${feature.gaps-switchover.enabled}")
     private boolean gapsSwitchOverFeature;
-    @Value("${feature.snl.adjournment.enabled}")
-    private boolean isAdjournmentEnabled;
 
     private final ListAssistHearingMessageHelper listAssistHearingMessageHelper;
 
@@ -64,8 +62,7 @@ public class UpdateListingRequirementsAboutToSubmitHandler implements PreSubmitC
             }
         }
 
-        if (isAdjournmentEnabled) {
-            OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
+        OverrideFields overrideFields = caseDataSnlFields.getOverrideFields();
 
             if (nonNull(overrideFields)) {
                 HearingChannel hearingChannel = overrideFields.getAppellantHearingChannel();
