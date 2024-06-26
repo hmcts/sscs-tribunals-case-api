@@ -43,7 +43,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.model.client.JudicialUserBase;
-import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 
 @ExtendWith(MockitoExtension.class)
 class UpdateListingRequirementsAboutToSubmitHandlerTest {
@@ -241,28 +240,7 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
     }
 
     @Test
-    void givenAdjournmentFlagIsOff_thenDontUpdateHearingChannel() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", false);
-
-        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
-        given(callback.getCaseDetails()).willReturn(caseDetails);
-        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
-        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
-        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantHearingChannel(HearingChannel.FACE_TO_FACE).build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
-                ABOUT_TO_SUBMIT,
-                callback,
-                USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-        assertThat(response.getData().getAppeal().getHearingSubtype()).isNull();
-    }
-
-    @Test
     void givenHearingChannelIsNotNull_thenReturnHearingSubtype() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
-
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
@@ -282,8 +260,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void givenHearingChannelIsNull_thenReturnCaseDataHearingSubtype() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
-
         HearingSubtype hearingSubType = HearingSubtype.builder()
                 .hearingTelephoneNumber("09038920")
                 .wantsHearingTypeTelephone(YES.getValue())
@@ -310,8 +286,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void givenAppellantInterpreterIsNotNull_thenReturnLanguageInterpreterOnCaseData() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
-
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
@@ -341,8 +315,6 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
 
     @Test
     void givenAppellantInterpreterIsNull_thenDontUpdateCaseDataInterpreter() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
-
         given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
         given(callback.getCaseDetails()).willReturn(caseDetails);
         given(caseDetails.getCaseData()).willReturn(sscsCaseData);
