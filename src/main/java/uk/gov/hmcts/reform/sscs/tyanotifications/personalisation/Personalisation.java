@@ -521,7 +521,8 @@ public class Personalisation<E extends NotificationWrapper> {
     }
 
     private Map<String, Object> setAppealReceivedDetails(Map<String, Object> personalisation, EventDetails eventDetails, SscsCaseData ccdResponse) {
-        LocalDate localDate = eventDetails.getDateTime().plusDays(calculateMaxDwpResponseDays(ccdResponse.getAppeal().getBenefitType().getCode())).toLocalDate();        String dwpResponseDateString = formatLocalDate(localDate);
+        LocalDate localDate = eventDetails.getDateTime().plusDays(calculateMaxDwpResponseDays(ccdResponse.getAppeal().getBenefitType().getCode())).toLocalDate();
+        String dwpResponseDateString = formatLocalDate(localDate);
         personalisation.put(APPEAL_RESPOND_DATE, dwpResponseDateString);
         translateToWelshDate(localDate, ccdResponse, value ->
             personalisation.put(APPEAL_RESPOND_DATE_WELSH, value)
