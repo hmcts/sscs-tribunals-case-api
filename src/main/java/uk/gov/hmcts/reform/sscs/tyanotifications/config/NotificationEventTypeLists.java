@@ -79,6 +79,7 @@ public final class NotificationEventTypeLists {
     );
 
     public static final Set<NotificationEventType> EVENT_TYPES_FOR_DORMANT_CASES = EnumSet.of(
+        ACTION_HEARING_RECORDING_REQUEST,
         ADMIN_APPEAL_WITHDRAWN,
         ADMIN_CORRECTION_HEADER,
         APPEAL_DORMANT,
