@@ -29,7 +29,8 @@ public final class AppConstants {
     public static final String THE_STRING_WELSH = "yr ";
     public static final String TOMORROW_STRING = "tomorrow";
     public static final String ZONE_ID = "Europe/London";
-    public static final int MAX_DWP_RESPONSE_DAYS = 35;
+    public static final int MAX_DWP_RESPONSE_DAYS = 28;
+    public static final int MAX_DWP_RESPONSE_DAYS_CHILD_SUPPORT = 42;
 
     private AppConstants() {
         //
