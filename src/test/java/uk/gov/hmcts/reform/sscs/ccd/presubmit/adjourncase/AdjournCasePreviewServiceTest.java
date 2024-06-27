@@ -34,7 +34,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -135,7 +134,6 @@ class AdjournCasePreviewServiceTest {
     void setUp() {
         service = new AdjournCasePreviewService(generateFile, userDetailsService, venueDataLoader, TEMPLATE_ID,
                 airLookupService, signLanguagesService, judicialRefDataService, documentConfiguration);
-        ReflectionTestUtils.setField(service, "adjournmentFeature", true);
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -801,28 +799,6 @@ class AdjournCasePreviewServiceTest {
 
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         checkOralHearingTimeslot(nextHearingTypeText, nextHearingType, "1 session");
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithThreePanelMembers_thenCorrectlySetTheHeldBeforeWithoutFlag(AdjournCaseTypeOfHearing nextHearingType) {
-        ReflectionTestUtils.setField(service, "adjournmentFeature", false);
-        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
-        when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
-        when(generateFile.assemble(any())).thenReturn(URL);
-
-        adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName(PANEL_MEMBER_1_NAME);
-        adjournment.setMedicallyQualifiedPanelMemberName(PANEL_MEMBER_2_NAME);
-        adjournment.setOtherPanelMemberName(OTHER_PANEL_MEMBER_NAME);
-
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
-        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
-
-        assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + ", "
-            + PANEL_MEMBER_1_NAME + ", "
-            + PANEL_MEMBER_2_NAME + " and "
-            + OTHER_PANEL_MEMBER_NAME);
     }
 
     @ParameterizedTest
