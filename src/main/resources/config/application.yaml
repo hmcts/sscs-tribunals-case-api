@@ -1949,12 +1949,12 @@ wlu:
 
 
 ---
+
 # default profile (development, production etc.)
 spring:
     config:
         activate:
             on-profile: default
-    flyway.enabled: ${RUN_DB_MIGRATION_ON_STARTUP:true}
     jackson:
         deserialization:
             read-unknown-enum-values-as-null: true
@@ -2004,7 +2004,10 @@ job.scheduler:
 judicial-ref:
     api:
         url: ${JUDICIAL_REF_API_URL:http://localhost:5555}
-
+dbMigration:
+    # When true, the app will run DB migration on startup.
+    # Otherwise, it will just check if all migrations have been applied (and fail to start if not).
+    runOnStartup: ${RUN_DB_MIGRATION_ON_STARTUP:true}
 ---
 # tya-integration profile
 spring:
