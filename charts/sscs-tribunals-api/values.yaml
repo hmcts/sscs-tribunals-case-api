@@ -127,6 +127,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     JOB_SCHEDULER_DB_USERNAME: pgadmin
     JOB_SCHEDULER_DB_NAME: notification
     JOB_SCHEDULER_DB_HOST: sscs-tya-notif-postgres-v15-db-{{ .Values.global.environment }}.postgres.database.azure.com
+    RUN_DB_MIGRATION_ON_STARTUP: false
 postgresql:
   enabled: false
 idam-pr:

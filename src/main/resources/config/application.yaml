@@ -13,6 +13,10 @@ spring:
             location: classpath:uk/gov/hmcts/reform/sscs/git.properties
     main:
         allow-bean-definition-overriding: true
+    flyway:
+        enabled: true
+        baseline-on-migrate: true  # Optional, based on your needs
+        locations: classpath:db/migration
     servlet:
         multipart:
             max-file-size: ${MAX_FILE_SIZE:10MB}
@@ -2016,7 +2020,8 @@ spring:
             on-profile: integration, functional
     autoconfigure.exclude:
         - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-    flyway.enabled: false
+    flyway:
+      enabled: false
 job.scheduler:
     autoStart: false
     retryPolicy:

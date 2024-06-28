@@ -61,7 +61,7 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationServic
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.*;
 import uk.gov.service.notify.NotificationClient;
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.reform.authorisation",
     "uk.gov.hmcts.reform.sscs.idam",
