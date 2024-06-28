@@ -12,7 +12,7 @@
       }
     },
     "benefitType": {
-      "code": "PIP",
+      "code": "childSupport",
       "description": "benefit Type"
     },
     "hearingOptions": {
