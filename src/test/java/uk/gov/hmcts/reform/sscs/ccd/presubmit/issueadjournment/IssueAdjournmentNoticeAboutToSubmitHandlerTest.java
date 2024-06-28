@@ -11,7 +11,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.PAPER;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus.TRANSLATION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
@@ -29,7 +28,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
@@ -175,20 +173,6 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
             .map(SscsDocument::getValue)
             .map(SscsDocumentDetails::getDocumentType)
             .containsOnly(DRAFT_ADJOURNMENT_NOTICE.getValue());
-    }
-
-    @DisplayName("When adjournment is disabled and case is LA, then should not send any messages")
-    @Test
-    void givenFeatureFlagDisabled_thenNoMessageIsSent() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", false);
-        sscsCaseData.getSchedulingAndListingFields().setHearingRoute(LIST_ASSIST);
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        verifyNoInteractions(hearingMessageHelper);
-
-        assertThat(response.getErrors()).isEmpty();
     }
 
     @DisplayName("When adjournment is enabled and case is LA and case cannot be listed right away "
@@ -438,7 +422,6 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         + "add them to the existing excluded panel members list")
     @Test
     void givenPanelMembersExcluded_thenAddPanelMembersToExclusionList() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
         sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
             .excludedPanelMembers(new ArrayList<>(Arrays.asList(
                 new CollectionItem<>("1", JudicialUserBase.builder().idamId("1").build()),
@@ -460,7 +443,6 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         + "exclusions, add them to the excluded panel members list")
     @Test
     void givenNoExistingPanelMembersExcluded_thenAddPanelMembersToExclusionList() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
         sscsCaseData.getAdjournment().setPanelMembersExcluded(AdjournCasePanelMembersExcluded.YES);
         sscsCaseData.getAdjournment().setPanelMember1(JudicialUserBase.builder().personalCode("4").idamId("1").build());
         sscsCaseData.getAdjournment().setPanelMember3(JudicialUserBase.builder().personalCode("5").idamId("3").build());
@@ -479,7 +461,6 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         + "add them to the existing reserved panel members list")
     @Test
     void givenPanelMembersReserved_thenAddPanelMembersToReservedList() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
         sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
             .reservedPanelMembers(new ArrayList<>(Arrays.asList(
                 new CollectionItem<>("1", JudicialUserBase.builder().idamId("1").build()),
@@ -501,7 +482,6 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         + "keep the existing excluded panel members list the same")
     @Test
     void givenPanelMembersNotExcluded_thenKeepExclusionListTheSame() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
         sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
             .excludedPanelMembers(new ArrayList<>(Arrays.asList(
                 new CollectionItem<>("1", JudicialUserBase.builder().idamId("1").build()),
@@ -521,7 +501,6 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         + "keep the existing excluded panel members list the same")
     @Test
     void givenPanelMembersNotExcludedAndAdjournmentNotSelected_thenKeepExclusionListTheSame() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
         sscsCaseData.getSchedulingAndListingFields().setPanelMemberExclusions(PanelMemberExclusions.builder()
             .excludedPanelMembers(new ArrayList<>(Arrays.asList(
                 new CollectionItem<>("1", JudicialUserBase.builder().idamId("1").build()),
@@ -542,7 +521,6 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
     @DisplayName("")
     @Test
     void givenHearingTypeIsDataToBeFixedOrNull_thenHearingWindowShouldBeNull() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
         Adjournment adjournment = sscsCaseData.getAdjournment();
         adjournment.setNextHearingFirstAvailableDateAfterDate(null);
         adjournment.setNextHearingFirstAvailableDateAfterPeriod(null);
@@ -565,4 +543,11 @@ class IssueAdjournmentNoticeAboutToSubmitHandlerTest extends IssueAdjournmentNot
         assertThat(sscsCaseData.getPresentingOfficersDetails()).isEqualTo(PoDetails.builder().build());
         assertThat(sscsCaseData.getPresentingOfficersHearingLink()).isNull();
     }
+
+    @Test
+    void givenAdjournmentIsIssued_thenClearAdjournmentFields() {
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrProperties();
+    }
+
 }
