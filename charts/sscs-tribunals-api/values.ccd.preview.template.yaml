@@ -122,10 +122,10 @@ ccd-case-document-am-api:
 xui-webapp:
   enabled: true
   nodejs:
-    memoryLimits: "4Gi"
-    cpuLimits: 2000m
-    memoryRequests: "1Gi"
-    cpuRequests: "1"
+    devmemoryLimits: "1Gi"
+    devcpuLimits: 1
+    devmemoryRequests: "512Mi"
+    devcpuRequests: "500m"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
