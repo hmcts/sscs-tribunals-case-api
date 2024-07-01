@@ -96,7 +96,7 @@ public class AssociatedCaseLinkHelper {
         }
     }
 
-    private void addLinkToOtherAssociatedCasesV2Enabled(List<SscsCaseDetails> matchedByNinoCases, String caseId) {
+    public void addLinkToOtherAssociatedCasesV2Enabled(List<SscsCaseDetails> matchedByNinoCases, String caseId) {
         log.info("Adding link to other associated cases V2");
         if (!matchedByNinoCases.isEmpty() && !StringUtils.isEmpty(caseId)) {
             for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
