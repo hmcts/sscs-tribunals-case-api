@@ -38,7 +38,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             .toBuilder()
             .region(region)
             .regionalProcessingCenter(rpc)
-                .schedulingAndListingFields(SchedulingAndListingFields.builder().hearingRoute(rpc.getHearingRoute()).build())
+            .schedulingAndListingFields(SchedulingAndListingFields.builder().hearingRoute(rpc.getHearingRoute()).build())
             .build();
     }
 
