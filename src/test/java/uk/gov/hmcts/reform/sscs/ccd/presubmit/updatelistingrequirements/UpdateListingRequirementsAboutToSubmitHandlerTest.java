@@ -10,7 +10,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.VIDEO;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,9 +27,14 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingInterpreter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReserveTo;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -232,4 +239,103 @@ class UpdateListingRequirementsAboutToSubmitHandlerTest {
         assertThat(result).isNull();
     }
 
+    @Test
+    void givenHearingChannelIsNotNull_thenReturnHearingSubtype() {
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
+
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantHearingChannel(VIDEO).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingSubtype()).isNotNull();
+        assertThat(response.getData().getAppeal().getHearingSubtype().isWantsHearingTypeVideo()).isTrue();
+    }
+
+    @Test
+    void givenHearingChannelIsNull_thenReturnCaseDataHearingSubtype() {
+        HearingSubtype hearingSubType = HearingSubtype.builder()
+                .hearingTelephoneNumber("09038920")
+                .wantsHearingTypeTelephone(YES.getValue())
+                .build();
+
+        sscsCaseData.getAppeal().setHearingSubtype(hearingSubType);
+
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
+
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().appellantHearingChannel(null).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingSubtype()).isNotNull();
+        assertThat(response.getData().getAppeal().getHearingSubtype().isWantsHearingTypeTelephone()).isTrue();
+    }
+
+    @Test
+    void givenAppellantInterpreterIsNotNull_thenReturnLanguageInterpreterOnCaseData() {
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
+
+        DynamicListItem interpreterLanguageItem = new DynamicListItem("test", "Arabic");
+        DynamicList interpreterLanguage = new DynamicList(interpreterLanguageItem, List.of());
+
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
+                .appellantInterpreter(HearingInterpreter.builder()
+                        .isInterpreterWanted(YES)
+                        .interpreterLanguage(interpreterLanguage)
+                        .build())
+                .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo("Yes");
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNotNull();
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isEqualTo("Arabic");
+
+    }
+
+    @Test
+    void givenAppellantInterpreterIsNull_thenDontUpdateCaseDataInterpreter() {
+        given(callback.getEvent()).willReturn(EventType.UPDATE_LISTING_REQUIREMENTS);
+        given(callback.getCaseDetails()).willReturn(caseDetails);
+        given(caseDetails.getCaseData()).willReturn(sscsCaseData);
+        given(caseDetails.getState()).willReturn(State.READY_TO_LIST);
+
+        sscsCaseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder()
+                .appellantInterpreter(null)
+                .build());
+
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder()
+                .languageInterpreter("Yes")
+                .languages("Welsh")
+                .build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(
+                ABOUT_TO_SUBMIT,
+                callback,
+                USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguageInterpreter()).isEqualTo("Yes");
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNotNull();
+    }
 }
