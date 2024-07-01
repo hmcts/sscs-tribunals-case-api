@@ -141,7 +141,14 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                 );
             }
 
-            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseData -> setSelectWhoReviewsCaseField(sscsCaseData, REVIEW_BY_JUDGE),
+            Consumer<SscsCaseData> caseDataConsumer = sscsCaseData -> {
+                setSelectWhoReviewsCaseField(sscsCaseData, REVIEW_BY_JUDGE);
+                if (isPostponementRequest(sscsCaseData)) {
+                    sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
+                }
+            };
+
+            return setInterlocReviewStateFieldAndTriggerEvent(caseDataConsumer,
                     callback.getCaseDetails().getId(),
                     REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
                     EventType.VALID_SEND_TO_INTERLOC, TCW_REVIEW_SEND_TO_JUDGE);
