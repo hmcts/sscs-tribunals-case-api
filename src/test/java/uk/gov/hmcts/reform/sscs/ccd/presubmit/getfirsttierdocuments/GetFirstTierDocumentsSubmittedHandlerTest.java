@@ -6,12 +6,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdCallbackMap;
@@ -69,6 +71,24 @@ public class GetFirstTierDocumentsSubmittedHandlerTest {
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         verify(ccdCallbackMapService).handleCcdCallbackMap(capture.capture(), eq(sscsCaseData));
+        assertThat(capture.getValue().getCallbackEvent()).isEqualTo(EventType.BUNDLE_CREATED_FOR_UPPER_TRIBUNAL);
+        assertThat(capture.getValue().getCallbackSummary()).isEqualTo("Bundle created for UT");
+        assertThat(capture.getValue().getCallbackDescription()).isEqualTo("Bundle created for UT");
+    }
+
+    @Test
+    public void shouldUpdateEventWhenCcdCallbackMapV2IsEnabled() {
+        ReflectionTestUtils.setField(handler, "isHandleCcdCallbackMapV2Enabled", true);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(ccdCallbackMapService.handleCcdCallbackMapV2(
+                capture.capture(),
+                eq(Long.valueOf(sscsCaseData.getCcdCaseId()))))
+                .thenReturn(Optional.of(sscsCaseData));
+
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        verify(ccdCallbackMapService).handleCcdCallbackMapV2(capture.capture(), eq(Long.valueOf(sscsCaseData.getCcdCaseId())));
         assertThat(capture.getValue().getCallbackEvent()).isEqualTo(EventType.BUNDLE_CREATED_FOR_UPPER_TRIBUNAL);
         assertThat(capture.getValue().getCallbackSummary()).isEqualTo("Bundle created for UT");
         assertThat(capture.getValue().getCallbackDescription()).isEqualTo("Bundle created for UT");

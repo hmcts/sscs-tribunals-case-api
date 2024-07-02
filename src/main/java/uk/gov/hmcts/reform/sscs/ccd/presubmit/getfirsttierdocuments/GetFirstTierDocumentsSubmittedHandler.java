@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.getfirsttierdocuments;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.GetFirstTierDocumentsActions.BUNDLE_CREATED;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +28,9 @@ public class GetFirstTierDocumentsSubmittedHandler implements PreSubmitCallbackH
     @Value("${feature.postHearingsB.enabled}")
     private final boolean isPostHearingsBEnabled;
 
+    @Value("${feature.handle-ccd-callbackMap-v2.enabled}")
+    private boolean isHandleCcdCallbackMapV2Enabled;
+
     private final CcdCallbackMapService ccdCallbackMapService;
 
     @Override
@@ -45,13 +49,20 @@ public class GetFirstTierDocumentsSubmittedHandler implements PreSubmitCallbackH
                                                           String userAuthorisation) {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        long caseId = Long.valueOf(caseData.getCcdCaseId());
         CcdCallbackMap callbackMap = BUNDLE_CREATED;
 
         log.info("Get first tier documents: handling action {} for case {}", callbackMap, caseId);
 
-        caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
-
+        if (isHandleCcdCallbackMapV2Enabled) {
+            Optional<SscsCaseData> sscsCaseDataOptional = ccdCallbackMapService.handleCcdCallbackMapV2(
+                    callbackMap,
+                    caseId
+            );
+            caseData = sscsCaseDataOptional.orElse(caseData);
+        } else {
+            caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
+        }
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }
