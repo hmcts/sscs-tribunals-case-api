@@ -63,7 +63,7 @@ class CitizenRequestServiceTest {
     @Mock
     private UpdateCcdCaseService updateCcdCaseService;
     @Captor
-    private ArgumentCaptor<Consumer<SscsCaseData>> sscsCaseDataCaptor;
+    private ArgumentCaptor<Consumer<SscsCaseDetails>> sscsCaseDataCaptor;
 
     @InjectMocks
     private CitizenRequestService citizenRequestService;
@@ -934,7 +934,7 @@ class CitizenRequestServiceTest {
                 sscsCaseDataCaptor.capture()
         );
 
-        Consumer<SscsCaseData> captorValue = sscsCaseDataCaptor.getValue();
-        captorValue.accept(caseData);
+        Consumer<SscsCaseDetails> captorValue = sscsCaseDataCaptor.getValue();
+        captorValue.accept(caseDetails);
     }
 }

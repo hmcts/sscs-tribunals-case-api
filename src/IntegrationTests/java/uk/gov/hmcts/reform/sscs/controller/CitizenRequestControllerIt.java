@@ -64,7 +64,8 @@ class CitizenRequestControllerIt {
     protected ObjectMapper mapper;
 
     @Captor
-    private ArgumentCaptor<Consumer<SscsCaseData>> captor;
+    private ArgumentCaptor<Consumer<SscsCaseDetails>> captor;
+    private SscsCaseDetails sscsCaseDetails;
     private SscsCaseData caseData;
     private IdamTokens idamTokens;
 
@@ -72,8 +73,9 @@ class CitizenRequestControllerIt {
     public void setUp() {
         idamTokens = IdamTokens.builder().build();
         caseData = HEARING_RECORDING_CCD.getDeserializeMessage();
+        sscsCaseDetails = SscsCaseDetails.builder().id(Long.parseLong(CASE_ID)).data(caseData).build();
         when(onlineHearingService.getCcdCaseByIdentifier(CASE_ID))
-                .thenReturn(Optional.ofNullable(SscsCaseDetails.builder().id(Long.parseLong(CASE_ID)).data(caseData).build()));
+                .thenReturn(Optional.ofNullable(sscsCaseDetails));
         UserDetails user = UserDetails.builder().email(E_MAIL).build();
         when(idamService.getUserDetails(AUTHORIZATION)).thenReturn(user);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -105,8 +107,8 @@ class CitizenRequestControllerIt {
                 eq(idamTokens),
                 captor.capture()
         );
-        Consumer<SscsCaseData> captorValue = captor.getValue();
-        captorValue.accept(caseData);
+        Consumer<SscsCaseDetails> captorValue = captor.getValue();
+        captorValue.accept(sscsCaseDetails);
         assertEquals(2, caseData.getSscsHearingRecordingCaseData().getRequestedHearings().size());
     }
 }
