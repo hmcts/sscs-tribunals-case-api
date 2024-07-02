@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,9 @@ public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
+    @Value("${feature.handle-ccd-callbackMap-v2.enabled}")
+    private boolean isHandleCcdCallbackMapV2Enabled;
+
 
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -50,10 +54,19 @@ public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
             Correction correction = caseData.getPostHearing().getCorrection();
 
             if (isYes(correction.getIsCorrectionFinalDecisionInProgress())) {
-                correction.setIsCorrectionFinalDecisionInProgress(NO);
-                caseData = ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, caseData);
+                if (isHandleCcdCallbackMapV2Enabled) {
+                    Optional<SscsCaseData> sscsCaseDataOptional = ccdCallbackMapService.handleCcdCallbackMapV2(
+                            CorrectionActions.GRANT,
+                            ccdCallbackMapService.getCcdCallbackMutator(CorrectionActions.GRANT,
+                                    caseData.getCcdCaseId(), isPostHearingsEnabled),
+                            callback.getCaseDetails().getId());
+                    return new PreSubmitCallbackResponse<>(sscsCaseDataOptional.orElse(caseData));
+                } else {
+                    correction.setIsCorrectionFinalDecisionInProgress(NO);
+                    caseData = ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, caseData);
 
-                return new PreSubmitCallbackResponse<>(caseData);
+                    return new PreSubmitCallbackResponse<>(caseData);
+                }
             }
         }
         log.info("Publishing message for the event {}", callback.getEvent());
