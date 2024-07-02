@@ -75,10 +75,14 @@ HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-aat"
 With the name of the subscription you have created.
 
 
-Once this is done you should be able to deploy to preview with hearings enabled.
+Once this is done you should be able to deploy to preview with hearings enabled. 
 
-Note: When you are finished with preview testing remember to delete the uploaded CCD definition from AAT and the subscription created on hmc-to-cft-aat. 
-ccd-def-cleanup should delete the ccd def file you uploaded, given the enable_keep_helm label is not on your PR. 
+Notes:
+* Currently we need to ask EXUI to whitelist our AAT case types in their configuration, otherwise the hearings tab will not display.
+* When you are finished with preview testing remember to delete the uploaded CCD definition from AAT and the subscription created on hmc-to-cft-aat. 
+* Before deleting the subscription you will need to unlock the hmc-shared-aat resource group in Azure-Resource-Locks
+* ccd-def-cleanup should delete the ccd def file you uploaded, given the enable_keep_helm label is not on your PR. 
+* If you need to update your PR ccd definition in aat, make sure you delete the original definition through ccd-def-cleanup before uploading the new file
 
 
 
