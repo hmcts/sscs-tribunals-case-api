@@ -1,0 +1,7 @@
+{
+  "case_id":"{caseId}",
+  "online_hearing_id":"{hearingId}",
+  "event_type":"{eventType}",
+  "expiry_date":"2018-08-12T23:59:59Z",
+  "reason":"foo"
+}

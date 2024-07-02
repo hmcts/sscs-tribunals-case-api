@@ -1,0 +1,453 @@
+{
+  "case_details": {
+    "after_submit_callback_response": null,
+    "callback_response_status": null,
+    "callback_response_status_code": null,
+    "case_data": {
+      "languagePreferenceWelsh": "Yes",
+      "processAudioVideoAction": {
+        "value": {
+          "code": "issueDirectionsNotice",
+          "label": "Issue directions notice"
+        },
+        "list_items": [
+        ]
+      },
+      "jointParty": "Yes",
+      "jointPartyName": {
+        "title": "mr",
+        "firstName": "Joint",
+        "lastName": "Party"
+      },
+      "jointPartyAddressSameAsAppellant": "No",
+      "jointPartyAddress": {
+        "line1": "30 Dale Street",
+        "line2": "Village",
+        "town": "Liverpool",
+        "county": "Merseyside",
+        "postcode": "TS4 4ST"
+      },
+      "appeal": {
+        "mrnDetails": {
+          "dwpIssuingOffice": "Birmingham",
+          "mrnDate": "2018-01-01",
+          "mrnLateReason": "It is late",
+          "mrnMissingReason": "It went missing"
+        },
+        "appellant": {
+          "name": {
+            "title": "Mr",
+            "lastName": "Vasquez",
+            "firstName": "Dexter"
+          },
+          "address": {
+            "line1": "36 Dale Street",
+            "line2": "Village",
+            "town": "Liverpool",
+            "county": "Merseyside",
+            "postcode": "TS1 1ST"
+          },
+          "contact": {
+            "email": "test@tester.com",
+            "mobile": "07848484848"
+          },
+          "identity": {
+            "dob": "1998-07-01",
+            "nino": "JT098230B"
+          },
+          "isAppointee": "Yes",
+          "appointee": {
+            "name": {
+              "title": "Mrs",
+              "firstName": "John",
+              "lastName": "Carry"
+            },
+            "address": {
+              "line1": "12, Highstreet, Test",
+              "line2": "Highstreet",
+              "town": "Camden",
+              "county": "Hertfordshire",
+              "postcode": "TS1 1ST"
+            },
+            "contact": {
+              "email": "sscs-citizen2@hmcts.net",
+              "phone": null,
+              "mobile": "01234567810"
+            },
+            "identity": {
+              "dob": "1991-03-27",
+              "nino": "SK334444A"
+            }
+          }
+        },
+        "rep": {
+          "hasRepresentative": "Yes",
+          "name": {
+            "title": "Mr",
+            "firstName": "Harry",
+            "lastName": "Potter"
+          },
+          "address": {
+            "line1": "123 Hairy Lane",
+            "line2": "Off Hairy Park",
+            "town": "Town",
+            "county": "County",
+            "postcode": "TS3 3ST"
+          },
+          "contact": {
+            "email": "harry.potter@wizards.com",
+            "mobile": "07411999999"
+          },
+          "organisation": "HP Ltd"
+        },
+        "benefitType": {
+          "code": "ESA"
+        },
+        "hearingOptions": {
+          "wantsToAttend": "Yes",
+          "wantsSupport": "No",
+          "languageInterpreter": "Yes",
+          "languages": "French",
+          "scheduleHearing": "Yes",
+          "other": "Bla",
+          "arrangements": [
+            "signLanguageInterpreter",
+            "hearingLoop"
+          ],
+          "excludeDates": [
+            {
+              "value": {
+                "start": "2018-04-04",
+                "end": "2018-04-06"
+              }
+            },
+            {
+              "value": {
+                "start": "2018-04-10"
+              }
+            }
+          ]
+        },
+        "appealReasons": {
+          "reasons": [
+            {
+              "value": {
+                "reason": "reason1",
+                "description": "description1"
+              }
+            },
+            {
+              "value": {
+                "reason": "reason2",
+                "description": "description2"
+              }
+            }
+          ],
+          "otherReasons": "Another reason"
+        },
+        "signer": "Yes",
+        "supporter": {
+          "contact": {
+            "email": "pacetest@yahoo.com",
+            "mobile": "07985223409"
+          },
+          "name": {
+            "firstName": "Guy",
+            "lastName": "Wilder",
+            "middleName": "Clark Eaton",
+            "title": "Mr"
+          }
+        },
+        "hearingType": ""
+      },
+      "sscsWelshDocuments": [],
+      "evidence": {
+        "documents": [
+          {
+            "value": {
+              "dateReceived": "2018-01-04",
+              "evidenceType": "Medical Evidence",
+              "evidenceProvidedBy": "Appellant"
+            }
+          }
+        ]
+      },
+      "events": [
+        {
+          "id": "88888888-e24e-46de-b4b6-33dfbecccddc",
+          "value": {
+            "date": "2017-05-22T14:01:18.243",
+            "description": "Appeal received",
+            "type": "appealReceived"
+          }
+        },
+        {
+          "id": "960c715a-e24e-46de-b4b6-33dfbecccddc",
+          "value": {
+            "date": "2017-05-01T12:34:56.789",
+            "description": "Appeal received",
+            "type": "appealReceived"
+          }
+        },
+        {
+          "id": "960c715a-e24e-46de-b4b6-33dfbecccddc",
+          "value": {
+            "date": "2017-05-24T14:01:18.243",
+            "description": "DWP response received",
+            "type": "responseReceived"
+          }
+        },
+        {
+          "id": "208d1978-3434-4719-8c8a-5a613364e17e",
+          "value": {
+            "date": "2017-05-24T13:54:06.637",
+            "description": "Hearing booked",
+            "type": "hearingBooked"
+          }
+        }
+      ],
+      "caseCreated": "2018-02-13",
+      "caseReference": "SC022/14/12423",
+      "subscriptions": {
+        "appellantSubscription": {
+          "email": "sscstest@greencroftconsulting.com",
+          "mobile": "07985233301",
+          "reason": null,
+          "wantSmsNotifications": "No",
+          "subscribeEmail": "No",
+          "subscribeSms": "No",
+          "tya": "543212345"
+        },
+        "representativeSubscription": {
+          "wantSmsNotifications": "No",
+          "tya": "NpmhpYaFLa",
+          "email": "sscstest+notify@greencroftconsulting.com",
+          "mobile": "07398785050",
+          "subscribeEmail": "No",
+          "subscribeSms": "No",
+          "reason": ""
+        },
+        "jointPartySubscription": {
+          "email": "sscstest+notify2@greencroftconsulting.com",
+          "mobile": "07398785051",
+          "reason": null,
+          "subscribeEmail": "No",
+          "subscribeSms": "No",
+          "wantSmsNotifications" : "No",
+          "tya": "232929249492"
+        }
+      },
+      "region": "CARDIFF",
+      "regionalProcessingCenter": {
+        "name": "CARDIFF",
+        "address1": "HM Courts & Tribunals Service",
+        "address2": "Social Security & Child Support Appeals",
+        "address3": "Eastgate House",
+        "address4": "Newport Road",
+        "city": "CARDIFF",
+        "postcode": "CF24 0AB",
+        "phoneNumber": "0300 123 1142",
+        "faxNumber": "0870 739 4438"
+      },
+      "hearings": [
+        {
+          "id": "1234",
+          "value": {
+            "hearingDate": "2018-01-12",
+            "time": "11:00",
+            "venue": {
+              "name": "Prudential House",
+              "address": {
+                "line1": "36 Dale Street",
+                "line2": "",
+                "town": "Liverpool",
+                "county": "Merseyside",
+                "postcode": "L2 5UZ"
+              },
+              "googleMapLink": "https://www.google.com/theAddress"
+            }
+          }
+        }
+      ]
+    },
+    "case_type_id": "Benefit",
+    "state": "validAppeal",
+    "created_date": [
+      2019,
+      9,
+      1,
+      13,
+      20,
+      21,
+      73000000
+    ],
+    "id": "12345656789"
+  },
+  "case_details_before": {
+    "after_submit_callback_response": null,
+    "callback_response_status": null,
+    "callback_response_status_code": null,
+    "case_data": {
+      "appeal": {
+        "mrnDetails": {
+          "dwpIssuingOffice": "Birmingham",
+          "mrnDate": "2018-01-01",
+          "mrnLateReason": "It is late",
+          "mrnMissingReason": "It went missing"
+        },
+        "appellant": {
+          "name": {
+            "title": "Mr",
+            "lastName": "Vasquez",
+            "firstName": "Dexter"
+          },
+          "address": {
+            "line1": "36 Dale Street",
+            "line2": "Village",
+            "town": "Liverpool",
+            "county": "Merseyside",
+            "postcode": "L2 5UZ"
+          },
+          "contact": {
+            "email": "test@tester.com",
+            "mobile": "07848484848"
+          },
+          "identity": {
+            "dob": "1998-07-01",
+            "nino": "JT098230B"
+          },
+          "appointee": {
+            "name": {
+              "title": "Mrs",
+              "lastName": "Cena",
+              "firstName": "John"
+            },
+            "address": {
+              "town": "Camden",
+              "line1": "12, Highstreet, Test",
+              "line2": "Highstreet",
+              "county": "Hertfordshire",
+              "postcode": "TS1 1ST"
+            },
+            "contact": {
+              "email": "sscs-citizen2@hmcts.net",
+              "phone": null,
+              "mobile": "01234567810"
+            },
+            "identity": {
+              "dob": "1991-03-26",
+              "nino": "SK334434A"
+            }
+          },
+          "isAppointee": "Yes"
+        },
+        "benefitType": {
+          "code": "ESA"
+        },
+        "hearingOptions": {
+          "wantsToAttend": "Yes",
+          "wantsSupport": "No",
+          "languageInterpreter": "Yes",
+          "languages": "French",
+          "scheduleHearing": "Yes",
+          "other": "Bla",
+          "arrangements": [
+            "signLanguageInterpreter",
+            "hearingLoop"
+          ],
+          "excludeDates": [
+            {
+              "value": {
+                "start": "2018-04-04",
+                "end": "2018-04-06"
+              }
+            },
+            {
+              "value": {
+                "start": "2018-04-10"
+              }
+            }
+          ]
+        },
+        "appealReasons": {
+          "reasons": [
+            {
+              "value": {
+                "reason": "reason1",
+                "description": "description1"
+              }
+            },
+            {
+              "value": {
+                "reason": "reason2",
+                "description": "description2"
+              }
+            }
+          ],
+          "otherReasons": "Another reason"
+        },
+        "signer": "Yes",
+        "supporter": {
+          "contact": {
+            "email": "pacetest@yahoo.com",
+            "mobile": "07985223409"
+          },
+          "name": {
+            "firstName": "Guy",
+            "lastName": "Wilder",
+            "middleName": "Clark Eaton",
+            "title": "Mr"
+          }
+        }
+      },
+      "caseCreated": "2018-02-13",
+      "caseReference": "SC022/14/12423",
+      "subscriptions": {
+        "appellantSubscription": {
+          "email": "tester@hmcts.net",
+          "mobile": "07985233301",
+          "reason": null,
+          "subscribeEmail": "No",
+          "subscribeSms": "No",
+          "tya": "543212345"
+        }
+      },
+      "region": "CARDIFF",
+      "regionalProcessingCenter": {
+        "name": "CARDIFF",
+        "address1": "HM Courts & Tribunals Service",
+        "address2": "Social Security & Child Support Appeals",
+        "address3": "Eastgate House",
+        "address4": "Newport Road",
+        "city": "CARDIFF",
+        "postcode": "CF24 0AB",
+        "phoneNumber": "0300 123 1142",
+        "faxNumber": "0870 739 4438"
+      },
+      "hearings": [
+        {
+          "id": "1234",
+          "value": {
+            "hearingDate": "2018-01-12",
+            "time": "11:00",
+            "venue": {
+              "name": "Prudential House",
+              "address": {
+                "line1": "36 Dale Street",
+                "line2": "",
+                "town": "Liverpool",
+                "county": "Merseyside",
+                "postcode": "L2 5UZ"
+              },
+              "googleMapLink": "https://www.google.com/theAddress"
+            }
+          }
+        }
+      ]
+    },
+    "case_type_id": "Benefit",
+    "state": "validAppeal",
+    "id": "12345656789"
+  },
+  "event_id": "deathOfAppellant"
+}

@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings("unchecked")
-public class PreSubmitCallbackDispatcherTest {
+public class PreSubmitTyanNotificationsCallbackDispatcherTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     @Mock private PreSubmitCallbackHandler<CaseData> handler1;
