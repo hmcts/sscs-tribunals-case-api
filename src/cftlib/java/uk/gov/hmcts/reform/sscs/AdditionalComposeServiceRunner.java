@@ -54,6 +54,7 @@ public class AdditionalComposeServiceRunner {
             if (code != 0) {
                 log.error("****** Failed to start {} services in {} ******", name, additionalService);
                 log.info("Exit value: {}", code);
+                Runtime.getRuntime().halt(1);
             } else {
                 log.info("Successfully started {} services in {}", name, additionalService);
             }
@@ -62,7 +63,7 @@ public class AdditionalComposeServiceRunner {
 
     private List<String> buildComposeCommand(String path) {
 
-        List<String> command = new ArrayList<>(Arrays.asList("docker", "compose", "-f", path, "up", "-d"));
+        List<String> command = new ArrayList<>(Arrays.asList("docker", "compose", "-f", path, "up", "-d", "--force-recreate"));
 
         if (parseBoolean(System.getenv("FORCE_RECREATE_ADDITIONAL_CONTAINERS"))) {
             command.add("--force-recreate");
