@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.util;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
@@ -11,6 +11,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.*;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -25,8 +29,6 @@ import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService
 
 @ExtendWith(MockitoExtension.class)
 class SscsUtilTest {
-    public static final String UNEXPECTED_POST_HEARING_REVIEW_TYPE_AND_ACTION = "getting the document type has an unexpected postHearingReviewType and action";
-  
     private SessionCategoryMapService categoryMapService = new SessionCategoryMapService();
     private PostHearing postHearing;
     private SscsCaseData caseData;
@@ -122,7 +124,7 @@ class SscsUtilTest {
     void givenActionTypePta_shouldReturnPtaDocument(PermissionToAppealActions action, DocumentType expectedDocumentType) {
         postHearing.setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
         postHearing.getPermissionToAppeal().setAction(action);
-      
+
         DocumentType documentType = getPostHearingReviewDocumentType(postHearing, true);
 
         assertThat(documentType).isEqualTo(expectedDocumentType);
@@ -175,7 +177,7 @@ class SscsUtilTest {
         postHearing.getCorrection().setIsCorrectionFinalDecisionInProgress(YesNo.YES);
         assertThat(getIssueFinalDecisionDocumentType(caseData, false)).isEqualTo(FINAL_DECISION_NOTICE);
     }
-  
+
     @Test
     void givenPostHearingsEnabledFalse_clearPostHearingsFieldClearsDocumentFields_butDoesNotAlterPostHearing() {
         postHearing.setRequestType(PostHearingRequestType.SET_ASIDE);
@@ -281,5 +283,56 @@ class SscsUtilTest {
         assertThat(hearingSubtype.isWantsHearingTypeTelephone()).isFalse();
         assertThat(hearingSubtype.isWantsHearingTypeFaceToFace()).isFalse();
         assertThat(hearingSubtype.isWantsHearingTypeVideo()).isFalse();
+    }
+
+    @Test
+    void givenPostHearingRequestTypeOfCorrection_HandleAndReturnWhenClearingPostHearingRequestFormatAndContentFields() {
+        postHearing.setRequestType(PostHearingRequestType.CORRECTION);
+
+        Correction correction = Correction.builder()
+            .requestFormat(RequestFormat.GENERATE)
+            .build();
+        postHearing.setCorrection(correction);
+
+        DocumentGeneration docGen = DocumentGeneration.builder()
+            .generateNotice(YesNo.NO)
+            .correctionBodyContent("bodyContent")
+            .build();
+
+        SscsCaseData caseData = SscsCaseData.builder()
+            .postHearing(postHearing)
+            .documentGeneration(docGen)
+            .build();
+
+        SscsUtil.clearPostHearingRequestFormatAndContentFields(caseData, postHearing.getRequestType());
+
+        assertNull(postHearing.getCorrection().getRequestFormat());
+        assertNull(caseData.getDocumentGeneration().getCorrectionBodyContent());
+    }
+
+    @Test
+    void givenNullPostHearingRequestType_HandleAndReturnDefaultValueWhenClearingPostHearingRequestFormatAndContentFields() {
+        postHearing.setRequestType(null);
+
+        DocumentGeneration docGen = DocumentGeneration.builder()
+            .generateNotice(YesNo.NO)
+            .correctionBodyContent("bodyContent")
+            .build();
+
+        SscsCaseData caseData = SscsCaseData.builder()
+            .postHearing(postHearing)
+            .documentGeneration(docGen)
+            .build();
+
+        Logger logger = (Logger) LoggerFactory.getLogger(SscsUtil.class);
+        var listAppender = new ListAppender<ILoggingEvent>();
+        listAppender.start();
+        logger.addAppender(listAppender);
+
+        SscsUtil.clearPostHearingRequestFormatAndContentFields(caseData, postHearing.getRequestType());
+
+        assertFalse(listAppender.list.isEmpty());
+        assertThat(listAppender.list.get(0).getFormattedMessage()
+            .contentEquals("PostHearingRequestType is null during clearing of request format and body content fields for case id: null"));
     }
 }
