@@ -176,7 +176,6 @@ aac-manage-case-assignment:
           - name: notify-mca-api-key-secret
             alias: NOTIFY_MCA_API_KEY
 
-
 #Enable for queues/topics
 #If you need a subscription for a topic, topic name should be not longer than 10 characters
 servicebus:
