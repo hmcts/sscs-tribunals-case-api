@@ -13,7 +13,6 @@ import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
-import uk.gov.hmcts.reform.sscs.service.servicebus.messaging.JmsErrorHandler;
 
 
 @Configuration
@@ -59,7 +58,8 @@ public class MessagingConfig {
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);
         returnValue.setSubscriptionDurable(Boolean.TRUE);
-        returnValue.setErrorHandler(new JmsErrorHandler());
+        returnValue.setErrorHandler(t -> log.error("Error while processing JMS message", t));
+        returnValue.setExceptionListener(t -> log.error("Exception while processing JMS message", t));
         return returnValue;
     }
 
