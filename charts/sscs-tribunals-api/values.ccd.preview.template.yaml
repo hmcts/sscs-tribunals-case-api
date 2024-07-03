@@ -257,7 +257,7 @@ ccd:
       - name: DATA_STORE_PASS
         value: ${SHARED_DB_PASSWORD}
       - name: DATA_STORE_URL
-        value: "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified"
+        value: "jdbc:postgresql://sscs-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-data-store?ssl=disable&stringtype=unspecified"
       - name: DATA_STORE_USER
         value: hmcts
       - name: ES_HOSTS
@@ -293,7 +293,7 @@ ccd:
           jdbc {
             jdbc_connection_string => "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified"
             jdbc_user => "hmcts"
-            jdbc_password => ${SHARED_DB_PASSWORD}
+            jdbc_password => "/etc/logstash/secrets/PASSWORD"
             jdbc_validate_connection => true
             jdbc_validation_timeout => "1"
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
