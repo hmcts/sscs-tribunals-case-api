@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SOR_WRITE;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -138,6 +139,22 @@ class WriteStatementOfReasonsAboutToSubmitHandlerTest {
         expectedDocument.getValue().setDocumentLink(sorDoc);
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(),
             eq(STATEMENT_OF_REASONS), any(), eq(null), eq(null), eq(null), eq(null));
+    }
+
+    @Test
+    void assertThatAfterStatementOfReasonsIsSubmitted_PreviewDocumentIsSetToNull() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        DocumentLink documentLink = DocumentLink.builder()
+                .documentFilename("test")
+                .documentUrl("document url")
+                .documentBinaryUrl("document binary url")
+                .build();
+        caseData.getDocumentStaging().setPreviewDocument(documentLink);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assertions.assertNull(response.getData().getDocumentStaging().getPreviewDocument());
     }
 
 }
