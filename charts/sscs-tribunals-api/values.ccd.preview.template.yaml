@@ -297,7 +297,7 @@ ccd:
           jdbc {
             jdbc_connection_string => "jdbc:postgresql://sscs-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-data-store?ssl=disable&stringtype=unspecified"
             jdbc_user => "hmcts"
-            jdbc_password => "/etc/logstash/secrets/PASSWORD"
+            jdbc_password_filepath => "/etc/logstash/secrets/PASSWORD"
             jdbc_validate_connection => true
             jdbc_validation_timeout => "1"
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
