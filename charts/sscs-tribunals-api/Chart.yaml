@@ -31,7 +31,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-tya-notif.enabled
   - name: ccd
-    version: 9.0.21
+    version: 9.2.0
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd.enabled
     tags:
