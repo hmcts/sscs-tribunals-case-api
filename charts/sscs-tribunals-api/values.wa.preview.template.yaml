@@ -1,4 +1,4 @@
-#Pull request needs to have the pr-values:ccd+wa label to deploy this stack.
+#Pull request needs to have the pr-values:wa label to deploy this stack.
 
 xui-webapp:
   enabled: true
@@ -205,7 +205,6 @@ postgresql:
       - name: "pr-${CHANGE_ID}-data-store"
       - name: "pr-${CHANGE_ID}-definition-store"
       - name: "pr-${CHANGE_ID}-user-profile"
-      - name: "pr-${CHANGE_ID}-draftstore"
       - name: "pr-${CHANGE_ID}-evidence"
       - name: "pr-${CHANGE_ID}-annotation"
       - name: "pr-${CHANGE_ID}-role-assignment"
@@ -255,7 +254,6 @@ wa:
         S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
         CAMUNDA_DB_CONN_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
         RELEASE_REVISION: "{{ .Release.Revision }}"
-
 
   wa-task-management-api:
     java:
