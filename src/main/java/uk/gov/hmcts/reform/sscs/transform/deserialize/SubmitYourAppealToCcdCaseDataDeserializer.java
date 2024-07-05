@@ -30,11 +30,11 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     private SubmitYourAppealToCcdCaseDataDeserializer() {
     }
 
-    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper,
+    public static SscsCaseData convertSyaToCcdCaseDataV1(SyaCaseWrapper syaCaseWrapper,
                                                        String region,
                                                        RegionalProcessingCenter rpc,
                                                        boolean caseAccessManagementEnabled) {
-        return convertSyaToCcdCaseData(syaCaseWrapper, caseAccessManagementEnabled)
+        return convertSyaToCcdCaseDataV1(syaCaseWrapper, caseAccessManagementEnabled)
             .toBuilder()
             .region(region)
             .regionalProcessingCenter(rpc)
@@ -42,7 +42,28 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             .build();
     }
 
-    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled) {
+    public static SscsCaseData convertSyaToCcdCaseDataV1(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled) {
+        return convertSyaToCcdCaseDataGeneric(syaCaseWrapper, caseAccessManagementEnabled, SscsCaseData.builder());
+    }
+
+    public static SscsCaseData convertSyaToCcdCaseDataV2(SyaCaseWrapper syaCaseWrapper,
+                                                       String region,
+                                                       RegionalProcessingCenter rpc,
+                                                       boolean caseAccessManagementEnabled,
+                                                       SscsCaseData sscsCaseData) {
+        return convertSyaToCcdCaseDataV2(syaCaseWrapper, caseAccessManagementEnabled, sscsCaseData)
+            .toBuilder()
+            .region(region)
+            .regionalProcessingCenter(rpc)
+            .build();
+    }
+
+    public static SscsCaseData convertSyaToCcdCaseDataV2(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled, SscsCaseData sscsCaseData) {
+        SscsCaseData.SscsCaseDataBuilder builder = sscsCaseData.toBuilder();
+        return convertSyaToCcdCaseDataGeneric(syaCaseWrapper, caseAccessManagementEnabled, builder);
+    }
+
+    public static SscsCaseData convertSyaToCcdCaseDataGeneric(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled, SscsCaseData.SscsCaseDataBuilder builder) {
         Appeal appeal = getAppeal(syaCaseWrapper);
 
         boolean isDraft = isDraft(syaCaseWrapper);
@@ -79,7 +100,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             caseAccessManagementFields.setCategories(benefit);
             caseAccessManagementFields.setOgdType(benefit.getSscsType().equals(SscsType.SSCS5) ? "HMRC" : "DWP");
 
-            return SscsCaseData.builder()
+            return builder
                     .caseAccessManagementFields(caseAccessManagementFields)
                     .caseCreated(LocalDate.now().toString())
                     .isSaveAndReturn(syaCaseWrapper.getIsSaveAndReturn())
@@ -100,7 +121,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                     .ccdCaseId(ccdCaseId)
                     .build();
         } else {
-            return SscsCaseData.builder()
+            return builder
                     .caseCreated(LocalDate.now().toString())
                     .isSaveAndReturn(syaCaseWrapper.getIsSaveAndReturn())
                     .appeal(appeal)
