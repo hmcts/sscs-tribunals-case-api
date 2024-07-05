@@ -36,16 +36,7 @@ Extra compose files can be provided in src/cftlib/resources/docker.
 
 #### Cftlib - Docker Desktop v4.30
 
-**On Mac**
-
-1. `sudo nano /etc/hosts`
-2. Add the following line to the file: `127.0.0.1    rse-idam-simulator`
-3. To Save and exit `control + x` to exit, `y` to save, `enter` to confirm
-4. Run `sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder`
-
 NOTE: Currently local setup fails if `ENABLE_WORK_ALLOCATION` is set to true so change this to false in the build.gradle file.
-
-Run the `bootWithCCD` gradle task. Once you see `Closing the ES REST client`, the application is ready to use.
 
 Navigate to `http://localhost:3455/cases`
 

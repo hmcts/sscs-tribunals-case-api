@@ -25,6 +25,14 @@ git pull
 echo "Switch to parent folder"
 cd ../
 
+HOST_ENTRY="127.0.0.1    rse-idam-simulator"
+
+if grep -q "$HOST_ENTRY" /etc/hosts; then
+  echo "Entry already exists in /etc/hosts"
+else
+  sudo bash -c "echo '$HOST_ENTRY' >> /etc/hosts"
+fi
+
 echo "pull rse-idam-simulator..."
 docker pull hmctspublic.azurecr.io/hmcts/rse/rse-idam-simulator:latest
 
