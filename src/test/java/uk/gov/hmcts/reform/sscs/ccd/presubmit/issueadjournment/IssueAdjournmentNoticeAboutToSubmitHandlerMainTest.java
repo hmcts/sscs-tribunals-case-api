@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
@@ -84,7 +83,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerMainTest extends IssueAdj
     @DisplayName("Duration is set as existing duration when standard timeslot selected during adjournment")
     @Test
     void givenStandardDurationSelectedShouldSetExistingDuration() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
 
         var adjournment = sscsCaseData.getAdjournment();
         adjournment.setNextHearingListingDuration(60);
