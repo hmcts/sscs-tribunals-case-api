@@ -27,7 +27,7 @@ java:
     IDAM_SSCS_SYSTEMUPDATE_USER: ${IDAM_SSCS_SYSTEMUPDATE_USER}
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
     CORE_CASE_DATA_JURISDICTION_ID: SSCS
-    CORE_CASE_DATA_CASE_TYPE_ID: ${CASE_TYPE}
+    CORE_CASE_DATA_CASE_TYPE_ID: Benefit-3868
     TEST_URL: http://${SERVICE_NAME}
     CREATE_CCD_ENDPOINT: true
     CASE_ACCESS_MANAGEMENT_FEATURE: true
@@ -674,7 +674,7 @@ redis:
 #Turning either hearings api (with either listener on) or cft hearing service on requires
 #service bus to be turned on.
 sscs-hearings-api:
-  enabled: false
+  enabled: true
   java:
     image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
