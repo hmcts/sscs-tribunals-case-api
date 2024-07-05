@@ -19,6 +19,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -224,7 +225,7 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
 
     @Bean
     @ConditionalOnProperty("spring.flyway.enabled")
-    public JobFactory jobFactory(ApplicationContext context) {
+    public JobFactory jobFactory(ApplicationContext context, FlywayMigrationInitializer flywayInitializer) {
         return (new QuartzConfiguration()).jobFactory(context);
     }
 

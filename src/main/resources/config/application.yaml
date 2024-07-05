@@ -14,7 +14,7 @@ spring:
     main:
         allow-bean-definition-overriding: true
     flyway:
-        enabled: true
+        enabled: ${RUN_DB_MIGRATION_ON_STARTUP:true}
         baseline-on-migrate: true  # Optional, based on your needs
         locations: classpath:db/migration
     servlet:
@@ -338,7 +338,6 @@ logging:
         org.quartz.plugins: INFO
         org.quartz.core.QuartzScheduler: INFO
         org.quartz.QuartzScheduler: INFO
-
 
 management:
     endpoint:
@@ -2018,10 +2017,8 @@ spring:
     config:
         activate:
             on-profile: integration, functional
-    autoconfigure.exclude:
-        - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
     flyway:
-      enabled: false
+        enabled: false
 job.scheduler:
     autoStart: false
     retryPolicy:
