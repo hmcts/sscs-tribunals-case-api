@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writestatementofreasons;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -105,6 +106,9 @@ class WriteStatementOfReasonsSubmittedHandlerTest {
 
         verify(ccdCallbackMapService, times(1))
             .handleCcdCallbackMap(WriteStatementOfReasons.IN_TIME, caseData);
+
+        verify(ccdCallbackMapService, never())
+                .handleCcdCallbackMapV2(eq(WriteStatementOfReasons.IN_TIME), anyLong(), consumerArgumentCaptor.capture());
     }
 
 
