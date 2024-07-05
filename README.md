@@ -41,45 +41,37 @@ Once the application running locally, please make sure
 
 ## Running tribunals with hearings enabled
 If you need to test Tribunals with HMC Hearings you must carry out the following steps:
-1. First you need to create a pull request on github for your branch
-2. The branch should have the labels: enable_keep_helm, pr-values:ccd, and enable_hearings
-3. Once this is done you then need to upload a CCD Definition file to AAT CCD. This definition file should have a unique CaseType ID in this format (3575 represents the Pull request number):
+### 1. PR labels
+   1. Create a pull request on github for your branch
+   2. Add the following labels to your PR: enable_keep_helm, pr-values:ccd, and enable_hearings
+### 2. Manual definition import
+   1. Upload a CCD Definition file to AAT CCD with a unique CaseType ID in this format (3575 represents the Pull request number):
+       ```
+       Benefit-3575
+       ```
+   2. Ensure the callbacks for the CaseEvents match the service ingress values within your PR's preview chart. Here is an example of a callback URL for a tribunals PR with an id of 3575:
+       ```
+       https://sscs-tribunals-api-pr-3575.preview.platform.hmcts.net/ccdAboutToSubmit
+       ```
+### 3. Servicebus subscription
+   1. Create a service bus subscription for the HMC hearings topic on AAT.
+      In the Azure portal go to hmc-servicebus-aat and create a subscription for the hmc-to-cft-aat topic, name it in this format:
+       ```
+       hmc-to-sscs-subscription-pr-XXXX
+       ```
+   2. Create a Correlation filter for the subscription with these values:
+       ```
+       hmctsServiceId:BBA3
+       ```
+   3. Enable the sscs-hearings-api service in values.ccd.preview.template.yaml, and replace the value of the following environment variable with the name of the subscription you have created as follows:
+       ```
+       HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-XXXX"
+       ```
+You are now ready to test your hearings changes end-to-end with HMC and ListAssist.
 
-```
-Benefit-3575 
-```
-4. You must ensure the callbacks for the CaseEvents match the service ingress values within your PR's preview chart. Here is an example of a callback URL for a tribunals PR with an id of 3575:
-
-```
-https://sscs-tribunals-api-pr-3575.preview.platform.hmcts.net/ccdAboutToSubmit
-```
-
-5. Once this file has been uploaded to AAT, you will need to create a service bus subscription for the HMC hearings topic on AAT. In the Azure portal go to hmc-servicebus-aat and create a subscription for the hmc-to-cft-aat topic,
-   name it in this format:
-
-```
-hmc-to-sscs-subscription-pr-XXXX
-```
-
-6. And on that subscription create a Correlation filter with these values:
-```
-hmctsServiceId:BBA3
-```
-
-7. Once this has been completed go to values.ccd.preview.template.yaml and enable sscs-hearings-api. you will need to replace
-
-```
-HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-aat"
-```
-
-With the name of the subscription you have created.
-
-
-Once this is done you should be able to deploy to preview with hearings enabled.
-
-Note: When you are finished with preview testing remember to delete the uploaded CCD definition from AAT and the subscription created on hmc-to-cft-aat. 
-ccd-def-cleanup should delete the ccd def file you uploaded, given the enable_keep_helm label is not on your PR. 
-
+### Post testing cleanup
+When you are finished with preview testing remember to delete the uploaded CCD definition from AAT and the subscription created on hmc-to-cft-aat. 
+Rerun the build without the enable_keep_helm label and ccd-def-cleanup should delete the ccd def file you uploaded.
 
 
 ### Running in Docker(Work in progress...)
