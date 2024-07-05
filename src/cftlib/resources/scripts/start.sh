@@ -33,6 +33,8 @@ else
   sudo bash -c "echo '$HOST_ENTRY' >> /etc/hosts"
 fi
 
+sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
+
 echo "pull rse-idam-simulator..."
 docker pull hmctspublic.azurecr.io/hmcts/rse/rse-idam-simulator:latest
 
