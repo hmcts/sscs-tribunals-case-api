@@ -10,6 +10,7 @@ import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -24,10 +25,11 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.factory.CcdNotificationWrapper;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
+@TestPropertySource(locations = "classpath:config/application_es_it.properties")
 public abstract class AbstractNotificationConfigTest {
 
 
-    // Below rules are needed to use the junitParamsRunner together with SpringRunner
+    // Below rules are  needed to use the junitParamsRunner together with SpringRunner
     @ClassRule
     public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
     public static final String SUBSCRIPTION_TEMPLATE_NAME_TEMPLATE = "%s.%s";
