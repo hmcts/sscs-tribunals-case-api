@@ -74,7 +74,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
             response.addWarning(listAssistExistsWarning);
             return response;
         }
-        
+
         String region = sscsCaseData.getRegion();
 
         Map<String, RegionalProcessingCenter> regionalProcessingCenterMap = regionalProcessingCenterService
