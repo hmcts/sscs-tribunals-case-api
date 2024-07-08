@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps.ListAssistHearingMessageHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
@@ -181,19 +180,6 @@ public class ActionPostponementRequestAboutToSubmitHandler implements PreSubmitC
                 .noteDate(LocalDate.now().toString())
                 .build())
             .build();
-    }
-
-    private void clearTransientFields(SscsCaseData caseData) {
-        caseData.setDocumentGeneration(DocumentGeneration.builder().build());
-        caseData.setDocumentStaging(DocumentStaging.builder().build());
-        caseData.setTempNoteDetail(null);
-        caseData.setShowRip1DocPage(null);
-
-        YesNo unprocessedPostponementRequest = caseData.getPostponementRequest().getUnprocessedPostponementRequest();
-        caseData.setPostponementRequest(PostponementRequest.builder()
-                .unprocessedPostponementRequest(unprocessedPostponementRequest)
-                .actionPostponementRequestSelected(caseData.getPostponementRequest().getActionPostponementRequestSelected())
-                .build());
     }
 
     private SscsDocument getLatestPostponementDocumentForDwpType(List<SscsDocument> postponementDocuments) {

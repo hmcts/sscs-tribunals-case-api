@@ -83,6 +83,7 @@ public class ActionPostponementRequestSubmittedCallbackHandler implements PreSub
         YesNo unprocessedPostponementRequest = caseData.getPostponementRequest().getUnprocessedPostponementRequest();
         caseData.setPostponementRequest(PostponementRequest.builder()
                 .unprocessedPostponementRequest(unprocessedPostponementRequest)
+                .actionPostponementRequestSelected(caseData.getPostponementRequest().getActionPostponementRequestSelected())
                 .build());
     }
 }
