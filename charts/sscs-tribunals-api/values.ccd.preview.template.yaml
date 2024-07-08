@@ -144,7 +144,9 @@ xui-webapp:
       HEALTH_ROLE_ASSIGNMENT_API: http://${SERVICE_NAME}-am-role-assignment-service/health
       GLOBAL_SEARCH_SERVICES: IA,CIVIL,PRIVATELAW,PUBLICLAW,SSCS
       JURISDICTIONS: SSCS
+      WA_SUPPORTED_JURISDICTIONS: SSCS
       LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
+      FEATURE_WORKALLOCATION_ENABLED: true
       FEATURE_REDIS_ENABLED: false
       FEATURE_APP_INSIGHTS_ENABLED: false
       FEATURE_SECURE_COOKIE_ENABLED: false
@@ -152,6 +154,7 @@ xui-webapp:
       FEATURE_TERMS_AND_CONDITIONS_ENABLED: false
       FEATURE_HELMET_ENABLED: false
       FEATURE_OIDC_ENABLED: false
+      FEATURE_ACCESS_MANAGEMENT_ENABLED: true
       ALLOW_CONFIG_MUTATIONS: true
       FEATURE_JRD_E_LINKS_V2_ENABLED: true
       NOW: false
@@ -511,7 +514,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:6.4.7nonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:PR1579nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -529,7 +532,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: 6.4.7nonProd
+      CCD_DEF_VERSION: PR1579nonProd
     secrets: []
     userRoles:
       - citizen
