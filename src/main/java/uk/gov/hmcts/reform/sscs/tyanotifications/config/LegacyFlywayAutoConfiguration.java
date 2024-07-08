@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.config;
 
 import javax.sql.DataSource;
 import org.flywaydb.core.Flyway;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -56,9 +57,8 @@ public class LegacyFlywayAutoConfiguration {
     protected static class FlywayInitializerJdbcOperationsDependencyConfiguration implements BeanFactoryPostProcessor {
 
         @Override
-        public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-            if (beanFactory instanceof BeanDefinitionRegistry) {
-                BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
+        public void postProcessBeanFactory(@NotNull ConfigurableListableBeanFactory beanFactory) throws BeansException {
+            if (beanFactory instanceof BeanDefinitionRegistry registry) {
                 String[] beanNamesForType = beanFactory.getBeanNamesForType(JdbcOperations.class, false, false);
                 for (String beanName : beanNamesForType) {
                     RootBeanDefinition beanDefinition = (RootBeanDefinition) registry.getBeanDefinition(beanName);
