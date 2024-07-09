@@ -278,5 +278,6 @@
   "preWorkAllocation": "No",
   "dwpIsOfficerAttending":  "No",
   "poAttendanceConfirmed": "No",
-  "tribunalDirectPoToAttend": "No"
+  "tribunalDirectPoToAttend": "No",
+  "hearingRoute":"gaps"
 }
