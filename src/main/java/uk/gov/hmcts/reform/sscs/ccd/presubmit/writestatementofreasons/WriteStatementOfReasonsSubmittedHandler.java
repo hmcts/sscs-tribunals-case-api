@@ -56,7 +56,7 @@ public class WriteStatementOfReasonsSubmittedHandler implements PreSubmitCallbac
                     callbackMap,
                     caseId,
                     sscsCaseDataConsumer
-            ).orElse(caseData);
+            );
         } else {
             sscsCaseDataConsumer.accept(caseData);
             caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
