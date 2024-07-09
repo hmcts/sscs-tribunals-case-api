@@ -72,7 +72,7 @@ public class PostHearingRequestIt extends AbstractEventIt {
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.registerModule(new JavaTimeModule());
         json = getJson("callback/postHearingRequest.json");
-
+        json = json.replaceFirst("invoking_event", "postHearingRequest");
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }
 
