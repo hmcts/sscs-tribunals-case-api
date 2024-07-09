@@ -13,7 +13,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SOR_WRITE;
 
-import java.util.Optional;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -125,7 +124,7 @@ class WriteStatementOfReasonsSubmittedHandlerTest {
         long caseId = Long.parseLong(caseData.getCcdCaseId());
 
         when(ccdCallbackMapService.handleCcdCallbackMapV2(eq(callbackMap), eq(caseId), any()))
-                .thenReturn(Optional.of(SscsCaseData.builder().build()));
+                .thenReturn(SscsCaseData.builder().build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
