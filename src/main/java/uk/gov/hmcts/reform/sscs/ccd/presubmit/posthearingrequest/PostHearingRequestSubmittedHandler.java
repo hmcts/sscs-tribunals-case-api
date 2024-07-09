@@ -68,7 +68,7 @@ public class PostHearingRequestSubmittedHandler implements PreSubmitCallbackHand
                     callbackMap,
                     caseId,
                     sscsCaseDataConsumer
-            ).orElse(caseData);
+            );
         } else {
             sscsCaseDataConsumer.accept(caseData);
             caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
