@@ -60,7 +60,7 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        long caseId = Long.parseLong(caseData.getCcdCaseId());
 
         PostHearing postHearing = caseData.getPostHearing();
         PostHearingReviewType typeSelected = postHearing.getReviewType();
@@ -84,7 +84,7 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
                     callbackMap,
                     caseId,
                     sscsCaseDataConsumer
-            ).orElse(caseData);
+            );
         } else {
             sscsCaseDataConsumer.accept(caseData);
             caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);

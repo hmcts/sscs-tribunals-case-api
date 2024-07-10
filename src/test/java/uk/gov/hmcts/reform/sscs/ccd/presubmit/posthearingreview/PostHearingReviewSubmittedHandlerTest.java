@@ -22,7 +22,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions.REFUSE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions.REFUSE_SOR;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
-import java.util.Optional;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -185,7 +184,7 @@ class PostHearingReviewSubmittedHandlerTest {
                 .build();
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
         when(ccdCallbackMapService.handleCcdCallbackMapV2(eq(action), eq(caseId), consumerArgumentCaptor.capture()))
-                .thenReturn(Optional.of(returnedCase));
+                .thenReturn(returnedCase);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
@@ -266,7 +265,7 @@ class PostHearingReviewSubmittedHandlerTest {
                 .build();
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
         when(ccdCallbackMapService.handleCcdCallbackMapV2(eq(REFUSE), eq(caseId), consumerArgumentCaptor.capture()))
-                .thenReturn(Optional.of(returnedCase));
+                .thenReturn(returnedCase);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
@@ -359,7 +358,7 @@ class PostHearingReviewSubmittedHandlerTest {
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
 
         when(ccdCallbackMapService.handleCcdCallbackMapV2(eq(REFUSE_SOR), eq(caseId), consumerArgumentCaptor.capture()))
-                .thenReturn(Optional.of(returnedCase));
+                .thenReturn(returnedCase);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
