@@ -126,6 +126,12 @@ withPipeline(type, product, component) {
             env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
             env.CCD_GW_API = "https://gateway-ccd.aat.platform.hmcts.net"
         }
+        for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
+            env.ROLE_ASSIGNMENT_URL = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
+        }
+        for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:wa") ) {
+            env.ROLE_ASSIGNMENT_URL = "http://sscs-tribunals-api-pr-${CHANGE_ID}-am-role-assignment-service"
+        }
     } else {
         loadVaultSecrets(secrets)
     }
