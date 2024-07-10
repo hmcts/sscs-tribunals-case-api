@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,9 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.TypedDocument;
 
 @Slf4j
 @Component
@@ -72,32 +73,32 @@ public class AddedDocumentsUtil {
         }
     }
 
-    public List<String> addedDocumentTypes(List<? extends AbstractDocument> previousDocuments, List<? extends AbstractDocument> documents) {
+    public List<String> addedDocumentTypes(List<? extends TypedDocument> previousDocuments, List<? extends TypedDocument> documents) {
         Map<String, Optional<String>> existingDocumentTypes = null;
         if (previousDocuments != null) {
             existingDocumentTypes = previousDocuments.stream().collect(
-                    Collectors.toMap(d -> d.getId(), d -> Optional.ofNullable(d.getValue().getDocumentType())));
+                    Collectors.toMap(d -> d.getId(), d -> Optional.ofNullable(d.getDocumentType())));
         }
 
         return addedDocumentTypes(existingDocumentTypes, documents);
     }
 
-    public List<String> addedDocumentTypes(Map<String, Optional<String>> existingDocumentTypes, List<? extends AbstractDocument> documents) {
+    public List<String> addedDocumentTypes(Map<String, Optional<String>> existingDocumentTypes, List<? extends TypedDocument> documents) {
         if (documents != null) {
             return documents.stream()
                     .filter(d -> isNewDocumentOrTypeChanged(existingDocumentTypes, d))
-                    .map(d -> d.getValue().getDocumentType())
+                    .map(d -> d.getDocumentType())
                     .filter(Objects::nonNull)
                     .distinct()
                     .collect(Collectors.toList());
         }
-        return null;
+        return new ArrayList<>();
     }
 
-    private boolean isNewDocumentOrTypeChanged(Map<String, Optional<String>> existingDocumentTypes, AbstractDocument document) {
+    private boolean isNewDocumentOrTypeChanged(Map<String, Optional<String>> existingDocumentTypes, TypedDocument document) {
         if (existingDocumentTypes != null) {
             if (existingDocumentTypes.containsKey(document.getId())) {
-                return !StringUtils.equals(document.getValue().getDocumentType(),
+                return !StringUtils.equals(document.getDocumentType(),
                         existingDocumentTypes.get(document.getId()).orElse(null));
             }
         }
