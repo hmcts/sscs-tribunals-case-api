@@ -13,7 +13,7 @@ import uk.gov.hmcts.contino.GradleBuilder
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
-def dmnBranch = "master"
+def dmnBranch = "SSCS-12404_write_sor_task_rename"
 def waStandaloneBranch = "master"
 
 def gradleBuilder = new GradleBuilder(this, product)
@@ -125,6 +125,12 @@ withPipeline(type, product, component) {
             env.CASE_TYPE = "Benefit-${CHANGE_ID}"
             env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
             env.CCD_GW_API = "https://gateway-ccd.aat.platform.hmcts.net"
+        }
+        for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
+            env.ROLE_ASSIGNMENT_URL = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
+        }
+        for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:wa") ) {
+            env.ROLE_ASSIGNMENT_URL = "http://sscs-tribunals-api-pr-${CHANGE_ID}-am-role-assignment-service"
         }
     } else {
         loadVaultSecrets(secrets)
