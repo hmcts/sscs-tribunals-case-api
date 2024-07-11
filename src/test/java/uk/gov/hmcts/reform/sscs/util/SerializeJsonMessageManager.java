@@ -15,7 +15,9 @@ public enum SerializeJsonMessageManager {
 
     APPEAL_RECEIVED("tya/appealReceived.json"),
     APPEAL_RECEIVED_MYA("tya/appealReceivedMya.json"),
+    APPEAL_RECEIVED_CHILD_SUPPORT_MYA("tya/appealReceivedChildSupportMya.json"),
     APPEAL_RECEIVED_CCD("tya/appealReceivedCcd.json"),
+    APPEAL_RECEIVED_CHILD_SUPPORT_CCD("tya/appealReceivedChildSupportCcd.json"),
     APPEAL_CREATED_WITH_CREATEDINGAPSFROM_FIELD_CCD_RESPONSE("tya/appealCreatedWithCreatedInGapsFromFieldCcdResponse.json"),
     DWP_RESPOND("tya/dwpRespond.json"),
     DWP_RESPOND_MYA("tya/dwpRespondMya.json"),

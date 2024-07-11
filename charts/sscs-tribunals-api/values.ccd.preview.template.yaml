@@ -35,7 +35,6 @@ java:
     SCHEDULE_LISTING_FEATURE: true
     POST_HEARINGS_FEATURE: true
     POST_HEARINGS_B_FEATURE: true
-    ADJOURNMENT_FEATURE: true
     GAPS_SWITCHOVER_FEATURE: true
     ELASTIC_SEARCH_FEATURE: true
     ELINKS_V2_FEATURE_ENABLED: true
@@ -48,6 +47,7 @@ java:
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
     AMQP_USERNAME: "RootManageSharedAccessKey"
     HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
+    HANDLE_CCD_CALLBACKMAP_V2: true
   secrets:
     HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
       secretRef: sscs-sb-preview
@@ -74,8 +74,7 @@ java:
             CREATE DATABASE "sscsjobscheduler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
     auth:
       username: "hmcts"
-      password: "hmcts"
-
+      password: ${SHARED_DB_PASSWORD}
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -122,10 +121,10 @@ ccd-case-document-am-api:
 xui-webapp:
   enabled: true
   nodejs:
-    memoryLimits: "4Gi"
-    cpuLimits: 2000m
-    memoryRequests: "1Gi"
-    cpuRequests: "1"
+    devmemoryLimits: "1Gi"
+    devcpuLimits: 1
+    devmemoryRequests: "512Mi"
+    devcpuRequests: "500m"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
@@ -206,7 +205,7 @@ ccd:
     postgresql:
       auth:
         postgresUsername: hmcts
-        postgresPassword: "${postgresPassword:hmcts}"
+        postgresPassword: ${SHARED_DB_PASSWORD}
 
   am-role-assignment-service:
     java:
@@ -264,7 +263,7 @@ ccd:
       enabled: false
     extraEnvs:
       - name: DATA_STORE_PASS
-        value: hmcts
+        value: ${SHARED_DB_PASSWORD}
       - name: DATA_STORE_URL
         value: "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified"
       - name: DATA_STORE_USER
@@ -302,7 +301,7 @@ ccd:
           jdbc {
             jdbc_connection_string => "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified"
             jdbc_user => "hmcts"
-            jdbc_password => "hmcts"
+            jdbc_password => ${SHARED_DB_PASSWORD}
             jdbc_validate_connection => true
             jdbc_validation_timeout => "1"
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
@@ -529,7 +528,7 @@ ccd:
 
   #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
   ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:S12472BnonProd
+    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:6.4.7nonProd
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
@@ -547,7 +546,7 @@ ccd:
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: S12472BnonProd
+      CCD_DEF_VERSION: 6.4.7nonProd
     secrets: []
     userRoles:
       - citizen
@@ -598,7 +597,7 @@ sscs-tya-notif:
       JOB_SCHEDULER_DB_HOST: ${SERVICE_NAME}-postgresql
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
       JOB_SCHEDULER_DB_USERNAME: hmcts
-      JOB_SCHEDULER_DB_PASSWORD: "${JOB_SCHEDULER:hmcts}"
+      JOB_SCHEDULER_DB_PASSWORD: ${SHARED_DB_PASSWORD}
       HOURS_START_TIME: 0
       HOURS_END_TIME: 23
       RUN_DB_MIGRATION_ON_STARTUP: true
