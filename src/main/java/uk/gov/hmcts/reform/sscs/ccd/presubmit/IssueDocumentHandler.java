@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.util.PdfRequestUtil;
 @Slf4j
 public class IssueDocumentHandler {
     private static final String GLASGOW = "GLASGOW";
+    private static final String DECISION_NOTICE_TEXT = "Decision Notice";
 
     // Fields used for a short period in case progression are transient,
     // relevant for a short period of the case lifecycle.
@@ -140,7 +141,7 @@ public class IssueDocumentHandler {
         String documentUrl = Optional.ofNullable(getDocumentFromCaseData(caseData)).map(DocumentLink::getDocumentUrl).orElse(null);
         LocalDate dateAdded = Optional.ofNullable(caseData.getDocumentStaging().getDateAdded()).orElse(LocalDate.now());
         String documentTypeLabel = getDocumentTypeLabel(caseData, documentType, isPostHearingsEnabled);
-        String embeddedDocumentTypeLabel = getEmbeddedDocumentTypeLabel(caseData, documentType, documentTypeLabel, isPostHearingsEnabled);
+        String embeddedDocumentTypeLabel = getEmbeddedDocumentTypeLabel(caseData, callback.getEvent(), documentType, documentTypeLabel, isPostHearingsEnabled);
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
@@ -187,20 +188,24 @@ public class IssueDocumentHandler {
         return documentTypeLabel;
     }
 
-    protected String getEmbeddedDocumentTypeLabel(SscsCaseData caseData, DocumentType documentType, String documentTypeLabel, boolean isPostHearingsEnabled) {
+    protected String getEmbeddedDocumentTypeLabel(SscsCaseData caseData, EventType eventType, DocumentType documentType, String documentTypeLabel, boolean isPostHearingsEnabled) {
         String embeddedDocumentTypeLabel = (FINAL_DECISION_NOTICE.equals(documentType) || CORRECTION_GRANTED.equals(documentType) ? "Decision Notice" : documentTypeLabel);
 
         if (isPostHearingsEnabled) {
+            if (eventType != null && eventType.equals(EventType.ADMIN_ACTION_CORRECTION)) {
+                return PostHearingReviewType.CORRECTION.getDescriptionEn() + " " + DECISION_NOTICE_TEXT;
+            }
+
             PostHearing postHearing = caseData.getPostHearing();
             PostHearingReviewType postHearingReviewType = postHearing.getReviewType();
 
             if (nonNull(postHearingReviewType)) {
                 if (PostHearingReviewType.PERMISSION_TO_APPEAL.equals(postHearingReviewType)
                         && PermissionToAppealActions.REVIEW.equals(postHearing.getPermissionToAppeal().getAction())) {
-                    return "Review Decision Notice";
+                    return "Review " + DECISION_NOTICE_TEXT;
                 }
 
-                return postHearingReviewType.getDescriptionEn() + " Decision Notice";
+                return postHearingReviewType.getDescriptionEn() + " " + DECISION_NOTICE_TEXT;
             }
 
             if (isYes(postHearing.getCorrection().getIsCorrectionFinalDecisionInProgress())) {
