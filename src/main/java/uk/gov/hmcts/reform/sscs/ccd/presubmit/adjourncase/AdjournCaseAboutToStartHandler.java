@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
-import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
@@ -41,20 +39,11 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        clearTransientFields(preSubmitCallbackResponse);
-
         DynamicList languageList = utils.generateInterpreterLanguageFields(sscsCaseData.getAdjournment().getInterpreterLanguage());
         sscsCaseData.getAdjournment().setInterpreterLanguage(languageList);
 
         return preSubmitCallbackResponse;
     }
 
-    private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (preSubmitCallbackResponse.getData().getSscsDocument() != null && preSubmitCallbackResponse.getData().getSscsDocument().stream()
-            .noneMatch(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()))) {
-
-            SscsUtil.clearAdjournmentTransientFields(preSubmitCallbackResponse.getData());
-        }
-    }
 }
 
