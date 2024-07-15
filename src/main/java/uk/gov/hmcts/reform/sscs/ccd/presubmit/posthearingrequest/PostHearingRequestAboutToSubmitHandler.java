@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.RequestFormat.UPLOAD;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostHearingRequestFormatAndContentFields;
 
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -25,12 +27,16 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
+
+    @Value("${feature.work-allocation.enabled}")
+    private final boolean isWorkAllocationEnabled;
+
     private final FooterService footerService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        requireNonNull(callbackType, "callbacktype must not be null");
+        requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && callback.getEvent() == EventType.POST_HEARING_REQUEST
@@ -40,8 +46,7 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType,
         Callback<SscsCaseData> callback,
-        String userAuthorisation
-    ) {
+        String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         String caseId = caseData.getCcdCaseId();
         PostHearingRequestType requestType = caseData.getPostHearing().getRequestType();
@@ -50,14 +55,18 @@ public class PostHearingRequestAboutToSubmitHandler implements PreSubmitCallback
         final PreSubmitCallbackResponse<SscsCaseData> response = validatePostHearingRequest(caseData);
 
         if (response.getErrors().isEmpty()) {
+            DocumentType postHearingDocumentType = PdfRequestUtil.getPostHearingDocumentType(caseData.getPostHearing().getRequestType());
             SscsUtil.addDocumentToDocumentTabAndBundle(footerService, caseData,
-                caseData.getDocumentStaging().getPreviewDocument(),
-                PdfRequestUtil.getPostHearingDocumentType(caseData.getPostHearing().getRequestType()),
-                callback.getEvent());
+                    caseData.getDocumentStaging().getPreviewDocument(), postHearingDocumentType, callback.getEvent());
+
+            if (isWorkAllocationEnabled && postHearingDocumentType.equals(DocumentType.STATEMENT_OF_REASONS_APPLICATION)) {
+                SscsDocument sorDocument = caseData.getLatestDocumentForDocumentType(DocumentType.STATEMENT_OF_REASONS_APPLICATION);
+                SscsDocument decisionDocument = caseData.getLatestDocumentForDocumentType(FINAL_DECISION_NOTICE);
+                YesNo sorRequestInTime = SscsUtil.isSorRequestInTime(sorDocument, decisionDocument);
+                caseData.getPostHearing().setSorRequestInTime(sorRequestInTime);
+            }
         }
-
         clearPostHearingRequestFormatAndContentFields(caseData, caseData.getPostHearing().getRequestType());
-
         return response;
     }
 

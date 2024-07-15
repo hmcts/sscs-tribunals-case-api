@@ -138,6 +138,26 @@
       }
     ],
     "overrideAll": true
+  },
+  {
+    "email": "super-user@example.com",
+    "id": "7e0c7094-abb9-359e-b58f-59d604316168",
+    "roleAssignments": [
+      {
+        "roleType": "ORGANISATION",
+        "roleName": "ctsc-team-leader",
+        "grantType": "STANDARD",
+        "roleCategory": "CTSC",
+        "classification": "PUBLIC",
+        "readOnly": false,
+        "attributes": {
+          "caseType": "Benefit",
+          "jurisdiction": "SSCS"
+        },
+        "authorisations": []
+      }
+    ],
+    "overrideAll": true
   }
 ]
 
