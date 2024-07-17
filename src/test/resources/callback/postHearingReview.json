@@ -186,7 +186,9 @@
           }
         }
       ],
-      "setAside": {},
+      "setAside": {
+        "action": "grant"
+      },
       "issueCode": "CC",
       "correction": {
         "isCorrectionFinalDecisionInProgress": "No"
@@ -576,6 +578,7 @@
       },
       "issueFinalDecisionDate": "2024-06-25",
       "postHearingRequestType": "setAside",
+      "postHearingReviewType": "setAside",
       "caseNameHmctsRestricted": "Tester Tues_1",
       "finalDecisionIssuedDate": "2024-06-25",
       "finalDecisionIdamSurname": "SSCS ctsc",
@@ -1787,7 +1790,9 @@
           }
         }
       ],
-      "setAside": {},
+      "setAside": {
+        "action": "grant"
+      },
       "issueCode": "CC",
       "correction": {
         "isCorrectionFinalDecisionInProgress": "No"
