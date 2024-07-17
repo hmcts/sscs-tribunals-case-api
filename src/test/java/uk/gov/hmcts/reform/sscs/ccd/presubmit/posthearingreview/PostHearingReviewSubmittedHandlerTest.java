@@ -129,7 +129,7 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = SetAsideActions.class, names = {"GRANT"})
+    @EnumSource(value = SetAsideActions.class, names = {"GRANT", "REFUSE", "REFUSE_SOR"})
     void givenActionTypeSetAsideSelectedIsNotRefuse_shouldNotUpdateCaseWIthCcdService(SetAsideActions action) {
         caseData.getPostHearing().setReviewType(SET_ASIDE);
         caseData.getPostHearing().getSetAside().setAction(action);
@@ -164,7 +164,7 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = SetAsideActions.class, names = {"GRANT"})
+    @EnumSource(value = SetAsideActions.class, names = {"GRANT", "REFUSE", "REFUSE_SOR"})
     void givenActionTypeSetAsideSelectedIsNotRefuse_shouldNotUpdateCaseWIthCcdService_whenCcdCallbackMapV2IsEnabled(SetAsideActions action) {
         caseData.getPostHearing().setReviewType(SET_ASIDE);
         caseData.getPostHearing().getSetAside().setAction(action);
@@ -201,7 +201,7 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = YesNo.class, names = {"NO"})
+    @EnumSource(value = YesNo.class, names = {"NO", "YES"})
     @NullSource
     void givenRefusedSetAsideSelected_andNoStatementOfReasons_shouldReturnCorrectCallback_andUpdateCase(YesNo requestSor) {
         caseData.getPostHearing().setReviewType(SET_ASIDE);
@@ -241,7 +241,7 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = YesNo.class, names = {"NO"})
+    @EnumSource(value = YesNo.class, names = {"NO", "YES"})
     @NullSource
     void givenRefusedSetAsideSelected_andNoStatementOfReasons_whenCcdCallbackMapV2IsEnabled_shouldReturnCorrectCallback_andUpdateCase(YesNo requestSor) {
         caseData.getPostHearing().setReviewType(SET_ASIDE);
@@ -393,7 +393,7 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = CorrectionActions.class)
+    @EnumSource(value = CorrectionActions.class, names = {"GRANT", "REFUSE"})
     void givenActionTypeCorrectionSelected_shouldReturnCallCorrectCallback(CorrectionActions value) {
         caseData.getPostHearing().setReviewType(CORRECTION);
         caseData.getPostHearing().getCorrection().setAction(value);
@@ -402,7 +402,7 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = StatementOfReasonsActions.class)
+    @EnumSource(value = StatementOfReasonsActions.class, names = {"GRANT", "REFUSE"})
     void givenActionTypeSorSelected_shouldReturnCallCorrectCallback(StatementOfReasonsActions value) {
         caseData.getPostHearing().setReviewType(STATEMENT_OF_REASONS);
         caseData.getPostHearing().getStatementOfReasons().setAction(value);
@@ -411,7 +411,7 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PermissionToAppealActions.class)
+    @EnumSource(value = PermissionToAppealActions.class, names = {"GRANT", "REFUSE", "REVIEW"})
     void givenActionTypePtaSelected_shouldReturnCallCorrectCallback(PermissionToAppealActions value) {
         caseData.getPostHearing().setReviewType(PERMISSION_TO_APPEAL);
         caseData.getPostHearing().getPermissionToAppeal().setAction(value);
@@ -420,7 +420,7 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = LibertyToApplyActions.class)
+    @EnumSource(value = LibertyToApplyActions.class, names = {"GRANT", "REFUSE"})
     void givenActionTypeLtaSelected_shouldReturnCallCorrectCallback(LibertyToApplyActions value) {
         caseData.getPostHearing().setReviewType(LIBERTY_TO_APPLY);
         caseData.getPostHearing().getLibertyToApply().setAction(value);
