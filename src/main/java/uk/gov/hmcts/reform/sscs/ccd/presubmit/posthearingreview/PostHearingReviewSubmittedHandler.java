@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
@@ -39,6 +40,9 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
+    @Value("${feature.handle-ccd-callbackMap-v2.enabled}")
+    private boolean isHandleCcdCallbackMapV2Enabled;
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -56,7 +60,7 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        long caseId = Long.parseLong(caseData.getCcdCaseId());
 
         PostHearing postHearing = caseData.getPostHearing();
         PostHearingReviewType typeSelected = postHearing.getReviewType();
@@ -73,9 +77,18 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
 
         boolean isSetAsideRefusedSor = isSetAsideRefusedSor(postHearing);
 
-        SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
+        Consumer<SscsCaseData> sscsCaseDataConsumer = sscsCaseData -> SscsUtil.clearPostHearingFields(sscsCaseData, isPostHearingsEnabled);
 
-        caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
+        if (isHandleCcdCallbackMapV2Enabled) {
+            caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
+                    callbackMap,
+                    caseId,
+                    sscsCaseDataConsumer
+            );
+        } else {
+            sscsCaseDataConsumer.accept(caseData);
+            caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
+        }
 
         if (isSetAsideRefusedSor) {
             handleSetAsideRefusedSor(caseData);

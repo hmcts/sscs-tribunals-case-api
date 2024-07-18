@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingreview;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -19,14 +22,18 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions.REFUSE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.SetAsideActions.REFUSE_SOR;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
+import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -60,6 +67,9 @@ class PostHearingReviewSubmittedHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     private SscsCaseData caseData;
+
+    @Captor
+    private ArgumentCaptor<Consumer<SscsCaseData>> consumerArgumentCaptor;
 
     @BeforeEach
     void setUp() {
@@ -119,7 +129,7 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = SetAsideActions.class, names = {"GRANT"})
+    @EnumSource(value = SetAsideActions.class, names = {"GRANT", "REFUSE", "REFUSE_SOR"})
     void givenActionTypeSetAsideSelectedIsNotRefuse_shouldNotUpdateCaseWIthCcdService(SetAsideActions action) {
         caseData.getPostHearing().setReviewType(SET_ASIDE);
         caseData.getPostHearing().getSetAside().setAction(action);
@@ -147,11 +157,51 @@ class PostHearingReviewSubmittedHandlerTest {
         verify(ccdCallbackMapService, times(1))
             .handleCcdCallbackMap(action, caseData);
 
+        verify(ccdCallbackMapService, never())
+                .handleCcdCallbackMapV2(eq(action), anyLong(), consumerArgumentCaptor.capture());
+
         verifyNoInteractions(ccdService);
     }
 
     @ParameterizedTest
-    @EnumSource(value = YesNo.class, names = {"NO"})
+    @EnumSource(value = SetAsideActions.class, names = {"GRANT", "REFUSE", "REFUSE_SOR"})
+    void givenActionTypeSetAsideSelectedIsNotRefuse_shouldNotUpdateCaseWIthCcdService_whenCcdCallbackMapV2IsEnabled(SetAsideActions action) {
+        caseData.getPostHearing().setReviewType(SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setAction(action);
+        ReflectionTestUtils.setField(handler, "isHandleCcdCallbackMapV2Enabled", true);
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        PostHearing returnedPostHearing = PostHearing.builder()
+                .reviewType(SET_ASIDE)
+                .setAside(SetAside.builder()
+                        .action(action)
+                        .build())
+                .build();
+        SscsCaseData returnedCase = SscsCaseData.builder()
+                .ccdCaseId("555")
+                .postHearing(returnedPostHearing)
+                .build();
+        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        when(ccdCallbackMapService.handleCcdCallbackMapV2(eq(action), eq(caseId), consumerArgumentCaptor.capture()))
+                .thenReturn(returnedCase);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        verify(ccdCallbackMapService, times(1))
+                .handleCcdCallbackMapV2(eq(action), anyLong(), consumerArgumentCaptor.capture());
+
+        verify(ccdCallbackMapService, never())
+                .handleCcdCallbackMap(action, caseData);
+
+        verifyNoInteractions(ccdService);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = YesNo.class, names = {"NO", "YES"})
     @NullSource
     void givenRefusedSetAsideSelected_andNoStatementOfReasons_shouldReturnCorrectCallback_andUpdateCase(YesNo requestSor) {
         caseData.getPostHearing().setReviewType(SET_ASIDE);
@@ -182,6 +232,51 @@ class PostHearingReviewSubmittedHandlerTest {
 
         verify(ccdCallbackMapService, times(1))
             .handleCcdCallbackMap(REFUSE, caseData);
+
+        verify(ccdCallbackMapService, never())
+                .handleCcdCallbackMapV2(eq(REFUSE), anyLong(), consumerArgumentCaptor.capture());
+
+        assertThat(response.getData().getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
+        assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.NONE);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = YesNo.class, names = {"NO", "YES"})
+    @NullSource
+    void givenRefusedSetAsideSelected_andNoStatementOfReasons_whenCcdCallbackMapV2IsEnabled_shouldReturnCorrectCallback_andUpdateCase(YesNo requestSor) {
+        caseData.getPostHearing().setReviewType(SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setAction(REFUSE);
+        ReflectionTestUtils.setField(handler, "isHandleCcdCallbackMapV2Enabled", true);
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        PostHearing returnedPostHearing = PostHearing.builder()
+                .reviewType(SET_ASIDE)
+                .setAside(SetAside.builder()
+                        .action(REFUSE)
+                        .requestStatementOfReasons(requestSor)
+                        .build())
+                .build();
+        SscsCaseData returnedCase = SscsCaseData.builder()
+                .state(State.DORMANT_APPEAL_STATE)
+                .interlocReviewState(InterlocReviewState.NONE)
+                .ccdCaseId("555")
+                .postHearing(returnedPostHearing)
+                .build();
+        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        when(ccdCallbackMapService.handleCcdCallbackMapV2(eq(REFUSE), eq(caseId), consumerArgumentCaptor.capture()))
+                .thenReturn(returnedCase);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        verify(ccdCallbackMapService, times(1))
+                .handleCcdCallbackMapV2(eq(REFUSE), anyLong(), consumerArgumentCaptor.capture());
+
+        verify(ccdCallbackMapService, never())
+                .handleCcdCallbackMap(REFUSE, caseData);
 
         assertThat(response.getData().getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
         assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.NONE);
@@ -222,12 +317,66 @@ class PostHearingReviewSubmittedHandlerTest {
         verify(ccdCallbackMapService, times(1))
             .handleCcdCallbackMap(REFUSE_SOR, caseData);
 
+        verify(ccdCallbackMapService, never())
+                .handleCcdCallbackMapV2(eq(REFUSE_SOR), anyLong(), consumerArgumentCaptor.capture());
+
         verify(ccdService, times(1)).updateCase(returnedCase,
             Long.valueOf(returnedCase.getCcdCaseId()),
             EventType.SOR_REQUEST.getCcdType(),
             "Send to hearing Judge for statement of reasons",
             "",
             idamService.getIdamTokens());
+
+        assertThat(response.getData().getState()).isEqualTo(State.POST_HEARING);
+        assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.NONE);
+    }
+
+    @Test
+    void givenRefusedSetAsideSelected_andStatementOfReasonsRequested_whenCcdCallbackMapV2IsEnabled_shouldReturnCallCorrectCallback() {
+        caseData.getPostHearing().setReviewType(SET_ASIDE);
+        caseData.getPostHearing().getSetAside().setAction(REFUSE);
+        ReflectionTestUtils.setField(handler, "isHandleCcdCallbackMapV2Enabled", true);
+
+        caseData.getPostHearing().getSetAside().setRequestStatementOfReasons(YES);
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        PostHearing returnedPostHearing = PostHearing.builder()
+                .reviewType(SET_ASIDE)
+                .setAside(SetAside.builder()
+                        .action(REFUSE)
+                        .requestStatementOfReasons(YES)
+                        .build())
+                .build();
+        SscsCaseData returnedCase = SscsCaseData.builder()
+                .state(State.POST_HEARING)
+                .postHearing(returnedPostHearing)
+                .interlocReviewState(InterlocReviewState.NONE)
+                .ccdCaseId("555")
+                .build();
+        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+
+        when(ccdCallbackMapService.handleCcdCallbackMapV2(eq(REFUSE_SOR), eq(caseId), consumerArgumentCaptor.capture()))
+                .thenReturn(returnedCase);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        verify(ccdCallbackMapService, times(1))
+                .handleCcdCallbackMapV2(eq(REFUSE_SOR), anyLong(), consumerArgumentCaptor.capture());
+
+        verify(ccdCallbackMapService, never())
+                .handleCcdCallbackMap(REFUSE_SOR, caseData);
+
+        verify(ccdService, times(1)).updateCase(returnedCase,
+                Long.valueOf(returnedCase.getCcdCaseId()),
+                EventType.SOR_REQUEST.getCcdType(),
+                "Send to hearing Judge for statement of reasons",
+                "",
+                idamService.getIdamTokens());
 
         assertThat(response.getData().getState()).isEqualTo(State.POST_HEARING);
         assertThat(response.getData().getInterlocReviewState()).isEqualTo(InterlocReviewState.NONE);
@@ -244,7 +393,7 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = CorrectionActions.class)
+    @EnumSource(value = CorrectionActions.class, names = {"GRANT", "REFUSE"})
     void givenActionTypeCorrectionSelected_shouldReturnCallCorrectCallback(CorrectionActions value) {
         caseData.getPostHearing().setReviewType(CORRECTION);
         caseData.getPostHearing().getCorrection().setAction(value);
@@ -253,7 +402,7 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = StatementOfReasonsActions.class)
+    @EnumSource(value = StatementOfReasonsActions.class, names = {"GRANT", "REFUSE"})
     void givenActionTypeSorSelected_shouldReturnCallCorrectCallback(StatementOfReasonsActions value) {
         caseData.getPostHearing().setReviewType(STATEMENT_OF_REASONS);
         caseData.getPostHearing().getStatementOfReasons().setAction(value);
@@ -262,7 +411,7 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = PermissionToAppealActions.class)
+    @EnumSource(value = PermissionToAppealActions.class, names = {"GRANT", "REFUSE", "REVIEW"})
     void givenActionTypePtaSelected_shouldReturnCallCorrectCallback(PermissionToAppealActions value) {
         caseData.getPostHearing().setReviewType(PERMISSION_TO_APPEAL);
         caseData.getPostHearing().getPermissionToAppeal().setAction(value);
@@ -271,7 +420,7 @@ class PostHearingReviewSubmittedHandlerTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = LibertyToApplyActions.class)
+    @EnumSource(value = LibertyToApplyActions.class, names = {"GRANT", "REFUSE"})
     void givenActionTypeLtaSelected_shouldReturnCallCorrectCallback(LibertyToApplyActions value) {
         caseData.getPostHearing().setReviewType(LIBERTY_TO_APPLY);
         caseData.getPostHearing().getLibertyToApply().setAction(value);

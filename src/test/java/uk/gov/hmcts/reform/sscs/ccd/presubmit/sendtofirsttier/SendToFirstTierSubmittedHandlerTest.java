@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_FIRST_TIER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPPER_TRIBUNAL_DECISION;
 
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -93,7 +92,7 @@ public class SendToFirstTierSubmittedHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(ccdCallbackMapService.handleCcdCallbackMapV2(value, CASE_ID))
-                .thenReturn(Optional.of(SscsCaseData.builder().build()));
+                .thenReturn(SscsCaseData.builder().build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
