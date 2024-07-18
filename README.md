@@ -22,7 +22,6 @@ To build the project execute the following command:
 ```
 
 ### Running the application
-
 Run the application by executing:
 
 ```
