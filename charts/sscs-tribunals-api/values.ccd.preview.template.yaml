@@ -206,7 +206,7 @@ ccd:
     java:
       image: 'hmctspublic.azurecr.io/am/role-assignment-service:latest'
       imagePullPolicy: Always
-      ingressHost: ""
+      ingressHost: ras-${SERVICE_FQDN}
       releaseNameOverride: ${SERVICE_NAME}-am-role-assignment-service
       readinessDelay: 240
       livenessDelay: 240
