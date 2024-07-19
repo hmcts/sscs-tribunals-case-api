@@ -524,6 +524,46 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
+    public void givenFurtherEvidenceActionPostponementRequestReviewByJudge_shouldTriggerEventAndUpdateCaseCorrectly() {
+        Callback<SscsCaseData> callback = buildCallback(
+                FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+                ACTION_FURTHER_EVIDENCE);
+
+        var idamTokens = IdamTokens.builder().build();
+        given(idamService.getIdamTokens()).willReturn(idamTokens);
+
+        var startEventResponse = StartEventResponse.builder()
+                .caseDetails(
+                        uk.gov.hmcts.reform.ccd.client.model.CaseDetails.builder().build()
+                ).build();
+
+        given(ccdClient.startEvent(idamTokens, 123L, UPDATE_CASE_ONLY.getCcdType())).willReturn(startEventResponse);
+
+        var sscsCaseData = callback.getCaseDetails().getCaseData();
+        sscsCaseData.setSscsDocument((Arrays.asList(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder().documentType(DocumentType.POSTPONEMENT_REQUEST.getValue()).build()).build())));
+
+        given(sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData())).willReturn(sscsCaseData);
+
+        ArgumentCaptor<Consumer<SscsCaseData>> captor = ArgumentCaptor.forClass(Consumer.class);
+
+        String eventType = "validSendToInterloc";
+        given(updateCcdCaseService.updateCaseV2(anyLong(), eq(eventType), anyString(), anyString(),
+                eq(idamTokens), any(Consumer.class)))
+                .willReturn(SscsCaseDetails.builder().data(sscsCaseData).build());
+
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        then(updateCcdCaseService).should(times(1))
+                .updateCaseV2(eq(123L), eq(eventType), eq(ActionFurtherEvidenceSubmittedCallbackHandler.TCW_REVIEW_SEND_TO_JUDGE),
+                        anyString(), eq(idamTokens), captor.capture());
+
+        captor.getValue().accept(sscsCaseData);
+        assertEquals(InterlocReviewState.REVIEW_BY_JUDGE, sscsCaseData.getInterlocReviewState());
+        assertEquals(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST, sscsCaseData.getInterlocReferralReason());
+    }
+
+    @Test
     public void givenPostHearingOtherAndFurtherEvidenceActionIsReviewByJudge_shouldTriggerEventAndUpdateCaseCorrectly() {
         Callback<SscsCaseData> callback = buildCallback(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(), ACTION_FURTHER_EVIDENCE);
 
