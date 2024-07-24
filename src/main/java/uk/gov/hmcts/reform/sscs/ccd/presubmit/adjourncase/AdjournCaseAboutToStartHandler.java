@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.util.DynamicListLanguageUtil;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @Component
 @Slf4j
@@ -38,6 +39,7 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        SscsUtil.clearAdjournmentTransientFields(preSubmitCallbackResponse.getData());
 
         DynamicList languageList = utils.generateInterpreterLanguageFields(sscsCaseData.getAdjournment().getInterpreterLanguage());
         sscsCaseData.getAdjournment().setInterpreterLanguage(languageList);

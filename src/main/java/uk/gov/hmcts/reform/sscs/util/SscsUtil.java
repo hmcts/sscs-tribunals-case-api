@@ -68,6 +68,12 @@ public class SscsUtil {
         }
     }
 
+    public static void clearAdjournmentTransientFields(SscsCaseData caseData) {
+        log.info("Clearing transient adjournment case fields for caseId {}", caseData.getCcdCaseId());
+
+        caseData.setAdjournment(Adjournment.builder().build());
+    }
+
     public static void clearPostHearingFields(SscsCaseData caseData, boolean isPostHearingsEnabled) {
         if (isPostHearingsEnabled) {
             caseData.setPostHearing(PostHearing.builder().build());
