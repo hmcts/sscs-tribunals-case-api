@@ -26,37 +26,6 @@ class AdjournCaseMidEventValidationHandlerTest extends AdjournCaseMidEventValida
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
-    @Test
-    void givenDirectionsDueDateIsToday_ThenDisplayAnError() {
-
-        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
-
-        sscsCaseData.getAdjournment().setDirectionsDueDate(LocalDate.now());
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors())
-            .hasSize(1)
-            .containsOnly("Directions due date must be in the future");
-    }
-
-    @Test
-    void givenDirectionsDueDateIsBeforeToday_ThenDisplayAnError() {
-
-        sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
-
-        sscsCaseData.getAdjournment().setDirectionsDueDate(LocalDate.now().minusDays(1));
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors())
-            .hasSize(1)
-            .containsOnly("Directions due date must be in the future");
-    }
 
     @Test
     void givenDirectionsDueDateIsAfterTodayAndDaysOffsetSpecified_ThenDisplayAnError() {

@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInThePast;
 
 import java.util.Set;
@@ -51,7 +50,6 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         validateSscsCaseDataConstraints(sscsCaseData, preSubmitCallbackResponse);
-        validateAdjournCaseDirectionsDueDateIsInFuture(sscsCaseData, preSubmitCallbackResponse);
         validateAdjournCaseEventValues(sscsCaseData, preSubmitCallbackResponse);
 
         return preSubmitCallbackResponse;
@@ -91,15 +89,6 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
                 .forEach(preSubmitCallbackResponse::addError);
     }
 
-    private void validateAdjournCaseDirectionsDueDateIsInFuture(
-        SscsCaseData sscsCaseData,
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (nonNull(sscsCaseData.getAdjournment().getDirectionsDueDate())
-            && !isDateInTheFuture(sscsCaseData.getAdjournment().getDirectionsDueDate())
-        ) {
-            preSubmitCallbackResponse.addError("Directions due date must be in the future");
-        }
-    }
 
     private boolean isNextHearingFirstAvailableDateAfterDateInvalid(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getAdjournment().getNextHearingFirstAvailableDateAfterDate() == null) {
