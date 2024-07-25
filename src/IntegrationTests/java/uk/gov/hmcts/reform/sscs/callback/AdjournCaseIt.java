@@ -61,6 +61,7 @@ public class AdjournCaseIt extends AbstractEventIt {
     public static final String CCD_ABOUT_TO_SUBMIT = "/ccdAboutToSubmit";
     public static final String CCD_MID_EVENT_PREVIEW_ADJOURN_CASE = "/ccdMidEventPreviewAdjournCase";
     public static final String CCD_MID_EVENT_ADJOURN_CASE_POPULATE_VENUE_DROPDOWN = "/ccdMidEventAdjournCasePopulateVenueDropdown";
+    public static final String CCD_MID_EVENT_ADJOURN_CASE_DUE_DATE = "/ccdMidEventAdjournDirectionDueDate";
     public static final String CCD_MID_EVENT = "/ccdMidEvent";
     public static final String TEST_NAME = "AN Test";
     public static final String CHESTER_MAGISTRATE_S_COURT = "Chester Magistrate's Court";
@@ -90,7 +91,7 @@ public class AdjournCaseIt extends AbstractEventIt {
             List.of(DIRECTIONS_DUE_DATE_PLACEHOLDER),
             List.of(DATE_2019));
 
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_MID_EVENT));
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_MID_EVENT_ADJOURN_CASE_DUE_DATE));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
