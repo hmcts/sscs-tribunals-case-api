@@ -154,9 +154,14 @@ public class CcdMideventCallbackController {
         log.info("About to start ccdMidEventAdjournDirectionDueDate callback `{}` received for Case ID `{}`", callback.getEvent(),
                 callback.getCaseDetails().getId());
         authorisationService.authorise(serviceAuthHeader);
-
-
-        return ok(adjournCaseMidEventDueDateService.validateAdjournCaseDirectionsDueDateIsInFuture(callback));
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
+        Boolean isDueDateInFuture = adjournCaseMidEventDueDateService
+                .validateAdjournCaseDirectionsDueDateIsInFuture(caseData);
+        if (!isDueDateInFuture) {
+            preSubmitCallbackResponse.addError("Directions due date must be in the future");
+        }
+        return  ok(preSubmitCallbackResponse);
     }
 
     @PostMapping(path = "/ccdMidEventAdminRestoreCases", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.FACE_TO_FACE;
@@ -16,7 +15,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
@@ -77,18 +75,18 @@ public class AdjournCaseMidEventDueDateServiceTest {
 
     @Test
     public void shouldReturnErrorWhenDueDatePast() {
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = adjournCaseMidEventDueDateService
-                .validateAdjournCaseDirectionsDueDateIsInFuture(callback);
-        assertEquals(1, preSubmitCallbackResponse.getErrors().size());
+        Boolean dateIsInFuture = adjournCaseMidEventDueDateService
+                .validateAdjournCaseDirectionsDueDateIsInFuture(callback.getCaseDetails().getCaseData());
+        assertEquals(false, dateIsInFuture);
 
     }
 
     @Test
     public void shouldNotReturnErrorWhenDueDateFuture() {
         sscsCaseData.getAdjournment().setDirectionsDueDate(LocalDate.now().plusDays(1));
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = adjournCaseMidEventDueDateService
-                .validateAdjournCaseDirectionsDueDateIsInFuture(callback);
-        assertTrue(preSubmitCallbackResponse.getErrors().isEmpty());
+        Boolean dateIsInFuture = adjournCaseMidEventDueDateService
+                .validateAdjournCaseDirectionsDueDateIsInFuture(callback.getCaseDetails().getCaseData());
+        assertEquals(true, dateIsInFuture);
 
     }
 
