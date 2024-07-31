@@ -8,7 +8,7 @@ plugins {
     id 'com.gorylenko.gradle-git-properties' version '2.4.1'
     id 'com.github.ben-manes.versions' version '0.46.0'
     id "info.solidsoft.pitest" version '1.9.11'
-    id 'org.owasp.dependencycheck' version '9.0.6'
+    id 'org.owasp.dependencycheck' version '10.0.3'
     id 'au.com.dius.pact' version '4.3.15'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.771'
 }
@@ -261,6 +261,7 @@ tasks.register('installLocalGitHook', Copy) {
     fileMode 0775
 }
 
+generateGitProperties.dependsOn installLocalGitHook
 compileJava.dependsOn installLocalGitHook
 
 tasks.register('runGitPreCommitTasks') {
