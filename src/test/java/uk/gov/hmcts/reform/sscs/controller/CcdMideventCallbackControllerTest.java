@@ -48,6 +48,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseMidEventValidationService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipWriteFinalDecisionPreviewDecisionService;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
@@ -90,6 +91,9 @@ public class CcdMideventCallbackControllerTest {
     @MockBean
     private RestoreCasesService2 restoreCasesService2;
 
+    @MockBean
+    private AdjournCaseMidEventValidationService adjournCaseMidEventValidationService;
+
     @Before
     public void setUp() {
         DynamicListItem listItem = new DynamicListItem("", "");
@@ -104,7 +108,7 @@ public class CcdMideventCallbackControllerTest {
                 Collections.singletonList(writeFinalDecisionPreviewDecisionService));
 
         CcdMideventCallbackController controller = new CcdMideventCallbackController(authorisationService, deserializer, decisionNoticeService,
-                adjournCasePreviewService, adjournCaseCcdService, restoreCasesService2);
+                adjournCasePreviewService, adjournCaseCcdService, restoreCasesService2, adjournCaseMidEventValidationService);
         mockMvc = standaloneSetup(controller)
             .setMessageConverters(new ByteArrayHttpMessageConverter(), new StringHttpMessageConverter(),
                 new ResourceHttpMessageConverter(false), new SourceHttpMessageConverter<>(),

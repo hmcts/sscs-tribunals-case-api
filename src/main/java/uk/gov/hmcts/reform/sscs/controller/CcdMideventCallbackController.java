@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseMidEventValidationService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
@@ -48,6 +49,8 @@ public class CcdMideventCallbackController {
     private final AdjournCaseCcdService adjournCaseCcdService;
     private final RestoreCasesService2 restoreCasesService2;
 
+    private final AdjournCaseMidEventValidationService adjournCaseMidEventValidationService;
+
     @Value("${feature.postHearings.enabled}")
     private boolean isPostHearingsEnabled;
     @Value("${feature.postHearingsB.enabled}")
@@ -59,13 +62,14 @@ public class CcdMideventCallbackController {
                                          DecisionNoticeService decisionNoticeService,
                                          AdjournCasePreviewService adjournCasePreviewService,
                                          AdjournCaseCcdService adjournCaseCcdService,
-                                         RestoreCasesService2 restoreCasesService2) {
+                                         RestoreCasesService2 restoreCasesService2, AdjournCaseMidEventValidationService adjournCaseMidEventValidationService) {
         this.authorisationService = authorisationService;
         this.deserializer = deserializer;
         this.decisionNoticeService = decisionNoticeService;
         this.adjournCasePreviewService = adjournCasePreviewService;
         this.adjournCaseCcdService = adjournCaseCcdService;
         this.restoreCasesService2 = restoreCasesService2;
+        this.adjournCaseMidEventValidationService = adjournCaseMidEventValidationService;
     }
 
     @PostMapping(path = "/ccdMidEventAdjournCasePopulateVenueDropdown", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -145,7 +149,7 @@ public class CcdMideventCallbackController {
         return ok(adjournCasePreviewService.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, userAuthorisation, false));
     }
 
-    @PostMapping(path = "/ccdMidEventAdjournDirectionDueDate", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/ccdMidEventAdjournCaseDirectionDueDate", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEventAdjournDirectionDueDate(
             @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
             @RequestBody String message) {
@@ -155,12 +159,43 @@ public class CcdMideventCallbackController {
         authorisationService.authorise(serviceAuthHeader);
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-        Boolean isDueDateInFuture =  nonNull(caseData.getAdjournment().getDirectionsDueDate())
-                && isDateInTheFuture(caseData.getAdjournment().getDirectionsDueDate());
-        if (!isDueDateInFuture) {
-            preSubmitCallbackResponse.addError("Directions due date must be in the future");
+        adjournCaseMidEventValidationService.validateSscsCaseDataConstraints(caseData, preSubmitCallbackResponse);
+        try {
+            adjournCaseMidEventValidationService.checkDirectionsDueDateInvalid(caseData);
+            Boolean isDueDateInFuture =  nonNull(caseData.getAdjournment().getDirectionsDueDate())
+                    && isDateInTheFuture(caseData.getAdjournment().getDirectionsDueDate());
+            if (!isDueDateInFuture) {
+                preSubmitCallbackResponse.addError("Directions due date must be in the future");
+            }
+        } catch (IllegalStateException e) {
+            log.error(e.getMessage() + ". Something has gone wrong for caseId: ", caseData.getCcdCaseId());
+            preSubmitCallbackResponse.addError(e.getMessage());
         }
         return  ok(preSubmitCallbackResponse);
+    }
+
+    @PostMapping(path = "/ccdMidEventAdjournCaseNextHearing", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEventAdjournCaseNextHearing(
+            @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
+            @RequestBody String message) {
+        Callback<SscsCaseData> callback = deserializer.deserialize(message);
+        log.info("About to start ccdMidEventAdjournCaseNextHearing callback `{}` received for Case ID `{}`", callback.getEvent(),
+                callback.getCaseDetails().getId());
+        authorisationService.authorise(serviceAuthHeader);
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
+        adjournCaseMidEventValidationService.validateSscsCaseDataConstraints(caseData, preSubmitCallbackResponse);
+        try {
+            if (adjournCaseMidEventValidationService.adjournCaseNextHearingDateOrPeriodIsProvideDate(caseData)
+                    && adjournCaseMidEventValidationService.adjournCaseNextHearingDateTypeIsFirstAvailableDateAfter(caseData)
+                    && adjournCaseMidEventValidationService.isNextHearingFirstAvailableDateAfterDateInvalid(caseData)) {
+                preSubmitCallbackResponse.addError("'First available date after' date cannot be in the past");
+            }
+        } catch (IllegalStateException e) {
+            log.error(e.getMessage() + ". Something has gone wrong for caseId: ", caseData.getCcdCaseId());
+            preSubmitCallbackResponse.addError(e.getMessage());
+        }
+        return ok(preSubmitCallbackResponse);
     }
 
     @PostMapping(path = "/ccdMidEventAdminRestoreCases", produces = MediaType.APPLICATION_JSON_VALUE)
