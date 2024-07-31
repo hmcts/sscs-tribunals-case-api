@@ -333,7 +333,6 @@ dependencies {
     implementation group: 'com.squareup.okio', name: 'okio-jvm', version: '3.5.0'
 
     implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '2.1.5'
-    implementation group: 'com.github.hmcts', name: 'properties-volume-spring-boot-starter', version: '0.1.1'
 
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.4'
 
@@ -344,7 +343,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
     
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.9.0'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.9.1'
 
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.5'
 
