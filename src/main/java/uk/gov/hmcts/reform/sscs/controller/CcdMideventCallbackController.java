@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_ACTION_CORRECTION;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 
 import com.opencsv.CSVReader;
 import java.io.InputStreamReader;
@@ -26,7 +28,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseMidEventDueDateService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionBenefitTypeHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
@@ -46,7 +47,6 @@ public class CcdMideventCallbackController {
     private final AdjournCasePreviewService adjournCasePreviewService;
     private final AdjournCaseCcdService adjournCaseCcdService;
     private final RestoreCasesService2 restoreCasesService2;
-    private final AdjournCaseMidEventDueDateService adjournCaseMidEventDueDateService;
 
     @Value("${feature.postHearings.enabled}")
     private boolean isPostHearingsEnabled;
@@ -59,14 +59,13 @@ public class CcdMideventCallbackController {
                                          DecisionNoticeService decisionNoticeService,
                                          AdjournCasePreviewService adjournCasePreviewService,
                                          AdjournCaseCcdService adjournCaseCcdService,
-                                         RestoreCasesService2 restoreCasesService2, AdjournCaseMidEventDueDateService adjournCaseMidEventDueDateService) {
+                                         RestoreCasesService2 restoreCasesService2) {
         this.authorisationService = authorisationService;
         this.deserializer = deserializer;
         this.decisionNoticeService = decisionNoticeService;
         this.adjournCasePreviewService = adjournCasePreviewService;
         this.adjournCaseCcdService = adjournCaseCcdService;
         this.restoreCasesService2 = restoreCasesService2;
-        this.adjournCaseMidEventDueDateService = adjournCaseMidEventDueDateService;
     }
 
     @PostMapping(path = "/ccdMidEventAdjournCasePopulateVenueDropdown", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -156,8 +155,8 @@ public class CcdMideventCallbackController {
         authorisationService.authorise(serviceAuthHeader);
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-        Boolean isDueDateInFuture = adjournCaseMidEventDueDateService
-                .validateAdjournCaseDirectionsDueDateIsInFuture(caseData);
+        Boolean isDueDateInFuture =  nonNull(caseData.getAdjournment().getDirectionsDueDate())
+                && isDateInTheFuture(caseData.getAdjournment().getDirectionsDueDate());
         if (!isDueDateInFuture) {
             preSubmitCallbackResponse.addError("Directions due date must be in the future");
         }
