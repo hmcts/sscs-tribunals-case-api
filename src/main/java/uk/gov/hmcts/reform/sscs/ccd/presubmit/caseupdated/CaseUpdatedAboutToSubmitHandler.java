@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RefDataService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
+import uk.gov.hmcts.reform.sscs.utility.EmailUtil;
 
 @Component
 @Slf4j
@@ -171,6 +172,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             validateAppointeeCaseData(sscsCaseData, preSubmitCallbackResponse);
             validateRepresentativeNameData(sscsCaseData, preSubmitCallbackResponse);
             validateJointPartyNameData(sscsCaseData, preSubmitCallbackResponse);
+            validateHearingVideoEmail(sscsCaseData, preSubmitCallbackResponse);
         }
 
         return preSubmitCallbackResponse;
@@ -461,6 +463,18 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             List<String> warnings = validateRepAndJointPartyCaseData(jointPartyInfo, "Joint Party");
             if (!warnings.isEmpty()) {
                 response.addErrors(warnings);
+            }
+        }
+    }
+
+    private void validateHearingVideoEmail(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
+        HearingSubtype hearingSubtype = sscsCaseData.getAppeal().getHearingSubtype();
+        if (hearingSubtype != null
+            && YesNo.isYes(hearingSubtype.getWantsHearingTypeVideo())) {
+
+            String hearingVideoEmail = hearingSubtype.getHearingVideoEmail();
+            if (!EmailUtil.isEmailValid(hearingVideoEmail)) {
+                response.addError("Hearing video email address must be valid email address");
             }
         }
     }
