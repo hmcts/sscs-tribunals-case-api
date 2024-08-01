@@ -937,6 +937,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenPostHearingIsEnabledAndFinalHeldAtHasBeenSet_thenDontUpdateFinalDecisionHeldAt() {
         when(caseDetails.getState()).thenReturn(State.POST_HEARING);
+        sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionHeldAt(ORIGINAL_HELD_AT);
         PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION, false, true, true);
 
