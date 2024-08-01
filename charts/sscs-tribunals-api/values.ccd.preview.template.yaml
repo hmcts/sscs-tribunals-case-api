@@ -7,6 +7,7 @@ java:
   memoryLimits: "8Gi"
   memoryRequests: "1Gi"
   cpuRequests: "2"
+  ingressHost: ${SERVICE_FQDN}
   cpuLimits: 2000m
   readinessDelay: 45
   environment:
