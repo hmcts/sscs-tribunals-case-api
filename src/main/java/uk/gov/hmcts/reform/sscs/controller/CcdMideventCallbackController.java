@@ -162,9 +162,9 @@ public class CcdMideventCallbackController {
         adjournCaseMidEventValidationService.validateSscsCaseDataConstraints(caseData, preSubmitCallbackResponse);
         try {
             adjournCaseMidEventValidationService.checkDirectionsDueDateInvalid(caseData);
-            Boolean isDueDateInFuture =  nonNull(caseData.getAdjournment().getDirectionsDueDate())
-                    && isDateInTheFuture(caseData.getAdjournment().getDirectionsDueDate());
-            if (!isDueDateInFuture) {
+            Boolean isDueDateInvalid =  nonNull(caseData.getAdjournment().getDirectionsDueDate())
+                    && !isDateInTheFuture(caseData.getAdjournment().getDirectionsDueDate());
+            if (isDueDateInvalid) {
                 preSubmitCallbackResponse.addError("Directions due date must be in the future");
             }
         } catch (IllegalStateException e) {
