@@ -34,6 +34,12 @@ Run the application by executing:
 This repo is now integrated with the rse-cft-library. For more information see the bootWithCCD task in build.gradle.
 Extra compose files can be provided in src/cftlib/resources/docker.
 
+#### Cftlib - Docker Desktop v4.30
+
+NOTE: Currently local setup fails if `ENABLE_WORK_ALLOCATION` is set to true so change this to false in the build.gradle file.
+
+Navigate to `http://localhost:3455/cases`
+
 ### Running Smoke Test locally
 Once the application running locally, please make sure
 1. Your local CCD is up and running with subscription id "7S9MxdSBpt"
