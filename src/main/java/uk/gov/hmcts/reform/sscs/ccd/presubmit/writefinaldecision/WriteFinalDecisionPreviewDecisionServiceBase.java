@@ -268,8 +268,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         if (SscsUtil.isCorrectionInProgress(caseData, isPostHearingsEnabled)) {
             judgeName = caseData.getSscsFinalDecisionCaseData().getFinalDecisionJudge();
         }
-
-        if (isNull(judgeName)) {
+        else {
             judgeName = buildSignedInJudgeName(userAuthorisation);
         }
 
