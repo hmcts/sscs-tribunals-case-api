@@ -944,8 +944,9 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     }
 
     @Test
-    public void givenFinalDecisionJudgeIsSet_thenDontGetSignedInJudgeName() {
+    public void givenFinalDecisionJudgeIsSetAndCorrectionInProgress_thenDontGetSignedInJudgeName() {
         when(caseDetails.getState()).thenReturn(State.POST_HEARING);
+        sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(YES);
         sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionJudge(ORIGINAL_JUDGE_NAME);
         PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION, false, true, true);
 
