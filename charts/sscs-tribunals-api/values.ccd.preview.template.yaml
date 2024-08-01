@@ -56,19 +56,20 @@ java:
     AMQP_PASSWORD:
       secretRef: sscs-sb-preview
       key: primaryKey
-  postgresql:
-    enabled: true
-    flexibleserver: sscs-preview
-    setup:
-      databases:
-        - name: "pr-${CHANGE_ID}-data-store"
-        - name: "pr-${CHANGE_ID}-definition-store"
-        - name: "pr-${CHANGE_ID}-user-profile"
-        - name: "pr-${CHANGE_ID}-evidence"
-        - name: "pr-${CHANGE_ID}-annotation"
-        - name: "pr-${CHANGE_ID}-role-assignment"
-        - name: "pr-${CHANGE_ID}-hmc-cft-hearing-service"
-        - name: "pr-${CHANGE_ID}-sscsjobscheduler"
+
+postgresql:
+  enabled: true
+  flexibleserver: sscs-preview
+  setup:
+    databases:
+      - name: "pr-${CHANGE_ID}-data-store"
+      - name: "pr-${CHANGE_ID}-definition-store"
+      - name: "pr-${CHANGE_ID}-user-profile"
+      - name: "pr-${CHANGE_ID}-evidence"
+      - name: "pr-${CHANGE_ID}-annotation"
+      - name: "pr-${CHANGE_ID}-role-assignment"
+      - name: "pr-${CHANGE_ID}-hmc-cft-hearing-service"
+      - name: "pr-${CHANGE_ID}-sscsjobscheduler"
 
 
 idam-pr:
