@@ -614,20 +614,32 @@ sscs-tya-notif:
     keyVaults:
       sscs:
         secrets:
-          - idam-api
-          - idam-oauth-user
-          - idam-redirect
-          - idam-sscs-systemupdate-user
-          - idam-sscs-systemupdate-password
-          - sscs-email-mac-secret-text
-          - idam-sscs-oauth2-client-secret
-          - sscs-s2s-secret
-          - s2s-micro
-          - evidence-share-topic-shared-access-key
+          - name: idam-api
+            alias: IDAM_URL
+          - name: idam-oauth-user
+            alias: IDAM_OAUTH2_CLIENT_ID
+          - name: idam-redirect
+            alias: IDAM_OAUTH2_REDIRECT_URL
+          - name: idam-sscs-systemupdate-user
+            alias: IDAM_SSCS_SYSTEMUPDATE_USER
+          - name: idam-sscs-systemupdate-password
+            alias: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
+          - name: sscs-email-mac-secret-text
+            alias: EMAIL_MAC_SECRET_TEXT
+          - name: idam-sscs-oauth2-client-secret
+            alias: IDAM_OAUTH2_CLIENT_SECRET
+          - name: sscs-s2s-secret
+            alias: IDAM_S2S_AUTH_TOTP_SECRET
+          - name: s2s-micro
+            alias: IDAM_S2S_AUTH_MICROSERVICES
+          - name: evidence-share-topic-shared-access-key
+            alias: AMQP_PASSWORD
           - name: docmosis-api-key
             alias: PDF_SERVICE_ACCESS_KEY
-          - notification-key
-          - notification-test-key
+          - name: notification-key
+            alias: NOTIFICATION_API_KEY
+          - name: notification-test-key
+            alias: NOTIFICATION_API_TEST_KEY
 
 #Enable for SYA
 sscs-tribunals-frontend:
