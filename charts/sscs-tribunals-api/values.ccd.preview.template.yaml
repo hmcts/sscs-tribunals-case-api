@@ -624,7 +624,8 @@ sscs-tya-notif:
           - sscs-s2s-secret
           - s2s-micro
           - evidence-share-topic-shared-access-key
-          - docmosis-api-key
+          - name: docmosis-api-key
+            alias: PDF_SERVICE_ACCESS_KEY
           - notification-key
           - notification-test-key
 
