@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.144
+version: 0.0.147
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -23,11 +23,11 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: idam-pr.enabled
   - name: xui-webapp
-    version: 1.0.9
+    version: 1.0.18
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: xui-webapp.enabled
   - name: sscs-tya-notif
-    version: 0.0.42
+    version: 0.0.52
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-tya-notif.enabled
   - name: ccd
@@ -37,7 +37,7 @@ dependencies:
     tags:
       - sscs-ccd-idam-pr
   - name: sscs-tribunals-frontend
-    version: 0.2.40
+    version: 0.2.43
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-tribunals-frontend.enabled
   - name: redis
@@ -45,7 +45,7 @@ dependencies:
     repository: "https://charts.bitnami.com/bitnami"
     condition: redis.enabled
   - name: em-ccdorc
-    version: 2.0.10
+    version: 2.0.25
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: em-ccdorc.enabled
   - name: ccd-case-document-am-api
@@ -53,7 +53,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd-case-document-am-api.enabled
   - name: sscs-hearings-api
-    version: 0.0.31
+    version: 0.0.38
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-hearings-api.enabled
   - name: servicebus
