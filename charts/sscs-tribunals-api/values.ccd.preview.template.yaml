@@ -7,6 +7,7 @@ java:
   memoryLimits: "8Gi"
   memoryRequests: "1Gi"
   cpuRequests: "2"
+  ingressHost: ${SERVICE_FQDN}
   cpuLimits: 2000m
   readinessDelay: 45
   environment:
@@ -585,7 +586,7 @@ elastic:
 sscs-tya-notif:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
+    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2499
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
@@ -689,7 +690,7 @@ redis:
 sscs-hearings-api:
   enabled: false
   java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-603" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     ingressHost: hearings-${SERVICE_FQDN}
     environment:
@@ -709,7 +710,7 @@ sscs-hearings-api:
       #Messaging
       HMC_HEARINGS_LISTENING_ENABLED: true
       HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
-      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-aat"
+      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-3806"
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
       TRIBUNALS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
@@ -717,7 +718,7 @@ sscs-hearings-api:
       HMC_HEARINGS_TOPIC_NAMESPACE: hmc-servicebus-aat
       HMC_DEPLOYMENT_ID: deployment-${SERVICE_NAME}
       HMC_DEPLOYMENT_FILTER_ENABLED: true
-      CORE_CASE_DATA_CASE_TYPE_ID: Benefit-${CHANGE_ID}
+      CORE_CASE_DATA_CASE_TYPE_ID: Benefit-3806
     secrets:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: sscs-sb-preview
