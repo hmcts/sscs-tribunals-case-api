@@ -63,8 +63,7 @@ public class HmctsResponseReviewedSubmittedHandler extends ResponseEventsAboutTo
     private void updateCase(SscsCaseData caseData, Long caseId, EventType eventType, String summary, String description) {
         try {
             ccdService.updateCase(caseData, caseId, eventType.getCcdType(), summary, description, idamService.getIdamTokens());
-        }
-        catch (FeignException e) {
+        } catch (FeignException e) {
             log.error(
                     "{}. CCD response: {}",
                     String.format("Could not update event %s for case %d", eventType, caseId),
