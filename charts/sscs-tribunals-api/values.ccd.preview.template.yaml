@@ -633,7 +633,7 @@ sscs-tribunals-frontend:
   nodejs:
     memoryLimits: "2Gi"
     cpuLimits: 2000m
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:pr-1491
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
@@ -741,3 +741,5 @@ servicebus:
         subscriptionNeeded: yes
     queues:
       - name: tribunals-to-hearing-api
+
+      
