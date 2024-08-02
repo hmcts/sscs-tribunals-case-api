@@ -201,7 +201,7 @@ repositories {
 
 processResources.dependsOn(generateGitProperties)
 
-project.tasks.named('sonar') {
+project.tasks.named('sonarqube') {
     dependsOn test, integration, jacocoTestReport
 }
 
@@ -211,7 +211,7 @@ test.shouldRunAfter(checkstyleTest)
 integration.shouldRunAfter(checkstyleIntegrationTest)
 integration.shouldRunAfter(test)
 
-sonar {
+sonarqube {
     properties {
         property "sonar.projectName", "SSCS - Tribunals Case Api"
         property "sonar.projectKey", "SSCSTCA"
