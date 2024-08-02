@@ -586,7 +586,7 @@ elastic:
 sscs-tya-notif:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2499 #TO BE REVERTED
+    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
@@ -690,7 +690,7 @@ redis:
 sscs-hearings-api:
   enabled: true #TO BE REVERTED
   java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-603" #Change to pr if required #TO BE REVERTED
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     ingressHost: hearings-${SERVICE_FQDN}
     environment:
@@ -710,7 +710,7 @@ sscs-hearings-api:
       #Messaging
       HMC_HEARINGS_LISTENING_ENABLED: true
       HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
-      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-3806" #TO BE REVERTED
+      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-3921" #TO BE REVERTED
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
       TRIBUNALS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
@@ -718,7 +718,7 @@ sscs-hearings-api:
       HMC_HEARINGS_TOPIC_NAMESPACE: hmc-servicebus-aat
       HMC_DEPLOYMENT_ID: deployment-${SERVICE_NAME}
       HMC_DEPLOYMENT_FILTER_ENABLED: true
-      CORE_CASE_DATA_CASE_TYPE_ID: Benefit-3806 #TO BE REVERTED
+      CORE_CASE_DATA_CASE_TYPE_ID: Benefit-3921 #TO BE REVERTED
       HEARINGS_CASE_UPDATE_V2_ENABLED: true #TO BE REVERTED
       ADJOURNMENT_ENABLED: true #TO BE REVERTED
     secrets:
