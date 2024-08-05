@@ -9,6 +9,8 @@ java:
   cpuRequests: "2"
   cpuLimits: 2000m
   readinessDelay: 45
+  devmemoryRequests: 1Gi
+  devmemoryLimits: 2Gi
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
@@ -47,6 +49,7 @@ java:
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
     AMQP_USERNAME: "RootManageSharedAccessKey"
     HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
+    BYPASS_NOTIFICATIONS_SERVICE: true
     HANDLE_CCD_CALLBACKMAP_V2: true
   secrets:
     HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
@@ -585,7 +588,7 @@ elastic:
 sscs-tya-notif:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
+    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2501
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
@@ -606,6 +609,7 @@ sscs-tya-notif:
       POST_HEARINGS_FEATURE: true
       POST_HEARINGS_B_FEATURE: true
       DUMMY: true
+      BYPASS_NOTIFICATIONS_SERVICE: true
     secrets:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
