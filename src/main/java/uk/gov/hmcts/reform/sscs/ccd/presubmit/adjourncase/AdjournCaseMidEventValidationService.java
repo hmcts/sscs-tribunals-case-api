@@ -47,21 +47,21 @@ public class AdjournCaseMidEventValidationService {
 
     public void checkDirectionsDueDateInvalid(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getAdjournment().getDirectionsDueDate() != null) {
-            if (directionDueDayIsNotEmptyOrZero(sscsCaseData)) {
+            if (directionDueDateOffsetIsNotEmptyOrZero(sscsCaseData)) {
                 throw new IllegalStateException(("Cannot specify both directions due date and directions due days offset"));
             }
         } else {
-            if (directionDueDaysIsEmpty(sscsCaseData)) {
+            if (directionDueDateOffsetIsEmpty(sscsCaseData)) {
                 throw new IllegalStateException(("At least one of directions due date or directions due date offset must be specified"));
             }
         }
     }
 
-    private boolean directionDueDaysIsEmpty(SscsCaseData sscsCaseData) {
+    private boolean directionDueDateOffsetIsEmpty(SscsCaseData sscsCaseData) {
         return sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset() == null;
     }
 
-    private boolean directionDueDayIsNotEmptyOrZero(SscsCaseData sscsCaseData) {
+    private boolean directionDueDateOffsetIsNotEmptyOrZero(SscsCaseData sscsCaseData) {
         return sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset() != null
                 && sscsCaseData.getAdjournment().getDirectionsDueDateDaysOffset() != AdjournCaseDaysOffset.OTHER;
     }
