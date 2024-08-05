@@ -4,7 +4,6 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -381,8 +380,8 @@ public class CcdMideventCallbackControllerTest {
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
                 new CaseDetails<>(ID, JURISDICTION, State.HEARING, sscsCaseData, LocalDateTime.now(), "Benefit"),
                 Optional.empty(), ADJOURN_CASE, false));
-        doThrow(new IllegalStateException("At least one of directions due date or directions due date offset must be specified"))
-                .when(adjournCaseMidEventValidationService).checkDirectionsDueDateInvalid(sscsCaseData);
+        when(adjournCaseMidEventValidationService.checkDirectionsDueDateInvalid(sscsCaseData))
+                .thenReturn(Set.of("At least one of directions due date or directions due date offset must be specified"));
         String expectedErrorsString = Arrays.asList("At least one of directions due date or directions due date offset must be specified").toString();
 
         String expectedJsonErrorsAndWarningsString = "{\"errors\": " + expectedErrorsString + "}, {\"warnings\" : []}";
@@ -408,6 +407,8 @@ public class CcdMideventCallbackControllerTest {
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
                 new CaseDetails<>(ID, JURISDICTION, State.HEARING, sscsCaseData, LocalDateTime.now(), "Benefit"),
                 Optional.empty(), ADJOURN_CASE, false));
+        when(adjournCaseMidEventValidationService.checkDirectionsDueDateInvalid(sscsCaseData))
+                .thenReturn(Set.of("Directions due date must be in the future"));
         String expectedErrorsString = Arrays.asList("Directions due date must be in the future").toString();
 
         String expectedJsonErrorsAndWarningsString = "{\"errors\": " + expectedErrorsString + "}, {\"warnings\" : []}";
@@ -453,9 +454,8 @@ public class CcdMideventCallbackControllerTest {
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
                 new CaseDetails<>(ID, JURISDICTION, State.HEARING, sscsCaseData, LocalDateTime.now(), "Benefit"),
                 Optional.empty(), ADJOURN_CASE, false));
-        when(adjournCaseMidEventValidationService.adjournCaseNextHearingDateOrPeriodIsProvideDate(sscsCaseData)).thenReturn(true);
-        when(adjournCaseMidEventValidationService.adjournCaseNextHearingDateTypeIsFirstAvailableDateAfter(sscsCaseData)).thenReturn(true);
-        when(adjournCaseMidEventValidationService.isNextHearingFirstAvailableDateAfterDateInvalid(sscsCaseData)).thenReturn(true);
+        when(adjournCaseMidEventValidationService.checkNextHearingDateInvalid(sscsCaseData))
+                .thenReturn(Set.of("'First available date after' date cannot be in the past"));
 
         String error = "'First available date after' date cannot be in the past";
 
@@ -479,11 +479,8 @@ public class CcdMideventCallbackControllerTest {
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
                 new CaseDetails<>(ID, JURISDICTION, State.HEARING, sscsCaseData, LocalDateTime.now(), "Benefit"),
                 Optional.empty(), ADJOURN_CASE, false));
-        when(adjournCaseMidEventValidationService.adjournCaseNextHearingDateOrPeriodIsProvideDate(sscsCaseData)).thenReturn(true);
-        when(adjournCaseMidEventValidationService.adjournCaseNextHearingDateTypeIsFirstAvailableDateAfter(sscsCaseData)).thenReturn(true);
-        doThrow(new IllegalStateException(error))
-                .when(adjournCaseMidEventValidationService).isNextHearingFirstAvailableDateAfterDateInvalid(sscsCaseData);
-
+        when(adjournCaseMidEventValidationService.checkNextHearingDateInvalid(sscsCaseData))
+                .thenReturn(Set.of("'First available date after' date must be provided"));
 
         mockMvc.perform(post("/ccdMidEventAdjournCaseNextHearing")
                         .contentType(MediaType.APPLICATION_JSON)

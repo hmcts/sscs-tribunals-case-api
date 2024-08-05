@@ -158,7 +158,7 @@ public class CcdMideventCallbackController {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         adjournCaseMidEventValidationService.validateSscsCaseDataConstraints(caseData, preSubmitCallbackResponse);
-         preSubmitCallbackResponse.addErrors(adjournCaseMidEventValidationService.checkDirectionsDueDateInvalid(caseData));
+        preSubmitCallbackResponse.addErrors(adjournCaseMidEventValidationService.checkDirectionsDueDateInvalid(caseData));
         return  ok(preSubmitCallbackResponse);
     }
 

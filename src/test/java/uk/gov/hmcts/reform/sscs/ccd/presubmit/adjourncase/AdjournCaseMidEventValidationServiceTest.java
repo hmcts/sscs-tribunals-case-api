@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
@@ -68,8 +69,8 @@ public class AdjournCaseMidEventValidationServiceTest {
         sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
         sscsCaseData.getAdjournment().setDirectionsDueDate(LocalDate.now().plusDays(1));
         sscsCaseData.getAdjournment().setDirectionsDueDateDaysOffset(AdjournCaseDaysOffset.FOURTEEN_DAYS);
-        IllegalStateException exception = assertThrows(IllegalStateException.class,() -> adjournCaseMidEventValidationService.checkDirectionsDueDateInvalid(sscsCaseData));
-        assertEquals("Cannot specify both directions due date and directions due days offset", exception.getMessage());
+        LinkedHashSet<String> exception = (LinkedHashSet<String>)  adjournCaseMidEventValidationService.checkDirectionsDueDateInvalid(sscsCaseData);
+        assertEquals("Cannot specify both directions due date and directions due days offset", exception.toArray()[0]);
     }
 
     @Test
@@ -90,8 +91,8 @@ public class AdjournCaseMidEventValidationServiceTest {
     @Test
     void givenNeitherDirectionsDueDateOrOffsetSpecified_ThenDisplayAnError() {
         sscsCaseData.getAdjournment().setAreDirectionsBeingMadeToParties(YES);
-        IllegalStateException exception = assertThrows(IllegalStateException.class,() -> adjournCaseMidEventValidationService.checkDirectionsDueDateInvalid(sscsCaseData));
-        assertEquals("At least one of directions due date or directions due date offset must be specified", exception.getMessage());
+        LinkedHashSet<String> exception = (LinkedHashSet<String>) adjournCaseMidEventValidationService.checkDirectionsDueDateInvalid(sscsCaseData);
+        assertEquals("At least one of directions due date or directions due date offset must be specified", exception.toArray()[0]);
 
     }
 
