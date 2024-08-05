@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInThePast;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -45,16 +48,38 @@ public class AdjournCaseMidEventValidationService {
         return isDateInThePast(sscsCaseData.getAdjournment().getNextHearingFirstAvailableDateAfterDate());
     }
 
-    public void checkDirectionsDueDateInvalid(SscsCaseData sscsCaseData) {
+    public Set<String> checkDirectionsDueDateInvalid(SscsCaseData sscsCaseData) {
+        Set<String> errors = new LinkedHashSet<>();
         if (sscsCaseData.getAdjournment().getDirectionsDueDate() != null) {
             if (directionDueDateOffsetIsNotEmptyOrZero(sscsCaseData)) {
-                throw new IllegalStateException(("Cannot specify both directions due date and directions due days offset"));
+                errors.add("Cannot specify both directions due date and directions due days offset");
             }
         } else {
             if (directionDueDateOffsetIsEmpty(sscsCaseData)) {
-                throw new IllegalStateException(("At least one of directions due date or directions due date offset must be specified"));
+                errors.add(("At least one of directions due date or directions due date offset must be specified"));
             }
         }
+        Boolean isDueDateInvalid =  nonNull(sscsCaseData.getAdjournment().getDirectionsDueDate())
+                && !isDateInTheFuture(sscsCaseData.getAdjournment().getDirectionsDueDate());
+        if (isDueDateInvalid) {
+            errors.add("Directions due date must be in the future");
+        }
+        return errors;
+    }
+
+    public Set<String> checkNextHearingDateInvalid(SscsCaseData sscsCaseData) {
+        Set<String> errors = new LinkedHashSet<>();
+        try {
+            if (adjournCaseNextHearingDateOrPeriodIsProvideDate(sscsCaseData)
+                    && adjournCaseNextHearingDateTypeIsFirstAvailableDateAfter(sscsCaseData)
+                    && isNextHearingFirstAvailableDateAfterDateInvalid(sscsCaseData)) {
+                errors.add("'First available date after' date cannot be in the past");
+            }
+        } catch (IllegalStateException e) {
+            log.error(e.getMessage() + ". Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
+            errors.add(e.getMessage());
+        }
+        return errors;
     }
 
     private boolean directionDueDateOffsetIsEmpty(SscsCaseData sscsCaseData) {

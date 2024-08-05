@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_ACTION_CORRECTION;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
-import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 
 import com.opencsv.CSVReader;
 import java.io.InputStreamReader;
@@ -160,17 +158,7 @@ public class CcdMideventCallbackController {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         adjournCaseMidEventValidationService.validateSscsCaseDataConstraints(caseData, preSubmitCallbackResponse);
-        try {
-            adjournCaseMidEventValidationService.checkDirectionsDueDateInvalid(caseData);
-            Boolean isDueDateInvalid =  nonNull(caseData.getAdjournment().getDirectionsDueDate())
-                    && !isDateInTheFuture(caseData.getAdjournment().getDirectionsDueDate());
-            if (isDueDateInvalid) {
-                preSubmitCallbackResponse.addError("Directions due date must be in the future");
-            }
-        } catch (IllegalStateException e) {
-            log.error(e.getMessage() + ". Something has gone wrong for caseId: ", caseData.getCcdCaseId());
-            preSubmitCallbackResponse.addError(e.getMessage());
-        }
+         preSubmitCallbackResponse.addErrors(adjournCaseMidEventValidationService.checkDirectionsDueDateInvalid(caseData));
         return  ok(preSubmitCallbackResponse);
     }
 
@@ -185,16 +173,7 @@ public class CcdMideventCallbackController {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         adjournCaseMidEventValidationService.validateSscsCaseDataConstraints(caseData, preSubmitCallbackResponse);
-        try {
-            if (adjournCaseMidEventValidationService.adjournCaseNextHearingDateOrPeriodIsProvideDate(caseData)
-                    && adjournCaseMidEventValidationService.adjournCaseNextHearingDateTypeIsFirstAvailableDateAfter(caseData)
-                    && adjournCaseMidEventValidationService.isNextHearingFirstAvailableDateAfterDateInvalid(caseData)) {
-                preSubmitCallbackResponse.addError("'First available date after' date cannot be in the past");
-            }
-        } catch (IllegalStateException e) {
-            log.error(e.getMessage() + ". Something has gone wrong for caseId: ", caseData.getCcdCaseId());
-            preSubmitCallbackResponse.addError(e.getMessage());
-        }
+        preSubmitCallbackResponse.addErrors(adjournCaseMidEventValidationService.checkNextHearingDateInvalid(caseData));
         return ok(preSubmitCallbackResponse);
     }
 
