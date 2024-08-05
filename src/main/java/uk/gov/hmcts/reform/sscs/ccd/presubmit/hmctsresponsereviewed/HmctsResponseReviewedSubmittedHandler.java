@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static java.util.Objects.requireNonNull;
 
-import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -61,16 +60,6 @@ public class HmctsResponseReviewedSubmittedHandler extends ResponseEventsAboutTo
     }
 
     private void updateCase(SscsCaseData caseData, Long caseId, EventType eventType, String summary, String description) {
-        try {
-            ccdService.updateCase(caseData, caseId, eventType.getCcdType(), summary, description, idamService.getIdamTokens());
-        } catch (FeignException e) {
-            log.error(
-                    "{}. CCD response: {}",
-                    String.format("Could not update event %s for case %d", eventType, caseId),
-                    // exception.contentUTF8() uses response body internally
-                    e.responseBody().isPresent() ? e.contentUTF8() : e.getMessage()
-            );
-            throw e;
-        }
+        ccdService.updateCase(caseData, caseId, eventType.getCcdType(), summary, description, idamService.getIdamTokens());
     }
 }
