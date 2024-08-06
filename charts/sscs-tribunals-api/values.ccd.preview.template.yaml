@@ -7,6 +7,7 @@ java:
   memoryLimits: "8Gi"
   memoryRequests: "1Gi"
   cpuRequests: "2"
+  ingressHost: ${SERVICE_FQDN}
   cpuLimits: 2000m
   readinessDelay: 45
   environment:
@@ -91,7 +92,7 @@ idam-pr:
       - http://${SERVICE_NAME}-ccd-data-store-api/oauth2redirect
 
 em-ccdorc:
-  enabled: true
+  enabled: false
   java:
     image: hmctspublic.azurecr.io/em/ccdorc:latest
     releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
@@ -585,7 +586,7 @@ elastic:
 sscs-tya-notif:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
+    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2499
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
@@ -613,19 +614,32 @@ sscs-tya-notif:
     keyVaults:
       sscs:
         secrets:
-          - idam-api
-          - idam-oauth-user
-          - idam-redirect
-          - idam-sscs-systemupdate-user
-          - idam-sscs-systemupdate-password
-          - sscs-email-mac-secret-text
-          - idam-sscs-oauth2-client-secret
-          - sscs-s2s-secret
-          - s2s-micro
-          - evidence-share-topic-shared-access-key
-          - docmosis-api-key
-          - notification-key
-          - notification-test-key
+          - name: idam-api
+            alias: IDAM_URL
+          - name: idam-oauth-user
+            alias: IDAM_OAUTH2_CLIENT_ID
+          - name: idam-redirect
+            alias: IDAM_OAUTH2_REDIRECT_URL
+          - name: idam-sscs-systemupdate-user
+            alias: IDAM_SSCS_SYSTEMUPDATE_USER
+          - name: idam-sscs-systemupdate-password
+            alias: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
+          - name: sscs-email-mac-secret-text
+            alias: EMAIL_MAC_SECRET_TEXT
+          - name: idam-sscs-oauth2-client-secret
+            alias: IDAM_OAUTH2_CLIENT_SECRET
+          - name: sscs-s2s-secret
+            alias: IDAM_S2S_AUTH_TOTP_SECRET
+          - name: s2s-micro
+            alias: IDAM_S2S_AUTH_MICROSERVICES
+          - name: evidence-share-topic-shared-access-key
+            alias: AMQP_PASSWORD
+          - name: docmosis-api-key
+            alias: PDF_SERVICE_ACCESS_KEY
+          - name: notification-key
+            alias: NOTIFICATION_API_KEY
+          - name: notification-test-key
+            alias: NOTIFICATION_API_TEST_KEY
 
 #Enable for SYA
 sscs-tribunals-frontend:
@@ -674,9 +688,9 @@ redis:
 #Turning either hearings api (with either listener on) or cft hearing service on requires
 #service bus to be turned on.
 sscs-hearings-api:
-  enabled: false
+  enabled: true
   java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-603" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     ingressHost: hearings-${SERVICE_FQDN}
     environment:
@@ -696,7 +710,7 @@ sscs-hearings-api:
       #Messaging
       HMC_HEARINGS_LISTENING_ENABLED: true
       HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
-      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-aat"
+      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-3806"
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
       TRIBUNALS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
@@ -705,6 +719,8 @@ sscs-hearings-api:
       HMC_DEPLOYMENT_ID: deployment-${SERVICE_NAME}
       HMC_DEPLOYMENT_FILTER_ENABLED: true
       CORE_CASE_DATA_CASE_TYPE_ID: Benefit-${CHANGE_ID}
+      HEARINGS_CASE_UPDATE_V2_ENABLED: true
+      ADJOURNMENT_ENABLED: true
     secrets:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: sscs-sb-preview
