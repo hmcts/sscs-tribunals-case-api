@@ -91,7 +91,7 @@ idam-pr:
       - http://${SERVICE_NAME}-ccd-data-store-api/oauth2redirect
 
 em-ccdorc:
-  enabled: false
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/em/ccdorc:latest
     releaseNameOverride: ${SERVICE_NAME}-em-ccdorc
