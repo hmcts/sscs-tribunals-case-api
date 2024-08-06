@@ -263,11 +263,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
     }
 
     protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
-        String judgeName = caseData.getSscsFinalDecisionCaseData().getFinalDecisionJudge();
-
-        if (isNull(judgeName)) {
-            judgeName = buildSignedInJudgeName(userAuthorisation);
-        }
+        String judgeName = buildSignedInJudgeName(userAuthorisation);
 
         return SscsUtil.buildWriteFinalDecisionHeldBefore(caseData, judgeName);
     }
