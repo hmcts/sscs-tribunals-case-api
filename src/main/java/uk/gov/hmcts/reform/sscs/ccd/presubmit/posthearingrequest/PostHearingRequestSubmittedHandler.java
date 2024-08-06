@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,8 @@ public class PostHearingRequestSubmittedHandler implements PreSubmitCallbackHand
     private final CcdCallbackMapService ccdCallbackMapService;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
+    @Value("${feature.handle-ccd-callbackMap-v2.enabled}")
+    private boolean isHandleCcdCallbackMapV2Enabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -44,7 +47,7 @@ public class PostHearingRequestSubmittedHandler implements PreSubmitCallbackHand
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        long caseId = Long.parseLong(caseData.getCcdCaseId());
 
         PostHearing postHearing = caseData.getPostHearing();
         PostHearingRequestType typeSelected = postHearing.getRequestType();
@@ -58,11 +61,18 @@ public class PostHearingRequestSubmittedHandler implements PreSubmitCallbackHand
                 typeSelected));
             return response;
         }
+        Consumer<SscsCaseData> sscsCaseDataConsumer = sscsCaseData -> SscsUtil.clearPostHearingFields(sscsCaseData, isPostHearingsEnabled);
 
-        SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
-
-        caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
-
+        if (isHandleCcdCallbackMapV2Enabled) {
+            caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
+                    callbackMap,
+                    caseId,
+                    sscsCaseDataConsumer
+            );
+        } else {
+            sscsCaseDataConsumer.accept(caseData);
+            caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
+        }
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }
