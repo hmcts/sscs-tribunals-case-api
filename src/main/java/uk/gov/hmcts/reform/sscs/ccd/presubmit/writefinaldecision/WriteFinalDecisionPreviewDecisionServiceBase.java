@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isOtherPartyPresent;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
@@ -101,7 +100,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         setHearings(writeFinalDecisionBuilder, caseData);
 
         String heldAt = writeFinalDecisionBuilder.build().getHeldAt();
-        String heldBefore = buildHeldBefore(caseData, userAuthorisation);
+        String heldBefore = buildHeldBefore(caseData, userAuthorisation, isPostHearingsEnabled);
 
         if (isPostHearingsEnabled && nonNull(finalDecisionCaseData.getFinalDecisionHeldAt())) {
             heldAt = finalDecisionCaseData.getFinalDecisionHeldAt();
@@ -262,8 +261,13 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         }
     }
 
-    protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
-        String judgeName = buildSignedInJudgeName(userAuthorisation);
+    protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation, Boolean isPostHearingsEnabled) {
+        String judgeName = null;
+        if (SscsUtil.isCorrectionInProgress(caseData, isPostHearingsEnabled)) {
+            judgeName = caseData.getSscsFinalDecisionCaseData().getFinalDecisionJudge();
+        } else {
+            judgeName = buildSignedInJudgeName(userAuthorisation);
+        }
 
         return SscsUtil.buildWriteFinalDecisionHeldBefore(caseData, judgeName);
     }
