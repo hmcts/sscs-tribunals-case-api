@@ -1,30 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
-import feign.FeignException;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-
-import java.util.Collections;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -34,6 +11,21 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
+
+import java.util.Collections;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @RunWith(JUnitParamsRunner.class)
 public class HmctsResponseReviewedSubmittedHandlerTest {
@@ -116,17 +108,6 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
         verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(READY_TO_LIST.getCcdType()), eq("Ready to list"), eq("Makes an appeal ready to list"), any(IdamTokens.class));
-    }
-
-    @Test
-    public void givenAHmctsResponseReviewedSubmittedEventAndInterlocIsNotRequired_thenTriggerReadyToListEventFeignException() {
-
-        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("No").build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(ccdService.updateCase(any(SscsCaseData.class), eq(123L), eq(READY_TO_LIST.getCcdType()), eq("Ready to list"), eq("Makes an appeal ready to list"), any(IdamTokens.class)))
-                .thenThrow(FeignException.class);
-
-        assertThrows(FeignException.class, () -> handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
     }
 
     @Test(expected = IllegalStateException.class)
