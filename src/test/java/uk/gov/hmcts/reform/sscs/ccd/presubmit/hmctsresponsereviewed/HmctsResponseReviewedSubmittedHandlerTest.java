@@ -1,18 +1,24 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERLOC;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.Optional;
+
+import feign.FeignException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -108,6 +114,22 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
         verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(READY_TO_LIST.getCcdType()), eq("Ready to list"), eq("Makes an appeal ready to list"), any(IdamTokens.class));
+    }
+
+    @Test
+    public void givenSubmittedEventAndInterlocIsNotRequired_thenThrowExceptionWhenReadyToListEventFailsToUpdate() {
+
+        sscsCaseData = sscsCaseData.toBuilder().isInterlocRequired("No").build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        FeignException feignException = mock(FeignException.class);
+        given(feignException.status()).willReturn(422);
+        given(feignException.responseBody()).willReturn(Optional.of(ByteBuffer.wrap("Warning".getBytes(StandardCharsets.UTF_8))));
+
+        doThrow(feignException).when(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(READY_TO_LIST.getCcdType()), eq("Ready to list"), eq("Makes an appeal ready to list"), any(IdamTokens.class));
+
+        assertThatExceptionOfType(FeignException.class).isThrownBy(
+                () ->  handler.handle(SUBMITTED, callback, USER_AUTHORISATION));
     }
 
     @Test(expected = IllegalStateException.class)
