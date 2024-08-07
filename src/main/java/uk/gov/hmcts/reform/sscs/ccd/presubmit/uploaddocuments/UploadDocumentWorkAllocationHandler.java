@@ -2,8 +2,11 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,15 +47,40 @@ public class UploadDocumentWorkAllocationHandler implements PreSubmitCallbackHan
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         addedDocumentsUtil.clearAddedDocumentsBeforeEventSubmit(caseData);
-        addedDocumentsUtil.updateScannedDocumentTypes(caseData, addedDocumentsUtil.addedDocumentTypes(
-                previousSscsDocuments(callback.getCaseDetailsBefore()),
-                caseData.getSscsDocument()
-        ));
+
+        List<String> addedDocumentTypes = addedDocumentsUtil.addedDocumentTypes(
+            previousSscsDocuments(callback.getCaseDetailsBefore()),
+            caseData.getSscsDocument()
+        );
+
+        List<String> addedScannedDocumentTypes = addedDocumentsUtil.addedDocumentTypes(
+                previousScannedDocuments(callback.getCaseDetailsBefore()),
+                caseData.getScannedDocuments()
+        );
+
+        List<String> addedAudioVideoTypes = addedDocumentsUtil.addedDocumentTypes(
+            previousEvidence(callback.getCaseDetailsBefore()),
+            caseData.getAudioVideoEvidence()
+        );
+
+        addedDocumentsUtil.updateScannedDocumentTypes(caseData,
+                Stream.of(addedDocumentTypes, addedAudioVideoTypes, addedScannedDocumentTypes)
+                    .flatMap(Collection::stream)
+                    .distinct()
+                    .collect(Collectors.toList()));
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
-    private List<? extends AbstractDocument> previousSscsDocuments(Optional<CaseDetails<SscsCaseData>> caseData) {
+    private List<? extends TypedDocument> previousSscsDocuments(Optional<CaseDetails<SscsCaseData>> caseData) {
         return caseData.isPresent() ? caseData.get().getCaseData().getSscsDocument() : null;
+    }
+
+    private List<? extends TypedDocument> previousScannedDocuments(Optional<CaseDetails<SscsCaseData>> caseData) {
+        return caseData.isPresent() ? caseData.get().getCaseData().getScannedDocuments() : null;
+    }
+
+    private List<? extends TypedDocument> previousEvidence(Optional<CaseDetails<SscsCaseData>> caseData) {
+        return caseData.isPresent() ? caseData.get().getCaseData().getAudioVideoEvidence() : null;
     }
 }

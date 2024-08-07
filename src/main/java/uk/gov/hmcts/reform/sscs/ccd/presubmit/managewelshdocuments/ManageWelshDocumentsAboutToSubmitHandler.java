@@ -58,7 +58,7 @@ public class ManageWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
     }
 
 
-    private List<? extends AbstractDocument> previousWelshDocuments(Optional<CaseDetails<SscsCaseData>> caseData) {
+    private List<? extends TypedDocument> previousWelshDocuments(Optional<CaseDetails<SscsCaseData>> caseData) {
         return caseData.isPresent() ? caseData.get().getCaseData().getSscsWelshDocuments() : null;
     }
 
