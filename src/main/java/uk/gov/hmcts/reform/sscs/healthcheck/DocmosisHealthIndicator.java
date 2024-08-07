@@ -42,15 +42,17 @@ public class DocmosisHealthIndicator implements HealthIndicator {
                         }
                     ).getBody();
 
-            if (response != null
-                && response.containsKey("ready")
-                && Boolean.TRUE.equals(response.get("ready"))) {
-
-                return new Health.Builder().up().build();
+            if (response != null && response.containsKey("ready")) {
+                Object readyValue = response.get("ready");
+                if ((readyValue instanceof String && "true".equalsIgnoreCase((String) readyValue))
+                        || (readyValue instanceof Boolean && Boolean.TRUE.equals(readyValue))) {
+                    return new Health.Builder().up().build();
+                } else {
+                    return new Health.Builder().down().build();
+                }
             } else {
                 return new Health.Builder().down().build();
             }
-
         } catch (RestClientException e) {
 
             LOG.error("Error performing Docmosis healthcheck", e);
