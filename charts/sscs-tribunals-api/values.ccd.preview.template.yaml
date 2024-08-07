@@ -568,7 +568,7 @@ elastic:
 sscs-tya-notif:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2499
+    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
@@ -675,7 +675,7 @@ redis:
 sscs-hearings-api:
   enabled: true
   java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-603" #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     ingressHost: hearings-${SERVICE_FQDN}
     environment:
