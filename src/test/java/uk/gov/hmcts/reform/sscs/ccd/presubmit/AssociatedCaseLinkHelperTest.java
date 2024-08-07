@@ -47,7 +47,7 @@ public class AssociatedCaseLinkHelperTest {
 
     private AssociatedCaseLinkHelper associatedCaseLinkHelper;
     @Captor
-    private ArgumentCaptor<Consumer<SscsCaseData>> caseDetailsCaptor;
+    private ArgumentCaptor<Consumer<SscsCaseDetails>> caseDetailsCaptor;
 
     @Before
     public void setUp() {
@@ -110,10 +110,10 @@ public class AssociatedCaseLinkHelperTest {
         assertEquals("12345678", result.getAssociatedCase().get(1).getValue().getCaseReference());
 
         verify(updateCcdCaseService).updateCaseV2(eq(12345678L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class), caseDetailsCaptor.capture());
-        caseDetailsCaptor.getValue().accept(matchingCase1.getData());
+        caseDetailsCaptor.getValue().accept(matchingCase1);
 
         verify(updateCcdCaseService).updateCaseV2(eq(56765676L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class), caseDetailsCaptor.capture());
-        caseDetailsCaptor.getValue().accept(matchingCase2.getData());
+        caseDetailsCaptor.getValue().accept(matchingCase2);
 
         assertEquals("Yes", matchingCase1.getData().getLinkedCasesBoolean());
         assertEquals("33333333", matchingCase1.getData().getAssociatedCase().get(0).getValue().getCaseReference());
@@ -227,10 +227,10 @@ public class AssociatedCaseLinkHelperTest {
         assertEquals("12345678", caseData.getAssociatedCase().get(1).getValue().getCaseReference());
 
         verify(updateCcdCaseService).updateCaseV2(eq(12345678L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class), caseDetailsCaptor.capture());
-        caseDetailsCaptor.getValue().accept(matchingCase1.getData());
+        caseDetailsCaptor.getValue().accept(matchingCase1);
 
         verify(updateCcdCaseService).updateCaseV2(eq(56765676L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class), caseDetailsCaptor.capture());
-        caseDetailsCaptor.getValue().accept(matchingCase2.getData());
+        caseDetailsCaptor.getValue().accept(matchingCase2);
 
         assertEquals("Yes", matchingCase1.getData().getLinkedCasesBoolean());
         assertEquals("33333333", matchingCase1.getData().getAssociatedCase().get(0).getValue().getCaseReference());
