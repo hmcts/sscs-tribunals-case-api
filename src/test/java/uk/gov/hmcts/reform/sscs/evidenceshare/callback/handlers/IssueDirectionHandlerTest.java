@@ -25,10 +25,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -47,7 +44,7 @@ public class IssueDirectionHandlerTest {
     private IssueDirectionHandler handler;
 
     @Captor
-    ArgumentCaptor<Consumer<SscsCaseData>> caseDataConsumerCaptor;
+    ArgumentCaptor<Consumer<SscsCaseDetails>> caseDataConsumerCaptor;
 
     @Before
     public void setUp() {
@@ -88,7 +85,10 @@ public class IssueDirectionHandlerTest {
 
     @Test
     public void givenAnIssueDirectionEventForInterlocCase_thenTriggerAppealToProceedEvent() {
-        var sscsCaseData = SscsCaseData.builder().directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString())).build();
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(
+                SscsCaseData.builder().directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString())).build()
+        ).build();
+        SscsCaseData sscsCaseData = sscsCaseDetails.getData();
         handler.handle(SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(sscsCaseData, INTERLOCUTORY_REVIEW_STATE, DIRECTION_ISSUED));
 
         verify(updateCcdCaseService).updateCaseV2(
@@ -100,7 +100,7 @@ public class IssueDirectionHandlerTest {
                 caseDataConsumerCaptor.capture()
         );
 
-        caseDataConsumerCaptor.getValue().accept(sscsCaseData);
+        caseDataConsumerCaptor.getValue().accept(sscsCaseDetails);
 
         assertNull((sscsCaseData.getDirectionTypeDl()));
     }
