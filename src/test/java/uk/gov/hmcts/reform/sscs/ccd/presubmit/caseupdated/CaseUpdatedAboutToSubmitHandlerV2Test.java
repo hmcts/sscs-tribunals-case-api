@@ -11,7 +11,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -21,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 public class CaseUpdatedAboutToSubmitHandlerV2Test extends AbstractedCaseUpdatedAboutToSubmitHandlerTest {
 
     @Captor
-    private ArgumentCaptor<Consumer<SscsCaseData>> caseDetailsCaptor;
+    private ArgumentCaptor<Consumer<SscsCaseDetails>> caseDetailsCaptor;
 
     @Override
     boolean getAddLinkToOtherAssociatedCasesV2() {
@@ -31,9 +30,9 @@ public class CaseUpdatedAboutToSubmitHandlerV2Test extends AbstractedCaseUpdated
     @Override
     void verifyUpdateCcdCaseServiceIsCalledWithExpectedValues(UpdateCcdCaseService updateCcdCaseService, SscsCaseDetails matchingCase1, SscsCaseDetails matchingCase2) {
         verify(updateCcdCaseService).updateCaseV2(eq(12345678L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class), caseDetailsCaptor.capture());
-        caseDetailsCaptor.getValue().accept(matchingCase1.getData());
+        caseDetailsCaptor.getValue().accept(matchingCase1);
 
         verify(updateCcdCaseService).updateCaseV2(eq(56765676L), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class), caseDetailsCaptor.capture());
-        caseDetailsCaptor.getValue().accept(matchingCase2.getData());
+        caseDetailsCaptor.getValue().accept(matchingCase2);
     }
 }
