@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -54,6 +55,7 @@ public class HmctsResponseReviewedSubmittedHandler extends ResponseEventsAboutTo
             String whoToReview = sscsCaseData.getSelectWhoReviewsCase().getValue().getCode().equals("reviewByJudge") ? "Judge" : "TCW";
             updateCase(sscsCaseData, callback.getCaseDetails().getId(), EventType.VALID_SEND_TO_INTERLOC, "Send to interloc", "Send a case to a " + whoToReview + " for review");
         } else {
+            sscsCaseData.setIgnoreCallbackWarnings(YesNo.YES);
             updateCase(sscsCaseData, callback.getCaseDetails().getId(), EventType.READY_TO_LIST, "Ready to list", "Makes an appeal ready to list");
         }
 
