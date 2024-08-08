@@ -12,16 +12,20 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.util.LinkedHashSet;
+import java.util.Set;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
@@ -140,6 +144,33 @@ public class AdjournCaseMidEventValidationServiceTest {
     void givenIsNextHearingFirstAvailableDateAfterDateIsValid_ThenReturnFalse() {
         sscsCaseData.getAdjournment().setNextHearingFirstAvailableDateAfterDate(LocalDate.now().plusDays(1));
         assertFalse(adjournCaseMidEventValidationService.isNextHearingFirstAvailableDateAfterDateInvalid(sscsCaseData));
+    }
+
+    @Test
+    void givenIsNextHearingextHearingListingDurationMinutesInvalid_ThenReturnError() {
+        sscsCaseData.getAdjournment().setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.MINUTES);
+        sscsCaseData.getAdjournment().setNextHearingListingDuration(67);
+        Set<String> errors = adjournCaseMidEventValidationService.validateNextHearingListingDuration(sscsCaseData);
+        assertEquals(1, errors.size());
+        assertEquals("Duration length needs to be a multiple of 5", errors.toArray()[0]);
+    }
+
+    @Test
+    void givenIsNextHearingextHearingListingDurationSessionsInvalid_ThenReturnError() {
+        sscsCaseData.getAdjournment().setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS);
+        sscsCaseData.getAdjournment().setNextHearingListingDuration(9);
+        Set<String> errors = adjournCaseMidEventValidationService.validateNextHearingListingDuration(sscsCaseData);
+        assertEquals(1, errors.size());
+        assertEquals("Duration length cannot be greater than 8", errors.toArray()[0]);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"MINUTES, 30", "SESSIONS, 5"})
+    void givenIsNextHearingextHearingListingDurationUnitsValid_ThenReturnNoError(AdjournCaseNextHearingDurationUnits unit, int duration) {
+        sscsCaseData.getAdjournment().setNextHearingListingDurationUnits(unit);
+        sscsCaseData.getAdjournment().setNextHearingListingDuration(duration);
+        Set<String> errors = adjournCaseMidEventValidationService.validateNextHearingListingDuration(sscsCaseData);
+        assertTrue(errors.isEmpty());
     }
 
 }

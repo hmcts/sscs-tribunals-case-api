@@ -515,4 +515,43 @@ public class CcdMideventCallbackControllerTest {
                 .andExpect(content().json("{'errors':[]}"));
     }
 
+    @Test
+    public void handleCcdMidEventadjournCaseNextHearingListingDuration_ValidDurationReturnsNoError() throws Exception {
+        String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
+        String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        SscsCaseData sscsCaseData = SscsCaseData.builder().build();
+
+        when(deserializer.deserialize(content)).thenReturn(new Callback<>(
+                new CaseDetails<>(ID, JURISDICTION, State.HEARING, sscsCaseData, LocalDateTime.now(), "Benefit"),
+                Optional.empty(), ADJOURN_CASE, false));
+        when(adjournCaseMidEventValidationService.validateNextHearingListingDuration(sscsCaseData))
+                .thenReturn(Set.of());
+
+        mockMvc.perform(post("/adjournCaseNextHearingListingDuration")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("ServiceAuthorization", "")
+                        .header("Authorization", "")
+                        .content(content))
+                .andExpect(content().json("{'errors':[]}"));
+    }
+
+    @Test
+    public void handleCcdMidEventadjournCaseNextHearingListingDuration_InvalidDurationReturnsError() throws Exception {
+        String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
+        String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        SscsCaseData sscsCaseData = SscsCaseData.builder().build();
+
+        when(deserializer.deserialize(content)).thenReturn(new Callback<>(
+                new CaseDetails<>(ID, JURISDICTION, State.HEARING, sscsCaseData, LocalDateTime.now(), "Benefit"),
+                Optional.empty(), ADJOURN_CASE, false));
+        when(adjournCaseMidEventValidationService.validateNextHearingListingDuration(sscsCaseData))
+                .thenReturn(Set.of("Duration length needs to be a multiple of 5"));
+
+        mockMvc.perform(post("/adjournCaseNextHearingListingDuration")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("ServiceAuthorization", "")
+                        .header("Authorization", "")
+                        .content(content))
+                .andExpect(jsonPath("$.errors[0]", is("Duration length needs to be a multiple of 5")));
+    }
 }

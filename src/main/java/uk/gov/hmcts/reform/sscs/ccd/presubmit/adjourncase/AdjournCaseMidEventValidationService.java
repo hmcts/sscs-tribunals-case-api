@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @Component
@@ -31,21 +32,6 @@ public class AdjournCaseMidEventValidationService {
         violations.stream()
                 .map(ConstraintViolation::getMessage)
                 .forEach(preSubmitCallbackResponse::addError);
-    }
-
-    public boolean adjournCaseNextHearingDateOrPeriodIsProvideDate(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getAdjournment().getNextHearingDateOrPeriod() == AdjournCaseNextHearingDateOrPeriod.PROVIDE_DATE;
-    }
-
-    public boolean adjournCaseNextHearingDateTypeIsFirstAvailableDateAfter(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getAdjournment().getNextHearingDateType() == AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER;
-    }
-
-    public boolean isNextHearingFirstAvailableDateAfterDateInvalid(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getAdjournment().getNextHearingFirstAvailableDateAfterDate() == null) {
-            throw new IllegalStateException("'First available date after' date must be provided");
-        }
-        return isDateInThePast(sscsCaseData.getAdjournment().getNextHearingFirstAvailableDateAfterDate());
     }
 
     public Set<String> checkDirectionsDueDateInvalid(SscsCaseData sscsCaseData) {
@@ -80,6 +66,33 @@ public class AdjournCaseMidEventValidationService {
             errors.add(e.getMessage());
         }
         return errors;
+    }
+
+    public Set<String> validateNextHearingListingDuration(SscsCaseData sscsCaseData) {
+        Set<String> errors = new LinkedHashSet<>();
+        AdjournCaseNextHearingDurationUnits unit = sscsCaseData.getAdjournment().getNextHearingListingDurationUnits();
+        int time = sscsCaseData.getAdjournment().getNextHearingListingDuration();
+        if (unit.equals(AdjournCaseNextHearingDurationUnits.MINUTES) && time % 5 != 0) {
+            errors.add("Duration length needs to be a multiple of 5");
+        } else if (unit.equals(AdjournCaseNextHearingDurationUnits.SESSIONS) && (time < 1 || time > 8)) {
+            errors.add("Duration length cannot be greater than 8");
+        }
+        return errors;
+    }
+
+    public boolean adjournCaseNextHearingDateOrPeriodIsProvideDate(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getAdjournment().getNextHearingDateOrPeriod() == AdjournCaseNextHearingDateOrPeriod.PROVIDE_DATE;
+    }
+
+    public boolean adjournCaseNextHearingDateTypeIsFirstAvailableDateAfter(SscsCaseData sscsCaseData) {
+        return sscsCaseData.getAdjournment().getNextHearingDateType() == AdjournCaseNextHearingDateType.FIRST_AVAILABLE_DATE_AFTER;
+    }
+
+    public boolean isNextHearingFirstAvailableDateAfterDateInvalid(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getAdjournment().getNextHearingFirstAvailableDateAfterDate() == null) {
+            throw new IllegalStateException("'First available date after' date must be provided");
+        }
+        return isDateInThePast(sscsCaseData.getAdjournment().getNextHearingFirstAvailableDateAfterDate());
     }
 
     private boolean directionDueDateOffsetIsEmpty(SscsCaseData sscsCaseData) {

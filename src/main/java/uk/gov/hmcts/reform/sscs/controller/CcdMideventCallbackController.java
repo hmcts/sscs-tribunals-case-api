@@ -177,6 +177,21 @@ public class CcdMideventCallbackController {
         return ok(preSubmitCallbackResponse);
     }
 
+    @PostMapping(path = "/adjournCaseNextHearingListingDuration", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEventadjournCaseNextHearingListingDuration(
+            @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
+            @RequestBody String message) {
+        Callback<SscsCaseData> callback = deserializer.deserialize(message);
+        log.info("About to start ccdMidEventAdjournCaseNextHearing callback `{}` received for Case ID `{}`", callback.getEvent(),
+                callback.getCaseDetails().getId());
+        authorisationService.authorise(serviceAuthHeader);
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
+        adjournCaseMidEventValidationService.validateSscsCaseDataConstraints(caseData, preSubmitCallbackResponse);
+        preSubmitCallbackResponse.addErrors(adjournCaseMidEventValidationService.validateNextHearingListingDuration(caseData));
+        return ok(preSubmitCallbackResponse);
+    }
+
     @PostMapping(path = "/ccdMidEventAdminRestoreCases", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEventAdminRestoreCases(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
