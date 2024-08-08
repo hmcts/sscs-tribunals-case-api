@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -66,10 +68,26 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
                     && isNextHearingFirstAvailableDateAfterDateInvalid(sscsCaseData)) {
                 preSubmitCallbackResponse.addError("'First available date after' date cannot be in the past");
             }
+            if (sscsCaseData.getAdjournment().getNextHearingListingDurationType() != null
+                    && sscsCaseData.getAdjournment().getNextHearingListingDurationType()
+                    .equals(AdjournCaseNextHearingDurationType.NON_STANDARD)) {
+                validateNextHearingListingDuration(sscsCaseData, preSubmitCallbackResponse);
+            }
 
         } catch (IllegalStateException e) {
             log.error(e.getMessage() + ". Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
             preSubmitCallbackResponse.addError(e.getMessage());
+        }
+    }
+
+    private void validateNextHearingListingDuration(SscsCaseData sscsCaseData,
+                                                    PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        AdjournCaseNextHearingDurationUnits unit = sscsCaseData.getAdjournment().getNextHearingListingDurationUnits();
+        int time = sscsCaseData.getAdjournment().getNextHearingListingDuration();
+        if (unit.equals(AdjournCaseNextHearingDurationUnits.MINUTES) && time % 5 != 0) {
+            preSubmitCallbackResponse.addError("Duration length needs to be a multiple of 5");
+        } else if (unit.equals(AdjournCaseNextHearingDurationUnits.SESSIONS) && (time < 1 || time > 8)) {
+            preSubmitCallbackResponse.addError("Duration length cannot be greater than 8");
         }
     }
 
