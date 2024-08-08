@@ -78,12 +78,12 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         String region = sscsCaseData.getRegion();
 
         Map<String, RegionalProcessingCenter> regionalProcessingCenterMap = regionalProcessingCenterService
-            .getRegionalProcessingCenterMap();
+                .getRegionalProcessingCenterMap();
 
         HearingRoute route = regionalProcessingCenterMap.values().stream()
-            .filter(rpc -> rpc.getName().equalsIgnoreCase(region))
-            .map(RegionalProcessingCenter::getHearingRoute)
-            .findFirst().orElse(HearingRoute.LIST_ASSIST);
+                .filter(rpc -> rpc.getName().equalsIgnoreCase(region))
+                .map(RegionalProcessingCenter::getHearingRoute)
+                .findFirst().orElse(HearingRoute.GAPS);
 
         return HearingHandler.valueOf(route.name()).handle(sscsCaseData, gapsSwitchOverFeature,
             hearingMessagingServiceFactory.getMessagingService(route));
