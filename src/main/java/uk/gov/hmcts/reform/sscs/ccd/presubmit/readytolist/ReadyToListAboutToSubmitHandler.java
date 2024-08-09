@@ -54,7 +54,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         if (HearingRoute.GAPS == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()) {
 
-            if (!callback.isIgnoreWarnings()) {
+            if (!callback.isIgnoreWarnings() && !YesNo.YES.equals(sscsCaseData.getIgnoreCallbackWarnings())) {
                 PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
                 String gapsProceedWarning = "This is a GAPS case, If you do want to proceed, "
                     + "then please change the hearing route to List Assist";

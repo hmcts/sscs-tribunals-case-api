@@ -239,8 +239,7 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/config/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/EnvironmentPropertiesPrinter.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/controller/FunctionalTestController.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/ccd/presubmit/hmctsresponsereviewed/HmctsResponseReviewedSubmittedHandler.java,"
+                "src/main/java/uk/gov/hmcts/reform/sscs/controller/FunctionalTestController.java,"
         property "sonar.host.url", "https://sonar.reform.hmcts.net/"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
