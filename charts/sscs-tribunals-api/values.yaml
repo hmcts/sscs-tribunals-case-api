@@ -57,6 +57,11 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
           alias: ld.sdk-key
         - name: sscs-sendgrid-api-key
           alias: send-grid.apiKey
+#         hearings=api
+        - name: hmc-servicebus-shared-access-key-tf
+          alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
+        - name: sscs-servicebus-shared-access-key
+          alias: TRIBUNALS_EVENT_QUEUE_ACCESS_KEY
 
   environment:
     SERVER_PORT: 8080
@@ -115,6 +120,24 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: false
     TRIGGER_EVENT_V2_ENABLED: false
     HANDLE_CCD_CALLBACKMAP_V2: false
+#    hearings=api
+    IDAM_S2S_URL: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    CASEWORKER_REF_API_URL: "http://rd-caseworker-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    COMMON_REF_API_URL: "http://rd-commondata-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-{{ .Values.global.environment }}"
+    HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-{{ .Values.global.environment }}"
+    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-{{ .Values.global.environment }}"
+    HMC_HEARINGS_LISTENING_ENABLED: false
+    HMC_HEARINGS_TOPIC_POLICY_NAME: SendAndListenSharedAccessKey
+    TRIBUNALS_EVENT_QUEUE_NAMESPACE: "sscs-servicebus-{{ .Values.global.environment }}"
+    TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api-{{ .Values.global.environment }}"
+    TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
+    TRIBUNALS_EVENT_QUEUE_POLICY_NAME: SendAndListenSharedAccessKey
+    EXUI_API_URL: "https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net"
+    HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    SSCS_SERVICE_CODE: BBA3
+    HMC_DEPLOYMENT_FILTER_ENABLED: false
+    HEARINGS_CASE_UPDATE_V2_ENABLED: false
 
 postgresql:
   enabled: false
