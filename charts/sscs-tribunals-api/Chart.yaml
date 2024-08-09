@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.147
+version: 0.0.148
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -68,7 +68,7 @@ dependencies:
     version: 0.0.50
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
     condition: am-org-role-mapping-service.enabled
-# WA
+  # WA
   - name: camunda-bpm
     version: 0.0.43
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
@@ -89,19 +89,19 @@ dependencies:
     version: 0.0.38
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wa.enabled
-#    initiation
+  #    initiation
   - name: wa-task-batch-service
     version: ~0.0.15
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     alias: wa-initiation-batch
     condition: wa.taskBatchCron.enabled
-#    reconfiguration
+  #    reconfiguration
   - name: wa-task-batch-service
     version: ~0.0.16
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     alias: wa-reconfiguration-batch
     condition: wa.reconfigurationBatchCron.enabled
-#    termination
+  #    termination
   - name: wa-task-batch-service
     version: ~0.0.16
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
