@@ -10,7 +10,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
@@ -27,11 +26,13 @@ public class AdjournCaseMidEventValidationService {
         this.validator = validator;
     }
 
-    public void validateSscsCaseDataConstraints(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+    public Set<String> validateSscsCaseDataConstraints(SscsCaseData sscsCaseData) {
+        Set<String> errors = new LinkedHashSet<>();
         Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
         violations.stream()
                 .map(ConstraintViolation::getMessage)
-                .forEach(preSubmitCallbackResponse::addError);
+                .forEach(errors::add);
+        return errors;
     }
 
     public Set<String> checkDirectionsDueDateInvalid(SscsCaseData sscsCaseData) {

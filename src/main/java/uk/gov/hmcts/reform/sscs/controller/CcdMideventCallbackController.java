@@ -157,7 +157,7 @@ public class CcdMideventCallbackController {
         authorisationService.authorise(serviceAuthHeader);
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-        adjournCaseMidEventValidationService.validateSscsCaseDataConstraints(caseData, preSubmitCallbackResponse);
+        preSubmitCallbackResponse.addErrors(adjournCaseMidEventValidationService.validateSscsCaseDataConstraints(caseData));
         preSubmitCallbackResponse.addErrors(adjournCaseMidEventValidationService.checkDirectionsDueDateInvalid(caseData));
         return  ok(preSubmitCallbackResponse);
     }
@@ -172,7 +172,7 @@ public class CcdMideventCallbackController {
         authorisationService.authorise(serviceAuthHeader);
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-        adjournCaseMidEventValidationService.validateSscsCaseDataConstraints(caseData, preSubmitCallbackResponse);
+        preSubmitCallbackResponse.addErrors(adjournCaseMidEventValidationService.validateSscsCaseDataConstraints(caseData));
         preSubmitCallbackResponse.addErrors(adjournCaseMidEventValidationService.checkNextHearingDateInvalid(caseData));
         return ok(preSubmitCallbackResponse);
     }
@@ -187,7 +187,7 @@ public class CcdMideventCallbackController {
         authorisationService.authorise(serviceAuthHeader);
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-        adjournCaseMidEventValidationService.validateSscsCaseDataConstraints(caseData, preSubmitCallbackResponse);
+        preSubmitCallbackResponse.addErrors(adjournCaseMidEventValidationService.validateSscsCaseDataConstraints(caseData));
         preSubmitCallbackResponse.addErrors(adjournCaseMidEventValidationService.validateNextHearingListingDuration(caseData));
         return ok(preSubmitCallbackResponse);
     }
