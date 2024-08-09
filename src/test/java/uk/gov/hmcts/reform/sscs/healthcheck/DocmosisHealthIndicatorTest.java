@@ -53,7 +53,7 @@ public class DocmosisHealthIndicatorTest {
         Map<String, Object> exampleReadyResponse =
             ImmutableMap
                 .of(
-                    "ready", "true"
+                    "ready", true
                 );
 
         when(responseEntity.getBody()).thenReturn(exampleReadyResponse);
@@ -67,7 +67,7 @@ public class DocmosisHealthIndicatorTest {
         Map<String, Object> exampleNotReadyResponse =
             ImmutableMap
                 .of(
-                    "ready", "false"
+                    "ready", false
                 );
 
         when(responseEntity.getBody()).thenReturn(exampleNotReadyResponse);
