@@ -5,7 +5,7 @@ name: cft-lib-hearings-queue
 
 services:
   active-mq:
-    image: rmohr/activemq:5.15.9-alpine
+    image: rmohr/activemq:latest
     ports:
       - 61616:61616
       - 8161:8161

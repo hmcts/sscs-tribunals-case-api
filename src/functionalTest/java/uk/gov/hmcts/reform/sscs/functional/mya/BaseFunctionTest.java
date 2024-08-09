@@ -32,7 +32,7 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 @SpringBootTest(classes = {TribunalsCaseApiApplication.class, CitizenIdamService.class})
 @Slf4j
 public abstract class BaseFunctionTest {
-    protected final String baseUrl = System.getenv("TEST_URL") != null ? System.getenv("TEST_URL") : "http://localhost:8080";
+    protected final String baseUrl = System.getenv("TEST_URL") != null ? System.getenv("TEST_URL") : "http://localhost:8008";
 
     private CloseableHttpClient client;
     private HttpClient myaClient;
