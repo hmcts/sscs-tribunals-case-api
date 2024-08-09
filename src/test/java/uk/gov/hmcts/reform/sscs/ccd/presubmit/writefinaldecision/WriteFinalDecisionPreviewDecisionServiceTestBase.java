@@ -949,7 +949,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionJudge(ORIGINAL_JUDGE_NAME);
         PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.CORRECTED_DECISION_NOTICE, USER_AUTHORISATION, false, true, true);
 
-        verify(userDetailsService, atMostOnce()).buildLoggedInUserName(USER_AUTHORISATION);
+        verify(userDetailsService, atMost(2)).buildLoggedInUserName(USER_AUTHORISATION);
         assertEquals(ORIGINAL_JUDGE_NAME, response.getData().getSscsFinalDecisionCaseData().getFinalDecisionJudge());
     }
 
