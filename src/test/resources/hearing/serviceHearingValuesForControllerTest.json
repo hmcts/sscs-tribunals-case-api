@@ -1,0 +1,71 @@
+{
+  "publicCaseName":"Test Case Name",
+  "autoListFlag":false,
+  "hearingType":"BBA3-SUB",
+  "caseType":"Benefit",
+  "caseManagementLocationCode": "12345",
+  "caseCategories":[
+    {
+      "categoryType":"caseType"
+    },
+    {
+      "categoryType":"caseSubType"
+    }
+  ],
+  "duration":30,
+  "hearingPriorityType":"Standard",
+  "numberOfPhysicalAttendees":0,
+  "hearingInWelshFlag":false,
+  "caseAdditionalSecurityFlag":false,
+  "facilitiesRequired":[
+
+  ],
+  "listingComments":null,
+  "hearingRequester":null,
+  "privateHearingRequiredFlag":false,
+  "leadJudgeContractType":null,
+  "hearingIsLinkedFlag":true,
+  "hmctsServiceID":null,
+  "hearingChannels": [ "INTER" ],
+  "hearingWindow":{
+    "dateRangeStart": "MOCK_DATE_TOMORROW"
+  },
+  "hearingLocations":[
+    {
+      "locationType":"court",
+      "locationId":"LIVERPOOL SOCIAL SECURITY AND CHILD SUPPORT TRIBUNAL"
+    }
+  ],
+  "panelRequirements":null,
+  "judiciary":{
+    "roleType":[],
+    "authorisationTypes":[],
+    "authorisationSubType":[],
+    "judiciaryPreferences":[],
+    "judiciarySpecialisms":[]
+  },
+  "parties":[
+    {
+      "partyID":"1",
+      "partyType":"IND",
+      "partyChannel":"INTER",
+      "partyRole":"APEL",
+      "individualDetails":{
+        "preferredHearingChannel":"INTER",
+        "interpreterLanguage":"bul",
+        "reasonableAdjustments":[],
+        "vulnerableFlag":false,
+        "hearingChannelEmail":[],
+        "hearingChannelPhone":[],
+        "relatedParties":[]
+      },
+      "unavailabilityRanges":[]
+    }
+  ],
+  "caseFlags":{
+    "flags":[],
+    "flagAmendURL":""
+  },
+  "screenFlow":null,
+  "vocabulary":null
+}
