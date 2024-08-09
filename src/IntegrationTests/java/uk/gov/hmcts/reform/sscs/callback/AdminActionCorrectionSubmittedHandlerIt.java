@@ -104,6 +104,8 @@ public class AdminActionCorrectionSubmittedHandlerIt extends AbstractEventIt {
                         .build());
         when(sscsCcdConvertService.getCaseDetails(caseDetails))
                 .thenReturn(sscsCaseDetails);
+        when(sscsCcdConvertService.getCaseDetails(any(StartEventResponse.class)))
+                .thenReturn(sscsCaseDetails);
 
         assertThat(sscsCaseDetails.getData().getPostHearing().getSetAside())
                 .isNotNull();
