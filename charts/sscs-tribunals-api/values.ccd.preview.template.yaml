@@ -71,7 +71,6 @@ postgresql:
       - name: "pr-${CHANGE_ID}-hmc-cft-hearing-service"
       - name: "pr-${CHANGE_ID}-sscsjobscheduler"
 
-
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
   enabled: true
@@ -695,7 +694,7 @@ sscs-hearings-api:
       #Messaging
       HMC_HEARINGS_LISTENING_ENABLED: true
       HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
-      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-3806"
+      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-aat"
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
       TRIBUNALS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
