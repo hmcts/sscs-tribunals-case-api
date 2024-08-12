@@ -6,7 +6,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -84,7 +83,7 @@ public class GetFirstTierDocumentsSubmittedHandlerTest {
         when(ccdCallbackMapService.handleCcdCallbackMapV2(
                 capture.capture(),
                 eq(Long.valueOf(sscsCaseData.getCcdCaseId()))))
-                .thenReturn(Optional.of(sscsCaseData));
+                .thenReturn(sscsCaseData);
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 

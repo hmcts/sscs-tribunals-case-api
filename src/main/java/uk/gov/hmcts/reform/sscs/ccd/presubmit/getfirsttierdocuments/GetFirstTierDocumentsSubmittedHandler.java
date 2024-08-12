@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.getfirsttierdocuments;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.GetFirstTierDocumentsActions.BUNDLE_CREATED;
 
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,17 +48,16 @@ public class GetFirstTierDocumentsSubmittedHandler implements PreSubmitCallbackH
                                                           String userAuthorisation) {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        long caseId = Long.valueOf(caseData.getCcdCaseId());
+        long caseId = Long.parseLong(caseData.getCcdCaseId());
         CcdCallbackMap callbackMap = BUNDLE_CREATED;
 
         log.info("Get first tier documents: handling action {} for case {}", callbackMap, caseId);
 
         if (isHandleCcdCallbackMapV2Enabled) {
-            Optional<SscsCaseData> sscsCaseDataOptional = ccdCallbackMapService.handleCcdCallbackMapV2(
+            caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
                     callbackMap,
                     caseId
             );
-            caseData = sscsCaseDataOptional.orElse(caseData);
         } else {
             caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
         }
