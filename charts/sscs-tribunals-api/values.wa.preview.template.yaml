@@ -52,6 +52,7 @@ java:
     SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
     AMQP_USERNAME: "RootManageSharedAccessKey"
+    HANDLE_CCD_CALLBACKMAP_V2: true
   secrets:
     AMQP_PASSWORD:
       secretRef: sscs-sb-preview

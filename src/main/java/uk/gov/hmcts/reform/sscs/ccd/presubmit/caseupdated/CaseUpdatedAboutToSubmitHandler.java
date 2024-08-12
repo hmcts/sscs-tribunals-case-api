@@ -154,8 +154,12 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         updateHearingTypeForNonSscs1Case(sscsCaseData, preSubmitCallbackResponse, hasSystemUserRole);
 
         YesNo isJointPartyAddressSameAsAppellant = sscsCaseData.getJointParty().getJointPartyAddressSameAsAppellant();
-        if (sscsCaseData.isThereAJointParty() && !Objects.isNull(isJointPartyAddressSameAsAppellant) && isJointPartyAddressSameAsAppellant.toBoolean()) {
-            sscsCaseData.getJointParty().setAddress(sscsCaseData.getAppeal().getAppellant().getAddress());
+        if (sscsCaseData.isThereAJointParty()) {
+            if (!Objects.isNull(isJointPartyAddressSameAsAppellant) && isJointPartyAddressSameAsAppellant.toBoolean()) {
+                sscsCaseData.getJointParty().setAddress(sscsCaseData.getAppeal().getAppellant().getAddress());
+            }
+        } else {
+            sscsCaseData.setJointParty(null);
         }
 
         //validate benefit type and dwp issuing office for updateCaseData event triggered by user, which is not by CaseLoader

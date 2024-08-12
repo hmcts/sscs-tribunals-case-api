@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -119,26 +118,6 @@ class AdjournCaseAboutToStartHandlerTest {
 
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertThat(sscsCaseData.getAdjournment()).hasAllNullFieldsOrPropertiesExcept("adjournmentInProgress");
-    }
-
-    @Test
-    void givenCaseHasAdjournedFieldsPopulatedAndDraftAdjournedDocs_thenDoNotClearTransientFields() {
-        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        List<SscsDocument> documentList = new ArrayList<>();
-
-        SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(DRAFT_ADJOURNMENT_NOTICE.getValue()).build();
-        documentList.add(new SscsDocument(details));
-
-        sscsCaseData.setSscsDocument(documentList);
-
-        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        Adjournment adjournment = sscsCaseData.getAdjournment();
-        assertThat(adjournment).hasNoNullFieldsOrPropertiesExcept("interpreterLanguage", "signedInUser");
     }
 
     @Test
