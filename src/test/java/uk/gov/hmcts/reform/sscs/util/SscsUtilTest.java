@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTION_GRANTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED_NOTICE;
@@ -9,9 +10,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.TELEPHONE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -281,5 +285,153 @@ class SscsUtilTest {
         assertThat(hearingSubtype.isWantsHearingTypeTelephone()).isFalse();
         assertThat(hearingSubtype.isWantsHearingTypeFaceToFace()).isFalse();
         assertThat(hearingSubtype.isWantsHearingTypeVideo()).isFalse();
+    }
+
+    @Test
+    void givenHearingChannelOfAttending_UpdateWantsToAttendToYesAndUpdateHearingSubtype() {
+        caseData.setAppeal(Appeal.builder().build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+
+        updateHearingChannel(caseData, TELEPHONE);
+
+        assertThat(caseData.getSchedulingAndListingFields().getOverrideFields().getAppellantHearingChannel()).isEqualTo(TELEPHONE);
+
+        Appeal appeal = caseData.getAppeal();
+        assertThat(appeal.getHearingType()).isEqualTo(HearingType.ORAL.getValue());
+        assertThat(appeal.getHearingOptions().getWantsToAttend()).isEqualTo(YesNo.YES.getValue());
+
+        HearingSubtype hearingSubtype = appeal.getHearingSubtype();
+        assertThat(hearingSubtype.isWantsHearingTypeTelephone()).isTrue();
+    }
+
+    @Test
+    void givenHearingChannelIsPaper_UpdateHearingSubtypeToNo() {
+        caseData.setAppeal(Appeal.builder().build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+
+        updateHearingChannel(caseData, PAPER);
+
+        assertThat(caseData.getSchedulingAndListingFields().getOverrideFields().getAppellantHearingChannel()).isEqualTo(PAPER);
+
+        Appeal appeal = caseData.getAppeal();
+        assertThat(appeal.getHearingType()).isEqualTo(HearingType.PAPER.getValue());
+
+        HearingSubtype hearingSubtype = appeal.getHearingSubtype();
+        assertThat(hearingSubtype.isWantsHearingTypeTelephone()).isFalse();
+        assertThat(hearingSubtype.isWantsHearingTypeFaceToFace()).isFalse();
+        assertThat(hearingSubtype.isWantsHearingTypeVideo()).isFalse();
+    }
+
+    @Test
+    void givenAppellantInterpreterIsSetToYesAndLanguageIsNotNull_UpdateCaseDataInterpreter() {
+        caseData.setAppeal(Appeal.builder().build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+
+        DynamicListItem interpreterLanguageItem = new DynamicListItem("test", "spanish");
+        DynamicList interpreterLanguage = new DynamicList(interpreterLanguageItem, List.of());
+
+        HearingInterpreter appellantInterpreter = HearingInterpreter.builder()
+                .isInterpreterWanted(YesNo.YES)
+                .interpreterLanguage(interpreterLanguage)
+                .build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        updateHearingInterpreter(caseData, response, appellantInterpreter);
+
+        Appeal appeal = caseData.getAppeal();
+
+        HearingOptions hearingOptions = appeal.getHearingOptions();
+        assertThat(hearingOptions.getLanguageInterpreter()).isEqualTo("Yes");
+        assertThat(hearingOptions.getLanguages()).isNotNull();
+        assertThat(hearingOptions.getLanguages()).isEqualTo("spanish");
+    }
+
+    @Test
+    void givenAppellantInterpreterIsSetToNoAndLanguageFieldIsNotEmpty_ThenClearLanguageValueField() {
+        caseData.setAppeal(Appeal.builder().build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+
+        DynamicListItem interpreterLanguageItem = new DynamicListItem("test1", "Welsh");
+        DynamicList interpreterLanguage = new DynamicList(interpreterLanguageItem, List.of());
+
+        HearingInterpreter appellantInterpreter = HearingInterpreter.builder()
+                .isInterpreterWanted(YesNo.NO)
+                .interpreterLanguage(interpreterLanguage)
+                .build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        updateHearingInterpreter(caseData, response, appellantInterpreter);
+
+        assertEquals(0, response.getErrors().size());
+        assertThat(response.getData().getSchedulingAndListingFields().getOverrideFields().getAppellantInterpreter().getInterpreterLanguage()).isNull();
+        assertNull(response.getData().getAppeal().getHearingOptions().getLanguages());
+    }
+
+    @Test
+    void givenAppellantInterpreterIsSetToNoAndLanguageFieldIsEmpty_ThenUpdateThisOnCaseData() {
+        caseData.setAppeal(Appeal.builder().build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+
+        caseData.getAppeal().setHearingOptions(HearingOptions.builder()
+                .languageInterpreter("Yes")
+                .languages("French")
+                .build());
+
+        HearingInterpreter appellantInterpreter = HearingInterpreter.builder()
+                .isInterpreterWanted(YesNo.NO)
+                .build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        updateHearingInterpreter(caseData, response, appellantInterpreter);
+
+        Appeal appeal = caseData.getAppeal();
+
+        HearingOptions hearingOptions = appeal.getHearingOptions();
+        assertThat(hearingOptions.getLanguageInterpreter()).isEqualTo("No");
+        assertNull(hearingOptions.getLanguages());
+    }
+
+    @Test
+    void givenAppellantInterpreterIsSetToYesAndLanguageIsNull_ThrowAnError() {
+        caseData.setAppeal(Appeal.builder().build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+
+        HearingInterpreter appellantInterpreter = HearingInterpreter.builder()
+                .isInterpreterWanted(YesNo.YES)
+                .interpreterLanguage(null)
+                .build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        updateHearingInterpreter(caseData, response, appellantInterpreter);
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("Interpreter language must be selected if an interpreter is wanted.", response.getErrors().toArray()[0]);
+    }
+
+    @Test
+    void givenAppellantInterpreterIsSetToYesAndLanguageValueIsNull_ThrowAnError() {
+        caseData.setAppeal(Appeal.builder().build());
+        caseData.getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().build());
+
+        DynamicListItem interpreterLanguageItem2 = new DynamicListItem("test", "Italian");
+        DynamicListItem interpreterLanguageItem3 = new DynamicListItem("test1", "Persian");
+        DynamicList interpreterLanguage = new DynamicList(null, List.of(interpreterLanguageItem2, interpreterLanguageItem3));
+
+        HearingInterpreter appellantInterpreter = HearingInterpreter.builder()
+                .isInterpreterWanted(YesNo.YES)
+                .interpreterLanguage(interpreterLanguage)
+                .build();
+
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        updateHearingInterpreter(caseData, response, appellantInterpreter);
+
+        assertEquals(1, response.getErrors().size());
+        assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNull();
+        assertEquals("Interpreter language must be selected if an interpreter is wanted.", response.getErrors().toArray()[0]);
     }
 }
