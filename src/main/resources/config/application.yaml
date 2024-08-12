@@ -65,6 +65,9 @@ amqp:
     clientId: sscs-evidence-share
     amqp-connection-string-template: ${JMS_AMQP_CONNECTION_TEMPLATE:amqps://%1s?amqp.idleTimeout=%2d}
     idleTimeout: ${JMS_IDLE_TIMEOUT:3600000}
+    prefetch:
+        override: ${AMQP_PREFETCH_OVERRIDE:false}
+        topicPrefetch: ${AMQP_TOPIC_PREFETCH:1}
 
 answer:
     html:
