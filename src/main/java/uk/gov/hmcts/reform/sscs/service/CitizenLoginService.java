@@ -175,10 +175,10 @@ public class CitizenLoginService {
         if (citizenLogicServiceV2Enabled) {
             log.info("Updating case with last logged in MYA using V2, case id: {}, matching email: {}", caseByAppealNumber.getId(), email);
             updateCcdCaseService.updateCaseV2(caseByAppealNumber.getId(), EventType.UPDATE_CASE_ONLY.getCcdType(), "SSCS - update last logged in MYA",
-                    UPDATED_SSCS, idamService.getIdamTokens(), caseData -> updateSubscriptionWithLastLoggedIntoMya(caseData, email));
+                    UPDATED_SSCS, idamService.getIdamTokens(), sscsCaseDetails -> updateSubscriptionWithLastLoggedIntoMya(sscsCaseDetails, email));
         } else {
             log.info("Updating case with last logged in MYA using V1, case id: {}, matching email: {}", caseByAppealNumber.getId(), email);
-            updateSubscriptionWithLastLoggedIntoMya(caseByAppealNumber.getData(), email);
+            updateSubscriptionWithLastLoggedIntoMya(caseByAppealNumber, email);
             ccdService.updateCase(caseByAppealNumber.getData(), caseByAppealNumber.getId(), EventType.UPDATE_CASE_ONLY.getCcdType(),
                     "SSCS - update last logged in MYA", UPDATED_SSCS, idamService.getIdamTokens()
             );
@@ -217,7 +217,8 @@ public class CitizenLoginService {
                 .anyMatch(subscription -> subscription != null && email.equalsIgnoreCase(subscription.getEmail()));
     }
 
-    private void updateSubscriptionWithLastLoggedIntoMya(SscsCaseData sscsCaseData, String email) {
+    private void updateSubscriptionWithLastLoggedIntoMya(SscsCaseDetails sscsCaseDetails, String email) {
+        SscsCaseData sscsCaseData = sscsCaseDetails.getData();
         Subscriptions subscriptions = sscsCaseData.getSubscriptions();
         String lastLoggedIntoMya = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
         if (subscriptions != null && subscriptions.getAppellantSubscription() != null
