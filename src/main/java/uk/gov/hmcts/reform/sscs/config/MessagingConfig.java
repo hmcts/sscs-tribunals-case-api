@@ -4,6 +4,7 @@ import javax.jms.ConnectionFactory;
 import javax.net.ssl.SSLContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.jms.JmsConnectionFactory;
+import org.apache.qpid.jms.policy.JmsDefaultPrefetchPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -13,8 +14,6 @@ import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
-import uk.gov.hmcts.reform.sscs.service.servicebus.messaging.JmsErrorHandler;
-
 
 @Configuration
 @Slf4j
@@ -33,7 +32,9 @@ public class MessagingConfig {
                                                   @Value("${amqp.username}") final String username,
                                                   @Value("${amqp.password}") final String password,
                                                   @Autowired final String jmsUrlString,
-                                                  @Autowired(required = false) final SSLContext jmsSslContext) {
+                                                  @Autowired(required = false) final SSLContext jmsSslContext,
+                                                  @Value("${amqp.prefetch.override}") final boolean prefetchOverride,
+                                                  @Value("${amqp.prefetch.topicPrefetch}") final int topicPrefetch) {
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(jmsUrlString);
         jmsConnectionFactory.setUsername(username);
         jmsConnectionFactory.setPassword(password);
@@ -42,7 +43,12 @@ public class MessagingConfig {
         if (jmsSslContext != null) {
             jmsConnectionFactory.setSslContext(jmsSslContext);
         }
-
+        if (prefetchOverride) {
+            JmsDefaultPrefetchPolicy prefetchPolicy = new JmsDefaultPrefetchPolicy();
+            prefetchPolicy.setTopicPrefetch(topicPrefetch);
+            prefetchPolicy.setDurableTopicPrefetch(topicPrefetch);
+            jmsConnectionFactory.setPrefetchPolicy(prefetchPolicy);
+        }
         return new CachingConnectionFactory(jmsConnectionFactory);
     }
 
@@ -59,8 +65,8 @@ public class MessagingConfig {
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);
         returnValue.setSubscriptionDurable(Boolean.TRUE);
-        returnValue.setErrorHandler(new JmsErrorHandler());
+        returnValue.setErrorHandler(t -> log.error("Error while processing JMS message", t));
+        returnValue.setExceptionListener(t -> log.error("Exception while processing JMS message", t));
         return returnValue;
     }
-
 }
