@@ -100,7 +100,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         setHearings(writeFinalDecisionBuilder, caseData);
 
-        String heldAt = writeFinalDecisionBuilder.build().getHeldAt();
+        String heldAt = SscsUtil.buildWriteFinalDecisionHeldAt(caseData, venueDataLoader);
         String heldBefore = buildHeldBefore(caseData, userAuthorisation, isPostHearingsEnabled);
 
         if (isPostHearingsEnabled && nonNull(finalDecisionCaseData.getFinalDecisionHeldAt())
