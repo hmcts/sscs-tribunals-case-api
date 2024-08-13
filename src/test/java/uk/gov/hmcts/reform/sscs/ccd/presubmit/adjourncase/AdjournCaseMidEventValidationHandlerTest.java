@@ -14,6 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
@@ -213,6 +215,52 @@ class AdjournCaseMidEventValidationHandlerTest extends AdjournCaseMidEventValida
         assertThat(response.getErrors())
             .hasSize(1)
             .containsOnly("'First available date after' date must be provided");
+    }
+
+    @Test
+    void givenInvalidListingDurationThrowError() {
+        sscsCaseData.getAdjournment().setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.NON_STANDARD);
+        sscsCaseData.getAdjournment().setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.MINUTES);
+        sscsCaseData.getAdjournment().setNextHearingListingDuration(32);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors())
+                .hasSize(1)
+                .containsOnly("Duration length needs to be a multiple of 5");
+
+    }
+
+    @Test
+    void givenValidListingDurationDoNotThrowError() {
+        sscsCaseData.getAdjournment().setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.NON_STANDARD);
+        sscsCaseData.getAdjournment().setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.MINUTES);
+        sscsCaseData.getAdjournment().setNextHearingListingDuration(30);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors()).isEmpty();
+    }
+
+    @Test
+    void givenInvalidListingSessionsThrowError() {
+        sscsCaseData.getAdjournment().setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.NON_STANDARD);
+        sscsCaseData.getAdjournment().setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS);
+        sscsCaseData.getAdjournment().setNextHearingListingDuration(12);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors())
+                .hasSize(1)
+                .containsOnly("Duration length cannot be greater than 8");
+
+    }
+
+    @Test
+    void givenValidListingSessionsDoNotThrowError() {
+        sscsCaseData.getAdjournment().setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.NON_STANDARD);
+        sscsCaseData.getAdjournment().setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS);
+        sscsCaseData.getAdjournment().setNextHearingListingDuration(5);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertThat(response.getErrors()).isEmpty();
     }
 
 }
