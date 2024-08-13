@@ -103,6 +103,8 @@ public class PostHearingRequestIt extends AbstractEventIt {
                         .build());
         when(sscsCcdConvertService.getCaseDetails(caseDetails))
                 .thenReturn(sscsCaseDetails);
+        when(sscsCcdConvertService.getCaseDetails(isA(StartEventResponse.class)))
+                .thenReturn(sscsCaseDetails);
 
         assertThat(sscsCaseDetails.getData().getPostHearing().getSetAside())
                 .isNotNull();
