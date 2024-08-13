@@ -238,6 +238,27 @@ public class ReadyToListAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenAGapsCaseOnSubmitIgnoreWarningIIgnoreWarningsFieldIsYes() {
+        SchedulingAndListingFields schedulingAndListingFields = SchedulingAndListingFields.builder()
+                .hearingRoute(HearingRoute.GAPS)
+                .build();
+        sscsCaseData = sscsCaseData.toBuilder()
+                .schedulingAndListingFields(schedulingAndListingFields)
+                .region("TEST")
+                .build();
+        sscsCaseData.setIgnoreCallbackWarnings(YesNo.YES);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        handler = new ReadyToListAboutToSubmitHandler(false, regionalProcessingCenterService,
+                hearingMessagingServiceFactory);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT,
+                callback, USER_AUTHORISATION);
+
+        MatcherAssert.assertThat(response.getErrors().size(), is(0));
+        MatcherAssert.assertThat(response.getWarnings().size(), is(0));
+    }
+
+    @Test
     public void givenAListAssistCaseIfAHearingExistsInTheFutureThenReturnWarning() {
         HearingDetails hearingDetails1 = HearingDetails.builder()
                 .hearingDate(LocalDate.now().minusDays(10).toString())
@@ -330,5 +351,20 @@ public class ReadyToListAboutToSubmitHandlerTest {
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+    }
+
+    @Test
+    public void givenRpcNotSet_HearingRouteShouldBeGaps() {
+
+        handler = new ReadyToListAboutToSubmitHandler(true, regionalProcessingCenterService,
+                hearingMessagingServiceFactory);
+
+        sscsCaseData = sscsCaseData.toBuilder().region("FakeRegion").build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT,
+                callback, USER_AUTHORISATION);
+
+        assertEquals(HearingRoute.GAPS, response.getData().getSchedulingAndListingFields().getHearingRoute());
     }
 }
