@@ -4,7 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
-import java.util.Optional;
+import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,20 +53,21 @@ public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
         if (isPostHearingsEnabled) {
             Correction correction = caseData.getPostHearing().getCorrection();
 
+            Consumer<SscsCaseData> sscsCaseDataConsumer = sscsCaseData ->
+                    sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(NO);
+
             if (isYes(correction.getIsCorrectionFinalDecisionInProgress())) {
                 if (isHandleCcdCallbackMapV2Enabled) {
-                    Optional<SscsCaseData> sscsCaseDataOptional = ccdCallbackMapService.handleCcdCallbackMapV2(
+                    caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
                             CorrectionActions.GRANT,
-                            ccdCallbackMapService.getCcdCallbackMutator(CorrectionActions.GRANT,
-                                    caseData.getCcdCaseId(), isPostHearingsEnabled),
-                            callback.getCaseDetails().getId());
-                    return new PreSubmitCallbackResponse<>(sscsCaseDataOptional.orElse(caseData));
+                            callback.getCaseDetails().getId(),
+                            sscsCaseDataConsumer);
                 } else {
-                    correction.setIsCorrectionFinalDecisionInProgress(NO);
+                    sscsCaseDataConsumer.accept(caseData);
                     caseData = ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, caseData);
 
-                    return new PreSubmitCallbackResponse<>(caseData);
                 }
+                return new PreSubmitCallbackResponse<>(caseData);
             }
         }
         log.info("Publishing message for the event {}", callback.getEvent());

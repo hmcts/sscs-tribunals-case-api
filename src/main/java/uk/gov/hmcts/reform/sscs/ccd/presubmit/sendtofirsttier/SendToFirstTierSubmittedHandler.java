@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.sendtofirsttier;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,15 +46,13 @@ public class SendToFirstTierSubmittedHandler implements PreSubmitCallbackHandler
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         if (isHandleCcdCallbackMapV2Enabled) {
-            Optional<SscsCaseData> sscsCaseDataOptional = ccdCallbackMapService.handleCcdCallbackMapV2(
+            caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
                     caseData.getPostHearing().getSendToFirstTier().getAction(),
-                    sscsCaseData -> { },
                     callback.getCaseDetails().getId()
             );
-            return new PreSubmitCallbackResponse<>(sscsCaseDataOptional.orElse(caseData));
         } else {
             caseData = ccdCallbackMapService.handleCcdCallbackMap(caseData.getPostHearing().getSendToFirstTier().getAction(), caseData);
-            return new PreSubmitCallbackResponse<>(caseData);
         }
+        return new PreSubmitCallbackResponse<>(caseData);
     }
 }
