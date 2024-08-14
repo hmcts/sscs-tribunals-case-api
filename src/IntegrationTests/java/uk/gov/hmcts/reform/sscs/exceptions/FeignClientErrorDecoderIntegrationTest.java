@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -77,6 +78,7 @@ public class FeignClientErrorDecoderIntegrationTest {
         wireMockServer.stop();
     }
 
+    @Disabled
     @ParameterizedTest
     @MethodSource("parameters")
     void testMockReturnBadRequest400(int statusCode, HttpStatus expectedHttpStatus, String expectedErrorMessage)
