@@ -150,7 +150,7 @@ wa:
   terminationBatchCron:
     enabled: false
 ccd-def-cleanup:
-  enabled: false
+  enabled: true
 job:
   #DO NOT DELETE, Below line is aliasing all values from Java settings above to job to avoid duplication.
   <<: *javavalues
