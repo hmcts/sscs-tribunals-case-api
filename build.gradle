@@ -490,7 +490,7 @@ pitest {
 
 project.ext {
     pacticipant = 'sscs_tribunalsCaseApi'
-    pacticipantVersion = getCheckedOutGitCommitHash()
+    pacticipantVersion = getCheckedOutGitCommitHash() + System.currentTimeMillis()
 }
 
 tasks.register('runAndPublishConsumerPactTests', Test) {
