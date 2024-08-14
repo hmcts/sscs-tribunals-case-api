@@ -37,7 +37,7 @@ import uk.gov.hmcts.reform.sscs.model.single.hearing.*;
 
 public class ContractTestDataProvider {
 
-    public static final String CONSUMER_NAME = "sscs_hearingsApi";
+    public static final String CONSUMER_NAME = "sscs_tribunalsCaseApi";
     public static final String PROVIDER_NAME = "hmcHearingServiceProvider";
 
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
