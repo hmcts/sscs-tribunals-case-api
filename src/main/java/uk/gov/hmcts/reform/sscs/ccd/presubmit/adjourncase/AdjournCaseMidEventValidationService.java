@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
@@ -71,12 +72,15 @@ public class AdjournCaseMidEventValidationService {
 
     public Set<String> validateNextHearingListingDuration(SscsCaseData sscsCaseData) {
         Set<String> errors = new LinkedHashSet<>();
-        AdjournCaseNextHearingDurationUnits unit = sscsCaseData.getAdjournment().getNextHearingListingDurationUnits();
-        int time = sscsCaseData.getAdjournment().getNextHearingListingDuration();
-        if (unit.equals(AdjournCaseNextHearingDurationUnits.MINUTES) && time % 5 != 0) {
-            errors.add("Duration length needs to be a multiple of 5");
-        } else if (unit.equals(AdjournCaseNextHearingDurationUnits.SESSIONS) && (time < 1 || time > 8)) {
-            errors.add("Duration length cannot be greater than 8");
+        if (sscsCaseData.getAdjournment().getNextHearingListingDurationType()
+                .equals(AdjournCaseNextHearingDurationType.NON_STANDARD)) {
+            AdjournCaseNextHearingDurationUnits unit = sscsCaseData.getAdjournment().getNextHearingListingDurationUnits();
+            int time = sscsCaseData.getAdjournment().getNextHearingListingDuration();
+            if (unit.equals(AdjournCaseNextHearingDurationUnits.MINUTES) && time % 5 != 0) {
+                errors.add("Duration length needs to be a multiple of 5");
+            } else if (unit.equals(AdjournCaseNextHearingDurationUnits.SESSIONS) && (time < 1 || time > 8)) {
+                errors.add("Duration length cannot be greater than 8");
+            }
         }
         return errors;
     }

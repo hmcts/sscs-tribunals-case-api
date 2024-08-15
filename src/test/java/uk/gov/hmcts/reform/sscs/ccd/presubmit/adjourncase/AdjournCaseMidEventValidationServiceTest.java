@@ -25,6 +25,7 @@ import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Adjournment;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -150,6 +151,7 @@ public class AdjournCaseMidEventValidationServiceTest {
     void givenIsNextHearingextHearingListingDurationMinutesInvalid_ThenReturnError() {
         sscsCaseData.getAdjournment().setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.MINUTES);
         sscsCaseData.getAdjournment().setNextHearingListingDuration(67);
+        sscsCaseData.getAdjournment().setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.NON_STANDARD);
         Set<String> errors = adjournCaseMidEventValidationService.validateNextHearingListingDuration(sscsCaseData);
         assertEquals(1, errors.size());
         assertEquals("Duration length needs to be a multiple of 5", errors.toArray()[0]);
@@ -159,6 +161,7 @@ public class AdjournCaseMidEventValidationServiceTest {
     void givenIsNextHearingextHearingListingDurationSessionsInvalid_ThenReturnError() {
         sscsCaseData.getAdjournment().setNextHearingListingDurationUnits(AdjournCaseNextHearingDurationUnits.SESSIONS);
         sscsCaseData.getAdjournment().setNextHearingListingDuration(9);
+        sscsCaseData.getAdjournment().setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.NON_STANDARD);
         Set<String> errors = adjournCaseMidEventValidationService.validateNextHearingListingDuration(sscsCaseData);
         assertEquals(1, errors.size());
         assertEquals("Duration length cannot be greater than 8", errors.toArray()[0]);
@@ -169,6 +172,7 @@ public class AdjournCaseMidEventValidationServiceTest {
     void givenIsNextHearingextHearingListingDurationUnitsValid_ThenReturnNoError(AdjournCaseNextHearingDurationUnits unit, int duration) {
         sscsCaseData.getAdjournment().setNextHearingListingDurationUnits(unit);
         sscsCaseData.getAdjournment().setNextHearingListingDuration(duration);
+        sscsCaseData.getAdjournment().setNextHearingListingDurationType(AdjournCaseNextHearingDurationType.NON_STANDARD);
         Set<String> errors = adjournCaseMidEventValidationService.validateNextHearingListingDuration(sscsCaseData);
         assertTrue(errors.isEmpty());
     }
