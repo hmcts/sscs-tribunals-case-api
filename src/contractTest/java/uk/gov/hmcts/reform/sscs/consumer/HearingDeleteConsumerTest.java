@@ -13,6 +13,7 @@ import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
+import au.com.dius.pact.core.model.PactSpecVersion;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import au.com.dius.pact.core.model.annotations.PactFolder;
@@ -140,7 +141,7 @@ class HearingDeleteConsumerTest extends BasePactTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "deleteHearingRequestForValidRequest")
+    @PactTestFor(pactMethod = "deleteHearingRequestForValidRequest", pactVersion = PactSpecVersion.V3)
     void shouldSuccessfullyDeleteHearingRequest() {
         HmcUpdateResponse hmcUpdateResponse = hmcHearingApi.cancelHearingRequest(
             ContractTestDataProvider.IDAM_OAUTH2_TOKEN,
@@ -158,7 +159,7 @@ class HearingDeleteConsumerTest extends BasePactTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "badRequestErrorFromDeleteHearing")
+    @PactTestFor(pactMethod = "badRequestErrorFromDeleteHearing", pactVersion = PactSpecVersion.V3)
     void shouldReturn400BadRequestForDeleteHearing(MockServer mockServer) {
         executeCall(mockServer, ContractTestDataProvider.authorisedHeaders, VALID_CASE_ID,
                     ContractTestDataProvider.generateInvalidHearingDeleteRequest(), HttpStatus.BAD_REQUEST
@@ -166,7 +167,7 @@ class HearingDeleteConsumerTest extends BasePactTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "unauthorisedRequestErrorFromDeleteHearing")
+    @PactTestFor(pactMethod = "unauthorisedRequestErrorFromDeleteHearing", pactVersion = PactSpecVersion.V3)
     void shouldReturn401UnauthorisedRequestForDeleteHearing(MockServer mockServer) {
         executeCall(mockServer, ContractTestDataProvider.unauthorisedHeaders, VALID_CASE_ID,
                     ContractTestDataProvider.generateHearingDeleteRequest(), HttpStatus.UNAUTHORIZED
@@ -174,7 +175,7 @@ class HearingDeleteConsumerTest extends BasePactTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "forbiddenRequestErrorFromDeleteHearing")
+    @PactTestFor(pactMethod = "forbiddenRequestErrorFromDeleteHearing", pactVersion = PactSpecVersion.V3)
     void shouldReturn403ForbiddenRequestForDeleteHearing(MockServer mockServer) {
         executeCall(mockServer, ContractTestDataProvider.authorisedHeaders, FORBIDDEN_CASE_ID,
                     ContractTestDataProvider.generateHearingDeleteRequest(), HttpStatus.FORBIDDEN
@@ -182,7 +183,7 @@ class HearingDeleteConsumerTest extends BasePactTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "notFoundRequestErrorFromDeleteHearing")
+    @PactTestFor(pactMethod = "notFoundRequestErrorFromDeleteHearing", pactVersion = PactSpecVersion.V3)
     void shouldReturn404NotFoundRequestForDeleteHearing(MockServer mockServer) {
         executeCall(mockServer, ContractTestDataProvider.authorisedHeaders, NOT_FOUND_CASE_ID,
                     ContractTestDataProvider.generateHearingDeleteRequest(), HttpStatus.NOT_FOUND

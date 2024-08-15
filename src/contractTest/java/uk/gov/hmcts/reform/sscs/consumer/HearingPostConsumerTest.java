@@ -12,6 +12,7 @@ import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
+import au.com.dius.pact.core.model.PactSpecVersion;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import au.com.dius.pact.core.model.annotations.PactFolder;
@@ -128,7 +129,7 @@ class HearingPostConsumerTest extends BasePactTest {
 
 
     @Test
-    @PactTestFor(pactMethod = "createHearingRequestForValidRequest")
+    @PactTestFor(pactMethod = "createHearingRequestForValidRequest", pactVersion = PactSpecVersion.V3)
     void shouldSuccessfullyPostHearingRequest() {
         HmcUpdateResponse hmcUpdateResponse = hmcHearingApi.createHearingRequest(
             ContractTestDataProvider.IDAM_OAUTH2_TOKEN,
@@ -146,7 +147,7 @@ class HearingPostConsumerTest extends BasePactTest {
 
 
     @Test
-    @PactTestFor(pactMethod = "validationErrorFromPostHearing")
+    @PactTestFor(pactMethod = "validationErrorFromPostHearing", pactVersion = PactSpecVersion.V3)
     void shouldReturn400BadRequestForPostHearing(MockServer mockServer) {
 
         executeCall(mockServer, ContractTestDataProvider.authorisedHeaders,
@@ -156,7 +157,7 @@ class HearingPostConsumerTest extends BasePactTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "unauthorisedRequestErrorFromPostHearing")
+    @PactTestFor(pactMethod = "unauthorisedRequestErrorFromPostHearing", pactVersion = PactSpecVersion.V3)
     void shouldReturn401UnauthorisedRequestForPostHearing(MockServer mockServer) {
         executeCall(mockServer, ContractTestDataProvider.unauthorisedHeaders,
                     ContractTestDataProvider.toJsonString(ContractTestDataProvider.generateHearingRequest()),
@@ -165,7 +166,7 @@ class HearingPostConsumerTest extends BasePactTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "forbiddenRequestErrorFromPostHearing")
+    @PactTestFor(pactMethod = "forbiddenRequestErrorFromPostHearing", pactVersion = PactSpecVersion.V3)
     void shouldReturn403ForbiddenRequestForPostHearing(MockServer mockServer) {
         executeCall(mockServer, ContractTestDataProvider.authorisedHeaders,
                     ContractTestDataProvider.toJsonString(ContractTestDataProvider.generateHearingRequest()),
@@ -174,7 +175,7 @@ class HearingPostConsumerTest extends BasePactTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "notFoundRequestErrorFromPostHearing")
+    @PactTestFor(pactMethod = "notFoundRequestErrorFromPostHearing", pactVersion = PactSpecVersion.V3)
     void shouldReturn404NotFoundRequestForPostHearing(MockServer mockServer) {
 
         executeCall(mockServer, ContractTestDataProvider.authorisedHeaders,

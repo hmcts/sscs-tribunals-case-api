@@ -11,6 +11,7 @@ import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
+import au.com.dius.pact.core.model.PactSpecVersion;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import au.com.dius.pact.core.model.annotations.PactFolder;
@@ -135,7 +136,7 @@ class HearingPutConsumerTest extends BasePactTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "updateHearingRequestForValidRequest")
+    @PactTestFor(pactMethod = "updateHearingRequestForValidRequest", pactVersion = PactSpecVersion.V3)
     void shouldSuccessfullyPutHearingRequest() {
         HmcUpdateResponse hmcUpdateResponse = hmcHearingApi.updateHearingRequest(
             IDAM_OAUTH2_TOKEN,
@@ -153,7 +154,7 @@ class HearingPutConsumerTest extends BasePactTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "validationErrorFromPutHearing")
+    @PactTestFor(pactMethod = "validationErrorFromPutHearing", pactVersion = PactSpecVersion.V3)
     void shouldReturn400BadRequestForPutHearing(MockServer mockServer) {
 
         executeCall(mockServer, authorisedHeaders,
@@ -165,7 +166,7 @@ class HearingPutConsumerTest extends BasePactTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "unauthorisedRequestErrorFromPutHearing")
+    @PactTestFor(pactMethod = "unauthorisedRequestErrorFromPutHearing", pactVersion = PactSpecVersion.V3)
     void shouldReturn401UnauthorisedRequestForPutHearing(MockServer mockServer) {
         executeCall(mockServer, unauthorisedHeaders,
                 VALID_CASE_ID,
@@ -175,7 +176,7 @@ class HearingPutConsumerTest extends BasePactTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "forbiddenRequestErrorFromPutHearing")
+    @PactTestFor(pactMethod = "forbiddenRequestErrorFromPutHearing", pactVersion = PactSpecVersion.V3)
     void shouldReturn403ForbiddenRequestForPutHearing(MockServer mockServer) {
         executeCall(mockServer, authorisedHeaders,
                 FORBIDDEN_CASE_ID,
@@ -185,7 +186,7 @@ class HearingPutConsumerTest extends BasePactTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "notFoundRequestErrorFromPutHearing")
+    @PactTestFor(pactMethod = "notFoundRequestErrorFromPutHearing", pactVersion = PactSpecVersion.V3)
     void shouldReturn404NotFoundRequestForPutHearing(MockServer mockServer) {
 
         executeCall(mockServer, authorisedHeaders,

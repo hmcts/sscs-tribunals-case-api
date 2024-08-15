@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.sscs.ContractTestDataProvider.unauthorisedHead
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
+import au.com.dius.pact.core.model.PactSpecVersion;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -89,7 +90,7 @@ class HearingGetConsumerTest extends BasePactTest {
     }
 
     @Test
-    @PactTestFor(pactMethod = "getHearing")
+    @PactTestFor(pactMethod = "getHearing", pactVersion = PactSpecVersion.V3)
     void shouldSuccessfullyGetHearing() throws JsonProcessingException {
 
         HearingGetResponse result = hmcHearingApi.getHearingRequest(
@@ -121,7 +122,7 @@ class HearingGetConsumerTest extends BasePactTest {
 
 
     @Test
-    @PactTestFor(pactMethod = "getHearingWithRefCheck")
+    @PactTestFor(pactMethod = "getHearingWithRefCheck", pactVersion = PactSpecVersion.V3)
     void shouldSuccessfullyGetHearingWithRefCheck() throws JsonProcessingException {
 
         HearingGetResponse result = hmcHearingApi.getHearingRequest(
@@ -154,7 +155,7 @@ class HearingGetConsumerTest extends BasePactTest {
 
 
     @Test
-    @PactTestFor(pactMethod = "getHearingWithNoContent")
+    @PactTestFor(pactMethod = "getHearingWithNoContent", pactVersion = PactSpecVersion.V3)
     void shouldSuccessfullyGetHearingWithNoContent() {
 
         HearingGetResponse result = hmcHearingApi.getHearingRequest(
@@ -186,7 +187,7 @@ class HearingGetConsumerTest extends BasePactTest {
 
 
     @Test
-    @PactTestFor(pactMethod = "getHearingWithBadRequest")
+    @PactTestFor(pactMethod = "getHearingWithBadRequest", pactVersion = PactSpecVersion.V3)
     void shouldFailGetHearingWithBadRequest() {
 
         assertThatExceptionOfType(ResponseStatusException.class).isThrownBy(
@@ -217,7 +218,7 @@ class HearingGetConsumerTest extends BasePactTest {
 
 
     @Test
-    @PactTestFor(pactMethod = "getHearingWithUnauthorized")
+    @PactTestFor(pactMethod = "getHearingWithUnauthorized", pactVersion = PactSpecVersion.V3)
     void shouldFailGetHearingWithUnauthorized() {
 
         assertThatExceptionOfType(ResponseStatusException.class).isThrownBy(
@@ -247,7 +248,7 @@ class HearingGetConsumerTest extends BasePactTest {
 
 
     @Test
-    @PactTestFor(pactMethod = "getHearingWithForbidden")
+    @PactTestFor(pactMethod = "getHearingWithForbidden", pactVersion = PactSpecVersion.V3)
     void shouldFailGetHearingWithForbidden() {
 
         assertThatExceptionOfType(ResponseStatusException.class).isThrownBy(
@@ -278,7 +279,7 @@ class HearingGetConsumerTest extends BasePactTest {
 
 
     @Test
-    @PactTestFor(pactMethod = "getHearingWithNotFound")
+    @PactTestFor(pactMethod = "getHearingWithNotFound", pactVersion = PactSpecVersion.V3)
     void shouldFailGetHearingWithNotFound() {
 
         assertThatExceptionOfType(ResponseStatusException.class).isThrownBy(
