@@ -55,10 +55,12 @@ public class SecurityConfiguration {
             .requestMatchers("/tokens/**").permitAll()
             .requestMatchers("/appeals").permitAll()
             .requestMatchers("/appeals/**").permitAll()
+            .requestMatchers("/favicon.ico").permitAll()
             .requestMatchers("/evidence/upload").permitAll()
             .requestMatchers("/drafts").authenticated()
             .requestMatchers("/api/citizen").authenticated()
-            .requestMatchers("/api/request").authenticated();
+            .requestMatchers("/api/request").authenticated()
+            .requestMatchers("/hearing/**").authenticated();
         // @formatter:on
 
         return http.build();
