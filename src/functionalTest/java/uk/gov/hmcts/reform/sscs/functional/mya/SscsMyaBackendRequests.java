@@ -114,6 +114,20 @@ public class SscsMyaBackendRequests {
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
     }
 
+    public void uploadSingleHearingEvidence(String hearingId, String fileName, String body, String idamEmail) throws IOException {
+        HttpEntity data = MultipartEntityBuilder.create()
+                .setContentType(ContentType.MULTIPART_FORM_DATA)
+                .addBinaryBody("file",
+                        Objects.requireNonNull(this.getClass().getClassLoader().getResourceAsStream(fileName)),
+                        ContentType.IMAGE_PNG,
+                        fileName)
+                .build();
+
+        HttpResponse response = putRequest("/api/continuous-online-hearings/" + hearingId + "/singleevidence?body=" + body
+                + "&idamEmail=" + idamEmail, data);
+        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+    }
+
     public void deleteUploadEvidence(Long caseId, String evidenceId) throws IOException {
         HttpResponse response = client.execute(addHeaders(delete(baseUrl + "/api/continuous-online-hearings/" + caseId + "/evidence/" + evidenceId)).build());
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));

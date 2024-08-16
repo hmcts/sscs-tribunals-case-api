@@ -17,6 +17,16 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 public class EvidenceUploadTest extends BaseFunctionTest {
 
     @Test
+    public void uploadSingleEvidence() throws IOException, JSONException, InterruptedException {
+        String emailAddress = createRandomEmail();
+        CreatedCcdCase createdCcdCase = createCcdCase(emailAddress);
+
+        Thread.sleep(5000L);
+
+        sscsMyaBackendRequests.uploadSingleHearingEvidence(createdCcdCase.getCaseId(), "evidence.png", "body", emailAddress);
+    }
+
+    @Test
     public void uploadThenSubmitEvidenceToAppeal() throws IOException, JSONException, InterruptedException {
         CreatedCcdCase createdCcdCase = createCase();
 
