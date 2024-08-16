@@ -51,7 +51,7 @@ public class PostHearingRequestSubmittedHandlerTest extends BaseHandler {
 
         JsonNode root = mapper.readTree(response);
         SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<>(){});
-        assertThat(result.getPostHearing()).isNull();
+        assertThat(result.getPostHearing()).hasAllNullFieldsOrProperties();
         assertThat(result.getDocumentGeneration()).isNull();
         assertThat(result.getDocumentStaging()).isNull();
         assertThat(result.getDwpState()).isNotNull();
