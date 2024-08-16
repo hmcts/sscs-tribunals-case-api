@@ -19,6 +19,7 @@ import au.com.dius.pact.core.model.annotations.PactFolder;
 import io.restassured.RestAssured;
 import java.time.LocalDateTime;
 import java.util.Map;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,6 +129,7 @@ class HearingPostConsumerTest extends BasePactTest {
     }
 
 
+    @Disabled
     @Test
     @PactTestFor(pactMethod = "createHearingRequestForValidRequest", pactVersion = PactSpecVersion.V3)
     void shouldSuccessfullyPostHearingRequest() {

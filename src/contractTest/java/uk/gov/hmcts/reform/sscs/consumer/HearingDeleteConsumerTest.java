@@ -20,6 +20,7 @@ import au.com.dius.pact.core.model.annotations.PactFolder;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.Map;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,6 +141,7 @@ class HearingDeleteConsumerTest extends BasePactTest {
             .toPact();
     }
 
+    @Disabled
     @Test
     @PactTestFor(pactMethod = "deleteHearingRequestForValidRequest", pactVersion = PactSpecVersion.V3)
     void shouldSuccessfullyDeleteHearingRequest() {

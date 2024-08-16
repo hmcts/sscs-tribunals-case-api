@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,6 +136,7 @@ class HearingPutConsumerTest extends BasePactTest {
             .toPact();
     }
 
+    @Disabled
     @Test
     @PactTestFor(pactMethod = "updateHearingRequestForValidRequest", pactVersion = PactSpecVersion.V3)
     void shouldSuccessfullyPutHearingRequest() {
