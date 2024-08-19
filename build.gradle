@@ -343,8 +343,8 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.11.4'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.10'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.12.0-RC-SSCSSI-336'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.9'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
@@ -590,6 +590,8 @@ bootWithCCD {
     // Features
     environment 'GAPS_SWITCHOVER_FEATURE', 'true'
     environment 'CASE_ACCESS_MANAGEMENT_FEATURE', 'true'
+    environment 'HANDLE_CCD_CALLBACKMAP_V2', 'true'
+    environment 'POST_HEARINGS_B_FEATURE', 'true'
 
     // Local Queue
     environment 'JMS_NAMESPACE', 'localhost:5672'
