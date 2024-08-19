@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.FeignException;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import java.io.File;
@@ -19,7 +18,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -29,7 +30,25 @@ import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.functional.sya.SubmitHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -118,6 +137,14 @@ public class BaseHandler {
         sscsCaseData.getAppeal().getMrnDetails().setMrnDate(submitHelper.getRandomMrnDate().toString());
         return ccdService.createCase(sscsCaseData,
             EventType.CREATE_WITH_DWP_TEST_CASE.getCcdType(), CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
+    }
+
+    protected SscsCaseDetails createCaseWithAdditionalSetting(Consumer<SscsCaseData> additionalSetting) {
+        final SscsCaseData sscsCaseData = buildSscsCaseDataForTesting("Bowie", submitHelper.getRandomNino());
+        additionalSetting.accept(sscsCaseData);
+        sscsCaseData.getAppeal().getMrnDetails().setMrnDate(submitHelper.getRandomMrnDate().toString());
+        return ccdService.createCase(sscsCaseData,
+                EventType.CREATE_WITH_DWP_TEST_CASE.getCcdType(), CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
     }
 
     protected SscsCaseDetails getByCaseId(Long id) {
