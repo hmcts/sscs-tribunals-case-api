@@ -90,7 +90,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             builder.dateIssued(finalDecisionCaseData.getFinalDecisionIssuedDate());
             builder.correctedJudgeName(buildSignedInJudgeName(userAuthorisation));
             builder.correctedDateIssued(showIssueDate ? LocalDate.now() : null);
-            builder.idamSurname(finalDecisionCaseData.getFinalDecisionIdamSurname());
+            builder.idamSurname(buildSignedInJudgeSurname(userAuthorisation));
         } else {
             builder.userName(buildSignedInJudgeName(userAuthorisation));
             builder.idamSurname(buildSignedInJudgeSurname(userAuthorisation));
