@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import java.io.File;
@@ -20,7 +21,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
