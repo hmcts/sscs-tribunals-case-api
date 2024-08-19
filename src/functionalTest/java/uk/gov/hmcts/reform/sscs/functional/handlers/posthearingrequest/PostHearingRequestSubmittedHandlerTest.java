@@ -40,7 +40,7 @@ public class PostHearingRequestSubmittedHandlerTest extends BaseHandler {
     @Autowired
     private ObjectMapper mapper;
 
-    @DisplayName("Given about to submit callback for Gaps event, should set fields")
+    @DisplayName("Given about to submit callback for post hearing event, should set fields")
     @Test
     public void testPostHearingRequestSubmitted() throws IOException {
         String jsonCallback = getJsonCallbackForTest("handlers/posthearingrequest/postHearingRequest.json");
