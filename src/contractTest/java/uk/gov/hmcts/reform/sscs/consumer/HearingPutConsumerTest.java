@@ -51,19 +51,6 @@ class HearingPutConsumerTest extends BasePactTest {
     }
 
     @Pact(provider = PROVIDER_NAME, consumer = CONSUMER_NAME)
-    public RequestResponsePact updateHearingRequestForValidRequest(PactDslWithProvider builder) {
-        return builder.given(CONSUMER_NAME + " successfully updating hearing request ")
-            .uponReceiving("Request to update hearing request to save details")
-            .path(HEARING_PATH + "/" + VALID_CASE_ID)
-            .method(HttpMethod.PUT.toString())
-            .body(toJsonString(generateHearingRequest()))
-            .headers(authorisedHeaders).willRespondWith()
-            .status(HttpStatus.OK.value())
-            .body(generateHearingsJsonBody(MSG_200_HEARING, HEARING_REQUESTED))
-            .toPact();
-    }
-
-    @Pact(provider = PROVIDER_NAME, consumer = CONSUMER_NAME)
     public RequestResponsePact validationErrorFromPutHearing(PactDslWithProvider builder) {
         return builder.given(CONSUMER_NAME
                                  + " throws validation error while trying to update hearing")

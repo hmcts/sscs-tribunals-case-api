@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static uk.gov.hmcts.reform.sscs.ContractTestDataProvider.CONSUMER_NAME;
-import static uk.gov.hmcts.reform.sscs.ContractTestDataProvider.MSG_200_HEARING;
 import static uk.gov.hmcts.reform.sscs.ContractTestDataProvider.PROVIDER_NAME;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus.CANCELLATION_REQUESTED;
 
@@ -51,19 +50,6 @@ class HearingDeleteConsumerTest extends BasePactTest {
     @Autowired
     private HmcHearingApi hmcHearingApi;
 
-    @Pact(provider = PROVIDER_NAME, consumer = CONSUMER_NAME)
-    RequestResponsePact deleteHearingRequestForValidRequest(PactDslWithProvider builder) {
-        return builder.given(CONSUMER_NAME + " successfully deleting a hearing request ")
-            .uponReceiving("Request to delete hearing request")
-            .path(ContractTestDataProvider.HEARING_PATH + "/" + VALID_CASE_ID)
-            .method(HttpMethod.DELETE.toString())
-            .body(ContractTestDataProvider.toJsonString(ContractTestDataProvider.generateHearingDeleteRequest()))
-            .headers(ContractTestDataProvider.authorisedHeaders)
-            .willRespondWith()
-            .status(HttpStatus.OK.value())
-            .body(generateHearingsJsonBody(MSG_200_HEARING,CANCELLATION_REQUESTED))
-            .toPact();
-    }
 
     @Pact(provider = PROVIDER_NAME, consumer = CONSUMER_NAME)
     public RequestResponsePact badRequestErrorFromDeleteHearing(PactDslWithProvider builder) {

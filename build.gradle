@@ -449,9 +449,9 @@ dependencies {
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '8.0.6'
     testImplementation group: 'com.github.tomakehurst', name: 'wiremock', version: '2.27.2'
     //pact contract testing
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.16'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
-    contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
+    contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.16'
     contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8',  version: '4.1.7'
 
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.14'

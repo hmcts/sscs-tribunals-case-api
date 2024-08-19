@@ -45,19 +45,6 @@ class HearingPostConsumerTest extends BasePactTest {
     private HmcHearingApi hmcHearingApi;
 
     @Pact(provider = PROVIDER_NAME, consumer = CONSUMER_NAME)
-    RequestResponsePact createHearingRequestForValidRequest(PactDslWithProvider builder) {
-        return builder.given(CONSUMER_NAME + " successfully creating hearing request ")
-            .uponReceiving("Request to create hearing request to save details")
-            .path(ContractTestDataProvider.HEARING_PATH)
-            .method(HttpMethod.POST.toString()).body(
-                ContractTestDataProvider.toJsonString(ContractTestDataProvider.generateHearingRequest()))
-            .headers(ContractTestDataProvider.authorisedHeaders).willRespondWith()
-            .status(HttpStatus.OK.value())
-            .body(generateHearingsJsonBody(ContractTestDataProvider.MSG_200_HEARING, HEARING_REQUESTED))
-            .toPact();
-    }
-
-    @Pact(provider = PROVIDER_NAME, consumer = CONSUMER_NAME)
     RequestResponsePact validationErrorFromPostHearing(PactDslWithProvider builder) {
         return builder.given(CONSUMER_NAME
                                  + " throws validation error while trying to create hearing")
