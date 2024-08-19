@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static uk.gov.hmcts.reform.sscs.ContractTestDataProvider.CONSUMER_NAME;
+import static uk.gov.hmcts.reform.sscs.ContractTestDataProvider.MSG_200_HEARING;
 import static uk.gov.hmcts.reform.sscs.ContractTestDataProvider.PROVIDER_NAME;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus.CANCELLATION_REQUESTED;
 
@@ -15,19 +16,18 @@ import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.PactSpecVersion;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
-import au.com.dius.pact.core.model.annotations.PactFolder;
+import au.com.dius.pact.core.model.annotations.PactDirectory;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.Map;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.sscs.ContractTestDataProvider;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingCancelRequestPayload;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
@@ -35,11 +35,11 @@ import uk.gov.hmcts.reform.sscs.service.HmcHearingApi;
 import uk.gov.hmcts.reform.sscs.utility.BasePactTest;
 
 @ExtendWith(PactConsumerTestExt.class)
-@EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.sscs.service"})
-@ActiveProfiles("contract")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@PactTestFor(providerName = PROVIDER_NAME, port = "10010")
+@PactDirectory("pacts")
 @SpringBootTest
-@PactTestFor(port = "10000")
-@PactFolder("pacts")
+@TestPropertySource(locations = {"/config/application_contract.properties"})
 class HearingDeleteConsumerTest extends BasePactTest {
 
     private static final String ID = "id";
@@ -50,6 +50,19 @@ class HearingDeleteConsumerTest extends BasePactTest {
     @Autowired
     private HmcHearingApi hmcHearingApi;
 
+    @Pact(provider = PROVIDER_NAME, consumer = CONSUMER_NAME)
+    RequestResponsePact deleteHearingRequestForValidRequest(PactDslWithProvider builder) {
+        return builder.given(CONSUMER_NAME + " successfully deleting a hearing request ")
+            .uponReceiving("Request to delete hearing request")
+            .path(ContractTestDataProvider.HEARING_PATH + "/" + VALID_CASE_ID)
+            .method(HttpMethod.DELETE.toString())
+            .body(ContractTestDataProvider.toJsonString(ContractTestDataProvider.generateHearingDeleteRequest()))
+            .headers(ContractTestDataProvider.authorisedHeaders)
+            .willRespondWith()
+            .status(HttpStatus.OK.value())
+            .body(generateHearingsJsonBody(MSG_200_HEARING,CANCELLATION_REQUESTED))
+            .toPact();
+    }
 
     @Pact(provider = PROVIDER_NAME, consumer = CONSUMER_NAME)
     public RequestResponsePact badRequestErrorFromDeleteHearing(PactDslWithProvider builder) {
@@ -127,7 +140,6 @@ class HearingDeleteConsumerTest extends BasePactTest {
             .toPact();
     }
 
-    @Disabled
     @Test
     @PactTestFor(pactMethod = "deleteHearingRequestForValidRequest", pactVersion = PactSpecVersion.V3)
     void shouldSuccessfullyDeleteHearingRequest() {

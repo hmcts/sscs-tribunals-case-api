@@ -24,32 +24,32 @@ import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.PactSpecVersion;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
+import au.com.dius.pact.core.model.annotations.PactDirectory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.reform.sscs.ContractTestDataProvider;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingApi;
 import uk.gov.hmcts.reform.sscs.utility.BasePactTest;
 
-@SpringBootTest
 @ExtendWith(PactConsumerTestExt.class)
-@EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.sscs.service"})
-@ActiveProfiles("contract")
-@PactTestFor(port = "10000")
-@Disabled
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@PactTestFor(providerName = PROVIDER_NAME, port = "10010")
+@PactDirectory("pacts")
+@SpringBootTest
+@TestPropertySource(locations = {"/config/application_contract.properties"})
 class HearingGetConsumerTest extends BasePactTest {
 
     private static final String PATH_HEARING = "/hearing";

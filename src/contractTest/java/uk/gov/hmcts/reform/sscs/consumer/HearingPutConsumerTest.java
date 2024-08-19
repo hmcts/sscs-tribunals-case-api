@@ -14,32 +14,31 @@ import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.PactSpecVersion;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
-import au.com.dius.pact.core.model.annotations.PactFolder;
+import au.com.dius.pact.core.model.annotations.PactDirectory;
 import io.restassured.RestAssured;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.sscs.ContractTestDataProvider;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingApi;
 import uk.gov.hmcts.reform.sscs.utility.BasePactTest;
 
 @ExtendWith(PactConsumerTestExt.class)
-@EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.sscs.service"})
-@ActiveProfiles("contract")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@PactTestFor(providerName = PROVIDER_NAME, port = "10010")
+@PactDirectory("pacts")
 @SpringBootTest
-@PactTestFor(port = "10000")
-@PactFolder("pacts")
+@TestPropertySource(locations = {"/config/application_contract.properties"})
 class HearingPutConsumerTest extends BasePactTest {
 
     @Autowired
@@ -48,6 +47,19 @@ class HearingPutConsumerTest extends BasePactTest {
     @BeforeEach
     public void timeGapBetweenEachTest() throws InterruptedException {
         TimeUnit.SECONDS.sleep(2);
+    }
+
+    @Pact(provider = PROVIDER_NAME, consumer = CONSUMER_NAME)
+    public RequestResponsePact updateHearingRequestForValidRequest(PactDslWithProvider builder) {
+        return builder.given(CONSUMER_NAME + " successfully updating hearing request ")
+            .uponReceiving("Request to update hearing request to save details")
+            .path(HEARING_PATH + "/" + VALID_CASE_ID)
+            .method(HttpMethod.PUT.toString())
+            .body(toJsonString(generateHearingRequest()))
+            .headers(authorisedHeaders).willRespondWith()
+            .status(HttpStatus.OK.value())
+            .body(generateHearingsJsonBody(MSG_200_HEARING, HEARING_REQUESTED))
+            .toPact();
     }
 
     @Pact(provider = PROVIDER_NAME, consumer = CONSUMER_NAME)
@@ -123,7 +135,6 @@ class HearingPutConsumerTest extends BasePactTest {
             .toPact();
     }
 
-    @Disabled
     @Test
     @PactTestFor(pactMethod = "updateHearingRequestForValidRequest", pactVersion = PactSpecVersion.V3)
     void shouldSuccessfullyPutHearingRequest() {
