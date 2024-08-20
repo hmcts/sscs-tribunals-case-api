@@ -112,7 +112,7 @@ This will start the API container exposing the application's port
 In order to test if the application is up, you can call its health endpoint:
 
 ```
-  curl http://localhost:8080/health
+  curl http://localhost:8008/health
 ```
 
 You should get a response similar to this:
