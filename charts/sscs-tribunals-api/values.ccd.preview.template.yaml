@@ -726,7 +726,7 @@ sscs-hearings-api:
 
 postgresql:
   enabled: true
-  flexibleserver: sptribs-preview
+  flexibleserver: sscs-preview
   setup:
     databases:
       - name: "pr-${CHANGE_ID}-data-store"
