@@ -564,7 +564,7 @@ elastic:
 sscs-tya-notif:
   enabled: true
   java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2520-3668932-20240814124923
+    image: hmctspublic.azurecr.io/sscs/tya-notif:pr-2520-aaca3c2-20240820125455
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
     readinessDelay: 45
     environment:
