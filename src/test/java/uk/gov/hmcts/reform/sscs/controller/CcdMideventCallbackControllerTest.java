@@ -1,17 +1,21 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADJOURN_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_RESTORE_CASES;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_INFORMATION_RECEIVED;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -48,6 +52,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseMidEventValidationService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipWriteFinalDecisionPreviewDecisionService;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
@@ -90,6 +95,9 @@ public class CcdMideventCallbackControllerTest {
     @MockBean
     private RestoreCasesService2 restoreCasesService2;
 
+    @MockBean
+    private AdjournCaseMidEventValidationService adjournCaseMidEventValidationService;
+
     @Before
     public void setUp() {
         DynamicListItem listItem = new DynamicListItem("", "");
@@ -104,7 +112,7 @@ public class CcdMideventCallbackControllerTest {
                 Collections.singletonList(writeFinalDecisionPreviewDecisionService));
 
         CcdMideventCallbackController controller = new CcdMideventCallbackController(authorisationService, deserializer, decisionNoticeService,
-                adjournCasePreviewService, adjournCaseCcdService, restoreCasesService2);
+                adjournCasePreviewService, adjournCaseCcdService, restoreCasesService2, adjournCaseMidEventValidationService);
         mockMvc = standaloneSetup(controller)
             .setMessageConverters(new ByteArrayHttpMessageConverter(), new StringHttpMessageConverter(),
                 new ResourceHttpMessageConverter(false), new SourceHttpMessageConverter<>(),
@@ -358,5 +366,134 @@ public class CcdMideventCallbackControllerTest {
             .andExpect(content().json(expectedJsonErrorsAndWarningsString));
     }
 
+    @Test
+    public void handleCcdMidEventAdjournCaseDirectionDueDate_EmptyDueDateReturnsError() throws Exception {
+        when(deserializer.deserialize(returnAllDetailsContent())).thenReturn(returnCallback());
+        when(adjournCaseMidEventValidationService.checkDirectionsDueDateInvalid(any()))
+                .thenReturn(Set.of("At least one of directions due date or directions due date offset must be specified"));
+        String expectedErrorsString = Arrays.asList("At least one of directions due date or directions due date offset must be specified").toString();
+
+        String expectedJsonErrorsAndWarningsString = "{\"errors\": " + expectedErrorsString + "}, {\"warnings\" : []}";
+
+        mockMvc.perform(post("/ccdMidEventAdjournCaseDirectionDueDate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("ServiceAuthorization", "")
+                        .header("Authorization", "")
+                        .content(returnAllDetailsContent()))
+                .andExpect(content().json(expectedJsonErrorsAndWarningsString));
+    }
+
+    @Test
+    public void handleCcdMidEventAdjournCaseDirectionDueDate_PastDueDateReturnsError() throws Exception {
+        when(deserializer.deserialize(returnAllDetailsContent())).thenReturn(returnCallback());
+        when(adjournCaseMidEventValidationService.checkDirectionsDueDateInvalid(any()))
+                .thenReturn(Set.of("Directions due date must be in the future"));
+        String expectedErrorsString = Arrays.asList("Directions due date must be in the future").toString();
+
+        String expectedJsonErrorsAndWarningsString = "{\"errors\": " + expectedErrorsString + "}, {\"warnings\" : []}";
+
+        mockMvc.perform(post("/ccdMidEventAdjournCaseDirectionDueDate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("ServiceAuthorization", "")
+                        .header("Authorization", "")
+                        .content(returnAllDetailsContent()))
+                .andExpect(content().json(expectedJsonErrorsAndWarningsString));
+    }
+
+    @Test
+    public void handleCcdMidEventAdjournCaseDirectionDueDate_FutureDueDateReturnsNoError() throws Exception {
+        when(deserializer.deserialize(returnAllDetailsContent())).thenReturn(returnCallback());
+        mockMvc.perform(post("/ccdMidEventAdjournCaseDirectionDueDate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("ServiceAuthorization", "")
+                        .header("Authorization", "")
+                        .content(returnAllDetailsContent()))
+                .andExpect(content().json("{'errors':[]}"));
+    }
+
+    @Test
+    public void handleCcdMidEventAdjournCaseNextHearing_PastHearingDateReturnsError() throws Exception {
+        when(deserializer.deserialize(returnAllDetailsContent())).thenReturn(returnCallback());
+        when(adjournCaseMidEventValidationService.checkNextHearingDateInvalid(any()))
+                .thenReturn(Set.of("'First available date after' date cannot be in the past"));
+
+        String error = "'First available date after' date cannot be in the past";
+
+        mockMvc.perform(post("/ccdMidEventAdjournCaseNextHearing")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("ServiceAuthorization", "")
+                        .header("Authorization", "")
+                        .content(returnAllDetailsContent()))
+                .andExpect(jsonPath("$.errors[0]", is(error)));
+    }
+
+    @Test
+    public void handleCcdMidEventAdjournCaseNextHearing_NoHearingDateReturnsError() throws Exception {
+        String error = "'First available date after' date must be provided";
+
+        when(deserializer.deserialize(returnAllDetailsContent())).thenReturn(returnCallback());
+        when(adjournCaseMidEventValidationService.checkNextHearingDateInvalid(any()))
+                .thenReturn(Set.of("'First available date after' date must be provided"));
+
+        mockMvc.perform(post("/ccdMidEventAdjournCaseNextHearing")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("ServiceAuthorization", "")
+                        .header("Authorization", "")
+                        .content(returnAllDetailsContent()))
+                .andExpect(jsonPath("$.errors[0]", is(error)));
+    }
+
+    @Test
+    public void handleCcdMidEventAdjournCaseNextHearing_FutureHearingDateReturnsNoError() throws Exception {
+        String error = "'First available date after' date must be provided";
+        when(deserializer.deserialize(returnAllDetailsContent())).thenReturn(returnCallback());
+
+        mockMvc.perform(post("/ccdMidEventAdjournCaseNextHearing")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("ServiceAuthorization", "")
+                        .header("Authorization", "")
+                        .content(returnAllDetailsContent()))
+                .andExpect(content().json("{'errors':[]}"));
+    }
+
+    @Test
+    public void handleCcdMidEventadjournCaseNextHearingListingDuration_ValidDurationReturnsNoError() throws Exception {
+        when(deserializer.deserialize(returnAllDetailsContent())).thenReturn(returnCallback());
+        when(adjournCaseMidEventValidationService.validateNextHearingListingDuration(any()))
+                .thenReturn(Set.of());
+
+        mockMvc.perform(post("/adjournCaseNextHearingListingDuration")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("ServiceAuthorization", "")
+                        .header("Authorization", "")
+                        .content(returnAllDetailsContent()))
+                .andExpect(content().json("{'errors':[]}"));
+    }
+
+    @Test
+    public void handleCcdMidEventadjournCaseNextHearingListingDuration_InvalidDurationReturnsError() throws Exception {
+        when(deserializer.deserialize(returnAllDetailsContent())).thenReturn(returnCallback());
+        when(adjournCaseMidEventValidationService.validateNextHearingListingDuration(any()))
+                .thenReturn(Set.of("Duration length needs to be a multiple of 5"));
+
+        mockMvc.perform(post("/adjournCaseNextHearingListingDuration")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("ServiceAuthorization", "")
+                        .header("Authorization", "")
+                        .content(returnAllDetailsContent()))
+                .andExpect(jsonPath("$.errors[0]", is("Duration length needs to be a multiple of 5")));
+    }
+
+    private Callback returnCallback() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder().build();
+        return new Callback<>(
+                new CaseDetails<>(ID, JURISDICTION, State.HEARING, sscsCaseData, LocalDateTime.now(), "Benefit"),
+                Optional.empty(), ADJOURN_CASE, false);
+    }
+
+    private String returnAllDetailsContent() throws IOException {
+        String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
+        return FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+    }
 
 }
