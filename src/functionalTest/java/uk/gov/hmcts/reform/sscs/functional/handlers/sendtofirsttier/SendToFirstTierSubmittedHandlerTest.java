@@ -33,7 +33,7 @@ public class SendToFirstTierSubmittedHandlerTest extends BaseHandler {
     @DisplayName("Given about to submit callback for send to first tier event, should set fields")
     @Test
     public void testSendToFirstTierSubmitted() throws IOException {
-        String jsonCallback = getJsonCallbackForTest("handlers/sendtofirsttier/sendToFirstTierRequest.json");
+        String jsonCallback = getJsonCallbackForTest("callback/sendToFirstTierRequest.json");
         Callback<SscsCaseData> callback = deserializer.deserialize(jsonCallback);
 
         SscsCaseDetails caseDetails = createCase();
