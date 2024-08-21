@@ -175,8 +175,6 @@ public class SubmitDraftTest {
                 .body(updateDraftCaseJsonWithMrnDateAndNino(mrnDate, nino))
                 .put("/drafts");
 
-        Thread.sleep(1500); //wait is added to give time for ES to update with ccd database
-
         SscsCaseData draft = findCase(citizenIdamTokens).get(0);
 
         String body = updateDraftCaseJsonWithMrnDateAndNino(mrnDate, nino).replace("CCD_CASE_ID", draft.getCcdCaseId());
@@ -248,8 +246,8 @@ public class SubmitDraftTest {
         Thread.sleep(1500);
 
         response.then()
-                .statusCode(anyOf(is(HttpStatus.SC_OK), is(HttpStatus.SC_CREATED)))
-                .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
+            .statusCode(anyOf(is(HttpStatus.SC_OK), is(HttpStatus.SC_CREATED)))
+            .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
         String responseHeader = response.getHeader(LOCATION_HEADER_NAME);
 
         Response response2 = saveDraft(draftAppeal);
@@ -257,8 +255,8 @@ public class SubmitDraftTest {
         Thread.sleep(1500); //wait is added to give time for ES to update with ccd database
 
         response2.then()
-                .statusCode(HttpStatus.SC_OK)
-                .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
+            .statusCode(HttpStatus.SC_OK)
+            .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
         String response2Header = response.getHeader(LOCATION_HEADER_NAME);
 
         assertEquals("the draft updated is not the same", responseHeader, response2Header);
