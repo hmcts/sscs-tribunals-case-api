@@ -37,7 +37,8 @@ public class SendToFirstTierSubmittedHandlerTest extends BaseHandler {
         Callback<SscsCaseData> callback = deserializer.deserialize(jsonCallback);
 
         SscsCaseDetails caseDetails = createCase();
-        callback = addCaseIdtoCallback(callback, caseDetails.getId().toString());
+        String caseId = caseDetails.getId().toString();
+        callback = addCaseIdtoCallback(callback, caseId);
 
         String response = RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
@@ -52,11 +53,12 @@ public class SendToFirstTierSubmittedHandlerTest extends BaseHandler {
 
         JsonNode root = mapper.readTree(response);
         SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<>(){});
-        assertThat(result.getDwpState()).as(result.getCcdCaseId())
+
+        assertThat(result.getDwpState()).describedAs(caseId)
                 .isNull();
-        assertThat(result.getInterlocReferralReason()).as(result.getCcdCaseId())
+        assertThat(result.getInterlocReferralReason()).describedAs(caseId)
                 .isNull();
-        assertThat(result.getInterlocReviewState()).as(result.getCcdCaseId())
+        assertThat(result.getInterlocReviewState()).describedAs(caseId)
                 .isNull();
     }
 
