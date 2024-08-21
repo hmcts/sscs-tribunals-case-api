@@ -36,12 +36,11 @@ public class ActionPostponementRequestAboutToStartCallbackHandlerTest extends Ba
                 "handlers/actionpostponementrequest/actionPostponementRequestAboutToStartCallback.json");
 
         RestAssured.given()
-                .log().method().log().headers().log().uri().log().body(true)
                 .contentType(ContentType.JSON)
                 .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
                 .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
                 .body(jsonCallbackForTest)
-                .post("/ccdAboutToSubmit")
+                .post("/ccdAboutToStart")
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .log().all(true)
