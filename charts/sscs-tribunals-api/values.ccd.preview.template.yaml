@@ -230,13 +230,6 @@ ccd:
         BYPASS_ORG_DROOL_RULE: true
         LAUNCH_DARKLY_ENV: pr
         ENABLE_DB_MIGRATE: true
-      keyVaults:
-        sscs:
-          secrets:
-            - name: preview-ccd-db-username
-              alias: ROLE_ASSIGNMENT_DB_USERNAME
-            - name: preview-ccd-db-password
-              alias: ROLE_ASSIGNMENT_DB_PASSWORD
   elasticsearch:
     nameOverride: ${SERVICE_NAME}-es
     clusterName: "es"
