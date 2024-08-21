@@ -63,12 +63,6 @@ idam-pr:
   redirect_uris:
     XUI:
       - https://xui-${SERVICE_FQDN}/oauth2/callback
-    CCD Admin:
-      - http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
-    CCD:
-      - https://${SERVICE_NAME}-case-management-web/oauth2redirect
-    ccd_data_store_api:
-      - http://${SERVICE_NAME}-ccd-data-store-api/oauth2redirect
 
 em-ccdorc:
   enabled: false
