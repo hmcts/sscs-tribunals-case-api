@@ -230,6 +230,26 @@ ccd:
         BYPASS_ORG_DROOL_RULE: true
         LAUNCH_DARKLY_ENV: pr
         ENABLE_DB_MIGRATE: true
+      keyVaults:
+        sscs:
+          secrets:
+            - name: preview-ccd-db-username
+              alias: ROLE_ASSIGNMENT_DB_USERNAME
+            - name: preview-ccd-db-password
+              alias: ROLE_ASSIGNMENT_DB_PASSWORD
+      secrets:
+        LD_SDK_KEY:
+          secretRef: role-assignment-service-LD-SDK-KEY
+          key: key
+          disabled: true
+        ROLE_ASSIGNMENT_IDAM_CLIENT_SECRET:
+          secretRef: role-assignment-service-IDAM-CLIENT-SECRET
+          key: key
+          disabled: true
+        ROLE_ASSIGNMENT_IDAM_ADMIN_PASSWORD:
+          secretRef: role-assignment-service-IDAM-ADMIN-SECRET
+          key: key
+          disabled: true
   elasticsearch:
     nameOverride: ${SERVICE_NAME}-es
     clusterName: "es"
