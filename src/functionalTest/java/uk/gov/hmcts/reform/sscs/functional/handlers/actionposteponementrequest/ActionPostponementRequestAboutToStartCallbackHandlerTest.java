@@ -44,6 +44,6 @@ public class ActionPostponementRequestAboutToStartCallbackHandlerTest extends Ba
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .log().all(true)
-                .assertThat().body("data.postponementRequest.actionPostponementRequestSelected", equalTo(""));
+                .assertThat().body("data.actionPostponementRequestSelected", equalTo(""));
     }
 }
