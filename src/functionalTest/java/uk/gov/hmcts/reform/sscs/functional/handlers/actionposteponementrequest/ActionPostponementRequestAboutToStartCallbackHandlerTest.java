@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 @RunWith(JUnitParamsRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
-public class ActionPostponementRequestAboutToStartCallbackHandlerTest extends BaseHandler{
+public class ActionPostponementRequestAboutToStartCallbackHandlerTest extends BaseHandler {
 
     @ClassRule
     public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
