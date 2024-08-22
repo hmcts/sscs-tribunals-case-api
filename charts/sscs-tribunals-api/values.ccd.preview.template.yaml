@@ -203,7 +203,6 @@ ccd:
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     enableKeyVaults: true
     devMode: true
-    environment:
     postgresql:
       auth:
         postgresUsername: hmcts
@@ -231,13 +230,9 @@ ccd:
         BYPASS_ORG_DROOL_RULE: true
         LAUNCH_DARKLY_ENV: pr
         ENABLE_DB_MIGRATE: true
-      keyVaults:
-        sscs:
-          secrets:
-            - name: preview-ccd-db-username
-              alias: ROLE_ASSIGNMENT_DB_USERNAME
-            - name: preview-ccd-db-password
-              alias: ROLE_ASSIGNMENT_DB_PASSWORD
+        ROLE_ASSIGNMENT_DB_USERNAME: hmcts
+        ROLE_ASSIGNMENT_DB_PASSWORD: ${SHARED_DB_PASSWORD}
+      keyVaults: [ ]
       secrets:
         LD_SDK_KEY:
           secretRef: role-assignment-service-LD-SDK-KEY
