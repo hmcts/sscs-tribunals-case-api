@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
@@ -20,6 +19,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
@@ -104,19 +105,20 @@ class AdjournCaseAboutToStartHandlerTest {
     }
 
     @Test
-    void givenCaseHasAdjournedFieldsPopulatedAndNoDraftAdjournedDocs_thenClearTransientFields() {
+    void givenCaseHasAdjournedFieldsPopulated_thenClearTransientFields() {
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         List<SscsDocument> documentList = new ArrayList<>();
 
-        SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(ADJOURNMENT_NOTICE.getValue()).build();
+        SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(DocumentType.DRAFT_ADJOURNMENT_NOTICE.getValue()).build();
         documentList.add(new SscsDocument(details));
 
         sscsCaseData.setSscsDocument(documentList);
 
-        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getAdjournment()).hasAllNullFieldsOrProperties();
 
     }
 
