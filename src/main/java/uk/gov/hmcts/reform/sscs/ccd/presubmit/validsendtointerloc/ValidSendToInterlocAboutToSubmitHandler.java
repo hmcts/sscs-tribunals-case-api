@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.model.PartyItemList.REPRESENTATIVE;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -68,7 +69,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
                 return preSubmitCallbackResponse;
             }
             UploadParty uploadParty = getUploadParty(sscsCaseData.getOriginalSender());
-            postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty);
+            postponementRequestService.processPostponementRequest(sscsCaseData, uploadParty, Optional.empty());
         } else {
             InterlocReviewState interlocState = Arrays.stream(InterlocReviewState.values())
                 .filter(x -> x.getCcdDefinition().equals(sscsCaseData.getSelectWhoReviewsCase().getValue().getCode()))
