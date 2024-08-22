@@ -203,6 +203,7 @@ ccd:
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     enableKeyVaults: true
     devMode: true
+
     postgresql:
       auth:
         postgresUsername: hmcts
@@ -223,7 +224,7 @@ ccd:
         AM_ROLE_ASSIGNMENT_SERVICE_SECRET: AAAAAAAAAAAAAAAA
         IDAM_USER_URL: "https://idam-web-public.aat.platform.hmcts.net"
         IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-        OPEN_ID_API_BASE_URI: "https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o"
+        OPEN_ID_API_BASE_URI: "https://idam-web-public.aat.platform.hmcts.net/o"
         ROLE_ASSIGNMENT_IDAM_ADMIN_USERID: ras-validation-system@hmcts.net
         APPLICATION_LOGGING_LEVEL: INFO
         BYPASS_ORG_DROOL_RULE: true
