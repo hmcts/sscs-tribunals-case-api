@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
-public class ActionPostponementRequestTest extends BaseHandler {
+public class ActionPostponementRequestAboutToSubmitCallbackHandlerTest extends BaseHandler {
 
     @Autowired
     private ObjectMapper mapper;
