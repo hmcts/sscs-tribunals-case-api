@@ -590,6 +590,8 @@ bootWithCCD {
     // Features
     environment 'GAPS_SWITCHOVER_FEATURE', 'true'
     environment 'CASE_ACCESS_MANAGEMENT_FEATURE', 'true'
+    environment 'HANDLE_CCD_CALLBACKMAP_V2', 'true'
+    environment 'POST_HEARINGS_FEATURE', 'true'
 
     // Local Queue
     environment 'JMS_NAMESPACE', 'localhost:5672'
