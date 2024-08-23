@@ -23,9 +23,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.UploadParty;
 @Service
 public class PostponementRequestService {
 
-    public void processPostponementRequest(SscsCaseData sscsCaseData, UploadParty uploadParty) {
+    public void processPostponementRequest(SscsCaseData sscsCaseData, UploadParty originalSender, Optional<UploadParty> uploadParty) {
         ensureSscsDocumentsIsNotNull(sscsCaseData);
-        final SscsDocument sscsDocument = buildNewSscsDocumentFromPostponementRequest(sscsCaseData, uploadParty);
+        final SscsDocument sscsDocument = buildNewSscsDocumentFromPostponementRequest(sscsCaseData, originalSender, uploadParty);
         addToSscsDocuments(sscsCaseData, sscsDocument);
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
@@ -33,13 +33,14 @@ public class PostponementRequestService {
         clearTransientFields(sscsCaseData);
     }
 
-    private SscsDocument buildNewSscsDocumentFromPostponementRequest(SscsCaseData sscsCaseData, UploadParty uploadParty) {
+    private SscsDocument buildNewSscsDocumentFromPostponementRequest(SscsCaseData sscsCaseData, UploadParty originalSender, Optional<UploadParty> uploadParty) {
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentLink(sscsCaseData.getPostponementRequest().getPostponementPreviewDocument())
                 .documentFileName(sscsCaseData.getPostponementRequest().getPostponementPreviewDocument().getDocumentFilename())
                 .documentType(DocumentType.POSTPONEMENT_REQUEST.getValue())
                 .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
-                .originalPartySender(uploadParty.getValue())
+                .originalPartySender(originalSender.getValue())
+                .partyUploaded(uploadParty.orElse(null))
                 .build()).build();
     }
 
