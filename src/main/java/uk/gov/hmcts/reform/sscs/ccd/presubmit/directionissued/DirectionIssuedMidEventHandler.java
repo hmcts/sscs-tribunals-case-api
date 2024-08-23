@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -45,17 +46,22 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
 
         if (caseData.getDirectionTypeDl() == null) {
-            PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
             errorResponse.addError("Direction Type cannot be empty");
             return errorResponse;
         }
 
         if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
                 && StringUtils.isBlank(caseData.getDirectionDueDate())) {
-            final PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
             errorResponse.addError("Please populate the direction due date");
+            return errorResponse;
+        }
+
+        if (caseData.getDocumentStaging().getDateAdded() != null
+                && isDateInTheFuture(caseData.getDocumentStaging().getDateAdded())) {
+            errorResponse.addError("Date added cannot be in the future");
             return errorResponse;
         }
 
