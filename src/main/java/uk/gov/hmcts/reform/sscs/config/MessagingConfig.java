@@ -1,15 +1,10 @@
 package uk.gov.hmcts.reform.sscs.config;
 
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import javax.jms.ConnectionFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.jms.JmsConnectionFactory;
+import org.apache.qpid.jms.policy.JmsDefaultPrefetchPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,8 +14,6 @@ import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
-import uk.gov.hmcts.reform.sscs.service.servicebus.messaging.JmsErrorHandler;
-
 
 @Configuration
 @Slf4j
@@ -39,7 +32,9 @@ public class MessagingConfig {
                                                   @Value("${amqp.username}") final String username,
                                                   @Value("${amqp.password}") final String password,
                                                   @Autowired final String jmsUrlString,
-                                                  @Autowired(required = false) final SSLContext jmsSslContext) {
+                                                  @Autowired(required = false) final SSLContext jmsSslContext,
+                                                  @Value("${amqp.prefetch.override}") final boolean prefetchOverride,
+                                                  @Value("${amqp.prefetch.topicPrefetch}") final int topicPrefetch) {
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(jmsUrlString);
         jmsConnectionFactory.setUsername(username);
         jmsConnectionFactory.setPassword(password);
@@ -48,63 +43,13 @@ public class MessagingConfig {
         if (jmsSslContext != null) {
             jmsConnectionFactory.setSslContext(jmsSslContext);
         }
-
-        return new CachingConnectionFactory(jmsConnectionFactory);
-    }
-
-    /**
-     * DO NOT USE THIS IN PRODUCTION!.
-     * This was only used for testing unverified ssl certs locally!
-     *
-     * @deprecated Only used for testing.
-     */
-    @SuppressWarnings("squid:S4423")
-    @Bean
-    @Deprecated
-    public SSLContext jmsSslContext(@Value("${amqp.trustAllCerts}") final boolean trustAllCerts)
-        throws NoSuchAlgorithmException, KeyManagementException {
-
-        if (trustAllCerts) {
-            // https://stackoverflow.com/a/2893932
-            // DO NOT USE THIS IN PRODUCTION!
-            TrustManager[] trustCerts = getTrustManagers();
-
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustCerts, new SecureRandom());
-
-            return sc;
+        if (prefetchOverride) {
+            JmsDefaultPrefetchPolicy prefetchPolicy = new JmsDefaultPrefetchPolicy();
+            prefetchPolicy.setTopicPrefetch(topicPrefetch);
+            prefetchPolicy.setDurableTopicPrefetch(topicPrefetch);
+            jmsConnectionFactory.setPrefetchPolicy(prefetchPolicy);
         }
-        return null;
-    }
-
-    /*
-     * DO NOT USE THIS IN PRODUCTION!
-     * This was only used for testing unverified ssl certs locally!
-     */
-    @Deprecated
-    private TrustManager[] getTrustManagers() {
-        return new TrustManager[]{
-            new X509TrustManager() {
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[0];
-                }
-
-                @Override
-                @SuppressWarnings("squid:S4830")
-                public void checkClientTrusted(
-                    X509Certificate[] certs, String authType) {
-                    // Empty
-                }
-
-                @Override
-                @SuppressWarnings("squid:S4830")
-                public void checkServerTrusted(
-                    X509Certificate[] certs, String authType) {
-                    // Empty
-                }
-            }
-        };
+        return new CachingConnectionFactory(jmsConnectionFactory);
     }
 
     @Bean
@@ -120,8 +65,8 @@ public class MessagingConfig {
         DefaultJmsListenerContainerFactory returnValue = new DefaultJmsListenerContainerFactory();
         returnValue.setConnectionFactory(connectionFactory);
         returnValue.setSubscriptionDurable(Boolean.TRUE);
-        returnValue.setErrorHandler(new JmsErrorHandler());
+        returnValue.setErrorHandler(t -> log.error("Error while processing JMS message", t));
+        returnValue.setExceptionListener(t -> log.error("Exception while processing JMS message", t));
         return returnValue;
     }
-
 }
