@@ -1,0 +1,46 @@
+{
+  "caseId": "1",
+  "caseReference": "SC123/45/00001",
+  "state": "appealCreated",
+  "dateSentToDwp": "2017-03-08",
+  "appeal": {
+    "appellant": {
+      "name": {
+        "title": "Mr",
+        "lastName": "Mock",
+        "firstName": "Jason"
+      }
+    },
+    "benefitType": {
+      "code": "childSupport",
+      "description": "benefit Type"
+    },
+    "hearingOptions": {
+      "wantsToAttend": "Yes"
+    }
+  },
+  "evidence": {
+    "documents": [{
+      "value": {
+        "dateReceived": "2017-03-10",
+        "description": "1",
+        "evidenceType": "General",
+        "evidenceProvidedBy": "Appellant"
+      }
+    }]
+  },
+  "events": [
+    {
+      "value": {
+        "date": "2017-03-08T12:01:47.620",
+        "type": "appealReceived",
+        "description": "Appeal received"
+      }
+    }
+  ],
+  "subscriptions": {
+    "appellantSubscription": {
+      "tya": "abcde12345"
+    }
+  }
+}

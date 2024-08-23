@@ -37,8 +37,6 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     private final ListAssistHearingMessageHelper hearingMessageHelper;
     private final VenueDataLoader venueDataLoader;
     private boolean isScheduleListingEnabled;
-    @Value("${feature.snl.adjournment.enabled}")
-    private boolean isAdjournmentEnabled;
     @Value("${feature.postHearings.enabled}")
     private boolean isPostHearingsEnabled;
 
@@ -119,9 +117,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                     CancellationReason.OTHER);
         }
 
-        if (isAdjournmentEnabled) {
-            sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());
-        }
+        sscsCaseData.setIssueFinalDecisionDate(LocalDate.now());
 
         sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionWasOriginalDecisionUploaded(isYes(sscsCaseData.getSscsFinalDecisionCaseData().getWriteFinalDecisionGenerateNotice()) ? NO : YES);
 

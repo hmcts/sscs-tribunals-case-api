@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.VenueService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -40,6 +41,9 @@ public class IssueAdjournmentIt extends AbstractEventIt {
     @MockBean
     private EvidenceManagementService evidenceManagementService;
 
+    @MockBean
+    private VenueService venueService;
+
     @Before
     public void setup() throws IOException {
         json = getJson("callback/issueAdjournmentCallback.json");
@@ -53,6 +57,7 @@ public class IssueAdjournmentIt extends AbstractEventIt {
 
         UploadResponse uploadResponse = createUploadResponse();
         when(evidenceManagementService.upload(any(), anyString())).thenReturn(uploadResponse);
+        when(venueService.getEpimsIdForVenue(any())).thenReturn("1");
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);

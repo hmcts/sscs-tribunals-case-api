@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.assertj.core.groups.Tuple;
@@ -84,7 +85,7 @@ public class PostponementRequestServiceTest {
         DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
         caseData.setOriginalSender(originalSender);
 
-        postponementRequestService.processPostponementRequest(caseData, uploadParty);
+        postponementRequestService.processPostponementRequest(caseData, uploadParty, Optional.of(uploadParty));
 
         assertThat(caseData.getInterlocReviewState()).isEqualTo(InterlocReviewState.REVIEW_BY_TCW);
         assertThat(caseData.getInterlocReferralReason()).isEqualTo(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
