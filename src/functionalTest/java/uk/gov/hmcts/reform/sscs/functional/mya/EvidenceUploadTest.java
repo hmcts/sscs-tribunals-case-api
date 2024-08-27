@@ -24,6 +24,13 @@ public class EvidenceUploadTest extends BaseFunctionTest {
         Thread.sleep(5000L);
 
         sscsMyaBackendRequests.uploadSingleHearingEvidence(createdCcdCase.getCaseId(), "evidence.png", "body", emailAddress);
+
+        SscsCaseDetails caseDetails = getCaseDetails(createdCcdCase.getCaseId());
+        List<ScannedDocument> scannedDocument = caseDetails.getData().getScannedDocuments();
+        assertThat(scannedDocument.size(), is(1));
+        String expectedEvidenceUploadFilename = String.format("Representative upload 1 - %s.pdf", caseDetails.getId());
+        assertThat(scannedDocument.get(0).getValue().getFileName(), is(expectedEvidenceUploadFilename));
+
     }
 
     @Test
