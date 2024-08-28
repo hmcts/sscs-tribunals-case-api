@@ -8,9 +8,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-
-import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.apache.groovy.json.internal.IO;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
@@ -40,7 +37,7 @@ public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
 
     @Test
     public void processAnIssueDirectionEvent_ifPastHearingExcludedDatesAreOnCaseDetails() throws IOException {
-    //set case to have past hearing excluded dates
+        //set case to have past hearing excluded dates
         //set case to be in appeal to proceed
         //set case to be in interloc review state
 
@@ -55,7 +52,7 @@ public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
 
         caseData.setInterlocReviewState(REVIEW_BY_TCW);
 
-//        caseData.setDirectionTypeDl(APPEAL_TO_PROCEED);
+        caseData.setDirectionTypeDl(new DynamicList(EventType.APPEAL_TO_PROCEED.toString()));
 
         updateCaseEvent(UPDATE_CASE_ONLY, caseDetails);
 
