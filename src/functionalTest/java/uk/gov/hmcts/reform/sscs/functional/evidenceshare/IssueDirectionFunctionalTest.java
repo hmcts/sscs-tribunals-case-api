@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
 import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 
 import java.io.IOException;
@@ -38,11 +37,6 @@ public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
 
     @Test
     public void processAnIssueDirectionEvent_ifPastHearingExcludedDatesAreOnCaseDetails() throws IOException {
-        //set case to have past hearing excluded dates
-        //set case to be in appeal to proceed
-        //set case to be in interloc review state
-
-        //assert that issue directions event is created.
         SscsCaseDetails caseDetails = createDigitalCaseWithEvent(NON_COMPLIANT);
         SscsCaseData caseData = caseDetails.getData();
 
@@ -63,10 +57,11 @@ public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
 
         simulateCcdCallback(json);
 
-        caseDetails = findCaseById(ccdCaseId); //get the case again to validate
+        caseDetails = findCaseById(ccdCaseId);
         caseData = caseDetails.getData();
 
-        assertTrue(caseData.getInterlocReviewState() == AWAITING_ADMIN_ACTION);
+        assertEquals(caseDetails.getState(), "interlocutoryReviewState");
+        assertEquals(caseData.getInterlocReviewState(), REVIEW_BY_TCW);
 
     }
 }
