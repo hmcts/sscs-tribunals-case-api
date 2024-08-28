@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertTrue;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 
 import java.io.IOException;
@@ -65,7 +66,7 @@ public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
         caseDetails = findCaseById(ccdCaseId); //get the case again to validate
         caseData = caseDetails.getData();
 
-        assertTrue(caseData.getEvents().stream().anyMatch(event -> event.getValue().getEventType().equals(DIRECTION_ISSUED)));
+        assertTrue(caseData.getInterlocReviewState() == AWAITING_ADMIN_ACTION);
 
     }
 }
