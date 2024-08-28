@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
@@ -10,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWi
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -58,6 +61,7 @@ public class AdjournCaseIt extends AbstractEventIt {
     public static final String CCD_ABOUT_TO_SUBMIT = "/ccdAboutToSubmit";
     public static final String CCD_MID_EVENT_PREVIEW_ADJOURN_CASE = "/ccdMidEventPreviewAdjournCase";
     public static final String CCD_MID_EVENT_ADJOURN_CASE_POPULATE_VENUE_DROPDOWN = "/ccdMidEventAdjournCasePopulateVenueDropdown";
+    public static final String CCD_MID_EVENT_ADJOURN_CASE_DUE_DATE = "/ccdMidEventAdjournCaseDirectionDueDate";
     public static final String CCD_MID_EVENT = "/ccdMidEvent";
     public static final String TEST_NAME = "AN Test";
     public static final String CHESTER_MAGISTRATE_S_COURT = "Chester Magistrate's Court";
@@ -76,6 +80,8 @@ public class AdjournCaseIt extends AbstractEventIt {
     private GenerateFile generateFile;
     @MockBean
     private UserInfo userInfo;
+    @MockBean
+    private JudicialRefDataService judicialRefDataService;
 
     @DisplayName("Call to mid event callback when path is YES NO YES will validate the data when due date in past")
     @Test
@@ -85,7 +91,7 @@ public class AdjournCaseIt extends AbstractEventIt {
             List.of(DIRECTIONS_DUE_DATE_PLACEHOLDER),
             List.of(DATE_2019));
 
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_MID_EVENT));
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_MID_EVENT_ADJOURN_CASE_DUE_DATE));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
@@ -381,6 +387,9 @@ public class AdjournCaseIt extends AbstractEventIt {
         when(userInfo.getFamilyName()).thenReturn(JUDGE_FAMILY_NAME);
 
         when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
+
+        given(judicialRefDataService.getAllJudicialUsersFullNames(any()))
+                .willReturn(Collections.emptyList());
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_MID_EVENT_PREVIEW_ADJOURN_CASE));
         assertHttpStatus(response, HttpStatus.OK);

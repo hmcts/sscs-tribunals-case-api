@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevid
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 
@@ -14,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -112,14 +110,14 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
 
-            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseData -> sscsCaseData.setInterlocReferralDate(LocalDate.now()),
+            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseDetails -> sscsCaseDetails.getData().setInterlocReferralDate(LocalDate.now()),
                     callback.getCaseDetails().getId(),
                     REVIEW_BY_JUDGE, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
                     EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_TCW)) {
 
-            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseData -> sscsCaseData.setInterlocReferralDate(LocalDate.now()),
+            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseDetails -> sscsCaseDetails.getData().setInterlocReferralDate(LocalDate.now()),
                     callback.getCaseDetails().getId(),
                     REVIEW_BY_TCW, INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
                     EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
@@ -139,17 +137,18 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                 return updateCcdCaseService.updateCaseV2(callback.getCaseDetails().getId(),
                         EventType.POST_HEARING_OTHER.getCcdType(), "Post hearing application 'Other'",
                         "Post hearing application 'Other'", idamService.getIdamTokens(),
-                        sscsCaseData -> sscsCaseData.setInterlocReviewState(REVIEW_BY_JUDGE)
+                        sscsCaseDetails -> sscsCaseDetails.getData().setInterlocReviewState(REVIEW_BY_JUDGE)
                 );
             }
 
-            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseData -> setSelectWhoReviewsCaseField(sscsCaseData, REVIEW_BY_JUDGE),
+            return setInterlocReviewStateFieldAndTriggerEvent(sscsCaseDetails -> setSelectWhoReviewsCaseField(sscsCaseDetails.getData(), REVIEW_BY_JUDGE),
                     callback.getCaseDetails().getId(),
                     REVIEW_BY_JUDGE, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
                     EventType.VALID_SEND_TO_INTERLOC, TCW_REVIEW_SEND_TO_JUDGE);
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_TCW)) {
-            Consumer<SscsCaseData> caseDataConsumer = sscsCaseData -> {
+            Consumer<SscsCaseDetails> caseDataConsumer = sscsCaseDetails -> {
+                SscsCaseData sscsCaseData = sscsCaseDetails.getData();
                 setSelectWhoReviewsCaseField(sscsCaseData, REVIEW_BY_TCW);
                 if (isPostponementRequest(sscsCaseData)) {
                     sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_POSTPONEMENT_REQUEST);
@@ -161,7 +160,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                     TCW_REVIEW_SEND_TO_JUDGE);
         }
         if (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, OTHER_DOCUMENT_MANUAL)
-                && isValidUrgentDocument(caseData)) {
+                && isValidUrgentDocument(callback)) {
             return setMakeCaseUrgentTriggerEvent(callback.getCaseDetails().getId(),
                     OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Send a case to urgent hearing");
         }
@@ -255,11 +254,16 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                         .getValue()));
     }
 
-    private boolean isValidUrgentDocument(SscsCaseData caseData) {
-        return ((StringUtils.isEmpty(caseData.getUrgentCase()) || "No".equalsIgnoreCase(caseData.getUrgentCase()))
+    private boolean isValidUrgentDocument(Callback callback) {
+        SscsCaseData caseData = (SscsCaseData) callback.getCaseDetails().getCaseData();
+        CaseDetails<SscsCaseData> caseDetailsBefore = (CaseDetails<SscsCaseData>) callback.getCaseDetailsBefore().orElse(null);
+        SscsDocument furtherEvidenceDoc = caseData.getSscsDocument().stream()
+                .filter(d -> caseDetailsBefore.getCaseData().getSscsDocument().stream().noneMatch(db -> db.getId().equals(d.getId())))
+                .filter(d -> d.getValue().getDocumentType().equals("urgentHearingRequest"))
+                .findFirst().orElse(null);
+        return (StringUtils.isEmpty(caseData.getUrgentCase()) || "No".equalsIgnoreCase(caseData.getUrgentCase()))
                 && (StringUtils.isEmpty(caseData.getTranslationWorkOutstanding()) || "No".equalsIgnoreCase(caseData.getTranslationWorkOutstanding()))
-                && !CollectionUtils.isEmpty(caseData.getSscsDocument())
-                && caseData.getSscsDocument().stream().filter(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType())).count() > 0);
+                && (furtherEvidenceDoc != null);
     }
 
     private void setSelectWhoReviewsCaseField(SscsCaseData caseData, InterlocReviewState reviewByWhom) {
@@ -268,7 +272,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     }
 
     private SscsCaseDetails setInterlocReviewStateFieldAndTriggerEvent(
-            Consumer<SscsCaseData> sscsCaseDataConsumer,
+            Consumer<SscsCaseDetails> sscsCaseDataConsumer,
             Long caseId,
             InterlocReviewState interlocReviewState,
             FurtherEvidenceActionDynamicListItems interlocType,
@@ -287,7 +291,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                 interlocType.getLabel(),
                 idamService.getIdamTokens(),
                 sscsCaseDataConsumer.andThen(
-                        sscsCaseData -> sscsCaseData.setInterlocReviewState(interlocReviewState)
+                        sscsCaseDetails -> sscsCaseDetails.getData().setInterlocReviewState(interlocReviewState)
                 )
         );
     }
