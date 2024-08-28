@@ -249,7 +249,7 @@ ccd:
           secretRef: role-assignment-service-IDAM-ADMIN-SECRET
           key: key
           disabled: true
-        DATA_STORE_DB_PASSWORD:
+        ROLE_ASSIGNMENT_DB_PASSWORD:
           secretRef: "{{ .Values.global.postgresSecret }}"
           key: PASSWORD
           disabled: true
@@ -457,7 +457,7 @@ ccd:
         USER_PROFILE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_definition,ccd_admin,sscs
       keyVaults: [ ]
       secrets:
-        DATA_STORE_DB_PASSWORD:
+        USER_PROFILE_DB_PASSWORD:
           secretRef: "{{ .Values.global.postgresSecret }}"
           key: PASSWORD
           disabled: true
@@ -478,7 +478,7 @@ ccd:
         USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
       keyVaults: [ ]
       secrets:
-        DATA_STORE_DB_PASSWORD:
+        DEFINITION_STORE_DB_PASSWORD:
           secretRef: "{{ .Values.global.postgresSecret }}"
           key: PASSWORD
           disabled: true
