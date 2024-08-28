@@ -4,7 +4,11 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
   applicationPort: 8080
   aadIdentityName: sscs
   ingressHost: sscs-tribunals-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  spotInstances:
+    enabled: false
   memoryLimits: '4096Mi'
+  autoscaling:
+    enabled: false
   keyVaults:
     sscs:
       resourceGroup: sscs
@@ -112,6 +116,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     EMAIL_SMTP_SSL_TRUST: "*"
     HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: false
     TRIGGER_EVENT_V2_ENABLED: false
+    HANDLE_CCD_CALLBACKMAP_V2: false
 
 postgresql:
   enabled: false
