@@ -202,6 +202,7 @@ ccd:
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     enableKeyVaults: true
     devMode: true
+    postgresSecret: "postgres"
     postgresql:
       auth:
         postgresUsername: hmcts
