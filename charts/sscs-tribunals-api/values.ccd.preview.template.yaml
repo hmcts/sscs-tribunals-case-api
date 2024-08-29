@@ -458,6 +458,10 @@ ccd:
       disableKeyVaults: true
       imagePullPolicy: Always
       ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
+      autoscaling:
+        enabled: false
+        minReplicas: 1
+        maxReplicas: 1
       enviroment:
         USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
         USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
