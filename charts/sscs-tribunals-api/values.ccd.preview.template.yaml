@@ -219,6 +219,7 @@ ccd:
       releaseNameOverride: ${SERVICE_NAME}-am-role-assignment-service
       readinessDelay: 240
       livenessDelay: 240
+      terminationGracePeriodSeconds: 0
       environment:
         ROLE_ASSIGNMENT_DB_HOST: ${SERVICE_NAME}-postgresql
         ROLE_ASSIGNMENT_DB_NAME: "role_assignment"
