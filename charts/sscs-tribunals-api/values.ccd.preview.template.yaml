@@ -50,6 +50,7 @@ java:
     HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
     SUBMIT_APPEAL_SERVICE_UPDATE_CASE_V2_ENABLED: true
     HANDLE_CCD_CALLBACKMAP_V2: true
+    aadIdentityName: sscs
   secrets:
     HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
       secretRef: sscs-sb-preview
@@ -106,6 +107,7 @@ em-ccdorc:
       CCD_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
       CALLBACK_HTTP_SCHEME: https
       CALLBACK_DOMAIN: em-ccdorc-${SERVICE_FQDN}
+      aadIdentityName: em-ccdorc
 
 ccd-case-document-am-api:
   enabled: true
@@ -119,6 +121,7 @@ ccd-case-document-am-api:
       OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts
       S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       DM_STORE_BASE_URL: http://dm-store-aat.service.core-compute-aat.internal
+      aadIdentityName: am
 
 xui-webapp:
   enabled: true
@@ -164,6 +167,7 @@ xui-webapp:
       REDISCLOUD_URL: http://dummyrediscloudurl
       UV_THREADPOOL_SIZE: 128
       PROTOCOL: http
+      aadIdentityName: rpx
     keyVaults:
       rpx:
         resourceGroup: rpx
@@ -611,6 +615,7 @@ sscs-tya-notif:
       POST_HEARINGS_FEATURE: true
       POST_HEARINGS_B_FEATURE: true
       DUMMY: true
+      aadIdentityName: sscs
     secrets:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
@@ -725,6 +730,7 @@ sscs-hearings-api:
       CORE_CASE_DATA_CASE_TYPE_ID: Benefit-${CHANGE_ID}
       HEARINGS_CASE_UPDATE_V2_ENABLED: true
       ADJOURNMENT_ENABLED: true
+      aadIdentityName: sscs
     secrets:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: sscs-sb-preview
