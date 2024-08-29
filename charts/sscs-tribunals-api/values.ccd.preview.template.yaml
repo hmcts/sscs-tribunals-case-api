@@ -203,7 +203,8 @@ ccd:
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     enableKeyVaults: true
-    environment: ${env}
+    tenantId: "531ff96d-0ae9-462a-8d2d-bec7c0b42082"
+    environment: aat
     devMode: true
     postgresql:
       auth:
