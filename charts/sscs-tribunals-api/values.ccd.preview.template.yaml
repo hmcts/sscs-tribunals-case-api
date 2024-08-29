@@ -204,6 +204,8 @@ ccd:
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     enableKeyVaults: true
     devMode: true
+    postgresHostname: ${SERVICE_NAME}-postgresql
+    databaseNamePrefix: ""
     postgresSecret: "postgres"
     postgresql:
       auth:
@@ -510,7 +512,7 @@ ccd:
         DATA_STORE_DB_MAX_POOL_SIZE: 80
         CCD_DOCUMENT_URL_PATTERN: 'http://dm-store.*'
         CASE_DOCUMENT_AM_URL: http://${SERVICE_NAME}-ccd-case-document-am-api
-        DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+        DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
         IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
         IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
