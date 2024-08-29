@@ -234,6 +234,7 @@ ccd:
         BYPASS_ORG_DROOL_RULE: true
         LAUNCH_DARKLY_ENV: pr
         ENABLE_DB_MIGRATE: true
+        CCD_DATA_STORE_URL: ${CORE_CASE_DATA_API_URL}
       keyVaults:
         sscs:
           secrets:
