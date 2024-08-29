@@ -201,8 +201,8 @@ ccd:
       keyVaults:
         am:
           secrets:
-            - name: role-assignment-service-LD-SDK-KEY
-              alias: LD_SDK_KEY
+          - name: role-assignment-service-LD-SDK-KEY
+            alias: LD_SDK_KEY
       secrets:
         ROLE_ASSIGNMENT_DB_PASSWORD:
           secretRef: postgres
