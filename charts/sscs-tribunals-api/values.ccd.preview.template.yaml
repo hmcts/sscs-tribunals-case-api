@@ -455,8 +455,9 @@ ccd:
 
   ccd-user-profile-api:
     java:
-      image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
+      disableKeyVaults: true
       imagePullPolicy: Always
+      ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
       enviroment:
         USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
         USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
@@ -481,7 +482,7 @@ ccd:
 
   ccd-data-store-api:
     java:
-      image: hmctspublic.azurecr.io/ccd/data-store-api:latest
+      disableKeyVaults: true
       imagePullPolicy: Always
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
