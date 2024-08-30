@@ -439,17 +439,15 @@ ccd:
         maxReplicas: 1
       imagePullPolicy: Always
       environment:
-        IMPORTER_USERNAME: servicesatcdm+sscs@gmail.com
-        IMPORTER_PASSWORD: SscsImport0304
         DEFINITION_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-        DEFINITION_STORE_DB_USERNAME: hmcts
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
-        DEFINITION_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_admin,xui_webapp,aac_manage_case_assignment
-        DEFINITION_STORE_TX_TIMEOUT_DEFAULT: 60
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
+        DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator,ccd_case_document_am_api
+        DEFINITION_STORE_TX_TIMEOUT_DEFAULT: 60
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
         WELSH_TRANSLATION_ENABLED: false
+        DEFINITION_STORE_DB_USERNAME: hmcts
       secrets:
         DEFINITION_STORE_DB_PASSWORD:
           secretRef: postgres
