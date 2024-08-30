@@ -90,7 +90,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             builder.dateIssued(finalDecisionCaseData.getFinalDecisionIssuedDate());
             builder.correctedJudgeName(buildSignedInJudgeName(userAuthorisation));
             builder.correctedDateIssued(showIssueDate ? LocalDate.now() : null);
-            builder.idamSurname(finalDecisionCaseData.getFinalDecisionIdamSurname());
+            builder.idamSurname(buildSignedInJudgeSurname(userAuthorisation));
         } else {
             builder.userName(buildSignedInJudgeName(userAuthorisation));
             builder.idamSurname(buildSignedInJudgeSurname(userAuthorisation));
@@ -100,10 +100,11 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         setHearings(writeFinalDecisionBuilder, caseData);
 
-        String heldAt = writeFinalDecisionBuilder.build().getHeldAt();
-        String heldBefore = buildHeldBefore(caseData, userAuthorisation);
+        String heldAt = SscsUtil.buildWriteFinalDecisionHeldAt(caseData, venueDataLoader);
+        String heldBefore = buildHeldBefore(caseData, userAuthorisation, isPostHearingsEnabled);
 
-        if (isPostHearingsEnabled && nonNull(finalDecisionCaseData.getFinalDecisionHeldAt())) {
+        if (isPostHearingsEnabled && nonNull(finalDecisionCaseData.getFinalDecisionHeldAt())
+                && SscsUtil.isCorrectionInProgress(caseData, isPostHearingsEnabled)) {
             heldAt = finalDecisionCaseData.getFinalDecisionHeldAt();
         }
 
@@ -262,10 +263,12 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         }
     }
 
-    protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
-        String judgeName = caseData.getSscsFinalDecisionCaseData().getFinalDecisionJudge();
-
-        if (isNull(judgeName)) {
+    protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation, boolean isPostHearingsEnabled) {
+        String judgeName = null;
+        String originalJudgeName = caseData.getSscsFinalDecisionCaseData().getFinalDecisionJudge();
+        if (SscsUtil.isCorrectionInProgress(caseData, isPostHearingsEnabled) && !isNull(originalJudgeName)) {
+            judgeName = originalJudgeName;
+        } else {
             judgeName = buildSignedInJudgeName(userAuthorisation);
         }
 
