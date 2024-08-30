@@ -54,7 +54,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         if (HearingRoute.GAPS == sscsCaseData.getSchedulingAndListingFields().getHearingRoute()) {
 
-            if (!callback.isIgnoreWarnings()) {
+            if (!callback.isIgnoreWarnings() && !YesNo.YES.equals(sscsCaseData.getIgnoreCallbackWarnings())) {
                 PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
                 String gapsProceedWarning = "This is a GAPS case, If you do want to proceed, "
                     + "then please change the hearing route to List Assist";
@@ -78,12 +78,12 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         String region = sscsCaseData.getRegion();
 
         Map<String, RegionalProcessingCenter> regionalProcessingCenterMap = regionalProcessingCenterService
-            .getRegionalProcessingCenterMap();
+                .getRegionalProcessingCenterMap();
 
         HearingRoute route = regionalProcessingCenterMap.values().stream()
-            .filter(rpc -> rpc.getName().equalsIgnoreCase(region))
-            .map(RegionalProcessingCenter::getHearingRoute)
-            .findFirst().orElse(HearingRoute.LIST_ASSIST);
+                .filter(rpc -> rpc.getName().equalsIgnoreCase(region))
+                .map(RegionalProcessingCenter::getHearingRoute)
+                .findFirst().orElse(HearingRoute.GAPS);
 
         return HearingHandler.valueOf(route.name()).handle(sscsCaseData, gapsSwitchOverFeature,
             hearingMessagingServiceFactory.getMessagingService(route));

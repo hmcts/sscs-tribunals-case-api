@@ -2,6 +2,7 @@
   "caseId": "1",
   "caseReference": "SC123/45/00001",
   "state": "appealCreated",
+  "dateSentToDwp": "2017-03-08",
   "appeal": {
     "appellant": {
       "name": {
