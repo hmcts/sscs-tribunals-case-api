@@ -524,8 +524,8 @@ ccd:
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
-      IMPORTER_USERNAME: ${DEFINITION_IMPORTER_USERNAME}
-      IMPORTER_PASSWORD: ${DEFINITION_IMPORTER_PASSWORD}
+      IMPORTER_USERNAME: ${IMPORT_USERNAME}
+      IMPORTER_PASSWORD: ${IMPORT_PWD}
       CCD_ENVIRONMENT: 'PROD'
       CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
       CCD_DEF_TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
