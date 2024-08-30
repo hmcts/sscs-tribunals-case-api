@@ -69,7 +69,9 @@ def secretsForPR = [
                 secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
                 secret('sscs-servicebus-connection-string-tf', 'SERVICE_BUS_CONNECTION_STRING'),
                 secret('preview-ccd-db-password-2', 'PREVIEW_DB_PASSWORD_2'),
-                secret('preview-shared-db-password', 'SHARED_DB_PASSWORD')
+                secret('preview-shared-db-password', 'SHARED_DB_PASSWORD'),
+                secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
+                secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD')
         ],
         's2s-${env}'      : [
                 secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
