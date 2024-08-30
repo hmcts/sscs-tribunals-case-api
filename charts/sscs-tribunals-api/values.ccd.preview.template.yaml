@@ -457,7 +457,7 @@ ccd:
       imagePullPolicy: Always
       enviroment:
         USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
-        USER_PROFILE_DB_OPTIONS: "?stringtype=unspecified"
+        USER_PROFILE_DB_OPTIONS: "?stringtype=unspecified&sslmode=disable"
         USER_PROFILE_DB_PASSWORD: ${SHARED_DB_PASSWORD}
         USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
         USER_PROFILE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_definition,ccd_admin,sscs
