@@ -439,6 +439,8 @@ ccd:
         maxReplicas: 1
       imagePullPolicy: Always
       environment:
+        IMPORTER_USERNAME: servicesatcdm+sscs@gmail.com
+        IMPORTER_PASSWORD: SscsImport0304
         DEFINITION_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         DEFINITION_STORE_DB_USERNAME: hmcts
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
