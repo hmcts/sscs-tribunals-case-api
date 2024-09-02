@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,15 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         DynamicList languageList = utils.generateInterpreterLanguageFields(sscsCaseData.getAdjournment().getInterpreterLanguage());
-        sscsCaseData.setAdjournment(Adjournment.builder().build());
+        if (sscsCaseData.getSscsDocument() != null) {
+            boolean draftAdjournmentDoc = sscsCaseData.getSscsDocument().stream()
+                    .anyMatch(sscsDocument -> sscsDocument.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
+            if (!draftAdjournmentDoc) {
+                sscsCaseData.setAdjournment(Adjournment.builder().build());
+            }
+        } else {
+            sscsCaseData.setAdjournment(Adjournment.builder().build());
+        }
         sscsCaseData.getAdjournment().setInterpreterLanguage(languageList);
 
         return preSubmitCallbackResponse;

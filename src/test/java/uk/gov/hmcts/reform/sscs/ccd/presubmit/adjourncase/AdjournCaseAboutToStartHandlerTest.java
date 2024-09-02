@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
@@ -105,21 +106,30 @@ class AdjournCaseAboutToStartHandlerTest {
     }
 
     @Test
+    void givenCaseHasAdjournedFieldsPopulated_andNoDraft_thenClearTransientFields() {
+        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        List<SscsDocument> documentList = new ArrayList<>();
+        sscsCaseData.setSscsDocument(documentList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        assertThat(response.getData().getAdjournment()).hasAllNullFieldsOrProperties();
+
+    }
+
+    @Test
     void givenCaseHasAdjournedFieldsPopulated_thenClearTransientFields() {
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         List<SscsDocument> documentList = new ArrayList<>();
-
         SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(DocumentType.DRAFT_ADJOURNMENT_NOTICE.getValue()).build();
         documentList.add(new SscsDocument(details));
-
         sscsCaseData.setSscsDocument(documentList);
-
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertThat(response.getData().getAdjournment()).hasAllNullFieldsOrProperties();
-
+        assertTrue(response.getData().getAdjournment().getAdjournmentInProgress().toBoolean());
     }
 
     @Test
