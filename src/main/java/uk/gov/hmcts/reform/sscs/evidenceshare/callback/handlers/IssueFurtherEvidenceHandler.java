@@ -143,8 +143,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
                     caseId,
                     EventType.UPDATE_CASE_ONLY.getCcdType(),
                     idamTokens,
-                    sscsCaseData -> {
-                        sscsCaseData.getSscsDocument().forEach(
+                    sscsCaseDetails -> {
+                        sscsCaseDetails.getData().getSscsDocument().forEach(
                                 sscsDocument -> {
                                     String documentBinaryUrl = sscsDocument.getValue().getDocumentLink().getDocumentBinaryUrl();
                                     if (binaryDocumentUrlLinkCaseDataMap.containsKey(documentBinaryUrl)) {
@@ -155,8 +155,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
                                 }
                         );
 
-                        final String description = determineDescription(sscsCaseData.getSscsDocument());
-                        setEvidenceIssuedFlagToYes(sscsCaseData.getSscsDocument());
+                        final String description = determineDescription(sscsCaseDetails.getData().getSscsDocument());
+                        setEvidenceIssuedFlagToYes(sscsCaseDetails.getData().getSscsDocument());
                         return new UpdateCcdCaseService.UpdateResult("Update case data", description);
 
                     }

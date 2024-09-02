@@ -74,10 +74,10 @@ public class IssueFurtherEvidenceHandlerTest {
     private IssueFurtherEvidenceHandler issueFurtherEvidenceHandler;
 
     @Captor
-    ArgumentCaptor<Consumer<SscsCaseData>> captor;
+    ArgumentCaptor<Consumer<SscsCaseDetails>> captor;
 
     @Captor
-    ArgumentCaptor<Function<SscsCaseData, UpdateCcdCaseService.UpdateResult>> functionArgumentCaptor;
+    ArgumentCaptor<Function<SscsCaseDetails, UpdateCcdCaseService.UpdateResult>> functionArgumentCaptor;
 
     @Captor
     ArgumentCaptor<CaseDataContent> caseDataContentArgumentCaptor;
@@ -212,7 +212,7 @@ public class IssueFurtherEvidenceHandlerTest {
                 captor.capture()
         );
 
-        captor.getValue().accept(caseData);
+        captor.getValue().accept(sscsCaseDetails);
 
         assertEquals("hmctsDwpState has incorrect value", "failedSendingFurtherEvidence", caseData.getHmctsDwpState());
     }
@@ -261,15 +261,15 @@ public class IssueFurtherEvidenceHandlerTest {
                 functionArgumentCaptor.capture()
         );
 
-        var updatedCaseData = SscsCaseData.builder().build();
+        var updatedCaseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build();
 
         SscsDocument otherPartySscsDocumentOtherNotIssuedWithoutResizedLink = buildSscsDocument("https://www.doclink.com/doc1");
 
-        updatedCaseData.setSscsDocument(List.of(otherPartySscsDocumentOtherNotIssuedWithoutResizedLink));
+        updatedCaseDetails.getData().setSscsDocument(List.of(otherPartySscsDocumentOtherNotIssuedWithoutResizedLink));
 
-        functionArgumentCaptor.getValue().apply(updatedCaseData);
+        functionArgumentCaptor.getValue().apply(updatedCaseDetails);
 
-        updatedCaseData.getSscsDocument().forEach(sscsDocument -> {
+        updatedCaseDetails.getData().getSscsDocument().forEach(sscsDocument -> {
             assertEquals("Yes", sscsDocument.getValue().getEvidenceIssued());
             assertNotNull(sscsDocument.getValue().getResizedDocumentLink().getDocumentUrl());
             assertNotNull(sscsDocument.getValue().getResizedDocumentLink().getDocumentBinaryUrl());
@@ -341,15 +341,15 @@ public class IssueFurtherEvidenceHandlerTest {
                 functionArgumentCaptor.capture()
         );
 
-        var updatedCaseData = SscsCaseData.builder().build();
+        var updatedCaseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build();
 
         SscsDocument otherPartySscsDocumentOtherNotIssuedWithoutResizedLink = buildSscsDocument("https://www.doclink.com/doc1");
 
-        updatedCaseData.setSscsDocument(List.of(otherPartySscsDocumentOtherNotIssuedWithoutResizedLink));
+        updatedCaseDetails.getData().setSscsDocument(List.of(otherPartySscsDocumentOtherNotIssuedWithoutResizedLink));
 
-        functionArgumentCaptor.getValue().apply(updatedCaseData);
+        functionArgumentCaptor.getValue().apply(updatedCaseDetails);
 
-        updatedCaseData.getSscsDocument().forEach(sscsDocument -> {
+        updatedCaseDetails.getData().getSscsDocument().forEach(sscsDocument -> {
             assertEquals("Yes", sscsDocument.getValue().getEvidenceIssued());
             assertNotNull(sscsDocument.getValue().getResizedDocumentLink().getDocumentUrl());
             assertNotNull(sscsDocument.getValue().getResizedDocumentLink().getDocumentBinaryUrl());
@@ -389,17 +389,17 @@ public class IssueFurtherEvidenceHandlerTest {
                 functionArgumentCaptor.capture()
         );
 
-        var updatedCaseData = SscsCaseData.builder().build();
+        var updatedCaseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build();
 
         SscsDocument otherPartySscsDocumentOtherNotIssuedWithoutResizedLink1 = buildSscsDocument("https://www.doclink.com/doc1");
 
         SscsDocument otherPartySscsDocumentOtherNotIssuedWithoutResizedLink2 = buildSscsDocument("https://www.doclink.com/doc2");
 
-        updatedCaseData.setSscsDocument(List.of(otherPartySscsDocumentOtherNotIssuedWithoutResizedLink1, otherPartySscsDocumentOtherNotIssuedWithoutResizedLink2));
+        updatedCaseDetails.getData().setSscsDocument(List.of(otherPartySscsDocumentOtherNotIssuedWithoutResizedLink1, otherPartySscsDocumentOtherNotIssuedWithoutResizedLink2));
 
-        functionArgumentCaptor.getValue().apply(updatedCaseData);
+        functionArgumentCaptor.getValue().apply(updatedCaseDetails);
 
-        updatedCaseData.getSscsDocument().forEach(sscsDocument -> {
+        updatedCaseDetails.getData().getSscsDocument().forEach(sscsDocument -> {
             assertEquals("Yes", sscsDocument.getValue().getEvidenceIssued());
             assertNotNull(sscsDocument.getValue().getResizedDocumentLink().getDocumentUrl());
             assertNotNull(sscsDocument.getValue().getResizedDocumentLink().getDocumentBinaryUrl());
@@ -461,7 +461,7 @@ public class IssueFurtherEvidenceHandlerTest {
                 functionArgumentCaptor.capture()
         );
 
-        var updatedCaseData = SscsCaseData.builder().build();
+        var updatedCaseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build();
 
         SscsDocument otherPartySscsDocumentWithoutResizedLink1 = buildSscsDocument("https://www.doclink.com/doc1");
         SscsDocument otherPartySscsDocumentWithoutResizedLink2 = buildSscsDocument("https://www.doclink.com/doc2");
@@ -470,7 +470,7 @@ public class IssueFurtherEvidenceHandlerTest {
         SscsDocument otherPartySscsDocumentWithoutResizedLink5 = buildSscsDocument("https://www.doclink.com/doc5");
         SscsDocument otherPartySscsDocumentWithoutResizedLink6 = buildSscsDocument("https://www.doclink.com/doc6");
 
-        updatedCaseData.setSscsDocument(List.of(
+        updatedCaseDetails.getData().setSscsDocument(List.of(
                 otherPartySscsDocumentWithoutResizedLink1,
                 otherPartySscsDocumentWithoutResizedLink2,
                 otherPartySscsDocumentWithoutResizedLink3,
@@ -479,9 +479,9 @@ public class IssueFurtherEvidenceHandlerTest {
                 otherPartySscsDocumentWithoutResizedLink6
         ));
 
-        functionArgumentCaptor.getValue().apply(updatedCaseData);
+        functionArgumentCaptor.getValue().apply(updatedCaseDetails);
 
-        updatedCaseData.getSscsDocument().forEach(sscsDocument -> {
+        updatedCaseDetails.getData().getSscsDocument().forEach(sscsDocument -> {
             assertEquals("Yes", sscsDocument.getValue().getEvidenceIssued());
             assertNotNull(sscsDocument.getValue().getResizedDocumentLink().getDocumentUrl());
             assertNotNull(sscsDocument.getValue().getResizedDocumentLink().getDocumentBinaryUrl());
