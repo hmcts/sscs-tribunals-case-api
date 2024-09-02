@@ -119,7 +119,7 @@ class AdjournCaseAboutToStartHandlerTest {
     }
 
     @Test
-    void givenCaseHasAdjournedFieldsPopulated_thenClearTransientFields() {
+    void givenCaseHasAdjournedFieldsPopulated_andDraftDocument_thenDoNotClearTransientFields() {
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
