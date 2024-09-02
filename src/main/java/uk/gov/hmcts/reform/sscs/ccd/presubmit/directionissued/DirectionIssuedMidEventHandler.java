@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -59,11 +58,6 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
             return errorResponse;
         }
 
-        if (caseData.getDocumentStaging().getDateAdded() != null
-                && isDateInTheFuture(caseData.getDocumentStaging().getDateAdded())) {
-            errorResponse.addError("Date added cannot be in the future");
-            return errorResponse;
-        }
 
         String templateId = documentConfiguration.getDocuments().get(caseData.getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
 

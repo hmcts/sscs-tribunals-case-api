@@ -201,22 +201,7 @@ public class DirectionIssuedMidEventHandlerTest {
         assertEquals("Direction Type cannot be empty", response.getErrors().toArray()[0]);
     }
 
-    @Test
-    public void givenDateAddedIsNotNull_ShouldReturnErrorWhenInFuture() {
-        callback.getCaseDetails().getCaseData().getDocumentStaging().setDateAdded(LocalDate.now().plusDays(1));
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getErrors().size());
-
-        assertEquals("Date added cannot be in the future", response.getErrors().toArray()[0]);
-    }
-
-    @Test
-    public void givenDateAddedIsNotNull_ShouldNotReturnErrorWhenDateIsPast() {
-        callback.getCaseDetails().getCaseData().getDocumentStaging().setDateAdded(LocalDate.now().minusDays(1));
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-        assertEquals(0, response.getErrors().size());
-    }
 
     private void verifyTemplateBody(String image, String expectedName, String templateId, boolean isLanguageWelsh) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
