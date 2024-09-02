@@ -201,8 +201,6 @@ public class DirectionIssuedMidEventHandlerTest {
         assertEquals("Direction Type cannot be empty", response.getErrors().toArray()[0]);
     }
 
-
-
     private void verifyTemplateBody(String image, String expectedName, String templateId, boolean isLanguageWelsh) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         var value = capture.getValue();
