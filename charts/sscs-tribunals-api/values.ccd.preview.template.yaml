@@ -158,7 +158,7 @@ ccd:
     adminWeb:
       enabled: ${PREVIEW_CCD_ENABLED}
     definitionImporter:
-      enabled: false
+      enabled: ${PREVIEW_CCD_ENABLED}
     userProfileImporter:
       enabled: ${PREVIEW_CCD_ENABLED}
     apiGatewayWeb:
