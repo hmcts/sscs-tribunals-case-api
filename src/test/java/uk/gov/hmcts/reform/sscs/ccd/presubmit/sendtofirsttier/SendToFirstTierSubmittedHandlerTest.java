@@ -97,7 +97,7 @@ public class SendToFirstTierSubmittedHandlerTest {
         when(callback.getEvent()).thenReturn(SEND_TO_FIRST_TIER);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(ccdCallbackMapService.handleCcdCallbackMapV2(eq(value), eq(CASE_ID)))
+        when(ccdCallbackMapService.handleCcdCallbackMapV2(value, CASE_ID))
                 .thenReturn(SscsCaseData.builder().build());
 
         PreSubmitCallbackResponse<SscsCaseData> response =
