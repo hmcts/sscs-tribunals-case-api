@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
-import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
@@ -80,16 +79,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData caseData = caseDetails.getCaseData();
-        if ((caseData.getDocumentStaging().getDateAdded() != null
-                && isDateInTheFuture(caseData.getDocumentStaging().getDateAdded()))
-                || (caseData.getSscsInterlocDirectionDocument() != null
-                && caseData.getSscsInterlocDirectionDocument().getDocumentDateAdded() != null
-                && isDateInTheFuture(caseData.getSscsInterlocDirectionDocument().getDocumentDateAdded()))
-        ) {
-            PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
-            errorResponse.addError("Date added should be today's date or in the past and cannot be in the future date");
-            return errorResponse;
-        }
 
         SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() && callback.getEvent() == EventType.DIRECTION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
         log.info("DocumentTranslationStatus is {},  for case id : {}", documentTranslationStatus, caseData.getCcdCaseId());
