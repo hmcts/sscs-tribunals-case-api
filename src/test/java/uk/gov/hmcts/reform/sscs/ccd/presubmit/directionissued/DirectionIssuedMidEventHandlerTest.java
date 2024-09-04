@@ -195,20 +195,35 @@ public class DirectionIssuedMidEventHandlerTest {
     }
 
     @Test
-    public void givenDateAddedIsNotNull_ShouldReturnErrorWhenInFuture() {
+    public void givenGeneratedDocDateAddedIsNotNull_ShouldReturnErrorWhenInFuture() {
         callback.getCaseDetails().getCaseData().getDocumentStaging().setDateAdded(LocalDate.now().plusDays(1));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
         assertEquals(1, response.getErrors().size());
-
         assertEquals("Date added should be today's date or in the past and cannot be in the future date", response.getErrors().toArray()[0]);
     }
 
     @Test
-    public void givenDateAddedIsNotNull_ShouldNotReturnErrorWhenDateIsPast() {
+    public void givenGeneratedDocDateAddedIsNotNull_ShouldNotReturnErrorWhenDateIsPast() {
         callback.getCaseDetails().getCaseData().getDocumentStaging().setDateAdded(LocalDate.now().minusDays(1));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void givenUploadedDocDateAddedIsNotNull_ShouldNotReturnErrorWhenDateIsPast() {
+        callback.getCaseDetails().getCaseData().setSscsInterlocDirectionDocument(SscsInterlocDirectionDocument
+                .builder().documentDateAdded(LocalDate.now().minusDays(1)).build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void givenUploadedDocDateAddedIsNotNull_ShouldReturnErrorWhenDateIsPast() {
+        callback.getCaseDetails().getCaseData().setSscsInterlocDirectionDocument(SscsInterlocDirectionDocument
+                .builder().documentDateAdded(LocalDate.now().plusDays(1)).build());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+        assertEquals("Date added should be today's date or in the past and cannot be in the future date", response.getErrors().toArray()[0]);
     }
 
     private void verifyTemplateBody(String image, String expectedName, String templateId, boolean isLanguageWelsh) {
