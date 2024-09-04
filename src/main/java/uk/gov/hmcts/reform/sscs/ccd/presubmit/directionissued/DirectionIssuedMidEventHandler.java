@@ -39,8 +39,7 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
         return callbackType == CallbackType.MID_EVENT
                 && callback.getEvent() == EventType.DIRECTION_ISSUED
                 && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData())
-                && isYes(callback.getCaseDetails().getCaseData().getDocumentGeneration().getGenerateNotice());
+                && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
@@ -59,16 +58,23 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
             return errorResponse;
         }
 
-        if (caseData.getDocumentStaging().getDateAdded() != null
-                && isDateInTheFuture(caseData.getDocumentStaging().getDateAdded())) {
-            errorResponse.addError("Date added cannot be in the future");
+        if ((caseData.getDocumentStaging().getDateAdded() != null
+                && isDateInTheFuture(caseData.getDocumentStaging().getDateAdded()))
+                || (caseData.getSscsInterlocDirectionDocument() != null
+                && caseData.getSscsInterlocDirectionDocument().getDocumentDateAdded() != null
+                && isDateInTheFuture(caseData.getSscsInterlocDirectionDocument().getDocumentDateAdded()))
+        ) {
+            errorResponse.addError("Date added should be today's date or in the past and cannot be in the future date");
             return errorResponse;
         }
 
-        String templateId = documentConfiguration.getDocuments().get(caseData.getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
+        if (isYes(caseData.getDocumentGeneration().getGenerateNotice())) {
+            String templateId = documentConfiguration.getDocuments().get(caseData.getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
 
-        log.info("Direction Type is {} and templateId is {}", caseData.getDirectionTypeDl().getValue(), templateId);
-        return issueDocument(callback, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
+            log.info("Direction Type is {} and templateId is {}", caseData.getDirectionTypeDl().getValue(), templateId);
+            return issueDocument(callback, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
+        }
+        return errorResponse;
     }
 
 }

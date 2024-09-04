@@ -10,7 +10,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
@@ -118,12 +117,6 @@ public class DirectionIssuedMidEventHandlerTest {
     }
 
     @Test
-    public void givenGenerateNoticeIsNo_thenReturnFalse() {
-        sscsCaseData.getDocumentGeneration().setGenerateNotice(NO);
-        assertFalse(handler.canHandle(MID_EVENT, callback));
-    }
-
-    @Test
     public void givenGenerateNoticeIsYes_thenReturnTrue() {
         assertTrue(handler.canHandle(MID_EVENT, callback));
     }
@@ -208,7 +201,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
         assertEquals(1, response.getErrors().size());
 
-        assertEquals("Date added cannot be in the future", response.getErrors().toArray()[0]);
+        assertEquals("Date added should be today's date or in the past and cannot be in the future date", response.getErrors().toArray()[0]);
     }
 
     @Test
