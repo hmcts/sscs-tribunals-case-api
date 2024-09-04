@@ -539,7 +539,7 @@ ccd:
       CCD_DEF_MYA_LINK: http://${SERVICE_NAME}/sign-in?tya=
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
-      CCD_DEF_VERSION: 6.4.14nonProd
+      CCD_DEF_VERSION: SI384nonProd
     secrets: []
     userRoles:
       - citizen
