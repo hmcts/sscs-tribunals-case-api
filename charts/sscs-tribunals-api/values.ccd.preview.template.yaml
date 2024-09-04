@@ -524,6 +524,7 @@ ccd:
     definitionFilename: sscs-ccd.xlsx
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
+      CCD_ENVIRONMENT: 'PROD'
       IMPORTER_USERNAME: ${IMPORT_USERNAME}
       IMPORTER_PASSWORD: ${IMPORT_PWD}
       CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
@@ -539,6 +540,7 @@ ccd:
       CCD_DEF_MYA_LINK: http://${SERVICE_NAME}/sign-in?tya=
       CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
       CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
+      CCD_DEF_ENV: 'PROD'
       CCD_DEF_VERSION: SI384nonProd
     secrets: []
     userRoles:
