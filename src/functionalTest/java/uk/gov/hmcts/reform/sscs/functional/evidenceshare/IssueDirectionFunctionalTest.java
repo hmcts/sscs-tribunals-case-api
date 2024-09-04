@@ -1,20 +1,44 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
+import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.equalTo;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
+import static io.restassured.RestAssured.baseURI;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.http.Header;
+import org.apache.http.HttpStatus;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
 
+    @Autowired
+    private IdamService idamService;
+    private IdamTokens idamTokens;
+    private static final String EVIDENCE_DOCUMENT_PDF = "evidence-document.pdf";
+    @Value("${test-url}")
+    protected String testUrl;
+
+
     public IssueDirectionFunctionalTest() {
         super();
+    }
+
+    @Before
+    public void setUp() {
+        baseURI = testUrl;
+        useRelaxedHTTPSValidation();
     }
 
     // Need tribunals running to pass this functional test
@@ -37,31 +61,19 @@ public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
 
     @Test
     public void processAnIssueDirectionEvent_ifPastHearingExcludedDatesAreOnCaseDetails() throws IOException {
-        SscsCaseDetails caseDetails = createDigitalCaseWithEvent(NON_COMPLIANT);
-        SscsCaseData caseData = caseDetails.getData();
+        idamTokens = idamService.getIdamTokens();
+        String json = BaseHandler.getJsonCallbackForTest("handlers/directionissued/directionIssuedAboutToSubmitCallback.json");
+        json = uploadCaseDocument(EVIDENCE_DOCUMENT_PDF, "EVIDENCE_DOCUMENT", json);
 
-        caseData.getAppeal().setHearingOptions(HearingOptions.builder()
-                        .excludeDates(List.of(
-                                ExcludeDate.builder().value(new DateRange("2024-04-03", "2024-05-04")).build()
-                        )).build());
-
-        caseData.setInterlocReviewState(REVIEW_BY_TCW);
-
-        caseData.setDirectionTypeDl(new DynamicList(EventType.APPEAL_TO_PROCEED.toString()));
-
-        updateCaseEvent(UPDATE_CASE_ONLY, caseDetails);
-
-        String json = getJson(DIRECTION_ISSUED.getCcdType());
-        json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
-        json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
-
-        simulateCcdCallback(json);
-
-        caseDetails = findCaseById(ccdCaseId);
-        caseData = caseDetails.getData();
-
-        assertEquals(caseDetails.getState(), "interlocutoryReviewState");
-        assertEquals(caseData.getInterlocReviewState(), REVIEW_BY_TCW);
-
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
+                .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
+                .body(json)
+                .post("/ccdAboutToSubmit")
+                .then()
+                .statusCode(HttpStatus.SC_OK)
+                .log().all(true)
+                .assertThat().body("data.dwpState", equalTo("directionActionRequired"));
     }
 }
