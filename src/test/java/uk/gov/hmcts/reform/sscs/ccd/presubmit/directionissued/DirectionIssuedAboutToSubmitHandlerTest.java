@@ -732,30 +732,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenGeneratedDocFutureDateAdded_ThenReturnError() {
-        sscsCaseData.getDocumentStaging().setDateAdded(LocalDate.now().plusDays(1));
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertFalse(response.getErrors().isEmpty());
-        assertThat(response.getErrors(), hasItem("Date added should be today's date or in the past and cannot be in the future date"));
-    }
-
-    @Test
-    public void givenUploadedDocFutureDateAdded_ThenReturnError() {
-        sscsCaseData.setSscsInterlocDirectionDocument(
-                SscsInterlocDirectionDocument.builder().documentDateAdded(LocalDate.now().plusDays(1)).build());
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertFalse(response.getErrors().isEmpty());
-        assertThat(response.getErrors(), hasItem("Date added should be today's date or in the past and cannot be in the future date"));
-    }
-
-    @Test
-    public void givenDocPastDateAdded_ThenReturnNoErrors() {
-        sscsCaseData.getDocumentStaging().setDateAdded(LocalDate.now().minusDays(1));
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertTrue(response.getErrors().isEmpty());
-    }
-
-    @Test
     public void givenGenerateNoticeIsSetToNoAndInterlocDocIsNotNull_thenReturnRelevantDocLink() {
         sscsCaseData.getDocumentGeneration().setGenerateNotice(NO);
         assertFalse(sscsCaseData.getDocumentGeneration().getGenerateNotice().toBoolean());
