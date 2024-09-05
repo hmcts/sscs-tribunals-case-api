@@ -193,8 +193,6 @@ ccd:
       imagePullPolicy: Always
       ingressHost: ""
       releaseNameOverride: ${SERVICE_NAME}-am-role-assignment-service
-      readinessDelay: 240
-      livenessDelay: 240
       environment:
         ROLE_ASSIGNMENT_DB_HOST: sscs-preview.postgres.database.azure.com
         ROLE_ASSIGNMENT_DB_NAME: pr-${CHANGE_ID}-role_assignment
