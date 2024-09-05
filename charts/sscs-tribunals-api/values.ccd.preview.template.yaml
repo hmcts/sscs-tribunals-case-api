@@ -58,17 +58,7 @@ java:
       secretRef: sscs-sb-preview
       key: primaryKey
   postgresql:
-    enabled: true
-    primary:
-      persistence:
-        enabled: false
-      initdb:
-        scripts:
-          init.sql: |
-            CREATE DATABASE "sscsjobscheduler" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-    auth:
-      username: "hmcts"
-      password: ${SHARED_DB_PASSWORD}
+    enabled: false
 
 idam-pr:
   releaseNameOverride: ${SERVICE_NAME}-idam-pr
@@ -234,7 +224,7 @@ ccd:
       - name: DATA_STORE_PASS
         value: ${SHARED_DB_PASSWORD}
       - name: DATA_STORE_URL
-        value: "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified"
+        value: jdbc:postgresql://sscs-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-data-store?stringtype=unspecified&sslmode=require
       - name: DATA_STORE_USER
         value: hmcts
       - name: ES_HOSTS
@@ -268,7 +258,7 @@ ccd:
       01_input.conf: |
         input  {
           jdbc {
-            jdbc_connection_string => "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified"
+            jdbc_connection_string => "jdbc:postgresql://sscs-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-data-store?stringtype=unspecified&sslmode=require"
             jdbc_user => "hmcts"
             jdbc_password => ${SHARED_DB_PASSWORD}
             jdbc_validate_connection => true
@@ -421,9 +411,7 @@ ccd:
         enabled: false
         minReplicas: 1
         maxReplicas: 1
-      enviroment:
-        USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
-        USER_PROFILE_HOST: http://${SERVICE_NAME}-ccd-user-profile-api
+      environment:
         USER_PROFILE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_definition,ccd_admin,sscs
       keyVaults: [ ]
 
@@ -588,8 +576,8 @@ sscs-tya-notif:
       AMQP_USERNAME: "RootManageSharedAccessKey"
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
-      JOB_SCHEDULER_DB_NAME: "sscsjobscheduler"
-      JOB_SCHEDULER_DB_HOST: ${SERVICE_NAME}-postgresql
+      JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscs-job-scheduler"
+      JOB_SCHEDULER_DB_HOST: {{ tpl .Values.global.postgresHostname $}}
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
       JOB_SCHEDULER_DB_USERNAME: hmcts
       JOB_SCHEDULER_DB_PASSWORD: ${SHARED_DB_PASSWORD}
@@ -764,3 +752,4 @@ postgresql:
       - name: "pr-${CHANGE_ID}-annotation"
       - name: "pr-${CHANGE_ID}-role-assignment"
       - name: "pr-${CHANGE_ID}-hmc-cft-hearing-service"
+      - name: "pr-${CHANGE_ID}-sscs-job-scheduler"
