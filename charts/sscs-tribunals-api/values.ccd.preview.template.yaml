@@ -219,12 +219,6 @@ ccd:
     persistence:
       enabled: false
     extraEnvs:
-      - name: DATA_STORE_PASS
-        value: ${SHARED_DB_PASSWORD}
-      - name: DATA_STORE_URL
-        value: jdbc:postgresql://sscs-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-data-store?stringtype=unspecified&sslmode=require
-      - name: DATA_STORE_USER
-        value: hmcts
       - name: ES_HOSTS
         value: "${SERVICE_NAME}-es-master"
     extraInitContainers: |
@@ -237,9 +231,15 @@ ccd:
     extraVolumes: |
       - name: logstash-lib
         emptyDir: {}
+      - name: database-secret-volume
+        secret:
+          secretName: postgres
     extraVolumeMounts: |
       - name: logstash-lib
         mountPath: /usr/share/logstash/ccd
+      - name: database-secret-volume
+        mountPath: /etc/logstash/secrets
+        readOnly: true
     logstashConfig:
       logstash.yml: |
         http.host: 0.0.0.0
@@ -258,7 +258,7 @@ ccd:
           jdbc {
             jdbc_connection_string => "jdbc:postgresql://sscs-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-data-store?stringtype=unspecified&sslmode=require"
             jdbc_user => "hmcts"
-            jdbc_password => ${SHARED_DB_PASSWORD}
+            jdbc_password_filepath => "/etc/logstash/secrets/PASSWORD"
             jdbc_validate_connection => true
             jdbc_validation_timeout => "1"
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
