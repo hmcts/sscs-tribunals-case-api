@@ -154,7 +154,19 @@ xui-webapp:
           - mc-idam-client-secret
           - system-user-name
           - system-user-password
-
+global:
+  ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
+  ccdAdminWebIngress: ${SERVICE_NAME}-ccd-admin-web
+  ccdDataStoreUrl: http://${SERVICE_NAME}-ccd-data-store-api
+  ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
+  ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
+  dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
+  idamApiUrl: https://idam-api.aat.platform.hmcts.net
+  idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
+  s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+  postgresHostname: "sscs-preview.postgres.database.azure.com"
+  postgresSecret: postgres
+  databaseNamePrefix: "pr-${CHANGE_ID}-"
 
 ccd:
   enabled: ${PREVIEW_CCD_ENABLED}
@@ -173,20 +185,6 @@ ccd:
       enabled: false
     elastic:
       enabled: ${PREVIEW_CCD_ENABLED}
-
-  global:
-    ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
-    ccdAdminWebIngress: ${SERVICE_NAME}-ccd-admin-web
-    ccdDataStoreUrl: http://${SERVICE_NAME}-ccd-data-store-api
-    ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
-    ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
-    dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
-    idamApiUrl: https://idam-api.aat.platform.hmcts.net
-    idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
-    s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-    postgresHostname: "sscs-preview.postgres.database.azure.com"
-    postgresSecret: postgres
-    databaseNamePrefix: "pr-${CHANGE_ID}-"
 
   am-role-assignment-service:
     java:
