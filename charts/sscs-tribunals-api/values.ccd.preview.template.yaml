@@ -577,7 +577,7 @@ sscs-tya-notif:
       TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
       SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
       JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscs-job-scheduler"
-      JOB_SCHEDULER_DB_HOST: {{ tpl .Values.global.postgresHostname $}}
+      JOB_SCHEDULER_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
       JOB_SCHEDULER_DB_USERNAME: hmcts
       JOB_SCHEDULER_DB_PASSWORD: ${SHARED_DB_PASSWORD}
