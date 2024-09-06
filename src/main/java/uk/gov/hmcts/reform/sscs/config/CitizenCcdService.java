@@ -122,6 +122,11 @@ public class CitizenCcdService {
         return updateCase(caseData, DRAFT_ARCHIVED.getCcdType(), "SSCS Archive Draft", "SSCS Archive Draft", userIdamTokens, caseId.toString());
     }
 
+    public CaseDetails archiveDraftV2(IdamTokens userIdamTokens, Long caseId, Consumer<SscsCaseData> mutator) {
+        log.info("Archiving Draft V2 for caseId {} with user roles {}", caseId, userIdamTokens.getRoles().toString());
+        return updateCaseCitizenV2(caseId.toString(), DRAFT_ARCHIVED.getCcdType(), "SSCS Archive Draft", "SSCS Archive Draft", userIdamTokens, mutator);
+    }
+
     private CaseDetails newCase(SscsCaseData caseData, String eventType, String summary, String description, IdamTokens idamTokens) {
         log.info("Creating a draft for a user.");
         CaseDetails caseDetails;

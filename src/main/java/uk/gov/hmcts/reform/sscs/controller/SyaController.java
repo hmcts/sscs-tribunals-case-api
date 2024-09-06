@@ -48,6 +48,9 @@ public class SyaController {
     private boolean isSubmitDraftAppealV2Enabled;
     @Value("${feature.submit-appeal-service-update-appeal-v2.enabled}")
     private boolean isUpdateAppealV2Enabled;
+    @Value("${feature.submit-appeal-service-archive-draft-appeal-v2.enabled}")
+    private boolean isArchiveDraftAppealV2Enabled;
+
 
     @Autowired
     SyaController(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2) {
@@ -219,7 +222,12 @@ public class SyaController {
             return ResponseEntity.noContent().build();
         }
 
-        Optional<SaveCaseResult> submitDraftResult = submitAppealService.archiveDraftAppeal(authorisation, syaCaseWrapper, ccdCaseId);
+        Optional<SaveCaseResult> submitDraftResult;
+        if (isArchiveDraftAppealV2Enabled) {
+            submitDraftResult = submitAppealServiceV2.archiveDraftAppeal(authorisation, syaCaseWrapper, ccdCaseId);
+        } else {
+            submitDraftResult = submitAppealService.archiveDraftAppeal(authorisation, syaCaseWrapper, ccdCaseId);
+        }
         return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
     }
 

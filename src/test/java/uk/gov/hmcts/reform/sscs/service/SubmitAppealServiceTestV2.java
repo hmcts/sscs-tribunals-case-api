@@ -65,4 +65,31 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
     public void verifyUpdateCaseCalledByUpdateDraftAppeal(CitizenCcdService citizenCcdService) {
         verify(citizenCcdService).updateCaseCitizenV2(any(), any(String.class), any(String.class), any(String.class), any(IdamTokens.class), any(Consumer.class));
     }
+
+    @Override
+    public Optional<SaveCaseResult> callArchiveDraftAppeal(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2, String auth2Token, SyaCaseWrapper appealData, Long caseId) {
+        return submitAppealServiceV2.archiveDraftAppeal(auth2Token, appealData, caseId);
+    }
+
+    @Override
+    public void verifyArchiveDraftAppeal(CitizenCcdService citizenCcdService) {
+        verify(citizenCcdService).archiveDraftV2(any(IdamTokens.class), any(Long.class), any(Consumer.class));
+    }
+
+    @Override
+    public void givenArchiveDraftAppealWillReturnCaseDetails(CitizenCcdService citizenCcdService, CaseDetails caseDetails) {
+        given(citizenCcdService.archiveDraftV2(any(IdamTokens.class), any(Long.class), any(Consumer.class)))
+                .willReturn(caseDetails);
+    }
+
+    @Override
+    public void givenArchiveDraftAppealWillThrow(CitizenCcdService citizenCcdService, FeignException feignException) {
+        given(citizenCcdService.archiveDraftV2(any(IdamTokens.class), any(Long.class), any(Consumer.class)))
+                .willThrow(feignException);
+    }
+
+    @Override
+    public void verifyArchiveDraft(CitizenCcdService citizenCcdService) {
+        verify(citizenCcdService).archiveDraftV2(any(IdamTokens.class), any(Long.class), any(Consumer.class));
+    }
 }
