@@ -454,12 +454,13 @@ ccd:
         DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         DATA_STORE_DB_USERNAME: hmcts
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
+        DEFINITION_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator
         IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
         IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
         IDAM_API_BASE_URL: https://idam-api.aat.platform.hmcts.net
         IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
-        CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: fpl_case_service,aac_manage_case_assignment
+        CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator
         DATA_STORE_CROSS_JURISDICTIONAL_ROLES: caseworker-caa,caseworker-approver
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
@@ -513,9 +514,6 @@ ccd:
     redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
     environment:
       CCD_ENVIRONMENT: 'PROD'
-      IMPORTER_USERNAME: ${IMPORT_USERNAME}
-      IMPORTER_PASSWORD: ${IMPORT_PWD}
-      CLIENT_SECRET: ${ADMIN_WEB_IDAM_SECRET}
       CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
       CCD_DEF_TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
       CCD_DEF_TYA_NOTIFICATIONS_API_URL: http://${SERVICE_NAME}-tya-notification
