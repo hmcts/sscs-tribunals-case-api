@@ -722,20 +722,6 @@ sscs-hearings-api:
           - name: idam-sscs-oauth2-client-secret
             alias: IDAM_OAUTH2_CLIENT_SECRET
 
-postgresql:
-  enabled: true
-  flexibleserver: sscs-preview
-  setup:
-    databases:
-      - name: "pr-${CHANGE_ID}-data-store"
-      - name: "pr-${CHANGE_ID}-definition-store"
-      - name: "pr-${CHANGE_ID}-user-profile"
-      - name: "pr-${CHANGE_ID}-role_assignment"
-      - name: "pr-${CHANGE_ID}-draftstore"
-      - name: "pr-${CHANGE_ID}-evidence"
-      - name: "pr-${CHANGE_ID}-annotation"
-      - name: "pr-${CHANGE_ID}-hmc-cft-hearing-service"
-      - name: "pr-${CHANGE_ID}-sscsjobscheduler"
 
 #Enable for queues/topics
 #If you need a subscription for a topic, topic name should be not longer than 10 characters
