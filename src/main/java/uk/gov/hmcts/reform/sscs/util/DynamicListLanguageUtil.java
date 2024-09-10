@@ -45,19 +45,6 @@ public class DynamicListLanguageUtil {
 
     @NotNull
     public DynamicListItem getLanguageDynamicListItem(Language language) {
-        String reference = language.getReference();
-        String name = language.getNameEn();
-        String dialectReference = language.getDialectReference();
-        String mrdReference = language.getMrdReference();
-
-        if (nonNull(dialectReference)) {
-            reference = String.format("%s-%s", reference, dialectReference);
-            name = language.getDialectEn();
-        }
-
-        if (nonNull(mrdReference)) {
-            reference = mrdReference;
-        }
-        return new DynamicListItem(reference, name);
+        return new DynamicListItem(language.getFullReference(), language.getName());
     }
 }
