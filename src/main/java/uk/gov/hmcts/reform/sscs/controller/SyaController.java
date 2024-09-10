@@ -44,13 +44,8 @@ public class SyaController {
 
     private final SubmitAppealService submitAppealService;
     private final SubmitAppealServiceV2 submitAppealServiceV2;
-    @Value("${feature.submit-appeal-service-submit-draft-appeal-v2.enabled}")
-    private boolean isSubmitDraftAppealV2Enabled;
-    @Value("${feature.submit-appeal-service-update-appeal-v2.enabled}")
-    private boolean isUpdateAppealV2Enabled;
-    @Value("${feature.submit-appeal-service-archive-draft-appeal-v2.enabled}")
-    private boolean isArchiveDraftAppealV2Enabled;
-
+    @Value("${feature.submit-appeal-service-v2.enabled}")
+    private boolean isSubmitAppealV2Enabled;
 
     @Autowired
     SyaController(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2) {
@@ -176,7 +171,7 @@ public class SyaController {
         log.info("createDraftAppeal {} {}", forceCreateDraft, syaCaseWrapper.getCcdCaseId());
 
         Optional<SaveCaseResult> submitDraftResult;
-        if (isSubmitDraftAppealV2Enabled) {
+        if (isSubmitAppealV2Enabled) {
             submitDraftResult = submitAppealServiceV2.submitDraftAppeal(authorisation, syaCaseWrapper, forceCreateDraft);
         } else {
             submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper, forceCreateDraft);
@@ -199,7 +194,7 @@ public class SyaController {
         }
         log.info("SyaController updateDraftAppeal {}", syaCaseWrapper.getCcdCaseId());
         Optional<SaveCaseResult> submitDraftResult;
-        if (isUpdateAppealV2Enabled) {
+        if (isSubmitAppealV2Enabled) {
             submitDraftResult = submitAppealServiceV2.updateDraftAppeal(authorisation, syaCaseWrapper);
         } else {
             submitDraftResult = submitAppealService.updateDraftAppeal(authorisation, syaCaseWrapper);
@@ -223,7 +218,7 @@ public class SyaController {
         }
 
         Optional<SaveCaseResult> submitDraftResult;
-        if (isArchiveDraftAppealV2Enabled) {
+        if (isSubmitAppealV2Enabled) {
             submitDraftResult = submitAppealServiceV2.archiveDraftAppeal(authorisation, syaCaseWrapper, ccdCaseId);
         } else {
             submitDraftResult = submitAppealService.archiveDraftAppeal(authorisation, syaCaseWrapper, ccdCaseId);

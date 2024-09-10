@@ -12,17 +12,7 @@ import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceV2;
 public class SyaControllerTestV1 extends AbstractSyaControllerTest {
 
     @Override
-    boolean v2SubmitDraftAppealIsEnable() {
-        return false;
-    }
-
-    @Override
-    boolean v2UpdateDraftAppealIsEnable() {
-        return false;
-    }
-
-    @Override
-    boolean isArchiveDraftAppealV2Enabled() {
+    boolean v2SubmitAppealIsEnable() {
         return false;
     }
 

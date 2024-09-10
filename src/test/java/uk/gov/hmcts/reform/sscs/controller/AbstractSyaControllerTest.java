@@ -93,11 +93,7 @@ public abstract class AbstractSyaControllerTest {
 
     private SyaController controller;
 
-    abstract boolean v2SubmitDraftAppealIsEnable();
-
-    abstract boolean v2UpdateDraftAppealIsEnable();
-
-    abstract boolean isArchiveDraftAppealV2Enabled();
+    abstract boolean v2SubmitAppealIsEnable();
 
     abstract void mockSubmitAppealService(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2, Long caseId, SaveCaseOperation saveCaseOperation);
 
@@ -107,9 +103,7 @@ public abstract class AbstractSyaControllerTest {
     @Before
     public void setUp() {
         controller = new SyaController(submitAppealService, submitAppealServiceV2);
-        ReflectionTestUtils.setField(controller, "isSubmitDraftAppealV2Enabled", v2SubmitDraftAppealIsEnable());
-        ReflectionTestUtils.setField(controller, "isUpdateAppealV2Enabled", v2UpdateDraftAppealIsEnable());
-        ReflectionTestUtils.setField(controller, "isArchiveDraftAppealV2Enabled", isArchiveDraftAppealV2Enabled());
+        ReflectionTestUtils.setField(controller, "isSubmitAppealV2Enabled", v2SubmitAppealIsEnable());
         mockMvc = standaloneSetup(controller).build();
     }
 
