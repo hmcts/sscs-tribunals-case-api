@@ -50,7 +50,7 @@ java:
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
     AMQP_USERNAME: "RootManageSharedAccessKey"
     HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
-    BYPASS_NOTIFICATIONS_SERVICE: true
+    BYPASS_NOTIFICATIONS_SERVICE: false
     HANDLE_CCD_CALLBACKMAP_V2: true
   secrets:
     HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
@@ -585,7 +585,7 @@ sscs-tya-notif:
       POST_HEARINGS_FEATURE: true
       POST_HEARINGS_B_FEATURE: true
       DUMMY: true
-      BYPASS_NOTIFICATIONS_SERVICE: true
+      BYPASS_NOTIFICATIONS_SERVICE: false
     secrets:
       JOB_SCHEDULER_DB_PASSWORD:
         secretRef: postgres
