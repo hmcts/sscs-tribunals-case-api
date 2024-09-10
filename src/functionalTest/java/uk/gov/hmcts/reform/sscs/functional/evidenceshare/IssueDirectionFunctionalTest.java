@@ -62,7 +62,7 @@ public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
-    public void processAnIssueDirectionEvent_ifPastHearingExcludedDatesAreOnCaseDetails() throws IOException {
+    public void processAnIssueDirectionEvent_ifPastOrFutureHearingExcludedDatesAreOnCaseDetails() throws IOException {
         idamTokens = idamService.getIdamTokens();
         String json = BaseHandler.getJsonCallbackForTest("handlers/directionissued/directionIssuedAboutToSubmitCallback.json");
         json = uploadCaseDocument(EVIDENCE_DOCUMENT_PDF, "EVIDENCE_DOCUMENT", json);
