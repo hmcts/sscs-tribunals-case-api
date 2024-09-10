@@ -586,6 +586,7 @@ sscs-tya-notif:
       POST_HEARINGS_FEATURE: true
       POST_HEARINGS_B_FEATURE: true
       DUMMY: true
+      CASE_DOCUMENT_AM_URL: http://${SERVICE_NAME}-ccd-case-document-am-api
     secrets:
       JOB_SCHEDULER_DB_PASSWORD:
         secretRef: postgres
