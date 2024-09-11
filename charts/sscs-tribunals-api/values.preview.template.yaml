@@ -36,7 +36,7 @@ java:
     JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
     HOURS_START_TIME: 0
     HOURS_END_TIME: 23
-    RUN_DB_MIGRATION_ON_STARTUP: true
+    RUN_DB_MIGRATION_ON_STARTUP: false
     TEST_RECIPIENTS_POSTCODE: "*"
     TESTING_SUPPORT_ENABLED: true
     HANDLE_CCD_CALLBACKMAP_V2: true
