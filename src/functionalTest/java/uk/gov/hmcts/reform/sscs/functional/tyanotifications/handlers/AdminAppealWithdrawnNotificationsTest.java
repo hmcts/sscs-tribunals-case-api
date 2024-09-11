@@ -11,10 +11,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import junitparams.Parameters;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.junit.rules.Timeout;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceType;
@@ -22,8 +21,7 @@ import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTe
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.Retry;
 import uk.gov.service.notify.Notification;
 
-//TODO remove/reset this value to false when bypass is enabled
-@EnabledIfSystemProperty(named = "feature.bypass-notifications-service.enabled", matches = "true")
+@Ignore("remove this when bypass is enabled")
 public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTest {
 
     public AdminAppealWithdrawnNotificationsTest() {

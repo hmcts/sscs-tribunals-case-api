@@ -7,15 +7,15 @@ import java.util.Arrays;
 import java.util.List;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.service.notify.Notification;
 
-@EnabledIfSystemProperty(named = "feature.bypass-notifications-service.enabled", matches = "true")
+@Ignore("remove this when bypass is enabled")
 public class OtherPartyFunctionalTest extends AbstractFunctionalTest {
 
     private SscsCaseData sscsCaseData;
