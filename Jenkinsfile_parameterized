@@ -7,7 +7,7 @@ properties([
     string(name: 'APP', defaultValue: 'tribunals-api', description: ''),
     string(name: 'TYPE', defaultValue: 'java', description: ''),
     string(name: 'ENVIRONMENT', defaultValue: 'saat', description: 'Environment where code should be build and deployed'),
-    choice(name: 'SUBSCRIPTION', choices: 'sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in')
+    choice(name: 'SUBSCRIPTION', choices: 'sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in'),
     string(name: 'LIB_VERSION', defaultValue: 'revert-1266-timja-patch-1', description: 'Branch name of pipeline library to use')
   ]),
   [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/tribunals-case-api'],
