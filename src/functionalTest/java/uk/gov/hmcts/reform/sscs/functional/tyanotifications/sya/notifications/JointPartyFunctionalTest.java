@@ -14,13 +14,13 @@ import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientException;
 
-@DisabledIfSystemProperty(named = "feature.bypass-notifications-service.enabled", matches = "false")
+@EnabledIfSystemProperty(named = "feature.bypass-notifications-service.enabled", matches = "true")
 public class JointPartyFunctionalTest extends AbstractFunctionalTest {
     private static final String NO_HEARING_TYPE = null;
     private static final String ORAL = "oral";

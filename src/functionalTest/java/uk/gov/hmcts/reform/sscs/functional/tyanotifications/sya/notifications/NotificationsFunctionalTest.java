@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import junitparams.Parameters;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ReasonableAdjustmentStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTe
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientException;
 
-@DisabledIfSystemProperty(named = "feature.bypass-notifications-service.enabled", matches = "false")
+@EnabledIfSystemProperty(named = "feature.bypass-notifications-service.enabled", matches = "true")
 public class NotificationsFunctionalTest extends AbstractFunctionalTest {
 
     private static final String AS_APPOINTEE_FOR = "You are receiving this update as the appointee for";
