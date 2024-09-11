@@ -9,13 +9,13 @@ import java.util.List;
 import junitparams.Parameters;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppealHearingType;
 import uk.gov.service.notify.Notification;
 
-@DisabledIfEnvironmentVariable(named = "BYPASS_NOTIFICATIONS_SERVICE", matches = "false")
+@DisabledIfSystemProperty(named = "feature.bypass-notifications-service.enabled", matches = "false")
 public class EvidenceReceivedFunctionalTest extends AbstractFunctionalTest {
 
     @Value("${notification.english.oral.evidenceReceived.appellant.emailId}")

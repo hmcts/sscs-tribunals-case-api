@@ -8,14 +8,14 @@ import java.util.List;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.junit.Test;
-import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 import uk.gov.service.notify.Notification;
 
-@DisabledIfEnvironmentVariable(named = "BYPASS_NOTIFICATIONS_SERVICE", matches = "false")
+@DisabledIfSystemProperty(named = "feature.bypass-notifications-service.enabled", matches = "false")
 public class OtherPartyFunctionalTest extends AbstractFunctionalTest {
 
     private SscsCaseData sscsCaseData;
