@@ -13,6 +13,7 @@ import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.junit.rules.Timeout;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceType;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.functional.tyanotifications.Retry;
 import uk.gov.service.notify.Notification;
 
 
+@DisabledIfEnvironmentVariable(named = "BYPASS_NOTIFICATIONS_SERVICE", matches = "false")
 public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTest {
 
     public AdminAppealWithdrawnNotificationsTest() {

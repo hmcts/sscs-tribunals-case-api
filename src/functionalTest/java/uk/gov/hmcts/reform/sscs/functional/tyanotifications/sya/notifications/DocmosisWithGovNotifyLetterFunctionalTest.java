@@ -13,6 +13,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
@@ -20,6 +21,7 @@ import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientException;
 
 @RunWith(JUnitParamsRunner.class)
+@DisabledIfEnvironmentVariable(named = "BYPASS_NOTIFICATIONS_SERVICE", matches = "false")
 public class DocmosisWithGovNotifyLetterFunctionalTest extends AbstractFunctionalTest {
 
     public static final String EXPECTED_LETTER_SUBJECT = "Pre-compiled PDF";
