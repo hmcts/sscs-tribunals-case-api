@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageService;
 
 @Slf4j
 @Component
-@ConditionalOnProperty("flags.hmc-to-hearings-api.enabled")
+@ConditionalOnProperty({"feature.bypass-hearing-api-service.enabled", "flags.hmc-to-hearings-api.enabled"})
 public class HmcHearingsEventTopicListener {
 
     private final ObjectMapper objectMapper;

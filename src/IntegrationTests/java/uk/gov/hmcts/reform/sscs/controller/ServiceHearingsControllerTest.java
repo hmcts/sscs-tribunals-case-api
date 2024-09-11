@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.List;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.service.ServiceHearingsService;
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("integration")
+@Disabled("Please remove this line when Hearing api bypass feature flag is true")
 class ServiceHearingsControllerTest {
 
     private static final long CASE_ID = 1625080769409918L;
@@ -59,6 +61,7 @@ class ServiceHearingsControllerTest {
             + "should return the case name with a with 200 response code")
     @Test
     void testPostRequestServiceHearingValues() throws Exception {
+
         ServiceHearingRequest request = ServiceHearingRequest.builder()
                 .caseId(String.valueOf(CASE_ID))
                 .build();

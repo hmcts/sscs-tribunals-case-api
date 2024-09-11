@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.service.ServiceHearingsService;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnProperty("feature.bypass-hearing-api-service.enabled")
 public class ServiceHearingsController {
 
     private final ServiceHearingsService serviceHearingsService;
@@ -49,6 +51,7 @@ public class ServiceHearingsController {
             @RequestBody ServiceHearingRequest request)
         throws GetCaseException, UpdateCaseException, ListingException, JsonProcessingException {
         try {
+            log.info("Handling request by tribunal hearing api merge code");
             log.info("Retrieving case details using Case id : {}, for use in generating Service Hearing Values",
                     request.getCaseId());
 
@@ -80,6 +83,7 @@ public class ServiceHearingsController {
             @RequestBody ServiceHearingRequest request)
         throws GetCaseException {
         try {
+            log.info("Handling request by tribunal hearing api merge code");
             log.info("Retrieving case details using Case id : {}, for use in generating Service Linked Cases",
                     request.getCaseId());
 
