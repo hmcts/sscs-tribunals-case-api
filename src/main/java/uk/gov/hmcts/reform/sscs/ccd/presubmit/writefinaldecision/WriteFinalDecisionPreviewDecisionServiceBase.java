@@ -264,12 +264,12 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
     }
 
     protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation, boolean isPostHearingsEnabled) {
-        String judgeName = null;
+        String judgeName = "Tribunal Judge ";
         String originalJudgeName = caseData.getSscsFinalDecisionCaseData().getFinalDecisionJudge();
         if (SscsUtil.isCorrectionInProgress(caseData, isPostHearingsEnabled) && !isNull(originalJudgeName)) {
-            judgeName = originalJudgeName;
+            judgeName += originalJudgeName;
         } else {
-            judgeName = buildSignedInJudgeName(userAuthorisation);
+            judgeName += buildSignedInJudgeSurname(userAuthorisation);
         }
 
         return SscsUtil.buildWriteFinalDecisionHeldBefore(caseData, judgeName);
