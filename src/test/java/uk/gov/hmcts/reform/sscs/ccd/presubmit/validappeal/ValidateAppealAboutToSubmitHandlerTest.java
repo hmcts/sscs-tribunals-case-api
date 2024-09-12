@@ -2,12 +2,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validappeal;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.google.common.collect.ImmutableList;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -33,10 +30,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AppealPostcodeHelper;
 import uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AppealValidator;
 import uk.gov.hmcts.reform.sscs.exception.CaseManagementLocationService;
-import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
+import uk.gov.hmcts.reform.sscs.helper.SscsDataHelper;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -46,8 +46,6 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -64,33 +62,33 @@ public class ValidateAppealAboutToSubmitHandlerTest {
     public static final String REGION_ID = "100";
     public static final String HEARING_TYPE_ORAL = "oral";
     public static final String NO_LITERAL = "No";
-    private ValidateAppealAboutToSubmitHandler handler;
 
-    @Mock
     private Callback<SscsCaseData> callback;
-    @Mock
-    private CallbackType callbackType;
-
-    @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-
-    @Mock
-    private ServiceRequestExecutor serviceRequestExecutor;
-
-    @Mock
-    private PreSubmitCallbackResponse<SscsCaseData> response;
-    @Mock
-    private CaseManagementLocationService caseManagementLocationService;
 
     @Mock
     private SscsCaseData bulkScanResponseData;
 
     private SscsCaseData sscsCaseData;
-
-    private ValidateAppealAboutToSubmitHandler validateAppealAboutToSubmitHandler;
+    @Mock
+    private PreSubmitCallbackResponse<SscsCaseData> response;
 
     @Mock
-    private AppealValidator caseValidator;
+    private SscsDataHelper sscsDataHelper;
+
+    @Mock
+    private IdamService idamService;
+    @Mock
+    private CcdService ccdService;
+    @Mock
+    private DwpAddressLookupService dwpAddressLookupService;
+    @Mock
+    private CaseManagementLocationService caseManagementLocationService;
+
+    private ValidateAppealAboutToSubmitHandler handler;
+
+    @Mock
+    private AppealValidator appealValidator;
     private MrnDetails defaultMrnDetails;
     @Mock
     private AppealPostcodeHelper appealPostcodeHelper;
@@ -99,13 +97,11 @@ public class ValidateAppealAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-
-        when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL);
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
-            .appeal(Appeal.builder().build())
-            .build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        CaseDetails<SscsCaseData> c = new CaseDetails<>(123L, "sscs",
+                State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now(), "Benefit");
+        callback = new Callback<>(c, Optional.empty(), EventType.VALID_APPEAL, false);
+        handler =
+                new ValidateAppealAboutToSubmitHandler(ccdService, appealValidator, appealPostcodeHelper, sscsDataHelper, idamService, dwpAddressLookupService, caseManagementLocationService, true);
     }
 
     @Test
@@ -136,7 +132,6 @@ public class ValidateAppealAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getCreatedInGapsFrom(), is(READY_TO_LIST.getId()));
-        verify(serviceRequestExecutor).post(callback, "https://sscs-bulk-scan.net/validate");
     }
 
     @Test
@@ -149,7 +144,6 @@ public class ValidateAppealAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getCreatedInGapsFrom(), is(READY_TO_LIST.getId()));
-        verify(serviceRequestExecutor).post(callback, "https://sscs-bulk-scan.net/validate");
     }
 
     @Test
@@ -161,7 +155,6 @@ public class ValidateAppealAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("PIP Newcastle", response.getData().getDwpRegionalCentre());
-        verify(serviceRequestExecutor).post(callback, "https://sscs-bulk-scan.net/validate");
     }
 
     @Test
@@ -178,22 +171,15 @@ public class ValidateAppealAboutToSubmitHandlerTest {
                 .benefitType(BenefitType.builder().code("PIP").build())
                 .build();
 
-        SscsCaseDetails caseDetails = SscsCaseDetails
-                .builder()
-                .data(SscsCaseData.builder().regionalProcessingCenter(rpc)
-                        .appeal(appeal).interlocReviewState(REVIEW_BY_TCW).formType(FormType.SSCS1PEU).build())
-                .state("ScannedRecordReceived")
-                .caseTypeId("1234")
-                .build();
+        SscsCaseData caseData = SscsCaseData.builder().regionalProcessingCenter(rpc)
+                        .appeal(appeal).interlocReviewState(REVIEW_BY_TCW).formType(FormType.SSCS1PEU).build();
 
-        CaseResponse caseValidationResponse = CaseResponse.builder().build(); // rename CaseResponse
-        when(handler.validateValidationRecord(any(), anyBoolean())).thenReturn(caseValidationResponse);
         when(appealPostcodeHelper.resolvePostcode(appeal.getAppellant())).thenReturn("CV35 2TD");
 
         when(caseManagementLocationService.retrieveCaseManagementLocation(PROCESSING_VENUE, rpc)).thenReturn(
                 Optional.of(CaseManagementLocation.builder().baseLocation("rpcEpimsId").region(REGION_ID).build()));
 
-        PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(caseDetails.getData());
+        PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(caseData);
 
         Assertions.assertThat(ccdCallbackResponse.getData()).isNotNull();
         Assertions.assertThat(ccdCallbackResponse.getErrors()).isEmpty();
@@ -237,9 +223,6 @@ public class ValidateAppealAboutToSubmitHandlerTest {
                 .state("ScannedRecordReceived")
                 .caseTypeId("1234")
                 .build();
-
-        CaseResponse caseValidationResponse = CaseResponse.builder().build();
-        when(handler.validateValidationRecord(any(), anyBoolean())).thenReturn(caseValidationResponse);
 
         PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(caseDetails.getData());
 
@@ -285,8 +268,6 @@ public class ValidateAppealAboutToSubmitHandlerTest {
                 .build();
 
         caseDetails.getData().setDirectionTypeDl(appealToProccedDynamicList);
-        CaseResponse caseValidationResponse = CaseResponse.builder().build();
-        when(handler.validateValidationRecord(any(), eq(true))).thenReturn(caseValidationResponse);
 
         PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(caseDetails.getData(), EventType.DIRECTION_ISSUED);
 
@@ -332,8 +313,6 @@ public class ValidateAppealAboutToSubmitHandlerTest {
                 .build();
 
         caseDetails.getData().setDirectionTypeDl(appealToProccedDynamicList);
-        CaseResponse caseValidationResponse = CaseResponse.builder().build();
-        when(handler.validateValidationRecord(any(), eq(true))).thenReturn(caseValidationResponse);
 
         PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(caseDetails.getData(), EventType.DIRECTION_ISSUED_WELSH);
 
@@ -377,8 +356,7 @@ public class ValidateAppealAboutToSubmitHandlerTest {
                 .caseTypeId("123")
                 .build();
 
-        CaseResponse caseValidationResponse = CaseResponse.builder().warnings(Lists.list("Mrn date is empty")).build();
-        when(handler.validateValidationRecord(any(), eq(false))).thenReturn(caseValidationResponse);
+//        CaseResponse caseValidationResponse = CaseResponse.builder().warnings(Lists.list("Mrn date is empty")).build(); ///just set MRN to empty as oppose to mocking.
 
         PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(caseDetails.getData());
 
@@ -418,10 +396,10 @@ public class ValidateAppealAboutToSubmitHandlerTest {
                 .caseTypeId("123")
                 .build();
 
-        when(handler.validateValidationRecord(any(), anyBoolean()))
-                .thenReturn(CaseResponse.builder()
-                        .errors(ImmutableList.of("NI Number is invalid"))
-                        .build());
+//        when(handler.validateValidationRecord(any(), anyBoolean()))
+//                .thenReturn(CaseResponse.builder()
+//                        .errors(ImmutableList.of("NI Number is invalid")) ///just set invalid NI NUMBER
+//                        .build());
 
         // when
         PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(caseDetails.getData());
@@ -441,10 +419,10 @@ public class ValidateAppealAboutToSubmitHandlerTest {
                 .caseTypeId("123")
                 .build();
 
-        when(handler.validateValidationRecord(any(), anyBoolean()))
-                .thenReturn(CaseResponse.builder()
-                        .warnings(ImmutableList.of("Postcode is invalid"))
-                        .build());
+//        when(handler.validateValidationRecord(any(), anyBoolean()))
+//                .thenReturn(CaseResponse.builder()
+//                        .warnings(ImmutableList.of("Postcode is invalid"))
+//                        .build());
 
         // when
         PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(caseDetails.getData());
@@ -458,34 +436,26 @@ public class ValidateAppealAboutToSubmitHandlerTest {
     @Test
     @Parameters({"", " ", "null", "Invalid"})
     public void should_return_error_for_invalid_benefitType(@Nullable String benefitType) {
-        SscsCaseDetails caseDetails = SscsCaseDetails
-                .builder()
-                .data(SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitType).build()).build()).benefitCode(benefitType).ccdCaseId("123").build())
-                .state("ScannedRecordReceived")
-                .caseTypeId("123")
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitType).build()).build())
+                .benefitCode(benefitType).ccdCaseId("123")
                 .build();
 
-        when(handler.validateValidationRecord(any(), anyBoolean()))
-                .thenReturn(CaseResponse.builder()
-                        .errors(ImmutableList.of("Benefit type is invalid"))
-                        .build());
-        // when
-        PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(caseDetails.getData());
+        PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(sscsCaseData);
 
-        // then
         Assertions.assertThat(ccdCallbackResponse.getErrors()).containsOnly("Benefit type is invalid");
         Assertions.assertThat(ccdCallbackResponse.getWarnings()).isEmpty();
     }
 
-    private PreSubmitCallbackResponse<SscsCaseData> invokeValidationCallbackHandler(SscsCaseData caseDetails) {
-        return invokeValidationCallbackHandler(caseDetails, EventType.VALID_APPEAL);
+    private PreSubmitCallbackResponse<SscsCaseData> invokeValidationCallbackHandler(SscsCaseData caseData) {
+        return invokeValidationCallbackHandler(caseData, EventType.VALID_APPEAL);
     }
 
-    private PreSubmitCallbackResponse<SscsCaseData> invokeValidationCallbackHandler(SscsCaseData caseDetails, EventType eventType) {
-        uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails<SscsCaseData> c = new uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails<>(123L, "sscs",
-                State.INTERLOCUTORY_REVIEW_STATE, caseDetails, LocalDateTime.now(), "Benefit");
+    private PreSubmitCallbackResponse<SscsCaseData> invokeValidationCallbackHandler(SscsCaseData caseData, EventType eventType) {
+        CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
+                State.INTERLOCUTORY_REVIEW_STATE, caseData, LocalDateTime.now(), "Benefit");
 
-        return validateAppealAboutToSubmitHandler.handle(callbackType,
-                new Callback<>(c, Optional.empty(), eventType, false), USER_AUTHORISATION);
+        return handler.handle(ABOUT_TO_SUBMIT,
+                new Callback<>(caseDetails, Optional.empty(), eventType, false), USER_AUTHORISATION);
     }
 }

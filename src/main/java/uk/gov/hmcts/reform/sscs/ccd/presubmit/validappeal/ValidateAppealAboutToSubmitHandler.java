@@ -5,7 +5,7 @@ import static java.util.Objects.requireNonNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.*;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.VALIDATION_CALLBACK;
+
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 
@@ -14,60 +14,59 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+
 import static uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AppealValidator.IS_NOT_A_VALID_POSTCODE;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.*;
 
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+
 import uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AppealPostcodeHelper;
+import uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AppealValidator;
 import uk.gov.hmcts.reform.sscs.exception.CaseManagementLocationService;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AppealValidator;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseResponse;
+
 import uk.gov.hmcts.reform.sscs.helper.SscsDataHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
-import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
-import javax.validation.ConstraintValidatorContext;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 public class ValidateAppealAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final ServiceRequestExecutor serviceRequestExecutor;
     private final AppealValidator appealValidator;
     private final SscsDataHelper sscsDataHelper;
     private final IdamService idamService;
     private final CcdService ccdService;
     private final DwpAddressLookupService dwpAddressLookupService;
-    private AppealPostcodeHelper appealPostcodeHelper;
+    private final AppealPostcodeHelper appealPostcodeHelper;
     private final CaseManagementLocationService caseManagementLocationService;
     private final boolean caseAccessManagementFeature;
-    private static ConstraintValidatorContext context;
-    private CallbackType callbackType;
-    List<String> warnings;
-    List<String> errors;
     private static final String LOGSTR_VALIDATION_ERRORS = "Errors found while validating exception record id {} - {}";
     private static final String LOGSTR_VALIDATION_WARNING = "Warnings found while validating exception record id {} - {}";
 
     public ValidateAppealAboutToSubmitHandler(CcdService ccdService,
-                                              ServiceRequestExecutor serviceRequestExecutor,
                                               AppealValidator appealValidator,
+                                              AppealPostcodeHelper appealPostcodeHelper,
                                               SscsDataHelper sscsDataHelper,
                                               IdamService idamService,
                                               DwpAddressLookupService dwpAddressLookupService,
                                               CaseManagementLocationService caseManagementLocationService,
-                                              @Value("${feature.case-access-management.enabled}") boolean caseAccessManagementFeature) {
+                                              @Value("${feature.case-access-management.enabled}") boolean caseAccessManagementFeature) { ////check if feature toggle exists, if does remove.
         this.ccdService = ccdService;
-        this.serviceRequestExecutor = serviceRequestExecutor;
+        this.appealPostcodeHelper = appealPostcodeHelper;
         this.appealValidator = appealValidator;
         this.sscsDataHelper = sscsDataHelper;
         this.idamService = idamService;
@@ -195,15 +194,12 @@ public class ValidateAppealAboutToSubmitHandler extends ResponseEventsAboutToSub
     }
 
     public CaseResponse validateValidationRecord(Map<String, Object> caseData, boolean ignoreMrnValidation) {
-        warnings = new ArrayList<>();
-        errors = new ArrayList<>();
-        callbackType = VALIDATION_CALLBACK;
-
-        appealValidator.validateAppeal(new HashMap<>(), caseData, ignoreMrnValidation, false, false);
+        Map<String, List<String>> errsWarns =
+                appealValidator.validateAppeal(new HashMap<>(), caseData, ignoreMrnValidation, false, false);
 
         return CaseResponse.builder()
-                .errors(errors)
-                .warnings(warnings)
+                .errors(errsWarns.get("errors"))
+                .warnings(errsWarns.get("warnings"))
                 .transformedCase(caseData)
                 .build();
     }
