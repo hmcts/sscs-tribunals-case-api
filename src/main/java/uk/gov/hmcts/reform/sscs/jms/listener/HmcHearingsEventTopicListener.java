@@ -51,6 +51,8 @@ public class HmcHearingsEventTopicListener {
     )
     public void onMessage(JmsBytesMessage message) throws JMSException, HmcEventProcessingException {
 
+        log.info("Handling request by tribunal hearing api merge code");
+
         if (isDeploymentFilterEnabled && !isMessageReleventForDeployment(message)) {
             return;
         }

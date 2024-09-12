@@ -35,6 +35,8 @@ public class TribunalsHearingsEventQueueListener {
             containerFactory = "tribunalsHearingsEventQueueContainerFactory"
     )
     public void handleIncomingMessage(HearingRequest message) throws TribunalsEventProcessingException, GetCaseException, UpdateCaseException {
+        log.info("Handling request by tribunal hearing api merge code");
+
         if (isNull(message)) {
             throw new TribunalsEventProcessingException("An exception occurred as message did not match format");
         }
