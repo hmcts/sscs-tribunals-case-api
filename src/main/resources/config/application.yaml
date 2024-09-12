@@ -2,7 +2,7 @@ server:
     error:
         whitelabel:
             enabled: false
-    port: ${PORT:8080}
+    port: ${PORT:8008}
 spring:
     application:
         name: TribunalsCaseApi
@@ -213,7 +213,7 @@ documents:
     welsh:
         CORRECTION_GRANTED: TB-SCS-GNO-ENG-corrected-decision-notice.docx
         DECISION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice.docx
-        DIRECTION_ISSUED: TB-SCS-GNO-ENG-draft-decision-notice.docx
+        DIRECTION_ISSUED: TB-SCS-GNO-ENG-directions-notice.docx
         ISSUE_FINAL_DECISION: TB-SCS-GNO-ENG-final-decision-notice.docx
         SOR_WRITE: TB-SCS-GNO-ENG-sor-directions-notice.docx
 dwp:
