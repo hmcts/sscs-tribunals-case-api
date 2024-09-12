@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 import java.util.Comparator;
 import java.util.List;
