@@ -60,8 +60,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
     public static SscsCaseData convertSyaToCcdCaseDataV2(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled, SscsCaseData sscsCaseData) {
         SscsCaseData.SscsCaseDataBuilder builder = sscsCaseData.toBuilder();
-        SscsCaseData sscsCaseData1 = convertSyaToCcdCaseDataGeneric(syaCaseWrapper, caseAccessManagementEnabled, builder);
-        log.info("convertSyaToCcdCaseDataGeneric case data {}", sscsCaseData1);
         return convertSyaToCcdCaseDataGeneric(syaCaseWrapper, caseAccessManagementEnabled, builder);
     }
 
@@ -102,7 +100,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             caseAccessManagementFields.setCategories(benefit);
             caseAccessManagementFields.setOgdType(benefit.getSscsType().equals(SscsType.SSCS5) ? "HMRC" : "DWP");
 
-            return builder
+            SscsCaseData sscsCaseData = builder
                     .caseAccessManagementFields(caseAccessManagementFields)
                     .caseCreated(LocalDate.now().toString())
                     .isSaveAndReturn(syaCaseWrapper.getIsSaveAndReturn())
@@ -122,6 +120,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                             && syaCaseWrapper.getLanguagePreferenceWelsh()))
                     .ccdCaseId(ccdCaseId)
                     .build();
+            log.info("case data object builder {}", System.identityHashCode(sscsCaseData));
+            return sscsCaseData;
         } else {
             return builder
                     .caseCreated(LocalDate.now().toString())
