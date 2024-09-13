@@ -48,7 +48,7 @@ java:
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
     AMQP_USERNAME: "RootManageSharedAccessKey"
     HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
-    SUBMIT_APPEAL_SERVICE_V2_ENABLED: false
+    SUBMIT_APPEAL_SERVICE_V2_ENABLED: true
     HANDLE_CCD_CALLBACKMAP_V2: true
     CASE_DOCUMENT_AM_URL: http://${SERVICE_NAME}-ccd-case-document-am-api
   secrets:
