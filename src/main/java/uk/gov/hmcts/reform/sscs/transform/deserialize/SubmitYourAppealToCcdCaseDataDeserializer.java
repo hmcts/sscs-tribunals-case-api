@@ -60,7 +60,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
     public static SscsCaseData convertSyaToCcdCaseDataV2(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled, SscsCaseData sscsCaseData) {
         SscsCaseData.SscsCaseDataBuilder builder = sscsCaseData.toBuilder();
-        return convertSyaToCcdCaseDataGeneric(syaCaseWrapper, caseAccessManagementEnabled, builder);
+        SscsCaseData sscsCaseData1 = convertSyaToCcdCaseDataGeneric(syaCaseWrapper, caseAccessManagementEnabled, builder);
+        log.info("to builder object {}", sscsCaseData1);
+        return sscsCaseData1;
     }
 
     public static SscsCaseData convertSyaToCcdCaseDataGeneric(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled, SscsCaseData.SscsCaseDataBuilder builder) {

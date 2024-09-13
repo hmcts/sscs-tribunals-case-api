@@ -163,6 +163,7 @@ public class CitizenCcdService {
         data.sortCollections();
 
         var result = mutator.apply(data);
+        log.info("db object id {} " , data);
         CaseDataContent caseDataContent = sscsCcdConvertService.getCaseDataContent(data, startEventResponse, result.summary, result.description);
 
         return citizenCcdClient.submitEventForCitizen(idamTokens, caseId, caseDataContent);
