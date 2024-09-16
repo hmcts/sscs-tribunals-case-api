@@ -78,7 +78,7 @@ public abstract class AbstractFunctionalTest {
     String ccdCaseId;
 
     private final String tcaInstance = System.getenv("TEST_URL");
-    private final String localInstance = "http://localhost:8091";
+    private final String localInstance = "http://localhost:8008";
 
     SscsCaseDetails createNonDigitalCaseWithEvent(EventType eventType) {
         return createCaseWithState(eventType, "PIP", "Personal Independence Payment", State.VALID_APPEAL.getId());
@@ -188,7 +188,7 @@ public abstract class AbstractFunctionalTest {
         updateCaseEvent(UPLOAD_DOCUMENT, caseDetails);
     }
 
-    private String uploadCaseDocument(String name, String type, String json) throws IOException {
+    protected String uploadCaseDocument(String name, String type, String json) throws IOException {
         UploadResponse upload = uploadDocToDocMgmtStore(name);
 
         String location = upload.getDocuments().get(0).links.self.href;
