@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import feign.FeignException;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 import junitparams.JUnitParamsRunner;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -46,13 +47,13 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
 
     @Override
     public void givenUpdateCaseWillReturnCaseDetails(CitizenCcdService citizenCcdService, CaseDetails caseDetails) {
-        given(citizenCcdService.updateCaseCitizenV2(any(String.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class), any(Consumer.class)))
+        given(citizenCcdService.updateCaseCitizenV2(any(String.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class), any(UnaryOperator.class)))
                 .willReturn(caseDetails);
     }
 
     @Override
     public void givenUpdateCaseWillThrowException(CitizenCcdService citizenCcdService, FeignException feignException) {
-        given(citizenCcdService.updateCaseCitizenV2(any(), any(String.class), any(String.class), any(String.class), any(IdamTokens.class), any(Consumer.class)))
+        given(citizenCcdService.updateCaseCitizenV2(any(), any(String.class), any(String.class), any(String.class), any(IdamTokens.class), any(UnaryOperator.class)))
                 .willThrow(feignException);
     }
 
@@ -63,7 +64,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
 
     @Override
     public void verifyUpdateCaseCalledByUpdateDraftAppeal(CitizenCcdService citizenCcdService) {
-        verify(citizenCcdService).updateCaseCitizenV2(any(), any(String.class), any(String.class), any(String.class), any(IdamTokens.class), any(Consumer.class));
+        verify(citizenCcdService).updateCaseCitizenV2(any(), any(String.class), any(String.class), any(String.class), any(IdamTokens.class), any(UnaryOperator.class));
     }
 
     @Override

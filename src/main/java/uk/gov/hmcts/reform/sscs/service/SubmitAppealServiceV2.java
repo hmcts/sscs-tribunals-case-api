@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToC
 import feign.FeignException;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.HttpStatus;
@@ -97,10 +98,9 @@ public class SubmitAppealServiceV2 {
         }
 
         try {
-            Consumer<SscsCaseData> mutator = caseData -> convertSyaToCcdCaseDataV2(syaCaseWrapper, caseAccessManagementFeature, caseData);
-
+            UnaryOperator<SscsCaseData> newCaseData = caseData -> convertSyaToCcdCaseDataV2(syaCaseWrapper, caseAccessManagementFeature, caseData);
             CaseDetails caseDetails = citizenCcdService.updateCaseCitizenV2(syaCaseWrapper.getCcdCaseId(), EventType.UPDATE_DRAFT.getCcdType(),
-                    "Update draft", "Update draft in CCD", idamTokens, mutator);
+                    "Update draft", "Update draft in CCD", idamTokens, newCaseData);
 
             return Optional.of(SaveCaseResult.builder()
                     .caseDetailsId(caseDetails.getId())

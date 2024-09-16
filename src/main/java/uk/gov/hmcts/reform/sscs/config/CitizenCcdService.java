@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_ARCHIVED;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -138,10 +139,10 @@ public class CitizenCcdService {
 
     @Retryable
     public CaseDetails triggerCaseEventV2(String caseId, String eventType, String summary, String description, IdamTokens idamTokens) {
-        return updateCaseCitizenV2(caseId, eventType, idamTokens, data -> new UpdateResult(summary, description));
+        return updateCaseCitizenV2(caseId, eventType, idamTokens, data -> new UpdateResult(data, summary, description));
     }
 
-    public record UpdateResult(String summary, String description) { }
+    public record UpdateResult(SscsCaseData sscsCaseData, String summary, String description) { }
 
     /**
      * Update a case while making correct use of CCD's optimistic locking.
@@ -164,7 +165,8 @@ public class CitizenCcdService {
 
         var result = mutator.apply(data);
         log.info("case data object db id {}", System.identityHashCode(data));
-        CaseDataContent caseDataContent = sscsCcdConvertService.getCaseDataContent(data, startEventResponse, result.summary, result.description);
+        log.info("case data when submit event is invoked {}", System.identityHashCode(result.sscsCaseData));
+        CaseDataContent caseDataContent = sscsCcdConvertService.getCaseDataContent(result.sscsCaseData, startEventResponse, result.summary, result.description);
 
         return citizenCcdClient.submitEventForCitizen(idamTokens, caseId, caseDataContent);
     }
@@ -173,7 +175,15 @@ public class CitizenCcdService {
     public CaseDetails updateCaseCitizenV2(String caseId, String eventType, String summary, String description, IdamTokens idamTokens, Consumer<SscsCaseData> mutator) {
         return updateCaseCitizenV2(caseId, eventType, idamTokens, data -> {
             mutator.accept(data);
-            return new UpdateResult(summary, description);
+            return new UpdateResult(data, summary, description);
+        });
+    }
+
+    @Retryable
+    public CaseDetails updateCaseCitizenV2(String caseId, String eventType, String summary, String description, IdamTokens idamTokens, UnaryOperator<SscsCaseData> newCaseData) {
+        return updateCaseCitizenV2(caseId, eventType, idamTokens, data -> {
+            SscsCaseData sscsCaseData = newCaseData.apply(data);
+            return new UpdateResult(sscsCaseData, summary, description);
         });
     }
 
