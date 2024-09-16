@@ -542,24 +542,21 @@ tasks.register('generateXls', Exec) {
     workingDir project.file('../sscs-ccd-definitions').path
 }
 
-task loadEnvSecrets() {
-    if (!project.file('./.aat-env').exists()) {
-        new ByteArrayOutputStream().withStream { os ->
-            exec {
-                commandLine 'az', 'keyvault', 'secret', 'show', '--vault-name', 'sscs-aat', '-o', 'tsv', '--query', 'value', '--name', 'sscs-tribunals-case-api-dot-env'
-                standardOutput = os
-            }
-            project.file('./.aat-env').write(new String(os.toString().replace('\n', '').decodeBase64(), java.nio.charset.StandardCharsets.UTF_8))
-        }
-    }
-}
-
 bootWithCCD {
     dependsOn generateXls
-    dependsOn loadEnvSecrets
     authMode = uk.gov.hmcts.rse.AuthMode.Local
 
     doFirst() {
+        if (!project.file('./.aat-env').exists()) {
+            new ByteArrayOutputStream().withStream { os ->
+                exec {
+                    commandLine 'az', 'keyvault', 'secret', 'show', '--vault-name', 'sscs-aat', '-o', 'tsv', '--query', 'value', '--name', 'sscs-tribunals-case-api-dot-env'
+                    standardOutput = os
+                }
+                project.file('./.aat-env').write(new String(os.toString().replace('\n', '').decodeBase64(), java.nio.charset.StandardCharsets.UTF_8))
+            }
+        }
+
         project.file('./.aat-env').readLines().each() {
             def index = it.indexOf("=")
             def key = it.substring(0, index)
