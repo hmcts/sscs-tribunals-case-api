@@ -100,7 +100,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             caseAccessManagementFields.setCategories(benefit);
             caseAccessManagementFields.setOgdType(benefit.getSscsType().equals(SscsType.SSCS5) ? "HMRC" : "DWP");
 
-            SscsCaseData sscsCaseData = builder
+            return builder
                     .caseAccessManagementFields(caseAccessManagementFields)
                     .caseCreated(LocalDate.now().toString())
                     .isSaveAndReturn(syaCaseWrapper.getIsSaveAndReturn())
@@ -120,8 +120,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                             && syaCaseWrapper.getLanguagePreferenceWelsh()))
                     .ccdCaseId(ccdCaseId)
                     .build();
-            log.info("case data object builder {}", System.identityHashCode(sscsCaseData));
-            return sscsCaseData;
         } else {
             return builder
                     .caseCreated(LocalDate.now().toString())

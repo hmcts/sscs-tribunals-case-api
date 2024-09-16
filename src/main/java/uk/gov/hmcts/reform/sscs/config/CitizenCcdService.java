@@ -150,7 +150,7 @@ public class CitizenCcdService {
      * the current version of case data from CCD's start event.
      */
     @Retryable
-    public CaseDetails updateCaseCitizenV2(String caseId, String eventType, IdamTokens idamTokens, Function<SscsCaseData, UpdateResult> mutator) {
+    public CaseDetails updateCaseCitizenV2(String caseId, String eventType, IdamTokens idamTokens, Function<SscsCaseData, UpdateResult> newCaseData) {
         log.info("Updating a draft with caseId {} and eventType {}, using updateCaseCitizenV2 method for citizen", caseId, eventType);
         StartEventResponse startEventResponse = citizenCcdClient.startEventForCitizen(idamTokens, caseId, eventType);
         var data = sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData());
@@ -163,9 +163,7 @@ public class CitizenCcdService {
         data.setCcdCaseId(caseId);
         data.sortCollections();
 
-        var result = mutator.apply(data);
-        log.info("case data object db id {}", System.identityHashCode(data));
-        log.info("case data when submit event is invoked {}", System.identityHashCode(result.sscsCaseData));
+        var result = newCaseData.apply(data);
         CaseDataContent caseDataContent = sscsCcdConvertService.getCaseDataContent(result.sscsCaseData, startEventResponse, result.summary, result.description);
 
         return citizenCcdClient.submitEventForCitizen(idamTokens, caseId, caseDataContent);
