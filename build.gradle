@@ -403,6 +403,7 @@ dependencies {
         exclude group: 'org.apache.poi', module: 'poi-ooxml'
         exclude group: 'org.apache.poi', module: 'poi'
         exclude group: 'com.launchdarkly', module: 'launchdarkly-java-server-sdk'
+        exclude group: 'org.codehaus.groovy', module: 'groovy-xml'
     }
 
 
