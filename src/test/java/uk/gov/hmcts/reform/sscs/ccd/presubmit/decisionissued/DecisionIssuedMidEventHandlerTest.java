@@ -206,7 +206,7 @@ public class DecisionIssuedMidEventHandlerTest {
     }
 
     @Test
-    public void willSetSignedByUserRoleandSurname(){
+    public void willSetSignedByUserRoleandSurname() {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(response.getData().getDocumentGeneration().getSignedRole(), "Tribunal Judge");
         assertEquals(response.getData().getDocumentGeneration().getSignedBy(), USER_SURNAME);
