@@ -40,3 +40,5 @@ lib/applicationinsights.log
 definitions/**/*.xlsx
 definitions/**/*.xlsx#
 
+# aat env file
+.aat-env
