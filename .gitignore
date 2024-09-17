@@ -35,3 +35,8 @@ build
 # Application insight
 lib/applicationinsights-agent-*.jar
 lib/applicationinsights.log
+
+# definitions
+definitions/**/*.xlsx
+definitions/**/*.xlsx#
+

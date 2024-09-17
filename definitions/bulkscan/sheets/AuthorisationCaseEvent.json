@@ -1,0 +1,17 @@
+[
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseEventID": "createException", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseEventID": "rejectRecord", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseEventID": "createNewCase", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseEventID": "updateManually", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "02/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseEventID": "attachToExistingCase", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseEventID": "createException", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseEventID": "rejectRecord", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseEventID": "createNewCase", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseEventID": "updateManually", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "02/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseEventID": "attachToExistingCase", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseEventID": "createException", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseEventID": "rejectRecord", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseEventID": "createNewCase", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseEventID": "updateManually", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"},
+  {"LiveFrom": "02/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseEventID": "attachToExistingCase", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"}
+]

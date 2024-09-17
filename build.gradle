@@ -535,14 +535,11 @@ run {
 
 
 tasks.register('generateXls', Exec) {
-    commandLine project.file('../sscs-ccd-definitions/bin/create-xlsx.sh').path, 'benefit', 'dev', 'local'
-    inputs.dir project.file('../sscs-ccd-definitions/benefit')
-    outputs.dir project.file('../sscs-ccd-definitions/releases')
-    environment "TRIBUNALS_API_URL", "http://localhost:8008"
-    workingDir project.file('../sscs-ccd-definitions').path
+    commandLine project.file('./bin/create-xlsx.sh').path, 'benefit', 'dev', 'local'
 }
 
 bootWithCCD {
+    group 'application'
     dependsOn generateXls
     authMode = uk.gov.hmcts.rse.AuthMode.Local
 

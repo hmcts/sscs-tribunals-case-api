@@ -1,0 +1,81 @@
+[
+  {
+    "LiveFrom": "01/01/2018",
+    "CaseTypeID": "SSCS_ExceptionRecord",
+    "ID": "createException",
+    "Name": "Create an exception record",
+    "Description": "Create an exception record",
+    "DisplayOrder": 1,
+    "PostConditionState": "ScannedRecordReceived",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "Y"
+  },
+  {
+    "LiveFrom": "01/01/2018",
+    "CaseTypeID": "SSCS_ExceptionRecord",
+    "ID": "attachToExistingCase",
+    "Name": "Attach record to existing case",
+    "Description": "Attach record to existing case",
+    "DisplayOrder": 2,
+    "PreConditionState(s)": "ScannedRecordReceived",
+    "PostConditionState": "ScannedRecordAttachedToCase",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_BULK_SCAN_ORCHESTRATOR_URL}/callback/attach_case",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "Y",
+    "CanSaveDraft": "N"
+  },
+  {
+    "LiveFrom": "01/01/2018",
+    "CaseTypeID": "SSCS_ExceptionRecord",
+    "ID": "createNewCase",
+    "Name": "Create new case from exception",
+    "Description": "Create a new case from exception",
+    "DisplayOrder": 3,
+    "PreConditionState(s)": "ScannedRecordReceived",
+    "PostConditionState": "ScannedRecordCaseCreated",
+    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_BULK_SCAN_ORCHESTRATOR_URL}/callback/create-new-case",
+    "RetriesTimeoutURLAboutToSubmitEvent": 30,
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "Y",
+    "CanSaveDraft": "N"
+  },
+  {
+    "LiveFrom": "01/01/2018",
+    "CaseTypeID": "SSCS_ExceptionRecord",
+    "ID": "rejectRecord",
+    "Name": "Reject record",
+    "Description": "Reject record",
+    "DisplayOrder": 4,
+    "PreConditionState(s)": "ScannedRecordReceived",
+    "PostConditionState": "ScannedRecordRejected",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "Y",
+    "CanSaveDraft": "N"
+  },
+  {
+    "LiveFrom": "01/01/2019",
+    "CaseTypeID": "SSCS_ExceptionRecord",
+    "ID": "updateManually",
+    "Name": "Manually handle record",
+    "Description": "Manually handle record",
+    "DisplayOrder": 5,
+    "PreConditionState(s)": "ScannedRecordReceived",
+    "PostConditionState": "ScannedRecordManuallyHandled",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "Y",
+    "CanSaveDraft": "N"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "CaseTypeID": "SSCS_ExceptionRecord",
+    "ID": "completeAwaitingPaymentDCNProcessing",
+    "Name": "Complete DCN processing",
+    "Description": "Complete the processing of payment document control numbers",
+    "DisplayOrder": 6,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "Y",
+    "CanSaveDraft": "N"
+  }
+]

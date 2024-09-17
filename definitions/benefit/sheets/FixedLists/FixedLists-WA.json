@@ -1,0 +1,7 @@
+[
+  {"LiveFrom": "22/05/2023", "ID": "FL_workType", "ListElementCode": "preHearingWork", "ListElement": "Pre Hearing Work"},
+  {"LiveFrom": "22/05/2023", "ID": "FL_workType", "ListElementCode": "postHearingWork", "ListElement": "Post Hearing Work"},
+  {"LiveFrom": "25/10/2023", "ID": "documentTypeWelsh", "ListElementCode": "postponementRequest", "ListElement": "Postponement request"},
+  {"LiveFrom": "01/01/2018", "ID": "FL_interlocReferralReason", "ListElementCode": "reviewReinstatementRequest", "ListElement": "Review reinstatement request"},
+  {"LiveFrom": "01/01/2018", "ID": "FL_interlocReferralReason", "ListElementCode": "reviewConfidentialityRequest", "ListElement": "Review confidentiality request"}
+]
