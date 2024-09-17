@@ -73,8 +73,8 @@ public class DecisionIssuedIt extends AbstractEventIt {
         verify(generateFile).assemble(capture.capture());
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         assertEquals("Hello, you have been instructed to provide further information. Please do so at your earliest convenience.", payload.getNoticeBody());
-        assertEquals("Maple Magoo", payload.getUserName());
-        assertEquals("Proxy Judge", payload.getUserRole());
+        assertEquals("Magoo", payload.getUserName());
+        assertEquals("Tribunal Judge", payload.getUserRole());
     }
 
     @Test
