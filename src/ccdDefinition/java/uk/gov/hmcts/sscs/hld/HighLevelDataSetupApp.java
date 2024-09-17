@@ -1,19 +1,17 @@
 package uk.gov.hmcts.sscs.hld;
 
+import java.util.List;
+import java.util.Locale;
+import javax.crypto.AEADBadTagException;
+import javax.net.ssl.SSLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import uk.gov.hmcts.befta.BeftaMain;
 import uk.gov.hmcts.befta.dse.ccd.CcdEnvironment;
 import uk.gov.hmcts.befta.dse.ccd.CcdRoleConfig;
 import uk.gov.hmcts.befta.dse.ccd.DataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.exception.ImportException;
 import uk.gov.hmcts.befta.util.BeftaUtils;
-
-import javax.crypto.AEADBadTagException;
-import javax.net.ssl.SSLException;
-import java.util.List;
-import java.util.Locale;
 
 public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
@@ -86,8 +84,8 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     }
 
     @Override
-    protected boolean shouldTolerateDataSetupFailure(){
-        if(BeftaMain.getConfig().getDefinitionStoreUrl().contains(".preview.")){
+    protected boolean shouldTolerateDataSetupFailure() {
+        if (BeftaMain.getConfig().getDefinitionStoreUrl().contains(".preview.")) {
             return true;
         }
         return false;
@@ -100,10 +98,10 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
             ImportException importException = (ImportException) e;
             return importException.getHttpStatusCode() == httpStatusCode504;
         }
-        if(e instanceof SSLException){
+        if (e instanceof SSLException) {
             return true;
         }
-        if(e instanceof AEADBadTagException){
+        if (e instanceof AEADBadTagException) {
             return true;
         }
         return shouldTolerateDataSetupFailure();
