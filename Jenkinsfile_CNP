@@ -135,10 +135,6 @@ withPipeline(type, product, component) {
     disableLegacyDeployment()
     syncBranchesWithMaster(branchesToSync)
 
-    afterAlways('checkout') {
-        generateDefinitions()
-    }
-
     afterSuccess('akschartsinstall'){
         // Vars needed for AKS testing
         env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
@@ -170,6 +166,7 @@ withPipeline(type, product, component) {
             }
         }
         println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}. - The branch name is ${env.BRANCH_NAME}""".stripIndent()
+        generateDefinitions()
     }
 
     env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'

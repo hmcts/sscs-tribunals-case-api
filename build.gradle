@@ -85,14 +85,6 @@ sourceSets {
         }
         resources.srcDir file('src/contractTest/resources')
     }
-    ccdDefinition {
-        java {
-            compileClasspath += main.output
-            runtimeClasspath += main.output
-            srcDir file('src/ccdDefinition/java')
-        }
-        resources.srcDir file('src/ccdDefinition/resources')
-    }
 }
 
 dependencies {
@@ -405,6 +397,7 @@ dependencies {
     // Remove this dependency once the secure doc-store is in use
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
+    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.0.2'
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.13.0'
 
@@ -463,9 +456,6 @@ dependencies {
 
     cftlibImplementation group: 'org.springframework.boot', name: 'spring-boot-devtools'
     cftlibAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
-
-    ccdDefinitionImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.0.2'
-    ccdDefinitionImplementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.9'
 
 }
 
@@ -599,7 +589,7 @@ bootWithCCD {
 }
 
 task highLevelDataSetup(type: JavaExec) {
-    mainClass = "uk.gov.hmcts.sscs.hld.HighLevelDataSetupApp"
+    mainClass = "uk.gov.hmcts.reform.sscs.config.HighLevelDataSetupApp"
     classpath += sourceSets.main.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }

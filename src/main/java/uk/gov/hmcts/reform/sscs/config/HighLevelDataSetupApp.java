@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.hld;
+package uk.gov.hmcts.reform.sscs.config;
 
 import java.util.List;
 import java.util.Locale;
@@ -49,7 +49,7 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     }
 
     public static void main(String[] args) throws Throwable {
-        main(HighLevelDataSetupApp.class, args);
+        DataLoaderToDefinitionStore.main(HighLevelDataSetupApp.class, args);
     }
 
     @Override
