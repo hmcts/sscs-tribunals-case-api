@@ -68,6 +68,11 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker-sscs",
             "caseworker-sscs-hmrcresponsewriter"
         );
+        lib.createIdamUser("ibcauser@example.com",
+                "caseworker",
+                "caseworker-sscs",
+                "caseworker-sscs-ibcaresponsewriter"
+        );
         lib.createIdamUser("ctsc-administrator@hmcts.net",
             "caseworker",
             "caseworker-sscs"
