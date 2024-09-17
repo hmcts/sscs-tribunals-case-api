@@ -85,6 +85,14 @@ sourceSets {
         }
         resources.srcDir file('src/contractTest/resources')
     }
+    ccdDefinition {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+            srcDir file('src/ccdDefinition/java')
+        }
+        resources.srcDir file('src/ccdDefinition/resources')
+    }
 }
 
 dependencies {
@@ -456,6 +464,9 @@ dependencies {
     cftlibImplementation group: 'org.springframework.boot', name: 'spring-boot-devtools'
     cftlibAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
 
+    ccdDefinitionImplementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.0.2'
+    ccdDefinitionImplementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.9'
+
 }
 
 bootJar {
@@ -585,4 +596,10 @@ bootWithCCD {
             }
         }
     }
+}
+
+task highLevelDataSetup(type: JavaExec) {
+    mainClass = "uk.gov.hmcts.sscs.hld.HighLevelDataSetupApp"
+    classpath += sourceSets.main.runtimeClasspath
+    jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }

@@ -129,10 +129,15 @@ withPipeline(type, product, component) {
     } else {
         loadVaultSecrets(secrets)
     }
+    enableHighLevelDataSetup()
     enableSlackNotifications('#sscs-tech')
     enableAksStagingDeployment()
     disableLegacyDeployment()
     syncBranchesWithMaster(branchesToSync)
+
+    afterAlways('checkout') {
+        generateDefinitions()
+    }
 
     afterSuccess('akschartsinstall'){
         // Vars needed for AKS testing
@@ -176,5 +181,30 @@ withPipeline(type, product, component) {
                         //Disabling due to IDAM OIDC issue. To be investigated under SSCS-10377
                       //AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK])
     }
+    onPR {
+        env.ENVIRONMENT = "preview"
+    }
+    onMaster {
+        env.ENVIRONMENT="aat"
+    }
+    onDemo {
+        env.ENVIRONMENT = "demo"
+    }
+    onPerftest {
+        env.ENVIRONMENT = "perftest"
+    }
+    onIthc {
+        env.ENVIRONMENT = "ithc"
+    }
 }
 
+def generateDefinitions() {
+    dir("${WORKSPACE}/bin") {
+        sh "./create-xlsx.sh benefit ${env.ENVIRONMENT} ${env.ENVIRONMENT}"
+        sh "./create-xlsx.sh bulkscan ${env.ENVIRONMENT} ${env.ENVIRONMENT}"
+    }
+    dir("${WORKSPACE}") {
+        steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
+        steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
+    }
+}
