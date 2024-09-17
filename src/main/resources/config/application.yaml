@@ -264,8 +264,6 @@ feature:
     secure-doc-store:
         enabled: ${SECURE_DOC_STORE_FEATURE:false}
     snl:
-        adjournment:
-            enabled: ${ADJOURNMENT_FEATURE:false}
         enabled: ${SCHEDULE_LISTING_FEATURE:true}
     sscs2:
         enabled: ${SSCS2_FEATURE:false}
