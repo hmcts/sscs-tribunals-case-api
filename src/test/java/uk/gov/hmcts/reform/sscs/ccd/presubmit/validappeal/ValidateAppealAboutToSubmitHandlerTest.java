@@ -1,7 +1,22 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validappeal;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.NONE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
+
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -30,29 +45,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AppealPostcodeHelper;
-import uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AppealValidator;
 import uk.gov.hmcts.reform.sscs.exception.CaseManagementLocationService;
 import uk.gov.hmcts.reform.sscs.helper.SscsDataHelper;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Optional;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.NONE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 
 @RunWith(JUnitParamsRunner.class)
 public class ValidateAppealAboutToSubmitHandlerTest {
@@ -351,7 +347,7 @@ public class ValidateAppealAboutToSubmitHandlerTest {
                 .caseTypeId("123")
                 .build();
 
-//        CaseResponse caseValidationResponse = CaseResponse.builder().warnings(Lists.list("Mrn date is empty")).build(); ///just set MRN to empty as oppose to mocking.
+        //CaseResponse caseValidationResponse = CaseResponse.builder().warnings(Lists.list("Mrn date is empty")).build(); ///just set MRN to empty as oppose to mocking.
 
         PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(caseDetails.getData());
 
@@ -391,10 +387,10 @@ public class ValidateAppealAboutToSubmitHandlerTest {
                 .caseTypeId("123")
                 .build();
 
-//        when(handler.validateValidationRecord(any(), anyBoolean()))
-//                .thenReturn(CaseResponse.builder()
-//                        .errors(ImmutableList.of("NI Number is invalid")) ///just set invalid NI NUMBER
-//                        .build());
+        //        when(handler.validateValidationRecord(any(), anyBoolean()))
+        //                .thenReturn(CaseResponse.builder()
+        //                        .errors(ImmutableList.of("NI Number is invalid")) ///just set invalid NI NUMBER
+        //                        .build());
 
         // when
         PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(caseDetails.getData());
@@ -414,10 +410,10 @@ public class ValidateAppealAboutToSubmitHandlerTest {
                 .caseTypeId("123")
                 .build();
 
-//        when(handler.validateValidationRecord(any(), anyBoolean()))
-//                .thenReturn(CaseResponse.builder()
-//                        .warnings(ImmutableList.of("Postcode is invalid"))
-//                        .build());
+        //        when(handler.validateValidationRecord(any(), anyBoolean()))
+        //                .thenReturn(CaseResponse.builder()
+        //                        .warnings(ImmutableList.of("Postcode is invalid"))
+        //                        .build());
 
         // when
         PreSubmitCallbackResponse<SscsCaseData> ccdCallbackResponse = invokeValidationCallbackHandler(caseDetails.getData());

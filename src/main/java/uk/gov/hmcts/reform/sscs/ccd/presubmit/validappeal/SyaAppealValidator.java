@@ -1,5 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.validappeal;
 
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.ValidationType.SYA_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AddressValidator.IS_NOT_A_VALID_POSTCODE;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -17,17 +27,6 @@ import uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AppealValidator;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static org.apache.commons.collections4.ListUtils.emptyIfNull;
-import static org.springframework.util.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.ValidationType.SYA_APPEAL;
-import static uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AddressValidator.IS_NOT_A_VALID_POSTCODE;
 
 @Component
 @Slf4j
