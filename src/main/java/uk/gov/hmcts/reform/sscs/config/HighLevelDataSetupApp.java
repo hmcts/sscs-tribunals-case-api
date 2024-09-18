@@ -72,7 +72,7 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     protected List<String> getAllDefinitionFilesToLoadAt(String definitionsPath) {
         String env = environment.name().toLowerCase(Locale.UK);
         return List.of(
-            String.format("definitions/bulk/CCD_BulkScanningDefinition_v%s_%s.xlsx", env, env.toUpperCase()),
+            String.format("definitions/bulkscan/CCD_BulkScanningDefinition_v%s_%s.xlsx", env, env.toUpperCase()),
             String.format("definitions/benefit/CCD_SSCSDefinition_v%s_%s.xlsx", env, env.toUpperCase())
         );
     }
