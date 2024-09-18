@@ -129,7 +129,6 @@ withPipeline(type, product, component) {
     } else {
         loadVaultSecrets(secrets)
     }
-    enableHighLevelDataSetup()
     enableSlackNotifications('#sscs-tech')
     enableAksStagingDeployment()
     disableLegacyDeployment()
@@ -147,6 +146,7 @@ withPipeline(type, product, component) {
                 env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
                 println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
                 env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
+                generateDefinitions()
             }
             for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_hearings") ) {
                 env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
@@ -164,9 +164,10 @@ withPipeline(type, product, component) {
                 """
                 env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
             }
+        } else {
+            generateDefinitions()
         }
         println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}. - The branch name is ${env.BRANCH_NAME}""".stripIndent()
-        generateDefinitions()
     }
 
     env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
@@ -177,22 +178,28 @@ withPipeline(type, product, component) {
         enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
                         //Disabling due to IDAM OIDC issue. To be investigated under SSCS-10377
                       //AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK])
-    }
-    onPR {
+
         env.ENVIRONMENT = "pr"
-        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+        for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
+            env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+            enableHighLevelDataSetup()
+        }
     }
     onMaster {
         env.ENVIRONMENT="aat"
+        enableHighLevelDataSetup()
     }
     onDemo {
         env.ENVIRONMENT = "demo"
+        enableHighLevelDataSetup()
     }
     onPerftest {
         env.ENVIRONMENT = "perftest"
+        enableHighLevelDataSetup()
     }
     onIthc {
         env.ENVIRONMENT = "ithc"
+        enableHighLevelDataSetup()
     }
 }
 
