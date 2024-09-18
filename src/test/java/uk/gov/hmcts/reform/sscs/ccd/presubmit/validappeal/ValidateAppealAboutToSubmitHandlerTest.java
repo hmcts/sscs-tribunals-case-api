@@ -75,11 +75,6 @@ public class ValidateAppealAboutToSubmitHandlerTest {
 
     @Mock
     private SscsDataHelper sscsDataHelper;
-
-    @Mock
-    private IdamService idamService;
-    @Mock
-    private CcdService ccdService;
     @Mock
     private DwpAddressLookupService dwpAddressLookupService;
     @Mock
@@ -88,7 +83,7 @@ public class ValidateAppealAboutToSubmitHandlerTest {
     private ValidateAppealAboutToSubmitHandler handler;
 
     @Mock
-    private AppealValidator appealValidator;
+    private SyaAppealValidator appealValidator;
     private MrnDetails defaultMrnDetails;
     @Mock
     private AppealPostcodeHelper appealPostcodeHelper;
@@ -101,7 +96,7 @@ public class ValidateAppealAboutToSubmitHandlerTest {
                 State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now(), "Benefit");
         callback = new Callback<>(c, Optional.empty(), EventType.VALID_APPEAL, false);
         handler =
-                new ValidateAppealAboutToSubmitHandler(ccdService, appealValidator, appealPostcodeHelper, sscsDataHelper, idamService, dwpAddressLookupService, caseManagementLocationService, true);
+                new ValidateAppealAboutToSubmitHandler(appealValidator, appealPostcodeHelper, sscsDataHelper, dwpAddressLookupService, caseManagementLocationService, true);
     }
 
     @Test
