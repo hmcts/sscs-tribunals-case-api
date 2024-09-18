@@ -2,9 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validappeal;
 
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static org.springframework.util.CollectionUtils.isEmpty;
-import static org.apache.commons.collections4.ListUtils.emptyIfNull;
-import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.tika.utils.StringUtils.EMPTY;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
@@ -15,61 +14,46 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 
-import static uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AppealValidator.IS_NOT_A_VALID_POSTCODE;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.*;
 
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 
 import uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AppealPostcodeHelper;
-import uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AppealValidator;
 import uk.gov.hmcts.reform.sscs.exception.CaseManagementLocationService;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 
 import uk.gov.hmcts.reform.sscs.helper.SscsDataHelper;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 public class ValidateAppealAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final AppealValidator appealValidator;
+    private final SyaAppealValidator appealValidator;
     private final SscsDataHelper sscsDataHelper;
-    private final IdamService idamService;
-    private final CcdService ccdService;
     private final DwpAddressLookupService dwpAddressLookupService;
     private final AppealPostcodeHelper appealPostcodeHelper;
     private final CaseManagementLocationService caseManagementLocationService;
     private final boolean caseAccessManagementFeature;
-    private static final String LOGSTR_VALIDATION_ERRORS = "Errors found while validating exception record id {} - {}";
-    private static final String LOGSTR_VALIDATION_WARNING = "Warnings found while validating exception record id {} - {}";
 
-    public ValidateAppealAboutToSubmitHandler(CcdService ccdService,
-                                              AppealValidator appealValidator,
+    public ValidateAppealAboutToSubmitHandler(SyaAppealValidator appealValidator,
                                               AppealPostcodeHelper appealPostcodeHelper,
                                               SscsDataHelper sscsDataHelper,
-                                              IdamService idamService,
                                               DwpAddressLookupService dwpAddressLookupService,
                                               CaseManagementLocationService caseManagementLocationService,
                                               @Value("${feature.case-access-management.enabled}") boolean caseAccessManagementFeature) { ////check if feature toggle exists, if does remove.
-        this.ccdService = ccdService;
         this.appealPostcodeHelper = appealPostcodeHelper;
         this.appealValidator = appealValidator;
         this.sscsDataHelper = sscsDataHelper;
-        this.idamService = idamService;
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.caseManagementLocationService = caseManagementLocationService;
         this.caseAccessManagementFeature = caseAccessManagementFeature;
@@ -128,80 +112,7 @@ public class ValidateAppealAboutToSubmitHandler extends ResponseEventsAboutToSub
                     callback.getCaseDetails().getCaseData().getDirectionTypeDl().getValue().getCode());
         }
 
-        //only keep errors and warning for caseResponse
-        CaseResponse caseValidationResponse = validateValidationRecord(appealData, ignoreMrnValidation);
-
-        PreSubmitCallbackResponse<SscsCaseData> validationErrorResponse = convertWarningsToErrors(callback.getCaseDetails().getCaseData(), caseValidationResponse); //convertWarn.. can be in tribs.
-
-        if (validationErrorResponse != null) {
-            log.info(LOGSTR_VALIDATION_ERRORS, callback.getCaseDetails().getId(), ".");
-            return validationErrorResponse;
-        } else {
-            log.info("Appeal {} validated successfully", callback.getCaseDetails().getId());
-
-            PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
-
-            if (caseValidationResponse.getWarnings() != null) {
-                preSubmitCallbackResponse.addWarnings(caseValidationResponse.getWarnings());
-            }
-
-            IdamTokens tokens = idamService.getIdamTokens();
-
-            checkForMatches(caseValidationResponse.getTransformedCase(), tokens);
-
-            return preSubmitCallbackResponse;
-        }
-    }
-
-    public Map<String, Object> checkForMatches(Map<String, Object> sscsCaseData, IdamTokens token) {
-        Appeal appeal = (Appeal) sscsCaseData.get("appeal");
-        String nino = "";
-        if (appeal != null && appeal.getAppellant() != null
-                && appeal.getAppellant().getIdentity() != null && appeal.getAppellant().getIdentity().getNino() != null) {
-            nino = appeal.getAppellant().getIdentity().getNino();
-        }
-
-        List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
-
-        if (!StringUtils.isEmpty(nino)) {
-            matchedByNinoCases = ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, token);
-        }
-
-        sscsCaseData = addAssociatedCases(sscsCaseData, matchedByNinoCases);
-        return sscsCaseData;
-    }
-
-    private Map<String, Object> addAssociatedCases(Map<String, Object> sscsCaseData,
-                                                   List<SscsCaseDetails> matchedByNinoCases) {
-        List<CaseLink> associatedCases = new ArrayList<>();
-
-        for (SscsCaseDetails sscsCaseDetails : matchedByNinoCases) {
-            CaseLink caseLink = CaseLink.builder().value(
-                    CaseLinkDetails.builder().caseReference(sscsCaseDetails.getId().toString()).build()).build();
-            associatedCases.add(caseLink);
-
-            String caseId = null != sscsCaseDetails.getId() ? sscsCaseDetails.getId().toString() : "N/A";
-            log.info("Added associated case {}" + caseId);
-        }
-        if (associatedCases.size() > 0) {
-            sscsCaseData.put("associatedCase", associatedCases);
-            sscsCaseData.put("linkedCasesBoolean", "Yes");
-        } else {
-            sscsCaseData.put("linkedCasesBoolean", "No");
-        }
-
-        return sscsCaseData;
-    }
-
-    public CaseResponse validateValidationRecord(Map<String, Object> caseData, boolean ignoreMrnValidation) {
-        Map<String, List<String>> errsWarns =
-                appealValidator.validateAppeal(new HashMap<>(), caseData, ignoreMrnValidation, false, false);
-
-        return CaseResponse.builder()
-                .errors(errsWarns.get("errors"))
-                .warnings(errsWarns.get("warnings"))
-                .transformedCase(caseData)
-                .build();
+        return appealValidator.validateAppeal(callback.getCaseDetails(), appealData, ignoreMrnValidation);
     }
 
     private void setUnsavedFieldsOnCallback(Callback<SscsCaseData> callback) {
@@ -296,44 +207,4 @@ public class ValidateAppealAboutToSubmitHandler extends ResponseEventsAboutToSub
                             List.of(caseManagementCategoryItem)));
         }
     }
-    private PreSubmitCallbackResponse<SscsCaseData> convertWarningsToErrors(SscsCaseData caseData, CaseResponse caseResponse) {
-
-        List<String> appendedWarningsAndErrors = new ArrayList<>();
-
-        List<String> allWarnings = caseResponse.getWarnings();
-        List<String> warningsThatAreNotErrors = getWarningsThatShouldNotBeErrors(caseResponse);
-        List<String> filteredWarnings = emptyIfNull(allWarnings).stream()
-                .filter(w -> !warningsThatAreNotErrors.contains(w))
-                .collect(Collectors.toList());
-
-        if (!isEmpty(filteredWarnings)) {
-            log.info(LOGSTR_VALIDATION_WARNING, caseData.getCcdCaseId(), stringJoin(filteredWarnings));
-            appendedWarningsAndErrors.addAll(filteredWarnings);
-        }
-
-        if (!isEmpty(caseResponse.getErrors())) {
-            log.info(LOGSTR_VALIDATION_ERRORS, caseData.getCcdCaseId(), stringJoin(caseResponse.getErrors()));
-            appendedWarningsAndErrors.addAll(caseResponse.getErrors());
-        }
-
-        if (!appendedWarningsAndErrors.isEmpty() || !warningsThatAreNotErrors.isEmpty()) {
-            PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-
-            preSubmitCallbackResponse.addErrors(appendedWarningsAndErrors);
-            preSubmitCallbackResponse.addWarnings(warningsThatAreNotErrors);
-            return preSubmitCallbackResponse;
-        }
-        return null;
-    }
-
-    private String stringJoin(List<String> messages) {
-        return String.join(". ", messages);
-    }
-
-    private List<String> getWarningsThatShouldNotBeErrors(CaseResponse caseResponse) {
-        return emptyIfNull(caseResponse.getWarnings()).stream()
-                .filter(warning -> warning.endsWith(IS_NOT_A_VALID_POSTCODE))
-                .collect(Collectors.toList());
-    }
-
 }
