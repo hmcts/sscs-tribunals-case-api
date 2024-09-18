@@ -55,7 +55,7 @@ if [ ${ENV} == "local" ]; then
     TYA_NOTIFICATIONS_API_URL="http://localhost:8081"
     BULK_SCAN_API_URL="http://localhost:8090"
     BULK_SCAN_ORCHESTRATOR_URL="http://localhost:8099"
-elif [ ${ENV} == "preview" ]; then
+elif [ ${ENV} == "pr" ]; then
     EM_CCD_ORCHESTRATOR_URL="http://${SERVICE_NAME}-em-ccd-orchestrator"
     TRIBUNALS_API_URL="http://${SERVICE_NAME}-java"
     TYA_NOTIFICATIONS_API_URL="http://${SERVICE_NAME}-tya-notification"
@@ -81,7 +81,7 @@ case ${ENV} in
     TYA_LINK="http://dockerhost:3000/validate-surname/\${subscriptions.appellantSubscription.tya}/trackyourappeal"
     TYA_APPOINTEE_LINK="http://dockerhost:3000/validate-surname/\${subscriptions.appointeeSubscription.tya}/trackyourappeal"
   ;;
-  preview)
+  pr)
     TYA_LINK=todo
     TYA_APPOINTEE_LINK=todo
     MYA_LINK=todo
