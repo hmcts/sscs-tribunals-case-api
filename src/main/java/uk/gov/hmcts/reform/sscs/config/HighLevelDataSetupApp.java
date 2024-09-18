@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.config;
 
 import java.util.List;
-import java.util.Locale;
 import javax.crypto.AEADBadTagException;
 import javax.net.ssl.SSLException;
 import org.slf4j.Logger;
