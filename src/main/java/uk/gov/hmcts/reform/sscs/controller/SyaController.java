@@ -17,7 +17,6 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,22 +34,17 @@ import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.Draft;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
-import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
-import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceV2;
+import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceInterface;
 
 @RestController
 @Slf4j
 public class SyaController {
 
-    private final SubmitAppealService submitAppealService;
-    private final SubmitAppealServiceV2 submitAppealServiceV2;
-    @Value("${feature.submit-appeal-service-v2.enabled}")
-    private boolean isSubmitAppealV2Enabled;
+    private final SubmitAppealServiceInterface submitAppealService;
 
     @Autowired
-    SyaController(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2) {
+    SyaController(SubmitAppealServiceInterface submitAppealService) {
         this.submitAppealService = submitAppealService;
-        this.submitAppealServiceV2 = submitAppealServiceV2;
     }
 
     @Operation(summary = "submitAppeal", description = "Creates a case from the SYA details")
@@ -140,7 +134,7 @@ public class SyaController {
         Preconditions.checkNotNull(authorisation);
 
         Optional<SessionDraft> draftAppeal = submitAppealService.getDraftAppeal(authorisation);
-        if (!draftAppeal.isPresent()) {
+        if (draftAppeal.isEmpty()) {
             log.info("Did not find any draft appeals for the requested user.");
         }
         return draftAppeal.map(ResponseEntity::ok).orElse(ResponseEntity.noContent().build());
@@ -161,21 +155,12 @@ public class SyaController {
             return ResponseEntity.noContent().build();
         }
 
-        Boolean forceCreateDraft;
-        if (forceCreate != null && forceCreate.equals("true")) {
-            forceCreateDraft = true;
-        } else {
-            forceCreateDraft = false;
-        }
+        boolean forceCreateDraft = forceCreate != null && forceCreate.equals("true");
 
         log.info("createDraftAppeal {} {}", forceCreateDraft, syaCaseWrapper.getCcdCaseId());
 
-        Optional<SaveCaseResult> submitDraftResult;
-        if (isSubmitAppealV2Enabled) {
-            submitDraftResult = submitAppealServiceV2.submitDraftAppeal(authorisation, syaCaseWrapper, forceCreateDraft);
-        } else {
-            submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper, forceCreateDraft);
-        }
+        Optional<SaveCaseResult> submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper, forceCreateDraft);
+
         return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
     }
 
@@ -193,12 +178,8 @@ public class SyaController {
             return ResponseEntity.noContent().build();
         }
         log.info("SyaController updateDraftAppeal {}", syaCaseWrapper.getCcdCaseId());
-        Optional<SaveCaseResult> submitDraftResult;
-        if (isSubmitAppealV2Enabled) {
-            submitDraftResult = submitAppealServiceV2.updateDraftAppeal(authorisation, syaCaseWrapper);
-        } else {
-            submitDraftResult = submitAppealService.updateDraftAppeal(authorisation, syaCaseWrapper);
-        }
+        Optional<SaveCaseResult> submitDraftResult = submitAppealService.updateDraftAppeal(authorisation, syaCaseWrapper);
+
         return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
     }
 
@@ -217,12 +198,8 @@ public class SyaController {
             return ResponseEntity.noContent().build();
         }
 
-        Optional<SaveCaseResult> submitDraftResult;
-        if (isSubmitAppealV2Enabled) {
-            submitDraftResult = submitAppealServiceV2.archiveDraftAppeal(authorisation, syaCaseWrapper, ccdCaseId);
-        } else {
-            submitDraftResult = submitAppealService.archiveDraftAppeal(authorisation, syaCaseWrapper, ccdCaseId);
-        }
+        Optional<SaveCaseResult> submitDraftResult = submitAppealService.archiveDraftAppeal(authorisation, syaCaseWrapper, ccdCaseId);
+
         return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
     }
 

@@ -128,50 +128,53 @@ public abstract class AbstractSubmitAppealServiceTest {
     @Captor
     private ArgumentCaptor<SscsCaseData> capture;
 
-    public static final String BIRMINGHAM_RPC = "{\n"
-        + "    \"name\" : \"BIRMINGHAM\",\n"
-        + "    \"address1\" : \"HM Courts & Tribunals Service\",\n"
-        + "    \"address2\" : \"Social Security & Child Support Appeals\",\n"
-        + "    \"address3\" : \"Administrative Support Centre\",\n"
-        + "    \"address4\" : \"PO Box 14620\",\n"
-        + "    \"city\" : \"BIRMINGHAM\",\n"
-        + "    \"postcode\" : \"B16 6FR\",\n"
-        + "    \"phoneNumber\" : \"0300 123 1142\",\n"
-        + "    \"faxNumber\" : \"0126 434 7983\",\n"
-        + "    \"email\" : \"Birmingham-SYA-Receipts@justice.gov.uk\",\n"
-        + "    \"hearingRoute\" : \"gaps\",\n"
-        + "    \"epimsId\" : \"815833\"\n"
-        + "  }";
+    public static final String BIRMINGHAM_RPC = """
+            {
+                "name" : "BIRMINGHAM",
+                "address1" : "HM Courts & Tribunals Service",
+                "address2" : "Social Security & Child Support Appeals",
+                "address3" : "Administrative Support Centre",
+                "address4" : "PO Box 14620",
+                "city" : "BIRMINGHAM",
+                "postcode" : "B16 6FR",
+                "phoneNumber" : "0300 123 1142",
+                "faxNumber" : "0126 434 7983",
+                "email" : "Birmingham-SYA-Receipts@justice.gov.uk",
+                "hearingRoute" : "gaps",
+                "epimsId" : "815833"
+              }""";
 
-    public static final String BRADFORD_RPC = "{\n"
-        + "    \"name\" : \"BRADFORD\",\n"
-        + "    \"address1\": \"HM Courts & Tribunals Service\",\n"
-        + "    \"address2\": \"Social Security & Child Support Appeals\",\n"
-        + "    \"address3\": \"Phoenix House\",\n"
-        + "    \"address4\": \"Rushton Avenue\",\n"
-        + "    \"city\": \"BRADFORD\",\n"
-        + "    \"postcode\": \"BD3 7BH\",\n"
-        + "    \"phoneNumber\" : \"0300 123 1142\",\n"
-        + "    \"faxNumber\" : \"0126 434 7983\",\n"
-        + "    \"email\" : \"SSCS_Bradford@justice.gov.uk\",\n"
-        + "    \"hearingRoute\" : \"gaps\",\n"
-        + "    \"epimsId\" : \"698118\"\n"
-        + "  }";
+    public static final String BRADFORD_RPC = """
+            {
+                "name" : "BRADFORD",
+                "address1": "HM Courts & Tribunals Service",
+                "address2": "Social Security & Child Support Appeals",
+                "address3": "Phoenix House",
+                "address4": "Rushton Avenue",
+                "city": "BRADFORD",
+                "postcode": "BD3 7BH",
+                "phoneNumber" : "0300 123 1142",
+                "faxNumber" : "0126 434 7983",
+                "email" : "SSCS_Bradford@justice.gov.uk",
+                "hearingRoute" : "gaps",
+                "epimsId" : "698118"
+              }""";
 
-    public static final String SUTTON_RPC = "{\n"
-        + "    \"name\" : \"SUTTON\",\n"
-        + "    \"address1\" : \"HM Courts & Tribunals Service\",\n"
-        + "    \"address2\" : \"Social Security & Child Support Appeals\",\n"
-        + "    \"address3\" : \"Copthall House\",\n"
-        + "    \"address4\" : \"9 The Pavement, Grove Road\",\n"
-        + "    \"city\" : \"SUTTON\",\n"
-        + "    \"postcode\" : \"SM1 1DA\",\n"
-        + "    \"phoneNumber\" : \"0300 123 1142\",\n"
-        + "    \"faxNumber\" : \"0870 739 4229\",\n"
-        + "    \"email\" : \"Sutton_SYA_Respons@justice.gov.uk\",\n"
-        + "    \"hearingRoute\" : \"gaps\",\n"
-        + "    \"epimsId\" : \"37792\"\n"
-        + "  }";
+    public static final String SUTTON_RPC = """
+            {
+                "name" : "SUTTON",
+                "address1" : "HM Courts & Tribunals Service",
+                "address2" : "Social Security & Child Support Appeals",
+                "address3" : "Copthall House",
+                "address4" : "9 The Pavement, Grove Road",
+                "city" : "SUTTON",
+                "postcode" : "SM1 1DA",
+                "phoneNumber" : "0300 123 1142",
+                "faxNumber" : "0870 739 4229",
+                "email" : "Sutton_SYA_Respons@justice.gov.uk",
+                "hearingRoute" : "gaps",
+                "epimsId" : "37792"
+              }""";
 
     @Before
     public void setup() {
@@ -189,15 +192,15 @@ public abstract class AbstractSubmitAppealServiceTest {
             true);
 
         submitAppealServiceV2 = new SubmitAppealServiceV2(
-            ccdService,
-            citizenCcdService,
-            regionalProcessingCenterService,
-            idamService,
-            convertAIntoBService,
-            airLookupService,
-            refDataService,
-            venueService,
-            true);
+                ccdService,
+                citizenCcdService,
+                regionalProcessingCenterService,
+                idamService,
+                convertAIntoBService,
+                airLookupService,
+                refDataService,
+                venueService,
+                true);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());

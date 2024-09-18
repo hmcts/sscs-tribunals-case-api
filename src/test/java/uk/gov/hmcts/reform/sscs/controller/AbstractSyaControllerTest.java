@@ -33,7 +33,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Reason;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaAppellant;
@@ -43,6 +42,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaContactDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaReasonsForAppealing;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
+import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantNino;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionAppointee;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
@@ -70,6 +70,7 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionSendToNumber;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionTextReminders;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
+import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceInterface;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceV2;
 
 @RunWith(JUnitParamsRunner.class)
@@ -87,23 +88,25 @@ public abstract class AbstractSyaControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private SubmitAppealService submitAppealService;
+    private SubmitAppealService submitAppealServiceV1;
     @MockBean
     private SubmitAppealServiceV2 submitAppealServiceV2;
+
+    private SubmitAppealServiceInterface submitAppealService;
 
     private SyaController controller;
 
     abstract boolean v2SubmitAppealIsEnable();
 
-    abstract void mockSubmitAppealService(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2, Long caseId, SaveCaseOperation saveCaseOperation);
-
-    abstract void mockSubmitAppealArchiveDraftAppeal(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2,
-                                                     Long caseId, SaveCaseOperation saveCaseOperation);
-
     @Before
     public void setUp() {
-        controller = new SyaController(submitAppealService, submitAppealServiceV2);
-        ReflectionTestUtils.setField(controller, "isSubmitAppealV2Enabled", v2SubmitAppealIsEnable());
+        if (v2SubmitAppealIsEnable()) {
+            controller = new SyaController(submitAppealServiceV2);
+            submitAppealService = submitAppealServiceV2;
+        } else {
+            controller = new SyaController(submitAppealServiceV1);
+            submitAppealService = submitAppealServiceV1;
+        }
         mockMvc = standaloneSetup(controller).build();
     }
 
@@ -121,7 +124,7 @@ public abstract class AbstractSyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode201ForTheSubmittedDraft() throws Exception {
-        mockSubmitAppealService(submitAppealService, submitAppealServiceV2, 1L, SaveCaseOperation.CREATE);
+        mockSubmitAppealService(submitAppealService,  1L, SaveCaseOperation.CREATE);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
 
@@ -134,7 +137,7 @@ public abstract class AbstractSyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode201ForTheSubmittedDraftWhenForceCreateTrue() throws Exception {
-        mockSubmitAppealService(submitAppealService, submitAppealServiceV2, 1L, SaveCaseOperation.CREATE);
+        mockSubmitAppealService(submitAppealService,  1L, SaveCaseOperation.CREATE);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
 
@@ -147,7 +150,7 @@ public abstract class AbstractSyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode201ForTheSubmittedDraftWhenForceCreateNotTrue() throws Exception {
-        mockSubmitAppealService(submitAppealService, submitAppealServiceV2, 1L, SaveCaseOperation.CREATE);
+        mockSubmitAppealService(submitAppealService,  1L, SaveCaseOperation.CREATE);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
 
@@ -158,11 +161,9 @@ public abstract class AbstractSyaControllerTest {
                 .andExpect(status().isCreated());
     }
 
-    public abstract void mockSubmitAppealServiceUpdateDraftAppeal(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2, Long caseId, SaveCaseOperation saveCaseOperation);
-
     @Test
     public void shouldReturnHttpStatusCode200ForTheUpdatedDraft() throws Exception {
-        mockSubmitAppealServiceUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, 1L, SaveCaseOperation.UPDATE);
+        mockSubmitAppealServiceUpdateDraftAppeal(submitAppealService, 1L, SaveCaseOperation.UPDATE);
 
         String json = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
 
@@ -175,7 +176,7 @@ public abstract class AbstractSyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode400ForInvalidAuthDraftUpdate() throws Exception {
-        mockSubmitAppealServiceUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, 1L, SaveCaseOperation.UPDATE);
+        mockSubmitAppealServiceUpdateDraftAppeal(submitAppealService, 1L, SaveCaseOperation.UPDATE);
 
         String json = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
 
@@ -187,7 +188,7 @@ public abstract class AbstractSyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode204ForInvalidCcdIdDraftUpdate() throws Exception {
-        mockSubmitAppealServiceUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, 1L, SaveCaseOperation.UPDATE);
+        mockSubmitAppealServiceUpdateDraftAppeal(submitAppealService,  1L, SaveCaseOperation.UPDATE);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
 
@@ -200,7 +201,7 @@ public abstract class AbstractSyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode200ForArchivedDraft() throws Exception {
-        mockSubmitAppealArchiveDraftAppeal(submitAppealService, submitAppealServiceV2, 1L, SaveCaseOperation.ARCHIVE);
+        mockSubmitAppealArchiveDraftAppeal(submitAppealService,  1L, SaveCaseOperation.ARCHIVE);
 
         String json = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
 
@@ -213,7 +214,7 @@ public abstract class AbstractSyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode400ForInvalidAuthArchivedDraft() throws Exception {
-        mockSubmitAppealArchiveDraftAppeal(submitAppealService, submitAppealServiceV2, 1L, SaveCaseOperation.ARCHIVE);
+        mockSubmitAppealArchiveDraftAppeal(submitAppealService,  1L, SaveCaseOperation.ARCHIVE);
 
         String json = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
 
@@ -225,7 +226,7 @@ public abstract class AbstractSyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode204ForInvalidDataArchivedDraft() throws Exception {
-        mockSubmitAppealArchiveDraftAppeal(submitAppealService, submitAppealServiceV2, 1L, SaveCaseOperation.ARCHIVE);
+        mockSubmitAppealArchiveDraftAppeal(submitAppealService,  1L, SaveCaseOperation.ARCHIVE);
 
         String json = getSyaCaseWrapperJson("json/sya.json");
 
@@ -714,4 +715,30 @@ public abstract class AbstractSyaControllerTest {
         return String.join("\n", Files.readAllLines(Paths.get(Objects.requireNonNull(resource).toURI())));
     }
 
+    void mockSubmitAppealService(SubmitAppealServiceInterface submitAppealService,
+                                 Long caseId, SaveCaseOperation saveCaseOperation) {
+        when(submitAppealService.submitDraftAppeal(any(), any(), any()))
+                .thenReturn(Optional.of(SaveCaseResult.builder()
+                        .caseDetailsId(caseId)
+                        .saveCaseOperation(saveCaseOperation)
+                        .build()));
+    }
+
+    public void mockSubmitAppealServiceUpdateDraftAppeal(SubmitAppealServiceInterface submitAppealService, Long caseId, SaveCaseOperation saveCaseOperation) {
+        when(submitAppealService.updateDraftAppeal(any(), any()))
+                .thenReturn(Optional.of(SaveCaseResult.builder()
+                        .caseDetailsId(caseId)
+                        .saveCaseOperation(saveCaseOperation)
+                        .build()));
+    }
+
+    void mockSubmitAppealArchiveDraftAppeal(SubmitAppealServiceInterface submitAppealService, Long caseId, SaveCaseOperation saveCaseOperation) {
+        when(submitAppealService.archiveDraftAppeal(any(), any(), any()))
+                .thenReturn(Optional.of(SaveCaseResult.builder()
+                        .caseDetailsId(caseId)
+                        .saveCaseOperation(saveCaseOperation)
+                        .build()));
+    }
+
 }
+
