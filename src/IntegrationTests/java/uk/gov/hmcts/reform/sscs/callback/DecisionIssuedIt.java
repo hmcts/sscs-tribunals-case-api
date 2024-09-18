@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -51,6 +52,9 @@ public class DecisionIssuedIt extends AbstractEventIt {
     @MockBean
     private GenerateFile generateFile;
 
+    @MockBean
+    private UserDetailsService userDetailsService;
+
     @Before
     public void setup() throws IOException {
         setup("callback/decisionIssuedForPreview.json");
@@ -60,6 +64,7 @@ public class DecisionIssuedIt extends AbstractEventIt {
     public void callToMidEventHandler_willPreviewTheDocument() throws Exception {
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
+        when(userDetailsService.buildLoggedInUserSurname("Bearer userToken")).thenReturn("Magoo");
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -68,13 +73,13 @@ public class DecisionIssuedIt extends AbstractEventIt {
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
         assertEquals(documentUrl, result.getData().getDocumentStaging().getPreviewDocument().getDocumentUrl());
+        assertEquals(result.getData().getDocumentGeneration().getSignedBy(), "Magoo");
+        assertEquals(result.getData().getDocumentGeneration().getSignedRole(), "Tribunal Judge");
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         assertEquals("Hello, you have been instructed to provide further information. Please do so at your earliest convenience.", payload.getNoticeBody());
-        assertEquals("Magoo", payload.getUserName());
-        assertEquals("Tribunal Judge", payload.getUserRole());
     }
 
     @Test
