@@ -180,6 +180,7 @@ withPipeline(type, product, component) {
     }
     onPR {
         env.ENVIRONMENT = "pr"
+        env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     }
     onMaster {
         env.ENVIRONMENT="aat"
