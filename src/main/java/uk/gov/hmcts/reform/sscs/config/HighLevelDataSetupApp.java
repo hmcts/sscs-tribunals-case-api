@@ -70,10 +70,10 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
     @Override
     protected List<String> getAllDefinitionFilesToLoadAt(String definitionsPath) {
-        String env = environment.name().toLowerCase(Locale.UK);
+        String env = environment.name().toUpperCase();
         return List.of(
-            String.format("definitions/bulkscan/CCD_BulkScanningDefinition_v%s_%s.xlsx", env, env.toUpperCase()),
-            String.format("definitions/benefit/CCD_SSCSDefinition_v%s_%s.xlsx", env, env.toUpperCase())
+            String.format("definitions/bulkscan/CCD_BulkScanningDefinition_%s.xlsx", env),
+            String.format("definitions/benefit/CCD_SSCSDefinition_%s.xlsx", env)
         );
     }
 
@@ -85,10 +85,7 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
     @Override
     protected boolean shouldTolerateDataSetupFailure() {
-        if (BeftaMain.getConfig().getDefinitionStoreUrl().contains(".preview.")) {
-            return true;
-        }
-        return false;
+        return BeftaMain.getConfig().getDefinitionStoreUrl().contains(".preview.");
     }
 
     @Override

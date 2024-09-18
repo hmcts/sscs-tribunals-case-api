@@ -41,10 +41,10 @@ UPPERCASE_ENV=$(printf '%s\n' "${ENV}" | awk '{ print toupper($0) }')
 
 if [ ${SHUTTERED} == true ]; then
   shutteredExclusion="*-nonshuttered.json"
-  ccdDefinitionFile="CCD_${CASE_TYPE_XLSX_NAME}Definition_v${FILE_VERSION}_${UPPERCASE_ENV}_SHUTTERED.xlsx"
+  ccdDefinitionFile="CCD_${CASE_TYPE_XLSX_NAME}Definition_${UPPERCASE_ENV}_SHUTTERED.xlsx"
 else
   shutteredExclusion="*-shuttered.json"
-  ccdDefinitionFile="CCD_${CASE_TYPE_XLSX_NAME}Definition_v${FILE_VERSION}_${UPPERCASE_ENV}.xlsx"
+  ccdDefinitionFile="CCD_${CASE_TYPE_XLSX_NAME}Definition_${UPPERCASE_ENV}.xlsx"
 fi
 
 echo "Tag version: ${TAG_VERSION}, CCD Definitions Version: ${CCD_DEF_VERSION}, File Name: ${ccdDefinitionFile}"
