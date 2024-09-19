@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
@@ -12,6 +13,7 @@ import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -23,6 +25,9 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 @TestPropertySource(locations = "classpath:config/application_functional.properties")
 @SpringBootTest
 public class DecisionIssuedAboutToSubmitHandlerTest extends BaseHandler {
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @DisplayName("Given about to submit callback for decisionIssued, should set fields")
     @Test
@@ -37,7 +42,8 @@ public class DecisionIssuedAboutToSubmitHandlerTest extends BaseHandler {
                 .post("/ccdAboutToSubmit")
                 .then()
                 .statusCode(HttpStatus.SC_OK)
-                .log().all(true).extract().body().asString();
+                .log().all(true)
+                .extract().body().asString();
 
         JsonNode root = mapper.readTree(response);
         SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<>(){});
