@@ -7,7 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.service.SubmitAppealService.DM_STORE_USER_ID;
+import static uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceInterface.DM_STORE_USER_ID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Collections;
@@ -71,7 +71,7 @@ public class EvidenceManagementControllerTest {
         document.mimeType = "application/pdf";
         document.size = 656;
         document.originalDocumentName = "docname";
-        Document.Links links = new Document.Links();;
+        Document.Links links = new Document.Links();
         links.binary = new Document.Link();
         links.self = new Document.Link();
         links.binary.href = "binaryUrl";
@@ -96,7 +96,7 @@ public class EvidenceManagementControllerTest {
     public void shouldUploadEvidenceDocumentListSecureDocStore() throws JsonProcessingException {
         controller = new EvidenceManagementController(evidenceManagementService, evidenceManagementSecureDocStoreService, fileToPdfConversionService, true, idamService);
 
-        uk.gov.hmcts.reform.ccd.document.am.model.Document.Links links = new uk.gov.hmcts.reform.ccd.document.am.model.Document.Links();;
+        uk.gov.hmcts.reform.ccd.document.am.model.Document.Links links = new uk.gov.hmcts.reform.ccd.document.am.model.Document.Links();
         links.binary = new uk.gov.hmcts.reform.ccd.document.am.model.Document.Link();
         links.self = new uk.gov.hmcts.reform.ccd.document.am.model.Document.Link();
         links.binary.href = "binaryUrl";

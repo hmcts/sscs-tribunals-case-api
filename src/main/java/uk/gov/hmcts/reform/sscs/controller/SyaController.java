@@ -36,15 +36,16 @@ import uk.gov.hmcts.reform.sscs.model.draft.Draft;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceInterface;
 
+
 @RestController
 @Slf4j
 public class SyaController {
 
-    private final SubmitAppealServiceInterface submitAppealService;
+    private final SubmitAppealServiceInterface submitAppealServiceInterface;
 
     @Autowired
-    SyaController(SubmitAppealServiceInterface submitAppealService) {
-        this.submitAppealService = submitAppealService;
+    public SyaController(SubmitAppealServiceInterface submitAppealServiceInterface) {
+        this.submitAppealServiceInterface = submitAppealServiceInterface;
     }
 
     @Operation(summary = "submitAppeal", description = "Creates a case from the SYA details")
@@ -61,7 +62,7 @@ public class SyaController {
         }
         log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
             syaCaseWrapper.getBenefitType().getCode());
-        Long caseId = submitAppealService.submitAppeal(syaCaseWrapper, authorisation);
+        Long caseId = submitAppealServiceInterface.submitAppeal(syaCaseWrapper, authorisation);
 
         log.info("Case {} with benefit type - {} processed successfully",
             caseId,
@@ -110,7 +111,7 @@ public class SyaController {
     public ResponseEntity<List<SessionDraft>> getDraftAppeals(@RequestHeader(AUTHORIZATION) String authorisation) {
         Preconditions.checkNotNull(authorisation);
 
-        List<SessionDraft> draftAppeals = submitAppealService.getDraftAppeals(authorisation);
+        List<SessionDraft> draftAppeals = submitAppealServiceInterface.getDraftAppeals(authorisation);
 
         if (draftAppeals.isEmpty()) {
             log.info("Did not find any draft appeals for the requested user.");
@@ -133,7 +134,7 @@ public class SyaController {
     public ResponseEntity<SessionDraft> getDraftAppeal(@RequestHeader(AUTHORIZATION) String authorisation) {
         Preconditions.checkNotNull(authorisation);
 
-        Optional<SessionDraft> draftAppeal = submitAppealService.getDraftAppeal(authorisation);
+        Optional<SessionDraft> draftAppeal = submitAppealServiceInterface.getDraftAppeal(authorisation);
         if (draftAppeal.isEmpty()) {
             log.info("Did not find any draft appeals for the requested user.");
         }
@@ -159,7 +160,7 @@ public class SyaController {
 
         log.info("createDraftAppeal {} {}", forceCreateDraft, syaCaseWrapper.getCcdCaseId());
 
-        Optional<SaveCaseResult> submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper, forceCreateDraft);
+        Optional<SaveCaseResult> submitDraftResult = submitAppealServiceInterface.submitDraftAppeal(authorisation, syaCaseWrapper, forceCreateDraft);
 
         return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
     }
@@ -178,7 +179,7 @@ public class SyaController {
             return ResponseEntity.noContent().build();
         }
         log.info("SyaController updateDraftAppeal {}", syaCaseWrapper.getCcdCaseId());
-        Optional<SaveCaseResult> submitDraftResult = submitAppealService.updateDraftAppeal(authorisation, syaCaseWrapper);
+        Optional<SaveCaseResult> submitDraftResult = submitAppealServiceInterface.updateDraftAppeal(authorisation, syaCaseWrapper);
 
         return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
     }
@@ -198,7 +199,7 @@ public class SyaController {
             return ResponseEntity.noContent().build();
         }
 
-        Optional<SaveCaseResult> submitDraftResult = submitAppealService.archiveDraftAppeal(authorisation, syaCaseWrapper, ccdCaseId);
+        Optional<SaveCaseResult> submitDraftResult = submitAppealServiceInterface.archiveDraftAppeal(authorisation, syaCaseWrapper, ccdCaseId);
 
         return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
     }

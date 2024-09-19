@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
-import static uk.gov.hmcts.reform.sscs.service.SubmitAppealService.DM_STORE_USER_ID;
+import static uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceInterface.DM_STORE_USER_ID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +34,7 @@ public class EvidenceManagementController {
     private final EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService;
     private final FileToPdfConversionService fileToPdfConversionService;
     private final boolean secureDocStoreEnabled;
-    private IdamService idamService;
+    private final IdamService idamService;
 
     @Autowired
     public EvidenceManagementController(EvidenceManagementService evidenceManagementService,
