@@ -579,8 +579,8 @@ sscs-tya-notif:
       JOB_SCHEDULER_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
       JOB_SCHEDULER_DB_USERNAME: hmcts
-      HOURS_START_TIME: 4
-      HOURS_END_TIME: 3
+      HOURS_START_TIME: 0
+      HOURS_END_TIME: 23
       RUN_DB_MIGRATION_ON_STARTUP: true
       TEST_RECIPIENTS_POSTCODE: "*"
       POST_HEARINGS_FEATURE: true
