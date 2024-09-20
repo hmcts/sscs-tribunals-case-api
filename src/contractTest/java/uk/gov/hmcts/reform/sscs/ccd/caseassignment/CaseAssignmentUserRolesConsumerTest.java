@@ -57,7 +57,7 @@ public class CaseAssignmentUserRolesConsumerTest {
                 .path("/case-users")
                 .method("GET")
                 .headers(HttpHeaders.AUTHORIZATION, SOME_AUTHORIZATION_TOKEN, SERVICE_AUTHORIZATION, SERVICE_AUTHORIZATION_TOKEN)
-                .matchQuery("case_ids", "^\\d+$")
+                .matchQuery("case_ids", caseId)
                 .willRespondWith()
                 .status(200)
                 .body(generateResponse())

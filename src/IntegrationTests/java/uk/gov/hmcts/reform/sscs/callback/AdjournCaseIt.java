@@ -60,7 +60,9 @@ public class AdjournCaseIt extends AbstractEventIt {
         "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
     public static final String CCD_ABOUT_TO_SUBMIT = "/ccdAboutToSubmit";
     public static final String CCD_MID_EVENT_PREVIEW_ADJOURN_CASE = "/ccdMidEventPreviewAdjournCase";
+    public static final String CCD_ABOUT_TO_START = "/ccdAboutToStart";
     public static final String CCD_MID_EVENT_ADJOURN_CASE_POPULATE_VENUE_DROPDOWN = "/ccdMidEventAdjournCasePopulateVenueDropdown";
+    public static final String CCD_MID_EVENT_ADJOURN_CASE_DUE_DATE = "/ccdMidEventAdjournCaseDirectionDueDate";
     public static final String CCD_MID_EVENT = "/ccdMidEvent";
     public static final String TEST_NAME = "AN Test";
     public static final String CHESTER_MAGISTRATE_S_COURT = "Chester Magistrate's Court";
@@ -90,7 +92,7 @@ public class AdjournCaseIt extends AbstractEventIt {
             List.of(DIRECTIONS_DUE_DATE_PLACEHOLDER),
             List.of(DATE_2019));
 
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_MID_EVENT));
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_MID_EVENT_ADJOURN_CASE_DUE_DATE));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
@@ -260,6 +262,20 @@ public class AdjournCaseIt extends AbstractEventIt {
             null,
             "paper"
         );
+    }
+
+    @DisplayName("Call to  adjourn case about to start handler will remove all adjournment data from case")
+    @Test
+    public void givenCallToAboutToStartThenRemovesAdjournmentData() throws Exception {
+        setup();
+        json = getJson(GENERATED_PAPER_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON);
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_ABOUT_TO_START));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+        assertThat(result.getData().getAdjournment().getInterpreterLanguage().getValue()).isNull();
+        result.getData().getAdjournment().setInterpreterLanguage(null);
+        assertThat(result.getData().getAdjournment()).hasAllNullFieldsOrProperties();
+
     }
 
     @DisplayName("Call to populate venue dropdown will populate next hearing venue selected list")
