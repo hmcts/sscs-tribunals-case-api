@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
 @Service
 @Slf4j
 @ConditionalOnProperty(name = "feature.submit-appeal-service-v2.enabled", havingValue = "false")
-public class SubmitAppealService extends AbstractSubmitAppealService {
+public class SubmitAppealService extends SubmitAppealServiceBase {
 
     @SuppressWarnings("squid:S107")
     SubmitAppealService(CcdService ccdService,
@@ -47,7 +47,6 @@ public class SubmitAppealService extends AbstractSubmitAppealService {
                 refDataService,
                 venueService,
                 caseAccessManagementFeature);
-
     }
 
     @Override

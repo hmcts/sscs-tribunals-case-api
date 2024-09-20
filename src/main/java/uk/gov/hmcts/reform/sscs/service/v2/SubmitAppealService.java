@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.service;
+package uk.gov.hmcts.reform.sscs.service.v2;
 
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseDataV2;
 
@@ -23,24 +23,37 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
+import uk.gov.hmcts.reform.sscs.service.RefDataService;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceBase;
+import uk.gov.hmcts.reform.sscs.service.VenueService;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
 
 @Service
 @Slf4j
 @ConditionalOnProperty(name = "feature.submit-appeal-service-v2.enabled", havingValue = "true")
-public class SubmitAppealServiceV2 extends AbstractSubmitAppealService {
+public class SubmitAppealService extends SubmitAppealServiceBase {
 
     @SuppressWarnings("squid:S107")
-    SubmitAppealServiceV2(CcdService ccdService,
-                        CitizenCcdService citizenCcdService,
-                        RegionalProcessingCenterService regionalProcessingCenterService,
-                        IdamService idamService,
-                        ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
-                        AirLookupService airLookupService,
-                        RefDataService refDataService,
-                        VenueService venueService,
-                        @Value("${feature.case-access-management.enabled}")  boolean caseAccessManagementFeature) {
-        super(ccdService,  citizenCcdService, idamService, convertAIntoBService, regionalProcessingCenterService, airLookupService, refDataService, venueService, caseAccessManagementFeature);
+    public SubmitAppealService(CcdService ccdService,
+                               CitizenCcdService citizenCcdService,
+                               RegionalProcessingCenterService regionalProcessingCenterService,
+                               IdamService idamService,
+                               ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
+                               AirLookupService airLookupService,
+                               RefDataService refDataService,
+                               VenueService venueService,
+                               @Value("${feature.case-access-management.enabled}") boolean caseAccessManagementFeature) {
+        super(ccdService,
+                citizenCcdService,
+                idamService,
+                convertAIntoBService,
+                regionalProcessingCenterService,
+                airLookupService,
+                refDataService,
+                venueService,
+                caseAccessManagementFeature);
     }
 
     @Override

@@ -72,7 +72,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.client.RefDataApi;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
-import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceInterface;
+import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceBase;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_it.properties")
@@ -118,7 +118,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
     private MockMvc mockMvc;
 
     @Autowired
-    private SubmitAppealServiceInterface submitAppealService;
+    private SubmitAppealServiceBase submitAppealServiceBase;
 
     private ObjectMapper mapper;
 

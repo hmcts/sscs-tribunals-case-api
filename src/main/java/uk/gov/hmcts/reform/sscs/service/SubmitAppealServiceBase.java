@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseDataV1;
 
+import feign.FeignException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,11 +41,16 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.CourtVenue;
+import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
 
 @Slf4j
-abstract class AbstractSubmitAppealService  implements SubmitAppealServiceInterface {
+public abstract class SubmitAppealServiceBase {
+    public static final String DM_STORE_USER_ID = "sscs";
+    public static final String CITIZEN_ROLE = "citizen";
+    public static final String DRAFT = "draft";
+    public static final String USER_HAS_A_INVALID_ROLE_MESSAGE = "User has a invalid role";
 
     protected final CcdService ccdService;
     protected final CitizenCcdService citizenCcdService;
@@ -56,15 +62,15 @@ abstract class AbstractSubmitAppealService  implements SubmitAppealServiceInterf
     protected final VenueService venueService;
     protected final boolean caseAccessManagementFeature;
 
-    public AbstractSubmitAppealService(CcdService ccdService,
-                                       CitizenCcdService citizenCcdService,
-                                       IdamService idamService,
-                                       ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
-                                       RegionalProcessingCenterService regionalProcessingCenterService,
-                                       AirLookupService airLookupService,
-                                       RefDataService refDataService,
-                                       VenueService venueService,
-                                       boolean caseAccessManagementFeature) {
+    public SubmitAppealServiceBase(CcdService ccdService,
+                                   CitizenCcdService citizenCcdService,
+                                   IdamService idamService,
+                                   ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
+                                   RegionalProcessingCenterService regionalProcessingCenterService,
+                                   AirLookupService airLookupService,
+                                   RefDataService refDataService,
+                                   VenueService venueService,
+                                   boolean caseAccessManagementFeature) {
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
         this.idamService = idamService;
@@ -76,7 +82,12 @@ abstract class AbstractSubmitAppealService  implements SubmitAppealServiceInterf
         this.venueService = venueService;
     }
 
-    @Override
+    public abstract Optional<SaveCaseResult> submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal, Boolean forceCreate);
+
+    public abstract Optional<SaveCaseResult> updateDraftAppeal(String oauth2Token, SyaCaseWrapper syaCaseWrapper);
+
+    public abstract Optional<SaveCaseResult> archiveDraftAppeal(String oauth2Token, SyaCaseWrapper syaCaseWrapper, Long ccdCaseId) throws FeignException;
+
     public Optional<SessionDraft> getDraftAppeal(String oauth2Token) {
         SscsCaseData caseDetails = null;
         SessionDraft sessionDraft = null;
@@ -100,7 +111,6 @@ abstract class AbstractSubmitAppealService  implements SubmitAppealServiceInterf
         return (sessionDraft != null) ? Optional.of(sessionDraft) : Optional.empty();
     }
 
-    @Override
     public List<SessionDraft> getDraftAppeals(String oauth2Token) {
         IdamTokens idamTokens = getUserTokens(oauth2Token);
 
@@ -116,7 +126,6 @@ abstract class AbstractSubmitAppealService  implements SubmitAppealServiceInterf
                 .toList();
     }
 
-    @Override
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
 
         IdamTokens idamTokens = idamService.getIdamTokens();

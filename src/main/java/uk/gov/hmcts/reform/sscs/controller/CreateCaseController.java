@@ -50,23 +50,23 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.CreateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceInterface;
+import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceBase;
 
 @RestController
 @ConditionalOnProperty("create_ccd_endpoint")
 @Slf4j
 public class CreateCaseController {
 
-    private final SubmitAppealServiceInterface submitAppealServiceInterface;
+    private final SubmitAppealServiceBase submitAppealServiceBase;
     private final CcdService ccdService;
     private final IdamService idamService;
 
     public CreateCaseController(
-        @Autowired SubmitAppealServiceInterface submitAppealServiceInterface,
+        @Autowired SubmitAppealServiceBase submitAppealServiceBase,
         @Autowired CcdService ccdService,
         @Autowired IdamService idamService
     ) {
-        this.submitAppealServiceInterface = submitAppealServiceInterface;
+        this.submitAppealServiceBase = submitAppealServiceBase;
         this.ccdService = ccdService;
         this.idamService = idamService;
     }
@@ -177,7 +177,7 @@ public class CreateCaseController {
         syaCaseWrapper.getMrn().setDate(getRandomMrnDate());
         log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
             syaCaseWrapper.getBenefitType().getCode());
-        Long caseId = submitAppealServiceInterface.submitAppeal(syaCaseWrapper, authorisation);
+        Long caseId = submitAppealServiceBase.submitAppeal(syaCaseWrapper, authorisation);
 
         log.info("Case {} with benefit type - {} processed successfully",
             caseId,

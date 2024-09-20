@@ -7,7 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceInterface.DM_STORE_USER_ID;
+import static uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceBase.DM_STORE_USER_ID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Collections;

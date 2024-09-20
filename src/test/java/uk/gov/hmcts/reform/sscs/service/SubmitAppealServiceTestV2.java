@@ -8,16 +8,14 @@ import feign.FeignException;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
-import junitparams.JUnitParamsRunner;
-import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
+import uk.gov.hmcts.reform.sscs.service.v2.SubmitAppealService;
 
-@RunWith(JUnitParamsRunner.class)
 public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
 
     @Override
@@ -41,7 +39,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
     }
 
     @Override
-    public Optional<SaveCaseResult> callSubmitDraftAppeal(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2, String auth2Token, SyaCaseWrapper appealData, boolean forceCreate) {
+    public Optional<SaveCaseResult> callSubmitDraftAppeal(uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService, SubmitAppealService submitAppealServiceV2, String auth2Token, SyaCaseWrapper appealData, boolean forceCreate) {
         return submitAppealServiceV2.submitDraftAppeal(auth2Token, appealData, forceCreate);
     }
 
@@ -58,7 +56,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
     }
 
     @Override
-    public Optional<SaveCaseResult> callUpdateDraftAppeal(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2, String auth2Token, SyaCaseWrapper appealData) {
+    public Optional<SaveCaseResult> callUpdateDraftAppeal(uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService, SubmitAppealService submitAppealServiceV2, String auth2Token, SyaCaseWrapper appealData) {
         return submitAppealServiceV2.updateDraftAppeal(auth2Token, appealData);
     }
 
@@ -68,7 +66,7 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
     }
 
     @Override
-    public Optional<SaveCaseResult> callArchiveDraftAppeal(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2, String auth2Token, SyaCaseWrapper appealData, Long caseId) {
+    public Optional<SaveCaseResult> callArchiveDraftAppeal(uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService, SubmitAppealService submitAppealServiceV2, String auth2Token, SyaCaseWrapper appealData, Long caseId) {
         return submitAppealServiceV2.archiveDraftAppeal(auth2Token, appealData, caseId);
     }
 

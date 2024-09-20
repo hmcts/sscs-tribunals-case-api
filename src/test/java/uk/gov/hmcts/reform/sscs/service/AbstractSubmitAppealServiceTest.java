@@ -81,6 +81,7 @@ import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
+import uk.gov.hmcts.reform.sscs.service.v2.SubmitAppealService;
 
 @RunWith(JUnitParamsRunner.class)
 public abstract class AbstractSubmitAppealServiceTest {
@@ -118,8 +119,8 @@ public abstract class AbstractSubmitAppealServiceTest {
     @Mock
     private EmailHelper emailHelper;
 
-    private SubmitAppealService submitAppealService;
-    private SubmitAppealServiceV2 submitAppealServiceV2;
+    private uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService;
+    private SubmitAppealService submitAppealServiceV2;
 
     private final SyaCaseWrapper appealData = getSyaCaseWrapper();
 
@@ -180,7 +181,7 @@ public abstract class AbstractSubmitAppealServiceTest {
     public void setup() {
         appealData.getMrn().setDate(LocalDate.now().minusMonths(1));
 
-        submitAppealService = new SubmitAppealService(
+        submitAppealService = new uk.gov.hmcts.reform.sscs.service.SubmitAppealService(
             ccdService,
             citizenCcdService,
             regionalProcessingCenterService,
@@ -191,7 +192,7 @@ public abstract class AbstractSubmitAppealServiceTest {
             venueService,
             true);
 
-        submitAppealServiceV2 = new SubmitAppealServiceV2(
+        submitAppealServiceV2 = new SubmitAppealService(
                 ccdService,
                 citizenCcdService,
                 regionalProcessingCenterService,
@@ -424,17 +425,17 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     public abstract void verifyCitizenCcdService(CitizenCcdService citizenCcdService);
 
-    public abstract Optional<SaveCaseResult> callSubmitDraftAppeal(SubmitAppealService submitAppealService,
-                                               SubmitAppealServiceV2 submitAppealServiceV2,
-                                               String auth2Token,
-                                               SyaCaseWrapper appealData,
-                                               boolean forceCreate);
+    public abstract Optional<SaveCaseResult> callSubmitDraftAppeal(uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService,
+                                                                   SubmitAppealService submitAppealServiceV2,
+                                                                   String auth2Token,
+                                                                   SyaCaseWrapper appealData,
+                                                                   boolean forceCreate);
 
-    public abstract Optional<SaveCaseResult> callArchiveDraftAppeal(SubmitAppealService submitAppealService,
-                                               SubmitAppealServiceV2 submitAppealServiceV2,
-                                               String auth2Token,
-                                               SyaCaseWrapper appealData,
-                                               Long caseId);
+    public abstract Optional<SaveCaseResult> callArchiveDraftAppeal(uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService,
+                                                                    SubmitAppealService submitAppealServiceV2,
+                                                                    String auth2Token,
+                                                                    SyaCaseWrapper appealData,
+                                                                    Long caseId);
 
     public abstract void verifyArchiveDraftAppeal(CitizenCcdService citizenCcdService);
 
@@ -459,7 +460,7 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     public abstract void givenUpdateCaseWillThrowException(CitizenCcdService citizenCcdService, FeignException feignException);
 
-    public abstract Optional<SaveCaseResult> callUpdateDraftAppeal(SubmitAppealService submitAppealService, SubmitAppealServiceV2 submitAppealServiceV2, String auth2Token, SyaCaseWrapper appealData);
+    public abstract Optional<SaveCaseResult> callUpdateDraftAppeal(uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService, SubmitAppealService submitAppealServiceV2, String auth2Token, SyaCaseWrapper appealData);
 
     public abstract void verifyUpdateCaseCalledByUpdateDraftAppeal(CitizenCcdService citizenCcdService);
 
