@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.service;
+package uk.gov.hmcts.reform.sscs.service.v2;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
-import uk.gov.hmcts.reform.sscs.service.v2.SubmitAppealService;
+import uk.gov.hmcts.reform.sscs.service.AbstractSubmitAppealServiceTest;
 
 public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
 
