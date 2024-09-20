@@ -35,3 +35,6 @@ build
 # Application insight
 lib/applicationinsights-agent-*.jar
 lib/applicationinsights.log
+
+# aat env file
+.aat-env

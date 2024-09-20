@@ -46,14 +46,13 @@ public class SendToFirstTierSubmittedHandler implements PreSubmitCallbackHandler
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         if (isHandleCcdCallbackMapV2Enabled) {
-            SscsCaseData sscsCaseDataOptional = ccdCallbackMapService.handleCcdCallbackMapV2(
+            caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
                     caseData.getPostHearing().getSendToFirstTier().getAction(),
                     callback.getCaseDetails().getId()
             );
-            return new PreSubmitCallbackResponse<>(sscsCaseDataOptional);
         } else {
             caseData = ccdCallbackMapService.handleCcdCallbackMap(caseData.getPostHearing().getSendToFirstTier().getAction(), caseData);
-            return new PreSubmitCallbackResponse<>(caseData);
         }
+        return new PreSubmitCallbackResponse<>(caseData);
     }
 }

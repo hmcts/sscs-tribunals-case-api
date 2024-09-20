@@ -60,6 +60,10 @@ public class ActionPostponementRequestSubmittedCallbackHandler implements PreSub
             return updateCase(caseData, caseId,
                     EventType.POSTPONEMENT_REFUSED.getCcdType(), "Postponement refused",
                     "Postponement refused");
+        } else if (REFUSE_ON_THE_DAY.getValue().equals(actionRequested)) {
+            return updateCase(caseData, caseId,
+                    EventType.POSTPONEMENT_REFUSED_ON_THE_DAY.getCcdType(), "Postponement refused on the day",
+                    "Postponement refused on the day");
         } else if (GRANT.getValue().equals(actionRequested)) {
             return updateCase(caseData, caseId,
                     EventType.POSTPONEMENT_GRANTED.getCcdType(), "Postponement granted",
@@ -83,6 +87,7 @@ public class ActionPostponementRequestSubmittedCallbackHandler implements PreSub
         YesNo unprocessedPostponementRequest = caseData.getPostponementRequest().getUnprocessedPostponementRequest();
         caseData.setPostponementRequest(PostponementRequest.builder()
                 .unprocessedPostponementRequest(unprocessedPostponementRequest)
+                .actionPostponementRequestSelected(caseData.getPostponementRequest().getActionPostponementRequestSelected())
                 .build());
     }
 }
