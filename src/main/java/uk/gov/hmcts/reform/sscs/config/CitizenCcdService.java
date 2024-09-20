@@ -146,7 +146,7 @@ public class CitizenCcdService {
 
     /**
      * Update a case while making correct use of CCD's optimistic locking.
-     * Changes can be made to case data by the provided consumer which will always be provided
+     * Changes can be made to case data by the provided function which will always be provided
      * the current version of case data from CCD's start event.
      */
     @Retryable
