@@ -122,6 +122,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: false
     TRIGGER_EVENT_V2_ENABLED: false
     HANDLE_CCD_CALLBACKMAP_V2: false
+    CALLBACK_MAX_RETRY_ATTEMPTS: 3
 #    hearings=api
     IDAM_S2S_URL: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     CASEWORKER_REF_API_URL: "http://rd-caseworker-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
