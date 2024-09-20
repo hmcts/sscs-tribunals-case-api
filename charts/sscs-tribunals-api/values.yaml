@@ -117,6 +117,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: false
     TRIGGER_EVENT_V2_ENABLED: false
     HANDLE_CCD_CALLBACKMAP_V2: false
+    CALLBACK_MAX_RETRY_ATTEMPTS: 3
 
 postgresql:
   enabled: false

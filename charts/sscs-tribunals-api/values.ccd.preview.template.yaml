@@ -544,6 +544,7 @@ ccd:
       - caseworker-sscs-bulkscan
       - caseworker-sscs-pcqextractor
       - caseworker-sscs-hmrcresponsewriter
+      - caseworker-sscs-ibcaresponsewriter
       - caseworker-wa-task-configuration
       - caseworker-ras-validation
       - GS_profile
