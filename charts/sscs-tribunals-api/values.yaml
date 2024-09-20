@@ -118,6 +118,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     TRIGGER_EVENT_V2_ENABLED: false
     SUBMIT_APPEAL_SERVICE_V2_ENABLED: false
     HANDLE_CCD_CALLBACKMAP_V2: false
+    CALLBACK_MAX_RETRY_ATTEMPTS: 3
 
 postgresql:
   enabled: false
