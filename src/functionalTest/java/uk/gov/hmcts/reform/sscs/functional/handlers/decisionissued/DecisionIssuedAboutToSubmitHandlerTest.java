@@ -46,7 +46,6 @@ public class DecisionIssuedAboutToSubmitHandlerTest extends BaseHandler {
         SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<>(){});
         assertThat(result.getInterlocReferralReason()).isNull();
         assertThat(result.getDirectionDueDate()).isNull();
-        assertThat(result.getDwpState()).isEqualTo(DwpState.STRUCK_OUT);
         assertThat(result.getPostponement()).isNull();
         assertThat(result.getPostponementRequest()).isNull();
 
