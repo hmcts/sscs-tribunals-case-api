@@ -30,7 +30,7 @@ public class TopicConsumer {
     private final NotificationsMessageProcessor notificationsMessageProcessor;
     private final boolean isNotificationServiceBypassed;
 
-    public TopicConsumer(@Value("${send-letter.maxRetryAttempts}") Integer maxRetryAttempts,
+    public TopicConsumer(@Value("${callback.maxRetryAttempts}") Integer maxRetryAttempts,
                          CallbackDispatcher<SscsCaseData> dispatcher,
                          SscsCaseCallbackDeserializer sscsDeserializer, NotificationsMessageProcessor notificationsMessageProcessor,
                          @Value("${feature.bypass-notifications-service.enabled:false}") boolean isNotificationServiceBypassed) {
