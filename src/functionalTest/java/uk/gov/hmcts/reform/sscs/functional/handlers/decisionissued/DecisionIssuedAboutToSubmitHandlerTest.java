@@ -44,7 +44,9 @@ public class DecisionIssuedAboutToSubmitHandlerTest extends BaseHandler {
         JsonNode root = mapper.readTree(response);
         SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<>(){});
         assertThat(result.getInterlocReferralReason()).isNull();
-        assertThat(result.getInterlocReviewState()).isNull();
+        assertThat(result.getPostponement()).isNull();
+        assertThat(result.getPostponementRequest()).isNull();
+
 
     }
 }
