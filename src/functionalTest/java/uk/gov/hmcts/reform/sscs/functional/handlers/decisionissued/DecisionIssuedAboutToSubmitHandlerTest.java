@@ -39,7 +39,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest extends BaseHandler {
                 .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
                 .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
                 .body(getJsonCallbackForTest("handlers/decisionissued/decisionIssuedAboutToSubmitCallback.json"))
-                .post("/ccdAboutToSubmit")
+                .post("/ccdAboutToStart")
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .log().all(true)
