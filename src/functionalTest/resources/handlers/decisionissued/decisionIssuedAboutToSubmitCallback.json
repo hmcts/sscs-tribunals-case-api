@@ -2,7 +2,7 @@
   "case_details": {
     "id": 1630670474682073,
     "jurisdiction": "SSCS",
-    "state": "dormantAppealState",
+    "state": "validAppeal",
     "version": 4,
     "case_type_id": "Benefit",
     "created_date": [
@@ -36,6 +36,15 @@
     "case_data": {
       "caseCode": "002DD",
       "pcqId": "12345678",
+      "sscsInterlocDecisionDocument": {
+        "documentDateAdded": "2018-02-09",
+        "documentLink": {
+          "document_url": "EVIDENCE_DOCUMENT_PLACEHOLDER",
+          "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_PLACEHOLDER",
+          "document_filename": "sscsInterlocDecisionDocument.pdf",
+          "document_hash": "EVIDENCE_DOCUMENT_HASH_PLACEHOLDER"
+        }
+      },
       "subscriptions": {
         "appellantSubscription": {
           "tya": "XyuwjN2MId",
@@ -372,6 +381,7 @@
       "interlocReferralDate": "2021-09-03",
       "caseCreated": "2021-09-03",
       "interlocReviewState": "reviewByTcw",
+      "directionTypeDl": "appealToProceed",
       "region": "BRADFORD",
       "hearingRoute": "listAssist"
     },
