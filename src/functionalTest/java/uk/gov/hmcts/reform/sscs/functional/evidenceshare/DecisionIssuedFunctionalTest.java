@@ -16,7 +16,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -65,8 +67,11 @@ public class DecisionIssuedFunctionalTest extends AbstractFunctionalTest {
         SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<>(){});
         assertThat(result.getInterlocReferralReason()).isNull();
         assertThat(result.getDirectionDueDate()).isNull();
-        assertThat(result.getPostponement()).isNull();
+        assertThat(result.getPostponement().getUnprocessedPostponement()).isNull();
+        assertThat(result.getPostponement().getPostponementEvent()).isNull();
         assertThat(result.getPostponementRequest()).isNull();
+        assertThat(result.getDwpState()).isEqualTo(DwpState.STRUCK_OUT);
+        assertThat(result.getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
     }
 
 }
