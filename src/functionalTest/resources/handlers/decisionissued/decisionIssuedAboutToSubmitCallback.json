@@ -36,6 +36,16 @@
     "case_data": {
       "caseCode": "002DD",
       "pcqId": "12345678",
+      "sscsInterlocDecisionDocument": {
+        "documentType": "Decision Notice",
+        "documentDateAdded": "2019-06-26",
+        "documentFileName": "DecisionNotice.pdf",
+        "documentLink": {
+          "document_url": "http://dm-store:4506/documents/3b18db2a-08ce-466b-babe-42c19ea95d60",
+          "document_binary_url": "http://dm-store:4506/documents/3b18db2a-08ce-466b-babe-42c19ea95d60/binary",
+          "document_filename": "DecisionNotice.pdf"
+        }
+      },
       "subscriptions": {
         "appellantSubscription": {
           "tya": "XyuwjN2MId",
