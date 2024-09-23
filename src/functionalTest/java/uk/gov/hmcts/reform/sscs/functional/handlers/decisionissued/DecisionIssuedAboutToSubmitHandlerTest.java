@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
@@ -44,6 +45,8 @@ public class DecisionIssuedAboutToSubmitHandlerTest extends BaseHandler {
         JsonNode root = mapper.readTree(response);
         SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<>(){});
         assertThat(result.getInterlocReferralReason()).isNull();
+        assertThat(result.getDirectionDueDate()).isNull();
+        assertThat(result.getDwpState()).isEqualTo(DwpState.STRUCK_OUT);
         assertThat(result.getPostponement()).isNull();
         assertThat(result.getPostponementRequest()).isNull();
 
