@@ -36,6 +36,13 @@
     "case_data": {
       "caseCode": "002DD",
       "pcqId": "12345678",
+      "sscsInterlocDecisionDocument": {
+        "documentDateAdded": "2018-02-09",
+        "documentLink": {
+          "document_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c",
+          "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",
+          "document_filename": "sscsdecisionIssuedDocument.pdf"
+        },
       "subscriptions": {
         "appellantSubscription": {
           "tya": "XyuwjN2MId",
