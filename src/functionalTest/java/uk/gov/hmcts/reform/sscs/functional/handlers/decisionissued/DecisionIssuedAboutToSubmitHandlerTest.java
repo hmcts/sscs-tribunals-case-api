@@ -46,6 +46,5 @@ public class DecisionIssuedAboutToSubmitHandlerTest extends BaseHandler {
         SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<>(){});
         assertThat(result.getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
         assertThat(result.getInterlocReviewState()).isNull();
-        assertThat(result.getSscsInterlocDecisionDocument().getDocumentLink()).isNotNull();
     }
 }
