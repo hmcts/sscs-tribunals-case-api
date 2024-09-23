@@ -2,7 +2,7 @@
   "case_details": {
     "id": 1630670474682073,
     "jurisdiction": "SSCS",
-    "state": "validAppeal",
+    "state": "dormantAppealState",
     "version": 4,
     "case_type_id": "Benefit",
     "created_date": [
