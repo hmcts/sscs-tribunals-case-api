@@ -69,7 +69,7 @@ public class DecisionIssuedFunctionalTest extends AbstractFunctionalTest {
         assertThat(result.getDirectionDueDate()).isNull();
         assertThat(result.getPostponement().getUnprocessedPostponement()).isNull();
         assertThat(result.getPostponement().getPostponementEvent()).isNull();
-        assertThat(result.getPostponementRequest()).isNull();
+        assertThat(result.getPostponementRequest().getActionPostponementRequestSelected()).isNull();
         assertThat(result.getDwpState()).isEqualTo(DwpState.STRUCK_OUT);
         assertThat(result.getState()).isEqualTo(State.DORMANT_APPEAL_STATE);
     }
