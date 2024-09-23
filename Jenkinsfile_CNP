@@ -146,7 +146,6 @@ withPipeline(type, product, component) {
                 env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
                 println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}""".stripIndent()
                 env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
-                generateDefinitions()
             }
             for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_hearings") ) {
                 env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
@@ -179,7 +178,6 @@ withPipeline(type, product, component) {
 
         env.ENVIRONMENT = "pr"
         for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
-            env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
             enableHighLevelDataSetup()
         }
     }
@@ -201,10 +199,12 @@ withPipeline(type, product, component) {
     }
 
     before('highleveldatasetup') {
-        if (env.ENVIRONMENT != "pr") {
-            env.DEFINITION_STORE_URL_BASE="http://ccd-definition-store-api-${env.ENVIRONMENT}.service.core-compute-${env.ENVIRONMENT}.internal"
-            generateDefinitions()
+        if (env.ENVIRONMENT == "pr") {
+            env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${env.ENVIRONMENT}.service.core-compute-${env.ENVIRONMENT}.internal"
+        } else {
+            env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
         }
+        generateDefinitions()
     }
 
     afterAlways('functionalTest:aat') {
