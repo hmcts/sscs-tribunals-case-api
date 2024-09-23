@@ -29,9 +29,8 @@ public class DecisionIssuedAboutToSubmitHandlerTest extends BaseHandler {
     @Autowired
     private ObjectMapper mapper;
 
-    @DisplayName("Given about to submit callback for decisionIssued, should set fields")
     @Test
-    public void givenAboutToSubmitCallbackForEvent_shouldSetField() throws IOException {
+    public void givenAboutToSubmitCallbackForEvent_shouldSetField() throws Exception {
 
         String response = RestAssured.given()
                 .log().method().log().headers().log().uri().log().body(true)
@@ -39,7 +38,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest extends BaseHandler {
                 .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
                 .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
                 .body(getJsonCallbackForTest("handlers/decisionissued/decisionIssuedAboutToSubmitCallback.json"))
-                .post("/ccdAboutToStart")
+                .post("/ccdAboutToSubmit")
                 .then()
                 .statusCode(HttpStatus.SC_OK)
                 .log().all(true)
