@@ -1,11 +1,16 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
+import static io.restassured.RestAssured.baseURI;
+import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
+import java.io.IOException;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,13 +21,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
-import java.io.IOException;
-
-import static io.restassured.RestAssured.baseURI;
-import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class DecisionIssuedFunctionalTest extends AbstractFunctionalTest{
+public class DecisionIssuedFunctionalTest extends AbstractFunctionalTest {
 
     @Autowired
     private IdamService idamService;
