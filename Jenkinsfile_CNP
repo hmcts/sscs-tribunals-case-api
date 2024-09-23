@@ -199,7 +199,7 @@ withPipeline(type, product, component) {
     }
 
     before('highleveldatasetup') {
-        if (env.ENVIRONMENT == "pr") {
+        if (env.ENVIRONMENT != "pr") {
             env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${env.ENVIRONMENT}.service.core-compute-${env.ENVIRONMENT}.internal"
         } else {
             env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
