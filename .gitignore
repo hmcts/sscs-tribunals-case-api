@@ -36,5 +36,9 @@ build
 lib/applicationinsights-agent-*.jar
 lib/applicationinsights.log
 
+# definitions
+definitions/**/*.xlsx
+definitions/**/*.xlsx#
+
 # aat env file
 .aat-env

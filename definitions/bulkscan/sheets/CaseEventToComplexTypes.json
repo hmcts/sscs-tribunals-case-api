@@ -1,0 +1,482 @@
+[
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "createException",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "# Record Meta data",
+    "EventElementLabel": "Scanned Documents",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "createException",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "type",
+    "EventElementLabel": "Document Type",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "createException",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "subtype",
+    "EventElementLabel": "Document Subtype",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "createException",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "url",
+    "EventElementLabel": "Document url",
+    "PageFieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "createException",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "controlNumber",
+    "EventElementLabel": "Document Control Number",
+    "PageFieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "createException",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "fileName",
+    "EventElementLabel": "File Name",
+    "PageFieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "createException",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "scannedDate",
+    "EventElementLabel": "Scanned Date",
+    "PageFieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "createException",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "deliveryDate",
+    "EventElementLabel": "Delivery Date",
+    "PageFieldDisplayOrder": 8,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "KeyValue",
+    "CaseEventID": "createException",
+    "CaseFieldID": "scanOCRData",
+    "ListElementCode": "key",
+    "EventElementLabel": "Key",
+    "PageFieldDisplayOrder": 9,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "KeyValue",
+    "CaseEventID": "createException",
+    "CaseFieldID": "scanOCRData",
+    "ListElementCode": "value",
+    "EventElementLabel": "Value",
+    "PageFieldDisplayOrder": 10,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "attachToExistingCase",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "# Record Meta data",
+    "EventElementLabel": "Scanned Documents",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "attachToExistingCase",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "type",
+    "EventElementLabel": "Document Type",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "attachToExistingCase",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "subtype",
+    "EventElementLabel": "Document Subtype",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "attachToExistingCase",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "url",
+    "EventElementLabel": "Document url",
+    "PageFieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "attachToExistingCase",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "controlNumber",
+    "EventElementLabel": "Document Control Number",
+    "PageFieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "attachToExistingCase",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "fileName",
+    "EventElementLabel": "File Name",
+    "PageFieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "attachToExistingCase",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "scannedDate",
+    "EventElementLabel": "Scanned Date",
+    "PageFieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "attachToExistingCase",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "deliveryDate",
+    "EventElementLabel": "Delivery Date",
+    "PageFieldDisplayOrder": 8,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "rejectRecord",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "# Record Meta data",
+    "EventElementLabel": "Scanned Documents",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "rejectRecord",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "type",
+    "EventElementLabel": "Document Type",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "rejectRecord",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "subtype",
+    "EventElementLabel": "Document Subtype",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "rejectRecord",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "url",
+    "EventElementLabel": "Document url",
+    "PageFieldDisplayOrder": 4,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "rejectRecord",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "controlNumber",
+    "EventElementLabel": "Document Control Number",
+    "PageFieldDisplayOrder": 5,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "rejectRecord",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "fileName",
+    "EventElementLabel": "File Name",
+    "PageFieldDisplayOrder": 6,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "rejectRecord",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "scannedDate",
+    "EventElementLabel": "Scanned Date",
+    "PageFieldDisplayOrder": 7,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "rejectRecord",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "deliveryDate",
+    "EventElementLabel": "Delivery Date",
+    "PageFieldDisplayOrder": 8,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "KeyValue",
+    "CaseEventID": "rejectRecord",
+    "CaseFieldID": "scanOCRData",
+    "ListElementCode": "key",
+    "EventElementLabel": "Key",
+    "PageFieldDisplayOrder": 9,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "KeyValue",
+    "CaseEventID": "rejectRecord",
+    "CaseFieldID": "scanOCRData",
+    "ListElementCode": "value",
+    "EventElementLabel": "Value",
+    "PageFieldDisplayOrder": 10,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "createNewCase",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "# Record Meta data",
+    "EventElementLabel": "Scanned Documents",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "createNewCase",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "type",
+    "EventElementLabel": "Document Type",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "createNewCase",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "subtype",
+    "EventElementLabel": "Document Subtype",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "createNewCase",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "url",
+    "EventElementLabel": "Document url",
+    "PageFieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "createNewCase",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "controlNumber",
+    "EventElementLabel": "Document Control Number",
+    "PageFieldDisplayOrder": 5,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "createNewCase",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "fileName",
+    "EventElementLabel": "File Name",
+    "PageFieldDisplayOrder": 6,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "createNewCase",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "scannedDate",
+    "EventElementLabel": "Scanned Date",
+    "PageFieldDisplayOrder": 7,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "createNewCase",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "deliveryDate",
+    "EventElementLabel": "Delivery Date",
+    "PageFieldDisplayOrder": 8,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "KeyValue",
+    "CaseEventID": "createNewCase",
+    "CaseFieldID": "scanOCRData",
+    "ListElementCode": "key",
+    "EventElementLabel": "Key",
+    "PageFieldDisplayOrder": 9,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "KeyValue",
+    "CaseEventID": "createNewCase",
+    "CaseFieldID": "scanOCRData",
+    "ListElementCode": "value",
+    "EventElementLabel": "Value",
+    "PageFieldDisplayOrder": 10,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "updateManually",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "# Record Meta data",
+    "EventElementLabel": "Scanned Documents",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "updateManually",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "type",
+    "EventElementLabel": "Document Type",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "updateManually",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "subtype",
+    "EventElementLabel": "Document Subtype",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "updateManually",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "url",
+    "EventElementLabel": "Document url",
+    "PageFieldDisplayOrder": 4,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "updateManually",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "controlNumber",
+    "EventElementLabel": "Document Control Number",
+    "PageFieldDisplayOrder": 5,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "updateManually",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "fileName",
+    "EventElementLabel": "File Name",
+    "PageFieldDisplayOrder": 6,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "updateManually",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "scannedDate",
+    "EventElementLabel": "Scanned Date",
+    "PageFieldDisplayOrder": 7,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "ScannedDocument",
+    "CaseEventID": "updateManually",
+    "CaseFieldID": "scannedDocuments",
+    "ListElementCode": "deliveryDate",
+    "EventElementLabel": "Delivery Date",
+    "PageFieldDisplayOrder": 8,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "KeyValue",
+    "CaseEventID": "updateManually",
+    "CaseFieldID": "scanOCRData",
+    "ListElementCode": "key",
+    "EventElementLabel": "Key",
+    "PageFieldDisplayOrder": 9,
+    "DisplayContext": "READONLY"
+  },
+  {
+    "LiveFrom": "01/04/2023",
+    "ID": "KeyValue",
+    "CaseEventID": "updateManually",
+    "CaseFieldID": "scanOCRData",
+    "ListElementCode": "value",
+    "EventElementLabel": "Value",
+    "PageFieldDisplayOrder": 10,
+    "DisplayContext": "READONLY"
+  }
+]
