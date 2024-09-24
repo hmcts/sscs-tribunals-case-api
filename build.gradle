@@ -399,6 +399,15 @@ dependencies {
     // Remove this dependency once the secure doc-store is in use
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
+    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.0.2', {
+        exclude group: 'org.apache.commons', module: 'commons-compress'
+        exclude group: 'com.google.guava', module: 'guava'
+        exclude group: 'org.apache.poi', module: 'poi-ooxml'
+        exclude group: 'org.apache.poi', module: 'poi'
+        exclude group: 'com.launchdarkly', module: 'launchdarkly-java-server-sdk'
+        exclude group: 'org.codehaus.groovy', module: 'groovy-xml'
+    }
+
 
     integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.13.0'
 
@@ -541,14 +550,11 @@ run {
 
 
 tasks.register('generateXls', Exec) {
-    commandLine project.file('../sscs-ccd-definitions/bin/create-xlsx.sh').path, 'benefit', 'dev', 'local'
-    inputs.dir project.file('../sscs-ccd-definitions/benefit')
-    outputs.dir project.file('../sscs-ccd-definitions/releases')
-    environment "TRIBUNALS_API_URL", "http://localhost:8008"
-    workingDir project.file('../sscs-ccd-definitions').path
+    commandLine project.file('./bin/create-xlsx.sh').path, 'benefit', 'dev', 'local'
 }
 
 bootWithCCD {
+    group 'application'
     dependsOn generateXls
     authMode = uk.gov.hmcts.rse.AuthMode.Local
 
@@ -594,4 +600,10 @@ bootWithCCD {
             }
         }
     }
+}
+
+task highLevelDataSetup(type: JavaExec) {
+    mainClass = "uk.gov.hmcts.reform.sscs.config.HighLevelDataSetupApp"
+    classpath += sourceSets.main.runtimeClasspath
+    jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
