@@ -596,8 +596,22 @@ bootWithCCD {
     }
 }
 
+task runE2eTestsAat(type: Exec) {
+     workingDir = file("${project.projectDir}/definitions/test")
+    commandLine 'yarn', 'test:aat'
+}
+
+task runE2eTestsPreview(type: Exec) {
+     workingDir = file("${project.projectDir}/definitions/test")
+    commandLine 'yarn', 'test:preview'
+}
+task runE2eTestsPreviewHearings(type: Exec) {
+     workingDir = file("${project.projectDir}/definitions/test")
+    commandLine 'yarn', 'test:preview-hearings'
+}
 task highLevelDataSetup(type: JavaExec) {
     mainClass = "uk.gov.hmcts.reform.sscs.config.HighLevelDataSetupApp"
     classpath += sourceSets.main.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
+

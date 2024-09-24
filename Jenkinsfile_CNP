@@ -217,11 +217,11 @@ withPipeline(type, product, component) {
                  echo "Don't run functional test"
               } else {
                   try{
-                    echo "attempting to run e2e tests"
+                    echo "attempting to run e2e tests on PREVIEW"
                     if(params.HEARINGS_LABEL_ENABLED == 'No'){
-                        yarnBuilder.yarn('test:preview')
+                        sh './gradlew runE2eTestsPreview'
                     } else {
-                        yarnBuilder.yarn('test:preview-hearings')
+                        sh './gradlew runE2eTestsPreviewHearings'
                     }
                 } finally {
                     publishHTML([
@@ -242,8 +242,8 @@ withPipeline(type, product, component) {
     afterSuccess('smoketest:aat') {
         stage('Playwright tests') {
             try{
-                echo "attempting to run e2e tests"
-                yarnBuilder.yarn('test:aat')
+                echo "attempting to run e2e tests on AAT"
+                sh 'runE2eTestsAat'
             } finally {
                 publishHTML([
                     allowMissing: true,
