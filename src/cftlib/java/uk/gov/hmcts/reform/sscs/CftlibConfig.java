@@ -129,7 +129,7 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-ras-validation",
                 "GS_profile"
         );
-        var def = Files.readAllBytes(Path.of("../sscs-ccd-definitions/releases/CCD_SSCSDefinition_vdev_LOCAL.xlsx"));
+        var def = Files.readAllBytes(Path.of("./definitions/benefit/CCD_SSCSDefinition_LOCAL.xlsx"));
         lib.importDefinition(def);
 
         var roleAssignments = Resources.toString(Resources.getResource("am-role-assignments.json"), StandardCharsets.UTF_8);

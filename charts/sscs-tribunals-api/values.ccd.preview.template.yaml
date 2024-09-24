@@ -173,7 +173,7 @@ ccd:
     adminWeb:
       enabled: ${PREVIEW_CCD_ENABLED}
     definitionImporter:
-      enabled: ${PREVIEW_CCD_ENABLED}
+      enabled: false
     userProfileImporter:
       enabled: ${PREVIEW_CCD_ENABLED}
     apiGatewayWeb:
@@ -504,50 +504,6 @@ ccd:
       - sscs.superuser@mailinator.com|SSCS|Benefit|appealCreated
       - sscs-citizen2@hmcts.net|SSCS|Benefit|appealCreated
 
-  #Use this image to import your CCD definition. To have an image available, create a git tag and push it.
-  ccd-definition-importer:
-    image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:6.4.16nonProd
-    definitionFilename: sscs-ccd.xlsx
-    redirectUri: http://${SERVICE_NAME}-ccd-admin-web/oauth2redirect
-    environment:
-      CCD_ENVIRONMENT: 'PROD'
-      CCD_DEF_EM_CCD_ORCHESTRATOR_URL: http://${SERVICE_NAME}-em-ccd-orchestrator
-      CCD_DEF_TRIBUNALS_API_URL: http://${SERVICE_NAME}-java
-      CCD_DEF_TYA_NOTIFICATIONS_API_URL: http://${SERVICE_NAME}-tya-notification
-      CCD_DEF_BULK_SCAN_API_URL: http://${SERVICE_NAME}-bulk-scan-api
-      CCD_DEF_BULK_SCAN_ORCHESTRATOR_URL: http://${SERVICE_NAME}-bulk-scan-orchestrator
-      CCD_DEF_COR_BACKEND_URL: http://${SERVICE_NAME}-ccd-definition-store
-      CCD_STORE_BASE_URL: http://${SERVICE_NAME}-ccd-definition-store
-      CCD_DEF_TYA_LINK: http://${SERVICE_NAME}-ccd-definition-store
-      CCD_DEF_TYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
-      CCD_DEF_MYA_LINK: http://${SERVICE_NAME}/sign-in?tya=
-      CCD_DEF_MYA_REPRESENTATIVE_LINK: http://${SERVICE_NAME}-ccd-definition-store
-      CCD_DEF_MYA_APPOINTEE_LINK: http://${SERVICE_NAME}-ccd-definition-store
-      CCD_DEF_ENV: 'PROD'
-      CCD_DEF_VERSION: 6.4.16nonProd
-    secrets: []
-    userRoles:
-      - citizen
-      - caseworker
-      - caseworker-sscs
-      - caseworker-sscs-systemupdate
-      - caseworker-sscs-anonymouscitizen
-      - caseworker-sscs-callagent
-      - caseworker-sscs-judge
-      - caseworker-sscs-judge-salaried
-      - caseworker-sscs-clerk
-      - caseworker-sscs-dwpresponsewriter
-      - caseworker-sscs-registrar
-      - caseworker-sscs-superuser
-      - caseworker-sscs-teamleader
-      - caseworker-sscs-panelmember
-      - caseworker-sscs-bulkscan
-      - caseworker-sscs-pcqextractor
-      - caseworker-sscs-hmrcresponsewriter
-      - caseworker-sscs-ibcaresponsewriter
-      - caseworker-wa-task-configuration
-      - caseworker-ras-validation
-      - GS_profile
 elastic:
   enabled: true
 
