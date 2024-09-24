@@ -1,0 +1,17 @@
+[
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseStateID": "ScannedRecordReceived", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseStateID": "ScannedRecordAttachedToCase", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseStateID": "ScannedRecordCaseCreated", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseStateID": "ScannedRecordRejected", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseStateID": "ScannedRecordManuallyHandled", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseStateID": "ScannedRecordReceived", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseStateID": "ScannedRecordAttachedToCase", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseStateID": "ScannedRecordCaseCreated", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseStateID": "ScannedRecordRejected", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseStateID": "ScannedRecordManuallyHandled", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseStateID": "ScannedRecordReceived", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseStateID": "ScannedRecordAttachedToCase", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseStateID": "ScannedRecordCaseCreated", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseStateID": "ScannedRecordRejected", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseStateID": "ScannedRecordManuallyHandled", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"}
+]

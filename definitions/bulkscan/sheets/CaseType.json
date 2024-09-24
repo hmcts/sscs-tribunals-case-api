@@ -1,0 +1,3 @@
+[
+  {"LiveFrom": "01/01/2018", "ID": "SSCS_ExceptionRecord", "Name": "SSCS Bulkscanning ${CCD_DEF_VERSION} ${CCD_DEF_ENV}", "Description": "Bulkscanning Exception", "JurisdictionID": "SSCS", "SecurityClassification": "PUBLIC"}
+]
