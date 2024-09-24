@@ -6,8 +6,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 
-import feign.FeignException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import java.io.File;
