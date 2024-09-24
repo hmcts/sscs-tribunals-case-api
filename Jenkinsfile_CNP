@@ -207,6 +207,55 @@ withPipeline(type, product, component) {
         generateDefinitions()
     }
 
+    afterSuccess('smoketest:preview') {
+        env.TEST_E2E_URL_WEB = params.URL_TO_TEST
+        env.TEST_E2E_API_URI = params.TRIBUNALS_API_URI
+
+         stage('Playwright tests') {
+
+             if(githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies")) {
+                 echo "Don't run functional test"
+              } else {
+                  try{
+                    if(params.HEARINGS_LABEL_ENABLED == 'No'){
+                        yarnBuilder.yarn('test:preview')
+                    } else {
+                        yarnBuilder.yarn('test:preview-hearings')
+                    }
+                } finally {
+                    publishHTML([
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: "playwright-report",
+                        reportFiles: 'index.html',
+                        reportName: 'SSCS E2E Test Report'
+            ])
+                steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**/*'
+                }
+              }
+        }
+            
+    }
+
+    afterSuccess('smoketest:aat') {
+        stage('Playwright tests') {
+            try{
+                yarnBuilder.yarn('test:aat')
+            } finally {
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: "playwright-report",
+                    reportFiles: 'index.html',
+                    reportName: 'SSCS E2E Test Report'
+            ])
+            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**/*'
+            }
+        }
+    }
+
     afterAlways('functionalTest:aat') {
         env.ENVIRONMENT="prod"
     }
