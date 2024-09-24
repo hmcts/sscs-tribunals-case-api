@@ -18,10 +18,10 @@
     "test:a11y": "echo test:a11y",
     "highLevelDataSetup": "echo 'bash bin/before-data-setup-step.sh benefit $1 && ./gradlew highLevelDataSetup --args=$1 && sh bin/after-data-setup-step.sh' > ./temp.sh && sh ./temp.sh",
     "test:smoke": "echo no tests run at this step",
-    "test:preview": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never yarn playwright install && npx playwright test --config functional-test/playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep @preview-pipeline",
-    "test:preview-hearings": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never yarn playwright install && npx playwright test --config functional-test/playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep '(?=.*@preview-pipeline) | (?=.*@hearings-enabled-test)'",
-    "test:aat": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never yarn playwright install && npx playwright test --config functional-test/playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep @master-pipeline",
-    "test:fullfunctional": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never yarn playwright install && npx playwright test --config functional-test/playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep @nightly-pipeline"
+    "test:preview": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never yarn playwright install && npx playwright test --config ./playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep @preview-pipeline",
+    "test:preview-hearings": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never yarn playwright install && npx playwright test --config ./playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep '(?=.*@preview-pipeline) | (?=.*@hearings-enabled-test)'",
+    "test:aat": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never yarn playwright install && npx playwright test --config ./playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep @master-pipeline",
+    "test:fullfunctional": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never yarn playwright install && npx playwright test --config ./playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep @nightly-pipeline"
   },
   "dependencies": {
     "@cucumber/cucumber": "^9.5.0",
