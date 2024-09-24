@@ -218,6 +218,7 @@ withPipeline(type, product, component) {
               } else {
                   try{
                     echo "attempting to run e2e tests on PREVIEW"
+                    sh './gradlew YarnInstall'
                     if(params.HEARINGS_LABEL_ENABLED == 'No'){
                         sh './gradlew runE2eTestsPreview'
                     } else {
@@ -243,7 +244,8 @@ withPipeline(type, product, component) {
         stage('Playwright tests') {
             try{
                 echo "attempting to run e2e tests on AAT"
-                sh 'runE2eTestsAat'
+                sh './gradlew yarnInstall'
+                sh './gradlew runE2eTestsAat'
             } finally {
                 publishHTML([
                     allowMissing: true,
