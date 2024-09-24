@@ -296,6 +296,13 @@ dependencyManagement {
     }
 }
 
+def versions = [
+        springboot   : '2.7.18',
+        jackson      : '2.17.2',
+        junitjupiter : '5.10.0',
+        lombok       : '1.18.28'
+]
+
 dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-autoconfigure', version: springBoot.class.package.implementationVersion
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter', version: springBoot.class.package.implementationVersion
@@ -343,8 +350,8 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.11.6'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.12'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'cb61d43'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: 'ea87714'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
@@ -353,10 +360,11 @@ dependencies {
 
     implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.4'
 
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.3'
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: versions.jackson
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: versions.jackson
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: versions.jackson
 
     implementation group:'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'org.springframework', name: 'spring-jms'

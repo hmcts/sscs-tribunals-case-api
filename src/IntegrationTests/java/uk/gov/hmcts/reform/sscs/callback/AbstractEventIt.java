@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWi
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -68,12 +67,12 @@ public abstract class AbstractEventIt {
 
     void setup() throws IOException {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-        mapper.registerModule(new JavaTimeModule());
+        mapper.findAndRegisterModules();
     }
 
     void setup(String jsonFile) throws IOException {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-        mapper.registerModule(new JavaTimeModule());
+        mapper.findAndRegisterModules();
         json = getJson(jsonFile);
     }
 
