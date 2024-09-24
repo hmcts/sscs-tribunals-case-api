@@ -64,6 +64,5 @@
     "semver": "^7.5.4",
     "tar": "^6.2.1",
     "micromatch": "^4.0.8"
-  },
-  "packageManager": "yarn@3.5.0"
+  }
 }

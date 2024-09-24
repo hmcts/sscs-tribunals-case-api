@@ -599,17 +599,20 @@ bootWithCCD {
 task runE2eTestsAat(type: Exec) {
      workingDir = file("${project.projectDir}/definitions/test")
     commandLine 'corepack', 'enable'
+    commandLine 'yarn', 'install'
     commandLine 'yarn', 'test:aat'
 }
 
 task runE2eTestsPreview(type: Exec) {
      workingDir = file("${project.projectDir}/definitions/test")
     commandLine 'corepack', 'enable'
+    commandLine 'yarn', 'install'
     commandLine 'yarn', 'test:preview'
 }
 task runE2eTestsPreviewHearings(type: Exec) {
      workingDir = file("${project.projectDir}/definitions/test")
     commandLine 'corepack', 'enable'
+    commandLine 'yarn', 'install'
     commandLine 'yarn', 'test:preview-hearings'
 }
 task highLevelDataSetup(type: JavaExec) {
