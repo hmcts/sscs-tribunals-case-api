@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
@@ -34,7 +33,6 @@ import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 @SpringBootTest({
     "document_management.url : http://localhost:5006"
 })
-@TestPropertySource(locations = {"classpath:application.properties"})
 public class DocumentServiceConsumerTest {
     @MockBean
     private AuthTokenGenerator authTokenGenerator;

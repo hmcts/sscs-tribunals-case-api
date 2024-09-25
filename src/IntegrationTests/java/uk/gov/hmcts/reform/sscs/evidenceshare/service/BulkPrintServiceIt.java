@@ -14,7 +14,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
@@ -25,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
-@ActiveProfiles("integration")
 public class BulkPrintServiceIt {
 
     // Below rules are needed to use the junitParamsRunner together with SpringRunner

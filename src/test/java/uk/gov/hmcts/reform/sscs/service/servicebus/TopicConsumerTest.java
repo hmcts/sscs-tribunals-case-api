@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.evidenceshare.exception.*;
 import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
 import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 import uk.gov.hmcts.reform.sscs.service.exceptions.ClientAuthorisationException;
-import uk.gov.hmcts.reform.sscs.tyanotifications.service.servicebus.NotificationsMessageProcessor;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TopicConsumerTest {
@@ -34,15 +33,12 @@ public class TopicConsumerTest {
     @Mock
     private SscsCaseCallbackDeserializer deserializer;
 
-    @Mock
-    private NotificationsMessageProcessor notificationsMessageProcessor;
-
     private TopicConsumer topicConsumer;
     private Exception exception;
 
     @Before
     public void setup() {
-        topicConsumer = new TopicConsumer(RETRY_THREE_TIMES, dispatcher, deserializer, notificationsMessageProcessor, false);
+        topicConsumer = new TopicConsumer(RETRY_THREE_TIMES, dispatcher, deserializer);
     }
 
     @Test
@@ -131,11 +127,4 @@ public class TopicConsumerTest {
         verify(dispatcher).handle(any(), any());
     }
 
-
-    @Test
-    public void shouldProcessMessageForNotifications() {
-        topicConsumer = new TopicConsumer(RETRY_THREE_TIMES, dispatcher, deserializer, notificationsMessageProcessor, true);
-        topicConsumer.onMessage(MESSAGE, "1");
-        verify(notificationsMessageProcessor).processMessage(MESSAGE, "1");
-    }
 }

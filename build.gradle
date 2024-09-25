@@ -102,8 +102,6 @@ tasks.withType(Test).configureEach {
 
 tasks.register('integration', Test) {
     jvmArgs = ['-Xms1024m', '-Xmx2048m']
-    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
-    forkEvery = 10
     setTestClassesDirs(sourceSets.integrationTest.output.classesDirs)
     setClasspath(sourceSets.integrationTest.runtimeClasspath)
 }
@@ -115,7 +113,6 @@ tasks.register('functional', Test) {
     setClasspath(sourceSets.functionalTest.runtimeClasspath)
     include "uk/gov/hmcts/reform/sscs/functional/**"
     exclude "uk/gov/hmcts/reform/sscs/smoke/**"
-    maxParallelForks = Runtime.runtime.availableProcessors()
 }
 
 tasks.register('smoke', Test) {
@@ -309,7 +306,6 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: springBoot.class.package.implementationVersion
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-activemq', version: springBoot.class.package.implementationVersion
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: springBoot.class.package.implementationVersion
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
 
     implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.8.10'
     implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.10'
@@ -347,9 +343,6 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.mchange', name: 'c3p0', version: '0.9.5.5'
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.11.6'
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.12'
 
@@ -375,20 +368,11 @@ dependencies {
     implementation group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.9.11'
     implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: '0.5'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '1.5.7', {
-        exclude group: "uk.gov.hmcts.reform", module:"properties-volume-spring-boot-starter"
-    }
-    implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.0-RELEASE'
-    implementation group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.17.0'
-
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.3.1'
     testImplementation group: 'io.rest-assured', name: 'xml-path', version: '5.3.1'
     testImplementation group: 'io.rest-assured', name: 'json-path', version: '5.3.1'
     testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.3.0', classifier: 'all', {
         exclude group: 'commons-io', module: 'commons-io'
-    }
-    testImplementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '1.5.7', {
-        exclude group: "uk.gov.hmcts.reform", module:"properties-volume-spring-boot-starter"
     }
 
     implementation group: 'commons-io', name: 'commons-io', version:  '2.13.0'
@@ -455,8 +439,6 @@ dependencies {
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 
     testImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-quartz', version: '2.7.18'
-
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
     functionalTestImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
     functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.28'
@@ -625,20 +607,3 @@ task highLevelDataSetup(type: JavaExec) {
     classpath += sourceSets.main.runtimeClasspath
     jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
-
-// this is required to force Java running on the Azure Windows Server OS into using
-// UTF-8 as the default character set instead of windows-1252 which causes issues
-applicationDefaultJvmArgs = ["-Dfile.encoding=UTF-8"]
-
-run {
-    def debug = System.getProperty("debug")
-    if (debug == 'true') {
-        jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
-    }
-}
-
-def dbHost = System.env.JOB_SCHEDULER_DB_HOST ?: "localhost"
-def dbPort = System.env.JOB_SCHEDULER_DB_PORT ?: 5432
-def dbName = System.env.JOB_SCHEDULER_DB_NAME ?: "sscsjobscheduler"
-def dbUser = System.env.JOB_SCHEDULER_DB_USERNAME ?: "sscsjobscheduler"
-def dbPass = System.env.JOB_SCHEDULER_DB_PASSWORD ?: "sscsjobscheduler"

@@ -21,20 +21,13 @@ public class DocmosisPdfService implements PdfService {
         ObjectMapper objectMapper = new ObjectMapper();
 
         Map<String, Object> placeholders = objectMapper.convertValue(
-            pdfSummary,
-            new TypeReference<>() {
-            }
+                pdfSummary,
+                new TypeReference<Map<String, Object>>() {
+                }
         );
         return docmosisPdfGenerationService.generatePdf(DocumentHolder.builder()
-            .template(new Template(templatePath, ""))
-            .placeholders(placeholders)
-            .build());
-    }
-
-    public byte[] createPdfFromMap(Map<String, Object> placeholders, String templatePath) {
-        return docmosisPdfGenerationService.generatePdf(DocumentHolder.builder()
-            .template(new Template(templatePath, ""))
-            .placeholders(placeholders)
-            .build());
+                .template(new Template(templatePath, ""))
+                .placeholders(placeholders)
+                .build());
     }
 }
