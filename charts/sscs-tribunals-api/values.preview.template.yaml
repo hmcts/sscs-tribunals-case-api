@@ -27,9 +27,22 @@ java:
     ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
     ISSUE_GENERIC_LETTER: true
     HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: true
+    COH_URL: "http://coh-cor-aat.service.core-compute-aat.internal"
+    ONLINE_HEARING_LINK: "https://sscs-cor-frontend-aat.service.core-compute-aat.internal"
+    JOB_SCHEDULER_DB_PASSWORD:  "{{ .Values.postgresql.auth.password}}"
+    JOB_SCHEDULER_DB_USERNAME: hmcts
+    JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscs-job-scheduler"
+    JOB_SCHEDULER_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
+    JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+    HOURS_START_TIME: 0
+    HOURS_END_TIME: 23
+    RUN_DB_MIGRATION_ON_STARTUP: false
+    TEST_RECIPIENTS_POSTCODE: "*"
     TESTING_SUPPORT_ENABLED: true
     HANDLE_CCD_CALLBACKMAP_V2: true
     POST_HEARINGS_B_FEATURE: true
+  postgresql:
+    enabled: true
 
 ccd-def-cleanup:
   enabled: true
