@@ -1,0 +1,23 @@
+[
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "type", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "subtype", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "url", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "controlNumber", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "fileName", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "scannedDate", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "deliveryDate", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "type", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "subtype", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "url", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "controlNumber", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "fileName", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "scannedDate", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "deliveryDate", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "type", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "subtype", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "url", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "controlNumber", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "fileName", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "scannedDate", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "scannedDocuments", "ListElementCode": "deliveryDate", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"}
+]
