@@ -10,6 +10,8 @@ java:
   ingressHost: ${SERVICE_FQDN}
   cpuLimits: 2000m
   readinessDelay: 45
+  devmemoryRequests: 1Gi
+  devmemoryLimits: 2Gi
   environment:
     PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
@@ -48,6 +50,7 @@ java:
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
     AMQP_USERNAME: "RootManageSharedAccessKey"
     HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
+    BYPASS_NOTIFICATIONS_SERVICE: false
     HANDLE_CCD_CALLBACKMAP_V2: true
   secrets:
     HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
@@ -539,6 +542,7 @@ sscs-tya-notif:
       POST_HEARINGS_FEATURE: true
       POST_HEARINGS_B_FEATURE: true
       DUMMY: true
+      BYPASS_NOTIFICATIONS_SERVICE: false
     secrets:
       JOB_SCHEDULER_DB_PASSWORD:
         secretRef: postgres
@@ -646,7 +650,7 @@ sscs-hearings-api:
       #Messaging
       HMC_HEARINGS_LISTENING_ENABLED: true
       HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
-      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-3901"
+      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-3764"
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
       TRIBUNALS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
