@@ -1721,10 +1721,21 @@ outOfHours:
     endHour: ${HOURS_END_TIME:19}
 
 feign:
+    httpclient:
+        enabled: true
     client:
         config:
             core-case-data-api:
                 decode404: true
+            default:
+                connect-timeout: 10000
+                read-timeout: 10000
+                logger-level: full
+        retryer:
+            period: 500
+            maxPeriod: 2000
+            maxAttempts: 3
+
 
 # Document store
 document_management.url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:5005}
@@ -1763,6 +1774,9 @@ retry:
         1: ${RETRY_DELAY_1:60}
         2: ${RETRY_DELAY_2:120}
         3: ${RETRY_DELAY_3:1800}
+    hearing-response-update:
+        max-retries: 3
+        backoff: 3000
 
 pdf-service:
     uri: ${PDF_SERVICE_BASE_URL:https://docmosis.aat.platform.hmcts.net/rs/render}
@@ -1954,6 +1968,24 @@ wlu:
         subject: ${WLU_EMAIL_SUBJECT:Welsh translation –}
         to: ${WLU_EMAIL_TO:sscs-tests@HMCTS.NET}
 
+
+---
+
+# Hearing-api
+exui:
+    url: ${EXUI_API_URL:http://localhost:3455}
+hmc:
+    url: ${HMC_API_URL:http://localhost:8084}
+    deployment-id: ${HMC_DEPLOYMENT_ID:}
+
+sscs.serviceCode: ${SSCS_SERVICE_CODE:BBA3}
+
+flags:
+    hmc-to-hearings-api.enabled: ${HMC_HEARINGS_LISTENING_ENABLED:false}
+    tribunals-to-hearings-api.enabled: ${TRIBUNALS_HEARINGS_LISTENING_ENABLED:false}
+    adjournment.enabled: ${ADJOURNMENT_ENABLED:false}
+    postHearings.enabled: ${POST_HEARING_ENABLED:false}
+    deployment-filter.enabled: ${HMC_DEPLOYMENT_FILTER_ENABLED:false}
 
 ---
 
