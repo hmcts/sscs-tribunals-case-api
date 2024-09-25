@@ -41,7 +41,7 @@ java:
     TESTING_SUPPORT_ENABLED: true
     HANDLE_CCD_CALLBACKMAP_V2: true
     POST_HEARINGS_B_FEATURE: true
-    BYPASS_HEARING_API_SERVICE: false
+    BYPASS_HEARING_API_SERVICE: true
   postgresql:
     enabled: true
 
