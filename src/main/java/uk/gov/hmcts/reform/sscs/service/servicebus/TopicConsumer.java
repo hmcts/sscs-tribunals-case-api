@@ -27,7 +27,7 @@ public class TopicConsumer {
     private final CallbackDispatcher<SscsCaseData> dispatcher;
     private final SscsCaseCallbackDeserializer sscsDeserializer;
 
-    public TopicConsumer(@Value("${send-letter.maxRetryAttempts}") Integer maxRetryAttempts,
+    public TopicConsumer(@Value("${callback.maxRetryAttempts}") Integer maxRetryAttempts,
                          CallbackDispatcher<SscsCaseData> dispatcher,
                          SscsCaseCallbackDeserializer sscsDeserializer) {
         this.maxRetryAttempts = maxRetryAttempts;
