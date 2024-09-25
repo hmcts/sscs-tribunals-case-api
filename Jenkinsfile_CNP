@@ -34,12 +34,10 @@ def secrets = [
         secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
         secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
         secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
-        secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
         secret('robotics-email-from', 'ROBOTICS_EMAIL_FROM'),
         secret('robotics-email-to', 'ROBOTICS_EMAIL_TO'),
         secret('robotics-email-scottish-to', 'ROBOTICS_EMAIL_SCOTTISH_TO'),
         secret('robotics-email-pip-ae-to', 'ROBOTICS_EMAIL_PIP_AE_TO'),
-        secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
     ],
     's2s-${env}'      : [
             secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
@@ -66,7 +64,6 @@ def secretsForPR = [
                 secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
                 secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
                 secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
-                secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
                 secret('sscs-servicebus-connection-string-tf', 'SERVICE_BUS_CONNECTION_STRING'),
                 secret('preview-ccd-db-password-2', 'PREVIEW_DB_PASSWORD_2'),
                 secret('preview-shared-db-password', 'SHARED_DB_PASSWORD')
