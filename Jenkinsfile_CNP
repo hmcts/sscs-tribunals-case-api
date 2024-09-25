@@ -117,7 +117,7 @@ withPipeline(type, product, component) {
     if (env.BRANCH_NAME.startsWith("PR")) {
         loadVaultSecrets(secretsForPR)
         env.PREVIEW_CCD_ENABLED = true
-        env.CASE_TYPE = "Benefit"
+        env.CASE_TYPE = "Benefit"   
         env.CORE_CASE_DATA_API_URL = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-data-store-api"
         env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
         for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_hearings") ) {

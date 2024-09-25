@@ -76,6 +76,9 @@ sourceSets {
             runtimeClasspath += main.output + test.output
             srcDir('src/functionalTest/java')
         }
+        resources {
+            srcDir('src/functionalTest/resources')
+        }
     }
     contractTest {
         java {
@@ -111,7 +114,9 @@ tasks.register('functional', Test) {
     description = 'Executes non-destructive functional tests in AAT against a running CCD and notification service'
     setTestClassesDirs(sourceSets.functionalTest.output.classesDirs)
     setClasspath(sourceSets.functionalTest.runtimeClasspath)
+    useJUnitPlatform()
     include "uk/gov/hmcts/reform/sscs/functional/**"
+    include "uk/gov/hmcts/reform/sscs/qa/api/functional/**"
     exclude "uk/gov/hmcts/reform/sscs/smoke/**"
 }
 
