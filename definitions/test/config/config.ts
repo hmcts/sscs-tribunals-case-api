@@ -10,11 +10,11 @@ export const urls = {
   s2sUrl : process.env.S2S_URL || 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal',
   ccdApiUrl : process.env.CCD_API_URL || 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
 };
-
+const versionFilePath = path.resolve(__dirname, '../../benefit/VERSION.yaml');
 export const environment = {
   name: process.env.ENVIRONMENT ?? '',
   hearingsEnabled: process.env.HEARINGS_ENABLED,
-  aatDefVersion: yaml.load(fs.readFileSync('../../benefit/VERSION.yaml', 'utf8'))
+  aatDefVersion: yaml.load(fs.readFileSync(versionFilePath, 'utf8'))
 }
 
 export const credentials = {
