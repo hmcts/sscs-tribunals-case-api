@@ -14,7 +14,7 @@ export const urls = {
 export const environment = {
   name: process.env.ENVIRONMENT ?? '',
   hearingsEnabled: process.env.HEARINGS_ENABLED,
-  aatDefVersion: yaml.load(fs.readFileSync('./benefit/VERSION.yaml', 'utf8'))
+  aatDefVersion: yaml.load(fs.readFileSync('../../benefit/VERSION.yaml', 'utf8'))
 }
 
 export const credentials = {
