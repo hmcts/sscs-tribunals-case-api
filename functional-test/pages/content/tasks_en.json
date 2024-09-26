@@ -1,0 +1,42 @@
+{
+    "tasksHeading": "Active tasks",
+    "assignToMe": "Assign to me",
+    "assignTask" : "Assign task",
+    "unassignTask" : "Unassign task",
+    "reassignTask" : "Reassign task",
+    "markAsDone" : "Mark as done",
+    "cancelTask" : "Cancel task",
+    "manageLabel" : "Manage",
+    "nextStepsLabel" : "Next steps",
+    "assignTaskHeading" : "Assign task",
+    "reassignTaskHeading" : "Reassign task",
+    "unassignTaskHeading" : "Unassign task",
+    "markAsDoneHeading" : "Mark the task as done",
+    "cancelTaskHeading" : "Cancel a task",
+    "assignTaskDescription" : "Assign a task to a person based on their role type",
+    "assignTaskCaseworkerLabel" : "Caseworker",
+    "roleTypeHeading" : "Choose a role type",
+    "findPersonHeading" : "Find person",
+    "roleTypeFormLabel" : "Which role type are you assigning the task to?",
+    "checkYourAnswersHeading" : "Check your answers",
+    "assignTaskButtonLabel" : "Assign",
+    "reassignTaskButtonLabel" : "Reassign",
+    "unassignTaskButtonLabel" : "Unassign",
+    "markAsDoneButtonLabel" : "Mark as done",
+    "cancelTaskButtonLabel" : "Cancel task",
+    "judicialRole": {
+        "roleType": "Judicial"
+    },
+    "legalOpsRole": {
+        "roleType": "Legal Ops",
+        "assignToName" : "SSCS cw"
+    },
+    "adminRole": {
+        "roleType": "Admin",
+        "assignToName" : "SSCS admin"
+    },
+    "ctscRole": {
+        "roleType": "CTSC",
+        "assignToName" : "SSCS ctscadmin"
+    }
+}

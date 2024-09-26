@@ -1,0 +1,45 @@
+{
+    "name": "Referred by Admin - LO",
+    "priority": "low",
+    "assignedToWhenNotAssigned": "Unassigned",
+    "assignedTo": "SSCS cw",
+    "unassignedManageOptions" : [
+        "Assign to me"
+    ],
+    "assignedManageOptions" : [
+        "Reassign task",
+        "Unassign task"
+    ],
+    "unassignedManageOptionsForCaseAllocator": [
+        "Assign task",
+        "Cancel task",
+        "Assign to me"
+    ],
+    "assignedManageOptionsForCaseAllocator" : [
+        "Cancel task",
+        "Mark as done",
+        "Reassign task",
+        "Unassign task"
+    ],
+    "nextStepsOptions": [
+        "Amend interloc review state",
+        "Issue directions notice",
+        "Send to admin",
+        "Send to Judge"
+    ],
+    "amendInterlocReviewState": {
+        "link": "Amend interloc review state",
+        "eventTitle": "Amend interloc review state"
+    },
+    "issueDirectionsNotice": {
+        "link": "Issue directions notice",
+        "eventTitle": "Issue direction"
+    },
+    "sendToAdmin": {
+        "link": "Send to admin",
+        "eventTitle": "Send to admin"
+    },
+    "sendToJudge": {
+        "link": "Send to Judge"
+    }
+}

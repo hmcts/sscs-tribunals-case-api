@@ -1,0 +1,68 @@
+{
+  "name": "sscs-tribunals-case-api",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "setup": "./bin/pull-latest-ccd-files.sh",
+    "lint": "echo lint",
+    "test": "NODE_PATH=. mocha test/unit/definitions/**/*.js",
+    "sonar-scan": "node_modules/sonar-scanner/bin/sonar-scanner",
+    "test:functional": "echo skip decomissioned protractor test",
+    "test:functional-headless": "yarn playwright install && npx playwright test --config functional-test/playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation",
+    "test:functional-head": "yarn playwright install && npx playwright test --config functional-test/playwright.config.ts --project chromium --headed --reporter=html --grep-invert @work-allocation --grep @wip-test",
+    "start": "node index.js",
+    "test:coverage": "echo test:coverage",
+    "test:a11y": "echo test:a11y",
+    "highLevelDataSetup": "echo 'bash bin/before-data-setup-step.sh benefit $1 && ./gradlew highLevelDataSetup --args=$1 && sh bin/after-data-setup-step.sh' > ./temp.sh && sh ./temp.sh",
+    "test:smoke": "echo no tests run at this step",
+    "test:preview": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never yarn playwright install && npx playwright test --config functional-test/playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep @preview-pipeline",
+    "test:preview-hearings": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never yarn playwright install && npx playwright test --config functional-test/playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep '(?=.*@preview-pipeline) | (?=.*@hearings-enabled-test)'",
+    "test:aat": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never yarn playwright install && npx playwright test --config functional-test/playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep @master-pipeline",
+    "test:fullfunctional": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never yarn playwright install && npx playwright test --config functional-test/playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep @nightly-pipeline"
+  },
+  "dependencies": {
+    "@cucumber/cucumber": "^9.5.0",
+    "@hmcts/nodejs-healthcheck": "^1.8.0",
+    "@hmcts/properties-volume": "^1.1.0",
+    "config": "^3.3.9",
+    "eslint-plugin-codeceptjs": "^1.3.0",
+    "express": "^4.21.0",
+    "js-yaml": "^4.1.0",
+    "json5": "^2.2.3",
+    "node-cache": "^5.1.2",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "7.2.0",
+    "@hmcts/eslint-config": "^1.4.0",
+    "@playwright/test": "^1.41.1",
+    "@types/node": "^20.11.6",
+    "chai": "^4.3.8",
+    "eslint": "^8.48.0",
+    "eslint-plugin-mocha": "^10.1.0",
+    "husky": "^9.0.0",
+    "lodash": "^4.17.21",
+    "mocha": "^10.4.0",
+    "otp": "^1.1.0",
+    "playwright-core": "^1.41.1",
+    "pre-commit": "^1.2.2",
+    "prettier": "^3.0.3",
+    "pretty-quick": "^4.0.0",
+    "request": "^2.88.2",
+    "request-promise-native": "^1.0.9",
+    "sonar-scanner": "^3.1.0",
+    "typescript": "^5.3.3"
+  },
+  "resolutions": {
+    "axios": "^1.7.4",
+    "braces": "^3.0.3",
+    "phin": "^3.7.1",
+    "semver": "^7.5.4",
+    "tar": "^6.2.1",
+    "micromatch": "^4.0.8"
+  },
+  "packageManager": "yarn@3.5.0"
+}
