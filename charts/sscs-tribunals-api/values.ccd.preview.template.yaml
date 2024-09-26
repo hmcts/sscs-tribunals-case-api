@@ -539,7 +539,8 @@ sscs-tya-notif:
       JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscs-job-scheduler"
       JOB_SCHEDULER_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
       JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
-      JOB_SCHEDULER_DB_USERNAME: hmcts
+      JOB_SCHEDULER_DB_PASSWORD:  "{{ .Values.postgresql.auth.password}}"
+      JOB_SCHEDULER_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
       HOURS_START_TIME: 0
       HOURS_END_TIME: 23
       RUN_DB_MIGRATION_ON_STARTUP: true
