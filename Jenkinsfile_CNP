@@ -247,7 +247,7 @@ withPipeline(type, product, component) {
                         reportFiles: 'index.html',
                         reportName: 'SSCS E2E Test Report'
             ])
-                steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/**/*'
+                steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/*'
                 }
               }
         }
