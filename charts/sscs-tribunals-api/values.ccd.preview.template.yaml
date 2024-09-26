@@ -542,7 +542,7 @@ sscs-tya-notif:
       POST_HEARINGS_FEATURE: true
       POST_HEARINGS_B_FEATURE: true
       DUMMY: true
-      BYPASS_NOTIFICATIONS_SERVICE: false
+      BYPASS_NOTIFICATIONS_SERVICE: true
     secrets:
       JOB_SCHEDULER_DB_PASSWORD:
         secretRef: postgres
