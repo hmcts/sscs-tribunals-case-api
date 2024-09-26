@@ -154,5 +154,15 @@
     "ReadOnly": "N",
     "AccessProfiles": "caseworker-sscs-pcqextractor",
     "Disabled": "N"
+  },
+  {
+    "LiveFrom": "18/03/2023",
+    "CaseTypeID": "Benefit",
+    "RoleName": "idam:caseworker-sscs-ibcaresponsewriter",
+    "CaseAccessCategories": "",
+    "Authorisation": "",
+    "ReadOnly": "N",
+    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-ibcaresponsewriter",
+    "Disabled": "N"
   }
 ]
