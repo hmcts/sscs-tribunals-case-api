@@ -83,13 +83,30 @@
       "bulkScanCaseReference": "12222",
       "generatedSurname": "Smith",
       "appeal": {
+        "rep": {
+          "name": {
+            "title": "Mr",
+            "lastName": "Hyland",
+            "firstName": "Peter"
+          },
+          "address": {
+            "town": "Redhill",
+            "line1": "63 Grove Hill Road",
+            "line2": "The Square",
+            "county": "Surrey",
+            "postcode": "RH1 6RE"
+          },
+          "contact": {
+            "email": null,
+            "phone": "02072323231",
+            "mobile": null
+          },
+          "organisation": "ABC Advisory Services",
+          "hasRepresentative": "Yes"
+        },
         "signer": "Sarah Smith",
         "appellant": {
-          "name": {
-            "title": "Mrs",
-            "lastName": "Smith",
-            "firstName": "Sarah"
-          },
+          "name": null,
           "address": {
             "town": "Brentwood",
             "line1": "109 Drake Close",
@@ -183,134 +200,15 @@
         }
       },
       "evidenceHandled": "Yes",
-      "otherParties": [
-        {
-          "value": {
-            "confidentialityRequired": "No",
-            "isAppointee": "No",
-            "id": "1",
-            "name": {
-              "title": "Mr",
-              "firstName": "John",
-              "lastName": "Lewis",
-              "middleName": null
-            },
-            "address": {
-              "line1": "12, Highstreet, Test",
-              "line2": "Highstreet",
-              "town": "Camden",
-              "county": "Hertfordshire",
-              "postcode": "TS1 1ST",
-              "line3": null,
-              "country": null,
-              "postcodeLookup": null,
-              "postcodeAddress": null
-            },
-            "contact": {
-              "phone": "07534744199",
-              "mobile": null,
-              "email": null
-            },
-            "role": {
-              "name": "receivingParent",
-              "description": "Papa"
-            },
-            "isAppointee": "Yes",
-            "appointee": {
-              "id": "2",
-              "name": {
-                "title": "Mrs",
-                "firstName": "Wendy",
-                "lastName": "Smith",
-                "middleName": null
-              },
-              "address": {
-                "line1": "16, Wheatleys",
-                "line2": "test",
-                "town": "St. Albans",
-                "county": "Hertfordshire",
-                "postcode": "TS1 1ST",
-                "line3": null,
-                "country": null,
-                "postcodeLookup": null,
-                "postcodeAddress": null
-              },
-              "contact": {
-                "phone": "07534744199",
-                "mobile": null,
-                "email": "sscs-citizen2@hmcts.net"
-              },
-              "identity": {
-                "dob": null,
-                "nino": null
-              }
-            },
-            "rep": {
-              "hasRepresentative": "Yes",
-              "organisation": "HBO",
-              "id": "3",
-              "name": {
-                "title": "Mr",
-                "firstName": "Test",
-                "lastName": "Rep",
-                "middleName": null
-              },
-              "address": {
-                "line1": "25",
-                "line2": "test",
-                "town": "St, Albans",
-                "county": "Essex",
-                "postcode": "AL4 9UE",
-                "line3": null,
-                "country": null,
-                "postcodeLookup": null,
-                "postcodeAddress": null
-              },
-              "contact": {
-                "phone": "07534744128",
-                "mobile": null,
-                "email": null
-              }
-            },
-            "hearingSubtype": {
-              "wantsHearingTypeTelephone": null,
-              "hearingTelephoneNumber": null,
-              "wantsHearingTypeVideo": null,
-              "hearingVideoEmail": null,
-              "wantsHearingTypeFaceToFace": null
-            },
-            "hearingOptions": {
-              "wantsToAttend": "Yes",
-              "wantsSupport": "No",
-              "languageInterpreter": null,
-              "languages": null,
-              "signLanguageType": null,
-              "other": null,
-              "agreeLessNotice": "Yes",
-              "scheduleHearing": "Yes",
-              "arrangements": [],
-              "excludeDates": [
-                {
-                  "value": {
-                    "start": "2022-12-12",
-                    "end": "2022-12-23"
-                  },
-                  "id": "b5e5a204-4784-429b-bbc9-ad6ae39dcfde"
-                }
-              ]
-            }
-          },
-          "id": "c516a1e8-c34b-4c82-84fe-e51b7b7c9008"
-        }
-      ],
       "sscsDocument": [
         {
           "id": "202c33d8-455a-4eb4-958f-6857f2500a7f",
           "value": {
             "documentLink": {
-              "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465",
+              "document_url": "EVIDENCE_DOCUMENT_PLACEHOLDER",
               "document_filename": "dl16-1563382899630221.pdf",
-              "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465/binary"
+              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_PLACEHOLDER",
+              "document_hash": "EVIDENCE_DOCUMENT_HASH_PLACEHOLDER"
             },
             "documentType": "dl16",
             "documentFileName": "dl16-1563382899630221.pdf",
@@ -318,33 +216,34 @@
           }
         },
         {
-          "id": "636030ca-243f-4a96-8c81-813ab44c1ac7",
+          "id": "636030ca-243f-4a96-8c81-813ab44c1ac8",
           "value": {
             "documentLink": {
-              "document_url": "http://bla.com/doc1",
+              "document_url": "EVIDENCE_DOCUMENT_PLACEHOLDER",
               "document_filename": "evidence-document.pdf",
-              "document_binary_url": "http://bla.com/doc2/binary"
+              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_PLACEHOLDER",
+              "document_hash": "EVIDENCE_DOCUMENT_HASH_PLACEHOLDER"
             },
-            "documentType": "otherPartyRepEvidence",
+            "documentType": "appellantEvidence",
             "controlNumber": "4",
             "evidenceIssued": "No",
             "documentFileName": "evidence-document",
-            "documentDateAdded": "2019-01-01",
-            "originalSenderOtherPartyId": "3"
+            "documentDateAdded": "2019-01-01"
           }
         },
         {
-          "id": "636030ca-243f-4a96-8c81-813ab44c1ac9",
+          "id": "c6838220-88f6-43db-b163-a3eb5008ec11",
           "value": {
             "documentLink": {
-              "document_url": "http://bla.com/doc3",
-              "document_filename": "evidence-document-issued.pdf",
-              "document_binary_url": "http://bla.com/doc3/binary"
+              "document_url": "EVIDENCE_DOCUMENT_PLACEHOLDER",
+              "document_filename": "rep-doc.pdf",
+              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_PLACEHOLDER",
+              "document_hash": "EVIDENCE_DOCUMENT_HASH_PLACEHOLDER"
             },
-            "documentType": "otherPartyEvidence",
+            "documentType": "representativeEvidence",
             "controlNumber": "4",
-            "evidenceIssued": "Yes",
-            "documentFileName": "evidence-document-issued",
+            "evidenceIssued": "No",
+            "documentFileName": "test_doc",
             "documentDateAdded": "2019-01-01"
           }
         },
@@ -352,9 +251,10 @@
           "id": "98f4cb7a-18bd-487a-aa7e-bb6355dfe1be",
           "value": {
             "documentLink": {
-              "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/2266abe2-38e0-4d1d-9aca-4419f6c82eb7",
+              "document_url": "EVIDENCE_DOCUMENT_PLACEHOLDER",
               "document_filename": "Screenshot 2019-07-19 at 13.45.04.pdf",
-              "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/2266abe2-38e0-4d1d-9aca-4419f6c82eb7/binary"
+              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_PLACEHOLDER",
+              "document_hash": "EVIDENCE_DOCUMENT_HASH_PLACEHOLDER"
             },
             "documentType": "Other document",
             "controlNumber": "4",
