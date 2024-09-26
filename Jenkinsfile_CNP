@@ -208,10 +208,9 @@ withPipeline(type, product, component) {
     }
 
     afterSuccess('smoketest:preview') {
-        env.TEST_E2E_URL_WEB = params.URL_TO_TEST
-        env.TEST_E2E_API_URI = params.TRIBUNALS_API_URI
-
-         stage('Playwright tests') {
+        env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.netRL_TO_TEST"
+        env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"         
+        stage('Playwright tests') {
 
              if(githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies")) {
                  echo "Don't run functional test"
