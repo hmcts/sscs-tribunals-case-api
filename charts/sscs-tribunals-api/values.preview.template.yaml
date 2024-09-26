@@ -30,10 +30,10 @@ java:
     COH_URL: "http://coh-cor-aat.service.core-compute-aat.internal"
     ONLINE_HEARING_LINK: "https://sscs-cor-frontend-aat.service.core-compute-aat.internal"
     JOB_SCHEDULER_DB_PASSWORD:  "{{ .Values.postgresql.auth.password}}"
-    JOB_SCHEDULER_DB_USERNAME: hmcts
-    JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscs-job-scheduler"
-    JOB_SCHEDULER_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-    JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+    JOB_SCHEDULER_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
+    JOB_SCHEDULER_DB_NAME: "{{ .Values.postgresql.auth.database}}"
+    JOB_SCHEDULER_DB_HOST: "{{ .Release.Name }}-postgresql"
+    JOB_SCHEDULER_DB_CONNECTION_OPTIONS: ""
     HOURS_START_TIME: 0
     HOURS_END_TIME: 23
     RUN_DB_MIGRATION_ON_STARTUP: false
