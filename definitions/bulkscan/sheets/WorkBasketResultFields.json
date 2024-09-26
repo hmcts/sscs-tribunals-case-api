@@ -1,0 +1,11 @@
+[
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "[CASE_REFERENCE]", "Label": "Exception ID", "DisplayOrder": 1},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "[CREATED_DATE]", "Label": "Exception Created Date", "DisplayOrder": 2},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "deliveryDate", "Label": "Delivery Date", "DisplayOrder": 3},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "caseReference", "Label": "New Case Reference", "DisplayOrder": 4},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "attachToCaseReference", "Label": "Existing Case Reference", "DisplayOrder": 5},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "poBox", "Label": "POBox", "DisplayOrder": 6},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "journeyClassification", "Label": "Journey Classification", "DisplayOrder": 7},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "surname", "Label": "Surname", "DisplayOrder": 8},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "formType", "Label": "Form Type", "DisplayOrder": 9}
+]
