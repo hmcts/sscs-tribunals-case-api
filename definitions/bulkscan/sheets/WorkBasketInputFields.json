@@ -1,0 +1,5 @@
+[
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "surname", "Label": "Surname", "DisplayOrder": 1},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "formType", "Label": "Form Type", "DisplayOrder": 2},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "CaseFieldID": "poBox", "Label": "PO Box", "DisplayOrder": 3}
+]

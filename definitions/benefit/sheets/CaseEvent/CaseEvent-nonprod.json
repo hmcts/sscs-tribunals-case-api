@@ -1,0 +1,13 @@
+[
+  {
+    "LiveFrom": "23/11/2022",
+    "CaseTypeID": "Benefit",
+    "ID": "setHearingRoute",
+    "Name": "Set Hearing Route",
+    "Description": "Set Hearing Route",
+    "DisplayOrder": 9990,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public"
+  }
+]
