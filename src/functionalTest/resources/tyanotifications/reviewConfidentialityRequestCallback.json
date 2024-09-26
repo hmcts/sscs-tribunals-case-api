@@ -1,0 +1,748 @@
+{
+  "case_details": {
+    "after_submit_callback_response": null,
+    "callback_response_status": null,
+    "callback_response_status_code": null,
+    "case_data": {
+      "confidentialityRequestOutcomeAppellant": {
+        "requestOutcome":"granted",
+        "date":"2020-09-30"
+      },
+      "hearings": [
+        {
+          "value": {
+            "venue": {
+              "name": "Prudential House",
+              "address": {
+                "line1": "2-10 Topping Street",
+                "line2": "",
+                "town": "Blackpool",
+                "county": "",
+                "postcode": "FY1 3AB"
+              },
+              "googleMapLink": "https://www.google.com/maps/place/2-10+Topping+Street+Blackpool+FY1+3AB/@53.820175,-3.050717"
+            },
+            "hearingDate": "2130-12-01",
+            "time": "11:40:00",
+            "adjourned": "No",
+            "eventDate": null,
+            "hearingId": "3698764"
+          },
+          "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
+        }
+      ],
+      "createdInGapsFrom": "readyToList",
+      "jointParty": "Yes",
+      "jointPartyName": {
+        "title": "mr",
+        "firstName": "Joint",
+        "lastName": "Party"
+      },
+      "jointPartyAddressSameAsAppellant": "No",
+      "jointPartyAddress": {
+        "line1": "30 Dale Street",
+        "line2": "Village",
+        "town": "Liverpool",
+        "county": "Merseyside",
+        "postcode": "TS4 4ST"
+      },
+      "appeal": {
+        "appealReasons": {},
+        "appellant": {
+          "address": {
+            "postcode": "TS1 1ST"
+          },
+          "contact": {
+            "email": "mail@email.com",
+            "phone": "01234567890"
+          },
+          "identity": {
+            "dob": "1904-03-10",
+            "nino": "AB 22 55 66 B"
+          },
+          "name": {
+            "firstName": "Appellant",
+            "lastName": "User",
+            "title": "Mr"
+          },
+          "isAddressSameAsAppointee":"no",
+          "appointee": {
+            "name": {
+              "title": "Mr",
+              "firstName": "Appointee",
+              "lastName": "User"
+            },
+            "contact": {
+              "email": "test@tester.com",
+              "mobile": "07848484848"
+            },
+            "address": {
+              "line1": "1 Appointee Street",
+              "line2": "Newcastle",
+              "town": "Newcastle",
+              "county": "Tyne and Wear",
+              "postcode": "TS2 2ST"
+            },
+            "identity": {
+              "dob": "1998-07-01",
+              "nino": ""
+            }
+          }
+        },
+        "benefitType": {
+          "code": "PIP"
+        },
+        "hearingOptions": {
+          "languageInterpreter": "Yes",
+          "other": "No",
+          "wantsSupport": "Yes",
+          "wantsToAttend": "Yes"
+        },
+        "mrnDetails": {},
+        "rep": {},
+        "signer": null,
+        "hearingType": "paper"
+      },
+      "caseReference": "SC022/14/12423",
+      "events": [
+        {
+          "id": "a95eb829-2da3-4ff4-9d21-90d22583facf",
+          "value": {
+            "date": "2017-05-24T14:01:18.243",
+            "description": "Some Events",
+            "type": "appealCreated"
+          }
+        },
+        {
+          "id": "89a668da-de45-4532-ba56-7ce5e14096a8",
+          "value": {
+            "date": "2016-01-16T12:34:56.789",
+            "description": "responseReceived",
+            "type": "responseReceived"
+          }
+        }
+      ],
+      "subscriptions": {
+        "appointeeSubscription": {
+          "email": "sscstest+notify@greencroftconsulting.com",
+          "mobile": "07398785050",
+          "subscribeEmail": "No",
+          "subscribeSms": "No",
+          "wantSmsNotifications": "No",
+          "tya": "v8eg15XeZk"
+        },
+        "jointPartySubscription": {
+          "email": "sscstest+notify2@greencroftconsulting.com",
+          "mobile": "07398785051",
+          "reason": null,
+          "subscribeEmail": "Yes",
+          "subscribeSms": "Yes",
+          "wantSmsNotifications" : "Yes",
+          "tya": "232929249492"
+        }
+      }
+    },
+    "case_type_id": "Benefit",
+    "created_date": [
+      2018,
+      7,
+      26,
+      10,
+      51,
+      3,
+      45000000
+    ],
+    "data_classification": {
+      "appeal": {
+        "classification": "PUBLIC",
+        "value": {
+          "appealReasons": {
+            "classification": "PUBLIC",
+            "value": {}
+          },
+          "appellant": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {}
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "identity": {
+                "classification": "PUBLIC",
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                }
+              },
+              "isAppointee": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              }
+            }
+          },
+          "benefitType": {
+            "classification": "PUBLIC",
+            "value": {
+              "code": "PUBLIC"
+            }
+          },
+          "hearingOptions": {
+            "classification": "PUBLIC",
+            "value": {
+              "languageInterpreter": "PUBLIC",
+              "other": "PUBLIC",
+              "wantsSupport": "PUBLIC",
+              "wantsToAttend": "PUBLIC"
+            }
+          },
+          "mrnDetails": {
+            "classification": "PUBLIC",
+            "value": {}
+          },
+          "rep": {
+            "classification": "PUBLIC",
+            "value": {}
+          },
+          "signer": "PUBLIC"
+        }
+      },
+      "caseReference": "PUBLIC",
+      "events": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "a95eb829-2da3-4ff4-9d21-90d22583facf",
+            "value": {
+              "date": "PUBLIC",
+              "description": "PUBLIC",
+              "type": "PUBLIC"
+            }
+          },
+          {
+            "id": "89a668da-de45-4532-ba56-7ce5e14096a8",
+            "value": {
+              "date": "PUBLIC",
+              "description": "PUBLIC",
+              "type": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "subscriptions": {
+        "classification": "PUBLIC",
+        "value": {
+          "appointeeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC",
+              "tya": "PUBLIC"
+            }
+          },
+          "jointPartySubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC",
+              "tya": "PUBLIC"
+            }
+          }
+        }
+      }
+    },
+    "id": 12345656789,
+    "jurisdiction": "SSCS",
+    "last_modified": [
+      2018,
+      7,
+      26,
+      10,
+      51,
+      4,
+      255000000
+    ],
+    "security_classification": "PUBLIC",
+    "security_classifications": {
+      "appeal": {
+        "classification": "PUBLIC",
+        "value": {
+          "appealReasons": {
+            "classification": "PUBLIC",
+            "value": {}
+          },
+          "appellant": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {}
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "identity": {
+                "classification": "PUBLIC",
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                }
+              },
+              "isAppointee": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              }
+            }
+          },
+          "benefitType": {
+            "classification": "PUBLIC",
+            "value": {
+              "code": "PUBLIC"
+            }
+          },
+          "hearingOptions": {
+            "classification": "PUBLIC",
+            "value": {
+              "languageInterpreter": "PUBLIC",
+              "other": "PUBLIC",
+              "wantsSupport": "PUBLIC",
+              "wantsToAttend": "PUBLIC"
+            }
+          },
+          "mrnDetails": {
+            "classification": "PUBLIC",
+            "value": {}
+          },
+          "rep": {
+            "classification": "PUBLIC",
+            "value": {}
+          },
+          "signer": "PUBLIC"
+        }
+      },
+      "caseReference": "PUBLIC",
+      "events": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "a95eb829-2da3-4ff4-9d21-90d22583facf",
+            "value": {
+              "date": "PUBLIC",
+              "description": "PUBLIC",
+              "type": "PUBLIC"
+            }
+          },
+          {
+            "id": "89a668da-de45-4532-ba56-7ce5e14096a8",
+            "value": {
+              "date": "PUBLIC",
+              "description": "PUBLIC",
+              "type": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "subscriptions": {
+        "classification": "PUBLIC",
+        "value": {
+          "appointeeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC",
+              "tya": "PUBLIC"
+            }
+          },
+          "jointPartySubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC",
+              "tya": "PUBLIC"
+            }
+          }
+        }
+      }
+    },
+    "state": "readyToList"
+  },
+  "case_details_before": {
+    "after_submit_callback_response": null,
+    "callback_response_status": null,
+    "callback_response_status_code": null,
+    "case_data": {
+      "createdInGapsFrom": "readyToList",
+      "jointParty": "Yes",
+      "jointPartyName": {
+        "title": "mr",
+        "firstName": "Joint",
+        "lastName": "Party"
+      },
+      "jointPartyAddressSameAsAppellant": "No",
+      "jointPartyAddress": {
+        "line1": "30 Dale Street",
+        "line2": "Village",
+        "town": "Liverpool",
+        "county": "Merseyside",
+        "postcode": "TS4 4ST"
+      },
+      "appeal": {
+        "appealReasons": {},
+        "appellant": {
+          "address": {},
+          "contact": {
+            "email": "mail@email.com",
+            "phone": "01234567890"
+          },
+          "identity": {
+            "dob": "1904-03-10",
+            "nino": "AB 22 55 66 B"
+          },
+          "name": {
+            "firstName": "Appellant",
+            "lastName": "User",
+            "title": "Mr"
+          },
+          "isAddressSameAsAppointee":"no",
+          "appointee": {
+            "name": {
+              "title": "Mr",
+              "firstName": "Appointee",
+              "lastName": "User"
+            },
+            "contact": {
+              "email": "test@tester.com",
+              "mobile": "07848484848"
+            },
+            "address": {
+              "line1": "1 Appointee Street",
+              "line2": "Newcastle",
+              "town": "Newcastle",
+              "county": "Tyne and Wear",
+              "postcode": "TS2 2ST"
+            },
+            "identity": {
+              "dob": "1998-07-01",
+              "nino": ""
+            }
+          }
+        },
+        "benefitType": {
+          "code": "PIP"
+        },
+        "hearingOptions": {
+          "languageInterpreter": "Yes",
+          "other": "No",
+          "wantsSupport": "Yes",
+          "wantsToAttend": "Yes"
+        },
+        "mrnDetails": {},
+        "rep": {},
+        "signer": null,
+        "hearingType": "paper"
+      },
+      "caseReference": "SC022/14/12423",
+      "events": [
+        {
+          "id": "d5169475-fbfd-4fd3-9d55-d7fa3ebd645f",
+          "value": {
+            "date": "2017-05-24T14:01:18.243",
+            "description": "Some Events",
+            "type": "appealCreated"
+          }
+        }
+      ],
+      "subscriptions": {
+        "appointeeSubscription": {
+          "email": "sscstest+notify@greencroftconsulting.com",
+          "mobile": "07398785050",
+          "subscribeEmail": "No",
+          "subscribeSms": "No",
+          "wantSmsNotifications": "Yes",
+          "tya": "v8eg15XeZk"
+        },
+        "jointPartySubscription": {
+          "email": "sscstest+notify2@greencroftconsulting.com",
+          "mobile": "07398785051",
+          "reason": null,
+          "subscribeEmail": "Yes",
+          "subscribeSms": "Yes",
+          "wantSmsNotifications" : "Yes",
+          "tya": "232929249492"
+        }
+      }
+    },
+    "case_type_id": "Benefit",
+    "created_date": [
+      2018,
+      7,
+      26,
+      10,
+      51,
+      3,
+      45000000
+    ],
+    "data_classification": {
+      "appeal": {
+        "classification": "PUBLIC",
+        "value": {
+          "appealReasons": {
+            "classification": "PUBLIC",
+            "value": {}
+          },
+          "appellant": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {}
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "identity": {
+                "classification": "PUBLIC",
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                }
+              },
+              "isAppointee": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              }
+            }
+          },
+          "benefitType": {
+            "classification": "PUBLIC",
+            "value": {
+              "code": "PUBLIC"
+            }
+          },
+          "hearingOptions": {
+            "classification": "PUBLIC",
+            "value": {
+              "languageInterpreter": "PUBLIC",
+              "other": "PUBLIC",
+              "wantsSupport": "PUBLIC",
+              "wantsToAttend": "PUBLIC"
+            }
+          },
+          "mrnDetails": {
+            "classification": "PUBLIC",
+            "value": {}
+          },
+          "rep": {
+            "classification": "PUBLIC",
+            "value": {}
+          },
+          "signer": "PUBLIC"
+        }
+      },
+      "caseReference": "PUBLIC",
+      "events": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "d5169475-fbfd-4fd3-9d55-d7fa3ebd645f",
+            "value": {
+              "date": "PUBLIC",
+              "description": "PUBLIC",
+              "type": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "subscriptions": {
+        "classification": "PUBLIC",
+        "value": {
+          "appointeeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC",
+              "tya": "PUBLIC"
+            }
+          },
+          "jointPartySubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC",
+              "tya": "PUBLIC"
+            }
+          }
+        }
+      }
+    },
+    "id": 12345656789,
+    "jurisdiction": "SSCS",
+    "last_modified": [
+      2018,
+      7,
+      26,
+      10,
+      51,
+      3,
+      47000000
+    ],
+    "security_classification": "PUBLIC",
+    "security_classifications": {
+      "appeal": {
+        "classification": "PUBLIC",
+        "value": {
+          "appealReasons": {
+            "classification": "PUBLIC",
+            "value": {}
+          },
+          "appellant": {
+            "classification": "PUBLIC",
+            "value": {
+              "address": {
+                "classification": "PUBLIC",
+                "value": {}
+              },
+              "contact": {
+                "classification": "PUBLIC",
+                "value": {
+                  "email": "PUBLIC",
+                  "phone": "PUBLIC"
+                }
+              },
+              "identity": {
+                "classification": "PUBLIC",
+                "value": {
+                  "dob": "PUBLIC",
+                  "nino": "PUBLIC"
+                }
+              },
+              "isAppointee": "PUBLIC",
+              "name": {
+                "classification": "PUBLIC",
+                "value": {
+                  "firstName": "PUBLIC",
+                  "lastName": "PUBLIC",
+                  "title": "PUBLIC"
+                }
+              }
+            }
+          },
+          "benefitType": {
+            "classification": "PUBLIC",
+            "value": {
+              "code": "PUBLIC"
+            }
+          },
+          "hearingOptions": {
+            "classification": "PUBLIC",
+            "value": {
+              "languageInterpreter": "PUBLIC",
+              "other": "PUBLIC",
+              "wantsSupport": "PUBLIC",
+              "wantsToAttend": "PUBLIC"
+            }
+          },
+          "mrnDetails": {
+            "classification": "PUBLIC",
+            "value": {}
+          },
+          "rep": {
+            "classification": "PUBLIC",
+            "value": {}
+          },
+          "signer": "PUBLIC"
+        }
+      },
+      "caseReference": "PUBLIC",
+      "events": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "id": "d5169475-fbfd-4fd3-9d55-d7fa3ebd645f",
+            "value": {
+              "date": "PUBLIC",
+              "description": "PUBLIC",
+              "type": "PUBLIC"
+            }
+          }
+        ]
+      },
+      "subscriptions": {
+        "classification": "PUBLIC",
+        "value": {
+          "appointeeSubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC",
+              "tya": "PUBLIC"
+            }
+          },
+          "jointPartySubscription": {
+            "classification": "PUBLIC",
+            "value": {
+              "email": "PUBLIC",
+              "mobile": "PUBLIC",
+              "subscribeEmail": "PUBLIC",
+              "subscribeSms": "PUBLIC",
+              "wantSmsNotifications": "PUBLIC",
+              "tya": "PUBLIC"
+            }
+          }
+        }
+      }
+    },
+    "state": "readyToList"
+  },
+  "event_id": "reviewConfidentialityRequest"
+}
