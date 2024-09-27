@@ -51,7 +51,7 @@ java:
     AMQP_USERNAME: "RootManageSharedAccessKey"
     HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
     BYPASS_NOTIFICATIONS_SERVICE: false
-    HANDLE_CCD_CALLBACKMAP_V2: false
+    HANDLE_CCD_CALLBACKMAP_V2: true
   secrets:
     HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
       secretRef: sscs-sb-preview
