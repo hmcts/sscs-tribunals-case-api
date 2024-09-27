@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -13,9 +12,15 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.*;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -28,11 +33,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.IssueFurtherEvidenceException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.PostIssueFurtherEvidenceTasksException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.FurtherEvidenceService;
@@ -52,26 +62,53 @@ public class IssueFurtherEvidenceHandlerTest {
     private IdamService idamService;
 
     @Mock
-    private CcdService ccdService;
+    private UpdateCcdCaseService updateCcdCaseService;
+
+    @Mock
+    private SscsCcdConvertService sscsCcdConvertService;
+
+    @Mock
+    private CcdClient ccdClient;
 
     @InjectMocks
     private IssueFurtherEvidenceHandler issueFurtherEvidenceHandler;
 
     @Captor
-    ArgumentCaptor<SscsCaseData> captor;
+    ArgumentCaptor<Consumer<SscsCaseDetails>> captor;
+
+    @Captor
+    ArgumentCaptor<Function<SscsCaseDetails, UpdateCcdCaseService.UpdateResult>> functionArgumentCaptor;
+
+    @Captor
+    ArgumentCaptor<CaseDataContent> caseDataContentArgumentCaptor;
 
     private final SscsDocument sscsDocumentNotIssued = SscsDocument.builder()
-        .value(SscsDocumentDetails.builder()
-            .documentType(APPELLANT_EVIDENCE.getValue())
-            .evidenceIssued("No")
-            .build())
-        .build();
+            .value(SscsDocumentDetails.builder()
+                    .documentType(APPELLANT_EVIDENCE.getValue())
+                    .evidenceIssued("No")
+                    .documentLink(
+                            DocumentLink
+                                    .builder()
+                                    .documentUrl("https://www.doclink.com/doc1")
+                                    .documentBinaryUrl("https://www.doclink.com/doc1/binary")
+                                    .build()
+                    ).resizedDocumentLink(
+                            DocumentLink
+                                    .builder()
+                                    .documentUrl("https://www.resizeddoclink.com/doc1")
+                                    .documentBinaryUrl("https://www.resizeddoclink.com/doc1/binary")
+                                    .build()
+                    )
+                    .build())
+            .build();
 
     private final SscsCaseData caseData = SscsCaseData.builder()
         .ccdCaseId("1563382899630221")
         .sscsDocument(Collections.singletonList(sscsDocumentNotIssued))
         .appeal(Appeal.builder().build())
         .build();
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
     @Before
     public void setup() {
@@ -124,9 +161,21 @@ public class IssueFurtherEvidenceHandlerTest {
 
     @Test(expected = PostIssueFurtherEvidenceTasksException.class)
     public void givenExceptionWhenPostIssueFurtherEvidenceTasks_shouldHandleIt() {
-        doThrow(RuntimeException.class).when(ccdService).updateCase(any(), any(),
-            eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any());
+        doThrow(RuntimeException.class).when(updateCcdCaseService).updateCaseV2(
+                any(Long.class),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class),
+                functionArgumentCaptor.capture()
+        );
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+
+        var caseDataMap = OBJECT_MAPPER.convertValue(caseData, new TypeReference<Map<String, Object>>() {
+        });
+        var startEventResponse = StartEventResponse.builder().caseDetails(CaseDetails.builder().data(caseDataMap).build()).build();
+
+        when(ccdClient.startEvent(any(IdamTokens.class), any(), eq(EventType.ISSUE_FURTHER_EVIDENCE.getCcdType()))).thenReturn(startEventResponse);
+
+        var sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
+        when(sscsCcdConvertService.getCaseDetails(startEventResponse)).thenReturn(sscsCaseDetails);
 
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(caseData,
             INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
@@ -137,6 +186,15 @@ public class IssueFurtherEvidenceHandlerTest {
         doThrow(RuntimeException.class).when(furtherEvidenceService).issue(any(), any(), any(), any(), eq(null));
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
+        var caseDataMap = OBJECT_MAPPER.convertValue(caseData, new TypeReference<Map<String, Object>>() {
+        });
+        var startEventResponse = StartEventResponse.builder().caseDetails(CaseDetails.builder().data(caseDataMap).build()).build();
+
+        when(ccdClient.startEvent(any(IdamTokens.class), any(), eq(EventType.ISSUE_FURTHER_EVIDENCE.getCcdType()))).thenReturn(startEventResponse);
+
+        var sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
+        when(sscsCcdConvertService.getCaseDetails(startEventResponse)).thenReturn(sscsCaseDetails);
+
         try {
             issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, HandlerHelper.buildTestCallbackForGivenData(caseData,
                 INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
@@ -145,19 +203,40 @@ public class IssueFurtherEvidenceHandlerTest {
             assertEquals("Failed sending further evidence for case(1563382899630221)...", e.getMessage());
         }
 
-        verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
-            eq(EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType()),
-            eq("Failed to issue further evidence"),
-            eq("Review document tab to see document(s) that haven't been issued, then use the"
-                + " \"Reissue further evidence\" within next step and select affected document(s) to re-send"),
-            any(IdamTokens.class));
-        assertEquals("hmctsDwpState has incorrect value", "failedSendingFurtherEvidence",
-            captor.getValue().getHmctsDwpState());
+        verify(updateCcdCaseService, times(1)).updateCaseV2(any(Long.class),
+                eq(EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType()),
+                eq("Failed to issue further evidence"),
+                eq("Review document tab to see document(s) that haven't been issued, then use the"
+                        + " \"Reissue further evidence\" within next step and select affected document(s) to re-send"),
+                any(IdamTokens.class),
+                captor.capture()
+        );
+
+        captor.getValue().accept(sscsCaseDetails);
+
+        assertEquals("hmctsDwpState has incorrect value", "failedSendingFurtherEvidence", caseData.getHmctsDwpState());
     }
 
     @Test
     public void givenIssueFurtherEvidenceCallback_shouldIssueEvidenceForAppellantAndRepAndJointParty() {
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+
+        var caseDataMap = OBJECT_MAPPER.convertValue(caseData, new TypeReference<Map<String, Object>>() {
+        });
+        var startEventResponse = StartEventResponse.builder().caseDetails(CaseDetails.builder().data(caseDataMap).build()).build();
+
+        when(ccdClient.startEvent(any(IdamTokens.class), any(), eq(EventType.ISSUE_FURTHER_EVIDENCE.getCcdType()))).thenReturn(startEventResponse);
+
+        var sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
+        when(sscsCcdConvertService.getCaseDetails(startEventResponse)).thenReturn(sscsCaseDetails);
+
+        var caseDataContent = CaseDataContent.builder().data(caseData).build();
+        when(sscsCcdConvertService.getCaseDataContent(
+                caseData,
+                startEventResponse,
+                "Update case data",
+                "Update issued evidence document flags after issuing further evidence"
+        )).thenReturn(caseDataContent);
 
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             HandlerHelper.buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
@@ -174,13 +253,32 @@ public class IssueFurtherEvidenceHandlerTest {
             eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), eq(null));
         verify(furtherEvidenceService).canHandleAnyDocument(caseData.getSscsDocument());
 
-        verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
-            eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class));
+        verify(ccdClient).startEvent(any(IdamTokens.class), eq(1L), eq(ISSUE_FURTHER_EVIDENCE.getCcdType()));
 
-        assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
+        verify(updateCcdCaseService, times(1)).updateCaseV2(
+                any(Long.class),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class),
+                functionArgumentCaptor.capture()
+        );
 
-        verifyNoMoreInteractions(ccdService);
+        var updatedCaseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build();
+
+        SscsDocument otherPartySscsDocumentOtherNotIssuedWithoutResizedLink = buildSscsDocument("https://www.doclink.com/doc1");
+
+        updatedCaseDetails.getData().setSscsDocument(List.of(otherPartySscsDocumentOtherNotIssuedWithoutResizedLink));
+
+        functionArgumentCaptor.getValue().apply(updatedCaseDetails);
+
+        updatedCaseDetails.getData().getSscsDocument().forEach(sscsDocument -> {
+            assertEquals("Yes", sscsDocument.getValue().getEvidenceIssued());
+            assertNotNull(sscsDocument.getValue().getResizedDocumentLink().getDocumentUrl());
+            assertNotNull(sscsDocument.getValue().getResizedDocumentLink().getDocumentBinaryUrl());
+        });
+
+        verifyNoMoreInteractions(updateCcdCaseService);
         verifyNoMoreInteractions(furtherEvidenceService);
+
+
     }
 
     @Test
@@ -215,9 +313,18 @@ public class IssueFurtherEvidenceHandlerTest {
     public void givenACaseWithAnOtherPartyDocumentNotIssued_shouldIssueEvidenceForOtherParty(DocumentType documentType) {
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
-        SscsDocument otherPartySscsDocumentOtherNotIssued = buildSscsDocument(NO, "test.pdf", documentType.getValue(), "1");
+        SscsDocument otherPartySscsDocumentOtherNotIssued = buildSscsDocument(NO, "test.pdf", documentType.getValue(), "1", "https://www.doclink.com/doc1", "https://www.resizedoclink.com/doc1/binary");
 
-        caseData.setSscsDocument(Arrays.asList(otherPartySscsDocumentOtherNotIssued));
+        caseData.setSscsDocument(Collections.singletonList(otherPartySscsDocumentOtherNotIssued));
+
+        var caseDataMap = OBJECT_MAPPER.convertValue(caseData, new TypeReference<Map<String, Object>>() {
+        });
+        var startEventResponse = StartEventResponse.builder().caseDetails(CaseDetails.builder().data(caseDataMap).build()).build();
+
+        when(ccdClient.startEvent(any(IdamTokens.class), any(), eq(EventType.ISSUE_FURTHER_EVIDENCE.getCcdType()))).thenReturn(startEventResponse);
+
+        var sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
+        when(sscsCcdConvertService.getCaseDetails(startEventResponse)).thenReturn(sscsCaseDetails);
 
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             HandlerHelper.buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
@@ -228,20 +335,42 @@ public class IssueFurtherEvidenceHandlerTest {
         verify(furtherEvidenceService, times(6)).issue(any(), eq(caseData), any(),
             eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), any());
 
-        verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
-            eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class));
+        verify(updateCcdCaseService, times(1)).updateCaseV2(
+                any(Long.class),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class),
+                functionArgumentCaptor.capture()
+        );
 
-        assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
+        var updatedCaseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build();
+
+        SscsDocument otherPartySscsDocumentOtherNotIssuedWithoutResizedLink = buildSscsDocument("https://www.doclink.com/doc1");
+
+        updatedCaseDetails.getData().setSscsDocument(List.of(otherPartySscsDocumentOtherNotIssuedWithoutResizedLink));
+
+        functionArgumentCaptor.getValue().apply(updatedCaseDetails);
+
+        updatedCaseDetails.getData().getSscsDocument().forEach(sscsDocument -> {
+            assertEquals("Yes", sscsDocument.getValue().getEvidenceIssued());
+            assertNotNull(sscsDocument.getValue().getResizedDocumentLink().getDocumentUrl());
+            assertNotNull(sscsDocument.getValue().getResizedDocumentLink().getDocumentBinaryUrl());
+        });
     }
 
     @Test
     @Parameters({"OTHER_PARTY_EVIDENCE", "OTHER_PARTY_REPRESENTATIVE_EVIDENCE"})
     public void givenACaseWithMultipleOtherPartyDocumentsNotIssuedForTheSameOtherPartyId_shouldIssueEvidenceForOtherParty(DocumentType documentType) {
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        var caseDataMap = OBJECT_MAPPER.convertValue(caseData, new TypeReference<Map<String, Object>>() {
+        });
+        var startEventResponse = StartEventResponse.builder().caseDetails(CaseDetails.builder().data(caseDataMap).build()).build();
 
-        SscsDocument otherPartySscsDocumentOtherNotIssued1 = buildSscsDocument(NO, "test.pdf", documentType.getValue(), "1");
+        when(ccdClient.startEvent(any(IdamTokens.class), any(), eq(EventType.ISSUE_FURTHER_EVIDENCE.getCcdType()))).thenReturn(startEventResponse);
 
-        SscsDocument otherPartySscsDocumentOtherNotIssued2 = buildSscsDocument(NO, "test2.pdf", documentType.getValue(), "1");
+        var sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
+        when(sscsCcdConvertService.getCaseDetails(startEventResponse)).thenReturn(sscsCaseDetails);
+
+        SscsDocument otherPartySscsDocumentOtherNotIssued1 = buildSscsDocument(NO, "test.pdf", documentType.getValue(), "1", "https://www.doclink.com/doc1", "https://www.resizedoclink.com/doc1/binary");
+        SscsDocument otherPartySscsDocumentOtherNotIssued2 = buildSscsDocument(NO, "test2.pdf", documentType.getValue(), "1", "https://www.doclink.com/doc2", "https://www.resizedoclink.com/doc2/binary");
 
         caseData.setSscsDocument(Arrays.asList(otherPartySscsDocumentOtherNotIssued1, otherPartySscsDocumentOtherNotIssued2));
 
@@ -254,10 +383,27 @@ public class IssueFurtherEvidenceHandlerTest {
         verify(furtherEvidenceService, times(6)).issue(any(), eq(caseData), any(),
             eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), any());
 
-        verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
-            eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class));
+        verify(updateCcdCaseService, times(1)).updateCaseV2(
+                any(Long.class),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class),
+                functionArgumentCaptor.capture()
+        );
 
-        assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
+        var updatedCaseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build();
+
+        SscsDocument otherPartySscsDocumentOtherNotIssuedWithoutResizedLink1 = buildSscsDocument("https://www.doclink.com/doc1");
+
+        SscsDocument otherPartySscsDocumentOtherNotIssuedWithoutResizedLink2 = buildSscsDocument("https://www.doclink.com/doc2");
+
+        updatedCaseDetails.getData().setSscsDocument(List.of(otherPartySscsDocumentOtherNotIssuedWithoutResizedLink1, otherPartySscsDocumentOtherNotIssuedWithoutResizedLink2));
+
+        functionArgumentCaptor.getValue().apply(updatedCaseDetails);
+
+        updatedCaseDetails.getData().getSscsDocument().forEach(sscsDocument -> {
+            assertEquals("Yes", sscsDocument.getValue().getEvidenceIssued());
+            assertNotNull(sscsDocument.getValue().getResizedDocumentLink().getDocumentUrl());
+            assertNotNull(sscsDocument.getValue().getResizedDocumentLink().getDocumentBinaryUrl());
+        });
     }
 
     @Test
@@ -265,36 +411,81 @@ public class IssueFurtherEvidenceHandlerTest {
     public void givenACaseWithMultipleOtherPartyDocumentsNotIssuedForMultipleOtherPartyIds_shouldIssueEvidenceForAllOtherParties(DocumentType documentType) {
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
-        SscsDocument otherPartySscsDocumentOtherNotIssued1 = buildSscsDocument(NO, "test.pdf", documentType.getValue(), "1");
+        SscsDocument otherPartySscsDocumentOtherNotIssued1 = buildSscsDocument(NO, "test.pdf", documentType.getValue(), "1", "https://www.doclink.com/doc1", "https://www.resizeddoclink.com/doc1");
 
-        SscsDocument otherPartySscsDocumentOtherNotIssued2 = buildSscsDocument(NO, "test2.pdf", documentType.getValue(), "1");
+        SscsDocument otherPartySscsDocumentOtherNotIssued2 = buildSscsDocument(NO, "test2.pdf", documentType.getValue(), "1", "https://www.doclink.com/doc2", "https://www.resizeddoclink.com/doc2");
 
-        SscsDocument otherPartySscsDocumentOtherIssued3 = buildSscsDocument(YES, "test.pdf", documentType.getValue(), "1");
+        SscsDocument otherPartySscsDocumentOtherIssued3 = buildSscsDocument(YES, "test.pdf", documentType.getValue(), "1", "https://www.doclink.com/doc3", "https://www.resizeddoclink.com/doc3");
 
-        SscsDocument otherPartySscsDocumentOtherNotIssued4 = buildSscsDocument(NO, "test2.pdf", documentType.getValue(), "2");
+        SscsDocument otherPartySscsDocumentOtherNotIssued4 = buildSscsDocument(NO, "test2.pdf", documentType.getValue(), "2", "https://www.doclink.com/doc4", "https://www.resizeddoclink.com/doc4");
 
-        SscsDocument otherPartySscsDocumentOtherNotIssued5 = buildSscsDocument(NO, "test.pdf", documentType.getValue(), "2");
+        SscsDocument otherPartySscsDocumentOtherNotIssued5 = buildSscsDocument(NO, "test.pdf", documentType.getValue(), "2", "https://www.doclink.com/doc5", "https://www.resizeddoclink.com/doc5");
 
-        SscsDocument otherPartySscsDocumentOtherIssued6 = buildSscsDocument(YES, "test2.pdf", documentType.getValue(), "2");
+        SscsDocument otherPartySscsDocumentOtherIssued6 = buildSscsDocument(YES, "test2.pdf", documentType.getValue(), "2", "https://www.doclink.com/doc6", "https://www.resizeddoclink.com/doc6");
 
         caseData.setSscsDocument(Arrays.asList(otherPartySscsDocumentOtherNotIssued1, otherPartySscsDocumentOtherNotIssued2, otherPartySscsDocumentOtherIssued3, otherPartySscsDocumentOtherNotIssued4, otherPartySscsDocumentOtherNotIssued5, otherPartySscsDocumentOtherIssued6));
 
+        var caseDataMap = OBJECT_MAPPER.convertValue(caseData, new TypeReference<Map<String, Object>>() {
+        });
+        var startEventResponse = StartEventResponse.builder().caseDetails(CaseDetails.builder().data(caseDataMap).build()).build();
+
+        when(ccdClient.startEvent(any(IdamTokens.class), any(), eq(EventType.ISSUE_FURTHER_EVIDENCE.getCcdType()))).thenReturn(startEventResponse);
+
+        var sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
+        when(sscsCcdConvertService.getCaseDetails(startEventResponse)).thenReturn(sscsCaseDetails);
+
+        var caseDataContent = CaseDataContent.builder().data(caseData).build();
+        when(sscsCcdConvertService.getCaseDataContent(
+                caseData,
+                startEventResponse,
+                "Update case data",
+                "Update issued evidence document flags after issuing further evidence"
+        )).thenReturn(caseDataContent);
+
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
-            HandlerHelper.buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+                HandlerHelper.buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
 
         verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()), eq(caseData), eq(documentType),
-            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), eq("1"));
+                eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), eq("1"));
 
         verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()), eq(caseData), eq(documentType),
-            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), eq("2"));
+                eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), eq("2"));
 
         verify(furtherEvidenceService, times(7)).issue(any(), eq(caseData), any(),
-            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), any());
+                eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), any());
 
-        verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
-            eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class));
 
-        assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
+        verify(updateCcdCaseService, times(1)).updateCaseV2(
+                any(Long.class),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class),
+                functionArgumentCaptor.capture()
+        );
+
+        var updatedCaseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build();
+
+        SscsDocument otherPartySscsDocumentWithoutResizedLink1 = buildSscsDocument("https://www.doclink.com/doc1");
+        SscsDocument otherPartySscsDocumentWithoutResizedLink2 = buildSscsDocument("https://www.doclink.com/doc2");
+        SscsDocument otherPartySscsDocumentWithoutResizedLink3 = buildSscsDocument("https://www.doclink.com/doc3");
+        SscsDocument otherPartySscsDocumentWithoutResizedLink4 = buildSscsDocument("https://www.doclink.com/doc4");
+        SscsDocument otherPartySscsDocumentWithoutResizedLink5 = buildSscsDocument("https://www.doclink.com/doc5");
+        SscsDocument otherPartySscsDocumentWithoutResizedLink6 = buildSscsDocument("https://www.doclink.com/doc6");
+
+        updatedCaseDetails.getData().setSscsDocument(List.of(
+                otherPartySscsDocumentWithoutResizedLink1,
+                otherPartySscsDocumentWithoutResizedLink2,
+                otherPartySscsDocumentWithoutResizedLink3,
+                otherPartySscsDocumentWithoutResizedLink4,
+                otherPartySscsDocumentWithoutResizedLink5,
+                otherPartySscsDocumentWithoutResizedLink6
+        ));
+
+        functionArgumentCaptor.getValue().apply(updatedCaseDetails);
+
+        updatedCaseDetails.getData().getSscsDocument().forEach(sscsDocument -> {
+            assertEquals("Yes", sscsDocument.getValue().getEvidenceIssued());
+            assertNotNull(sscsDocument.getValue().getResizedDocumentLink().getDocumentUrl());
+            assertNotNull(sscsDocument.getValue().getResizedDocumentLink().getDocumentBinaryUrl());
+        });
     }
 
     private SscsDocument buildSscsDocument(YesNo yesNo, String fileName, String documentType, String originalSenderOtherPartyId) {
@@ -308,4 +499,39 @@ public class IssueFurtherEvidenceHandlerTest {
         return SscsDocument.builder().value(docDetails).build();
     }
 
+    private SscsDocument buildSscsDocument(YesNo yesNo, String fileName, String documentType, String originalSenderOtherPartyId, String documentUrl, String resizedDocumentUrl) {
+        SscsDocumentDetails docDetails = SscsDocumentDetails.builder().evidenceIssued(yesNo.getValue())
+                .documentType(documentType)
+                .originalSenderOtherPartyId(originalSenderOtherPartyId)
+                .documentLink(
+                        DocumentLink
+                                .builder()
+                                .documentUrl(documentUrl)
+                                .documentFilename(fileName)
+                                .documentBinaryUrl(documentUrl + "/binary")
+                                .build()
+                ).resizedDocumentLink(
+                        DocumentLink
+                                .builder()
+                                .documentUrl(resizedDocumentUrl)
+                                .documentFilename(fileName)
+                                .documentBinaryUrl(resizedDocumentUrl + "/binary")
+                                .build()
+                )
+                .build();
+        return SscsDocument.builder().value(docDetails).build();
+    }
+
+    private SscsDocument buildSscsDocument(String documentUrl) {
+        SscsDocumentDetails docDetails = SscsDocumentDetails.builder().evidenceIssued(NO.getValue())
+                .documentLink(
+                        DocumentLink
+                                .builder()
+                                .documentUrl(documentUrl)
+                                .documentBinaryUrl(documentUrl + "/binary")
+                                .build()
+                )
+                .build();
+        return SscsDocument.builder().value(docDetails).build();
+    }
 }
