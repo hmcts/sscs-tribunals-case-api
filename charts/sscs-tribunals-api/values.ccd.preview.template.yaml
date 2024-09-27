@@ -475,6 +475,7 @@ ccd:
         CCD_DOCUMENT_URL_PATTERN: ^https?://(((?:dm-store-aat\.service\.core-compute-aat\.internal(?::\d+)?)\/documents\/[A-Za-z0-9-]+(?:\/binary)?))
         CASE_DOCUMENT_AM_URL: http://${SERVICE_NAME}-ccd-case-document-am-api
         UPLOAD_TIMESTAMP_FEATURED_CASE_TYPES: CARE_SUPERVISION_EPO
+        TESTING_SUPPORT_ENABLED: true
       secrets:
         DATA_STORE_DB_PASSWORD:
           secretRef: postgres
