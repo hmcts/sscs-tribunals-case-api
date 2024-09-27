@@ -356,8 +356,8 @@ dependencies {
 
     implementation group: 'com.mchange', name: 'c3p0', version: '0.9.5.5'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '357cd72'
 
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '357cd72'
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: 'ea87714'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
