@@ -17,6 +17,7 @@ def dmnBranch = "master"
 def waStandaloneBranch = "master"
 
 def gradleBuilder = new GradleBuilder(this, product)
+def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 def secrets = [
     'sscs-${env}'      : [
@@ -242,9 +243,9 @@ withPipeline(type, product, component) {
         env.TEST_E2E_API_URI = 'https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net'
         env.HEARINGS_ENABLED = 'No'
             stage('Playwright tests') {
-                //if(githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies")) {
-                //     echo "Don't run functional test"
-                //  } else {
+                if(githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies")) {
+                     echo "Don't run functional test"
+                  } else {
                       try{
                         if(env.HEARINGS_ENABLED == 'No'){
                             yarnBuilder.yarn('test:preview')
@@ -262,7 +263,7 @@ withPipeline(type, product, component) {
                     ])
                     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**/*'
                     }
-                //}
+                }
             }
     }
 
