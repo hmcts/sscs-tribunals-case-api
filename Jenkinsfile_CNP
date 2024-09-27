@@ -85,6 +85,7 @@ def secrets = [
         secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
         secret('test-e2e-am-senior-tcw-case-allocator-username', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_USERNAME'),
         secret('test-e2e-am-senior-tcw-case-allocator-password', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_PASSWORD')
+
     ],
     's2s-${env}'      : [
             secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
