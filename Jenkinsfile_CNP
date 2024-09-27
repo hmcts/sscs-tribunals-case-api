@@ -121,12 +121,20 @@ def secretsForPR = [
                 secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
                 secret('test-e2e-am-senior-tcw-case-allocator-username', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_USERNAME'),
                 secret('test-e2e-am-senior-tcw-case-allocator-password', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_PASSWORD')
+
+                // tya notifications
+                secret('notification-key', 'NOTIFICATION_API_KEY'),
+                secret('notification-test-key', 'NOTIFICATION_API_TEST_KEY'),
+                secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
+                secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
+                secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD'),
         ],
         's2s-${env}'      : [
                 secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
                 secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
                 secret('microservicekey-ccd-admin', 'ADMIN_S2S_KEY'),
                 secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET')
+
         ],
         'ccd-${env}'      : [
                 secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
@@ -234,14 +242,16 @@ withPipeline(type, product, component) {
         env.IDAM_URL='https://idam-api.aat.platform.hmcts.net'
         env.S2S_URL='http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
         env.IDAM_OAUTH2_CLIENT_ID='sscs'
-        env.TEST_E2E_URL_WEB = 'https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net'
-        env.TEST_E2E_API_URI = 'https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net'
-        env.HEARINGS_ENABLED = 'No'
+        env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+        env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+        env.HEARINGS_ENABLED = "No"
     }
     afterSuccess('smoketest:preview') {
-        //env.TEST_E2E_URL_WEB = 'https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net'
-        //env.TEST_E2E_API_URI = 'https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net'
-        env.HEARINGS_ENABLED = 'No'
+        env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+        env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+        env.HEARINGS_ENABLED = "No"
+        echo 'The value of the TEST_E2E_URL_WEB ' +env.TEST_E2E_URL_WEB
+        echo 'The value of the TEST_E2E_API_URI ' +env.TEST_E2E_API_URI
             stage('Playwright tests') {
                 if(githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies")) {
                      echo "Don't run functional test"
