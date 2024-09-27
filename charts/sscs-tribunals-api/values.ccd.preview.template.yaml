@@ -52,11 +52,6 @@ java:
     HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
     BYPASS_NOTIFICATIONS_SERVICE: true
     HANDLE_CCD_CALLBACKMAP_V2: true
-    JOB_SCHEDULER_DB_PASSWORD:  "{{ .Values.postgresql.auth.password}}"
-    JOB_SCHEDULER_DB_USERNAME: hmcts
-    JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscs-job-scheduler"
-    JOB_SCHEDULER_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-    JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
   secrets:
     HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
       secretRef: sscs-sb-preview
