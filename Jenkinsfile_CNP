@@ -85,6 +85,7 @@ def secrets = [
         secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
         secret('test-e2e-am-senior-tcw-case-allocator-username', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_USERNAME'),
         secret('test-e2e-am-senior-tcw-case-allocator-password', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_PASSWORD')
+
     ],
     's2s-${env}'      : [
             secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
@@ -120,6 +121,42 @@ def secretsForPR = [
                 secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
                 secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
                 secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD'),
+                // e2es
+                secret('test-e2e-caseofficer-username', 'TEST_CASEOFFICER_USERNAME'),
+                secret('test-e2e-caseofficer-password', 'TEST_CASEOFFICER_PASSWORD'),
+                secret('test-e2e-hmc-caseofficer-username', 'TEST_HMC_CASEOFFICER_USERNAME'),
+                secret('test-e2e-hmc-caseofficer-password', 'TEST_HMC_CASEOFFICER_PASSWORD'),
+                secret('test-e2e-judge-username', 'TEST_JUDGE_USERNAME'),
+                secret('test-e2e-judge-password', 'TEST_JUDGE_PASSWORD'),
+                secret('test-e2e-salaried-judge-username', 'TEST_SALARIED_JUDGE_USERNAME'),
+                secret('test-e2e-salaried-judge-password', 'TEST_SALARIED_JUDGE_PASSWORD'),
+                secret('test-e2e-fee-paid-judge-username', 'TEST_FEE_PAID_JUDGE_USERNAME'),
+                secret('test-e2e-fee-paid-judge-password', 'TEST_FEE_PAID_JUDGE_PASSWORD'),
+                secret('test-e2e-dwp-username', 'TEST_DWP_USERNAME'),
+                secret('test-e2e-dwp-password', 'TEST_DWP_PASSWORD'),
+                secret('test-e2e-am-tcw-username', 'TEST_AM_TRIBUNAL_CASEWORKER_USERNAME'),
+                secret('test-e2e-am-tcw-password', 'TEST_AM_TRIBUNAL_CASEWORKER_PASSWORD'),
+                secret('test-e2e-am-caseofficer-case-allocator-username', 'TEST_AM_CASEOFFICER_CASE_ALLOCATOR_USERNAME'),
+                secret('test-e2e-am-caseofficer-case-allocator-password', 'TEST_AM_CASEOFFICER_CASE_ALLOCATOR_PASSWORD'),
+                secret('test-e2e-hmrc-username', 'TEST_HMRC_USERNAME'),
+                secret('test-e2e-hmrc-password', 'TEST_HMRC_PASSWORD'),
+                secret('test-e2e-am-regional-center-admin-username', 'TEST_AM_REGIONAL_CENTER_ADMIN_USERNAME'),
+                secret('test-e2e-am-regional-center-admin-password', 'TEST_AM_REGIONAL_CENTER_ADMIN_PASSWORD'),
+                secret('test-e2e-am-regional-center-team-leader-username', 'TEST_AM_REGIONAL_CENTER_TEAM_LEADER_USERNAME'),
+                secret('test-e2e-am-regional-center-team-leader-password', 'TEST_AM_REGIONAL_CENTER_TEAM_LEADER_PASSWORD'),
+
+
+        secret('test-e2e-am-caseofficer-username', 'TEST_AM_CASEOFFICER_USERNAME'),
+        secret('test-e2e-am-caseofficer-password', 'TEST_AM_CASEOFFICER_PASSWORD'),
+        secret('test-e2e-caseofficer-username', 'TEST_AM_SUPERUSER_USERNAME'),
+        secret('test-e2e-caseofficer-password', 'TEST_AM_SUPERUSER_PASSWORD'),
+        secret('test-e2e-superuser-username', 'SUPER_USER_USERNAME'),
+        secret('test-e2e-superuser-password', 'SUPER_USER_PASSWORD'),
+        secret('idam-sscs-oauth2-client-secret', 'IDAM_OAUTH2_CLIENT_SECRET'),
+        secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
+        secret('test-e2e-am-senior-tcw-case-allocator-username', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_USERNAME'),
+        secret('test-e2e-am-senior-tcw-case-allocator-password', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_PASSWORD')
+
         ],
         's2s-${env}'      : [
                 secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
@@ -230,7 +267,6 @@ withPipeline(type, product, component) {
         for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
             enableHighLevelDataSetup()
         }
-        env.ENVIRONMENT="preview"
         env.IDAM_URL='https://idam-api.aat.platform.hmcts.net'
         env.S2S_URL='http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
         env.IDAM_OAUTH2_CLIENT_ID='sscs'
@@ -272,8 +308,9 @@ withPipeline(type, product, component) {
         env.TEST_E2E_RETRIES = 5
         env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
         stage('Playwright tests') {
+            env.ENVIRONMENT="preview"
 
-             if(githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies")) {
+            if(githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies")) {
                  echo "Don't run functional test"
               } else {
                   try{
