@@ -230,7 +230,6 @@ withPipeline(type, product, component) {
         for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
             enableHighLevelDataSetup()
         }
-        env.ENVIRONMENT="preview"
         env.IDAM_URL='https://idam-api.aat.platform.hmcts.net'
         env.S2S_URL='http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
         env.IDAM_OAUTH2_CLIENT_ID='sscs'
@@ -272,8 +271,9 @@ withPipeline(type, product, component) {
         env.TEST_E2E_RETRIES = 5
         env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
         stage('Playwright tests') {
+            env.ENVIRONMENT="preview"
 
-             if(githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies")) {
+            if(githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies")) {
                  echo "Don't run functional test"
               } else {
                   try{
