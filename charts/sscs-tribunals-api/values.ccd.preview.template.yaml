@@ -718,8 +718,9 @@ postgresql:
 
 ccd-def-cleanup:
   enabled: true
-  ccdDefStore: "https://ccd-definition-store-sscs-tribunals-api-pr-3977.preview.platform.hmcts.net"
-  ccdDataStore: "https://ccd-data-store-api-sscs-tribunals-api-pr-3977.preview.platform.hmcts.net"
+  api:
+    ccdDefStore: "https://ccd-definition-store-sscs-tribunals-api-pr-3977.preview.platform.hmcts.net"
+    ccdDataStore: "https://ccd-data-store-api-sscs-tribunals-api-pr-3977.preview.platform.hmcts.net"
   posthook: test
   prehook: test
   change_id: ${CHANGE_ID}
