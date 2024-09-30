@@ -65,6 +65,7 @@ public class DecisionIssuedFunctionalTest extends AbstractFunctionalTest {
 
         JsonNode root = mapper.readTree(response);
         SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<>(){});
+        assertThat(result.getInterlocReferralReason()).isNull();
         assertThat(result.getDirectionDueDate()).isNull();
         assertThat(result.getPostponement().getUnprocessedPostponement()).isNull();
         assertThat(result.getPostponement().getPostponementEvent()).isNull();
