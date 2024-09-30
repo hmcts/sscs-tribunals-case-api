@@ -59,6 +59,9 @@ java:
     AMQP_PASSWORD:
       secretRef: sscs-sb-preview
       key: primaryKey
+    JOB_SCHEDULER_DB_PASSWORD:
+      secretRef: postgres
+      key: PASSWORD
   postgresql:
     enabled: false
 
