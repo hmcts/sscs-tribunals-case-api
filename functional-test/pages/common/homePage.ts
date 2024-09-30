@@ -92,7 +92,7 @@ export class HomePage {
     }
 
     async searchCaseWithPreviewDef() {
-        const optionToSelect = await this.page.locator('option', { hasText: `nonProd PROD` }).textContent();
+        const optionToSelect = await this.page.locator('option', { hasText: `SSCS Case ${environment.aatDefVersion.TAG} PR` }).textContent();
         console.log(`case type dropdown value is ###### ${optionToSelect}`);
         await webActions.chooseOptionByLabel(this.caseTypeDropdown, optionToSelect);
     }
