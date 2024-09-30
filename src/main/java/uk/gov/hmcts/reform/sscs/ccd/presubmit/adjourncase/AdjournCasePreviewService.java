@@ -353,10 +353,11 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
     protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
         List<String> names = new ArrayList<>();
-        String signedInJudgeName = buildSignedInJudgeName(userAuthorisation);
+        String signedInJudgeName = buildSignedInJudgeSurname(userAuthorisation);
         if (signedInJudgeName == null) {
             throw new IllegalStateException("Unable to obtain signed in user name");
         }
+        signedInJudgeName = "Tribunal Judge " + signedInJudgeName;
         names.add(signedInJudgeName);
 
         Adjournment adjournment = caseData.getAdjournment();
