@@ -14,7 +14,6 @@ test.describe("Issue direction test", {tag: '@nightly-pipeline'}, async() => {
         });
 
     test("Issue Direction Notice - Post Hearing - Employment Support Application - Provide Information",
-        {tag: '@preview-pipeline'},
         async ({issueDirectionsNoticeSteps}) => {
             test.slow();
             await issueDirectionsNoticeSteps.performIssueDirectionNoticePostHearingESAAppealToProceed();
@@ -27,7 +26,6 @@ test.describe("Issue direction test", {tag: '@nightly-pipeline'}, async() => {
         });
 
     test("Issue Direction Notice - Error Messages Test",
-        {tag: '@preview-pipeline'},
         async ({issueDirectionsNoticeSteps}) => {
             test.slow();
             await issueDirectionsNoticeSteps.performIssueDirectionErrorMessages();
