@@ -136,6 +136,9 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     JOB_SCHEDULER_DB_NAME: notification
     JOB_SCHEDULER_DB_HOST: sscs-tya-notif-postgres-v15-db-{{ .Values.global.environment }}.postgres.database.azure.com
     RUN_DB_MIGRATION_ON_STARTUP: false
+    POST_HEARINGS_FEATURE: true
+    POST_HEARINGS_B_FEATURE: true
+
     #    hearings=api
     IDAM_S2S_URL: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     CASEWORKER_REF_API_URL: "http://rd-caseworker-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
