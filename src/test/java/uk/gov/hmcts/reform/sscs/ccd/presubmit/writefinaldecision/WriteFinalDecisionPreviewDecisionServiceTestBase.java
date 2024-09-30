@@ -43,7 +43,9 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     protected static final String ORIGINAL_HELD_AT = "held at testtest";
     protected static final String ORIGINAL_JUDGE_NAME = "test judge name name";
     protected static final String USER_AUTHORISATION = "Bearer token";
-    protected static final String LOGGED_IN_JUDGE_NAME = "Judge Full Name";
+    protected static final String LOGGED_IN_JUDGE_NAME = "Test";
+    protected static final String LOGGED_IN_JUDGE_FULL_NAME = "Judge Full Name";
+    protected static final String HELD_BEFORE_JUDGE = "Tribunal Judge Test";
     protected static final String URL = "http://dm-store/documents/123";
     public static final String APPELLANT_LAST_NAME = "APPELLANT Last'NamE";
     protected WriteFinalDecisionPreviewDecisionServiceBase service;
@@ -106,7 +108,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
-        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(LOGGED_IN_JUDGE_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(LOGGED_IN_JUDGE_NAME);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(LOGGED_IN_JUDGE_FULL_NAME);
 
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
@@ -669,7 +672,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         assertNotNull(body);
 
 
-        assertEquals("Judge Full Name and Mr Panel Member 1", body.getHeldBefore());
+        assertEquals("Tribunal Judge Test and Mr Panel Member 1", body.getHeldBefore());
 
     }
 
@@ -704,7 +707,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
 
-        assertEquals("Judge Full Name, Mr Panel Member 1, Ms Panel Member 2 and Miss other", body.getHeldBefore());
+        assertEquals("Tribunal Judge Test, Mr Panel Member 1, Ms Panel Member 2 and Miss other", body.getHeldBefore());
     }
 
     @Test
@@ -736,7 +739,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         assertNotNull(body);
 
 
-        assertEquals("Judge Full Name and Mr Panel Member 1", body.getHeldBefore());
+        assertEquals("Tribunal Judge Test and Mr Panel Member 1", body.getHeldBefore());
     }
 
     @Test
@@ -766,7 +769,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
 
-        assertEquals("Judge Full Name", body.getHeldBefore());
+        assertEquals("Tribunal Judge Test", body.getHeldBefore());
 
     }
 
@@ -842,7 +845,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
 
-        assertEquals("Judge Full Name", body.getHeldBefore());
+        assertEquals(HELD_BEFORE_JUDGE, body.getHeldBefore());
 
     }
 
@@ -1014,7 +1017,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true,
                 true, true, isDescriptorFlowSupported(), true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.CORRECTION_GRANTED));
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
-        assertEquals(ORIGINAL_JUDGE_NAME, body.getHeldBefore());
+        assertEquals("Tribunal Judge " + ORIGINAL_JUDGE_NAME, body.getHeldBefore());
     }
 
     @Test
@@ -1031,7 +1034,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, APPELLANT_LAST_NAME, null, "2018-10-10", true,
                 true, true, isDescriptorFlowSupported(), true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
-        assertEquals(LOGGED_IN_JUDGE_NAME, body.getHeldBefore());
+        assertEquals(HELD_BEFORE_JUDGE, body.getHeldBefore());
     }
 
     @Test
