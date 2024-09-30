@@ -16,17 +16,21 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 @Component
 @Slf4j
 public class DecisionIssuedMidEventHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final GenerateFile generateFile;
+    protected final UserDetailsService userDetailsService;
     private final DocumentConfiguration documentConfiguration;
 
+
     @Autowired
-    public DecisionIssuedMidEventHandler(GenerateFile generateFile, DocumentConfiguration documentConfiguration) {
+    public DecisionIssuedMidEventHandler(GenerateFile generateFile, UserDetailsService userDetailsService, DocumentConfiguration documentConfiguration) {
         this.generateFile = generateFile;
+        this.userDetailsService = userDetailsService;
         this.documentConfiguration = documentConfiguration;
     }
 
@@ -43,6 +47,8 @@ public class DecisionIssuedMidEventHandler extends IssueDocumentHandler implemen
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         String templateId = documentConfiguration.getDocuments()
                 .get(callback.getCaseDetails().getCaseData().getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
+        callback.getCaseDetails().getCaseData().getDocumentGeneration().setSignedRole("Tribunal Judge");
+        callback.getCaseDetails().getCaseData().getDocumentGeneration().setSignedBy(userDetailsService.buildLoggedInUserSurname(userAuthorisation));
         return issueDocument(callback, DocumentType.DECISION_NOTICE, templateId, generateFile, userAuthorisation);
     }
 }
