@@ -41,6 +41,10 @@ java:
     HANDLE_CCD_CALLBACKMAP_V2: true
     POST_HEARINGS_B_FEATURE: true
     BYPASS_NOTIFICATIONS_SERVICE: true
+  secrets:
+    JOB_SCHEDULER_DB_PASSWORD:
+      secretRef: "{{ .Release.Name }}-postgresql"
+      key: password
   postgresql:
     enabled: true
 
