@@ -149,6 +149,16 @@
   {
     "LiveFrom": "18/03/2023",
     "CaseTypeID": "Benefit",
+    "RoleName": "idam:caseworker-sscs-ibcaresponsewriter",
+    "CaseAccessCategories": "infectedBloodAppeal",
+    "Authorisation": "",
+    "ReadOnly": "N",
+    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-ibcaresponsewriter",
+    "Disabled": "N"
+  },
+  {
+    "LiveFrom": "18/03/2023",
+    "CaseTypeID": "Benefit",
     "RoleName": "idam:caseworker-sscs-pcqextractor",
     "Authorisation": "",
     "ReadOnly": "N",
