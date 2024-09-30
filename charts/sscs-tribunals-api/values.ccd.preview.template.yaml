@@ -417,7 +417,7 @@ ccd:
 
   ccd-definition-store-api:
     java:
-      image: hmctspublic.azurecr.io/ccd/definition-store-api:pr-1503-0bc9692-20240925150858
+      image: hmctspublic.azurecr.io/ccd/definition-store-api:pr-1503-b9c968f-20240930090638
       disableKeyVaults: true
       devmemoryRequests: '1024Mi'
       devmemoryLimits: '2048Mi'
@@ -446,7 +446,7 @@ ccd:
 
   ccd-data-store-api:
     java:
-      image: hmctspublic.azurecr.io/ccd/data-store-api:pr-2477-2c6807e-20240925144602
+      image: hmctspublic.azurecr.io/ccd/data-store-api:pr-2468-5bfd26b-20240930085441
       disableKeyVaults: true
       imagePullPolicy: Always
       devmemoryRequests: '1524Mi'
