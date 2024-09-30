@@ -99,95 +99,6 @@ def secrets = [
     ]
 ]
 
-def secretsForPR = [
-        'sscs-${env}'      : [
-                secret('idam-api', 'IDAM_API_URL'),
-                secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
-                secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
-                secret('idam-sscs-systemupdate-user', 'IDAM_SSCS_SYSTEMUPDATE_USER'),
-                secret('idam-sscs-systemupdate-password', 'IDAM_SSCS_SYSTEMUPDATE_PASSWORD'),
-                secret('idam-sscs-oauth2-client-secret', 'IDAM_OAUTH2_CLIENT_SECRET'),
-                secret('idam-s2s-api', 'IDAM_S2S_AUTH'),
-                secret('sscs-s2s-secret', 'IDAM_S2S_AUTH_TOTP_SECRET'),
-                secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
-                secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
-                secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
-                secret('sscs-servicebus-connection-string-tf', 'SERVICE_BUS_CONNECTION_STRING'),
-                secret('preview-ccd-db-password-2', 'PREVIEW_DB_PASSWORD_2'),
-                secret('preview-shared-db-password', 'SHARED_DB_PASSWORD'),
-                // tya notifications
-                secret('notification-key', 'NOTIFICATION_API_KEY'),
-                secret('notification-test-key', 'NOTIFICATION_API_TEST_KEY'),
-                secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
-                secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
-                secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD'),
-                // e2es
-                secret('test-e2e-caseofficer-username', 'TEST_CASEOFFICER_USERNAME'),
-                secret('test-e2e-caseofficer-password', 'TEST_CASEOFFICER_PASSWORD'),
-                secret('test-e2e-hmc-caseofficer-username', 'TEST_HMC_CASEOFFICER_USERNAME'),
-                secret('test-e2e-hmc-caseofficer-password', 'TEST_HMC_CASEOFFICER_PASSWORD'),
-                secret('test-e2e-judge-username', 'TEST_JUDGE_USERNAME'),
-                secret('test-e2e-judge-password', 'TEST_JUDGE_PASSWORD'),
-                secret('test-e2e-salaried-judge-username', 'TEST_SALARIED_JUDGE_USERNAME'),
-                secret('test-e2e-salaried-judge-password', 'TEST_SALARIED_JUDGE_PASSWORD'),
-                secret('test-e2e-fee-paid-judge-username', 'TEST_FEE_PAID_JUDGE_USERNAME'),
-                secret('test-e2e-fee-paid-judge-password', 'TEST_FEE_PAID_JUDGE_PASSWORD'),
-                secret('test-e2e-dwp-username', 'TEST_DWP_USERNAME'),
-                secret('test-e2e-dwp-password', 'TEST_DWP_PASSWORD'),
-                secret('test-e2e-am-tcw-username', 'TEST_AM_TRIBUNAL_CASEWORKER_USERNAME'),
-                secret('test-e2e-am-tcw-password', 'TEST_AM_TRIBUNAL_CASEWORKER_PASSWORD'),
-                secret('test-e2e-am-caseofficer-case-allocator-username', 'TEST_AM_CASEOFFICER_CASE_ALLOCATOR_USERNAME'),
-                secret('test-e2e-am-caseofficer-case-allocator-password', 'TEST_AM_CASEOFFICER_CASE_ALLOCATOR_PASSWORD'),
-                secret('test-e2e-hmrc-username', 'TEST_HMRC_USERNAME'),
-                secret('test-e2e-hmrc-password', 'TEST_HMRC_PASSWORD'),
-                secret('test-e2e-am-regional-center-admin-username', 'TEST_AM_REGIONAL_CENTER_ADMIN_USERNAME'),
-                secret('test-e2e-am-regional-center-admin-password', 'TEST_AM_REGIONAL_CENTER_ADMIN_PASSWORD'),
-                secret('test-e2e-am-regional-center-team-leader-username', 'TEST_AM_REGIONAL_CENTER_TEAM_LEADER_USERNAME'),
-                secret('test-e2e-am-regional-center-team-leader-password', 'TEST_AM_REGIONAL_CENTER_TEAM_LEADER_PASSWORD'),
-
-
-        secret('test-e2e-am-caseofficer-username', 'TEST_AM_CASEOFFICER_USERNAME'),
-        secret('test-e2e-am-caseofficer-password', 'TEST_AM_CASEOFFICER_PASSWORD'),
-        secret('test-e2e-caseofficer-username', 'TEST_AM_SUPERUSER_USERNAME'),
-        secret('test-e2e-caseofficer-password', 'TEST_AM_SUPERUSER_PASSWORD'),
-        secret('test-e2e-superuser-username', 'SUPER_USER_USERNAME'),
-        secret('test-e2e-superuser-password', 'SUPER_USER_PASSWORD'),
-        secret('idam-sscs-oauth2-client-secret', 'IDAM_OAUTH2_CLIENT_SECRET'),
-        secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
-        secret('test-e2e-am-senior-tcw-case-allocator-username', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_USERNAME'),
-        secret('test-e2e-am-senior-tcw-case-allocator-password', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_PASSWORD')
-
-        ],
-        's2s-${env}'      : [
-                secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
-                secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
-                secret('microservicekey-ccd-admin', 'ADMIN_S2S_KEY'),
-                secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET')
-        ],
-        'ccd-${env}'      : [
-                secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
-                secret('postcode-info-address-lookup-token', 'ADDRESS_LOOKUP_TOKEN'),
-                secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET'),
-                secret('idam-data-store-system-user-password', 'IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
-                secret('idam-data-store-system-user-username', 'IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
-                secret('idam-data-store-client-secret', 'IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET')
-        ],
-        'wa-${env}'      : [
-                secret('app-insights-connection-string', 'WA_INSIGHT_CONNECTION_STRING'),
-                secret('ld-secret', 'WA_LAUNCH_DARKLY_SDK_KEY'),
-                secret('s2s-secret-case-event-handler', 'S2S_SECRET_CASE_EVENT_HANDLER'),
-                secret('s2s-secret-task-management-api', 'S2S_SECRET_TASK_MANAGEMENT_API'),
-                secret('s2s-secret-task-monitor', 'S2S_SECRET_TASK_MONITOR'),
-                secret('s2s-secret-workflow-api', 'S2S_SECRET_WORKFLOW_API'),
-                secret('wa-idam-client-secret', 'WA_IDAM_CLIENT_SECRET'),
-                secret('wa-system-username', 'WA_SYSTEM_USERNAME'),
-                secret('wa-system-password', 'WA_SYSTEM_PASSWORD')
-        ],
-        'am-${env}'      : [
-                secret('am-role-assignment-service-s2s-secret', 'AM_ROLE_ASSIGNMENT_SERVICE_SECRET')
-        ]
-]
-
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   [ $class: 'AzureKeyVaultSecret',
     secretType: 'Secret',
@@ -202,7 +113,6 @@ def branchesToSync = ['demo', 'ithc', 'perftest']
 withPipeline(type, product, component) {
     def githubApi = new GithubAPI(this)
     if (env.BRANCH_NAME.startsWith("PR")) {
-        loadVaultSecrets(secretsForPR)
         env.PREVIEW_CCD_ENABLED = true
         env.CASE_TYPE = "Benefit"
         env.CORE_CASE_DATA_API_URL = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-data-store-api"
@@ -213,15 +123,15 @@ withPipeline(type, product, component) {
             env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
             env.CCD_GW_API = "https://gateway-ccd.aat.platform.hmcts.net"
         }
-    } else {
-        loadVaultSecrets(secrets)
     }
+
+    loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
     enableAksStagingDeployment()
     disableLegacyDeployment()
     syncBranchesWithMaster(branchesToSync)
 
-    afterSuccess('akschartsinstall'){
+    afterSuccess('akschartsinstall') {
         // Vars needed for AKS testing
         env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
         env.DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
@@ -254,15 +164,12 @@ withPipeline(type, product, component) {
         println """After akschartsinstall Using CORE_CASE_DATA_API_URL: ${env.CORE_CASE_DATA_API_URL}. - The branch name is ${env.BRANCH_NAME}""".stripIndent()
     }
 
-    env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
     onMaster() {
+        env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
         enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
     }
-    onPR() {
-        enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
-                        //Disabling due to IDAM OIDC issue. To be investigated under SSCS-10377
-                      //AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK])
 
+    onPR() {
         env.ENVIRONMENT = "pr"
         for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
             enableHighLevelDataSetup()
@@ -298,7 +205,7 @@ withPipeline(type, product, component) {
         generateDefinitions()
     }
 
-    afterSuccess('smoketest:preview') {
+    afterSuccess('highleveldatasetup:preview') {
         env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
         env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"         
         env.TEST_E2E_NUM_BROWSERS = params.NUM_TESTS_IN_PARALLEL
@@ -309,52 +216,13 @@ withPipeline(type, product, component) {
         env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
         stage('Playwright tests') {
             env.ENVIRONMENT="preview"
-
-            if(githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies")) {
-                 echo "Don't run functional test"
-              } else {
-                  try{
-                    echo "attempting to run e2e tests on PREVIEW"
-                    sh './gradlew YarnInstall'
-                    if(params.HEARINGS_LABEL_ENABLED == 'No'){
-                        sh './gradlew runE2eTestsPreview'
-                    } else {
-                        sh './gradlew runE2eTestsPreviewHearings'
-                    }
-                } finally {
-                    publishHTML([
-                        allowMissing: true,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: "playwright-report",
-                        reportFiles: 'index.html',
-                        reportName: 'SSCS E2E Test Report'
-            ])
-                sh "ls -lashR *"
-                steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
-                }
-              }
+            runE2eTests()
         }
-            
     }
 
     afterSuccess('smoketest:aat') {
         stage('Playwright tests') {
-            try{
-                echo "attempting to run e2e tests on AAT"
-                sh './gradlew yarnInstall'
-                sh './gradlew runE2eTestsAat'
-            } finally {
-                publishHTML([
-                    allowMissing: true,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: "playwright-report",
-                    reportFiles: 'index.html',
-                    reportName: 'SSCS E2E Test Report'
-            ])
-            steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**/*'
-            }
+            runE2eTests()
         }
     }
 
@@ -368,4 +236,25 @@ def generateDefinitions() {
     sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT}"
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
     steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
+}
+
+def runE2eTests() {
+    try {
+        sh './gradlew YarnInstall'
+        if (params.HEARINGS_LABEL_ENABLED == 'No') {
+            sh './gradlew runE2eTests'
+        } else {
+            sh './gradlew runE2eTestsHearings'
+        }
+    } finally {
+        publishHTML([
+            allowMissing: true,
+            alwaysLinkToLastBuild: true,
+            keepAll: true,
+            reportDir: "playwright-report",
+            reportFiles: 'index.html',
+            reportName: 'SSCS E2E Test Report'
+        ])
+        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
+    }
 }

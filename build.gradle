@@ -621,21 +621,16 @@ task yarnInstall(type:Exec) {
     commandLine 'yarn', 'install'
 }
 
-task runE2eTestsAat(type: Exec) {
-     workingDir = file("${project.projectDir}/definitions/test")
-    commandLine 'yarn', 'test:aat'
+task runE2eTests(type: Exec) {
+    workingDir = file("${project.projectDir}/definitions/test")
+    commandLine 'yarn', 'test:' + System.getProperty('ENVIRONMENT')
 }
 
-task runE2eTestsPreview(type: Exec) {
-     workingDir = file("${project.projectDir}/definitions/test")
-    commandLine 'yarn', 'install'
-    commandLine 'yarn', 'test:preview'
+task runE2eTestsHearings(type: Exec) {
+    workingDir = file("${project.projectDir}/definitions/test")
+    commandLine 'yarn', 'test:' + System.getProperty('ENVIRONMENT') + '-hearings'
 }
-task runE2eTestsPreviewHearings(type: Exec) {
-     workingDir = file("${project.projectDir}/definitions/test")
-    commandLine 'yarn', 'install'
-    commandLine 'yarn', 'test:preview-hearings'
-}
+
 task highLevelDataSetup(type: JavaExec) {
     mainClass = "uk.gov.hmcts.reform.sscs.config.HighLevelDataSetupApp"
     classpath += sourceSets.main.runtimeClasspath
