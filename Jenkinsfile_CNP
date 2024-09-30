@@ -243,10 +243,10 @@ def generateDefinitions() {
 def runE2eTests() {
     try {
         sh './gradlew YarnInstall'
-        if (params.HEARINGS_LABEL_ENABLED == 'No') {
-            sh './gradlew runE2eTests'
-        } else {
+        if (params.HEARINGS_LABEL_ENABLED == 'Yes') {
             sh './gradlew runE2eTestsHearings'
+        } else {
+            sh './gradlew runE2eTests'
         }
     } finally {
         publishHTML([

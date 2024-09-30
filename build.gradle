@@ -623,12 +623,12 @@ task yarnInstall(type:Exec) {
 
 task runE2eTests(type: Exec) {
     workingDir = file("${project.projectDir}/definitions/test")
-    commandLine 'yarn', 'test:' + System.getProperty('ENVIRONMENT')
+    commandLine 'yarn', 'test:' + System.getenv('ENVIRONMENT')
 }
 
 task runE2eTestsHearings(type: Exec) {
     workingDir = file("${project.projectDir}/definitions/test")
-    commandLine 'yarn', 'test:' + System.getProperty('ENVIRONMENT') + '-hearings'
+    commandLine 'yarn', 'test:' + System.getenv('ENVIRONMENT') + '-hearings'
 }
 
 task highLevelDataSetup(type: JavaExec) {
