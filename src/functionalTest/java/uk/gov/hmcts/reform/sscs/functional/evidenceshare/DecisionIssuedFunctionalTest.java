@@ -47,7 +47,7 @@ public class DecisionIssuedFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
-    public void processAnIssueDirectionEvent_ifPastOrFutureHearingExcludedDatesAreOnCaseDetails() throws IOException {
+    public void processAnIssueDecisionEvent() throws IOException {
         idamTokens = idamService.getIdamTokens();
         String json = BaseHandler.getJsonCallbackForTest("handlers/decisionissued/decisionIssuedAboutToSubmitCallback.json");
         json = uploadCaseDocument(EVIDENCE_DOCUMENT_PDF, "EVIDENCE_DOCUMENT", json);
