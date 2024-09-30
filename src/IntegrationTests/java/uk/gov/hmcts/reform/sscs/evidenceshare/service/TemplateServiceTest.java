@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
+@TestPropertySource(locations = "classpath:config/application_es_it.properties")
 public class TemplateServiceTest {
 
     @Autowired

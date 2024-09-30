@@ -1,0 +1,5 @@
+[
+  {"LiveFrom": "01/01/2018", "UserIDAMId": "nitin.prabhu@hmcts.net", "WorkBasketDefaultJurisdiction": "SSCS", "WorkBasketDefaultCaseType": "SSCS_ExceptionRecord", "WorkBasketDefaultState": "ScannedRecordReceived"},
+  {"LiveFrom": "01/01/2018", "UserIDAMId": "bulkscan+ccd@gmail.com", "WorkBasketDefaultJurisdiction": "SSCS", "WorkBasketDefaultCaseType": "SSCS_ExceptionRecord", "WorkBasketDefaultState": "ScannedRecordReceived"},
+  {"LiveFrom": "01/01/2018", "UserIDAMId": "venkata.akepati@hmcts.net", "WorkBasketDefaultJurisdiction": "SSCS", "WorkBasketDefaultCaseType": "SSCS_ExceptionRecord", "WorkBasketDefaultState": "ScannedRecordReceived"}
+]

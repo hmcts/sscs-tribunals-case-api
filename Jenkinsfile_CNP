@@ -34,12 +34,21 @@ def secrets = [
         secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
         secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
         secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
-        secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
         secret('robotics-email-from', 'ROBOTICS_EMAIL_FROM'),
         secret('robotics-email-to', 'ROBOTICS_EMAIL_TO'),
         secret('robotics-email-scottish-to', 'ROBOTICS_EMAIL_SCOTTISH_TO'),
         secret('robotics-email-pip-ae-to', 'ROBOTICS_EMAIL_PIP_AE_TO'),
-        secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
+
+        // tya notifications
+        secret('notification-key', 'NOTIFICATION_API_KEY'),
+        secret('notification-test-key', 'NOTIFICATION_API_TEST_KEY'),
+        secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
+        secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
+        secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD'),
+
+        // Used by Kubernetes
+        secret('idam-s2s-api', 'IDAM_S2S_AUTH'),
+        secret('sscs-s2s-secret', 'IDAM_S2S_AUTH_TOTP_SECRET'),
     ],
     's2s-${env}'      : [
             secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
@@ -66,10 +75,15 @@ def secretsForPR = [
                 secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
                 secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
                 secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
-                secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
                 secret('sscs-servicebus-connection-string-tf', 'SERVICE_BUS_CONNECTION_STRING'),
                 secret('preview-ccd-db-password-2', 'PREVIEW_DB_PASSWORD_2'),
-                secret('preview-shared-db-password', 'SHARED_DB_PASSWORD')
+                secret('preview-shared-db-password', 'SHARED_DB_PASSWORD'),
+                // tya notifications
+                secret('notification-key', 'NOTIFICATION_API_KEY'),
+                secret('notification-test-key', 'NOTIFICATION_API_TEST_KEY'),
+                secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
+                secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
+                secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD'),
         ],
         's2s-${env}'      : [
                 secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
@@ -177,6 +191,46 @@ withPipeline(type, product, component) {
         enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
                         //Disabling due to IDAM OIDC issue. To be investigated under SSCS-10377
                       //AppPipelineDsl.PactRoles.CONSUMER_DEPLOY_CHECK])
+
+        env.ENVIRONMENT = "pr"
+        for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
+            enableHighLevelDataSetup()
+        }
+    }
+    onMaster {
+        env.ENVIRONMENT="aat"
+        enableHighLevelDataSetup()
+    }
+    onDemo {
+        env.ENVIRONMENT = "demo"
+        enableHighLevelDataSetup()
+    }
+    onPerftest {
+        env.ENVIRONMENT = "perftest"
+        enableHighLevelDataSetup()
+    }
+    onIthc {
+        env.ENVIRONMENT = "ithc"
+        enableHighLevelDataSetup()
+    }
+
+    before('highleveldatasetup') {
+        if (env.ENVIRONMENT != "pr") {
+            env.DEFINITION_STORE_URL_BASE = "http://ccd-definition-store-api-${env.ENVIRONMENT}.service.core-compute-${env.ENVIRONMENT}.internal"
+        } else {
+            env.DEFINITION_STORE_URL_BASE = "https://ccd-definition-store-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+        }
+        generateDefinitions()
+    }
+
+    afterAlways('functionalTest:aat') {
+        env.ENVIRONMENT="prod"
     }
 }
 
+def generateDefinitions() {
+    sh "./bin/create-xlsx.sh benefit tag ${env.ENVIRONMENT}"
+    sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT}"
+    steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
+    steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
+}
