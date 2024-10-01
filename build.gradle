@@ -616,19 +616,10 @@ bootWithCCD {
     }
 }
 
-task yarnInstall(type:Exec) {
-    workingDir = file("${project.projectDir}/definitions/test")
-    commandLine 'yarn', 'install'
-}
-
 task runE2eTests(type: Exec) {
     workingDir = file("${project.projectDir}/definitions/test")
+    commandLine 'yarn', 'install'
     commandLine 'yarn', 'test:' + System.getenv('ENVIRONMENT')
-}
-
-task runE2eTestsHearings(type: Exec) {
-    workingDir = file("${project.projectDir}/definitions/test")
-    commandLine 'yarn', 'test:' + System.getenv('ENVIRONMENT') + '-hearings'
 }
 
 task highLevelDataSetup(type: JavaExec) {
