@@ -36,7 +36,7 @@ export class Summary {
     }
 
     async verifyPresenceOfText(fieldValue: string) {
-        await webAction.screenshot();
+        await webAction.screenshot({ fullPage: true });
         let text = await this.page.locator(`//div/markdown/p[contains(text(),"${fieldValue}")]`).textContent()
         expect(text).toContain(fieldValue); // TODO An exact match is not done as there is Text from Upper nodes of the Dom Tree Appearing.
     }
