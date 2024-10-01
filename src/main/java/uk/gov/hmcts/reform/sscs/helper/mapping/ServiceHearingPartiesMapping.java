@@ -4,7 +4,7 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.mapping.HearingsMapping.DWP_ID;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.EntityRoleCode.RESPONDENT;
-import static uk.gov.hmcts.reform.sscs.model.hmc.reference.PartyType.INDIVIDUAL;
+import static uk.gov.hmcts.reform.sscs.model.hmc.reference.PartyType.ORGANISATION;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +31,7 @@ public final class ServiceHearingPartiesMapping {
 
         List<PartyDetails> partiesDetails = new ArrayList<>();
 
-        if (HearingsDetailsMapping.isPoOfficerAttending(caseData)) {
-            partiesDetails.add(createDwpPartyDetails(caseData));
-        }
+        partiesDetails.add(createDwpPartyDetails(caseData));
 
         if (isYes(caseData.getJointParty().getHasJointParty())) {
             partiesDetails.add(createJointPartyDetails());
@@ -93,7 +91,7 @@ public final class ServiceHearingPartiesMapping {
     public static PartyDetails createDwpPartyDetails(SscsCaseData caseData) {
         return PartyDetails.builder()
                 .partyID(DWP_ID)
-                .partyType(INDIVIDUAL)
+                .partyType(ORGANISATION)
                 .partyRole(RESPONDENT.getHmcReference())
                 .organisationDetails(HearingsPartiesMapping.getDwpOrganisationDetails(caseData))
                 .unavailabilityDow(HearingsPartiesMapping.getDwpUnavailabilityDayOfWeek())

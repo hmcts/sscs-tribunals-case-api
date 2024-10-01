@@ -210,15 +210,6 @@ public final class HearingsPartiesMapping {
         return getEntityRoleCode(entity).getHmcReference();
     }
 
-
-    public static IndividualDetails getDwpIndividualDetails(SscsCaseData caseData) {
-        return IndividualDetails.builder()
-                .firstName(DWP_PO_FIRST_NAME)
-                .lastName(DWP_PO_LAST_NAME)
-                .preferredHearingChannel(HearingChannelUtil.getHearingChannel(caseData))
-                .build();
-    }
-
     public static IndividualDetails getPartyIndividualDetails(Entity entity, HearingOptions hearingOptions,
                                                               HearingSubtype hearingSubtype,
                                                               String partyId,

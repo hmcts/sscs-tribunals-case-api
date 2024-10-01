@@ -69,7 +69,7 @@ public class ServiceHearingsService {
         List<SscsCaseDetails> mainCaseData = ccdCaseService.getCasesViaElastic(List.of(request.getCaseId()));
 
         if (mainCaseData == null || mainCaseData.size() != NUM_CASES_EXPECTED) {
-            throw new IllegalStateException(
+            throw new GetCaseException(
                     "Invalid search data returned: one case is required. Attempted to fetch data for " + caseId);
         }
 

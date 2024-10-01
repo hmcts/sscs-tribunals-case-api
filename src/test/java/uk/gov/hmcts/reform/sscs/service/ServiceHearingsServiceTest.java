@@ -30,6 +30,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.model.service.ServiceHearingRequest;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
@@ -225,7 +226,7 @@ class ServiceHearingsServiceTest {
 
         given(ccdCaseService.getCasesViaElastic(List.of(String.valueOf(CASE_ID)))).willReturn(searchResult);
 
-        assertThatExceptionOfType(IllegalStateException.class)
+        assertThatExceptionOfType(GetCaseException.class)
             .isThrownBy(() -> serviceHearingsService.getServiceLinkedCases(request));
     }
 
