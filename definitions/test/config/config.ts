@@ -130,8 +130,8 @@ export const paths = {
 
 export const timeouts = {
   shortTimeout: 5000,
-  mediumTimout: 60000,
-  longTimeout: 120000,
-  maxTimeout: 180000
+  mediumTimout: 10000,
+  longTimeout: 30000,
+  maxTimeout: 90000
 };
 
