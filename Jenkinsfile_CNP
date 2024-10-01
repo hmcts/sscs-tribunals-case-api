@@ -198,14 +198,14 @@ withPipeline(type, product, component) {
         for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
             env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
             env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+            env.CCD_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+            env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
             env.TEST_E2E_NUM_BROWSERS = params.NUM_TESTS_IN_PARALLEL
             env.TEST_E2E_WAIT_FOR_ANGULAR = 'false'
             env.TEST_E2E_FAIL_FAST = 'false'
             env.TEST_E2E_ANNOTATION = params.PREVIEW_TAG
             env.TEST_E2E_RETRIES = 5
             env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
-            env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-            env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
             stage('Playwright tests') {
                 env.ENVIRONMENT="preview"
                 runE2eTests()
