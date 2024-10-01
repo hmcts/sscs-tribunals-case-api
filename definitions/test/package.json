@@ -7,7 +7,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "test:preview": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never npx playwright install && npx playwright test --config ./playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep @preview-pipeline",
+    "test:pr": "ENVIRONMENT=preview PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never npx playwright install && npx playwright test --config ./playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep @preview-pipeline",
     "test:preview-hearings": "HEARINGS_ENABLED=Yes PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never npx playwright install && npx playwright test --config ./playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation",
     "test:aat": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never npx playwright install && npx playwright test --config ./playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep @master-pipeline",
     "test:fullfunctional": "PLAYWRIGHT_HTML_REPORT=playwright-report PW_TEST_HTML_REPORT_OPEN=never npx playwright install && npx playwright test --config ./playwright.config.ts --project chromium --reporter=html --grep-invert @work-allocation --grep @nightly-pipeline"
