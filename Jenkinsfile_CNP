@@ -103,8 +103,6 @@ def branchesToSync = ['demo', 'ithc', 'perftest']
 
 withPipeline(type, product, component) {
     def githubApi = new GithubAPI(this)
-    env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
     if (env.BRANCH_NAME.startsWith("PR")) {
         env.PREVIEW_CCD_ENABLED = true
         env.CASE_TYPE = "Benefit"
@@ -206,6 +204,8 @@ withPipeline(type, product, component) {
             env.TEST_E2E_ANNOTATION = params.PREVIEW_TAG
             env.TEST_E2E_RETRIES = 5
             env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net"
+            env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+            env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
             stage('Playwright tests') {
                 env.ENVIRONMENT="preview"
                 runE2eTests()
