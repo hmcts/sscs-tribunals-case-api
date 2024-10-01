@@ -27,8 +27,6 @@ public class PostHearingRequestSubmittedHandler implements PreSubmitCallbackHand
     private final CcdCallbackMapService ccdCallbackMapService;
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
-    @Value("${feature.handle-ccd-callbackMap-v2.enabled}")
-    private boolean isHandleCcdCallbackMapV2Enabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -63,16 +61,11 @@ public class PostHearingRequestSubmittedHandler implements PreSubmitCallbackHand
         }
         Consumer<SscsCaseData> sscsCaseDataConsumer = sscsCaseData -> SscsUtil.clearPostHearingFields(sscsCaseData, isPostHearingsEnabled);
 
-        if (isHandleCcdCallbackMapV2Enabled) {
-            caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
-                    callbackMap,
-                    caseId,
-                    sscsCaseDataConsumer
-            );
-        } else {
-            sscsCaseDataConsumer.accept(caseData);
-            caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
-        }
+        caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
+                callbackMap,
+                caseId,
+                sscsCaseDataConsumer
+        );
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }

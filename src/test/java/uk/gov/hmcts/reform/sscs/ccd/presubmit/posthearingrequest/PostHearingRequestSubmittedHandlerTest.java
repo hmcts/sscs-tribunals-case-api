@@ -2,10 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.posthearingrequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -24,7 +22,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -95,32 +92,7 @@ class PostHearingRequestSubmittedHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = PostHearingRequestType.class)
-    void givenRequestPostHearingTypes_shouldReturnCallCorrectCallback(PostHearingRequestType value) {
-        caseData.getPostHearing().setRequestType(value);
-
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-
-        when(ccdCallbackMapService.handleCcdCallbackMap(value, caseData))
-            .thenReturn(SscsCaseData.builder().build());
-
-        PreSubmitCallbackResponse<SscsCaseData> response =
-            handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-
-        verify(ccdCallbackMapService, times(1))
-            .handleCcdCallbackMap(value, caseData);
-
-        verify(ccdCallbackMapService, never())
-                .handleCcdCallbackMapV2(eq(value), anyLong(), consumerArgumentCaptor.capture());
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = PostHearingRequestType.class)
     void givenRequestPostHearingTypes_shouldReturnCallCorrectCallback_WhenCcdCallbackMapV2IsEnabled(PostHearingRequestType value) {
-        ReflectionTestUtils.setField(handler, "isHandleCcdCallbackMapV2Enabled", true);
         caseData.getPostHearing().setRequestType(value);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
