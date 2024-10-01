@@ -169,10 +169,11 @@ withPipeline(type, product, component) {
         generateDefinitions()
     }
 
-    afterSuccess('smoketest') {
-        stage('Playwright tests') {
-            runE2eTests()
-        }
+    afterSuccess('smoketest:preview') {
+        runE2eTests()
+    }
+    afterSuccess('smoketest:aat') {
+        runE2eTests()
     }
 
 }
@@ -186,7 +187,9 @@ def generateDefinitions() {
 
 def runE2eTests() {
     try {
-        sh './gradlew runE2eTests'
+        stage('Playwright tests') {
+            sh './gradlew runE2eTests'
+        }
     } finally {
         publishHTML([
             allowMissing: true,
