@@ -2039,6 +2039,17 @@ public class NotificationServiceTest {
     }
 
     @Test
+    public void givenActionPostponementRequestWithRefuseOnTheDay_willNotSendNotifications() {
+        CcdNotificationWrapper ccdNotificationWrapper = buildBaseWrapper(ACTION_POSTPONEMENT_REQUEST, APPELLANT_WITH_ADDRESS, Representative.builder().hasRepresentative("no").build(), SscsDocument.builder().value(SscsDocumentDetails.builder().build()).build());
+
+        ccdNotificationWrapper.getNewSscsCaseData().getPostponementRequest().setActionPostponementRequestSelected("refuseOnTheDay");
+        notificationService.manageNotificationAndSubscription(ccdNotificationWrapper, false);
+
+        verifyNoInteractions(notificationValidService);
+        verifyNoInteractions(notificationHandler);
+    }
+
+    @Test
     public void willNotSendHearingNotifications_whenGapsAndActionPostponementRequest() {
         CcdNotificationWrapper ccdNotificationWrapper = buildBaseWrapper(POSTPONEMENT, APPELLANT_WITH_ADDRESS, null, null);
         ccdNotificationWrapper.getNewSscsCaseData().getSchedulingAndListingFields().setHearingRoute(HearingRoute.GAPS);
