@@ -56,10 +56,10 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
             if (!StringUtils.isEmpty(existingLanguage)) {
                 Language language = verbalLanguagesService.getVerbalLanguage(existingLanguage);
 
-                log.info("Verbal language dialect {}, dialect reference {} ", language.getDialectEn(), language.getDialectReference());
-                log.info("Verbal language full reference {}, mrd reference {} ", language.getFullReference(), language.getMrdReference());
-
                 if (null != language) {
+                    log.info("Verbal language dialect {}, dialect reference {} ", language.getDialectEn(), language.getDialectReference());
+                    log.info("Verbal language full reference {}, mrd reference {} ", language.getFullReference(), language.getMrdReference());
+
                     DynamicListItem dynamicListItem = utils.getLanguageDynamicListItem(language);
 
                     log.info("Dynamic List item code {} , label {} ", dynamicListItem.getCode(), dynamicListItem.getLabel());
