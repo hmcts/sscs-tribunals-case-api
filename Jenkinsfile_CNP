@@ -106,13 +106,11 @@ withPipeline(type, product, component) {
     if (env.BRANCH_NAME.startsWith("PR")) {
         env.PREVIEW_CCD_ENABLED = true
         env.CASE_TYPE = "Benefit"
-        env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal/"
+        env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
         env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
         for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_hearings") ) {
             env.PREVIEW_CCD_ENABLED = false
             env.CASE_TYPE = "Benefit-${CHANGE_ID}"
-            env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-            env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
         }
     }
 
