@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writestatementofreasons;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,6 +44,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
     public static final String URL = "http://dm-store/documents/123";
     private static final String USER_AUTHORISATION = "Bearer token";
     protected static final String LOGGED_IN_JUDGE_NAME = "Judge Full Name";
+    protected static final String ORIGINAL_JUDGE_NAME = "test judge name name";
     public static final String CASE_ID = "123123";
     public static final String GENERATE_DOCUMENT = "generateDocument";
     public static final String TEMPLATE_ID = "template.docx";
@@ -213,6 +215,24 @@ class WriteStatementOfReasonsMidEventHandlerTest {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         assertThat(payload.getHeldAt()).isEqualTo(IN_CHAMBERS);
+    }
+
+    @Test
+    void givenCorrectionInProgressAndFinalDecisionJudgeExists_thenJudgeNameIsOriginalJudgeName() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        caseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(YES);
+
+        caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
+        caseData.getSscsFinalDecisionCaseData().setFinalDecisionJudge(ORIGINAL_JUDGE_NAME);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        verify(userDetailsService, atMostOnce()).buildLoggedInUserName(USER_AUTHORISATION);
+
+        assertThat(response.getData().getSscsFinalDecisionCaseData().getFinalDecisionJudge()).isEqualTo(ORIGINAL_JUDGE_NAME);
     }
 
     @Test
