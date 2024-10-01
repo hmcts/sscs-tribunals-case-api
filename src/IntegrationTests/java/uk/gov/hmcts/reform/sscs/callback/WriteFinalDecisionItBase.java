@@ -100,7 +100,7 @@ public abstract class WriteFinalDecisionItBase extends AbstractEventIt {
         assertEquals("Judge Full Name", parentPayload.getUserName());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
-        assertEquals("Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
+        assertEquals("Tribunal Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
