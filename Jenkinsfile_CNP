@@ -95,49 +95,30 @@ def branchesToSync = ['demo', 'ithc', 'perftest']
 
 withPipeline(type, product, component) {
     def githubApi = new GithubAPI(this)
+    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:hearings").size() == 0) {
+        enableHighLevelDataSetup()
+    }
 
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
     syncBranchesWithMaster(branchesToSync)
-    enableHighLevelDataSetup()
 
-    afterSuccess('akschartsinstall') {
-        env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-        env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
-
-        // Vars needed for AKS testing
-        for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_hearings") ) {
-            env.CASE_TYPE = "Benefit-${CHANGE_ID}"
-            env.CCD_GW_API = "https://gateway-ccd.aat.platform.hmcts.net"
-            env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-            env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
-        }
-        for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:wa") ) {
-            env.CAMUNDA_BASE_URL = "https://camunda-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-            sh """
-            ./bin/pull-camunda-dmn-files.sh ${dmnBranch}
-            ./bin/pull-camunda-bpmn-files.sh ${waStandaloneBranch}
-            ./bin/import-camunda-files.sh . sscs sscs
-            """
-        }
-    }
+    env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
+    env.TEST_DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
+    env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
 
     onMaster() {
-        env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
-        env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-        env.ENVIRONMENT="aat"
-        env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
+        setAatEnvVars();
+
         enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
     }
     onPR() {
-        env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
-        env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-        env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-        env.CCD_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-        env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
-        env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-        env.CASE_DOCUMENT_AM_URL = "https://ccd-case-document-am-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-        env.ENVIRONMENT = "pr"
+        setPreviewEnvVars();
+
+        for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:hearings") ) {
+            env.CASE_TYPE = "Benefit-${CHANGE_ID}"
+            setAatEnvVars();
+        }
     }
     onDemo {
         env.ENVIRONMENT = "demo"
@@ -161,6 +142,17 @@ withPipeline(type, product, component) {
         generateDefinitions()
     }
 
+    afterSuccess('akschartsinstall') {
+        for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:wa") ) {
+            env.CAMUNDA_BASE_URL = "https://camunda-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+            sh """
+            ./bin/pull-camunda-dmn-files.sh ${dmnBranch}
+            ./bin/pull-camunda-bpmn-files.sh ${waStandaloneBranch}
+            ./bin/import-camunda-files.sh . sscs sscs
+            """
+        }
+    }
+
     afterSuccess('smoketest:preview') {
         env.ENVIRONMENT = "preview"
         runE2eTests()
@@ -168,7 +160,6 @@ withPipeline(type, product, component) {
     afterSuccess('smoketest:aat') {
         runE2eTests()
     }
-
 }
 
 def generateDefinitions() {
@@ -176,6 +167,28 @@ def generateDefinitions() {
     sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT}"
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
     steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
+}
+
+def setAatEnvVars() {
+    env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
+    env.TEST_E2E_URL_WEB = "https://manage-case.aat.platform.hmcts.net/"
+    env.TEST_E2E_API_URI = "http://sscs-tribunals-api-aat.service.core-compute-aat.internal"
+    env.CCD_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    env.CCD_GW_API = "https://gateway-ccd.aat.platform.hmcts.net"
+    env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
+    env.ENVIRONMENT="aat"
+}
+
+def setPreviewEnvVars() {
+    env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
+    env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CCD_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
+    env.CASE_DOCUMENT_AM_URL = "https://ccd-case-document-am-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.ENVIRONMENT = "pr"
 }
 
 def runE2eTests() {
