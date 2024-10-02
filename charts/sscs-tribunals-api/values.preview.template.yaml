@@ -97,6 +97,7 @@ ccd-case-document-am-api:
   java:
     image: hmctspublic.azurecr.io/ccd/case-document-am-api:latest
     releaseNameOverride: ${SERVICE_NAME}-ccd-case-document-am-api
+    ingressHost: ccd-case-document-am-api-${SERVICE_FQDN}
     environment:
       CCD_DATA_STORE_API_BASE_URL: ${CORE_CASE_DATA_API_URL}
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
@@ -525,6 +526,7 @@ sscs-tya-notif:
   java:
     image: hmctspublic.azurecr.io/sscs/tya-notif:latest
     releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
+    ingressHost: sscs-tya-notification-${SERVICE_FQDN}
     readinessDelay: 45
     environment:
       CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
