@@ -1,0 +1,22 @@
+{
+    "eventName": "Create a bundle",
+    "docName": "Document Name",
+    "sourceDoc": "Source Document",
+    "folderName": "Folder Name",
+    "stitchStatusLabel": "Stitch status",
+    "stitchDocLabel": "Stitched document",
+    "configUsed": "Config used for bundle",
+    "amendBundle": "Is this the bundle you want to amend?",
+    "amendBundleDefaultVal": "No",
+    "configUsedDefaultVal": "SSCS Bundle Original",
+    "configUsedEditedVal": "SSCS Bundle Edited",
+    "folderNameVal": "FTA",
+    "folderOneDocVal": "FTA response received on",
+    "folderOneSourceVal": "FTA response received on",
+    "folderTwoDocVal": "FTA evidence received on",
+    "folderTwoSourceVal": "FTA evidence received on",
+    "bundleFolderTwoVal": "Further additions",
+    "stitchStatusDone": "DONE",
+    "stitchVal": "SscsBundle",
+    "editedStitchVal": "EditedSscsBundle"
+}

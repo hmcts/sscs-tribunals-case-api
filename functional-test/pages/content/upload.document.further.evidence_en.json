@@ -1,0 +1,11 @@
+{
+    "eventName": "Upload document FE",
+    "pageHeading": "Upload further evidence documents",
+    "sectionHeading": "Further evidence documents (Optional)",
+    "documentType": "Appellant evidence",
+    "testfileone" : "testfile1.pdf",
+    "testfiletwo" : "testfile2.pdf",
+    "testfilethree" : "testfile3.pdf",
+    "testaudiofile" : "test_av.mp3",
+    "fileName" : "Test file"
+}

@@ -42,3 +42,19 @@ definitions/**/*.xlsx#
 
 # aat env file
 .aat-env
+
+# Yarn and Sub directories
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+/node_modules/
+
+#Test Output folders
+dist/
+playwright-report/
+logs/
+test-results

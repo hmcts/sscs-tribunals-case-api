@@ -1,0 +1,17 @@
+{
+    "testfileone" : "testfile1.pdf",
+    "testfiletwo" : "testfile2.pdf",
+    "testfilethree" : "testfile3.pdf",
+    "testaudiofile": "test_av.mp3",
+    "pipBenefitCode" : "002",
+    "pipIssueCode" : "CC",
+    "taxBenefitCode" : "053",
+    "taxIssueCode" : "EC",
+    "poAttendOption" : "No",
+    "ucBenefitCode": "001",
+    "ucIssueCode": "WC",
+    "dlaIssueCode": "EI",
+    "ucDisputeOption": "No",
+    "ucJointPartyOnCase": "No",
+    "ucJointPartyOnCase_Yes": "Yes"
+}

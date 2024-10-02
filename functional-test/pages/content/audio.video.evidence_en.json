@@ -1,0 +1,12 @@
+{
+    "avTab": "Audio/Video Evidence",
+    "typeField": "Document Type",
+    "typeValue": "audioDocument",
+    "docField": "Audio/video document url",
+    "partyField": "Audio/video party uploaded",
+    "ftaValue": "FTA",
+    "eventNameCaptor": "Process audio/video evidence",
+    "docTab": "Documents",
+    "docTypeField": "Type",
+    "docTypeValue": "Audio/Video evidence direction notice"
+}

@@ -1,0 +1,10 @@
+{
+    "eventName": "Welsh - update lang preference",
+    "captionText": "Welsh - update lang preference",
+    "heading": "Update Welsh Preference",
+    "languagePreferenceQuestionLabel": "Is the language preference Welsh? (Optional)",
+    "welshlanguagePreferenceYesLabel": "Yes",
+    "welshlanguagePreferenceNoLabel": "No",
+    "checkYourAnswersHeading": "Check your answers",
+    "languagePreferenceQuestionLabelWithinWelshTab": "Is the language preference Welsh?"
+}

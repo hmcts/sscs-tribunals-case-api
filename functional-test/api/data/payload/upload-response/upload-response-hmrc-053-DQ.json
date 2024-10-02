@@ -1,0 +1,407 @@
+{
+  "appeal": {
+    "mrnDetails": {
+      "dwpIssuingOffice": "Child Support",
+      "mrnDate": "2024-05-31",
+      "mrnLateReason": "Lost my paperwork",
+      "mrnMissingReason": null
+    },
+    "appellant": {
+      "id": "733a4867-8500-4118-9f96-25acf2521e34",
+      "identity": {
+        "dob": "1990-02-26",
+        "nino": "0ZUP7GLBN"
+      },
+      "name": {
+        "title": "Mr",
+        "firstName": "Joe",
+        "lastName": "Bloggs"
+      },
+      "address": {
+        "line1": "123 Hairy Lane",
+        "line2": "Off Hairy Park",
+        "town": "Hairyfield",
+        "county": "Kent",
+        "postcode": "CF24 0AD"
+      },
+      "contact": {
+        "email": "joe@bloggs.com",
+        "phone": null,
+        "mobile": "07411222222"
+      },
+      "organisation": null,
+      "isAppointee": "No",
+      "appointee": {
+        "id": "984eecc9-5989-42ae-8030-ae412ccff0af",
+        "identity": {
+          "dob": null,
+          "nino": null
+        },
+        "name": {
+          "title": null,
+          "firstName": null,
+          "lastName": null
+        },
+        "address": {},
+        "contact": {
+          "email": null,
+          "phone": null,
+          "mobile": null
+        },
+        "organisation": null
+      },
+      "role": {},
+      "confidentialityRequired": null,
+      "isAddressSameAsAppointee": null
+    },
+    "benefitType": {
+      "code": "childSupport",
+      "description": "Child Support"
+    },
+    "hearingOptions": {
+      "wantsToAttend": null,
+      "wantsSupport": null,
+      "languageInterpreter": null,
+      "languages": null,
+      "languagesList": null,
+      "scheduleHearing": null,
+      "other": null,
+      "signLanguageType": null,
+      "hearingRoute": null,
+      "agreeLessNotice": null,
+      "arrangements": [],
+      "excludeDates": []
+    },
+    "appealReasons": {
+      "reasons": [
+        {
+          "value": {
+            "reason": "aaaaaaaaaa",
+            "description": "aaaaaaaaaa"
+          },
+          "id": "ae866c76-df92-4ff1-8629-7c01bb4a3147"
+        },
+        {
+          "value": {
+            "reason": "bbbbbbbbbb",
+            "description": "bbbbbbbbbb"
+          },
+          "id": "41bbcb2e-784a-47a6-9f86-ee23c52d927a"
+        },
+        {
+          "value": {
+            "reason": "cccccccccc",
+            "description": "cccccccccc"
+          },
+          "id": "d8521590-d51a-416e-b3d3-c3ac85e77919"
+        }
+      ],
+      "otherReasons": "Another reason"
+    },
+    "rep": {
+      "id": "9d1603d6-922e-4f89-92cb-bd4fd2b01389",
+      "identity": {
+        "dob": null,
+        "nino": null
+      },
+      "name": {
+        "title": "Mr",
+        "firstName": "Harry",
+        "lastName": "Potter"
+      },
+      "address": {
+        "line1": "123 Hairy Lane",
+        "line2": "Off Hairy Park",
+        "town": "Town",
+        "county": "County",
+        "postcode": "CM14 4LQ"
+      },
+      "contact": {
+        "email": "joe@bloggs.com",
+        "phone": null,
+        "mobile": "07411999999"
+      },
+      "organisation": "HP Ltd",
+      "hasRepresentative": "Yes"
+    },
+    "signer": "Joe Bloggs",
+    "hearingType": "oral",
+    "hearingSubtype": {},
+    "receivedVia": "Online"
+  },
+  "dwpResponseDocument": {
+    "documentFileName": null,
+    "documentLink": {
+      "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/b4b8b038-1e11-49b3-b83e-13546cfc152d",
+      "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/b4b8b038-1e11-49b3-b83e-13546cfc152d/binary",
+      "document_filename": "dummy.pdf"
+    }
+  },
+  "dwpAT38Document": {
+    "documentFileName": null,
+    "documentLink": {
+      "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/b4b8b038-1e11-49b3-b83e-13546cfc152d",
+      "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/b4b8b038-1e11-49b3-b83e-13546cfc152d/binary",
+      "document_filename": "ceb988f5-1536-422a-8636-a989a8a86456.pdf"
+    }
+  },
+  "scannedDocumentTypes": null,
+  "dwpEvidenceBundleDocument": {
+    "documentFileName": null,
+    "documentLink": {
+      "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/eebd53d9-e4e3-42d7-b4ea-937efb629339",
+      "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/eebd53d9-e4e3-42d7-b4ea-937efb629339/binary",
+      "document_filename": "dummy.pdf"
+    }
+  },
+  "dwpEditedEvidenceReason": null,
+  "dwpUploadAudioVideoEvidence": [],
+  "benefitCode": "053",
+  "issueCode": "DQ",
+  "dwpFurtherInfo": "No",
+  "dwpUCB": null,
+  "dwpFurtherEvidenceStates": null,
+  "dynamicDwpState": {
+    "value": {
+      "code": "UnRegistered",
+      "label": "Appeal to-be registered"
+    },
+    "list_items": [
+      {
+        "code": "adjournmentNoticeIssued",
+        "label": "Adjournment notice issued"
+      },
+      {
+        "code": "appealAbated",
+        "label": "Appeal abated"
+      },
+      {
+        "code": "appointeeDetailsNeeded",
+        "label": "Appointee details needed"
+      },
+      {
+        "code": "decisionActioned",
+        "label": "Decision actioned"
+      },
+      {
+        "code": "directionActionRequired",
+        "label": "Direction - action req'd"
+      },
+      {
+        "code": "directionResponded",
+        "label": "Direction - responded"
+      },
+      {
+        "code": "Exception",
+        "label": "Exception"
+      },
+      {
+        "code": "extensionRequested",
+        "label": "Extension requested"
+      },
+      {
+        "code": "feActionedNA",
+        "label": "FE Actioned - NA"
+      },
+      {
+        "code": "feActionedNR",
+        "label": "FE Actioned - NR"
+      },
+      {
+        "code": "feReceived",
+        "label": "FE received"
+      },
+      {
+        "code": "finalDecisionIssued",
+        "label": "Final decision issued"
+      },
+      {
+        "code": "hearingDateIssued",
+        "label": "Hearing date issued"
+      },
+      {
+        "code": "hearingPostponed",
+        "label": "Postponed"
+      },
+      {
+        "code": "hearingRecordingActioned",
+        "label": "Hearing recording actioned"
+      },
+      {
+        "code": "hearingRecordingProcessed",
+        "label": "Hearing recording processed"
+      },
+      {
+        "code": "inProgress",
+        "label": "In progress"
+      },
+      {
+        "code": "lapsed",
+        "label": "Lapsed"
+      },
+      {
+        "code": "noAction",
+        "label": "No action"
+      },
+      {
+        "code": "phmeGranted",
+        "label": "PHE granted"
+      },
+      {
+        "code": "phmeRefused",
+        "label": "PHE refused"
+      },
+      {
+        "code": "Registered",
+        "label": "Appeal registered (FTA)"
+      },
+      {
+        "code": "reinstatementGranted",
+        "label": "Reinstatement Granted"
+      },
+      {
+        "code": "reinstatementRefused",
+        "label": "Reinstatement Refused"
+      },
+      {
+        "code": "repAdded",
+        "label": "Rep added"
+      },
+      {
+        "code": "responseSubmittedDwp",
+        "label": "Response submitted (FTA)"
+      },
+      {
+        "code": "strikeOutActioned",
+        "label": "Strike-out actioned"
+      },
+      {
+        "code": "struckOut",
+        "label": "Struck out"
+      },
+      {
+        "code": "supplementaryResponse",
+        "label": "Supplementary response"
+      },
+      {
+        "code": "UnRegistered",
+        "label": "Appeal to-be registered"
+      },
+      {
+        "code": "validityChallenge",
+        "label": "Validity challenge"
+      },
+      {
+        "code": "withdrawalReceived",
+        "label": "Withdrawal received"
+      },
+      {
+        "code": "Withdrawn",
+        "label": "Withdrawn"
+      }
+    ]
+  },
+  "dwpIsOfficerAttending": "No",
+  "otherParties": [
+    {
+      "value": {
+        "confidentialityRequired": "No",
+        "unacceptableCustomerBehaviour": "No",
+        "isAppointee": null,
+        "id": "13e1b3d7-c593-4e6a-b51a-99f35cac69e9",
+        "showRole": null,
+        "sendNewOtherPartyNotification": null,
+        "name": {
+          "title": "adf",
+          "firstName": "Pettedson",
+          "lastName": "John",
+          "middleName": null
+        },
+        "address": {
+          "line1": "41, Egerton Gate",
+          "line2": null,
+          "town": "MILTON KEYNES",
+          "county": null,
+          "postcode": "MK5 7HH",
+          "line3": null,
+          "country": null,
+          "postcodeLookup": null,
+          "postcodeAddress": null
+        },
+        "contact": {
+          "phone": "07919621017",
+          "mobile": null,
+          "email": "hmctspentet1@mailinator.com"
+        },
+        "role": {
+          "name": "Receiving parent",
+          "description": null
+        },
+        "reasonableAdjustment": {
+          "wantsReasonableAdjustment": null,
+          "reasonableAdjustmentRequirements": null
+        },
+        "otherPartySubscription": {
+          "wantSmsNotifications": null,
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "reason": null,
+          "lastLoggedIntoMya": null
+        },
+        "hearingSubtype": {
+          "wantsHearingTypeTelephone": null,
+          "hearingTelephoneNumber": null,
+          "wantsHearingTypeVideo": null,
+          "hearingVideoEmail": null,
+          "wantsHearingTypeFaceToFace": null
+        },
+        "hearingOptions": {
+          "wantsToAttend": null,
+          "wantsSupport": null,
+          "languageInterpreter": null,
+          "languages": null,
+          "languagesList": null,
+          "scheduleHearing": null,
+          "other": null,
+          "signLanguageType": null,
+          "hearingRoute": null,
+          "agreeLessNotice": null,
+          "arrangements": [],
+          "excludeDates": []
+        },
+        "otherPartyAppointeeSubscription": {
+          "wantSmsNotifications": null,
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "reason": null,
+          "lastLoggedIntoMya": null
+        },
+        "appointeeReasonableAdjustment": {
+          "wantsReasonableAdjustment": null,
+          "reasonableAdjustmentRequirements": null
+        },
+        "otherPartyRepresentativeSubscription": {
+          "wantSmsNotifications": null,
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "subscribeEmail": null,
+          "subscribeSms": null,
+          "reason": null,
+          "lastLoggedIntoMya": null
+        },
+        "repReasonableAdjustment": {
+          "wantsReasonableAdjustment": null,
+          "reasonableAdjustmentRequirements": null
+        }
+      },
+      "id": "ce348d99-f14d-432a-8d31-e02116835c75"
+    }
+  ]
+}

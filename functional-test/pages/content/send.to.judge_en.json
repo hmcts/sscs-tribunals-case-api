@@ -1,0 +1,11 @@
+{
+    "sendToJudgeCaption" : "Send to Judge",
+    "sendToJudgeHeading" : "Send to Judge",
+    "sendToJudgeTextFieldLabel" : "Enter note (Optional)",
+    "sendToJudgePrePostHearingFieldLabel" : "Pre or post hearing?",
+    "sendToJudgeReviewStateFieldLabel" : "Interlocutory review state",
+    "sendToJudgeInput" : "Automation testing of the Send to Judge Event",
+    "sendToJudgePrePostHearingSelectValue" : "Pre Hearing",
+    "sendToJudgeReviewStateSelectValueAwaitingInformation" : "Awaiting Information",
+    "sendToJudgeReviewStateSelectValueReviewByJudge" : "Review by Judge"
+}

@@ -1,0 +1,9 @@
+{
+  "notListableEventCaption": "Not listable",
+  "notListableEventHeading": "Reasons",
+  "notListableReasonsErrorMessage": "Reason(s) for the case being unlistable is required",
+  "notListablePastDueDataErrorMessage": "Directions due date must be in the future",
+  "notListableProvideReasons": "Test Reason(s) for the case being not listable is required",
+  "updateNotListableEventCaption": "Update not listable case",
+  "updateNotListableEventHeading": "Directions fulfilled"
+}

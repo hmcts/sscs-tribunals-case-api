@@ -1,0 +1,35 @@
+{
+    "name": "Review Admin Action - CTSC",
+    "priority": "high",
+    "assignedToWhenNotAssigned": "Unassigned",
+    "assignedTo": "SSCS ctscadmin",
+    "unassignedManageOptions" : [
+        "Assign to me"
+    ],
+    "assignedManageOptions" : [
+        "Reassign task",
+        "Unassign task"
+    ],
+    "unassignedManageOptionsForCaseAllocator": [
+            "Assign task",
+            "Cancel task",
+            "Assign to me"
+    ],
+    "nextStepsOptions": [
+        "Send to interloc",
+        "Send case to TCW",
+        "Information received"
+    ],
+    "sendToInterloc": {
+        "link": "Send to Interloc",
+        "eventTitle": "Send to interloc"
+    },
+    "sendCaseToTcw": {
+        "link": "Send case to TCW",
+        "eventTitle": "Log case progress"
+    },
+    "informationReceived": {
+        "link": "Information received",
+        "eventTitle": "Log case progress"
+    }
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "CaseEventID": "setHearingRoute",
+    "CaseFieldID": "hearingRoute",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "23/11/2022",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "setHearingRoute",
+    "PageLabel": "Set Hearing Route",
+    "ShowSummaryChangeOption": "Y"
+  }
+]

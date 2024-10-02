@@ -1,0 +1,76 @@
+{
+  "benefitType": {
+    "description": "Industrial Injuries Disablement Benefit",
+    "code": "industrialInjuriesDisablement"
+  },
+  "mrn": {
+    "dwpIssuingOffice": "Barrow IIDB Centre",
+    "date": "01-01-2021",
+    "reasonForBeingLate": "Lost my paperwork"
+  },
+  "isAppointee": false,
+  "evidenceProvide": "false",
+  "appellant": {
+    "title": "Mr",
+    "firstName": "Joe",
+    "lastName": "Bloggs",
+    "dob": "26-02-1990",
+    "nino": "AB877533C",
+    "contactDetails": {
+      "addressLine1": "123 Hairy Lane",
+      "addressLine2": "Off Hairy Park",
+      "townCity": "Hairyfield",
+      "county": "Kent",
+      "postCode": "CF24 0AD",
+      "phoneNumber": "07411222222",
+      "emailAddress": "joe@bloggs.com"
+    }
+  },
+  "smsNotify": {
+    "wantsSMSNotifications": true,
+    "smsNumber": "07411333333"
+  },
+  "hasRepresentative": false,
+  "reasonsForAppealing": {
+    "reasons": [
+      {
+        "whatYouDisagreeWith": "aaaaaaaaaa",
+        "reasonForAppealing": "aaaaaaaaaa"
+      },
+      {
+        "whatYouDisagreeWith": "bbbbbbbbbb",
+        "reasonForAppealing": "bbbbbbbbbb"
+      },
+      {
+        "whatYouDisagreeWith": "cccccccccc",
+        "reasonForAppealing": "cccccccccc"
+      }
+    ],
+    "otherReasons": "Another reason"
+  },
+  "hearingType": "oral",
+  "hearing": {
+    "wantsToAttend": true,
+    "wantsSupport": true,
+    "anythingElse": "Yes, this...",
+    "interpreterLanguageType": "danish",
+    "arrangements": {
+      "languageInterpreter": true,
+      "hearingLoop": true,
+      "accessibleHearingRoom": false,
+      "other": true
+    },
+    "scheduleHearing": true,
+    "datesCantAttend": ["10-12-2022", "11-12-2022", "12-12-2022"],
+    "options": {
+      "hearingTypeTelephone": true,
+      "telephone": "0999733733",
+      "hearingTypeVideo": false,
+      "email": "test@gmail.com",
+      "hearingTypeFaceToFace": true
+    }
+  },
+  "signAndSubmit": {
+    "signer": "Joe Bloggs"
+  }
+}

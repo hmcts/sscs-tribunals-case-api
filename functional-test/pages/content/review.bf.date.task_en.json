@@ -1,0 +1,41 @@
+{
+    "name": "Review BF Date - CTSC",
+    "priority": "low",
+    "assignedToWhenNotAssigned": "Unassigned",
+    "assignedTo": "SSCS ctscadmin",
+    "unassignedManageOptions" : [
+        "Assign to me"
+    ],
+    "assignedManageOptions" : [
+        "Reassign task",
+        "Unassign task"
+    ],
+    "unassignedManageOptionsForCaseAllocator": [
+            "Assign task",
+            "Cancel task",
+            "Assign to me"
+    ],
+    "assignedManageOptionsForCaseAllocator" : [
+        "Cancel task",
+        "Mark as done",
+        "Reassign task",
+        "Unassign task"
+    ],
+    "nextStepsOptions": [
+        "Send to interloc",
+        "Send case to TCW",
+        "Amend due date"
+    ],
+    "sendToInterloc": {
+        "link": "Send to interloc",
+        "eventTitle": "Send to interloc"
+    },
+    "sendCaseToTCW": {
+        "link": "Send case to TCW",
+        "eventTitle": "Log case progress"
+    },
+    "amendDueDate": {
+        "link": "Amend due date",
+        "eventTitle": "Request information"
+    }
+}

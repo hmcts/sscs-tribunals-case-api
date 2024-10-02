@@ -1,0 +1,13 @@
+{
+    "tabName": "Hearings",
+    "hearingLengthKey": "Length of hearing",
+    "hearingLengthValue": "1 Hour",
+    "ucHearingLengthValue": "45 Minutes",
+    "pipHearingLengthValue": "30 Minutes",
+    "hearingVenueKey": "What are the hearing venue details?",
+    "hearingVenueValue": "Cardiff Social Security And Child Support Tribunal",
+    "hearingPriorityKey": "What is the priority of this hearing?",
+    "hearingPriorityValue": "Standard",
+    "hearingAttendanceKey": "How will each participant attend the hearing?",
+    "hearingAttendanceValue": "Joe BloggsPIP - In Person"
+}

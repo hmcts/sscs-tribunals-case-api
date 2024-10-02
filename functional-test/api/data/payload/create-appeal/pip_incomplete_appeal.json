@@ -1,0 +1,104 @@
+{
+    "benefitType": {
+        "description": "PIP",
+        "code": "PIP"
+    },
+    "mrn": {
+        "dwpIssuingOffice": "DWP PIP (2)",
+        "date": "",
+        "mrnLateReason": "",
+        "mrnMissingReason": ""
+    },
+    "isAppointee": true,
+    "evidenceProvide": "false",
+    "appellant": {
+        "title": "Mr",
+        "firstName": "Test",
+        "lastName": "Appellant",
+        "dob": "26-02-1976",
+        "nino": "SK703352C",
+        "contactDetails": {
+            "addressLine1": "123 Hairy Lane",
+            "addressLine2": "Off Hairy Park",
+            "townCity": "Hairyfield",
+            "county": "Kent",
+            "postCode": "CF24 0AD",
+            "phoneNumber": "07398785050",
+            "emailAddress": "hmctspentet1@mailinator.com"
+        },
+        "isAddressSameAsAppointee": false
+    },
+    "appointee": {
+        "title": "Mrs",
+        "firstName": "Test",
+        "lastName": "Appointee",
+        "dob": "31-03-1991",
+        "contactDetails": {
+            "addressLine1": "999 Another Street",
+            "townCity": "Another Town",
+            "county": "Newcastle",
+            "postCode": "CF24 0AD",
+            "phoneNumber": "07398785051",
+            "emailAddress": "sscstest+notify@greencroftconsulting.com"
+        }
+    },
+    "smsNotify": {
+        "wantsSMSNotifications": true,
+        "smsNumber": "07398785050",
+        "useSameNumber": false
+    },
+    "hasRepresentative": true,
+    "representative": {
+        "title": "Mr",
+        "firstName": "Test",
+        "lastName": "Rep",
+        "organisation": "HP Ltd",
+        "contactDetails": {
+            "addressLine1": "123 Hairy Lane",
+            "addressLine2": "Off Hairy Park",
+            "townCity": "Town",
+            "county": "County",
+            "postCode": "CF24 1AD",
+            "phoneNumber": "07398785051",
+            "emailAddress": "sscstest+notify2@greencroftconsulting.com"
+        }
+    },
+    "reasonsForAppealing": {
+        "reasons": [
+            {
+                "whatYouDisagreeWith": "aaaaaaaaaa",
+                "reasonForAppealing": "aaaaaaaaaa"
+            },
+            {
+                "whatYouDisagreeWith": "bbbbbbbbbb",
+                "reasonForAppealing": "bbbbbbbbbb"
+            },
+            {
+                "whatYouDisagreeWith": "cccccccccc",
+                "reasonForAppealing": "cccccccccc"
+            }
+        ],
+        "otherReasons": "Another reason"
+    },
+    "hearing": {
+        "wantsToAttend": true,
+        "wantsSupport": true,
+        "anythingElse": "Yes, this...",
+        "arrangements": {
+            "hearingLoop": true,
+            "accessibleHearingRoom": false,
+            "other": true
+        },
+        "scheduleHearing": true,
+        "datesCantAttend": [
+            "04-04-2025",
+            "05-04-2025",
+            "06-04-2025"
+        ]
+    },
+    "signAndSubmit": {
+        "signer": "Joe Bloggs"
+    },
+    "pcqId": "12345678",
+    "languagePreferenceWelsh": false
+}

@@ -1,0 +1,70 @@
+{
+  "benefitType": {
+      "description": "PIP",
+      "code": "PIP"
+  },
+  "mrn": {
+      "dwpIssuingOffice": "DWP PIP",
+      "date": "18-02-2022",
+      "reasonForBeingLate": "Lost my paperwork"
+  },
+  "isAppointee": false,
+  "evidenceProvide": "false",
+  "appellant": {
+      "title": "Mr",
+      "firstName": "Pavi",
+      "lastName": "TestAppellant",
+      "dob": "15-01-2001",
+      "nino": "AB877533C",
+      "contactDetails": {
+          "addressLine1": "Quay Street",
+          "addressLine2": "Castle Quarter",
+          "townCity": "Castle",
+          "county": "kent",
+          "postCode": "CF24 0AD",
+          "phoneNumber": "07411222222",
+          "emailAddress": "sscstest+notify@greencroftconsulting.com"
+      }
+  },
+  "smsNotify": {
+      "wantsSMSNotifications": true,
+      "smsNumber": "07411333333"
+  },
+  "hasRepresentative": true,
+  "representative": {
+      "title": "Mrs",
+      "firstName": "krish",
+      "lastName": "ayya",
+      "organisation": "HP Ltd",
+      "contactDetails": {
+          "addressLine1": "Quay Street",
+          "addressLine2": "Castle Quarter",
+          "townCity": "Castle",
+          "county": "kent",
+          "postCode": "CF24 0AD",
+          "phoneNumber": "07411999999",
+          "emailAddress": "sscstest+notify@greencroftconsulting.com"
+      }
+  },
+  "reasonsForAppealing": {
+      "reasons": [
+          {
+              "whatYouDisagreeWith": "aaaaaaaaaa",
+              "reasonForAppealing": "aaaaaaaaaa"
+          },
+          {
+              "whatYouDisagreeWith": "bbbbbbbbbb",
+              "reasonForAppealing": "bbbbbbbbbb"
+          },
+          {
+              "whatYouDisagreeWith": "cccccccccc",
+              "reasonForAppealing": "cccccccccc"
+          }
+      ],
+      "otherReasons": "Another reason"
+  },
+  "hearingType": "paper",
+  "signAndSubmit": {
+      "signer": "Joe Bloggs"
+  }
+}

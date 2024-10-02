@@ -1,0 +1,89 @@
+{
+  "furtherEvidenceAction": {
+    "value": {
+      "code": "issueFurtherEvidence",
+      "label": "Issue further evidence to all parties"
+    },
+    "list_items": [
+      {
+        "code": "issueFurtherEvidence",
+        "label": "Issue further evidence to all parties"
+      },
+      {
+        "code": "otherDocumentManual",
+        "label": "Other document type - action manually"
+      },
+      {
+        "code": "informationReceivedForInterlocJudge",
+        "label": "Information received for Interloc - send to Judge"
+      },
+      {
+        "code": "informationReceivedForInterlocTcw",
+        "label": "Information received for Interloc - send to TCW"
+      },
+      {
+        "code": "sendToInterlocReviewByJudge",
+        "label": "Send to Interloc - Review by Judge"
+      },
+      {
+        "code": "sendToInterlocReviewByTcw",
+        "label": "Send to Interloc - Review by Tcw"
+      },
+      {
+        "code": "adminActionCorrection",
+        "label": "Admin action correction"
+      }
+    ]
+  },
+  "originalSender": {
+    "value": {
+      "code": "appellant",
+      "label": "Appellant (or Appointee)"
+    },
+    "list_items": [
+      {
+        "code": "appellant",
+        "label": "Appellant (or Appointee)"
+      },
+      {
+        "code": "representative",
+        "label": "Representative"
+      },
+      {
+        "code": "otherParty13e1b3d7-c593-4e6a-b51a-99f35cac69e9",
+        "label": "Other party 1 - Pettedson John"
+      },
+      {
+        "code": "dwp",
+        "label": "FTA"
+      },
+      {
+        "code": "hmcts",
+        "label": "HMCTS"
+      }
+    ]
+  },
+  "scannedDocuments": [
+    {
+      "value": {
+        "type": "other",
+        "controlNumber": "1",
+        "fileName": "dummy.pdf",
+        "scannedDate": "2024-06-21T00:00:00.000",
+        "exceptionRecordReference": null,
+        "originalSenderOtherPartyId": null,
+        "originalSenderOtherPartyName": null,
+        "subtype": null,
+        "includeInBundle": null,
+        "deliveryDate": null,
+        "url": {
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/b4b8b038-1e11-49b3-b83e-13546cfc152d",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/b4b8b038-1e11-49b3-b83e-13546cfc152d/binary",
+          "document_filename": "Bloggs_IEF.pdf"
+        }
+      },
+      "id": "ba96501e-7160-448f-9bea-e703246418c1"
+    }
+  ],
+  "directionDueDate": "2024-07-05"
+}

@@ -1,0 +1,36 @@
+{
+    "eventNameCaptor": "Postponement request",
+    "postponementDetailsPageHeading": "Postponement details",
+    "previewPostponementRequestDocumentPageHeading": "Preview postponement request document",
+
+    "dateAndTimeLabel" : "Date & Time",
+    "venueLabel" : "Venue",
+    "venueValue" : "Fox court",
+    "postponementDetailsLabel" : "Postponement details",
+
+    "postponementDetailsInputValue" : "Automation Testing of Postponement",
+
+    "postponementPreviewLabel" : "Postponement preview (Optional)",
+    "postponementPreviewGuidanceText" : "All documents must be PDF formatted",
+
+    "actionPostponementRequestEventNameCaptor": "Action Postponement Request",
+    "actionPostponementRequestPageHeading": "Action Postponement Request",
+    "actionPostponementRequestFieldLabel": "Action postponement request",
+    "tribunalDirectPOToAttendLabel" : "Tribunal direct PO to attend? (Optional)",
+    "bodyContentLabel" : "Body content",
+    "reservedToInterLocLabel" : "Reserved to (Interloc): (Optional)",
+    "signedByLabel" : "Signed by",
+    "signedRoleLabel" : "Signed role",
+    "listingOptionLabel" : "Listing option",
+    "yesLabel" : "Yes",
+    "noLabel" : "No",
+
+    "readyToListInputValue" : "Ready to List",
+    "bodyContentInputValue" : "Body Content For Automation Testing - Postponement",
+    "reservedToJudgeInterlocInputValue" : "Reserved to Judge Interloc for Automation Testing - Postponement",
+    "signedByInputValue" : "Signing Authority - Postponement",
+    "signedRoleInputValue" : "Signed By Authority - Postponement",
+    "previewDocumentLabel" : "Preview Document",
+
+    "eventSummaryLabel" : "Event summary (optional)"
+}

@@ -1,0 +1,7 @@
+{
+    "informationReceivedCaption": "Information received",
+    "informationReceivedHeading": "Log case progress",
+    "informationReceivedFieldLabel": "Interlocutory review state",
+    "informationReceivedReviewStateSelectValue": "Awaiting Admin Action",
+    "informationReceivedInput" : "Automation testing of the Information received Event"
+}

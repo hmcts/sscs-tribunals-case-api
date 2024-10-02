@@ -1,0 +1,9 @@
+[
+  {"LiveFrom": "22/05/2023", "CaseTypeID": "Benefit", "ID": "workType", "Label": "Work Type", "HintText": "Select a work type e.g. Pre Hearing Work", "FieldType": "FixedList", "FieldTypeParameter": "FL_workType", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "10/06/2019", "CaseTypeID": "Benefit", "ID": "scannedDocumentTypes", "Label": "Scanned Document Types", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "uploadedWelshDocumentTypes", "Label": "Uploaded Welsh Document Types", "FieldType": "MultiSelectList", "FieldTypeParameter": "documentTypeWelsh", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "daysToHearing", "Label": "Days to hearing", "FieldType": "Number", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "assignedCaseRoles", "Label": "Assigned Case Roles", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "previouslyAssignedCaseRoles", "Label": "Assigned Case Roles", "FieldType": "DynamicList", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "24/08/2023", "CaseTypeID": "Benefit", "ID": "issueInterlocDecisionDate", "Label": "Issue interloc decision date", "FieldType": "Date", "SecurityClassification": "PUBLIC"}
+]

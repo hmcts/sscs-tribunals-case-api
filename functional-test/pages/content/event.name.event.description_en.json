@@ -1,0 +1,9 @@
+{
+    "eventSummarycheckYourAnswersHeading" : "Check your answers",
+    "eventSummaryCheckTheInformationText" : "Check the information below carefully.",
+    "eventSummaryLabel" : "Event summary (optional) A few words describing the purpose of the event.",
+    "eventSummaryGuidanceText" : "A few words describing the purpose of the event.",
+    "eventSummaryDescription" : "Event description (optional)",
+    "eventSummaryInput" : "Event Summary for Automation",
+    "eventDescriptionInput" : "Event Description for Automation Verification"
+}

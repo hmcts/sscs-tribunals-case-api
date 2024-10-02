@@ -1,0 +1,33 @@
+{
+    "deathOfAppellantHeading" : "Death of appellant",
+    "dateOfAppellantDeathTextFieldLabel" : "Date of appellant death",
+    "dayAppellantDeathTextFieldLabel" : "Day",
+    "monthAppellantDeathTextFieldLabel" : "Month",
+    "yearAppellantDeathTextFieldLabel" : "Year",
+    "appealSectionHeading" : "Appeal",
+    "appellantDetailsSectionHeading" : "Appellant Details",
+    "appointeeTextFieldLabel" : "Appointee",
+    "yesTextFieldLabel" : "Yes",
+    "noTextFieldLabel" : "No",
+
+    "appointeeDetailsSectionHeading" : "Appointee details",
+    "nameSectionHeading" : "Name",
+    "identitySectionHeading" : "Identity",
+    "addressDetailsSectionHeading" : "Address Details",
+    "contactDetailsSectionHeading" : "Contact Details",
+
+    "titleTextFieldLabel" : "Title",
+    "firstNameTextFieldLabel" : "First Name",
+    "lastNameTextFieldLabel" : "Last Name",
+    "dateOfBirthTextFieldLabel" : "Date of birth",
+    "nationalInsuranceNumberTextFieldLabel" : "National insurance number",
+    "addressLine1TextFieldLabel" : "Address Line 1",
+    "addressLine2TextFieldLabel" : "Address Line 2 (Optional)",
+    "townTextFieldLabel" : "Town",
+    "countyTextFieldLabel" : "County",
+    "postcodeTextFieldLabel" : "Postcode",
+
+    "contactNumberTextFieldLabel" : "Contact Number (Optional)",
+    "mobileNumberTextFieldLabel" : "Mobile Number (Optional)",
+    "contactEmailTextFieldLabel" : "Contact Email (Optional)"
+}

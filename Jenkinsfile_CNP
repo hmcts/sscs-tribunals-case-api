@@ -17,6 +17,7 @@ def dmnBranch = "master"
 def waStandaloneBranch = "master"
 
 def gradleBuilder = new GradleBuilder(this, product)
+def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 def secrets = [
     'sscs-${env}'      : [
@@ -84,12 +85,56 @@ def secretsForPR = [
                 secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
                 secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
                 secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD'),
+                //UI Test Secrets
+
+                secret('test-e2e-caseofficer-username', 'TEST_CASEOFFICER_USERNAME'),
+                secret('test-e2e-caseofficer-password', 'TEST_CASEOFFICER_PASSWORD'),
+                secret('test-e2e-hmc-caseofficer-username', 'TEST_HMC_CASEOFFICER_USERNAME'),
+                secret('test-e2e-hmc-caseofficer-password', 'TEST_HMC_CASEOFFICER_PASSWORD'),
+                secret('test-e2e-judge-username', 'TEST_JUDGE_USERNAME'),
+                secret('test-e2e-judge-password', 'TEST_JUDGE_PASSWORD'),
+                secret('test-e2e-salaried-judge-username', 'TEST_SALARIED_JUDGE_USERNAME'),
+                secret('test-e2e-salaried-judge-password', 'TEST_SALARIED_JUDGE_PASSWORD'),
+                secret('test-e2e-fee-paid-judge-username', 'TEST_FEE_PAID_JUDGE_USERNAME'),
+                secret('test-e2e-fee-paid-judge-password', 'TEST_FEE_PAID_JUDGE_PASSWORD'),
+                secret('test-e2e-dwp-username', 'TEST_DWP_USERNAME'),
+                secret('test-e2e-dwp-password', 'TEST_DWP_PASSWORD'),
+                secret('test-e2e-am-tcw-username', 'TEST_AM_TRIBUNAL_CASEWORKER_USERNAME'),
+                secret('test-e2e-am-tcw-password', 'TEST_AM_TRIBUNAL_CASEWORKER_PASSWORD'),
+                secret('test-e2e-am-caseofficer-case-allocator-username', 'TEST_AM_CASEOFFICER_CASE_ALLOCATOR_USERNAME'),
+                secret('test-e2e-am-caseofficer-case-allocator-password', 'TEST_AM_CASEOFFICER_CASE_ALLOCATOR_PASSWORD'),
+                secret('test-e2e-hmrc-username', 'TEST_HMRC_USERNAME'),
+                secret('test-e2e-hmrc-password', 'TEST_HMRC_PASSWORD'),
+                secret('test-e2e-am-regional-center-admin-username', 'TEST_AM_REGIONAL_CENTER_ADMIN_USERNAME'),
+                secret('test-e2e-am-regional-center-admin-password', 'TEST_AM_REGIONAL_CENTER_ADMIN_PASSWORD'),
+                secret('test-e2e-am-regional-center-team-leader-username', 'TEST_AM_REGIONAL_CENTER_TEAM_LEADER_USERNAME'),
+                secret('test-e2e-am-regional-center-team-leader-password', 'TEST_AM_REGIONAL_CENTER_TEAM_LEADER_PASSWORD'),
+
+
+                secret('test-e2e-am-caseofficer-username', 'TEST_AM_CASEOFFICER_USERNAME'),
+                secret('test-e2e-am-caseofficer-password', 'TEST_AM_CASEOFFICER_PASSWORD'),
+                secret('test-e2e-caseofficer-username', 'TEST_AM_SUPERUSER_USERNAME'),
+                secret('test-e2e-caseofficer-password', 'TEST_AM_SUPERUSER_PASSWORD'),
+                secret('test-e2e-superuser-username', 'SUPER_USER_USERNAME'),
+                secret('test-e2e-superuser-password', 'SUPER_USER_PASSWORD'),
+                secret('idam-sscs-oauth2-client-secret', 'IDAM_OAUTH2_CLIENT_SECRET'),
+                secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
+                secret('test-e2e-am-senior-tcw-case-allocator-username', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_USERNAME'),
+                secret('test-e2e-am-senior-tcw-case-allocator-password', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_PASSWORD'),
+
+                // tya notifications
+                secret('notification-key', 'NOTIFICATION_API_KEY'),
+                secret('notification-test-key', 'NOTIFICATION_API_TEST_KEY'),
+                secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
+                secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
+                secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD'),
         ],
         's2s-${env}'      : [
                 secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
                 secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
                 secret('microservicekey-ccd-admin', 'ADMIN_S2S_KEY'),
                 secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET')
+
         ],
         'ccd-${env}'      : [
                 secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
@@ -194,13 +239,77 @@ withPipeline(type, product, component) {
         for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:ccd") ) {
             enableHighLevelDataSetup()
         }
+        env.IDAM_URL='https://idam-api.aat.platform.hmcts.net'
+        env.S2S_URL='http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
+        env.IDAM_OAUTH2_CLIENT_ID='sscs'
+        env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+        env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+        env.HEARINGS_ENABLED = "No"
     }
+    afterSuccess('smoketest:preview') {
+        env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+        env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+        env.HEARINGS_ENABLED = "No"
+        echo 'The value of the TEST_E2E_URL_WEB ' +env.TEST_E2E_URL_WEB
+        echo 'The value of the TEST_E2E_API_URI ' +env.TEST_E2E_API_URI
+            stage('Playwright tests') {
+                if(githubApi.getLabelsbyPattern(env.BRANCH_NAME, "dependencies")) {
+                     echo "Don't run functional test"
+                  } else {
+                      try{
+                        if(env.HEARINGS_ENABLED == 'No'){
+                            yarnBuilder.yarn('test:preview')
+                        } else {
+                            yarnBuilder.yarn('test:preview-hearings')
+                        }
+                    } finally {
+                        publishHTML([
+                            allowMissing: true,
+                            alwaysLinkToLastBuild: true,
+                            keepAll: true,
+                            reportDir: "playwright-report",
+                            reportFiles: 'index.html',
+                            reportName: 'SSCS E2E Test Report'
+                    ])
+                    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**/*'
+                    }
+                }
+            }
+    }
+
+    afterSuccess('smoketest:aat') {
+
+            stage('Playwright tests') {
+                try{
+                    yarnBuilder.yarn('test:aat')
+                } finally {
+                    publishHTML([
+                        allowMissing: true,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: "playwright-report",
+                        reportFiles: 'index.html',
+                        reportName: 'SSCS E2E Test Report'
+                ])
+                steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**/*'
+                }
+            }
+        }
+
     onMaster {
         env.ENVIRONMENT="aat"
+        env.IDAM_OAUTH2_CLIENT_ID='sscs'
+        env.TEST_E2E_URL_WEB = 'https://manage-case.aat.platform.hmcts.net'
+                env.TEST_E2E_API_URI = 'http://sscs-tribunals-api-aat.service.core-compute-aat.internal'
         enableHighLevelDataSetup()
     }
     onDemo {
         env.ENVIRONMENT = "demo"
+        env.IDAM_URL='https://idam-api.demo.platform.hmcts.net'
+        env.S2S_URL='http://rpe-service-auth-provider-demo.service.core-compute-demo.internal'
+        env.TRIBUNALS_API_URL='http://sscs-tribunals-api-demo.service.core-compute-demo.internal'
+        env.SSCS_XUI_URL='https://manage-case.demo.platform.hmcts.net'
+        env.IDAM_OAUTH2_CLIENT_ID='sscs'
         enableHighLevelDataSetup()
     }
     onPerftest {
