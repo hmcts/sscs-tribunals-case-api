@@ -36,8 +36,7 @@ def secrets = [
         secret('notification-test-key', 'NOTIFICATION_API_TEST_KEY'),
         secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
         secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
-        secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD'),
-
+        secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD')
     ],
     's2s-${env}': [
         secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
@@ -126,7 +125,6 @@ withPipeline(type, product, component) {
 
     if (!isHearingsPr) {
         enableHighLevelDataSetup()
-        loadVaultSecrets(secretsForPR)
     }
 
     loadVaultSecrets(secrets)
@@ -146,6 +144,7 @@ withPipeline(type, product, component) {
         setPreviewEnvVars();
 
         if (isHearingsPr) {
+            loadVaultSecrets(secretsForPR)
             env.CASE_TYPE = "Benefit-${CHANGE_ID}"
             setAatEnvVars();
         }
