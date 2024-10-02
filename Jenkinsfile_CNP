@@ -38,6 +38,21 @@ def secrets = [
         secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
         secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD'),
 
+    ],
+    's2s-${env}': [
+        secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
+        secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
+        secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET')
+    ],
+    'ccd-${env}': [
+        secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
+        secret('postcode-info-address-lookup-token', 'ADDRESS_LOOKUP_TOKEN'),
+        secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET')
+    ]
+]
+
+def secretsForPR = [
+    'sscs-${env}': [
         // e2es
         secret('test-e2e-caseofficer-username', 'TEST_CASEOFFICER_USERNAME'),
         secret('test-e2e-caseofficer-password', 'TEST_CASEOFFICER_PASSWORD'),
@@ -70,15 +85,27 @@ def secrets = [
         secret('test-e2e-am-senior-tcw-case-allocator-username', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_USERNAME'),
         secret('test-e2e-am-senior-tcw-case-allocator-password', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_PASSWORD')
     ],
-    's2s-${env}': [
-        secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
-        secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
-        secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET')
-    ],
     'ccd-${env}': [
         secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
         secret('postcode-info-address-lookup-token', 'ADDRESS_LOOKUP_TOKEN'),
-        secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET')
+        secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET'),
+        secret('idam-data-store-system-user-password', 'IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
+        secret('idam-data-store-system-user-username', 'IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
+        secret('idam-data-store-client-secret', 'IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET')
+    ],
+    'wa-${env}': [
+        secret('app-insights-connection-string', 'WA_INSIGHT_CONNECTION_STRING'),
+        secret('ld-secret', 'WA_LAUNCH_DARKLY_SDK_KEY'),
+        secret('s2s-secret-case-event-handler', 'S2S_SECRET_CASE_EVENT_HANDLER'),
+        secret('s2s-secret-task-management-api', 'S2S_SECRET_TASK_MANAGEMENT_API'),
+        secret('s2s-secret-task-monitor', 'S2S_SECRET_TASK_MONITOR'),
+        secret('s2s-secret-workflow-api', 'S2S_SECRET_WORKFLOW_API'),
+        secret('wa-idam-client-secret', 'WA_IDAM_CLIENT_SECRET'),
+        secret('wa-system-username', 'WA_SYSTEM_USERNAME'),
+        secret('wa-system-password', 'WA_SYSTEM_PASSWORD')
+    ],
+    'am-${env}': [
+        secret('am-role-assignment-service-s2s-secret', 'AM_ROLE_ASSIGNMENT_SERVICE_SECRET')
     ]
 ]
 
@@ -97,6 +124,7 @@ withPipeline(type, product, component) {
     def githubApi = new GithubAPI(this)
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:hearings").size() == 0) {
         enableHighLevelDataSetup()
+        loadVaultSecrets(secretsForPR)
     }
 
     loadVaultSecrets(secrets)
