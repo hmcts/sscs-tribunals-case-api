@@ -2,6 +2,8 @@ import path from "path";
 const fs = require('fs');
 const yaml = require('js-yaml');
 
+console.log(process.env);
+
 export const urls = {
 
   tribunalsApiUri: process.env.TEST_E2E_API_URI || '',

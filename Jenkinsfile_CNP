@@ -149,7 +149,6 @@ withPipeline(type, product, component) {
         } else {
             println "Loading secrets for PR"
             loadVaultSecrets(secretsForPR)
-            sh 'echo $TEST_CASEOFFICER_USERNAME'
         }
     }
     onDemo {
