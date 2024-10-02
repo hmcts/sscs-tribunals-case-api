@@ -417,6 +417,7 @@ ccd:
 
   ccd-definition-store-api:
     java:
+      image: hmctspublic.azurecr.io/ccd/definition-store-api:pr-1503-b9c968f-20240930090638
       disableKeyVaults: true
       devmemoryRequests: '1024Mi'
       devmemoryLimits: '2048Mi'
@@ -445,6 +446,7 @@ ccd:
 
   ccd-data-store-api:
     java:
+      image: hmctspublic.azurecr.io/ccd/data-store-api:pr-2468-5bfd26b-20240930085441
       disableKeyVaults: true
       imagePullPolicy: Always
       devmemoryRequests: '1524Mi'
@@ -473,6 +475,7 @@ ccd:
         CCD_DOCUMENT_URL_PATTERN: ^https?://(((?:dm-store-aat\.service\.core-compute-aat\.internal(?::\d+)?)\/documents\/[A-Za-z0-9-]+(?:\/binary)?))
         CASE_DOCUMENT_AM_URL: http://${SERVICE_NAME}-ccd-case-document-am-api
         UPLOAD_TIMESTAMP_FEATURED_CASE_TYPES: CARE_SUPERVISION_EPO
+        TESTING_SUPPORT_ENABLED: true
       secrets:
         DATA_STORE_DB_PASSWORD:
           secretRef: postgres
@@ -712,3 +715,14 @@ postgresql:
       - name: "pr-${CHANGE_ID}-role-assignment"
       - name: "pr-${CHANGE_ID}-hmc-cft-hearing-service"
       - name: "pr-${CHANGE_ID}-sscs-job-scheduler"
+
+ccd-def-cleanup:
+  enabled: true
+  api:
+    ccdDefStore: "https://ccd-definition-store-sscs-tribunals-api-pr-3977.preview.platform.hmcts.net"
+    ccdDataStore: "https://ccd-data-store-api-sscs-tribunals-api-pr-3977.preview.platform.hmcts.net"
+  posthook: test
+  prehook: test
+  change_id: ${CHANGE_ID}
+  case_type_ids:
+    - Benefit
