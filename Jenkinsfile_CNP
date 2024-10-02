@@ -122,7 +122,9 @@ def branchesToSync = ['demo', 'ithc', 'perftest']
 
 withPipeline(type, product, component) {
     def githubApi = new GithubAPI(this)
-    if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:hearings").size() == 0) {
+    def isHearingsPr = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:hearings").size() > 0;
+
+    if (!isHearingsPr) {
         enableHighLevelDataSetup()
         loadVaultSecrets(secretsForPR)
     }
@@ -143,7 +145,7 @@ withPipeline(type, product, component) {
     onPR() {
         setPreviewEnvVars();
 
-        for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:hearings") ) {
+        if (isHearingsPr) {
             env.CASE_TYPE = "Benefit-${CHANGE_ID}"
             setAatEnvVars();
         }
@@ -182,10 +184,8 @@ withPipeline(type, product, component) {
     }
 
     afterSuccess('smoketest:preview') {
-        if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:hearings").size() == 0) {
-            env.ENVIRONMENT = "preview"
-            runE2eTests()
-        }
+        env.ENVIRONMENT = isHearingsPr ? "aat" : "preview"
+        runE2eTests()
     }
     afterSuccess('smoketest:aat') {
         runE2eTests()
