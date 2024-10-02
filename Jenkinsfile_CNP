@@ -107,8 +107,9 @@ withPipeline(type, product, component) {
 
         // Vars needed for AKS testing
         for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_hearings") ) {
+            env.CASE_TYPE = "Benefit-${CHANGE_ID}"
+            env.CCD_GW_API = "https://gateway-ccd.aat.platform.hmcts.net"
             env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-            env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
             env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
         }
         for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:wa") ) {
@@ -122,6 +123,7 @@ withPipeline(type, product, component) {
     }
 
     onMaster() {
+        env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
         env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
         env.ENVIRONMENT="aat"
         env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
@@ -134,6 +136,7 @@ withPipeline(type, product, component) {
         env.CCD_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
         env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
         env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+        env.CASE_DOCUMENT_AM_URL = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-case-document-am-api"
         env.ENVIRONMENT = "pr"
     }
     onDemo {
