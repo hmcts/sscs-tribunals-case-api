@@ -37,3 +37,30 @@ variable "appinsights_instrumentation_key" {
 variable "send_grid_subscription" {
   default = "1c4f0704-a29e-403d-b719-b90c34ef14c9"
 }
+
+
+variable "tya-component" {
+  default = "tya-notif"
+}
+
+variable "postgresql_user" {
+  default = "notification"
+}
+
+variable "database_name" {
+  default = "notification"
+}
+
+/// POSTGRES FLEXIBLE SERVER DB VARIABLES
+variable "pgsql_sku" {
+  description = "The PGSql flexible server instance sku"
+  default     = "GP_Standard_D2s_v3"
+}
+
+variable "pgsql_storage_mb" {
+  description = "Max storage allowed for the PGSql Flexibile instance"
+  type        = number
+  default     = 65536
+}
+
+variable "aks_subscription_id" {} # provided by the Jenkins library, ADO users will need to specify this
