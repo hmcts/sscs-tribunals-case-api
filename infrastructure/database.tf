@@ -13,7 +13,7 @@ module "notification-scheduler-db-flexible" {
   source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
   env    = var.env
   product       = var.product
-  tya-component     = var.tya-component
+  component     = var.tya-component
   name          = "${var.product}-${var.tya-component}-postgres-v15-db"
   business_area = "CFT" # sds or cft
   force_user_permissions_trigger = "1"
