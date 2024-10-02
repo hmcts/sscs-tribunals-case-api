@@ -182,8 +182,10 @@ withPipeline(type, product, component) {
     }
 
     afterSuccess('smoketest:preview') {
-        env.ENVIRONMENT = "preview"
-        runE2eTests()
+        if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:hearings").size() == 0) {
+            env.ENVIRONMENT = "preview"
+            runE2eTests()
+        }
     }
     afterSuccess('smoketest:aat') {
         runE2eTests()
