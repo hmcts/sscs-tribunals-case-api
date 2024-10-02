@@ -144,9 +144,10 @@ withPipeline(type, product, component) {
         setPreviewEnvVars();
 
         if (isHearingsPr) {
-            loadVaultSecrets(secretsForPR)
             env.CASE_TYPE = "Benefit-${CHANGE_ID}"
             setAatEnvVars();
+        } else {
+            loadVaultSecrets(secretsForPR)
         }
     }
     onDemo {
