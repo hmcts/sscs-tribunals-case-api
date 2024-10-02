@@ -102,12 +102,13 @@ withPipeline(type, product, component) {
     enableHighLevelDataSetup()
 
     afterSuccess('akschartsinstall') {
+        env.DOCUMENT_MANAGEMENT_URL = "http://dm-store-aat.service.core-compute-aat.internal"
+        env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
+
         // Vars needed for AKS testing
         for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_hearings") ) {
             env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
             env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
-            env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
-            env.DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
             env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
         }
         for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:wa") ) {
