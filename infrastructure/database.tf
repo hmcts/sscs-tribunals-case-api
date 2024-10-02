@@ -5,11 +5,6 @@ provider "azurerm" {
   subscription_id            = var.aks_subscription_id
 }
 
-data "azurerm_key_vault" "sscs_key_vault" {
-  name                = local.azureVaultName
-  resource_group_name = local.azureVaultName
-}
-
 
 module "notification-scheduler-db-flexible" {
   providers = {
