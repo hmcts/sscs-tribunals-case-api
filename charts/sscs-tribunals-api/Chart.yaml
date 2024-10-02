@@ -120,6 +120,6 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wa.enabled
   - name: ccd-def-cleanup
-    version: ~9.0.4-gamma
+    version: ~9.0.4
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd-def-cleanup.enabled
