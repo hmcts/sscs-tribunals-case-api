@@ -11,8 +11,6 @@ export const urls = {
   ccdApiUrl : process.env.CCD_API_URL || 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
 };
 
-console.log(`CCD API URL: ${urls.ccdApiUrl}`);
-
 const versionFilePath = path.resolve(__dirname, '../../benefit/VERSION.yaml');
 export const environment = {
   name: process.env.ENVIRONMENT ?? '',
