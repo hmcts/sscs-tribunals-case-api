@@ -1,6 +1,44 @@
 tags:
   sscs-ccd-idam-pr: false
 
+postgresql:
+  enabled: false
+idam-pr:
+  enabled: false
+xui-webapp:
+  enabled: false
+elastic:
+  enabled: false
+sscs-tya-notif:
+  enabled: false
+sscs-tribunals-frontend:
+  enabled: false
+redis:
+  enabled: false
+ccd:
+  enabled: false
+em-ccdorc:
+  enabled: false
+sscs-hearings-api:
+  enabled: false
+servicebus:
+  enabled: false
+ccd-case-document-am-api:
+  enabled: false
+aac-manage-case-assignment:
+  enabled: false
+am-org-role-mapping-service:
+  enabled: false
+wa:
+  enabled: false
+  taskBatchCron:
+    enabled: false
+  reconfigurationBatchCron:
+    enabled: false
+  terminationBatchCron:
+    enabled: false
+
+
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
