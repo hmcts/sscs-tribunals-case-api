@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -38,32 +39,42 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
         return callbackType == CallbackType.MID_EVENT
                 && callback.getEvent() == EventType.DIRECTION_ISSUED
                 && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData())
-                && isYes(callback.getCaseDetails().getCaseData().getDocumentGeneration().getGenerateNotice());
+                && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
 
         if (caseData.getDirectionTypeDl() == null) {
-            PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
             errorResponse.addError("Direction Type cannot be empty");
             return errorResponse;
         }
 
         if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
                 && StringUtils.isBlank(caseData.getDirectionDueDate())) {
-            final PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
             errorResponse.addError("Please populate the direction due date");
             return errorResponse;
         }
 
-        String templateId = documentConfiguration.getDocuments().get(caseData.getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
+        if ((caseData.getDocumentStaging().getDateAdded() != null
+                && isDateInTheFuture(caseData.getDocumentStaging().getDateAdded()))
+                || (caseData.getSscsInterlocDirectionDocument() != null
+                && caseData.getSscsInterlocDirectionDocument().getDocumentDateAdded() != null
+                && isDateInTheFuture(caseData.getSscsInterlocDirectionDocument().getDocumentDateAdded()))
+        ) {
+            errorResponse.addError("Date added should be today's date or in the past and cannot be in the future date");
+            return errorResponse;
+        }
 
-        log.info("Direction Type is {} and templateId is {}", caseData.getDirectionTypeDl().getValue(), templateId);
+        if (isYes(caseData.getDocumentGeneration().getGenerateNotice())) {
+            String templateId = documentConfiguration.getDocuments().get(caseData.getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
 
-        return issueDocument(callback, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
+            log.info("Direction Type is {} and templateId is {}", caseData.getDirectionTypeDl().getValue(), templateId);
+            return issueDocument(callback, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
+        }
+        return errorResponse;
     }
 
 }
