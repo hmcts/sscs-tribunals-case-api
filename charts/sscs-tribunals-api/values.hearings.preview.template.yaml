@@ -51,6 +51,13 @@ java:
     AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
     AMQP_USERNAME: "SendAndListenSharedAccessKey"
     CORE_CASE_DATA_CASE_TYPE_ID: ${CASE_TYPE}
+    JOB_SCHEDULER_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
+    JOB_SCHEDULER_DB_NAME: "{{ .Values.postgresql.auth.database}}"
+    JOB_SCHEDULER_DB_HOST: "{{ .Release.Name }}-postgresql"
+  secrets:
+    JOB_SCHEDULER_DB_PASSWORD:
+      secretRef: "{{ .Release.Name }}-postgresql"
+      key: password
   postgresql:
     enabled: true
 
