@@ -148,7 +148,6 @@ withPipeline(type, product, component) {
             env.CASE_TYPE = "Benefit-${CHANGE_ID}"
             setAatEnvVars();
         } else {
-            println "Loading secrets for PR"
             loadVaultSecrets(secretsForPR)
         }
     }
