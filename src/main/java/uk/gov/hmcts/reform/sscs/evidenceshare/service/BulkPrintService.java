@@ -6,6 +6,7 @@ import static java.util.Base64.getEncoder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -34,7 +35,11 @@ public class BulkPrintService implements PrintService {
     private static final String CASE_IDENTIFIER = "caseIdentifier";
     private static final String LETTER_TYPE_KEY = "letterType";
     private static final String APPELLANT_NAME = "appellantName";
+    private static final String IS_INTERNATIONAL = "isInternational";
     public static final String RECIPIENTS = "recipients";
+
+    private static final Pattern UK_POSTCODE_PATTERN =
+            Pattern.compile("^(GIR 0AA|[A-Z]{1,2}[0-9]{1,2} ?[0-9][A-Z]{2}|[A-Z]{1,2}[0-9][A-Z]? ?[0-9][A-Z]{2}|[A-Z]{1,2}[0-9]{1,2}[0-9]? ?[0-9][A-Z]{2})$", Pattern.CASE_INSENSITIVE);
 
     private final SendLetterApi sendLetterApi;
     private final IdamService idamService;
@@ -161,6 +166,9 @@ public class BulkPrintService implements PrintService {
         additionalData.put(CASE_IDENTIFIER, sscsCaseData.getCcdCaseId());
         additionalData.put(APPELLANT_NAME, sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
         additionalData.put(RECIPIENTS, getRecipients(recipient));
+        if (sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode() != null && isUkAddress(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode())) {
+            additionalData.put(IS_INTERNATIONAL, "true");
+        }
         return additionalData;
     }
 
@@ -168,5 +176,9 @@ public class BulkPrintService implements PrintService {
         List<String> parties = new ArrayList<>();
         parties.add(recipient);
         return parties;
+    }
+
+    private static boolean isUkAddress(String postcode) {
+        return UK_POSTCODE_PATTERN.matcher(postcode).matches();
     }
 }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -217,5 +218,48 @@ public class BulkPrintServiceTest {
         bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, ISSUE_FURTHER_EVIDENCE, null);
 
         verify(bulkPrintServiceHelper).saveAsReasonableAdjustment(any(), any(), any());
+    }
+
+    @Test
+    public void shouldSendToBulkPrintWithAdditionalDataInternationFlagFalse() {
+        SscsCaseData sscsCaseDataNonUK = SscsCaseData.builder()
+                .ccdCaseId("234")
+                .appeal(
+                        Appeal.builder()
+                                .appellant(
+                                        Appellant.builder()
+                                                .name(Name.builder().firstName("Appellant").lastName("LastName").build())
+                                                .address(Address.builder().line1("line1").postcode("PH17-26").build())
+                                                .build())
+                                .build())
+                .build();
+
+        when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture()))
+                .thenReturn(new SendLetterResponse(LETTER_ID));
+        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, sscsCaseDataNonUK, null);
+        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
+        //Check isInternational flag is NOT added
+        assertFalse("isInternational", captor.getValue().getAdditionalData().containsKey("isInternational"));
+    }
+
+    @Test
+    public void shouldSendToBulkPrintWithAdditionalDataInternationFlagTrue() {
+        SscsCaseData sscsCaseDataUK = SscsCaseData.builder()
+                .ccdCaseId("234")
+                .appeal(Appeal.builder().appellant(
+                                Appellant.builder()
+                                        .name(Name.builder().firstName("Appellant").lastName("LastName").build())
+                                        .address(Address.builder().line1("line1").postcode("PO1 5AY").build())
+                                        .build())
+                        .build())
+                .build();
+
+        when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture()))
+                .thenReturn(new SendLetterResponse(LETTER_ID));
+
+        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, sscsCaseDataUK, null);
+        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
+        //Check isInternational flag is present and true
+        assertEquals("true", captor.getValue().getAdditionalData().get("isInternational"));
     }
 }
