@@ -1098,6 +1098,33 @@ public class PersonalisationTest {
     }
 
     @Test
+    public void givenHearingDate_welshFormattedDateIsCorrect() {
+        LocalDate hearingDate = LocalDate.parse("2022-11-30");
+        Hearing hearing = createHearing(hearingDate);
+
+        List<Hearing> hearingList = new ArrayList<>();
+        hearingList.add(hearing);
+
+        SscsCaseData response = SscsCaseData.builder()
+                .ccdCaseId(CASE_ID).caseReference("SC/1234/5")
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build())
+                        .appellant(Appellant.builder().name(name).build())
+                        .build())
+                .subscriptions(subscriptions)
+                .hearings(hearingList)
+                .languagePreferenceWelsh("Yes")
+                .build();
+
+        Map result = personalisation.create(NotificationSscsCaseDataWrapper.builder()
+                        .newSscsCaseData(response).notificationEventType(HEARING_BOOKED).build(),
+                new SubscriptionWithType(subscriptions.getAppellantSubscription(), APPELLANT,
+                        response.getAppeal().getAppellant(),
+                        response.getAppeal().getAppellant()));
+
+        assertEquals("Mer, 30 Tach 2022", result.get(HEARING_DATE_WEEKDAY_WELSH));
+    }
+
+    @Test
     @Parameters(method = "generateHearingNotificationTypeAndSubscriptionsScenarios")
     public void givenHearingData_correctlySetTheHearingDetails_welsh(NotificationEventType hearingNotificationEventType,
                                                                      SubscriptionType subscriptionType) {
