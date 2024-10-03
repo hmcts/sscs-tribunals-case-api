@@ -20,7 +20,6 @@ import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientException;
 
 @RunWith(JUnitParamsRunner.class)
-@Ignore("remove this when bypass is enabled")
 public class DocmosisWithGovNotifyLetterFunctionalTest extends AbstractFunctionalTest {
 
     public static final String EXPECTED_LETTER_SUBJECT = "Pre-compiled PDF";
