@@ -29,7 +29,6 @@ java:
     HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: true
     COH_URL: "http://coh-cor-aat.service.core-compute-aat.internal"
     ONLINE_HEARING_LINK: "https://sscs-cor-frontend-aat.service.core-compute-aat.internal"
-    JOB_SCHEDULER_DB_PASSWORD:  "{{ .Values.postgresql.auth.password}}"
     JOB_SCHEDULER_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
     JOB_SCHEDULER_DB_NAME: "{{ .Values.postgresql.auth.database}}"
     JOB_SCHEDULER_DB_HOST: "{{ .Release.Name }}-postgresql"
@@ -41,6 +40,11 @@ java:
     TESTING_SUPPORT_ENABLED: true
     HANDLE_CCD_CALLBACKMAP_V2: true
     POST_HEARINGS_B_FEATURE: true
+    BYPASS_NOTIFICATIONS_SERVICE: true
+  secrets:
+    JOB_SCHEDULER_DB_PASSWORD:
+      secretRef: "{{ .Release.Name }}-postgresql"
+      key: password
   postgresql:
     enabled: true
 

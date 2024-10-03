@@ -484,7 +484,7 @@
     "Description": "Deprecated - Admin - Appeal created in CCD",
     "DisplayOrder": 371,
     "PostConditionState": "appealCreated",
-    "CallBackURLSubmittedEvent": "${CCD_DEF_TYA_NOTIFICATIONS_API_URL}/send",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/sendNotification",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
   },
@@ -564,7 +564,7 @@
     "PreConditionState(s)": "interlocutoryReviewState",
     "PostConditionState": "validAppeal",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
-    "CallBackURLSubmittedEvent": "${CCD_DEF_TYA_NOTIFICATIONS_API_URL}/send",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/sendNotification",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
   },
@@ -577,7 +577,7 @@
     "PreConditionState(s)": "interlocutoryReviewState",
     "PostConditionState": "validAppeal",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
-    "CallBackURLSubmittedEvent": "${CCD_DEF_TYA_NOTIFICATIONS_API_URL}/send",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/sendNotification",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
   },
@@ -1333,7 +1333,7 @@
     "DisplayOrder": 950,
     "PreConditionState(s)": "interlocutoryReviewState",
     "PostConditionState": "*",
-    "CallBackURLSubmittedEvent": "${CCD_DEF_TYA_NOTIFICATIONS_API_URL}/send",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/sendNotification",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
   },
@@ -1346,7 +1346,7 @@
     "DisplayOrder": 960,
     "PreConditionState(s)": "interlocutoryReviewState",
     "PostConditionState": "*",
-    "CallBackURLSubmittedEvent": "${CCD_DEF_TYA_NOTIFICATIONS_API_URL}/send",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/sendNotification",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
   },
@@ -1707,7 +1707,7 @@
     "DisplayOrder": 1230,
     "PreConditionState(s)": "*",
     "PostConditionState": "dormantAppealState",
-    "CallBackURLSubmittedEvent": "${CCD_DEF_TYA_NOTIFICATIONS_API_URL}/send",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/sendNotification",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
   },

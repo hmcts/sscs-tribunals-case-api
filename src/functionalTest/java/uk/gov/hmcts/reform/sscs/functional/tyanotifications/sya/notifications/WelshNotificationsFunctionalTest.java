@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEvent
 import uk.gov.service.notify.Notification;
 import uk.gov.service.notify.NotificationClientException;
 
-@Ignore("remove this when bypass is enabled")
 public class WelshNotificationsFunctionalTest extends AbstractFunctionalTest {
 
     private static final String AS_APPOINTEE_FOR = "You are receiving this update as the appointee for";

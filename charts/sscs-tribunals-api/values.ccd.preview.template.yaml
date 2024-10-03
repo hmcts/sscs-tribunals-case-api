@@ -50,9 +50,16 @@ java:
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
     AMQP_USERNAME: "RootManageSharedAccessKey"
     HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
-    BYPASS_NOTIFICATIONS_SERVICE: false
+    BYPASS_NOTIFICATIONS_SERVICE: true
     HANDLE_CCD_CALLBACKMAP_V2: true
+    JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscs-job-scheduler"
+    JOB_SCHEDULER_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
+    JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+    JOB_SCHEDULER_DB_USERNAME: hmcts
   secrets:
+    JOB_SCHEDULER_DB_PASSWORD:
+      secretRef: postgres
+      key: PASSWORD
     HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
       secretRef: sscs-sb-preview
       key: connectionString
@@ -542,7 +549,7 @@ sscs-tya-notif:
       POST_HEARINGS_FEATURE: true
       POST_HEARINGS_B_FEATURE: true
       DUMMY: true
-      BYPASS_NOTIFICATIONS_SERVICE: false
+      BYPASS_NOTIFICATIONS_SERVICE: true
     secrets:
       JOB_SCHEDULER_DB_PASSWORD:
         secretRef: postgres
@@ -650,7 +657,7 @@ sscs-hearings-api:
       #Messaging
       HMC_HEARINGS_LISTENING_ENABLED: true
       HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
-      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-3764"
+      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-3973"
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
       TRIBUNALS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
