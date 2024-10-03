@@ -1,0 +1,44 @@
+{
+    "name": "Review PHE Request - Judge",
+    "priority": "low",
+    "assignedToWhenNotAssigned": "Unassigned",
+    "assignedToSalariedJudge": "Edwin Ford",
+    "assignedToInterlocutaryJudge": "Edwin Ford",
+    "assignedToFeePaidJudge": "Jay Griffith",
+    "assignedToTCW": "SSCS cw",
+    "unassignedManageOptions" : [
+        "Assign to me"
+    ],
+    "unassignedManageOptionsForSalariedJudge" : [
+        "Assign to me"
+    ],
+    "unassignedManageOptionsForFeePaidJudge" : [
+        "Assign to me"
+    ],
+    "assignedManageOptionsForSalariedJudge" : [
+        "Reassign task",
+        "Unassign task"
+    ],
+    "assignedManageOptionsForInterlocutaryJudge" : [
+        "Reassign task",
+        "Unassign task"
+    ],
+    "assignedManageOptionsForFeePaidJudge" : [
+        "Unassign task"
+    ],
+    "assignedManageOptionsForTCW" : [
+        "Unassign task"
+    ],
+    "nextStepsOptions": [
+        "Review PHE request",
+        "Amend interloc review state"
+    ],
+    "reviewPheRequest": {
+        "link": "Review PHE request",
+        "eventTitle": "Review PHE request"
+    },
+    "amendInterlocReviewState": {
+        "link": "Amend interloc review state",
+        "eventTitle": "Amend interloc review state"
+    }
+}
