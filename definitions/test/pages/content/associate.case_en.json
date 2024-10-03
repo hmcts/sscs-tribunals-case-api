@@ -1,0 +1,8 @@
+{
+    "associateCaseNonExistentCase": "9999999999999999",
+    "associateCaseCaption" : "Associate case",
+    "associateCaseHeading" : "Associate cases",
+    "associateCaseRelatedAppealsLabel" : "Has related appeal(s)",
+    "associateCaseRelatedAppealsYesLabel" : "Yes",
+    "associateCaseRelatedAppealsNoLabel" : "No"
+}

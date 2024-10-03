@@ -623,6 +623,18 @@ bootWithCCD {
     }
 }
 
+
+task yarnInstall(type:Exec) {
+    workingDir = file("${project.projectDir}/definitions/test")
+    commandLine 'yarn', 'install'
+}
+
+task runE2eTests(type: Exec) {
+    dependsOn yarnInstall
+    workingDir = file("${project.projectDir}/definitions/test")
+    commandLine 'yarn', 'test:' + System.getenv('ENVIRONMENT')
+}
+
 task highLevelDataSetup(type: JavaExec) {
     mainClass = "uk.gov.hmcts.reform.sscs.config.HighLevelDataSetupApp"
     classpath += sourceSets.main.runtimeClasspath
