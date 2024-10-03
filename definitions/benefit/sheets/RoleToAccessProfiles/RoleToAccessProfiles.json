@@ -149,20 +149,20 @@
   {
     "LiveFrom": "18/03/2023",
     "CaseTypeID": "Benefit",
-    "RoleName": "idam:caseworker-sscs-pcqextractor",
+    "RoleName": "idam:caseworker-sscs-ibcaresponsewriter",
+    "CaseAccessCategories": "infectedBloodAppeal",
     "Authorisation": "",
     "ReadOnly": "N",
-    "AccessProfiles": "caseworker-sscs-pcqextractor",
+    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-ibcaresponsewriter",
     "Disabled": "N"
   },
   {
     "LiveFrom": "18/03/2023",
     "CaseTypeID": "Benefit",
-    "RoleName": "idam:caseworker-sscs-ibcaresponsewriter",
-    "CaseAccessCategories": "",
+    "RoleName": "idam:caseworker-sscs-pcqextractor",
     "Authorisation": "",
     "ReadOnly": "N",
-    "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-ibcaresponsewriter",
+    "AccessProfiles": "caseworker-sscs-pcqextractor",
     "Disabled": "N"
   }
 ]

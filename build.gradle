@@ -350,7 +350,10 @@ dependencies {
     implementation group: 'com.mchange', name: 'c3p0', version: '0.9.5.5'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.11.8'
+    //TODO: revert back after testing in preview
+    //implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.11.8'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'SSCSCI-1144-SNAPSHOT'
+
     implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.12'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
