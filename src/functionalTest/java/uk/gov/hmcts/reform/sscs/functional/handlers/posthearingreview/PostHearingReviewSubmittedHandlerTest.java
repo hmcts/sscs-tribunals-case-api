@@ -43,7 +43,7 @@ public class PostHearingReviewSubmittedHandlerTest extends BaseHandler {
     @DisplayName("Given about to submit callback for state of reasons, should set fields")
     @Test
     public void testStatementOfReasonsSubmitted() throws IOException {
-        String jsonCallback = getJsonCallbackForTest("callback/postHearingReviewRequest.json");
+        String jsonCallback = getJsonCallbackForTest("callback/postHearingReview.json");
         jsonCallback = jsonCallback.replaceFirst("invoking_event", "postHearingReview");
 
         Callback<SscsCaseData> callback = deserializer.deserialize(jsonCallback);
