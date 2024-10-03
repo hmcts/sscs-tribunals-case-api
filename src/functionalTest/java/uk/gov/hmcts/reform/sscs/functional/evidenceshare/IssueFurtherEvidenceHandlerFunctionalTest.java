@@ -34,6 +34,7 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
     }
 
     @Test
+    @Ignore("disabled as update case v2 fetches data from DB and doesn't uses callback data to ensure data integrity. Moved to integration test")
     public void givenIssueFurtherEvidenceFails_shouldHandleException() throws IOException {
         // we are able to cause the issue further evidence to fail by setting to null the Appellant.Name in the callback.json
         String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType() + "Faulty");

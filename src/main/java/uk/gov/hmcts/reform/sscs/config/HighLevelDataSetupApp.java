@@ -69,11 +69,16 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
     @Override
     protected List<String> getAllDefinitionFilesToLoadAt(String definitionsPath) {
-        String env = environment.name().toUpperCase() == "PREVIEW" ? "PR" : environment.name().toUpperCase();
-        return List.of(
-            String.format("definitions/bulkscan/CCD_BulkScanningDefinition_%s.xlsx", env),
-            String.format("definitions/benefit/CCD_SSCSDefinition_%s.xlsx", env)
-        );
+        if (environment.name().toUpperCase().equals(CcdEnvironment.PREVIEW.name())) {
+            return List.of(
+                    String.format("definitions/bulkscan/CCD_BulkScanningDefinition_%s.xlsx", "PR"),
+                    String.format("definitions/benefit/CCD_SSCSDefinition_%s.xlsx", "PR")
+            );
+        } else {
+            return List.of(
+                    String.format("definitions/benefit/CCD_SSCSDefinition_%s.xlsx", environment.name().toUpperCase())
+            );
+        }
     }
 
     @Override
