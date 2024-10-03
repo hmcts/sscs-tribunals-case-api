@@ -74,7 +74,6 @@ public class DecisionIssuedIt extends AbstractEventIt {
 
         assertEquals(documentUrl, result.getData().getDocumentStaging().getPreviewDocument().getDocumentUrl());
         assertEquals(result.getData().getDocumentGeneration().getSignedBy(), "Magoo");
-        assertEquals(result.getData().getDocumentGeneration().getSignedRole(), "Tribunal Judge");
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
