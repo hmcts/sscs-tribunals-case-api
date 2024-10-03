@@ -206,9 +206,8 @@ public class DecisionIssuedMidEventHandlerTest {
     }
 
     @Test
-    public void willSetSignedByUserRoleandSurname() {
+    public void willSetSignedByUserSurname() {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-        assertEquals(response.getData().getDocumentGeneration().getSignedRole(), "Tribunal Judge");
         assertEquals(response.getData().getDocumentGeneration().getSignedBy(), USER_SURNAME);
     }
 
@@ -220,7 +219,6 @@ public class DecisionIssuedMidEventHandlerTest {
         assertEquals("DECISION NOTICE", payload.getNoticeType());
         assertEquals(expectedName, payload.getAppellantFullName());
         assertEquals(templateId, value.getTemplateId());
-        assertEquals("Tribunal Judge", payload.getUserRole());
         assertEquals(USER_SURNAME, payload.getIdamSurname());
     }
 }

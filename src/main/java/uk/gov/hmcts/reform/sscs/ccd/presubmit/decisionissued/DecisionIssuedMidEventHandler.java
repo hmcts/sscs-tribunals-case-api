@@ -47,7 +47,6 @@ public class DecisionIssuedMidEventHandler extends IssueDocumentHandler implemen
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         String templateId = documentConfiguration.getDocuments()
                 .get(callback.getCaseDetails().getCaseData().getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
-        callback.getCaseDetails().getCaseData().getDocumentGeneration().setSignedRole("Tribunal Judge");
         callback.getCaseDetails().getCaseData().getDocumentGeneration().setSignedBy(userDetailsService.buildLoggedInUserSurname(userAuthorisation));
         return issueDocument(callback, DocumentType.DECISION_NOTICE, templateId, generateFile, userAuthorisation);
     }
