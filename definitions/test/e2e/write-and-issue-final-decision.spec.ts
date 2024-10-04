@@ -6,7 +6,7 @@ let caseId: string;
 
 test.describe('Issue Final Decision - PIP Appeal Type', {tag: '@nightly-pipeline'}, async () => {
 
-    test("Issue Final Decision - Upload Response with Further Information as No - Simple Decision Notice - 'Yes' notice generated. - No Award Given",
+    test("Issue Final Decision - Upload Response with Further Information as No - Simple Decision Notice - 'Yes' notice generated. - No Award Given", {tag: ['@regression']},
         async ({issueFinalDecisionSteps}) => {
             test.slow();
             let pipCaseId = await createCaseBasedOnCaseType('PIP');
@@ -15,7 +15,7 @@ test.describe('Issue Final Decision - PIP Appeal Type', {tag: '@nightly-pipeline
             // await performAppealDormantOnCase(pipCaseId);
         });
 
-    test("Issue Final Decision - Upload Response with Further Information as No - Simple Decision Notice - 'Yes' notice generated. - Yes Award is Given", {tag: '@preview-pipeline'}, 
+    test("Issue Final Decision - Upload Response with Further Information as No - Simple Decision Notice - 'Yes' notice generated. - Yes Award is Given", {tag: ['@preview-pipeline', '@regression']},
         async ({issueFinalDecisionSteps}) => {
             test.slow();
             let pipCaseId = await createCaseBasedOnCaseType('PIP');
@@ -28,7 +28,7 @@ test.describe('Issue Final Decision - PIP Appeal Type', {tag: '@nightly-pipeline
 
 test.describe('Issue Final Decision - Tax Credit Appeal Type', {tag: ['@nightly-pipeline']},  async () => {
 
-    test("Issue Final Decision - Upload Response with Further Information as No - Simple Decision Notice - 'No' notice generated",
+    test("Issue Final Decision - Upload Response with Further Information as No - Simple Decision Notice - 'No' notice generated", {tag: ['@regression']},
         async ({issueFinalDecisionSteps}) => {
             test.slow();
             let taxCreditCaseId = await createCaseBasedOnCaseType('TAX CREDIT');
