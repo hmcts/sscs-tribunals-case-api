@@ -16,7 +16,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: branch
-          path: build/branch/definition/benefit/sheets/*
+          path: build/branch/definitions/benefit/sheets/*
 
   buildMaster:
     runs-on: ubuntu-latest
@@ -28,7 +28,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: master
-          path: build/master/definition/benefit/sheets/*
+          path: build/master/definitions/benefit/sheets/*
 
   report:
     runs-on: ubuntu-latest
