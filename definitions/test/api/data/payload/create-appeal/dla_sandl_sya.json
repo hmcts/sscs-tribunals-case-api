@@ -1,0 +1,70 @@
+{
+  "benefitType": {
+    "description": "Disability Living Allowance",
+    "code": "DLA"
+  },
+  "mrn": {
+    "dwpIssuingOffice": "The Pension Service 11",
+    "date": "01-01-2021",
+    "reasonForBeingLate": "Lost my paperwork"
+  },
+  "isAppointee": false,
+  "evidenceProvide": "false",
+  "appellant": {
+    "title": "Mr",
+    "firstName": "Joe",
+    "lastName": "BloggsPIP",
+    "dob": "26-02-1990",
+    "nino": "AB877533C",
+    "contactDetails": {
+      "addressLine1": "123 Hairy Lane",
+      "addressLine2": "Off Hairy Park",
+      "townCity": "Hairyfield",
+      "county": "Kent",
+      "postCode": "CF24 0AD",
+      "phoneNumber": "07411222222",
+      "emailAddress": "joe@bloggs.com"
+    }
+  },
+  "smsNotify": {
+    "wantsSMSNotifications": true,
+    "smsNumber": "07411333333"
+  },
+  "hasRepresentative": false,
+  "reasonsForAppealing": {
+    "reasons": [
+      {
+        "whatYouDisagreeWith": "aaaaaaaaaa",
+        "reasonForAppealing": "aaaaaaaaaa"
+      },
+      {
+        "whatYouDisagreeWith": "bbbbbbbbbb",
+        "reasonForAppealing": "bbbbbbbbbb"
+      },
+      {
+        "whatYouDisagreeWith": "cccccccccc",
+        "reasonForAppealing": "cccccccccc"
+      }
+    ],
+    "otherReasons": "Another reason"
+  },
+  "hearing": {
+    "wantsToAttend": true,
+    "wantsSupport": false,
+    "anythingElse": "Yes, this...",
+    "interpreterLanguageType": "Danish",
+    "signLanguageType": "British",
+    "arrangements": {
+      "languageInterpreter": false,
+      "signLanguageInterpreter": false,
+      "hearingLoop": false,
+      "accessibleHearingRoom": false,
+      "other": false
+    },
+    "scheduleHearing": false,
+    "datesCantAttend": ["10-12-2099", "11-12-2099", "12-12-2099"]
+  },
+  "signAndSubmit": {
+    "signer": "Joe Bloggs"
+  }
+}
