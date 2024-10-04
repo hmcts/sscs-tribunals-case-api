@@ -138,6 +138,9 @@ withPipeline(type, product, component) {
             env.CASE_TYPE = "Benefit-${CHANGE_ID}"
             setAatEnvVars();
         }
+
+        def tests = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "test-suite")
+        env.TEST_SUITE = tests.size() > 0 ? tests.collect { it.replace("test-suite:", "@") }.join(",") : "@preview-pipeline"
     }
     onDemo {
         env.ENVIRONMENT = "demo"
