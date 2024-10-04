@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 
 
 @RunWith(JUnitParamsRunner.class)
@@ -52,6 +53,7 @@ public class DecisionIssuedMidEventHandlerTest {
     private static final String TEMPLATE_ID = "nuts.docx";
     private static final String URL = "http://dm-store/documents/123";
     public static final String APPELLANT_LAST_NAME = "APPELLANT Last'NamE";
+    private static final String USER_SURNAME = "LOGGED_IN_JUDGE_SURNAME";
 
     private DecisionIssuedMidEventHandler handler;
 
@@ -63,6 +65,9 @@ public class DecisionIssuedMidEventHandlerTest {
 
     @Mock
     private GenerateFile generateFile;
+
+    @Mock
+    private UserDetailsService userDetailsService;
 
     @Spy
     private DocumentConfiguration documentConfiguration;
@@ -90,7 +95,7 @@ public class DecisionIssuedMidEventHandlerTest {
         documents.put(LanguagePreference.WELSH, welshEventTypeDocs);
 
         documentConfiguration.setDocuments(documents);
-        handler = new DecisionIssuedMidEventHandler(generateFile, documentConfiguration);
+        handler = new DecisionIssuedMidEventHandler(generateFile, userDetailsService, documentConfiguration);
 
         when(callback.getEvent()).thenReturn(EventType.DECISION_ISSUED);
 
@@ -113,6 +118,7 @@ public class DecisionIssuedMidEventHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(generateFile.assemble(any())).thenReturn(URL);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(USER_SURNAME);
     }
 
     @Test
@@ -199,6 +205,13 @@ public class DecisionIssuedMidEventHandlerTest {
                 documentConfiguration.getDocuments().get(LanguagePreference.WELSH).get(EventType.DECISION_ISSUED));
     }
 
+    @Test
+    public void willSetSignedByUserRoleandSurname() {
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertEquals(response.getData().getDocumentGeneration().getSignedRole(), "Tribunal Judge");
+        assertEquals(response.getData().getDocumentGeneration().getSignedBy(), USER_SURNAME);
+    }
+
     private void verifyTemplateBody(String image, String expectedName, String templateId) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         var value = capture.getValue();
@@ -207,7 +220,8 @@ public class DecisionIssuedMidEventHandlerTest {
         assertEquals("DECISION NOTICE", payload.getNoticeType());
         assertEquals(expectedName, payload.getAppellantFullName());
         assertEquals(templateId, value.getTemplateId());
-
+        assertEquals("Tribunal Judge", payload.getUserRole());
+        assertEquals(USER_SURNAME, payload.getIdamSurname());
     }
 }
 
