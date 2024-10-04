@@ -136,7 +136,9 @@ withPipeline(type, product, component) {
 
         if (isHearingsPr) {
             env.CASE_TYPE = "Benefit-${CHANGE_ID}"
-            setAatEnvVarsForHearings();
+            setAatEnvVars();
+            env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+            env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
         }
 
         def tests = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "test-suite")
@@ -189,17 +191,6 @@ def generateDefinitions() {
     sh "./bin/create-xlsx.sh bulkscan tag ${env.ENVIRONMENT}"
     steps.archiveArtifacts artifacts: "definitions/benefit/*.xlsx"
     steps.archiveArtifacts artifacts: "definitions/bulkscan/*.xlsx"
-}
-
-def setAatEnvVarsForHearings() {
-    env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
-    env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.CCD_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-    env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-    env.CCD_GW_API = "https://gateway-ccd.aat.platform.hmcts.net"
-    env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
-    env.ENVIRONMENT="aat"
 }
 
 def setAatEnvVars() {
