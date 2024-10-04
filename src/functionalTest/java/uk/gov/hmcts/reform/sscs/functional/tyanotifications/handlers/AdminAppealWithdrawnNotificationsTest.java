@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import junitparams.Parameters;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
@@ -21,7 +20,6 @@ import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTe
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.Retry;
 import uk.gov.service.notify.Notification;
 
-@Ignore("remove this when bypass is enabled")
 public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTest {
 
     public AdminAppealWithdrawnNotificationsTest() {
