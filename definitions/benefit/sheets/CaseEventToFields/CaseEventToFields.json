@@ -2384,7 +2384,7 @@
     "FieldShowCondition": "generateNotice=\"Yes\"",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 11,
+    "PageFieldDisplayOrder": 9,
     "PageID": "1.0",
     "PageLabel": "Issue decision"
   },
