@@ -1,16 +1,15 @@
 package uk.gov.hmcts.reform.sscs.config;
 
-import java.util.List;
-import javax.crypto.AEADBadTagException;
-import javax.net.ssl.SSLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.hmcts.befta.BeftaMain;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import uk.gov.hmcts.befta.dse.ccd.CcdEnvironment;
 import uk.gov.hmcts.befta.dse.ccd.CcdRoleConfig;
 import uk.gov.hmcts.befta.dse.ccd.DataLoaderToDefinitionStore;
-import uk.gov.hmcts.befta.exception.ImportException;
 import uk.gov.hmcts.befta.util.BeftaUtils;
+
+import java.util.List;
 
 public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
@@ -60,10 +59,20 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
                 logger.info("\n\nAdded CCD Role {}.", roleConfig);
             } catch (Exception e) {
                 logger.error("\n\nCouldn't add CCD Role {} - Exception: {}.\n\n", roleConfig, e);
-                if (!shouldTolerateDataSetupFailure()) {
-                    throw e;
-                }
+
+                throw e;
             }
+        }
+    }
+
+    @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 1000))
+    protected void doLoadTestData() {
+        try {
+            super.doLoadTestData();
+        } catch (Exception e) {
+            logger.error("\n\nCouldn't load test data - Exception: {}.\n\n", e);
+
+            throw e;
         }
     }
 
@@ -89,22 +98,6 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
     @Override
     protected boolean shouldTolerateDataSetupFailure() {
-        return BeftaMain.getConfig().getDefinitionStoreUrl().contains(".preview.");
-    }
-
-    @Override
-    protected boolean shouldTolerateDataSetupFailure(Throwable e) {
-        int httpStatusCode504 = 504;
-        if (e instanceof ImportException) {
-            ImportException importException = (ImportException) e;
-            return importException.getHttpStatusCode() == httpStatusCode504;
-        }
-        if (e instanceof SSLException) {
-            return true;
-        }
-        if (e instanceof AEADBadTagException) {
-            return true;
-        }
-        return shouldTolerateDataSetupFailure();
+        return false;
     }
 }
