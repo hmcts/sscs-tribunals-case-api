@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/countries-of-residence")
+@RequestMapping("/api/country-of-residences")
 public class CountryOfResidenceController {
 
     @GetMapping
