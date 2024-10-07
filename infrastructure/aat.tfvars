@@ -1,0 +1,5 @@
+postgresql_password_id="https://sscs-aat.vault.azure.net/secrets/tya-notif-POSTGRES-PASS-FLEX-V15/8255fb0f891d4c20be223ca609bcb430"
+postgresql_user_id="https://sscs-aat.vault.azure.net/secrets/tya-notif-POSTGRES-USER-FLEX-V15/48d678ff6e1f41d08c9120429ee9b1d8"
+postgresql_database_id="https://sscs-aat.vault.azure.net/secrets/tya-notif-POSTGRES-DATABASE-FLEX-V15/dbc15dd2b87b4455b90f8fda422df566"
+postgresql_host_id="https://sscs-aat.vault.azure.net/secrets/tya-notif-POSTGRES-HOST-FLEX-V15/b18ab5aaf7784ab093e50608678e3546"
+postgresql_port_id="https://sscs-aat.vault.azure.net/secrets/tya-notif-POSTGRES-PORT-FLEX-V15/c546f4fb3251499f836a9870f505160c"

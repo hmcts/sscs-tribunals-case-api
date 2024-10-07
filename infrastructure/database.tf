@@ -5,6 +5,30 @@ provider "azurerm" {
   subscription_id            = var.aks_subscription_id
 }
 
+import {
+  to = azurerm_key_vault_secret.POSTGRES-PASS-FLEX-V15
+  id = var.postgresql_password_id
+}
+
+import {
+  to = azurerm_key_vault_secret.POSTGRES-USER-FLEX-V15
+  id = var.postgresql_user_id
+}
+
+import {
+  to = azurerm_key_vault_secret.POSTGRES_DATABASE-FLEX-V15
+  id = var.postgresql_database_id
+}
+
+import {
+  to = azurerm_key_vault_secret.POSTGRES_HOST-FLEX-V15
+  id = var.postgresql_host_id
+}
+
+import {
+  to = azurerm_key_vault_secret.POSTGRES_PORT-FLEX-V15
+  id = var.postgresql_port_id
+}
 
 module "notification-scheduler-db-flexible" {
   providers = {
