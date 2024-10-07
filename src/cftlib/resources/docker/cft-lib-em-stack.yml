@@ -8,11 +8,11 @@ services:
       - SERVER_PORT=8080
       - CALLBACK_DOMAIN=rpa-em-ccd-orchestrator
       - IDAM_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5062}
-      - OPEN_ID_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://172.17.0.1:5062}/o
-      - S2S_BASE_URI=http://172.17.0.1:4502
+      - OPEN_ID_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://host.docker.internal:5062}/o
+      - S2S_BASE_URI=http://host.docker.internal:4502
       - APPINSIGHTS_INSTRUMENTATIONKEY=test_app
       - DM_STORE_APP_URL=http://dm-store:5005
-      - CCD_DATA_API_URL=http://172.17.0.1:4452
+      - CCD_DATA_API_URL=http://host.docker.internal:4452
       - EM_STITCHING_API_URL=http://stitching-api:8080
       - ENABLE_LIQUIBASE=true
       - JSON_CONSOLE_PRETTY_PRINT=false
@@ -26,7 +26,7 @@ services:
     networks:
       - cftlib_default
     extra_hosts:
-      - "172.17.0.1:host-gateway"
+      - "host.docker.internal:host-gateway"
 
   stitching-api:
     image: hmctspublic.azurecr.io/em/stitching:latest
@@ -39,10 +39,10 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://shared-database-pg12:5432/emstitch
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
-      - S2S_BASE_URI=http://172.17.0.1:4502
-      - CDAM_URL=http://172.17.0.1:4455
+      - S2S_BASE_URI=http://host.docker.internal:4502
+      - CDAM_URL=http://host.docker.internal:4455
       - IDAM_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://rse-idam-simulator:5062}
-      - OPEN_ID_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://172.17.0.1:5062}/o
+      - OPEN_ID_API_BASE_URI=${IDAM_STUB_SERVICE_NAME:-http://host.docker.internal:5062}/o
       - ENABLE_LIQUIBASE=true
       - APPINSIGHTS_INSTRUMENTATIONKEY=test-key
       - DM_STORE_APP_URL=http://localhost:5005
@@ -57,7 +57,7 @@ services:
     networks:
       - cftlib_default
     extra_hosts:
-      - "172.17.0.1:host-gateway"
+      - "host.docker.internal:host-gateway"
       - "docmosis.aat.platform.hmcts.net:10.10.161.100"
 
 networks:
