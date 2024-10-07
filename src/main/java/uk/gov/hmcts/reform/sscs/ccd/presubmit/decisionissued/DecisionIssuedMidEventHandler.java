@@ -50,5 +50,6 @@ public class DecisionIssuedMidEventHandler extends IssueDocumentHandler implemen
         callback.getCaseDetails().getCaseData().getDocumentGeneration().setSignedRole("Tribunal Judge");
         callback.getCaseDetails().getCaseData().getDocumentGeneration().setSignedBy(userDetailsService.buildLoggedInUserSurname(userAuthorisation));
         return issueDocument(callback, DocumentType.DECISION_NOTICE, templateId, generateFile, userAuthorisation);
+
     }
 }
