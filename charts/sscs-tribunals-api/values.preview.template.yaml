@@ -438,7 +438,7 @@ ccd:
     java:
       disableKeyVaults: true
       devmemoryRequests: '2048Mi'
-      devmemoryLimits: '4048992Mi'
+      devmemoryLimits: '4092Mi'
       devcpuRequests: '1800m'
       autoscaling:
         enabled: false
