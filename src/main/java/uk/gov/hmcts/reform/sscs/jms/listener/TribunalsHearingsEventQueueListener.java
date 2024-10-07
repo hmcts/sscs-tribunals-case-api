@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.LISTING_ERROR;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.retry.ExhaustedRetryException;
@@ -30,12 +31,19 @@ public class TribunalsHearingsEventQueueListener {
 
     private final CcdCaseService ccdCaseService;
 
+    @Value("${feature.bypass-hearing-api-service.enabled}")
+    private boolean isByPassHearingServiceEnabled;
+
     @JmsListener(
             destination = "${azure.service-bus.tribunals-to-hearings-api.queueName}",
             containerFactory = "tribunalsHearingsEventQueueContainerFactory"
     )
     public void handleIncomingMessage(HearingRequest message) throws TribunalsEventProcessingException, GetCaseException, UpdateCaseException {
         log.info("Handling request by tribunal hearing api merge code");
+
+        if (!isByPassHearingServiceEnabled) {
+            return;
+        }
 
         if (isNull(message)) {
             throw new TribunalsEventProcessingException("An exception occurred as message did not match format");

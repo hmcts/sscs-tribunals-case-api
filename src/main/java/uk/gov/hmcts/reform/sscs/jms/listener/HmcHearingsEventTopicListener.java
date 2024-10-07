@@ -34,6 +34,9 @@ public class HmcHearingsEventTopicListener {
     @Value("${flags.deployment-filter.enabled}")
     private boolean isDeploymentFilterEnabled;
 
+    @Value("${feature.bypass-hearing-api-service.enabled}")
+    private boolean isByPassHearingServiceEnabled;
+
     private static final String HMCTS_DEPLOYMENT_ID = "hmctsDeploymentId";
 
     public HmcHearingsEventTopicListener(@Value("${sscs.serviceCode}") String sscsServiceCode,
@@ -53,7 +56,7 @@ public class HmcHearingsEventTopicListener {
 
         log.info("Handling request by tribunal hearing api merge code");
 
-        if (isDeploymentFilterEnabled && !isMessageReleventForDeployment(message)) {
+        if (!isByPassHearingServiceEnabled && isDeploymentFilterEnabled && !isMessageReleventForDeployment(message)) {
             return;
         }
         byte[] messageBytes = new byte[(int) message.getBodyLength()];
