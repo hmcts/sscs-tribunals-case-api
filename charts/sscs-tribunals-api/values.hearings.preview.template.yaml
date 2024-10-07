@@ -6,7 +6,13 @@ postgresql:
 idam-pr:
   enabled: false
 xui-webapp:
-  enabled: false
+  enabled: true
+  nodejs:
+    environment:
+      SERVICES_CCD_CASE_ASSIGNMENT_API: "http://aac-manage-case-assignment-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+      SERVICES_HEARINGS_COMPONENT_API_SSCS: "http://sscs-hearings-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+      SERVICES_DOCUMENTS_API_V2: "http://ccd-case-document-am-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+
 elastic:
   enabled: false
 sscs-tya-notif:
