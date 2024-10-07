@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.config;
 
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.retry.annotation.Backoff;
@@ -8,8 +9,6 @@ import uk.gov.hmcts.befta.dse.ccd.CcdEnvironment;
 import uk.gov.hmcts.befta.dse.ccd.CcdRoleConfig;
 import uk.gov.hmcts.befta.dse.ccd.DataLoaderToDefinitionStore;
 import uk.gov.hmcts.befta.util.BeftaUtils;
-
-import java.util.List;
 
 public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
