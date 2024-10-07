@@ -97,9 +97,7 @@ public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCase
                 description,
                 idamService.getIdamTokens(),
                 sscsCaseDetails -> {
-                    log.info("sscscasedetails object id {}", System.identityHashCode(sscsCaseDetails));
                     SscsCaseData sscsCaseData = sscsCaseDetails.getData();
-                    log.info("sscsCaseData object id {}", System.identityHashCode(sscsCaseDetails.getData()));
                     sscsCaseData.setDwpState(DwpState.HEARING_POSTPONED);
                     sscsCaseData.setPostponement(Postponement.builder()
                             .unprocessedPostponement(NO)
