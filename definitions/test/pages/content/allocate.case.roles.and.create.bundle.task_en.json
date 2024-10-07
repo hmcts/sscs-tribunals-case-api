@@ -1,0 +1,32 @@
+{
+    "name": "Allocate Case Roles and Create Bundle - RPC",
+    "priority": "high",
+    "assignedToWhenNotAssigned": "Unassigned",
+    "assignedToRegionalCenterAdmin": "SSCS regional",
+    "assignedToRegionalCenterTeamLeader": "SSCS regionleader",
+    "unassignedManageOptionsForRegionalCenterAdmin" : [
+        "Assign to me"
+    ],
+    "unassignedManageOptionsForRegionalCenterTeamLeader" : [
+        "Assign task",
+        "Cancel task",
+        "Assign to me"
+    ],
+    "assignedManageOptionsForRegionalCenterAdmin" : [
+        "Reassign task",
+        "Unassign task"
+    ],
+    "assignedManageOptionsForRegionalCenterTeamLeader" : [
+        "Cancel task",
+        "Mark as done",
+        "Reassign task",
+        "Unassign task"
+    ],
+    "nextStepsOptions": [
+        "Create Bundle"
+    ],
+    "createBundle": {
+        "link": "Create Bundle",
+        "eventTitle": "Create Bundle"
+    }
+}

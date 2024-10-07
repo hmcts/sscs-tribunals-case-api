@@ -1,0 +1,38 @@
+{
+    "updateSubscriptionHeading": "Update subscription",
+    "updateSubscriptionHeading2": "Appellant Subscription (Optional)",
+    "updateSubscriptionFieldLabel": "Mobile Number",
+    "updateSubscriptionInput": "07377467999",
+
+    "updateSubscriptionTrackYAappellant": "appellant123",
+    "updateSubscriptionEmailappellant": "appellant-test@mailinator.com",
+    "updateSubscriptionMobileNumberappellant": "01234567890",
+    
+    "updateSubscriptionTrackYArepresentative": "representative123",
+    "updateSubscriptionEmailrepresentative": "representative-test@mailinator.com",
+    "updateSubscriptionMobileNumberrepresentative": "01234567890",
+
+    "updateSubscriptionTrackYAappointee": "appointee123",
+    "updateSubscriptionEmailappointee": "appointee-test@mailinator.com",
+    "updateSubscriptionMobileNumberappointee": "01234567890",
+
+    "updateSubscriptionTrackYAjointParty": "jointParty123",
+    "updateSubscriptionEmailjointParty": "jointparty-test@mailinator.com",
+    "updateSubscriptionMobileNumberjointParty": "01234567890",
+
+    "updateSubscriptionTrackYAsupportParty": "supportParty123",
+    "updateSubscriptionEmailsupportParty": "supportparty-test@mailinator.com",
+    "updateSubscriptionMobileNumbersupportParty": "01234567890",
+    
+    "updateSubscriptionTrackYAotherParty": "otherParty123",
+    "updateSubscriptionEmailotherParty": "otherparty-test@mailinator.com",
+    "updateSubscriptionMobileNumberotherParty": "01234567890",
+
+    "updateSubscriptionTrackYAotherPartyAppointee": "otherpartyappointee123",
+    "updateSubscriptionEmailotherPartyAppointee": "therpartyappointee-test@mailinator.com",
+    "updateSubscriptionMobileNumberotherPartyAppointee": "01234567890",
+
+    "updateSubscriptionTrackYAotherPartyRepresentative": "otherpartyrepresentative123",
+    "updateSubscriptionEmailotherPartyRepresentative": "otherpartyrepresentative-test@mailinator.com",
+    "updateSubscriptionMobileNumberotherPartyRepresentative": "01234567890"
+}
