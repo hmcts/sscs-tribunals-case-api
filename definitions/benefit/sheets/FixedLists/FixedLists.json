@@ -592,6 +592,7 @@
   {"LiveFrom": "01/01/2018", "ID": "FL_dwpRegionalCentre", "ListElementCode": "Child Support", "ListElement": "Child Support Agency"},
   {"LiveFrom": "01/01/2018", "ID": "FL_dwpRegionalCentre", "ListElementCode": "C.B.O (HMRC)", "ListElement": "C.B.O (HMRC)"},
   {"LiveFrom": "01/01/2018", "ID": "FL_dwpRegionalCentre", "ListElementCode": "TCO Preston Appeals Team", "ListElement": "TCO Preston Appeals Team"},
+  {"LiveFrom": "01/01/2018", "ID": "FL_dwpRegionalCentre", "ListElementCode": "IBCA", "ListElement": "IBCA"},
   {"LiveFrom": "01/01/2018", "ID": "pageNumberFormat", "ListElementCode": "pageRange", "ListElement": "Page Range"},
   {"LiveFrom": "01/01/2018", "ID": "pageNumberFormat", "ListElementCode": "numberOfPages", "ListElement": "Number Of Pages"},
   {"LiveFrom": "01/01/2018", "ID": "paginationStyle", "ListElementCode": "off", "ListElement": "Off"},
