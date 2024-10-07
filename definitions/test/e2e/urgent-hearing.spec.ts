@@ -7,16 +7,16 @@ test.describe("Urgent hearing test",  async() => {
 
     let caseId : string;
 
-    test.beforeEach("Case has to be Created", {tag: ['@regression', '@nightly-pipeline']}, async () => {
+    test.beforeEach("Case has to be Created", async () => {
         caseId = await createCaseBasedOnCaseType('PIP');
     });
     
-    test("Grant - Urgent hearing request", {tag: ['@regression', '@nightly-pipeline']}, async ({ urgentHearingSteps }) => {
+    test("Grant - Urgent hearing request", {tag: ['@preview-regression', '@nightly-pipeline']}, async ({ urgentHearingSteps }) => {
         test.slow();
         await urgentHearingSteps.requestAndGrantAnUrgentHearing(caseId);
     });
     
-    test("Refuse - Urgent hearing request", {tag: ['@regression', '@nightly-pipeline']},async ({ urgentHearingSteps }) => {
+    test("Refuse - Urgent hearing request", {tag: ['@preview-regression', '@nightly-pipeline']},async ({ urgentHearingSteps }) => {
         test.slow();
         await urgentHearingSteps.requestAndRefuseAnUrgentHearing(caseId);
     });
