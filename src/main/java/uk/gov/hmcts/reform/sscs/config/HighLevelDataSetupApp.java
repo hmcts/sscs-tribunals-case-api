@@ -45,12 +45,12 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
         environment = dataSetupEnvironment;
     }
 
+    @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 1000))
     public static void main(String[] args) throws Throwable {
         DataLoaderToDefinitionStore.main(HighLevelDataSetupApp.class, args);
     }
 
     @Override
-    @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 1000))
     public void addCcdRoles() {
         for (CcdRoleConfig roleConfig : CCD_ROLES) {
             try {
