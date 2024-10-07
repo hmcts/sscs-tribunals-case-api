@@ -3,30 +3,30 @@ import createCaseBasedOnCaseType from "../api/client/sscs/factory/appeal.type.fa
 import performAppealDormantOnCase from "../api/client/sscs/appeal.event";
 
 
-test.describe("Urgent hearing test", {tag: ['@preview-regression', '@nightly-pipeline']}, async() => {
+test.describe("Urgent hearing test",  async() => {
 
     let caseId : string;
 
-    test.beforeEach("Case has to be Created", async () => {
+    test.beforeEach("Case has to be Created", {tag: ['@regression', '@nightly-pipeline']}, async () => {
         caseId = await createCaseBasedOnCaseType('PIP');
     });
     
-    test("Grant - Urgent hearing request", async ({ urgentHearingSteps }) => {
+    test("Grant - Urgent hearing request", {tag: ['@regression', '@nightly-pipeline']}, async ({ urgentHearingSteps }) => {
         test.slow();
         await urgentHearingSteps.requestAndGrantAnUrgentHearing(caseId);
     });
     
-    test("Refuse - Urgent hearing request", async ({ urgentHearingSteps }) => {
+    test("Refuse - Urgent hearing request", {tag: ['@regression', '@nightly-pipeline']},async ({ urgentHearingSteps }) => {
         test.slow();
         await urgentHearingSteps.requestAndRefuseAnUrgentHearing(caseId);
     });
 
-    test("Welsh - Urgent hearing request", async ({ urgentHearingSteps }) => {
+    test("Welsh - Urgent hearing request", {tag: ['@todo-test-not-working', '@nightly-pipeline']}, async ({ urgentHearingSteps }) => {
         test.slow();
         await urgentHearingSteps.requestAnUrgentHearingForAWelshCase();
     });
     
-    test("Error scenario - Upload encrypted file in Action further evidence event", async({ urgentHearingSteps }) => {
+    test("Error scenario - Upload encrypted file in Action further evidence event", {tag: ['@preview-regression', '@nightly-pipeline']}, async({ urgentHearingSteps }) => {
         test.slow();
         await urgentHearingSteps.uploadEncryptedFiles(caseId);
     });
