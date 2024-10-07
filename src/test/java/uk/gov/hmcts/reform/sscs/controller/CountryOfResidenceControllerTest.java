@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CountryOfResidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 
 import java.util.List;
@@ -27,8 +28,7 @@ class CountryOfResidenceControllerTest {
 
         Map<String, String> jordanEntry = Map.of(
             "label", "Jordan",
-            "officialName", "The Hashemite Kingdom of Jordan",
-            "value", "Jordan"
+            "officialName", "The Hashemite Kingdom of Jordan"
         );
 
         assertTrue(result.contains(jordanEntry), "The result should contain the entry for Jordan");
@@ -36,7 +36,6 @@ class CountryOfResidenceControllerTest {
         result.forEach(entry -> {
             assertTrue(entry.containsKey("label"), "Each entry should have a 'label' field");
             assertTrue(entry.containsKey("officialName"), "Each entry should have a 'officialName' field");
-            assertTrue(entry.containsKey("value"), "Each entry should have a 'value' field");
         });
     }
 
@@ -47,8 +46,7 @@ class CountryOfResidenceControllerTest {
         for (CountryOfResidence entry : CountryOfResidence.values()) {
             Map<String, String> expectedEntry = Map.of(
                 "label", entry.getLabel(),
-                "officialName", entry.getOfficialName(),
-                "value", entry.getValue()
+                "officialName", entry.getOfficialName()
             );
             assertTrue(result.contains(expectedEntry), "Result should contain the expected entry for " + entry.getLabel());
         }

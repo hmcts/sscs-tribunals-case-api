@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CountryOfResidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 
 import java.util.Arrays;
@@ -21,8 +22,7 @@ public class CountryOfResidenceController {
         return Arrays.stream(CountryOfResidence.values())
             .map(enumVal -> Map.of(
                 "label", enumVal.getLabel(),
-                "officialName", enumVal.getOfficialName(),
-                "value", enumVal.getValue()))
+                "officialName", enumVal.getOfficialName()))
             .collect(Collectors.toList());
     }
 }
