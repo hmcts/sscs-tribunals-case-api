@@ -50,6 +50,7 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     }
 
     @Override
+    @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 1000))
     public void addCcdRoles() {
         for (CcdRoleConfig roleConfig : CCD_ROLES) {
             try {
@@ -62,11 +63,6 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
                 throw e;
             }
         }
-    }
-
-    @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 1000))
-    protected void doLoadTestData() {
-        super.doLoadTestData();
     }
 
     @Override
