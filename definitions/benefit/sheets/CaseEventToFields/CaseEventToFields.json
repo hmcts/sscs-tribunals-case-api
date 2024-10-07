@@ -2378,13 +2378,37 @@
   },
   {
     "CaseEventID": "decisionIssued",
+    "CaseFieldID": "signedBy",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "generateNotice=\"Yes\"",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 11,
+    "PageID": "1.0",
+    "PageLabel": "Issue decision"
+  },
+  {
+    "CaseEventID": "decisionIssued",
+    "CaseFieldID": "signedRole",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "generateNotice=\"Yes\"",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 10,
+    "PageID": "1.0",
+    "PageLabel": "Issue decision"
+  },
+  {
+    "CaseEventID": "decisionIssued",
     "CaseFieldID": "dateAdded",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
     "FieldShowCondition": "generateNotice=\"Yes\"",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 9,
+    "PageFieldDisplayOrder": 11,
     "PageID": "1.0",
     "PageLabel": "Issue decision"
   },
@@ -2395,7 +2419,7 @@
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 10,
+    "PageFieldDisplayOrder": 12,
     "PageID": "2.0",
     "PageLabel": "Issue decision",
     "PageShowCondition": "generateNotice=\"Yes\""
