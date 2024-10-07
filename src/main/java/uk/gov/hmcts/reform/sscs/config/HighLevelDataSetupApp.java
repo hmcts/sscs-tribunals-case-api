@@ -66,13 +66,7 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
     @Retryable(maxAttempts = 5, backoff = @Backoff(delay = 1000))
     protected void doLoadTestData() {
-        try {
-            super.doLoadTestData();
-        } catch (Exception e) {
-            logger.error("\n\nCouldn't load test data - Exception: {}.\n\n", e);
-
-            throw e;
-        }
+        super.doLoadTestData();
     }
 
     @Override
