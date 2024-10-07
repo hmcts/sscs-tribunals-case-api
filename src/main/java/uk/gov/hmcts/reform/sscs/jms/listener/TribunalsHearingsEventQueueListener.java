@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.sscs.service.HearingsService;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty({"feature.bypass-hearing-api-service.enabled", "flags.tribunals-to-hearings-api.enabled"})
+@ConditionalOnProperty("flags.tribunals-to-hearings-api.enabled")
 public class TribunalsHearingsEventQueueListener {
 
     private final HearingsService hearingsService;
