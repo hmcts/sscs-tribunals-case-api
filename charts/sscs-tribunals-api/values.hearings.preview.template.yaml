@@ -1,0 +1,69 @@
+tags:
+  sscs-ccd-idam-pr: false
+
+postgresql:
+  enabled: false
+idam-pr:
+  enabled: false
+xui-webapp:
+  enabled: false
+elastic:
+  enabled: false
+sscs-tya-notif:
+  enabled: false
+sscs-tribunals-frontend:
+  enabled: false
+redis:
+  enabled: false
+ccd:
+  enabled: false
+em-ccdorc:
+  enabled: false
+sscs-hearings-api:
+  enabled: false
+servicebus:
+  enabled: false
+ccd-case-document-am-api:
+  enabled: false
+aac-manage-case-assignment:
+  enabled: false
+am-org-role-mapping-service:
+  enabled: false
+wa:
+  enabled: false
+  taskBatchCron:
+    enabled: false
+  reconfigurationBatchCron:
+    enabled: false
+  terminationBatchCron:
+    enabled: false
+
+
+java:
+  image: ${IMAGE_NAME}
+  ingressHost: ${SERVICE_FQDN}
+  readinessDelay: 45
+  environment:
+    CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    CASE_DOCUMENT_AM_URL: "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
+    SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
+    TOPIC_NAME: "sscs-evidenceshare-topic-aat"
+    AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
+    AMQP_USERNAME: "SendAndListenSharedAccessKey"
+    CORE_CASE_DATA_CASE_TYPE_ID: ${CASE_TYPE}
+    JOB_SCHEDULER_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
+    JOB_SCHEDULER_DB_NAME: "{{ .Values.postgresql.auth.database}}"
+    JOB_SCHEDULER_DB_HOST: "{{ .Release.Name }}-postgresql"
+    JOB_SCHEDULER_DB_CONNECTION_OPTIONS: ""
+  secrets:
+    JOB_SCHEDULER_DB_PASSWORD:
+      secretRef: "{{ .Release.Name }}-postgresql"
+      key: password
+  postgresql:
+    enabled: true
+
+ccd-def-cleanup:
+  enabled: true
+  change_id: ${CHANGE_ID}
+  case_type_ids:
+    - Benefit
