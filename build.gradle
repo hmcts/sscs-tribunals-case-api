@@ -332,7 +332,7 @@ dependencies {
 
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.7.0'
 
-    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '12.4'
+    implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.5'
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.11.0'
     implementation group: 'com.squareup.okio', name: 'okio-jvm', version: '3.5.0'
 
@@ -369,7 +369,7 @@ dependencies {
 
     implementation group:'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'org.springframework', name: 'spring-jms'
-    implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.10.0'
+    implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '2.6.1'
 
     implementation group: 'org.pitest', name: 'pitest', version:  '1.14.2'
     implementation group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.9.11'
@@ -406,8 +406,8 @@ dependencies {
 
     implementation group: "com.networknt", name: "json-schema-validator", version: "1.0.81"
 
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.86'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.86'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '10.1.30'
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.30'
 
     //evidence-share depenedencies
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
@@ -471,9 +471,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.0'
 
-    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-core', version: '8.0.6'
-    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '8.0.6'
-    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '8.0.6'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-core', version: '9.2.0'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '9.2.0'
+    testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '9.2.0'
     //pact contract testing
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
 
