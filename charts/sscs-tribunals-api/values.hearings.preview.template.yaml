@@ -6,7 +6,7 @@ postgresql:
 idam-pr:
   enabled: false
 xui-webapp:
-  enabled: false
+  enabled: true
 elastic:
   enabled: false
 sscs-tya-notif:
@@ -20,7 +20,7 @@ ccd:
 em-ccdorc:
   enabled: false
 sscs-hearings-api:
-  enabled: false
+  enabled: true
 servicebus:
   enabled: false
 ccd-case-document-am-api:
