@@ -536,7 +536,11 @@ sscs-tribunals-frontend:
     memoryLimits: "2Gi"
     cpuLimits: 2000m
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:pr-1543
-    ingressHost: ${IBA_OR_NOT}sya-${SERVICE_FQDN}
+    ingressHost: sya-${SERVICE_FQDN}
+    registerAdditionalDns:
+      enabled: true
+      prefix: iba
+      primaryIngressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
       APPINSIGHTS_ROLE_NAME: ${SERVICE_NAME}
