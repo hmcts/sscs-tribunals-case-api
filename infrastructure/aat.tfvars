@@ -3,3 +3,4 @@ postgresql_user_id="https://sscs-aat.vault.azure.net/secrets/tya-notif-POSTGRES-
 postgresql_database_id="https://sscs-aat.vault.azure.net/secrets/tya-notif-POSTGRES-DATABASE-FLEX-V15/dbc15dd2b87b4455b90f8fda422df566"
 postgresql_host_id="https://sscs-aat.vault.azure.net/secrets/tya-notif-POSTGRES-HOST-FLEX-V15/b18ab5aaf7784ab093e50608678e3546"
 postgresql_port_id="https://sscs-aat.vault.azure.net/secrets/tya-notif-POSTGRES-PORT-FLEX-V15/c546f4fb3251499f836a9870f505160c"
+psqlserver_id="/subscriptions/1c4f0704-a29e-403d-b719-b90c34ef14c9/resourceGroups/sscs-tya-notif-postgres-v15-db-data-aat/providers/Microsoft.DBforPostgreSQL/flexibleServers/sscs-tya-notif-postgres-v15-db-aat"
