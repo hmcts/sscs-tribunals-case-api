@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 
 class PortOfEntryControllerTest {
 
