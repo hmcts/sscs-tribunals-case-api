@@ -1,0 +1,16 @@
+{
+    "eventName": "Action further evidence",
+    "eventNameCaptor": "Action further evidence",
+    "sender": "Appellant (or Appointee)",
+    "jpSender": "Joint party",
+    "ftaSender": "FTA",
+    "other" : "Other",
+    "urgentDocType": "Urgent hearing request",
+    "confDocType": "Confidentiality request",
+    "reinstatementDocType": "Reinstatement request",
+    "testfileone" : "testfile1.pdf",
+    "encrytpedFile": "test-encrypted-file.pdf",
+    "corruptedFile": "test-corrupted-file.pdf",
+    "otherDocType": "Other",
+    "redactedTestFile": "testfile2.pdf"
+}
