@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.controller;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,6 @@ public class CountryOfResidenceController {
             .map(enumVal -> Map.of(
                 "label", enumVal.getLabel(),
                 "officialName", enumVal.getOfficialName()))
-            .toList();
+            .collect(Collectors.toList());
     }
 }
