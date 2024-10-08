@@ -6,10 +6,10 @@ plugins {
     id 'org.springframework.boot' version '2.7.18'
     id 'uk.gov.hmcts.java' version '0.12.43'
     id 'com.gorylenko.gradle-git-properties' version '2.4.1'
-    id 'com.github.ben-manes.versions' version '0.46.0'
+    id 'com.github.ben-manes.versions' version '0.51.0'
     id "info.solidsoft.pitest" version '1.9.11'
     id 'org.owasp.dependencycheck' version '10.0.3'
-    id 'au.com.dius.pact' version '4.3.15'
+    id 'au.com.dius.pact' version '4.6.14'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.1335'
 }
 
@@ -449,9 +449,9 @@ dependencies {
     testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.37.0'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.40.1'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.37.0'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.40.1'
 
     testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
@@ -469,12 +469,12 @@ dependencies {
     functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-    testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.9.3')
+    testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.11.2')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
     testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine'
     testImplementation group: 'com.h2database', name: 'h2', version: '2.1.214'
 
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.3'
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.0'
 
@@ -482,7 +482,7 @@ dependencies {
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '8.0.6'
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '8.0.6'
     //pact contract testing
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.14'
 
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBoot.class.package.implementationVersion
 
