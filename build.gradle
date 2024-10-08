@@ -381,7 +381,7 @@ dependencies {
     implementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: pitest.pitestVersion.get()
     implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: '0.5'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '1.5.7', {
+    implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '3e0755f', {
         exclude group: "uk.gov.hmcts.reform", module:"properties-volume-spring-boot-starter"
     }
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.2'
