@@ -515,5 +515,5 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "tribunalDirectPoToAttend", "Label": "Tribunal direct PO to attend?", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "06/02/2024", "CaseTypeID": "Benefit", "ID": "preWorkAllocation", "Label": "Case created before WA went Live", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "ID": "ignoreCallbackWarnings", "Label": "Ignore callback warningsR", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "ibcaUniqueRefNo", "Label": "IBCA Unique Reference Number", "FieldType": "Text", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "ibcaReference", "Label": "IBCA Reference", "FieldType": "Text", "SecurityClassification": "PUBLIC"}
 ]

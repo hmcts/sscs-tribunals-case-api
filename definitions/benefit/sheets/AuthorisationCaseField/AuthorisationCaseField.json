@@ -1619,5 +1619,5 @@
   {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "CaseFieldID": "ignoreCallbackWarnings", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "CaseFieldID": "ignoreCallbackWarnings", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
   {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "CaseFieldID": "ignoreCallbackWarnings", "AccessProfile": "caseworker-sscs-registrar", "CRUD": "CRUD"},
-  {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "CaseFieldID": "ibcaUniqueRefNo", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CRUD": "CRUD"}
+  {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "CaseFieldID": "ibcaReference", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CRUD": "CRUD"}
 ]
