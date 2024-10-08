@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageService;
 
 @Slf4j
 @Component
-@ConditionalOnProperty("flags.hmc-to-hearings-api.enabled")
+@ConditionalOnProperty({"feature.bypass-hearing-api-service.enabled", "flags.hmc-to-hearings-api.enabled"})
 public class HmcHearingsEventTopicListener {
 
     private final ObjectMapper objectMapper;
@@ -54,11 +54,12 @@ public class HmcHearingsEventTopicListener {
     )
     public void onMessage(JmsBytesMessage message) throws JMSException, HmcEventProcessingException {
 
-        log.info("Handling request by tribunal hearing api merge code");
-
         if (!isByPassHearingServiceEnabled && isDeploymentFilterEnabled && !isMessageReleventForDeployment(message)) {
             return;
         }
+
+        log.info("Handling request by tribunal hearing api merge code");
+
         byte[] messageBytes = new byte[(int) message.getBodyLength()];
         message.readBytes(messageBytes);
         String convertedMessage = new String(messageBytes, StandardCharsets.UTF_8);

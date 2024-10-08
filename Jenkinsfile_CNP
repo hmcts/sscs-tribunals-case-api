@@ -12,100 +12,105 @@ def dmnBranch = "master"
 def waStandaloneBranch = "master"
 
 def secrets = [
-    'sscs-${env}': [
-        secret('idam-api', 'IDAM_API_URL'),
-        secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
-        secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
-        secret('idam-sscs-systemupdate-user', 'IDAM_SSCS_SYSTEMUPDATE_USER'),
-        secret('idam-sscs-systemupdate-password', 'IDAM_SSCS_SYSTEMUPDATE_PASSWORD'),
-        secret('idam-sscs-oauth2-client-secret', 'IDAM_OAUTH2_CLIENT_SECRET'),
-        secret('idam-s2s-api', 'IDAM_S2S_AUTH'),
-        secret('ccd-jid', 'CORE_CASE_DATA_JURISDICTION_ID'),
-        secret('ccd-tid', 'CORE_CASE_DATA_CASE_TYPE_ID'),
-        secret('sscs-s2s-secret', 'IDAM_S2S_AUTH_TOTP_SECRET'),
-        secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
-        secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
-        secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
-        secret('robotics-email-from', 'ROBOTICS_EMAIL_FROM'),
-        secret('robotics-email-to', 'ROBOTICS_EMAIL_TO'),
-        secret('robotics-email-scottish-to', 'ROBOTICS_EMAIL_SCOTTISH_TO'),
-        secret('robotics-email-pip-ae-to', 'ROBOTICS_EMAIL_PIP_AE_TO'),
+        'sscs-${env}': [
+                secret('idam-api', 'IDAM_API_URL'),
+                secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
+                secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
+                secret('idam-sscs-systemupdate-user', 'IDAM_SSCS_SYSTEMUPDATE_USER'),
+                secret('idam-sscs-systemupdate-password', 'IDAM_SSCS_SYSTEMUPDATE_PASSWORD'),
+                secret('idam-sscs-oauth2-client-secret', 'IDAM_OAUTH2_CLIENT_SECRET'),
+                secret('idam-s2s-api', 'IDAM_S2S_AUTH'),
+                secret('ccd-jid', 'CORE_CASE_DATA_JURISDICTION_ID'),
+                secret('ccd-tid', 'CORE_CASE_DATA_CASE_TYPE_ID'),
+                secret('sscs-s2s-secret', 'IDAM_S2S_AUTH_TOTP_SECRET'),
+                secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
+                secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
+                secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
+                secret('robotics-email-from', 'ROBOTICS_EMAIL_FROM'),
+                secret('robotics-email-to', 'ROBOTICS_EMAIL_TO'),
+                secret('robotics-email-scottish-to', 'ROBOTICS_EMAIL_SCOTTISH_TO'),
+                secret('robotics-email-pip-ae-to', 'ROBOTICS_EMAIL_PIP_AE_TO'),
 
-        // tya notifications
-        secret('notification-key', 'NOTIFICATION_API_KEY'),
-        secret('notification-test-key', 'NOTIFICATION_API_TEST_KEY'),
-        secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
-        secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
-        secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD'),
+                secret('caseworker-ref-api', 'CASEWORKER_REF_API_URL'),
+                secret('ccd-api', 'CORE_CASE_DATA_API_URL'),
+                secret('judicial-ref-api', 'JUDICIAL_REF_API_URL'),
+                secret('common-ref-data-api', 'COMMON_REF_API_URL'),
 
-        // e2es
-        secret('test-e2e-caseofficer-username', 'TEST_CASEOFFICER_USERNAME'),
-        secret('test-e2e-caseofficer-password', 'TEST_CASEOFFICER_PASSWORD'),
-        secret('test-e2e-hmc-caseofficer-username', 'TEST_HMC_CASEOFFICER_USERNAME'),
-        secret('test-e2e-hmc-caseofficer-password', 'TEST_HMC_CASEOFFICER_PASSWORD'),
-        secret('test-e2e-judge-username', 'TEST_JUDGE_USERNAME'),
-        secret('test-e2e-judge-password', 'TEST_JUDGE_PASSWORD'),
-        secret('test-e2e-salaried-judge-username', 'TEST_SALARIED_JUDGE_USERNAME'),
-        secret('test-e2e-salaried-judge-password', 'TEST_SALARIED_JUDGE_PASSWORD'),
-        secret('test-e2e-fee-paid-judge-username', 'TEST_FEE_PAID_JUDGE_USERNAME'),
-        secret('test-e2e-fee-paid-judge-password', 'TEST_FEE_PAID_JUDGE_PASSWORD'),
-        secret('test-e2e-dwp-username', 'TEST_DWP_USERNAME'),
-        secret('test-e2e-dwp-password', 'TEST_DWP_PASSWORD'),
-        secret('test-e2e-am-tcw-username', 'TEST_AM_TRIBUNAL_CASEWORKER_USERNAME'),
-        secret('test-e2e-am-tcw-password', 'TEST_AM_TRIBUNAL_CASEWORKER_PASSWORD'),
-        secret('test-e2e-am-caseofficer-case-allocator-username', 'TEST_AM_CASEOFFICER_CASE_ALLOCATOR_USERNAME'),
-        secret('test-e2e-am-caseofficer-case-allocator-password', 'TEST_AM_CASEOFFICER_CASE_ALLOCATOR_PASSWORD'),
-        secret('test-e2e-hmrc-username', 'TEST_HMRC_USERNAME'),
-        secret('test-e2e-hmrc-password', 'TEST_HMRC_PASSWORD'),
-        secret('test-e2e-am-regional-center-admin-username', 'TEST_AM_REGIONAL_CENTER_ADMIN_USERNAME'),
-        secret('test-e2e-am-regional-center-admin-password', 'TEST_AM_REGIONAL_CENTER_ADMIN_PASSWORD'),
-        secret('test-e2e-am-regional-center-team-leader-username', 'TEST_AM_REGIONAL_CENTER_TEAM_LEADER_USERNAME'),
-        secret('test-e2e-am-regional-center-team-leader-password', 'TEST_AM_REGIONAL_CENTER_TEAM_LEADER_PASSWORD'),
-        secret('test-e2e-am-caseofficer-username', 'TEST_AM_CASEOFFICER_USERNAME'),
-        secret('test-e2e-am-caseofficer-password', 'TEST_AM_CASEOFFICER_PASSWORD'),
-        secret('test-e2e-caseofficer-username', 'TEST_AM_SUPERUSER_USERNAME'),
-        secret('test-e2e-caseofficer-password', 'TEST_AM_SUPERUSER_PASSWORD'),
-        secret('test-e2e-superuser-username', 'SUPER_USER_USERNAME'),
-        secret('test-e2e-superuser-password', 'SUPER_USER_PASSWORD'),
-        secret('test-e2e-am-senior-tcw-case-allocator-username', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_USERNAME'),
-        secret('test-e2e-am-senior-tcw-case-allocator-password', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_PASSWORD')
-    ],
-    's2s-${env}': [
-        secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
-        secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
-        secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET')
-    ],
-    'ccd-${env}': [
-        secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
-        secret('postcode-info-address-lookup-token', 'ADDRESS_LOOKUP_TOKEN'),
-        secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET'),
-        secret('idam-data-store-system-user-password', 'IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
-        secret('idam-data-store-system-user-username', 'IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
-        secret('idam-data-store-client-secret', 'IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET')
-    ],
-    'wa-${env}': [
-        secret('app-insights-connection-string', 'WA_INSIGHT_CONNECTION_STRING'),
-        secret('ld-secret', 'WA_LAUNCH_DARKLY_SDK_KEY'),
-        secret('s2s-secret-case-event-handler', 'S2S_SECRET_CASE_EVENT_HANDLER'),
-        secret('s2s-secret-task-management-api', 'S2S_SECRET_TASK_MANAGEMENT_API'),
-        secret('s2s-secret-task-monitor', 'S2S_SECRET_TASK_MONITOR'),
-        secret('s2s-secret-workflow-api', 'S2S_SECRET_WORKFLOW_API'),
-        secret('wa-idam-client-secret', 'WA_IDAM_CLIENT_SECRET'),
-        secret('wa-system-username', 'WA_SYSTEM_USERNAME'),
-        secret('wa-system-password', 'WA_SYSTEM_PASSWORD')
-    ],
-    'am-${env}': [
-        secret('am-role-assignment-service-s2s-secret', 'AM_ROLE_ASSIGNMENT_SERVICE_SECRET')
-    ]
+                // tya notifications
+                secret('notification-key', 'NOTIFICATION_API_KEY'),
+                secret('notification-test-key', 'NOTIFICATION_API_TEST_KEY'),
+                secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
+                secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
+                secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD'),
+
+                // e2es
+                secret('test-e2e-caseofficer-username', 'TEST_CASEOFFICER_USERNAME'),
+                secret('test-e2e-caseofficer-password', 'TEST_CASEOFFICER_PASSWORD'),
+                secret('test-e2e-hmc-caseofficer-username', 'TEST_HMC_CASEOFFICER_USERNAME'),
+                secret('test-e2e-hmc-caseofficer-password', 'TEST_HMC_CASEOFFICER_PASSWORD'),
+                secret('test-e2e-judge-username', 'TEST_JUDGE_USERNAME'),
+                secret('test-e2e-judge-password', 'TEST_JUDGE_PASSWORD'),
+                secret('test-e2e-salaried-judge-username', 'TEST_SALARIED_JUDGE_USERNAME'),
+                secret('test-e2e-salaried-judge-password', 'TEST_SALARIED_JUDGE_PASSWORD'),
+                secret('test-e2e-fee-paid-judge-username', 'TEST_FEE_PAID_JUDGE_USERNAME'),
+                secret('test-e2e-fee-paid-judge-password', 'TEST_FEE_PAID_JUDGE_PASSWORD'),
+                secret('test-e2e-dwp-username', 'TEST_DWP_USERNAME'),
+                secret('test-e2e-dwp-password', 'TEST_DWP_PASSWORD'),
+                secret('test-e2e-am-tcw-username', 'TEST_AM_TRIBUNAL_CASEWORKER_USERNAME'),
+                secret('test-e2e-am-tcw-password', 'TEST_AM_TRIBUNAL_CASEWORKER_PASSWORD'),
+                secret('test-e2e-am-caseofficer-case-allocator-username', 'TEST_AM_CASEOFFICER_CASE_ALLOCATOR_USERNAME'),
+                secret('test-e2e-am-caseofficer-case-allocator-password', 'TEST_AM_CASEOFFICER_CASE_ALLOCATOR_PASSWORD'),
+                secret('test-e2e-hmrc-username', 'TEST_HMRC_USERNAME'),
+                secret('test-e2e-hmrc-password', 'TEST_HMRC_PASSWORD'),
+                secret('test-e2e-am-regional-center-admin-username', 'TEST_AM_REGIONAL_CENTER_ADMIN_USERNAME'),
+                secret('test-e2e-am-regional-center-admin-password', 'TEST_AM_REGIONAL_CENTER_ADMIN_PASSWORD'),
+                secret('test-e2e-am-regional-center-team-leader-username', 'TEST_AM_REGIONAL_CENTER_TEAM_LEADER_USERNAME'),
+                secret('test-e2e-am-regional-center-team-leader-password', 'TEST_AM_REGIONAL_CENTER_TEAM_LEADER_PASSWORD'),
+                secret('test-e2e-am-caseofficer-username', 'TEST_AM_CASEOFFICER_USERNAME'),
+                secret('test-e2e-am-caseofficer-password', 'TEST_AM_CASEOFFICER_PASSWORD'),
+                secret('test-e2e-caseofficer-username', 'TEST_AM_SUPERUSER_USERNAME'),
+                secret('test-e2e-caseofficer-password', 'TEST_AM_SUPERUSER_PASSWORD'),
+                secret('test-e2e-superuser-username', 'SUPER_USER_USERNAME'),
+                secret('test-e2e-superuser-password', 'SUPER_USER_PASSWORD'),
+                secret('test-e2e-am-senior-tcw-case-allocator-username', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_USERNAME'),
+                secret('test-e2e-am-senior-tcw-case-allocator-password', 'TEST_AM_SENIOR_TRIBUNAL_CASEWORKER_CASE_ALLOCATOR_PASSWORD')
+        ],
+        's2s-${env}': [
+                secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
+                secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
+                secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET')
+        ],
+        'ccd-${env}': [
+                secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
+                secret('postcode-info-address-lookup-token', 'ADDRESS_LOOKUP_TOKEN'),
+                secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET'),
+                secret('idam-data-store-system-user-password', 'IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
+                secret('idam-data-store-system-user-username', 'IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
+                secret('idam-data-store-client-secret', 'IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET')
+        ],
+        'wa-${env}': [
+                secret('app-insights-connection-string', 'WA_INSIGHT_CONNECTION_STRING'),
+                secret('ld-secret', 'WA_LAUNCH_DARKLY_SDK_KEY'),
+                secret('s2s-secret-case-event-handler', 'S2S_SECRET_CASE_EVENT_HANDLER'),
+                secret('s2s-secret-task-management-api', 'S2S_SECRET_TASK_MANAGEMENT_API'),
+                secret('s2s-secret-task-monitor', 'S2S_SECRET_TASK_MONITOR'),
+                secret('s2s-secret-workflow-api', 'S2S_SECRET_WORKFLOW_API'),
+                secret('wa-idam-client-secret', 'WA_IDAM_CLIENT_SECRET'),
+                secret('wa-system-username', 'WA_SYSTEM_USERNAME'),
+                secret('wa-system-password', 'WA_SYSTEM_PASSWORD')
+        ],
+        'am-${env}': [
+                secret('am-role-assignment-service-s2s-secret', 'AM_ROLE_ASSIGNMENT_SERVICE_SECRET')
+        ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
-  [ $class: 'AzureKeyVaultSecret',
-    secretType: 'Secret',
-    name: secretName,
-    version: '',
-    envVariable: envVar
-  ]
+    [ $class: 'AzureKeyVaultSecret',
+      secretType: 'Secret',
+      name: secretName,
+      version: '',
+      envVariable: envVar
+    ]
 }
 
 def branchesToSync = ['demo', 'ithc', 'perftest']
@@ -220,12 +225,12 @@ def runE2eTests() {
         }
     } finally {
         publishHTML([
-            allowMissing: true,
-            alwaysLinkToLastBuild: true,
-            keepAll: true,
-            reportDir: "playwright-report",
-            reportFiles: 'index.html',
-            reportName: 'SSCS E2E Test Report'
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: "playwright-report",
+                reportFiles: 'index.html',
+                reportName: 'SSCS E2E Test Report'
         ])
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'definitions/test/playwright-report/**'
     }
