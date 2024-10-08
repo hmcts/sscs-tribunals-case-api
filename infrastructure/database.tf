@@ -34,6 +34,12 @@ import {
   to = module.notification-scheduler-db-flexible.azurerm_postgresql_flexible_server.pgsql_server
   id = var.psqlserver_id
 }
+
+import {
+  to = module.notification-scheduler-db-flexible.azurerm_postgresql_flexible_server_active_directory_administrator.pgsql_adadmin
+  id = var.psqladmin_id
+}
+
 module "notification-scheduler-db-flexible" {
   providers = {
     azurerm.postgres_network = azurerm.postgres_network

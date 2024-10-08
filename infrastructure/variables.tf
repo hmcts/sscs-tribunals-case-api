@@ -76,3 +76,5 @@ variable "postgresql_host_id" {}
 variable "postgresql_port_id" {}
 
 variable "psqlserver_id" {}
+
+variable "psqladmin_id" {}
