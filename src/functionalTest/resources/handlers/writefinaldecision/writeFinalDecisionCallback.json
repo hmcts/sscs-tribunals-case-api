@@ -60,6 +60,9 @@
         "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",
         "document_filename": "decisionIssued.pdf"
       },
+      "finalDecisionHeldAt": "Chester",
+      "finalDecisionJudge": "Judge Ed",
+      "finalDecisionIdamSurname": "Service Account",
       "subscriptions": {
         "appellantSubscription": {},
         "appointeeSubscription": {},

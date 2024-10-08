@@ -1,0 +1,19 @@
+[
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "warnings", "TabLabel": "Warnings", "TabDisplayOrder": 1, "CaseFieldID": "ocrDataValidationWarnings", "TabFieldDisplayOrder": 1, "TabShowCondition": "hasWarnings=\"Yes\""},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "warnings", "TabLabel": "Warnings", "TabDisplayOrder": 1, "CaseFieldID": "hasWarnings", "TabFieldDisplayOrder": 2, "FieldShowCondition": "hasWarnings=\"{NeverShowThisField}\""},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "warnings", "TabLabel": "Warnings", "TabDisplayOrder": 1, "CaseFieldID": "displayWarnings", "TabFieldDisplayOrder": 2, "FieldShowCondition": "displayWarnings=\"DO_NOT_SHOW\""},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "eventHistory", "TabLabel": "Event History", "TabDisplayOrder": 2, "CaseFieldID": "caseHistory", "TabFieldDisplayOrder": 1},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "envelope", "TabLabel": "Envelope", "TabDisplayOrder": 3, "CaseFieldID": "envelopeLabel", "TabFieldDisplayOrder": 1},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "envelope", "TabLabel": "Envelope", "TabDisplayOrder": 3, "CaseFieldID": "journeyClassification", "TabFieldDisplayOrder": 2},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "envelope", "TabLabel": "Envelope", "TabDisplayOrder": 3, "CaseFieldID": "poBox", "TabFieldDisplayOrder": 3},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "envelope", "TabLabel": "Envelope", "TabDisplayOrder": 3, "CaseFieldID": "poBoxJurisdiction", "TabFieldDisplayOrder": 4},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "envelope", "TabLabel": "Envelope", "TabDisplayOrder": 3, "CaseFieldID": "deliveryDate", "TabFieldDisplayOrder": 5},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "envelope", "TabLabel": "Envelope", "TabDisplayOrder": 3, "CaseFieldID": "openingDate", "TabFieldDisplayOrder": 6},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "envelope", "TabLabel": "Envelope", "TabDisplayOrder": 3, "CaseFieldID": "caseReference", "TabFieldDisplayOrder": 7},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "envelope", "TabLabel": "Envelope", "TabDisplayOrder": 3, "CaseFieldID": "attachToCaseReference", "TabFieldDisplayOrder": 8},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "envelope", "TabLabel": "Envelope", "TabDisplayOrder": 3, "CaseFieldID": "containsPayments", "TabFieldDisplayOrder": 9},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "envelope", "TabLabel": "Envelope", "TabDisplayOrder": 3, "CaseFieldID": "surname", "TabFieldDisplayOrder": 10},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "documentation", "TabLabel": "Documentation", "TabDisplayOrder": 4, "CaseFieldID": "scannedDocuments", "TabFieldDisplayOrder": 1},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "ocr", "TabLabel": "Form OCR", "TabDisplayOrder": 5, "CaseFieldID": "formType", "TabFieldDisplayOrder": 1, "FieldShowCondition": " "},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "Channel": "CaseWorker", "TabID": "ocr", "TabLabel": "Form OCR", "TabDisplayOrder": 5, "CaseFieldID": "scanOCRData", "TabFieldDisplayOrder": 1, "FieldShowCondition": " "}
+]

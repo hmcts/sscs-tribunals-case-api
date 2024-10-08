@@ -1,0 +1,11 @@
+{
+    "tabName": "Hearing Recordings",
+    "hearingTypeKey": "Hearing type",
+    "hearingTypeValue": "Final Hearing",
+    "hearingIDKey": "Hearing ID",
+    "hearingIDValue": "1234",
+    "hearingVenueKey": "Venue",
+    "hearingVenueValue": "Fox court",
+    "requestPartyKey": "Requesting Party",
+    "requestPartyValue": "FTA"
+}
