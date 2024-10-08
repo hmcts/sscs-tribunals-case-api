@@ -9,8 +9,6 @@ xui-webapp:
   enabled: false
 elastic:
   enabled: false
-sscs-tya-notif:
-  enabled: false
 sscs-tribunals-frontend:
   enabled: false
 redis:
