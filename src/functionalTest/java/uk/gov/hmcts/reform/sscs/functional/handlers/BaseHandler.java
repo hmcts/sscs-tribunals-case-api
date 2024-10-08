@@ -413,4 +413,10 @@ public class BaseHandler {
             throw new IllegalArgumentException("Could not serialize caseData", var3);
         }
     }
+
+    protected Callback<SscsCaseData> replaceCallbackCaseId(Callback<SscsCaseData> sscsCaseDataCallback, String id, String caseIdToBeReplaced) {
+        String jsonCallback = serializeSscsCallback(sscsCaseDataCallback);
+        jsonCallback = jsonCallback.replace(caseIdToBeReplaced, id);
+        return deserializer.deserialize(jsonCallback);
+    }
 }
