@@ -1,0 +1,14 @@
+{
+    "requestInfoCaption" : "Request info from party",
+    "requestInfoHeading" : "Request information",
+    "requestInfoFromCasePartyFieldSetLabel" : "Request info from case party",
+    "requestInfoFromCasePartyYesRadioButtonLabel" : "Yes",
+    "requestInfoFromCasePartyNoRadioButtonLabel" : "No",
+    "requestInfoResponseRequiredFieldSetLabel" : "Is response required?",
+    "requestInfoResponseRequiredYesRadioButtonLabel" : "Yes",
+    "requestInfoResponseRequiredNoRadioButtonLabel" : "No",
+    "requestInfoPartySelectionDropdownLabel" : "Select party to request info from",
+    "requestInfoPartySelectionDropdownValue" : "Appellant (or Appointee)",
+    "requestInfoDetailsToRequestInputLabel" : "Request details",
+    "requestInfoDetailsToRequestInput" : "Automation testing of the Request Information From Party Event"
+}
