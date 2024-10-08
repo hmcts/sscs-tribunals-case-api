@@ -116,6 +116,11 @@ def branchesToSync = ['demo', 'ithc', 'perftest']
 withPipeline(type, product, component) {
     def githubApi = new GithubAPI(this)
     def isHearingsPr = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:hearings").size() > 0;
+    def isIbaPr = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "pr-values:iba").size() > 0;
+    env.IBA_OR_NOT = ""
+    if (isIbaPr) {
+        env.IBA_OR_NOT = "iba-"
+    }
 
     if (!isHearingsPr) {
         enableHighLevelDataSetup()
