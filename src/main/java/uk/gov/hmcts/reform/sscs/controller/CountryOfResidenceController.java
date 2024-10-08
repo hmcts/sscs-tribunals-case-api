@@ -1,16 +1,13 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CountryOfResidence;
-import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -23,6 +20,6 @@ public class CountryOfResidenceController {
             .map(enumVal -> Map.of(
                 "label", enumVal.getLabel(),
                 "officialName", enumVal.getOfficialName()))
-            .collect(Collectors.toList());
+            .toList();
     }
 }

@@ -1,13 +1,11 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 
 @Slf4j
 @RestController
@@ -21,6 +19,6 @@ public class PortOfEntryController {
                 "label", enumVal.getLabel(),
                 "trafficType", enumVal.getTrafficType(),
                 "locationCode", enumVal.getLocationCode()))
-            .collect(Collectors.toList());
+            .toList();
     }
 }
