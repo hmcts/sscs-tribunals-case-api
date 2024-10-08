@@ -702,64 +702,6 @@ sscs-evidence-share:
         secretRef: sscs-sb-preview
         key: primaryKey
 
-# tya disabled by default due of requirements of additional topic subscriptions which is not possible currently configure and should be done manually
-# if your PR requires tya-notif change enabled to true
-# deploy to preview as usual
-# and when go to azure portal and search for sscs-sb-preview
-# click topics and select your PR topic
-# click subscriptions and click add subscription button (+ subscription)
-# into name field add name: sscs-tribunals-api-pr-##YOUR PR NUMBER ##-servicebus-tya (example: sscs-tribunals-api-pr-3290-servicebus-tya)
-# click create
-# azure steps should be repeated every time PR is undeployed from preview
-sscs-tya-notif:
-  enabled: false
-  java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
-    releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
-    readinessDelay: 45
-    environment:
-      CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
-      AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
-      AMQP_USERNAME: "RootManageSharedAccessKey"
-      TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
-      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
-      JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscsjobscheduler"
-      JOB_SCHEDULER_DB_HOST: sscs-preview.postgres.database.azure.com
-      JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
-      JOB_SCHEDULER_DB_USERNAME: hmcts
-      JOB_SCHEDULER_DB_PASSWORD: "${JOB_SCHEDULER:hmcts}"
-      HOURS_START_TIME: 0
-      HOURS_END_TIME: 23
-      RUN_DB_MIGRATION_ON_STARTUP: true
-      TEST_RECIPIENTS_POSTCODE: "*"
-      POST_HEARINGS_FEATURE: true
-      POST_HEARINGS_B_FEATURE: true
-      DUMMY: true
-    secrets:
-      AMQP_PASSWORD:
-        secretRef: sscs-sb-preview
-        key: primaryKey
-      JOB_SCHEDULER_DB_PASSWORD:
-        secretRef: "{{ .Values.global.postgresSecret }}"
-        key: PASSWORD
-        disabled: false
-    keyVaults:
-      sscs:
-        secrets:
-          - idam-api
-          - idam-oauth-user
-          - idam-redirect
-          - idam-sscs-systemupdate-user
-          - idam-sscs-systemupdate-password
-          - sscs-email-mac-secret-text
-          - idam-sscs-oauth2-client-secret
-          - sscs-s2s-secret
-          - s2s-micro
-          - evidence-share-topic-shared-access-key
-          - docmosis-api-key
-          - notification-key
-          - notification-test-key
-
 #Enable for SYA
 sscs-tribunals-frontend:
   enabled: true
