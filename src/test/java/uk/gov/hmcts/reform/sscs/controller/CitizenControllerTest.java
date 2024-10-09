@@ -155,7 +155,7 @@ public class CitizenControllerTest {
 
     @Test
     public void shouldReturnAllPortOfEntriesWithExpectedFields() {
-        List<Map<String, String>> result = underTest.getPortOfEntries();
+        List<Map<String, String>> result = underTest.getPortsOfEntry();
 
         assertNotNull(result);
         assertFalse(result.isEmpty(), "The result should not be empty");
@@ -177,7 +177,7 @@ public class CitizenControllerTest {
 
     @Test
     public void shouldMatchPortOfEntryEnumValues() {
-        List<Map<String, String>> result = underTest.getPortOfEntries();
+        List<Map<String, String>> result = underTest.getPortsOfEntry();
 
         for (UkPortOfEntry entry : UkPortOfEntry.values()) {
             Map<String, String> expectedEntry = Map.of(
@@ -191,7 +191,7 @@ public class CitizenControllerTest {
 
     @Test
     public void shouldReturnAllCountriesOfResidenceWithExpectedFields() {
-        List<Map<String, String>> result = underTest.getCountryOfResidence();
+        List<Map<String, String>> result = underTest.getCountriesOfResidence();
 
         assertNotNull(result);
         assertFalse(result.isEmpty(), "The result should not be empty");
@@ -211,7 +211,7 @@ public class CitizenControllerTest {
 
     @Test
     public void shouldMatchCountryOfResidenceEnumValues() {
-        List<Map<String, String>> result = underTest.getCountryOfResidence();
+        List<Map<String, String>> result = underTest.getCountriesOfResidence();
 
         for (CountryOfResidence entry : CountryOfResidence.values()) {
             Map<String, String> expectedEntry = Map.of(

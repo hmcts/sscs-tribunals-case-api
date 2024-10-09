@@ -182,13 +182,13 @@ public class CitizenController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping(value = "/port-of-entries", produces = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Loads port of entries",
-        description = "Loads JSON list of port of entries pulled from Enum in sscs-common.")
+    @GetMapping(value = "/ports-of-entry", produces = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Loads ports of entry",
+        description = "Loads JSON list of ports of entry pulled from Enum in sscs-common.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "A list of the port of entries.")
+        @ApiResponse(responseCode = "200", description = "A list of the ports of entry.")
     })
-    public List<Map<String, String>> getPortOfEntries() {
+    public List<Map<String, String>> getPortsOfEntry() {
         return Arrays.stream(UkPortOfEntry.values())
             .map(enumVal -> Map.of(
                 "label", enumVal.getLabel(),
@@ -197,13 +197,13 @@ public class CitizenController {
             .collect(Collectors.toList());
     }
 
-    @GetMapping(value = "/country-of-residences", produces = APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/countries-of-residence", produces = APPLICATION_JSON_VALUE)
     @Operation(summary = "Loads countries",
-        description = "Loads JSON of the country of residence list pulled from Enum in sscs-common.")
+        description = "Loads JSON of the countries of residence list pulled from Enum in sscs-common.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "A list of the countries of possible residence.")
     })
-    public List<Map<String, String>> getCountryOfResidence() {
+    public List<Map<String, String>> getCountriesOfResidence() {
         return Arrays.stream(CountryOfResidence.values())
             .map(enumVal -> Map.of(
                 "label", enumVal.getLabel(),
