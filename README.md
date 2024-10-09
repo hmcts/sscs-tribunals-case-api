@@ -195,9 +195,9 @@ If you need to run the CCD provider test against the Preview environment for a p
 
 ### Running Functional UI tests against Preview env on a Pipeline
 
-By default preview pipelines would just have 1 test as part of sanity check on Preview env, but QA's would need to add label "test-suite:preview-regression" to their respective ticket PR's to enable running regression UI test pack against preview env
+By default preview pipelines would just have 1 test as part of sanity check on Preview env, but QA's would need to add label `test-suite:preview-regression` to their respective ticket PR's to enable running regression UI test pack against preview env.
 
-In order to include Bundling & Hearings tests as part of preview pipeline, QA's need to add an additional label "test-suite:aat-regression" against their PR.
+In order to include Bundling & Hearings tests as part of preview pipeline, QA's need to add an additional label `test-suite:aat-regression` against their PR. As a pre-requisite to add "aat-regression" label please make sure your PR has gone through the config set-up explained in this section [Running tribunals with hearings enabled](https://github.com/hmcts/sscs-tribunals-case-api/tree/enable-preview-test-coverage?tab=readme-ov-file#running-tribunals-with-hearings-enabled) of readme.
 
 
 ### Cron tasks
