@@ -199,7 +199,7 @@ By default preview pipelines would just have 1 test as part of sanity check on P
 
 The format of the label added to run UI tests is always `test-suite:<tag-name>` so please make sure if a above tag name(ie preview-regression) gets updated on tests or new tags added needs github label name to be updated or new label to be created depending on your scenario.
 
-In order to include Bundling & Hearings tests as part of preview pipeline, QA's need to add an additional label `test-suite:aat-regression` against their PR. As a pre-requisite to add "aat-regression" label please make sure your PR has gone through the config set-up explained in this section [Running tribunals with hearings enabled](#Running-tribunals-with-hearings- enabled) of readme.
+In order to include Bundling & Hearings tests as part of preview pipeline, QA's need to add an additional label `test-suite:aat-regression` against their PR. As a pre-requisite to add "aat-regression" label please make sure your PR has gone through the config set-up explained in this section [Running tribunals with hearings enabled](#Running-tribunals-with-hearings-enabled) of readme.
 
 
 ### Cron tasks
