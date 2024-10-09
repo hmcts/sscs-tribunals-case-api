@@ -1,0 +1,8 @@
+{
+    "eventNameCaptor": "Request time extension",
+    "stateField" : "FTA State",
+    "stateValue": "Extension requested",
+    "reasonField": "Reason referred to interloc",
+    "reasonValue": "Time extension"
+
+}
