@@ -117,5 +117,20 @@
   {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "workBasketHearingDate", "Label": "Hearing Date", "DisplayOrder": 19},
   {"LiveFrom": "01/12/2023", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "workBasketHearingDateIssued", "Label": "Hearing Date Issued", "DisplayOrder": 20},
   {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "workBasketHearingEpimsId", "Label": "Hearing Venue", "DisplayOrder": 21},
-  {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "hearingRoute", "Label": "Hearing Route", "DisplayOrder": 22}
+  {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "hearingRoute", "Label": "Hearing Route", "DisplayOrder": 22},
+  {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "[CASE_REFERENCE]", "Label": "CCD case number", "DisplayOrder": 1},
+  {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "appeal", "ListElementCode": "appellant.name.lastName", "Label": "Appellant surname", "DisplayOrder": 2},
+  {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "dwpState", "Label": "FTA state", "DisplayOrder": 3},
+  {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "benefitCode", "Label": "Appeal code", "DisplayOrder": 4},
+  {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "issueCode", "Label": "Issue code", "DisplayOrder": 5},
+  {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "dwpFurtherEvidenceStates", "Label": "FTA evidence received state", "DisplayOrder": 6},
+  {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "isConfidentialCase", "Label": "Is a Confidential Case?", "DisplayOrder": 7},
+  {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "createdInGapsFrom", "Label": "Is a new digital case?", "DisplayOrder": 8},
+  {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "appeal", "ListElementCode": "hearingType", "Label": "Hearing type", "DisplayOrder": 9},
+  {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "tribunalDirectPoToAttend", "Label": "Tribunal direct PO to attend?", "DisplayOrder": 10},
+  {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "dwpIsOfficerAttending", "Label": "FTA recommend PO to attend?", "DisplayOrder": 11},
+  {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "poAttendanceConfirmed", "Label": "PO attendance confirmed?", "DisplayOrder": 12},
+  {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "workBasketHearingDate", "Label": "Hearing Date", "DisplayOrder": 13},
+  {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "workBasketHearingDateIssued", "Label": "Hearing Date Issued", "DisplayOrder": 14},
+  {"LiveFrom": "01/01/2024", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "workBasketHearingEpimsId", "Label": "Hearing Venue", "DisplayOrder": 15}
 ]
