@@ -192,6 +192,14 @@ If you need to run the CCD provider test against the Preview environment for a p
     @VersionSelector(tag = "feature_branch_name")})
 
 ```
+
+### Running Functional UI tests against Preview env on a Pipeline
+
+By default preview pipelines would just have 1 test as part of sanity check on Preview env, but QA's would need to add label "test-suite:preview-regression" to their respective ticket PR's to enable running regression UI test pack against preview env
+
+In order to include Bundling & Hearings tests as part of preview pipeline, QA's need to add an additional label "test-suite:aat-regression" against their PR.
+
+
 ### Cron tasks
 
 - You can run a cron task locally by setting the `TASK_NAME` environment variable.
