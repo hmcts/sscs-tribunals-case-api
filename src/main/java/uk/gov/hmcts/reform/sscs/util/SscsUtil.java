@@ -373,12 +373,23 @@ public class SscsUtil {
         return false;
     }
     
-    public static DynamicList getBenefitDescriptions() {
-        List<DynamicListItem> items = Arrays.stream(Benefit.values())
-                .sorted(Comparator.comparing(Benefit::getDescription))
-                .map(SscsUtil::getBenefitDescriptionList)
-                .flatMap(List::stream)
-                .toList();
+    public static DynamicList getBenefitDescriptions(boolean isInfectedBloodAppealEnabled) {
+        List<DynamicListItem> items;
+
+        if (isInfectedBloodAppealEnabled) {
+            items = Arrays.stream(Benefit.values())
+                    .sorted(Comparator.comparing(Benefit::getDescription))
+                    .map(SscsUtil::getBenefitDescriptionList)
+                    .flatMap(List::stream)
+                    .toList();
+        } else {
+            items = Arrays.stream(Benefit.values())
+                    .filter(benefit -> !benefit.getShortName().equals("infectedBloodAppeal"))
+                    .sorted(Comparator.comparing(Benefit::getDescription))
+                    .map(SscsUtil::getBenefitDescriptionList)
+                    .flatMap(List::stream)
+                    .toList();
+        }
 
         return new DynamicList(null, items);
     }
