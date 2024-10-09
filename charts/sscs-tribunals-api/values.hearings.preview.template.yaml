@@ -62,6 +62,7 @@ java:
 
 ccd-def-cleanup:
   enabled: true
+  debug: true
   change_id: ${CHANGE_ID}
   case_type_ids:
     - Benefit
