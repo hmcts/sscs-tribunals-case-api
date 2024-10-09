@@ -64,17 +64,3 @@ variable "pgsql_storage_mb" {
 }
 
 variable "aks_subscription_id" {} # provided by the Jenkins library, ADO users will need to specify this
-
-variable "postgresql_password_id" {}
-
-variable "postgresql_user_id" {}
-
-variable "postgresql_database_id" {}
-
-variable "postgresql_host_id" {}
-
-variable "postgresql_port_id" {}
-
-variable "psqlserver_id" {}
-
-variable "psqladmin_id" {}
