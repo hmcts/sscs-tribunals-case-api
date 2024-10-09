@@ -34,17 +34,18 @@ import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.Draft;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
-import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
+import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceBase;
+
 
 @RestController
 @Slf4j
 public class SyaController {
 
-    private final SubmitAppealService submitAppealService;
+    private final SubmitAppealServiceBase submitAppealServiceBase;
 
     @Autowired
-    SyaController(SubmitAppealService submitAppealService) {
-        this.submitAppealService = submitAppealService;
+    public SyaController(SubmitAppealServiceBase submitAppealServiceBase) {
+        this.submitAppealServiceBase = submitAppealServiceBase;
     }
 
     @Operation(summary = "submitAppeal", description = "Creates a case from the SYA details")
@@ -61,7 +62,7 @@ public class SyaController {
         }
         log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
             syaCaseWrapper.getBenefitType().getCode());
-        Long caseId = submitAppealService.submitAppeal(syaCaseWrapper, authorisation);
+        Long caseId = submitAppealServiceBase.submitAppeal(syaCaseWrapper, authorisation);
 
         log.info("Case {} with benefit type - {} processed successfully",
             caseId,
@@ -110,7 +111,7 @@ public class SyaController {
     public ResponseEntity<List<SessionDraft>> getDraftAppeals(@RequestHeader(AUTHORIZATION) String authorisation) {
         Preconditions.checkNotNull(authorisation);
 
-        List<SessionDraft> draftAppeals = submitAppealService.getDraftAppeals(authorisation);
+        List<SessionDraft> draftAppeals = submitAppealServiceBase.getDraftAppeals(authorisation);
 
         if (draftAppeals.isEmpty()) {
             log.info("Did not find any draft appeals for the requested user.");
@@ -133,8 +134,8 @@ public class SyaController {
     public ResponseEntity<SessionDraft> getDraftAppeal(@RequestHeader(AUTHORIZATION) String authorisation) {
         Preconditions.checkNotNull(authorisation);
 
-        Optional<SessionDraft> draftAppeal = submitAppealService.getDraftAppeal(authorisation);
-        if (!draftAppeal.isPresent()) {
+        Optional<SessionDraft> draftAppeal = submitAppealServiceBase.getDraftAppeal(authorisation);
+        if (draftAppeal.isEmpty()) {
             log.info("Did not find any draft appeals for the requested user.");
         }
         return draftAppeal.map(ResponseEntity::ok).orElse(ResponseEntity.noContent().build());
@@ -155,16 +156,12 @@ public class SyaController {
             return ResponseEntity.noContent().build();
         }
 
-        Boolean forceCreateDraft;
-        if (forceCreate != null && forceCreate.equals("true")) {
-            forceCreateDraft = true;
-        } else {
-            forceCreateDraft = false;
-        }
+        boolean forceCreateDraft = forceCreate != null && forceCreate.equals("true");
 
         log.info("createDraftAppeal {} {}", forceCreateDraft, syaCaseWrapper.getCcdCaseId());
 
-        Optional<SaveCaseResult> submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper, forceCreateDraft);
+        Optional<SaveCaseResult> submitDraftResult = submitAppealServiceBase.submitDraftAppeal(authorisation, syaCaseWrapper, forceCreateDraft);
+
         return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
     }
 
@@ -181,8 +178,9 @@ public class SyaController {
             log.info("Cannot proceed with update draft because the {} data is missing", getMissingDataInfo(syaCaseWrapper, authorisation));
             return ResponseEntity.noContent().build();
         }
+        log.info("SyaController updateDraftAppeal {}", syaCaseWrapper.getCcdCaseId());
+        Optional<SaveCaseResult> submitDraftResult = submitAppealServiceBase.updateDraftAppeal(authorisation, syaCaseWrapper);
 
-        Optional<SaveCaseResult> submitDraftResult = submitAppealService.updateDraftAppeal(authorisation, syaCaseWrapper);
         return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
     }
 
@@ -201,7 +199,8 @@ public class SyaController {
             return ResponseEntity.noContent().build();
         }
 
-        Optional<SaveCaseResult> submitDraftResult = submitAppealService.archiveDraftAppeal(authorisation, syaCaseWrapper, ccdCaseId);
+        Optional<SaveCaseResult> submitDraftResult = submitAppealServiceBase.archiveDraftAppeal(authorisation, syaCaseWrapper, ccdCaseId);
+
         return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
     }
 
