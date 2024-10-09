@@ -53,7 +53,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-hearings-api.enabled
   - name: servicebus
-    version: 1.0.6
+    version: 1.0.7
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: servicebus.enabled
   - name: aac-manage-case-assignment
@@ -116,6 +116,6 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wa.enabled
   - name: ccd-def-cleanup
-    version: ~9.0.3
+    version: ~9.0.4
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd-def-cleanup.enabled
