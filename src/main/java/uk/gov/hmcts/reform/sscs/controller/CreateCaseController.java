@@ -21,7 +21,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -29,30 +32,41 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.CreateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
+import uk.gov.hmcts.reform.sscs.service.SubmitAppealServiceBase;
 
 @RestController
 @ConditionalOnProperty("create_ccd_endpoint")
 @Slf4j
 public class CreateCaseController {
 
-    private final SubmitAppealService submitAppealService;
+    private final SubmitAppealServiceBase submitAppealServiceBase;
     private final CcdService ccdService;
     private final IdamService idamService;
 
     public CreateCaseController(
-        @Autowired SubmitAppealService submitAppealService,
+        @Autowired SubmitAppealServiceBase submitAppealServiceBase,
         @Autowired CcdService ccdService,
         @Autowired IdamService idamService
     ) {
-        this.submitAppealService = submitAppealService;
+        this.submitAppealServiceBase = submitAppealServiceBase;
         this.ccdService = ccdService;
         this.idamService = idamService;
     }
@@ -163,7 +177,7 @@ public class CreateCaseController {
         syaCaseWrapper.getMrn().setDate(getRandomMrnDate());
         log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
             syaCaseWrapper.getBenefitType().getCode());
-        Long caseId = submitAppealService.submitAppeal(syaCaseWrapper, authorisation);
+        Long caseId = submitAppealServiceBase.submitAppeal(syaCaseWrapper, authorisation);
 
         log.info("Case {} with benefit type - {} processed successfully",
             caseId,
