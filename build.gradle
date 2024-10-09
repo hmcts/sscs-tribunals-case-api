@@ -283,7 +283,7 @@ dependencyManagement {
         }
 
         //CVE-2023-33202
-        dependencySet(group: 'org.springframework.security', version: '1.1.1') {
+        dependencySet(group: 'org.springframework.security', version: '1.1.5') {
             entry 'spring-security-rsa'
         }
 
@@ -294,7 +294,7 @@ dependencyManagement {
         }
 
         imports {
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.8"
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.9"
         }
     }
 }
@@ -311,10 +311,10 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: springBoot.class.package.implementationVersion
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
 
-    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.8.10'
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.10'
-    implementation group: 'org.springframework.security', name: 'spring-security-config', version: '5.8.10'
-    implementation group: 'org.springframework.security', name: 'spring-security-web', version: '5.8.10'
+    implementation group: 'org.springframework.security', name: 'spring-security-core', version: '5.8.14'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.14'
+    implementation group: 'org.springframework.security', name: 'spring-security-config', version: '5.8.14'
+    implementation group: 'org.springframework.security', name: 'spring-security-web', version: '5.8.14'
 
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.4'
@@ -334,7 +334,7 @@ dependencies {
 
     implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '12.4'
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.11.0'
-    implementation group: 'com.squareup.okio', name: 'okio-jvm', version: '3.5.0'
+    implementation group: 'com.squareup.okio', name: 'okio-jvm', version: '3.9.1'
 
     implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '2.1.5'
 
@@ -347,7 +347,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.0'
     implementation group: 'com.github.hmcts', name: 'cmc-pdf-service-client', version: '7.0.1'
 
-    implementation group: 'com.mchange', name: 'c3p0', version: '0.9.5.5'
+    implementation group: 'com.mchange', name: 'c3p0', version: '0.10.1'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
 
@@ -478,7 +478,7 @@ dependencies {
     //pact contract testing
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
 
-    contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.14'
+    contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.18'
 
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
