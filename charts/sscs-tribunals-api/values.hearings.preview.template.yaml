@@ -18,9 +18,9 @@ ccd:
 em-ccdorc:
   enabled: false
 sscs-hearings-api:
-  enabled: false
+  enabled: true
 servicebus:
-  enabled: false
+  enabled: true
 ccd-case-document-am-api:
   enabled: false
 aac-manage-case-assignment:
