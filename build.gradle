@@ -422,7 +422,7 @@ dependencies {
     // Remove this dependency once the secure doc-store is in use
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
-    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.0.2', {
+    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.1.0', {
         exclude group: 'org.apache.commons', module: 'commons-compress'
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'org.apache.poi', module: 'poi-ooxml'
@@ -472,7 +472,7 @@ dependencies {
     testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.9.3')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
     testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine'
-    testImplementation group: 'com.h2database', name: 'h2', version: '2.1.214'
+    testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'
 
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
