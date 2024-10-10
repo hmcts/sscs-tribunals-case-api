@@ -290,6 +290,8 @@ feature:
         enabled: ${BYPASS_NOTIFICATIONS_SERVICE:false}
     handle-ccd-callbackMap-v2:
         enabled: ${HANDLE_CCD_CALLBACKMAP_V2:false}
+    submit-appeal-service-v2:
+        enabled: ${SUBMIT_APPEAL_SERVICE_V2_ENABLED:false}
 
 
 idam:
