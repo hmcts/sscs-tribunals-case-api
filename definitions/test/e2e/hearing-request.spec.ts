@@ -7,7 +7,7 @@ let caseId : string;
 
 test.describe("Create a new hearing for an List assist case", {tag: '@nightly-pipeline'}, async() => {
     
-    test("Trigger a new hearing & cancellation for DLA case", {tag:'@hearings-enabled-test'}, async ({ uploadResponseSteps, hearingSteps }) => {
+    test("Trigger a new hearing & cancellation for DLA case", {tag: '@aat-regression'}, async ({ uploadResponseSteps, hearingSteps }) => {
         caseId = await createCaseBasedOnCaseType('DLASANDL');
         await uploadResponseSteps.performUploadResponse(caseId, 'dla');
         await hearingSteps.verifyHearingIsTriggered(caseId, 'dla');
