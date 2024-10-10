@@ -4,10 +4,14 @@ import static java.util.stream.Stream.of;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_ARCHIVED;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -78,6 +82,29 @@ public class CitizenCcdService {
         }
     }
 
+    public SaveCaseResult saveCaseV2(IdamTokens idamTokens, Consumer<SscsCaseData> mutator) {
+
+        List<CaseDetails> caseDetailsList = citizenCcdClient.searchForCitizen(idamTokens);
+
+        CaseDetails caseDetails;
+
+        if (CollectionUtils.isNotEmpty(caseDetailsList)) {
+
+            String caseId = caseDetailsList.get(0).getId().toString();
+            caseDetails = updateCaseCitizenV2(caseId, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
+                "Update draft in CCD", idamTokens, mutator);
+
+            return SaveCaseResult.builder()
+                .caseDetailsId(caseDetails.getId())
+                .saveCaseOperation(SaveCaseOperation.UPDATE)
+                .build();
+        } else {
+            SscsCaseData caseData = new SscsCaseData();
+            mutator.accept(caseData);
+            return createDraft(caseData, idamTokens);
+        }
+    }
+
     @Retryable
     public SaveCaseResult createDraft(SscsCaseData caseData, IdamTokens idamTokens) {
 
@@ -96,6 +123,11 @@ public class CitizenCcdService {
         return updateCase(caseData, DRAFT_ARCHIVED.getCcdType(), "SSCS Archive Draft", "SSCS Archive Draft", userIdamTokens, caseId.toString());
     }
 
+    public CaseDetails archiveDraftV2(IdamTokens userIdamTokens, Long caseId, Consumer<SscsCaseData> mutator) {
+        log.info("Archiving Draft V2 for caseId {} with user roles {}", caseId, userIdamTokens.getRoles().toString());
+        return updateCaseCitizenV2(caseId.toString(), DRAFT_ARCHIVED.getCcdType(), "SSCS Archive Draft", "SSCS Archive Draft", userIdamTokens, mutator);
+    }
+
     private CaseDetails newCase(SscsCaseData caseData, String eventType, String summary, String description, IdamTokens idamTokens) {
         log.info("Creating a draft for a user.");
         CaseDetails caseDetails;
@@ -103,6 +135,64 @@ public class CitizenCcdService {
         CaseDataContent caseDataContent = sscsCcdConvertService.getCaseDataContent(caseData, startEventResponse, summary, description);
         caseDetails = citizenCcdClient.submitForCitizen(idamTokens, caseDataContent);
         return caseDetails;
+    }
+
+    @Retryable
+    public CaseDetails triggerCaseEventV2(String caseId, String eventType, String summary, String description, IdamTokens idamTokens) {
+        return updateCaseCitizenV2(caseId, eventType, idamTokens, data -> new UpdateResult(data, summary, description));
+    }
+
+    public record UpdateResult(SscsCaseData sscsCaseData, String summary, String description) { }
+
+    /**
+     * Update a case while making correct use of CCD's optimistic locking.
+     * Changes can be made to case data by the provided function which will always be provided
+     * the current version of case data from CCD's start event.
+     */
+    @Retryable
+    public CaseDetails updateCaseCitizenV2(String caseId, String eventType, IdamTokens idamTokens, Function<SscsCaseData, UpdateResult> newCaseData) {
+        log.info("Updating a draft with caseId {} and eventType {}, using updateCaseCitizenV2 method for citizen", caseId, eventType);
+        StartEventResponse startEventResponse = citizenCcdClient.startEventForCitizen(idamTokens, caseId, eventType);
+        var data = sscsCcdConvertService.getCaseData(startEventResponse.getCaseDetails().getData());
+        data.setWorkBasketFields(null); // This has to be done as the work basket fields default to a null instantiation and ccd views that as a create / update of which one of the fields the citizen doesn't have the authorisation to change
+
+        /**
+         * @see uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer#deserialize(String)
+         * setCcdCaseId & sortCollections are called above, so this functionality has been replicated here preserving existing logic
+         */
+        data.setCcdCaseId(caseId);
+        data.sortCollections();
+
+        var result = newCaseData.apply(data);
+        CaseDataContent caseDataContent = sscsCcdConvertService.getCaseDataContent(result.sscsCaseData, startEventResponse, result.summary, result.description);
+
+        return citizenCcdClient.submitEventForCitizen(idamTokens, caseId, caseDataContent);
+    }
+
+    @Retryable
+    public CaseDetails updateCaseCitizenV2(String caseId, String eventType, String summary, String description, IdamTokens idamTokens, Consumer<SscsCaseData> mutator) {
+        return updateCaseCitizenV2(caseId, eventType, idamTokens, data -> {
+            mutator.accept(data);
+            return new UpdateResult(data, summary, description);
+        });
+    }
+
+    @Retryable
+    public CaseDetails updateCaseCitizenV2(String caseId, String eventType, String summary, String description, IdamTokens idamTokens, UnaryOperator<SscsCaseData> newCaseData) {
+        return updateCaseCitizenV2(caseId, eventType, idamTokens, data -> {
+            SscsCaseData sscsCaseData = newCaseData.apply(data);
+            return new UpdateResult(sscsCaseData, summary, description);
+        });
+    }
+
+    /**
+     * Need to provide this so that recoverable/non-recoverable exception doesn't get wrapped in an IllegalArgumentException.
+     *
+     */
+    @Recover
+    public SscsCaseDetails recoverUpdateCaseCitizenV2(RuntimeException exception, Long caseId, String eventType) {
+        log.error("In recover method (recoverUpdateCaseCitizenV2) for draft with caseId {} and eventType {}", caseId, eventType);
+        throw exception;
     }
 
     @Retryable
