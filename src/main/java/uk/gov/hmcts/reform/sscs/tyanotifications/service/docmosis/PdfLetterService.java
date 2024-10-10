@@ -35,7 +35,9 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
 @Slf4j
 public class PdfLetterService {
     private static final String SSCS_URL_LITERAL = "sscs_url";
+    private static final String SSCS_URL_LITERAL_WELSH = "sscs_url_welsh";
     private static final String SSCS_URL = "www.gov.uk/appeal-benefit-decision";
+    private static final String SSCS_URL_WELSH = "www.gov.uk/apelio-penderfyniad-budd-dal";
     protected static final String GENERATED_DATE_LITERAL = "generated_date";
     protected static final String WELSH_GENERATED_DATE_LITERAL = "welsh_generated_date";
     private static final List<NotificationEventType> REQUIRES_TWO_COVERSHEET =
@@ -107,6 +109,7 @@ public class PdfLetterService {
 
             Map<String, Object> placeholders = new HashMap<>(notification.getPlaceholders());
             placeholders.put(SSCS_URL_LITERAL, SSCS_URL);
+            placeholders.put(SSCS_URL_LITERAL_WELSH, SSCS_URL_WELSH);
             placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
 
             translateToWelshDate(LocalDateTime.now().toLocalDate(), wrapper.getNewSscsCaseData(), value -> placeholders.put(WELSH_GENERATED_DATE_LITERAL, value));
