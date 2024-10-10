@@ -98,7 +98,7 @@ public class BaseHandler {
                 .stream()
                 .peek(sscsDoc -> sscsDoc.getValue().setBundleAddition(doc.getBundleAddition()))
                 .peek(sscsDoc -> updateEditedDocument(doc.isHasEditedDocumentLink(), sscsDoc)))
-            .collect(Collectors.toList());
+            .toList();
 
         sscsCaseData.setSscsDocument(sscsDocuments.stream()
             .filter(doc -> !DWP_DOCUMENT_TYPES.contains(doc.getValue().getDocumentType()))

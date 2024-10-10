@@ -81,9 +81,10 @@ import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
+import uk.gov.hmcts.reform.sscs.service.v2.SubmitAppealService;
 
 @RunWith(JUnitParamsRunner.class)
-public class SubmitAppealServiceTest {
+public abstract class AbstractSubmitAppealServiceTest {
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.LENIENT);
@@ -118,7 +119,8 @@ public class SubmitAppealServiceTest {
     @Mock
     private EmailHelper emailHelper;
 
-    private SubmitAppealService submitAppealService;
+    private uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService;
+    private SubmitAppealService submitAppealServiceV2;
 
     private final SyaCaseWrapper appealData = getSyaCaseWrapper();
 
@@ -127,56 +129,59 @@ public class SubmitAppealServiceTest {
     @Captor
     private ArgumentCaptor<SscsCaseData> capture;
 
-    public static final String BIRMINGHAM_RPC = "{\n"
-        + "    \"name\" : \"BIRMINGHAM\",\n"
-        + "    \"address1\" : \"HM Courts & Tribunals Service\",\n"
-        + "    \"address2\" : \"Social Security & Child Support Appeals\",\n"
-        + "    \"address3\" : \"Administrative Support Centre\",\n"
-        + "    \"address4\" : \"PO Box 14620\",\n"
-        + "    \"city\" : \"BIRMINGHAM\",\n"
-        + "    \"postcode\" : \"B16 6FR\",\n"
-        + "    \"phoneNumber\" : \"0300 123 1142\",\n"
-        + "    \"faxNumber\" : \"0126 434 7983\",\n"
-        + "    \"email\" : \"Birmingham-SYA-Receipts@justice.gov.uk\",\n"
-        + "    \"hearingRoute\" : \"gaps\",\n"
-        + "    \"epimsId\" : \"815833\"\n"
-        + "  }";
+    public static final String BIRMINGHAM_RPC = """
+            {
+                "name" : "BIRMINGHAM",
+                "address1" : "HM Courts & Tribunals Service",
+                "address2" : "Social Security & Child Support Appeals",
+                "address3" : "Administrative Support Centre",
+                "address4" : "PO Box 14620",
+                "city" : "BIRMINGHAM",
+                "postcode" : "B16 6FR",
+                "phoneNumber" : "0300 123 1142",
+                "faxNumber" : "0126 434 7983",
+                "email" : "Birmingham-SYA-Receipts@justice.gov.uk",
+                "hearingRoute" : "gaps",
+                "epimsId" : "815833"
+              }""";
 
-    public static final String BRADFORD_RPC = "{\n"
-        + "    \"name\" : \"BRADFORD\",\n"
-        + "    \"address1\": \"HM Courts & Tribunals Service\",\n"
-        + "    \"address2\": \"Social Security & Child Support Appeals\",\n"
-        + "    \"address3\": \"Phoenix House\",\n"
-        + "    \"address4\": \"Rushton Avenue\",\n"
-        + "    \"city\": \"BRADFORD\",\n"
-        + "    \"postcode\": \"BD3 7BH\",\n"
-        + "    \"phoneNumber\" : \"0300 123 1142\",\n"
-        + "    \"faxNumber\" : \"0126 434 7983\",\n"
-        + "    \"email\" : \"SSCS_Bradford@justice.gov.uk\",\n"
-        + "    \"hearingRoute\" : \"gaps\",\n"
-        + "    \"epimsId\" : \"698118\"\n"
-        + "  }";
+    public static final String BRADFORD_RPC = """
+            {
+                "name" : "BRADFORD",
+                "address1": "HM Courts & Tribunals Service",
+                "address2": "Social Security & Child Support Appeals",
+                "address3": "Phoenix House",
+                "address4": "Rushton Avenue",
+                "city": "BRADFORD",
+                "postcode": "BD3 7BH",
+                "phoneNumber" : "0300 123 1142",
+                "faxNumber" : "0126 434 7983",
+                "email" : "SSCS_Bradford@justice.gov.uk",
+                "hearingRoute" : "gaps",
+                "epimsId" : "698118"
+              }""";
 
-    public static final String SUTTON_RPC = "{\n"
-        + "    \"name\" : \"SUTTON\",\n"
-        + "    \"address1\" : \"HM Courts & Tribunals Service\",\n"
-        + "    \"address2\" : \"Social Security & Child Support Appeals\",\n"
-        + "    \"address3\" : \"Copthall House\",\n"
-        + "    \"address4\" : \"9 The Pavement, Grove Road\",\n"
-        + "    \"city\" : \"SUTTON\",\n"
-        + "    \"postcode\" : \"SM1 1DA\",\n"
-        + "    \"phoneNumber\" : \"0300 123 1142\",\n"
-        + "    \"faxNumber\" : \"0870 739 4229\",\n"
-        + "    \"email\" : \"Sutton_SYA_Respons@justice.gov.uk\",\n"
-        + "    \"hearingRoute\" : \"gaps\",\n"
-        + "    \"epimsId\" : \"37792\"\n"
-        + "  }";
+    public static final String SUTTON_RPC = """
+            {
+                "name" : "SUTTON",
+                "address1" : "HM Courts & Tribunals Service",
+                "address2" : "Social Security & Child Support Appeals",
+                "address3" : "Copthall House",
+                "address4" : "9 The Pavement, Grove Road",
+                "city" : "SUTTON",
+                "postcode" : "SM1 1DA",
+                "phoneNumber" : "0300 123 1142",
+                "faxNumber" : "0870 739 4229",
+                "email" : "Sutton_SYA_Respons@justice.gov.uk",
+                "hearingRoute" : "gaps",
+                "epimsId" : "37792"
+              }""";
 
     @Before
     public void setup() {
         appealData.getMrn().setDate(LocalDate.now().minusMonths(1));
 
-        submitAppealService = new SubmitAppealService(
+        submitAppealService = new uk.gov.hmcts.reform.sscs.service.SubmitAppealService(
             ccdService,
             citizenCcdService,
             regionalProcessingCenterService,
@@ -186,6 +191,17 @@ public class SubmitAppealServiceTest {
             refDataService,
             venueService,
             true);
+
+        submitAppealServiceV2 = new SubmitAppealService(
+                ccdService,
+                citizenCcdService,
+                regionalProcessingCenterService,
+                idamService,
+                convertAIntoBService,
+                airLookupService,
+                refDataService,
+                venueService,
+                true);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -400,20 +416,53 @@ public class SubmitAppealServiceTest {
         assertEquals("Yes", capture.getValue().getIsSaveAndReturn());
     }
 
+    public abstract void givenSaveCaseWillReturnSaveCaseOperation(CitizenCcdService citizenCcdService,
+                                         Long caseDetailsId,
+                                         SaveCaseOperation saveCaseOperation);
+
+    public abstract void givenSaveCaseWillThrow(CitizenCcdService citizenCcdService,
+                                         FeignException feignException);
+
+    public abstract void verifyCitizenCcdService(CitizenCcdService citizenCcdService);
+
+    public abstract Optional<SaveCaseResult> callSubmitDraftAppeal(uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService,
+                                                                   SubmitAppealService submitAppealServiceV2,
+                                                                   String auth2Token,
+                                                                   SyaCaseWrapper appealData,
+                                                                   boolean forceCreate);
+
+    public abstract Optional<SaveCaseResult> callArchiveDraftAppeal(uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService,
+                                                                    SubmitAppealService submitAppealServiceV2,
+                                                                    String auth2Token,
+                                                                    SyaCaseWrapper appealData,
+                                                                    Long caseId);
+
+    public abstract void verifyArchiveDraftAppeal(CitizenCcdService citizenCcdService);
+
+    public abstract void givenArchiveDraftAppealWillReturnCaseDetails(CitizenCcdService citizenCcdService, CaseDetails caseDetails);
+
+    public abstract void givenArchiveDraftAppealWillThrow(CitizenCcdService citizenCcdService, FeignException feignException);
+
+    public abstract void verifyArchiveDraft(CitizenCcdService citizenCcdService);
+
     @Test
     public void shouldCreateDraftCaseWithAppealDetailsWithDraftEventNotForcedCreate() {
-        given(citizenCcdService.saveCase(any(SscsCaseData.class), any(IdamTokens.class)))
-            .willReturn(SaveCaseResult.builder()
-                .caseDetailsId(123L)
-                .saveCaseOperation(SaveCaseOperation.CREATE)
-                .build());
+        givenSaveCaseWillReturnSaveCaseOperation(citizenCcdService, 123L, SaveCaseOperation.CREATE);
 
-        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData, false);
+        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, false);
 
-        verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
+        verifyCitizenCcdService(citizenCcdService);
         assertTrue(result.isPresent());
 
     }
+
+    public abstract void givenUpdateCaseWillReturnCaseDetails(CitizenCcdService citizenCcdService, CaseDetails caseDetails);
+
+    public abstract void givenUpdateCaseWillThrowException(CitizenCcdService citizenCcdService, FeignException feignException);
+
+    public abstract Optional<SaveCaseResult> callUpdateDraftAppeal(uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService, SubmitAppealService submitAppealServiceV2, String auth2Token, SyaCaseWrapper appealData);
+
+    public abstract void verifyUpdateCaseCalledByUpdateDraftAppeal(CitizenCcdService citizenCcdService);
 
     @Test
     public void shouldUpdateDraftCase() {
@@ -421,13 +470,12 @@ public class SubmitAppealServiceTest {
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetails =
                 uk.gov.hmcts.reform.ccd.client.model.CaseDetails.builder().id(12L).build();
 
-        given(citizenCcdService.updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any()))
-                .willReturn(caseDetails);
+        givenUpdateCaseWillReturnCaseDetails(citizenCcdService, caseDetails);
 
         SyaCaseWrapper caseWrapper = getSyaCaseWrapper("json/sya_with_ccdId.json");
-        Optional<SaveCaseResult> result = submitAppealService.updateDraftAppeal("authorisation", caseWrapper);
+        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", caseWrapper);
 
-        verify(citizenCcdService).updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any());
+        verifyUpdateCaseCalledByUpdateDraftAppeal(citizenCcdService);
         assertTrue(result.isPresent());
     }
 
@@ -435,12 +483,11 @@ public class SubmitAppealServiceTest {
     public void shouldRaiseExceptionOnUpdateDraftEvent() {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(404);
-        given(citizenCcdService.updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any()))
-                .willThrow(feignException);
+        givenUpdateCaseWillThrowException(citizenCcdService, feignException);
 
-        Optional<SaveCaseResult> result = submitAppealService.updateDraftAppeal("authorisation", appealData);
+        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData);
 
-        verify(citizenCcdService).archiveDraft(any(SscsCaseData.class), any(IdamTokens.class), any());
+        verifyArchiveDraftAppeal(citizenCcdService);
         assertFalse(result.isPresent());
     }
 
@@ -448,31 +495,29 @@ public class SubmitAppealServiceTest {
     public void shouldSuppressExceptionIfIts409OnUpdateDraftCaseWithAppealDetailsWithDraftEvent() {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(409);
-        given(citizenCcdService.updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any()))
-                .willThrow(feignException);
+        givenUpdateCaseWillThrowException(citizenCcdService, feignException);
 
-        Optional<SaveCaseResult> result = submitAppealService.updateDraftAppeal("authorisation", appealData);
+        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData);
 
-        verify(citizenCcdService).updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any());
+        verifyUpdateCaseCalledByUpdateDraftAppeal(citizenCcdService);
         assertFalse(result.isPresent());
     }
 
     @Test(expected = ApplicationErrorException.class)
     public void shouldRaisedExceptionOnUpdateDraftWhenCitizenRoleIsNotPresent() {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        Optional<SaveCaseResult> result = submitAppealService.updateDraftAppeal("authorisation", appealData);
+        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData);
 
         assertFalse(result.isPresent());
     }
 
     @Test
     public void shouldArchiveDraftCase() {
-        given(citizenCcdService.archiveDraft(any(SscsCaseData.class), any(IdamTokens.class), any()))
-                .willReturn(CaseDetails.builder().build());
+        givenArchiveDraftAppealWillReturnCaseDetails(citizenCcdService, CaseDetails.builder().build());
 
-        Optional<SaveCaseResult> result = submitAppealService.archiveDraftAppeal("authorisation", appealData, 112L);
+        Optional<SaveCaseResult> result = callArchiveDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, 112L);
 
-        verify(citizenCcdService).archiveDraft(any(SscsCaseData.class), any(IdamTokens.class), any());
+        verifyArchiveDraft(citizenCcdService);
         assertTrue(result.isPresent());
     }
 
@@ -480,19 +525,18 @@ public class SubmitAppealServiceTest {
     public void shouldRaiseExceptionOnArchiveDraftEvent() {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(404);
-        given(citizenCcdService.archiveDraft(any(SscsCaseData.class), any(IdamTokens.class), any()))
-                .willThrow(feignException);
+        givenArchiveDraftAppealWillThrow(citizenCcdService, feignException);
 
-        Optional<SaveCaseResult> result = submitAppealService.archiveDraftAppeal("authorisation", appealData, 112L);
+        Optional<SaveCaseResult> result = callArchiveDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, 112L);
 
-        verify(citizenCcdService).archiveDraft(any(SscsCaseData.class), any(IdamTokens.class), any());
+        verifyArchiveDraftAppeal(citizenCcdService);
         assertFalse(result.isPresent());
     }
 
     @Test(expected = ApplicationErrorException.class)
     public void shouldRaisedExceptionOnArchiveDraftWhenCitizenRoleIsNotPresent() {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        Optional<SaveCaseResult> result = submitAppealService.archiveDraftAppeal("authorisation", appealData, 121L);
+        Optional<SaveCaseResult> result = callArchiveDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, 121L);
 
         assertFalse(result.isPresent());
     }
@@ -505,7 +549,7 @@ public class SubmitAppealServiceTest {
                         .saveCaseOperation(SaveCaseOperation.CREATE)
                         .build());
 
-        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData, true);
+        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, true);
 
         verify(citizenCcdService).createDraft(any(SscsCaseData.class), any(IdamTokens.class));
         assertTrue(result.isPresent());
@@ -516,12 +560,11 @@ public class SubmitAppealServiceTest {
     public void shouldRaisedExceptionOnCreateDraftCaseWithAppealDetailsWithDraftEvent() {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(404);
-        given(citizenCcdService.saveCase(any(SscsCaseData.class), any(IdamTokens.class)))
-            .willThrow(feignException);
+        givenSaveCaseWillThrow(citizenCcdService, feignException);
 
-        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData, false);
+        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, false);
 
-        verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
+        verifyCitizenCcdService(citizenCcdService);
         assertFalse(result.isPresent());
     }
 
@@ -529,14 +572,13 @@ public class SubmitAppealServiceTest {
     public void shouldHandleScConflictWithNullNinoForSubmitDraftAppeal() {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(HttpStatus.SC_CONFLICT);
-        given(citizenCcdService.saveCase(any(SscsCaseData.class), any(IdamTokens.class)))
-                .willThrow(feignException);
+        givenSaveCaseWillThrow(citizenCcdService, feignException);
         appealData.getAppellant().setNino(null);
 
 
-        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData, false);
+        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, false);
 
-        verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
+        verifyCitizenCcdService(citizenCcdService);
         assertEquals(result, Optional.empty());
     }
 
@@ -544,20 +586,19 @@ public class SubmitAppealServiceTest {
     public void shouldHandleScConflictWithNullNinoForUpdateDraftAppeal() {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(409);
-        given(citizenCcdService.updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any()))
-                .willThrow(feignException);
+        givenUpdateCaseWillThrowException(citizenCcdService, feignException);
         appealData.getAppellant().setNino(null);
 
-        Optional<SaveCaseResult> result = submitAppealService.updateDraftAppeal("authorisation", appealData);
+        Optional<SaveCaseResult> result = callUpdateDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData);
 
-        verify(citizenCcdService).updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any());
+        verifyUpdateCaseCalledByUpdateDraftAppeal(citizenCcdService);
         assertEquals(result, Optional.empty());
     }
 
     @Test(expected = ApplicationErrorException.class)
     public void shouldRaisedExceptionOnCreateDraftWhenCitizenRoleIsNotPresent() {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData, false);
+        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, false);
 
         assertFalse(result.isPresent());
     }
@@ -566,12 +607,11 @@ public class SubmitAppealServiceTest {
     public void shouldSuppressExceptionIfIts409OnCreateDraftCaseWithAppealDetailsWithDraftEvent() {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(409);
-        given(citizenCcdService.saveCase(any(SscsCaseData.class), any(IdamTokens.class)))
-            .willThrow(feignException);
+        givenSaveCaseWillThrow(citizenCcdService, feignException);
 
-        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData, false);
+        Optional<SaveCaseResult> result = callSubmitDraftAppeal(submitAppealService, submitAppealServiceV2, "authorisation", appealData, false);
 
-        verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
+        verifyCitizenCcdService(citizenCcdService);
         assertFalse(result.isPresent());
     }
 
