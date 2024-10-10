@@ -441,10 +441,10 @@ dependencies {
     testImplementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
 
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.37.0'
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
-    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.37.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.14.1'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '3.4.1'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.14.1'
+    testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '3.4.1'
 
     testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
