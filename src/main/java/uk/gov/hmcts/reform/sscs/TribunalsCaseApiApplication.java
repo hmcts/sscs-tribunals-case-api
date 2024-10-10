@@ -36,6 +36,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 import org.springframework.http.converter.xml.SourceHttpMessageConverter;
+import org.springframework.jms.annotation.EnableJms;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.retry.annotation.EnableRetry;
@@ -71,13 +72,13 @@ import uk.gov.service.notify.NotificationClient;
     "uk.gov.hmcts.reform.idam",
     "uk.gov.hmcts.reform.sscs.client",
     "uk.gov.hmcts.reform.sendletter",
-    "uk.gov.hmcts.reform.ccd.client",
-    "uk.gov.hmcts.reform.sscs.tyanotifications.service.coh"
+    "uk.gov.hmcts.reform.ccd.client"
 })
 
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform", "uk.gov.hmcts.reform.sscs",
     "uk.gov.hmcts.reform.ccd.document.am"})
 @EnableScheduling
+@EnableJms
 @EnableRetry
 @EnableAsync
 public class TribunalsCaseApiApplication implements CommandLineRunner {
