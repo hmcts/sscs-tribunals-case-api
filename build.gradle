@@ -415,7 +415,7 @@ dependencies {
     // Remove this dependency once the secure doc-store is in use
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
-    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.1.0', {
+    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '20.2.0.rdm.8934.1', {
         exclude group: 'org.apache.commons', module: 'commons-compress'
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'org.apache.poi', module: 'poi-ooxml'
