@@ -258,6 +258,8 @@ feature:
         enabled: ${GAPS_SWITCHOVER_FEATURE:false}
     hearing-recording-filter:
         enabled: ${UPLOAD_HEARING_FILTER_ENABLED:false}
+    infected-blood-appeal:
+        enabled: ${INFECTED_BLOOD_APPEAL_ENABLED:false}
     postHearings:
         enabled: ${POST_HEARINGS_FEATURE:false}
     postHearingsB:
@@ -288,6 +290,8 @@ feature:
         enabled: ${BYPASS_NOTIFICATIONS_SERVICE:false}
     handle-ccd-callbackMap-v2:
         enabled: ${HANDLE_CCD_CALLBACKMAP_V2:false}
+    submit-appeal-service-v2:
+        enabled: ${SUBMIT_APPEAL_SERVICE_V2_ENABLED:false}
 
 
 idam:

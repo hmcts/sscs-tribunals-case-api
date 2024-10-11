@@ -8,8 +8,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CountryOfResidence;
+import uk.gov.hmcts.reform.sscs.ccd.domain.UkPortOfEntry;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.AssociateCaseDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.OnlineHearing;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -50,7 +55,7 @@ public class CitizenController {
         description = "Loads the cases that have been associated with a citizen in CCD. "
             + "Gets the user from the token in the Authorization header.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description  = "A list of the hearings associated with a citizen.")
+        @ApiResponse(responseCode = "200", description = "A list of the hearings associated with a citizen.")
     })
     public ResponseEntity<java.util.List<OnlineHearing>> getOnlineHearings(
         @Parameter(description = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW")
@@ -65,7 +70,7 @@ public class CitizenController {
             + "been associated with the user. Gets the user from the token in the Authorization header."
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description  = "A list of the hearings associated with a citizen and tya number.")
+        @ApiResponse(responseCode = "200", description = "A list of the hearings associated with a citizen and tya number.")
     })
     public ResponseEntity<java.util.List<OnlineHearing>> getOnlineHearingsForTyaNumber(
         @Parameter(description = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW")
@@ -175,5 +180,34 @@ public class CitizenController {
         citizenLoginService.findAndUpdateCaseLastLoggedIntoMya(citizenTokens, caseId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(value = "/ports-of-entry", produces = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Loads ports of entry",
+        description = "Loads JSON list of ports of entry pulled from Enum in sscs-common.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "A list of the ports of entry.")
+    })
+    public List<Map<String, String>> getPortsOfEntry() {
+        return Arrays.stream(UkPortOfEntry.values())
+            .map(enumVal -> Map.of(
+                "label", enumVal.getLabel(),
+                "trafficType", enumVal.getTrafficType(),
+                "locationCode", enumVal.getLocationCode()))
+            .collect(Collectors.toList());
+    }
+
+    @GetMapping(value = "/countries-of-residence", produces = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Loads countries",
+        description = "Loads JSON of the countries of residence list pulled from Enum in sscs-common.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "A list of the countries of possible residence.")
+    })
+    public List<Map<String, String>> getCountriesOfResidence() {
+        return Arrays.stream(CountryOfResidence.values())
+            .map(enumVal -> Map.of(
+                "label", enumVal.getLabel(),
+                "officialName", enumVal.getOfficialName()))
+            .collect(Collectors.toList());
     }
 }
