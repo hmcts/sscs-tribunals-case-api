@@ -6,13 +6,13 @@ postgresql:
 idam-pr:
   enabled: false
 xui-webapp:
-  enabled: false
+  enabled: true
 elastic:
   enabled: false
 sscs-tribunals-frontend:
   enabled: false
 redis:
-  enabled: false
+  enabled: true
 ccd:
   enabled: false
 em-ccdorc:
