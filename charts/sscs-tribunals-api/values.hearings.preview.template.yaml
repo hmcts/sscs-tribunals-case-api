@@ -26,7 +26,7 @@ ccd-case-document-am-api:
 aac-manage-case-assignment:
   enabled: true
 am-org-role-mapping-service:
-  enabled: false
+  enabled: true
 wa:
   enabled: false
   taskBatchCron:
