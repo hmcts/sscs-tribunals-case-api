@@ -5,5 +5,7 @@
     <cve>CVE-2023-36052</cve>
     <cve>CVE-2024-1597</cve>
     <cve>CVE-2023-39017</cve>
+    <!-- Requires update of elasticsearch lib that has lucene dependency version > 9.12.0 -->
+    <cve>CVE-2024-45772</cve>
   </suppress>
 </suppressions>
