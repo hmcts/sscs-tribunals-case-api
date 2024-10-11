@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
 
 public interface PreSubmitCallbackHandler<T extends CaseData> {
 
+    @Deprecated
     boolean canHandle(CallbackType callbackType, Callback<T> callback);
 
     PreSubmitCallbackResponse<T> handle(CallbackType callbackType, Callback<T> callback, String userAuthorisation);
