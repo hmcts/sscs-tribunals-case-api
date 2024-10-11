@@ -206,12 +206,16 @@ def setPreviewEnvVars() {
     env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
     // env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     // env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    // env.CCD_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    // env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    // env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
+    // env.CASE_DOCUMENT_AM_URL = "https://ccd-case-document-am-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-4041.preview.platform.hmcts.net"
     env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-4041.preview.platform.hmcts.net"
-    env.CCD_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
-    env.CASE_DOCUMENT_AM_URL = "https://ccd-case-document-am-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CCD_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-4041.preview.platform.hmcts.net"
+    env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-4041.preview.platform.hmcts.net"
+    env.CCD_GW_API = "http://sscs-tribunals-api-pr-4041-ccd-api-gw"
+    env.CASE_DOCUMENT_AM_URL = "https://ccd-case-document-am-api-sscs-tribunals-api-pr-4041.preview.platform.hmcts.net"
     env.ENVIRONMENT = "pr"
 }
 
