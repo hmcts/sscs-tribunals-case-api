@@ -22,9 +22,9 @@ sscs-hearings-api:
 servicebus:
   enabled: true
 ccd-case-document-am-api:
-  enabled: false
+  enabled: true
 aac-manage-case-assignment:
-  enabled: false
+  enabled: true
 am-org-role-mapping-service:
   enabled: false
 wa:
