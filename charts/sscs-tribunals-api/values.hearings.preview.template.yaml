@@ -4,7 +4,7 @@ tags:
 postgresql:
   enabled: true
 idam-pr:
-  enabled: false
+  enabled: true
 xui-webapp:
   enabled: true
 elastic:
