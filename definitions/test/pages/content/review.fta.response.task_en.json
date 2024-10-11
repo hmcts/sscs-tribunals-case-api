@@ -1,0 +1,25 @@
+{
+    "name": "Review FTA Response - CTSC",
+    "priority": "high",
+    "assignedToWhenNotAssigned": "Unassigned",
+    "assignedTo": "SSCS ctscadmin",
+    "unassignedManageOptions" : [
+        "Assign to me"
+    ],
+    "assignedManageOptions" : [
+        "Reassign task",
+        "Unassign task"
+    ],
+    "unassignedManageOptionsForCaseAllocator": [
+            "Assign task",
+            "Cancel task",
+            "Assign to me"
+    ],
+    "nextStepsOptions": [
+        "Response reviewed"
+    ],
+    "responseReviewed": {
+        "link": "Response reviewed",
+        "eventTitle": "Response reviewed"
+    }
+}
