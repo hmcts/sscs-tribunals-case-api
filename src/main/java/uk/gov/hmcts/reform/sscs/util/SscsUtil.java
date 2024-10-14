@@ -373,6 +373,15 @@ public class SscsUtil {
         return false;
     }
 
+    public static DynamicList getPortsOfEntry() {
+        List<DynamicListItem> items = Arrays.stream(UkPortOfEntry.values())
+                .sorted(Comparator.comparing(UkPortOfEntry::getLabel))
+                .map(ukPortOfEntry -> new DynamicListItem(ukPortOfEntry.getLocationCode(), ukPortOfEntry.getLabel()))
+                .toList();
+
+        return new DynamicList(null, items);
+    }
+
     public static DynamicList getBenefitDescriptions(boolean isInfectedBloodAppealEnabled) {
         List<DynamicListItem> items = Arrays.stream(Benefit.values())
                 .filter(benefit -> isInfectedBloodAppealEnabled || !benefit.getShortName().equals("infectedBloodAppeal"))
