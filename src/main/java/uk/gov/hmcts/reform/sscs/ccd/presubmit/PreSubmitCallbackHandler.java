@@ -15,6 +15,7 @@ public interface PreSubmitCallbackHandler<T extends CaseData> {
      * @deprecated (since = "10/2024 - some comment use something else)
      */
     @Deprecated(since = "10/2024 - some comment", forRemoval = true)
+    @SuppressWarnings(value = "deprecated")
     boolean canHandle(CallbackType callbackType, Callback<T> callback);
 
     PreSubmitCallbackResponse<T> handle(CallbackType callbackType, Callback<T> callback, String userAuthorisation);
