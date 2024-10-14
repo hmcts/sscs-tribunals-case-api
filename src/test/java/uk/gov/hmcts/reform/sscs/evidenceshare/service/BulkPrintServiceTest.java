@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -221,7 +220,7 @@ public class BulkPrintServiceTest {
     }
 
     @Test
-    public void shouldSendToBulkPrintWithAdditionalDataInternationFlagFalse() {
+    public void shouldSendToBulkPrint_noAdditionalDataInternationalFlag() {
         SscsCaseData sscsCaseDataNonUK = SscsCaseData.builder()
                 .ccdCaseId("234")
                 .appeal(
@@ -229,7 +228,7 @@ public class BulkPrintServiceTest {
                                 .appellant(
                                         Appellant.builder()
                                                 .name(Name.builder().firstName("Appellant").lastName("LastName").build())
-                                                .address(Address.builder().line1("line1").postcode("PH17-26").build())
+                                                .address(Address.builder().line1("line1").postcode("PO1 1AY").country("United Kingdom").isInUk(YES).build())
                                                 .build())
                                 .build())
                 .build();
@@ -237,19 +236,21 @@ public class BulkPrintServiceTest {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture()))
                 .thenReturn(new SendLetterResponse(LETTER_ID));
         Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, sscsCaseDataNonUK, null);
+
         assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
         //Check isInternational flag is NOT added
         assertFalse("isInternational", captor.getValue().getAdditionalData().containsKey("isInternational"));
+        assertEquals(4, captor.getValue().getAdditionalData().size());
     }
 
     @Test
-    public void shouldSendToBulkPrintWithAdditionalDataInternationFlagTrue() {
+    public void shouldSendToBulkPrint_additionalDataInternationalFlagTrue() {
         SscsCaseData sscsCaseDataUK = SscsCaseData.builder()
                 .ccdCaseId("234")
                 .appeal(Appeal.builder().appellant(
                                 Appellant.builder()
                                         .name(Name.builder().firstName("Appellant").lastName("LastName").build())
-                                        .address(Address.builder().line1("line1").postcode("PO1 5AY").build())
+                                        .address(Address.builder().line1("line1").postcode("PH17-26").country("Australia").portOfEntry(UkPortOfEntry.LONDON_GATEWAY_PORT).isInUk(NO).build())
                                         .build())
                         .build())
                 .build();
@@ -259,7 +260,9 @@ public class BulkPrintServiceTest {
 
         Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, sscsCaseDataUK, null);
         assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
+
         //Check isInternational flag is present and true
         assertEquals("true", captor.getValue().getAdditionalData().get("isInternational"));
+        assertEquals(5, captor.getValue().getAdditionalData().size());
     }
 }
