@@ -7,14 +7,12 @@ let caseId: string;
 test.describe("Issue direction test", {tag: '@nightly-pipeline'}, async() => {
 
     test("Issue Direction Notice - Pre Hearing - Normal Tax Credit Application - Appeal to Proceed",
-        {tag: '@preview-regression'},
         async ({issueDirectionsNoticeSteps}) => {
             test.slow();
             await issueDirectionsNoticeSteps.performIssueDirectionNoticePreHearingAppealToProceed();
         });
 
     test("Issue Direction Notice - Post Hearing - Employment Support Application - Provide Information",
-        {tag: '@preview-regression'},
         async ({issueDirectionsNoticeSteps}) => {
             test.slow();
             await issueDirectionsNoticeSteps.performIssueDirectionNoticePostHearingESAAppealToProceed();
@@ -27,7 +25,6 @@ test.describe("Issue direction test", {tag: '@nightly-pipeline'}, async() => {
         });
 
     test("Issue Direction Notice - Error Messages Test",
-        {tag: '@preview-regression'},
         async ({issueDirectionsNoticeSteps}) => {
             test.slow();
             await issueDirectionsNoticeSteps.performIssueDirectionErrorMessages();

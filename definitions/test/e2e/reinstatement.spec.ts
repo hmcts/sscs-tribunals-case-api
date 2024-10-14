@@ -2,7 +2,7 @@ import { test } from "../lib/steps.factory";
 import createCaseBasedOnCaseType from "../api/client/sscs/factory/appeal.type.factory";
 import performAppealDormantOnCase from "../api/client/sscs/appeal.event";
 
-test.describe('Reinstatement request tests', {tag: ['@preview-regression', '@nightly-pipeline']}, async() => {
+test.describe('Reinstatement request tests', {tag: ['@nightly-pipeline']}, async() => {
     let caseId : string;
 
     test.beforeEach("Case has to be Created", async () => {
