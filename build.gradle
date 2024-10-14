@@ -5,7 +5,7 @@ plugins {
     id 'jacoco'
     id 'org.springframework.boot' version '2.7.18'
     id 'uk.gov.hmcts.java' version '0.12.43'
-    id 'com.gorylenko.gradle-git-properties' version '2.4.1'
+    id 'com.gorylenko.gradle-git-properties' version '2.4.2'
     id 'com.github.ben-manes.versions' version '0.46.0'
     id "info.solidsoft.pitest" version '1.9.11'
     id 'org.owasp.dependencycheck' version '10.0.3'
@@ -52,7 +52,7 @@ application {
 }
 
 pmd {
-    toolVersion = "6.55.0"
+    toolVersion = "7.6.0"
     ignoreFailures = true
     sourceSets = [sourceSets.main, sourceSets.test]
     reportsDir = layout.buildDirectory.dir("reports/pmd").get().asFile
@@ -351,9 +351,9 @@ dependencies {
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.11.9'    
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.13'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.12.2'
 
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.13'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
@@ -378,7 +378,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '1.5.7', {
         exclude group: "uk.gov.hmcts.reform", module:"properties-volume-spring-boot-starter"
     }
-    implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.0-RELEASE'
+    implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
     implementation group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.17.0'
 
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.3.1'
@@ -415,7 +415,7 @@ dependencies {
     // Remove this dependency once the secure doc-store is in use
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
-    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.0.2', {
+    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.1.0', {
         exclude group: 'org.apache.commons', module: 'commons-compress'
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'org.apache.poi', module: 'poi-ooxml'
@@ -465,7 +465,7 @@ dependencies {
     testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.9.3')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
     testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine'
-    testImplementation group: 'com.h2database', name: 'h2', version: '2.1.214'
+    testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'
 
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
