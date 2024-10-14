@@ -15,7 +15,7 @@ test.describe('Issue Final Decision - PIP Appeal Type', {tag: '@nightly-pipeline
             // await performAppealDormantOnCase(pipCaseId);
         });
 
-    test("Issue Final Decision - Upload Response with Further Information as No - Simple Decision Notice - 'Yes' notice generated. - Yes Award is Given", {tag: ['@preview-regression', '@regression']},
+    test("Issue Final Decision - Upload Response with Further Information as No - Simple Decision Notice - 'Yes' notice generated. - Yes Award is Given", {tag: ['@preview-pipeline', '@regression']},
         async ({issueFinalDecisionSteps}) => {
             test.slow();
             let pipCaseId = await createCaseBasedOnCaseType('PIP');
