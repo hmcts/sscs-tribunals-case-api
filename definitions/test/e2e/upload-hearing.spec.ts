@@ -5,7 +5,7 @@ import performAppealDormantOnCase from "../api/client/sscs/appeal.event";
 let caseId : string;
 
 
-test.describe("Hearing upload test", {tag: ['@preview-regression', '@nightly-pipeline']}, async() => {
+test.describe("Hearing upload test", {tag: '@nightly-pipeline'}, async() => {
 
     test.beforeEach("Case has to be Created", async () => {
         caseId = await createCaseBasedOnCaseType('PIP');
