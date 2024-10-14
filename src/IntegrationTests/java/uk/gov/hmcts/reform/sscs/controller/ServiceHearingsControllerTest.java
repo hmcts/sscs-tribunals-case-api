@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.sscs.service.ServiceHearingsService;
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("integration")
-@Disabled("Please remove this line when Hearing api bypass feature flag is true")
 class ServiceHearingsControllerTest {
 
     private static final long CASE_ID = 1625080769409918L;
