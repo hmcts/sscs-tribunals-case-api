@@ -238,7 +238,29 @@ public class BulkPrintServiceTest {
         Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, sscsCaseDataNonUK, null);
 
         assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
-        //Check isInternational flag is NOT added
+        assertFalse("isInternational", captor.getValue().getAdditionalData().containsKey("isInternational"));
+        assertEquals(4, captor.getValue().getAdditionalData().size());
+    }
+
+    @Test
+    public void shouldSendToBulkPrint_noAdditionalDataInternationalFlagAsIsInUkNull() {
+        SscsCaseData sscsCaseDataNonUK = SscsCaseData.builder()
+                .ccdCaseId("234")
+                .appeal(
+                        Appeal.builder()
+                                .appellant(
+                                        Appellant.builder()
+                                                .name(Name.builder().firstName("Appellant").lastName("LastName").build())
+                                                .address(Address.builder().line1("line1").postcode("PO1 1AY").country("United Kingdom").isInUk(null).build())
+                                                .build())
+                                .build())
+                .build();
+
+        when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture()))
+                .thenReturn(new SendLetterResponse(LETTER_ID));
+        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, sscsCaseDataNonUK, null);
+
+        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
         assertFalse("isInternational", captor.getValue().getAdditionalData().containsKey("isInternational"));
         assertEquals(4, captor.getValue().getAdditionalData().size());
     }
@@ -259,9 +281,8 @@ public class BulkPrintServiceTest {
                 .thenReturn(new SendLetterResponse(LETTER_ID));
 
         Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, sscsCaseDataUK, null);
-        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
 
-        //Check isInternational flag is present and true
+        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
         assertEquals("true", captor.getValue().getAdditionalData().get("isInternational"));
         assertEquals(5, captor.getValue().getAdditionalData().size());
     }
