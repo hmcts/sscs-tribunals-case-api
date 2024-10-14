@@ -44,6 +44,8 @@ java:
     BYPASS_NOTIFICATIONS_SERVICE: true
     HANDLE_CCD_CALLBACKMAP_V2: true
     TESTING_SUPPORT_ENABLED: true
+    SEND_LETTER_SERVICE_ENABLED: "true"
+    SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
     TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
