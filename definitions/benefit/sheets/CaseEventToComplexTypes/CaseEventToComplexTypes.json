@@ -5027,6 +5027,16 @@
   {
     "CaseEventID": "incompleteApplicationReceived",
     "CaseFieldID": "appeal",
+    "ListElementCode": "appellant.identity.ibcaReference",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection=\"093\"",
+    "LiveFrom": "01/01/2018",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "incompleteApplicationReceived",
+    "CaseFieldID": "appeal",
     "ListElementCode": "appellant.address",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/01/2018",
@@ -5099,6 +5109,27 @@
   {
     "CaseEventID": "incompleteApplicationReceived",
     "CaseFieldID": "appeal",
+    "ListElementCode": "appellant.address.isInUk",
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection=\"093\"",
+    "LiveFrom": "01/01/2018",
+    "FieldDisplayOrder": 8,
+    "PageID": "1.0",
+    "EventElementLabel": "Does the appellant live in England, Wales or Scotland?"
+  },
+  {
+    "CaseEventID": "incompleteApplicationReceived",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "appellant.address.ukPortOfEntryList",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.appellant.address.isInUk=\"No\"",
+    "LiveFrom": "01/01/2018",
+    "FieldDisplayOrder": 9,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "incompleteApplicationReceived",
+    "CaseFieldID": "appeal",
     "ListElementCode": "appellant.contact",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/01/2018",
@@ -5137,6 +5168,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.isAppointee",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 5,
     "PageID": "1.0"
@@ -5146,6 +5178,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 6,
     "PageID": "1.0"
@@ -5155,6 +5188,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.name",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 1,
     "PageID": "1.0"
@@ -5164,6 +5198,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.name.title",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 1,
     "PageID": "1.0"
@@ -5173,6 +5208,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.name.firstName",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 2,
     "PageID": "1.0"
@@ -5182,6 +5218,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.name.middleName",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 3,
     "PageID": "1.0"
@@ -5191,6 +5228,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.name.lastName",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 4,
     "PageID": "1.0"
@@ -5200,6 +5238,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.identity",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 2,
     "PageID": "1.0"
@@ -5209,6 +5248,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.identity.dob",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 1,
     "PageID": "1.0"
@@ -5228,6 +5268,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.address",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 3,
     "PageID": "1.0"
@@ -5237,6 +5278,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.address.line1",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 1,
     "PageID": "1.0"
@@ -5246,6 +5288,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.address.line2",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 2,
     "PageID": "1.0"
@@ -5255,6 +5298,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.address.line3",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 3,
     "PageID": "1.0"
@@ -5264,6 +5308,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.address.town",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 4,
     "PageID": "1.0"
@@ -5273,6 +5318,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.address.county",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 5,
     "PageID": "1.0"
@@ -5282,6 +5328,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.address.postcode",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 6,
     "PageID": "1.0"
@@ -5291,6 +5338,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.address.country",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 7,
     "PageID": "1.0"
@@ -5300,6 +5348,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.contact",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 4,
     "PageID": "1.0"
@@ -5309,6 +5358,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.contact.phone",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 1,
     "PageID": "1.0"
@@ -5318,6 +5368,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.contact.mobile",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 2,
     "PageID": "1.0"
@@ -5327,6 +5378,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.contact.email",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 3,
     "PageID": "1.0"
@@ -5336,6 +5388,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.id",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 5,
     "PageID": "1.0"
@@ -5345,6 +5398,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.appointee.organisation",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 6,
     "PageID": "1.0"
@@ -5354,6 +5408,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.isAddressSameAsAppointee",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 7,
     "PageID": "1.0"
@@ -5363,6 +5418,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.confidentialityRequired",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 8,
     "PageID": "1.0"
@@ -5372,7 +5428,6 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.role",
     "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 9,
     "PageID": "1.0"
@@ -5382,7 +5437,6 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.role.name",
     "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 1,
     "PageID": "1.0"
@@ -5392,7 +5446,6 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.role.description",
     "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 2,
     "PageID": "1.0"
@@ -5402,7 +5455,6 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.organisation",
     "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 10,
     "PageID": "1.0"
@@ -5894,6 +5946,17 @@
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 7,
     "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "incompleteApplicationReceived",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "rep.address.isInUk",
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection=\"093\"",
+    "LiveFrom": "01/01/2018",
+    "FieldDisplayOrder": 8,
+    "PageID": "1.0",
+    "EventElementLabel": "Does the representative live in England, Wales or Scotland?"
   },
   {
     "CaseEventID": "incompleteApplicationReceived",
