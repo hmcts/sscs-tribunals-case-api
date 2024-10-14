@@ -22,7 +22,7 @@ test.describe("Enhanced confidentiality test", async() => {
         await createBundleSteps.triggerBundleForConfidentialCase();
     });
 
-    test("Refuse - confidentiality request for a party on a case", {tag: ['@preview-regression','@nightly-pipeline']}, async({ uploadResponseSteps, enhancedConfidentialitySteps }) => {
+    test("Refuse - confidentiality request for a party on a case", {tag: ['@nightly-pipeline']}, async({ uploadResponseSteps, enhancedConfidentialitySteps }) => {
         await uploadResponseSteps.performUploadResponseOnAUniversalCreditWithJP(caseId);
         await enhancedConfidentialitySteps.requestForConfidentiality();
         await enhancedConfidentialitySteps.requestConfidentialityForJP();
