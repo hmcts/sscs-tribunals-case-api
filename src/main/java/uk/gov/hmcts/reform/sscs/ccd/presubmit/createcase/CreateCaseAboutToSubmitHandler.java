@@ -99,7 +99,17 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
     }
 
     private void createAppealPdf(SscsCaseData caseData) {
-        String fileName = emailHelper.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
+        String fileName;
+        Benefit benefitType = caseData.getBenefitType().orElse(null);
+        boolean isIba = (benefitType != null && benefitType.equals(Benefit.INFECTED_BLOOD_APPEAL));
+        if (isIba) {
+            String appellantLastName = caseData.getAppeal().getAppellant().getName().getLastName();
+            String ibcaRef = caseData.getAppeal().getAppellant().getIdentity().getIbcaReference();
+            fileName = String.format("%s_%s", appellantLastName, ibcaRef) + ".pdf";
+            // temp solution - need to update generateUniqueEmailId in sscs-common to work with ibcaRef
+        } else {
+            fileName = emailHelper.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
+        }
 
         boolean hasPdf = hasPdfDocument(caseData, fileName);
 

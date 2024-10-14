@@ -28,6 +28,8 @@ public class SyaAppellant {
 
     private String nino;
 
+    private String ibcaReference;
+
     @JsonProperty("contactDetails")
     private SyaContactDetails contactDetails;
 

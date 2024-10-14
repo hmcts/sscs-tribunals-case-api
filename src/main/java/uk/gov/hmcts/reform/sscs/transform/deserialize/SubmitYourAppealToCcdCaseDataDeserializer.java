@@ -308,8 +308,12 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         } else {
             contact = Contact.builder().build();
         }
-
-        Identity identity = buildAppellantIdentity(syaAppellant);
+        Identity identity;
+        if (syaCaseWrapper.getBenefitType().getCode().equals("infectedBloodAppeal")) {
+            identity = buildAppellantIdentity(syaAppellant, true);
+        } else {
+            identity = buildAppellantIdentity(syaAppellant, false);
+        }
 
         String isAppointee = buildAppellantIsAppointee(syaCaseWrapper);
 
@@ -347,13 +351,17 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .build();
     }
 
-    private static Identity buildAppellantIdentity(SyaAppellant syaAppellant) {
+    private static Identity buildAppellantIdentity(SyaAppellant syaAppellant, boolean isIba) {
         Identity identity = Identity.builder().build();
         if (null != syaAppellant) {
-            identity = identity.toBuilder()
-                    .dob(syaAppellant.getDob() == null ? null : syaAppellant.getDob().toString())
-                    .nino(syaAppellant.getNino())
-                    .build();
+            Identity.IdentityBuilder builder = identity.toBuilder()
+                .dob(syaAppellant.getDob() == null ? null : syaAppellant.getDob().toString());
+            if (isIba) {
+                builder.ibcaReference(syaAppellant.getIbcaReference());
+            } else {
+                builder.nino(syaAppellant.getNino());
+            }
+            identity = builder.build();
         }
 
         return identity;
