@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -33,6 +34,7 @@ public class CreateCaseAboutToStartHandlerTest {
     @BeforeEach
     void setUp() {
         handler = new CreateCaseAboutToStartHandler();
+        ReflectionTestUtils.setField(handler, "isInfectedBloodAppealEnabled", true);
     }
 
     @ParameterizedTest
