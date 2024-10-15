@@ -2,7 +2,7 @@ tags:
   sscs-ccd-idam-pr: false
 
 postgresql:
-  enabled: false
+  enabled: true
 idam-pr:
   enabled: false
 xui-webapp:
