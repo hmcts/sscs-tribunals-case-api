@@ -353,7 +353,7 @@ dependencies {
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.12.3'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.13'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.14'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
@@ -363,9 +363,11 @@ dependencies {
     implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.4'
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.15.2'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.15.2'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.15.2'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.2'
 
     implementation group:'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'org.springframework', name: 'spring-jms'
@@ -469,13 +471,17 @@ dependencies {
 
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
-    testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.0'
+    testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.2'
 
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-core', version: '8.0.6'
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '8.0.6'
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '8.0.6'
+    testImplementation group: 'com.github.tomakehurst', name: 'wiremock', version: '2.27.2'
     //pact contract testing
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.16'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
+    contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.16'
+    contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8',  version: '4.1.7'
 
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.18'
 
