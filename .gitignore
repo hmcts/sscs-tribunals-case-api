@@ -40,5 +40,9 @@ lib/applicationinsights.log
 definitions/**/*.xlsx
 definitions/**/*.xlsx#
 
-# aat env file
+# mirrord
+.mirrord/*
+
+# env files
 .aat-env
+.env.local
