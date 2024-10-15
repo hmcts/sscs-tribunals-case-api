@@ -309,7 +309,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             contact = Contact.builder().build();
         }
         Identity identity;
-        if (syaCaseWrapper.getBenefitType().getCode().equals("infectedBloodAppeal")) {
+        if (syaCaseWrapper.getBenefitType().getCode().equals(Benefit.INFECTED_BLOOD_APPEAL.getBenefitCode())) {
             identity = buildAppellantIdentity(syaAppellant, true);
         } else {
             identity = buildAppellantIdentity(syaAppellant, false);

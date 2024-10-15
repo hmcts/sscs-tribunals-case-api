@@ -21,15 +21,9 @@ import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
@@ -196,39 +190,49 @@ public abstract class SubmitAppealServiceBase {
         }
     }
 
+    private Pair<List<SscsCaseDetails>, SscsCaseDetails> getMatchedNinoCasesAndCaseDetails(SscsCaseData caseData,
+                                                                                           IdamTokens idamTokens,
+                                                                                           boolean isIba,
+                                                                                           String nino,
+                                                                                           String ibcaReference) {
+        SscsCaseDetails caseDetails = null;
+        List<SscsCaseDetails> matchedByNinoCases = List.of();
+        if (!isIba) {
+            matchedByNinoCases = getMatchedCases(nino, idamTokens);
+            if (!matchedByNinoCases.isEmpty()) {
+                log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino "
+                    + nino + " before filtering non exact matches");
+            } else {
+                log.info("No matching cases for Nino {}", nino);
+            }
+            caseDetails = matchedByNinoCases.stream().filter(createNinoAndBenefitTypeAndMrnDatePredicate(caseData)).findFirst().orElse(null);
+        } else {
+            log.info("Case is IBA with reference {}", ibcaReference);
+        }
+        return Pair.of(matchedByNinoCases, caseDetails);
+    }
+
     private SscsCaseDetails createOrUpdateCase(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
         SscsCaseDetails caseDetails = null;
-        Benefit benefitType = caseData.getBenefitType().orElse(null);
-        boolean isIba = (benefitType != null && benefitType.equals(Benefit.INFECTED_BLOOD_APPEAL));
-        String referenceName = isIba ? "IBCA Reference" : "Nino";
-        String referenceValue = isIba ? caseData.getAppeal().getAppellant().getIdentity().getIbcaReference()
-            : caseData.getAppeal().getAppellant().getIdentity().getNino();
-        List<SscsCaseDetails> matchedByNinoCases = List.of();
+        String benefitShortName = caseData.getAppeal().getBenefitType().getCode();
+        boolean isIba = (caseData.getBenefitCode().equals(Benefit.INFECTED_BLOOD_APPEAL.getBenefitCode()));
+        String nino = caseData.getAppeal().getAppellant().getIdentity().getNino();
+        String ibcaReference = caseData.getAppeal().getAppellant().getIdentity().getIbcaReference();
         try {
-            if (!isIba) {
-                matchedByNinoCases = getMatchedCases(caseData.getAppeal().getAppellant().getIdentity().getNino(), idamTokens);
-
-                if (!matchedByNinoCases.isEmpty()) {
-                    log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino "
-                        + caseData.getAppeal().getAppellant().getIdentity().getNino() + " before filtering non exact matches");
-                } else {
-                    log.info("No matching cases for Nino {}", caseData.getAppeal().getAppellant().getIdentity().getNino());
-                }
-
-                caseDetails = matchedByNinoCases.stream().filter(createNinoAndBenefitTypeAndMrnDatePredicate(caseData)).findFirst().orElse(null);
-            } else {
-                log.info("Case is IBA with reference {}", caseData.getAppeal().getAppellant().getIdentity().getIbcaReference());
-            }
+            Pair<List<SscsCaseDetails>, SscsCaseDetails> matchedByNinoCasesCaseDetails =
+                getMatchedNinoCasesAndCaseDetails(caseData, idamTokens, isIba, nino, ibcaReference);
+            List<SscsCaseDetails> matchedByNinoCases = matchedByNinoCasesCaseDetails.getLeft();
+            caseDetails = matchedByNinoCasesCaseDetails.getRight();
             if (caseDetails == null) {
                 if (!matchedByNinoCases.isEmpty()) {
                     log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino "
-                        + caseData.getAppeal().getAppellant().getIdentity().getNino());
+                        + nino);
                     caseData = addAssociatedCases(caseData, matchedByNinoCases);
                 }
 
                 log.info("About to attempt creating case or updating draft case in CCD with event {} for benefit type {} and event {} and isScottish {} and languagePreference {}",
                     eventType,
-                    caseData.getAppeal().getBenefitType().getCode(),
+                    benefitShortName,
                     eventType,
                     caseData.getIsScottishCase(),
                     caseData.getLanguagePreference().getCode());
@@ -245,7 +249,7 @@ public abstract class SubmitAppealServiceBase {
 
                     log.info("Case {} successfully converted from Draft to SSCS case in CCD for benefit type {} with event {}",
                         caseDetails.getId(),
-                        caseData.getAppeal().getBenefitType().getCode(),
+                        benefitShortName,
                         eventType);
                 } else {
                     caseDetails = ccdService.createCase(caseData,
@@ -255,23 +259,26 @@ public abstract class SubmitAppealServiceBase {
                         idamTokens);
                     log.info("Case {} successfully created in CCD for benefit type {} with event {}",
                         caseDetails.getId(),
-                        caseData.getAppeal().getBenefitType().getCode(),
+                        benefitShortName,
                         eventType);
                 }
                 return caseDetails;
             }
         } catch (Exception e) {
+            String caseId = caseDetails != null ? caseDetails.getId().toString() : "";
+            String referenceName = isIba ? "IBCA Reference" : "Nino";
+            String referenceValue = isIba ? ibcaReference : nino;
             throw new CcdException(
                 String.format("Error found in the creating case process for case with Id - %s"
-                        + " and " + referenceName + " - %s and Benefit type - %s and exception: %s",
-                    caseDetails != null ? caseDetails.getId() : "", referenceValue,
-                    caseData.getAppeal().getBenefitType().getCode(), e.getMessage()), e);
+                        + " and %s - %s and Benefit type - %s and exception: %s",
+                    caseId, referenceName, referenceValue,
+                    benefitShortName, e.getMessage()), e);
         }
 
         log.info("Duplicate case {} found for Nino {} and benefit type {}. "
                 + "No need to continue with post create case processing.",
-            caseDetails.getId(), caseData.getAppeal().getAppellant().getIdentity().getNino(),
-            caseData.getAppeal().getBenefitType().getCode());
+            caseDetails.getId(), nino,
+            benefitShortName);
         throw new DuplicateCaseException(
             String.format("An appeal has already been submitted, for that decision date %s ",
                 caseData.getAppeal().getMrnDetails().getMrnDate()));

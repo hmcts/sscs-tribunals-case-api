@@ -54,14 +54,7 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
-import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
@@ -226,6 +219,24 @@ public abstract class AbstractSubmitAppealServiceTest {
 
         verify(ccdService).createCase(capture.capture(), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         assertEquals("No", capture.getValue().getIsSaveAndReturn());
+    }
+
+    @Test
+    public void givenCaseIsIbca_shouldCreateCaseWithAppealDetailsWithValidAppealCreatedEvent() {
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
+        appealData.setBenefitType(new SyaBenefitType("Infected blood appeal", "infectedBloodAppeal"));
+        submitAppealService.submitAppeal(appealData, userToken);
+        appealData.setBenefitType(null);
+        verify(ccdService).createCase(capture.capture(), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("No", capture.getValue().getIsSaveAndReturn());
+        Optional<Benefit> benefitType = capture.getValue().getBenefitType();
+        assertTrue(benefitType.isPresent());
+        assertEquals(Benefit.INFECTED_BLOOD_APPEAL, benefitType.get());
+        assertEquals(Benefit.INFECTED_BLOOD_APPEAL.getShortName(), capture.getValue().getAppeal().getBenefitType().getCode());
+        assertEquals(Benefit.INFECTED_BLOOD_APPEAL.getBenefitCode(), capture.getValue().getBenefitCode());
     }
 
     @Test

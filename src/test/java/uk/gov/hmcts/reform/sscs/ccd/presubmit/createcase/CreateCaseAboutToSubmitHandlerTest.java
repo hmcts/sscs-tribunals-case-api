@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +44,21 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
+
+    @Mock
+    private SscsCaseData mockedCaseData;
+
+    @Mock
+    private Appeal mockedAppeal;
+
+    @Mock
+    private Appellant mockedAppellant;
+
+    @Mock
+    private Name mockedName;
+
+    @Mock
+    private Identity mockedIdentity;
 
     @Mock
     private VerbalLanguagesService verbalLanguagesService;
@@ -108,7 +124,28 @@ public class CreateCaseAboutToSubmitHandlerTest {
         createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
-        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), eq("Test.pdf"));
+    }
+
+
+    @Test
+    void shouldCallPdfServiceWhenIbca() throws CcdException {
+        when(caseDetails.getCaseData()).thenReturn(mockedCaseData);
+        when(mockedCaseData.getCaseCreated()).thenReturn("");
+        when(mockedCaseData.getCcdCaseId()).thenReturn("1021");
+        when(mockedCaseData.getBenefitType()).thenReturn(Optional.of(Benefit.INFECTED_BLOOD_APPEAL));
+        when(mockedCaseData.getAppeal()).thenReturn(mockedAppeal);
+        when(mockedAppeal.getAppellant()).thenReturn(mockedAppellant);
+        when(mockedAppellant.getName()).thenReturn(mockedName);
+        when(mockedAppellant.getIdentity()).thenReturn(mockedIdentity);
+        when(mockedName.getLastName()).thenReturn("appellantLastName");
+        when(mockedIdentity.getIbcaReference()).thenReturn("ibcaRef");
+
+        createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(emailHelper, never()).generateUniqueEmailId(any());
+        String expectedFilename = String.format("%s_%s", "appellantLastName", "ibcaRef") + ".pdf";
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), eq(expectedFilename));
     }
 
     @Test
