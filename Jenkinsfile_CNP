@@ -213,6 +213,7 @@ def setPreviewEnvVars() {
     env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
     env.CASE_DOCUMENT_AM_URL = "https://ccd-case-document-am-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.ENVIRONMENT = "pr"
+    env.HEARINGS_ENABLED = 'No'
 }
 
 def runE2eTests() {
