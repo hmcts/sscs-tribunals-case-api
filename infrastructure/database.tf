@@ -72,31 +72,31 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE-FLEX-V15" {
 }
 
 # FlexibleServer v15 creds
-resource "azurerm_key_vault_secret" "POSTGRES-USER-FLEX-V15" {
+resource "azurerm_key_vault_secret" "POSTGRES-USER" {
   name         = "${var.component}-POSTGRES-USER"
   value        = module.notification-scheduler-db-flexible.username
   key_vault_id = data.azurerm_key_vault.sscs_key_vault.id
 }
 
-resource "azurerm_key_vault_secret" "POSTGRES-PASS-FLEX-V15" {
+resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
   name         = "${var.component}-POSTGRES-PASS"
   value        = module.notification-scheduler-db-flexible.password
   key_vault_id = data.azurerm_key_vault.sscs_key_vault.id
 }
 
-resource "azurerm_key_vault_secret" "POSTGRES_HOST-FLEX-V15" {
+resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
   name         = "${var.component}-POSTGRES-HOST"
   value        = module.notification-scheduler-db-flexible.fqdn
   key_vault_id = data.azurerm_key_vault.sscs_key_vault.id
 }
 
-resource "azurerm_key_vault_secret" "POSTGRES_PORT-FLEX-V15" {
+resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
   name         = "${var.component}-POSTGRES-PORT"
   value        = "5432"
   key_vault_id = data.azurerm_key_vault.sscs_key_vault.id
 }
 
-resource "azurerm_key_vault_secret" "POSTGRES_DATABASE-FLEX-V15" {
+resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   name         = "${var.component}-POSTGRES-DATABASE"
   value        = var.database_name
   key_vault_id = data.azurerm_key_vault.sscs_key_vault.id
