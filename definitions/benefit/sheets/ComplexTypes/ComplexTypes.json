@@ -1,4 +1,7 @@
 [
+  {"LiveFrom": "01/01/2018", "ID": "ukPortOfEntry", "ListElementCode": "label", "FieldType": "Text", "ElementLabel": "Label", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "ukPortOfEntry", "ListElementCode": "trafficType", "FieldType": "Text", "ElementLabel": "Traffic Type", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "ukPortOfEntry", "ListElementCode": "locationCode", "FieldType": "Text", "ElementLabel": "Location Code", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "judicialUserPanel", "ListElementCode": "assignedTo", "FieldType": "JudicialUser", "ElementLabel": "Judge", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/02/2023", "ID": "judicialUserPanel", "ListElementCode": "panelMembers", "FieldType": "Collection", "FieldTypeParameter": "JudicialUser", "ElementLabel": "Panel Members", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "dateRange", "ListElementCode": "start", "FieldType": "Date", "ElementLabel": "Start Date", "SecurityClassification": "PUBLIC"},
@@ -38,7 +41,8 @@
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "postcode", "FieldType": "Text", "ElementLabel": "Postcode", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "country", "FieldType": "Text", "ElementLabel": "Country", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "isInUk", "FieldType": "YesOrNo", "ElementLabel": "Living in the UK", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "portOfEntry", "FieldType": "FixedList", "FieldTypeParameter": "FL_portOfEntry", "ElementLabel": "Port of entry", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "portOfEntry", "FieldType": "ukPortOfEntry", "ElementLabel": "Port of entry", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "ukPortOfEntryList", "FieldType": "DynamicList", "ElementLabel": "Port of Entry", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "identity", "ListElementCode": "dob", "FieldType": "Date", "ElementLabel": "Date of birth", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "identity", "ListElementCode": "nino", "FieldType": "Text", "ElementLabel": "National insurance number", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "identity", "ListElementCode": "ibcaReference", "FieldType": "Text", "ElementLabel": "IBCA Reference Number", "SecurityClassification": "PUBLIC"},
