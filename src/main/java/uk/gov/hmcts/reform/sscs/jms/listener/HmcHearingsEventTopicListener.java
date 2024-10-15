@@ -54,6 +54,7 @@ public class HmcHearingsEventTopicListener {
     )
     public void onMessage(JmsBytesMessage message) throws JMSException, HmcEventProcessingException {
 
+        log.info("isByPassHearingServiceEnabled ------------------------> {}", isByPassHearingServiceEnabled);
         if (!isByPassHearingServiceEnabled && isDeploymentFilterEnabled && !isMessageReleventForDeployment(message)) {
             return;
         }
