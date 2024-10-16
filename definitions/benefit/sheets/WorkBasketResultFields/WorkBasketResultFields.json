@@ -76,5 +76,17 @@
   {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "poAttendanceConfirmed", "Label": "PO attendance confirmed?", "DisplayOrder": 11},
   {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "workBasketHearingDate", "Label": "Hearing Date", "DisplayOrder": 18},
   {"LiveFrom": "01/12/2023", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "workBasketHearingDateIssued", "Label": "Hearing Date Issued", "DisplayOrder": 19},
-  {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "workBasketHearingEpimsId", "Label": "Hearing Venue", "DisplayOrder": 20}
+  {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CaseFieldID": "workBasketHearingEpimsId", "Label": "Hearing Venue", "DisplayOrder": 20},
+  {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "region", "Label": "Regional centre", "DisplayOrder": 3},
+  {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "dwpFurtherEvidenceStates", "Label": "Further evidence state", "DisplayOrder": 4},
+  {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "dwpState", "Label": "State", "DisplayOrder": 5},
+  {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "caseCreated", "Label": "Case created date", "DisplayOrder": 6},
+  {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "dateSentToDwp", "Label": "FTA referral date", "DisplayOrder": 7, "ResultsOrdering": "1:ASC"},
+  {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "dwpIsOfficerAttending", "Label": "FTA recommend PO to attend?", "DisplayOrder": 8},
+  {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "tribunalDirectPoToAttend", "Label": "Tribunal direct PO to attend?", "DisplayOrder": 9},
+  {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "poAttendanceConfirmed", "Label": "PO attendance confirmed?", "DisplayOrder": 10},
+  {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "workBasketHearingDate", "Label": "Hearing Date", "DisplayOrder": 11},
+  {"LiveFrom": "01/12/2023", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "workBasketHearingDateIssued", "Label": "Hearing Date Issued", "DisplayOrder": 12},
+  {"LiveFrom": "13/01/2022", "CaseTypeID": "Benefit", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CaseFieldID": "workBasketHearingEpimsId", "Label": "Hearing Venue", "DisplayOrder": 13}
+
 ]

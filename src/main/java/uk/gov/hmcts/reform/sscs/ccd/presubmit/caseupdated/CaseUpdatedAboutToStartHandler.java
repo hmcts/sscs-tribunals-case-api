@@ -7,6 +7,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -22,10 +23,14 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Slf4j
 @RequiredArgsConstructor
 public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
     private final DynamicListLanguageUtil utils;
 
     private final VerbalLanguagesService verbalLanguagesService;
-  
+
+    @Value("${feature.infected-blood-appeal.enabled}")
+    private boolean isInfectedBloodAppealEnabled;
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -78,18 +83,18 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private static void setupBenefitSelection(SscsCaseData sscsCaseData) {
+    private void setupBenefitSelection(SscsCaseData sscsCaseData) {
         BenefitType benefitType = sscsCaseData.getAppeal().getBenefitType();
 
         if (!isNull(benefitType)) {
-            DynamicList benefitDescriptions = SscsUtil.getBenefitDescriptions();
+            DynamicList benefitDescriptions = SscsUtil.getBenefitDescriptions(isInfectedBloodAppealEnabled);
             DynamicListItem selectedBenefit = getSelectedBenefit(benefitDescriptions.getListItems(), sscsCaseData.getBenefitCode());
             benefitDescriptions.setValue(selectedBenefit);
             benefitType.setDescriptionSelection(benefitDescriptions);
         }
     }
 
-    private static DynamicListItem getSelectedBenefit(List<DynamicListItem> listItems, String benefitCode) {
+    private DynamicListItem getSelectedBenefit(List<DynamicListItem> listItems, String benefitCode) {
         if (isNull(benefitCode) || isNull(listItems)) {
             return null;
         }

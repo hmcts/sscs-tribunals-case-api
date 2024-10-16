@@ -1,64 +1,84 @@
-tags:
-  sscs-ccd-idam-pr: false
-
-postgresql:
-  enabled: false
-idam-pr:
-  enabled: false
-xui-webapp:
-  enabled: false
-elastic:
-  enabled: false
-sscs-tribunals-frontend:
-  enabled: false
-redis:
-  enabled: false
-ccd:
-  enabled: false
-em-ccdorc:
-  enabled: false
-sscs-hearings-api:
-  enabled: false
-servicebus:
-  enabled: false
-ccd-case-document-am-api:
-  enabled: false
-aac-manage-case-assignment:
-  enabled: false
-am-org-role-mapping-service:
-  enabled: false
-wa:
-  enabled: false
-  taskBatchCron:
-    enabled: false
-  reconfigurationBatchCron:
-    enabled: false
-  terminationBatchCron:
-    enabled: false
-
-
 java:
   image: ${IMAGE_NAME}
+  memoryLimits: "8Gi"
+  memoryRequests: "1Gi"
+  cpuRequests: "2"
   ingressHost: ${SERVICE_FQDN}
+  cpuLimits: 2000m
   readinessDelay: 45
+  devmemoryRequests: 1Gi
+  devmemoryLimits: 2Gi
   environment:
-    CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-    CASE_DOCUMENT_AM_URL: "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
-    SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
-    TOPIC_NAME: "sscs-evidenceshare-topic-aat"
-    AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
-    AMQP_USERNAME: "SendAndListenSharedAccessKey"
+    PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
+    CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
+    DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
+    BUNDLE_URL: http://${SERVICE_NAME}-em-ccdorc
+    CCD_UI_BASE_URL: https://${SERVICE_NAME}-case-management-web
     CORE_CASE_DATA_CASE_TYPE_ID: ${CASE_TYPE}
-    JOB_SCHEDULER_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
-    JOB_SCHEDULER_DB_NAME: "{{ .Values.postgresql.auth.database}}"
-    JOB_SCHEDULER_DB_HOST: "{{ .Release.Name }}-postgresql"
-    JOB_SCHEDULER_DB_CONNECTION_OPTIONS: ""
+    IDAM_S2S_AUTH: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+    IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+    IDAM_OAUTH2_REDIRECT_URL: ${IDAM_OAUTH2_REDIRECT_URL}
+    IDAM_API_JWK_URL: https://idam-api.aat.platform.hmcts.net/jwks
+    MANAGE_CASE_UI_BASE_URL: https://${SERVICE_NAME}-xui
+    IDAM_OAUTH2_CLIENT_ID: ${IDAM_OAUTH2_CLIENT_ID}
+    IDAM_OAUTH2_CLIENT_SECRET: ${IDAM_OAUTH2_CLIENT_SECRET}
+    IDAM_S2S-AUTH_TOTP_SECRET: ${IDAM_S2S_AUTH_TOTP_SECRET}
+    IDAM_S2S-AUTH_MICROSERVICE: ${IDAM_S2S_AUTH_MICROSERVICE}
+    IDAM_SSCS_SYSTEMUPDATE_USER: ${IDAM_SSCS_SYSTEMUPDATE_USER}
+    IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
+    TEST_URL: http://${SERVICE_NAME}
+    CREATE_CCD_ENDPOINT: true
+    SECURE_DOC_STORE_FEATURE: true
+    CASE_DOCUMENT_AM_URL: ${CASE_DOCUMENT_AM_URL}
+    WORK_ALLOCATION_FEATURE: false
+    CASE_ACCESS_MANAGEMENT_FEATURE: true
+    SCHEDULE_LISTING_FEATURE: true
+    POST_HEARINGS_FEATURE: true
+    POST_HEARINGS_B_FEATURE: true
+    GAPS_SWITCHOVER_FEATURE: true
+    ELASTIC_SEARCH_FEATURE: true
+    ELINKS_V2_FEATURE_ENABLED: true
+    DELETED_REDACTED_DOC_ENABLED: true
+    CITIZEN_LOGIN_SERVICE_V2: true
+    ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: true
+    BYPASS_NOTIFICATIONS_SERVICE: true
+    HANDLE_CCD_CALLBACKMAP_V2: true
+    TESTING_SUPPORT_ENABLED: true
+    SEND_LETTER_SERVICE_ENABLED: "true"
+    SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
+    TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+    SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
+    AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
+    AMQP_USERNAME: "RootManageSharedAccessKey"
+    HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
+    ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
+    ROBOTICS_EMAIL_TO: "fake"
+    ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
+    ROBOTICS_EMAIL_PIP_AE_TO: "fake3"
+    ISSUE_GENERIC_LETTER: true
+    HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: true
+    COH_URL: "http://coh-cor-aat.service.core-compute-aat.internal"
+    ONLINE_HEARING_LINK: "https://sscs-cor-frontend-aat.service.core-compute-aat.internal"
+    JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscs-job-scheduler"
+    JOB_SCHEDULER_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
+    JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+    JOB_SCHEDULER_DB_USERNAME: hmcts
+    HOURS_START_TIME: 0
+    HOURS_END_TIME: 23
+    RUN_DB_MIGRATION_ON_STARTUP: true
+    TEST_RECIPIENTS_POSTCODE: "*"
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
-      secretRef: "{{ .Release.Name }}-postgresql"
-      key: password
+      secretRef: postgres
+      key: PASSWORD
+    HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING:
+      secretRef: sscs-sb-preview
+      key: connectionString
+    AMQP_PASSWORD:
+      secretRef: sscs-sb-preview
+      key: primaryKey
   postgresql:
-    enabled: true
+    enabled: false
 
 ccd-def-cleanup:
   enabled: true

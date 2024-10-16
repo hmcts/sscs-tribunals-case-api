@@ -4,6 +4,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -15,6 +16,10 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Component
 @Slf4j
 public class CreateCaseAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    @Value("${feature.infected-blood-appeal.enabled}")
+    private boolean isInfectedBloodAppealEnabled;
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -47,7 +52,7 @@ public class CreateCaseAboutToStartHandler implements PreSubmitCallbackHandler<S
             appeal.setBenefitType(type);
         }
 
-        appeal.getBenefitType().setDescriptionSelection(SscsUtil.getBenefitDescriptions());
+        appeal.getBenefitType().setDescriptionSelection(SscsUtil.getBenefitDescriptions(isInfectedBloodAppealEnabled));
 
         return new PreSubmitCallbackResponse<>(caseData);
     }

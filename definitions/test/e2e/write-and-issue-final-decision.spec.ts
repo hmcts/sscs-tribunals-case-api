@@ -26,7 +26,7 @@ test.describe('Issue Final Decision - PIP Appeal Type', {tag: '@nightly-pipeline
 
 })
 
-test.describe('Issue Final Decision - Tax Credit Appeal Type', {tag: ['@nightly-pipeline']},  async () => {
+test.describe('Issue Final Decision - Tax Credit Appeal Type', {tag: ['@preview-regression', '@nightly-pipeline']},  async () => {
 
     test("Issue Final Decision - Upload Response with Further Information as No - Simple Decision Notice - 'No' notice generated", {tag: ['@regression']},
         async ({issueFinalDecisionSteps}) => {
@@ -38,7 +38,7 @@ test.describe('Issue Final Decision - Tax Credit Appeal Type', {tag: ['@nightly-
         });
 })
 
-test.describe('Issue Final Decision - Universal Credit Appeal Type', {tag: ['@nightly-pipeline']},  async () => {
+test.describe('Issue Final Decision - Universal Credit Appeal Type', {tag: ['@preview-regression', '@nightly-pipeline']},  async () => {
 
     test("Issue Final Decision - Simple Decision Notice - 'Yes' notice generated",
         async ({issueFinalDecisionSteps}) => {
@@ -53,6 +53,7 @@ test.describe('Issue Final Decision - Universal Credit Appeal Type', {tag: ['@ni
 test.describe('Issue Final Decision - ESA Appeal Type', {tag: '@nightly-pipeline'}, async () => {
 
     test("Issue Final Decision - 'Yes' notice generated - 'No' Award Given",
+        {tag: '@preview-regression'},
         async ({issueFinalDecisionSteps}) => {
             test.slow();
             let esaCaseId = await createCaseBasedOnCaseType('ESA');

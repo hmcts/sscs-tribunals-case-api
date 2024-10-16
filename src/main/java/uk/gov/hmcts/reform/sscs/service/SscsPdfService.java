@@ -57,7 +57,9 @@ public class SscsPdfService {
 
 
 
-        PdfWrapper pdfWrapper = PdfWrapper.builder().sscsCaseData(sscsCaseData).ccdCaseId(caseDetailsId)
+        PdfWrapper pdfWrapper = PdfWrapper.builder()
+                .sscsCaseData(sscsCaseData)
+                .ccdCaseId(caseDetailsId)
                 .isSignLanguageInterpreterRequired(sscsCaseData.getAppeal().getHearingOptions().wantsSignLanguageInterpreter())
                 .isHearingLoopRequired(sscsCaseData.getAppeal().getHearingOptions().wantsHearingLoop())
                 .isAccessibleHearingRoomRequired(sscsCaseData.getAppeal().getHearingOptions().wantsAccessibleHearingRoom())
