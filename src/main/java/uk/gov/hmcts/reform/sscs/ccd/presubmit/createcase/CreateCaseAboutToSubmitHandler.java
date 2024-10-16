@@ -106,7 +106,7 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
     private void createAppealPdf(SscsCaseData caseData) {
         String fileName = IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode())
-                ? generateUniqueIbcaId(caseData.getAppeal().getAppellant())
+                ? generateUniqueIbcaId(caseData.getAppeal().getAppellant()) + ".pdf"
                 : emailHelper.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
 
         boolean hasPdf = hasPdfDocument(caseData, fileName);
