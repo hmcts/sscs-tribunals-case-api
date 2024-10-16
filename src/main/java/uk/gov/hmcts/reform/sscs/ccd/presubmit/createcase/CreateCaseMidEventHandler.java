@@ -34,9 +34,9 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
         PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
 
         if (NO.equals(caseData.getAppeal().getAppellant().getAddress().getIsInUk())) {
-            System.out.println("here! hello!");
             //TODO:
             // - handle isInUK == No then ensure airlookup uses GB code
+            // - validate postcode and first line of address if inTheUK == Yes
             final String selectedPortOfEntryLocationCode = caseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList().getValue().getCode();
             caseData.getAppeal().getAppellant().getAddress().setPortOfEntry(selectedPortOfEntryLocationCode);
         }
