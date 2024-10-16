@@ -507,6 +507,48 @@
   {
     "CaseEventID": "caseUpdated",
     "CaseFieldID": "appeal",
+    "ListElementCode": "benefitType",
+    "ID": "appealBenefitType",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 2,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "caseUpdated",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "benefitType.code",
+    "ID": "appealBenefitTypeCode",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "FieldShowCondition": "benefitType=\"DO_NOT_SHOW\"",
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "caseUpdated",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "benefitType.description",
+    "ID": "appealBenefitTypeDescription",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 2,
+    "FieldShowCondition": "benefitType=\"DO_NOT_SHOW\"",
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "caseUpdated",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "benefitType.descriptionSelection",
+    "ID": "appealBenefitTypeDescriptionSelection",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "caseUpdated",
+    "CaseFieldID": "appeal",
     "ListElementCode": "mrnDetails",
     "ID": "appealMrnDetails",
     "DisplayContext": "OPTIONAL",
@@ -520,6 +562,7 @@
     "ListElementCode": "mrnDetails.dwpIssuingOffice",
     "ID": "appealMrnDetailsDwpIssuingOffice",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "19/11/2019",
     "FieldDisplayOrder": 2,
     "PageID": "1.0"
@@ -550,6 +593,7 @@
     "ListElementCode": "mrnDetails.mrnMissingReason",
     "ID": "appealMrnDetailsMissingReason",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "19/11/2019",
     "FieldDisplayOrder": 2,
     "PageID": "1.0"
@@ -623,8 +667,19 @@
     "ListElementCode": "appellant.identity.nino",
     "ID": "appealAppellantNino",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "19/11/2020",
     "FieldDisplayOrder": 8
+  },
+  {
+    "CaseEventID": "caseUpdated",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "appellant.identity.ibcaReference",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection=\"093\"",
+    "LiveFrom": "01/01/2018",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0"
   },
   {
     "CaseEventID": "caseUpdated",
@@ -683,6 +738,36 @@
   {
     "CaseEventID": "caseUpdated",
     "CaseFieldID": "appeal",
+    "ListElementCode": "appellant.address.country",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "FieldDisplayOrder": 14,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "caseUpdated",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "appellant.address.isInUk",
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection=\"093\"",
+    "LiveFrom": "01/01/2018",
+    "FieldDisplayOrder": 15,
+    "PageID": "1.0",
+    "EventElementLabel": "Does the appellant live in England, Wales or Scotland?"
+  },
+  {
+    "CaseEventID": "caseUpdated",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "appellant.address.ukPortOfEntryList",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.appellant.address.isInUk=\"No\"",
+    "LiveFrom": "01/01/2018",
+    "FieldDisplayOrder": 16,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "caseUpdated",
+    "CaseFieldID": "appeal",
     "ListElementCode": "appellant.contact",
     "ID": "appealAppellantContact",
     "DisplayContext": "OPTIONAL",
@@ -732,6 +817,7 @@
     "ListElementCode": "appellant.isAppointee",
     "ID": "appealApellantIsAppointee",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "19/11/2020",
     "FieldDisplayOrder": 17
   },
@@ -897,48 +983,6 @@
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2020",
     "FieldDisplayOrder": 31
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "appeal",
-    "ListElementCode": "benefitType",
-    "ID": "appealBenefitType",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 32,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "appeal",
-    "ListElementCode": "benefitType.code",
-    "ID": "appealBenefitTypeCode",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 32,
-    "FieldShowCondition": "benefitType=\"DO_NOT_SHOW\"",
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "appeal",
-    "ListElementCode": "benefitType.description",
-    "ID": "appealBenefitTypeDescription",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 32,
-    "FieldShowCondition": "benefitType=\"DO_NOT_SHOW\"",
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "appeal",
-    "ListElementCode": "benefitType.descriptionSelection",
-    "ID": "appealBenefitTypeDescriptionSelection",
-    "DisplayContext": "OPTIONAL",
-    "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 32,
-    "PageID": "1.0"
   },
   {
     "CaseEventID": "caseUpdated",
@@ -1413,13 +1457,23 @@
     "PageID": "1.0"
   },
   {
+    "CaseEventID": "incompleteApplicationReceived",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "appellant.ibcRole",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection=\"093\"",
+    "LiveFrom": "01/01/2018",
+    "FieldDisplayOrder": 69,
+    "PageID": "1.0"
+  },
+  {
     "CaseEventID": "caseUpdated",
     "CaseFieldID": "jointPartyAddress",
     "ListElementCode": "line1",
     "ID": "jointPartyAddressLine1",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 69,
+    "FieldDisplayOrder": 70,
     "PageID": "1.0"
   },
   {
@@ -1429,7 +1483,7 @@
     "ID": "jointPartyAddressLine2",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 70,
+    "FieldDisplayOrder": 71,
     "PageID": "1.0"
   },
   {
@@ -1439,7 +1493,7 @@
     "ID": "jointPartyAddressTown",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 71,
+    "FieldDisplayOrder": 72,
     "PageID": "1.0"
   },
   {
@@ -1449,7 +1503,7 @@
     "ID": "jointPartyAddressCounty",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 72,
+    "FieldDisplayOrder": 73,
     "PageID": "1.0"
   },
   {
@@ -1459,7 +1513,7 @@
     "ID": "jointPartyAddressPostcode",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 73,
+    "FieldDisplayOrder": 74,
     "PageID": "1.0"
   },
   {
@@ -1469,7 +1523,7 @@
     "ID": "jointPartyContactEmail",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 74,
+    "FieldDisplayOrder": 75,
     "PageID": "1.0"
   },
   {
@@ -1479,7 +1533,7 @@
     "ID": "jointPartyContactPhone",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 75,
+    "FieldDisplayOrder": 76,
     "PageID": "1.0"
   },
   {
@@ -1489,7 +1543,7 @@
     "ID": "jointPartyContactMobile",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 76,
+    "FieldDisplayOrder": 77,
     "PageID": "1.0"
   },
   {

@@ -4,6 +4,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.generateUniqueIbcaId;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
@@ -32,8 +33,6 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
     private final EmailHelper emailHelper;
 
     private final VerbalLanguagesService verbalLanguagesService;
-
-    private static final String IBCA_BENEFIT_CODE = "093";
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {

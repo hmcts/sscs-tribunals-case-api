@@ -581,6 +581,7 @@
     "CaseFieldID": "caseReference",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
