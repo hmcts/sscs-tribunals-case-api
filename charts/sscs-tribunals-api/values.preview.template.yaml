@@ -537,7 +537,7 @@ sscs-tribunals-frontend:
   nodejs:
     memoryLimits: "2Gi"
     cpuLimits: 2000m
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:pr-1544-242ec3f-20241010111925
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:pr-1544-b712397-20241016114543
     ingressHost: sya-${SERVICE_FQDN}
     registerAdditionalDns:
       enabled: true
