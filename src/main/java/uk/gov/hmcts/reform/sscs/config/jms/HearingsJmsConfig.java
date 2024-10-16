@@ -37,7 +37,8 @@ public class HearingsJmsConfig {
     @Value("${azure.service-bus.hmc-to-hearings-api.idleTimeout}")
     private Long idleTimeout;
 
-    private String clientId = "SSCS Hearings API";
+    @Value("${spring.application.name}")
+    private String clientId;
 
     private ConnectionFactory hmcHearingJmsConnectionFactory() {
         String connection = String.format(AMQP_CONNECTION_STRING_TEMPLATE, namespace + connectionPostfix, idleTimeout);
