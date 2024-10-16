@@ -41,8 +41,7 @@ public class TribunalsHearingsJmsConfig {
     @Value("${azure.service-bus.amqp-connection-string-template:amqps://%1s?amqp.idleTimeout=%2d}")
     public String amqpConnectionStringTemplate;
 
-    @Value("${spring.application.name}")
-    private String clientId;
+    private String clientId = "SSCS Hearings API";
 
     private ConnectionFactory tribunalsHearingsJmsConnectionFactory() {
         String connection = String.format(amqpConnectionStringTemplate, namespace + connectionPostfix, idleTimeout);
