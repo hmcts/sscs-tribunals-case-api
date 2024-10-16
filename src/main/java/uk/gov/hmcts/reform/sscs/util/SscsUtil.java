@@ -40,6 +40,8 @@ public class SscsUtil {
     public static final String INVALID_BENEFIT_ISSUE_CODE = "Incorrect benefit/issue code combination";
     public static final String BENEFIT_CODE_NOT_IN_USE = "The benefit code selected is not in use";
 
+    private static final String ID_FORMAT = "%s_%s";
+
     private SscsUtil() {
         //
     }
@@ -426,6 +428,24 @@ public class SscsUtil {
         benefitType.setDescription(benefit.getDescription());
         benefitType.setDescriptionSelection(null);
         caseData.setBenefitCode(code);
+    }
+
+    public static void handleIbcaCase(SscsCaseData caseData) {
+        caseData.getAppeal().getHearingOptions().setHearingRoute(LIST_ASSIST);
+        caseData.getAppeal().getMrnDetails().setDwpIssuingOffice("IBCA");
+    }
+
+    public static UkPortOfEntry getUkPortOfEntry(String selectedPortOfEntryLocationCode) {
+        return Arrays.stream(UkPortOfEntry.values())
+                .filter(ukPortOfEntry -> selectedPortOfEntryLocationCode.equals(ukPortOfEntry.getLocationCode()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static String generateUniqueIbcaId(Appellant appellant) {
+        String appellantLastName = appellant.getName().getLastName();
+        String ibcaReference = appellant.getIdentity().getIbcaReference();
+        return String.format(ID_FORMAT, appellantLastName, ibcaReference);
     }
 
     public static void updateHearingChannel(SscsCaseData caseData, HearingChannel hearingChannel) {

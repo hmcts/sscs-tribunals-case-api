@@ -5437,6 +5437,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.role.name",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 1,
     "PageID": "1.0"
@@ -5453,10 +5454,21 @@
   {
     "CaseEventID": "incompleteApplicationReceived",
     "CaseFieldID": "appeal",
+    "ListElementCode": "appellant.ibcRole",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection=\"093\"",
+    "LiveFrom": "01/01/2018",
+    "FieldDisplayOrder": 9,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "incompleteApplicationReceived",
+    "CaseFieldID": "appeal",
     "ListElementCode": "appellant.organisation",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
-    "FieldDisplayOrder": 10,
+    "FieldDisplayOrder": 11,
     "PageID": "1.0"
   },
   {
@@ -5951,7 +5963,7 @@
     "CaseEventID": "incompleteApplicationReceived",
     "CaseFieldID": "appeal",
     "ListElementCode": "rep.address.isInUk",
-    "DisplayContext": "MANDATORY",
+    "DisplayContext": "OPTIONAL",
     "FieldShowCondition": "appeal.benefitType.descriptionSelection=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 8,
