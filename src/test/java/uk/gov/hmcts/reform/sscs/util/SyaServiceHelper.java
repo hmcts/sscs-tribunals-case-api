@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
@@ -10,7 +9,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 
 public final class SyaServiceHelper {
 
-    private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private static final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
     private SyaServiceHelper() {
     }
