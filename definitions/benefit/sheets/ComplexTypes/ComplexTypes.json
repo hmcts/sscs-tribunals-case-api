@@ -38,7 +38,7 @@
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "postcode", "FieldType": "Text", "ElementLabel": "Postcode", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "country", "FieldType": "Text", "ElementLabel": "Country", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "isInUk", "FieldType": "YesOrNo", "ElementLabel": "Living in the UK", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "portOfEntry", "FieldType": "Text", "ElementLabel": "Port of entry value", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "portOfEntry", "FieldType": "Text", "ElementLabel": "Port of entry", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "address", "ListElementCode": "ukPortOfEntryList", "FieldType": "DynamicList", "ElementLabel": "Port of Entry", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "identity", "ListElementCode": "dob", "FieldType": "Date", "ElementLabel": "Date of birth", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "identity", "ListElementCode": "nino", "FieldType": "Text", "ElementLabel": "National insurance number", "SecurityClassification": "PUBLIC"},
