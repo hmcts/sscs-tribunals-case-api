@@ -9,17 +9,5 @@
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "SecurityClassification": "Public"
-  },
-  {
-    "LiveFrom": "04/07/2022",
-    "CaseTypeID": "Benefit",
-    "ID": "addCaseOutcome",
-    "Name": "Add hearing outcome",
-    "Description": "Add a hearing outcome",
-    "DisplayOrder": 140,
-    "PreConditionState(s)": "dormantAppealState;postHearing;withUT;hearing;readyToList",
-    "PostConditionState": "*",
-    "ShowEventNotes": "Y",
-    "SecurityClassification": "Public"
   }
 ]
