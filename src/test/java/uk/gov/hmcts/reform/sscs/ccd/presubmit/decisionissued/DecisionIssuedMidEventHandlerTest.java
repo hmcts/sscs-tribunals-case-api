@@ -207,7 +207,6 @@ public class DecisionIssuedMidEventHandlerTest {
         assertEquals("DECISION NOTICE", payload.getNoticeType());
         assertEquals(expectedName, payload.getAppellantFullName());
         assertEquals(templateId, value.getTemplateId());
-
     }
 }
 
