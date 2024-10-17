@@ -56,7 +56,7 @@ public class HmcHearingsEventTopicListener {
 
         log.info("isByPassHearingServiceEnabled && isDeploymentFilterEnabled ------------------------> {}, {}", isByPassHearingServiceEnabled,
                 isDeploymentFilterEnabled);
-        if (!isByPassHearingServiceEnabled && isDeploymentFilterEnabled && !isMessageReleventForDeployment(message)) {
+        if (isDeploymentFilterEnabled && !isMessageReleventForDeployment(message)) {
             return;
         }
 
