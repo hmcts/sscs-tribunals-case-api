@@ -45,12 +45,29 @@ public class AppealDormantFunctionalTest {
                 //.expect().that().statusCode(expectedHttpStatus.value())
                 .given()
                 .headers(headers)
-                .baseUri("https://sscs-tribunals-api-pr-3764.preview.platform.hmcts.net")
+                .baseUri("http://sscs-tribunals-api-aat.service.core-compute-aat.internal")
                 .body(value)
                 .post("/api/appeals").then().extract().response();
         System.out.println("The value of the Response status : " + response.getStatusCode());
         System.out.println("The value of the Response status line : " + response.getStatusLine());
 
-        System.out.println("The value of the Location : "+response.getHeaders().get("Location").getValue().split("/"));
+        String[] tokens =  response.getHeaders().get("Location").getValue().split("/");
+        // Get the last token
+        String lastToken = tokens[tokens.length - 1];
+
+        // Print the last token
+        String caseId = lastToken;
+
+        System.out.println("The value of the Case Id : "+caseId);
+        Thread.sleep(12000);
+
+        Response getResponse= RestAssured
+                //.expect().that().statusCode(expectedHttpStatus.value())
+                .given()
+                .headers(headers)
+                .baseUri("http://sscs-tribunals-api-aat.service.core-compute-aat.internal")
+                .body(value)
+                .get("/caseworkers/a9ab7f4b-7e0c-49d4-8ed3-75b54d421cdc/jurisdictions/SSCS/case-types/Benefit/cases/"+caseId).then().extract().response();
+        System.out.println(getResponse.body().prettyPrint());
     }
 }
