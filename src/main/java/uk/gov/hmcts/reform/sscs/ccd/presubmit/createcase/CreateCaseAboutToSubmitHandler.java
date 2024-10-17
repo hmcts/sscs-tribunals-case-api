@@ -106,7 +106,7 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
             String appellantLastName = caseData.getAppeal().getAppellant().getName().getLastName();
             String ibcaRef = caseData.getAppeal().getAppellant().getIdentity().getIbcaReference();
             fileName = String.format("%s_%s", appellantLastName, ibcaRef) + ".pdf";
-            // temp solution - need to update generateUniqueEmailId in sscs-common to work with ibcaRef
+            // TODO temp solution - need to update generateUniqueEmailId in sscs-pdf-email-common to work with ibcaRef
         } else {
             fileName = emailHelper.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
         }

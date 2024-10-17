@@ -148,6 +148,22 @@ public class CreateCaseAboutToSubmitHandlerTest {
         verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), eq(expectedFilename));
     }
 
+
+    @Test
+    void isIbaFalseIfNullBenefitType() throws CcdException {
+        when(caseDetails.getCaseData()).thenReturn(mockedCaseData);
+        when(mockedCaseData.getCaseCreated()).thenReturn("");
+        when(mockedCaseData.getCcdCaseId()).thenReturn("1021");
+        when(mockedCaseData.getBenefitType()).thenReturn(Optional.empty());
+        when(mockedCaseData.getAppeal()).thenReturn(mockedAppeal);
+        when(mockedAppeal.getAppellant()).thenReturn(mockedAppellant);
+
+        createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(emailHelper, times(1)).generateUniqueEmailId(any());
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
+    }
+
     @Test
     void shouldCallPdfServiceWhenNoAppointee() throws CcdException {
 
