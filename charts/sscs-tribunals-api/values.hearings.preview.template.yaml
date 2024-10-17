@@ -50,7 +50,7 @@ java:
     SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-main-topic"
     AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
     AMQP_USERNAME: "RootManageSharedAccessKey"
-    HEARINGS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
+    HEARINGS_EVENT_QUEUE_NAME: "${SERVICE_NAME}-servicebus-tribunals-to-hearing-api"
     ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
     ROBOTICS_EMAIL_TO: "fake"
     ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
@@ -67,6 +67,26 @@ java:
     HOURS_END_TIME: 23
     RUN_DB_MIGRATION_ON_STARTUP: true
     TEST_RECIPIENTS_POSTCODE: "*"
+    HMC_HEARINGS_LISTENING_ENABLED: true
+    TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
+    EXUI_API_URL: "https://${SERVICE_NAME}-xui"
+    IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+    CASEWORKER_REF_API_URL: "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
+    COMMON_REF_API_URL: "http://rd-commondata-api-aat.service.core-compute-aat.internal"
+    JUDICIAL_REF_API_URL: "http://rd-judicial-api-aat.service.core-compute-aat.internal"
+    HMC_API_URL: "http://hmc-cft-hearing-service-aat.service.core-compute-aat.internal"
+    #Messaging
+    HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
+    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-4056"
+    TRIBUNALS_EVENT_QUEUE_NAME: "${SERVICE_NAME}-servicebus-tribunals-to-hearing-api"
+    TRIBUNALS_EVENT_QUEUE_POLICY_NAME: "RootManageSharedAccessKey"
+    TRIBUNALS_EVENT_QUEUE_NAMESPACE: "sscs-sb-preview"
+    HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
+    HMC_DEPLOYMENT_ID: "deployment-${SERVICE_NAME}"
+    HMC_DEPLOYMENT_FILTER_ENABLED: true
+    HEARINGS_CASE_UPDATE_V2_ENABLED: true
+    ADJOURNMENT_ENABLED: true
+    BYPASS_HEARING_API_SERVICE: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
@@ -75,6 +95,9 @@ java:
       secretRef: sscs-sb-preview
       key: connectionString
     AMQP_PASSWORD:
+      secretRef: sscs-sb-preview
+      key: primaryKey
+    TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
       secretRef: sscs-sb-preview
       key: primaryKey
   postgresql:

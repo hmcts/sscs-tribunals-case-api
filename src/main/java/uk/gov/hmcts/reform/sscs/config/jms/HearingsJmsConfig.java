@@ -37,23 +37,23 @@ public class HearingsJmsConfig {
     @Value("${azure.service-bus.hmc-to-hearings-api.idleTimeout}")
     private Long idleTimeout;
 
-    @Bean
-    @ConditionalOnProperty({"feature.bypass-hearing-api-service.enabled", "flags.hmc-to-hearings-api.enabled"})
-    public ConnectionFactory hmcHearingJmsConnectionFactory(@Value("${spring.application.name}") final String clientId) {
+    @Value("${spring.application.name}")
+    private String clientId;
+
+    private ConnectionFactory hmcHearingJmsConnectionFactory() {
         String connection = String.format(AMQP_CONNECTION_STRING_TEMPLATE, namespace + connectionPostfix, idleTimeout);
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(connection);
         jmsConnectionFactory.setUsername(username);
         jmsConnectionFactory.setPassword(password);
         jmsConnectionFactory.setClientID(clientId);
-
         return new CachingConnectionFactory(jmsConnectionFactory);
     }
 
     @Bean
     @ConditionalOnProperty({"feature.bypass-hearing-api-service.enabled", "flags.hmc-to-hearings-api.enabled"})
     public JmsListenerContainerFactory<DefaultMessageListenerContainer> hmcHearingsEventTopicContainerFactory(
-        ConnectionFactory hmcHearingJmsConnectionFactory,
         DefaultJmsListenerContainerFactoryConfigurer configurer) {
+        ConnectionFactory hmcHearingJmsConnectionFactory = hmcHearingJmsConnectionFactory();
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         factory.setConnectionFactory(hmcHearingJmsConnectionFactory);
         factory.setReceiveTimeout(receiveTimeout);
