@@ -1,1 +1,13 @@
-[]
+[
+  {"LiveFrom": "13/06/2022", "ID": "hearingOutcomeDetails", "ListElementCode": "hearingStartDateTime", "FieldType": "DateTime", "ElementLabel": "Hearing Start Date and Time", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/06/2022", "ID": "hearingOutcomeDetails", "ListElementCode": "hearingEndDateTime", "FieldType": "DateTime", "ElementLabel": "Hearing End Date and Time", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "hearingOutcomeDetails", "ListElementCode": "completedHearingId", "FieldType": "Text", "ElementLabel": "Hearing id", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/06/2022", "ID": "hearingOutcomeDetails", "ListElementCode": "hearingOutcomeId", "FieldType": "FixedList", "FieldTypeParameter": "FL_caseOutcome", "ElementLabel": "Hearing Outcome", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "hearingOutcomeDetails", "ListElementCode": "didPoAttendHearing", "FieldType": "YesOrNo", "ElementLabel": "Did PO Attend?", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/06/2022", "ID": "hearingOutcomeDetails", "ListElementCode": "outcomeHearingChannelId", "FieldType": "FixedList", "FieldTypeParameter": "FL_hearingChannel", "ElementLabel": "Hearing Channel", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "hearingOutcomeDetails", "ListElementCode": "venue", "FieldType": "venue", "ElementLabel": "Venue", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/06/2022", "ID": "hearingOutcomeDetails", "ListElementCode": "epimsId", "FieldType": "Text", "ElementLabel": "Epims Id", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "13/06/2022", "ID": "hearingOutcomeValue", "ListElementCode": "hearingOutcomeId", "FieldType": "FixedList", "FieldTypeParameter": "FL_caseOutcome", "ElementLabel": "Hearing Outcome", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "hearingOutcomeValue", "ListElementCode": "didPoAttendHearing", "FieldType": "YesOrNo", "ElementLabel": "Did PO Attend?", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "hearingOutcomeValue", "ListElementCode": "completedHearings", "FieldType": "DynamicList", "ElementLabel": "Hearing", "SecurityClassification": "PUBLIC"}
+]
