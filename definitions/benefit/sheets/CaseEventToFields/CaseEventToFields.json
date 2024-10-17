@@ -581,6 +581,7 @@
     "CaseFieldID": "caseReference",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
@@ -972,7 +973,8 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
-    "PageLabel": "Incomplete appeal"
+    "PageLabel": "Incomplete appeal",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=incompleteApplicationReceived1.0"
   },
   {
     "CaseEventID": "incompleteApplicationReceived",
@@ -990,6 +992,7 @@
     "CaseFieldID": "caseReference",
     "CaseTypeID": "Benefit",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 3,

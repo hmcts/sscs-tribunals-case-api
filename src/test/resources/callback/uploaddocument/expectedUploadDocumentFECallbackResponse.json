@@ -38,6 +38,7 @@
         "isAppointee": null,
         "confidentialityRequired": null,
         "role": null,
+        "ibcRole": null,
         "appointee": {
           "id": null,
           "name": null,

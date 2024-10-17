@@ -35,6 +35,7 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
         "jointPartyId",
         "appeal.appellant.appointee.id",
         "appeal.appellant.id",
+        "appeal.appellant.ibcRole",
         "appeal.rep.id",
         "subscriptions.appellantSubscription.tya",
         "subscriptions.appointeeSubscription.tya",

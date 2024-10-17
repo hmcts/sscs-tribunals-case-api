@@ -133,6 +133,7 @@ public class SubmitAppealTest {
                 "regionalProcessingCenter.epimsId",
                 "appeal.appellant.id",
                 "appeal.appellant.appointee.id",
+                "appeal.appellant.ibcRole",
                 "appeal.rep.id",
                 "jointPartyId",
                 "correction",

@@ -38,6 +38,8 @@ public class AppConstants {
     public static final String DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX = "FTA edited evidence received";
     public static final String DATE_FORMAT_YYYYMMDD = "yyyy-MM-dd";
 
+    public static final String IBCA_BENEFIT_CODE = "093";
+
     private AppConstants() {
         //
     }
