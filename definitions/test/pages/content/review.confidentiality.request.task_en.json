@@ -1,0 +1,67 @@
+{
+    "name": "Review Confidentiality Request - Judge",
+    "assignedToWhenNotAssigned": "Unassigned",
+    "assignedToSalariedJudge": "Ms Angelica Ross",
+    "assignedToFeePaidJudge": "Mr Ian Wagner",
+    "assignedToTCW": "SSCS cw",
+    "unassignedManageOptions" : [
+        "Assign to me"
+    ],
+    "unassignedManageOptions1" : [
+        "Assign task",
+        "Cancel task",
+        "Assign to me"
+    ],
+    "unassignedManageOptionsForFeePaidJudge" : [
+        "Assign to me"
+    ],
+    "assignedManageOptionsForSalariedJudge" : [
+        "Mark as done",
+        "Reassign task",
+        "Unassign task"
+    ],
+    "assignedManageOptionsForSalariedJudge1" : [
+        "Cancel task",
+        "Mark as done",
+        "Reassign task",
+        "Unassign task"
+    ],
+    "assignedManageOptionsForFeePaidJudge" : [
+        "Unassign task"
+    ],
+    "assignedManageOptionsForTCW" : [
+        "Unassign task"
+    ],
+    "nextStepsOptions": [
+        "Review confidentiality request",
+        "Issue directions notice",
+        "Send to admin",
+        "Send case to TCW",
+        "Issue final decision",
+        "Amend interloc review state"
+    ],
+    "reviewConfidentialityRequest": {
+        "link": "Review confidentiality request",
+        "eventTitle": "Review confidentiality request"
+    },
+    "issueDirectionsNotice": {
+        "link": "Issue directions notice",
+        "eventTitle": "Issue direction"
+    },
+    "sendToAdmin": {
+        "link": "Send to admin",
+        "eventTitle": "Send to admin"
+    },
+    "sendCaseToTcw": {
+        "link": "Send case to TCW",
+        "eventTitle": "Log case progress"
+    },
+    "issueFinalDecision": {
+        "link": "Issue final decision",
+        "eventTitle": "Issue final decision"
+    },
+    "amendInterlocReviewState": {
+        "link": "Amend interloc review state",
+        "eventTitle": "Amend interloc review state"
+    }
+}

@@ -13,19 +13,19 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Service
 @Slf4j
 public class CreateWelshNoticeSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final CcdService ccdService;
+    private final UpdateCcdCaseService updateCcdCaseService;
     private final IdamService idamService;
 
     @Autowired
-    public CreateWelshNoticeSubmittedHandler(CcdService ccdService, IdamService idamService) {
-        this.ccdService = ccdService;
+    public CreateWelshNoticeSubmittedHandler(UpdateCcdCaseService updateCcdCaseService, IdamService idamService) {
+        this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
     }
 
@@ -44,9 +44,13 @@ public class CreateWelshNoticeSubmittedHandler implements PreSubmitCallbackHandl
         final String nextEvent = callback.getCaseDetails().getCaseData().getSscsWelshPreviewNextEvent();
         log.info("Next event to submit  {}", nextEvent);
         callback.getCaseDetails().getCaseData().setSscsWelshPreviewNextEvent(null);
-        SscsCaseDetails sscsCaseDetails = ccdService.updateCase(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(),
-                nextEvent, "Create Welsh notice",
-                "Create Welsh notice", idamService.getIdamTokens());
+        log.info("Pre calling Welsh Notice Submitted Handler to trigger Case Event V2");
+        SscsCaseDetails sscsCaseDetails = updateCcdCaseService.triggerCaseEventV2(callback.getCaseDetails().getId(),
+            nextEvent,
+            "Create Welsh notice",
+            "Create Welsh notice",
+            idamService.getIdamTokens());
+        log.info("Triggered case event V2 calling Welsh Notice Submitted Handler");
         return new PreSubmitCallbackResponse<>(sscsCaseDetails.getData());
     }
 }

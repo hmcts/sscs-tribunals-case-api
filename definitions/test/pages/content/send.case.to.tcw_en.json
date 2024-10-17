@@ -1,0 +1,8 @@
+{
+    "caption" : "Send case to TCW",
+    "heading" : "Log case progress",
+    "interlocReviewStateDropdownLabel": "Interlocutory review state",
+    "interlocReviewStateSelectValue": "Review by Judge",
+    "enterNoteFieldLabel" : "Enter note",
+    "enterNoteInput" : "Automation testing of Send case to TCW Event"
+}

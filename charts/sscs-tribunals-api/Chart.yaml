@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.155
+version: 0.0.160
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
@@ -26,12 +26,8 @@ dependencies:
     version: 1.0.18
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: xui-webapp.enabled
-  - name: sscs-tya-notif
-    version: 0.0.54
-    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-    condition: sscs-tya-notif.enabled
   - name: ccd
-    version: 9.2.0
+    version: 9.2.1
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd.enabled
     tags:
@@ -57,7 +53,7 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: sscs-hearings-api.enabled
   - name: servicebus
-    version: 1.0.6
+    version: 1.0.7
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: servicebus.enabled
   - name: aac-manage-case-assignment
@@ -120,6 +116,6 @@ dependencies:
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: wa.enabled
   - name: ccd-def-cleanup
-    version: ~9.0.3
+    version: ~9.0.4
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
     condition: ccd-def-cleanup.enabled
