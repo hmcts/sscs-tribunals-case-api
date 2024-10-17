@@ -140,10 +140,9 @@ public abstract class SubmitAppealServiceBase {
     }
 
     SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal) {
-
-        String postCode = resolvePostCode(appeal);
-        String firstHalfOfPostcode = getFirstHalfOfPostcode(postCode);
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
+        boolean isIba = appeal.getBenefitType().getCode().equals(Benefit.INFECTED_BLOOD_APPEAL.getShortName());
+        String postCode = resolvePostCode(appeal, isIba);
+        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(isIba ? postCode : getFirstHalfOfPostcode(postCode));
 
         SscsCaseData sscsCaseData = rpc == null
             ? convertSyaToCcdCaseDataV1(appeal, caseAccessManagementFeature)
@@ -168,24 +167,30 @@ public abstract class SubmitAppealServiceBase {
         }
 
         log.info("{} - setting venue name to {}",
-            sscsCaseData.getAppeal().getAppellant().getIdentity().getNino(),
+            isIba
+                ? sscsCaseData.getAppeal().getAppellant().getIdentity().getIbcaReference()
+                : sscsCaseData.getAppeal().getAppellant().getIdentity().getNino(),
             sscsCaseData.getProcessingVenue());
 
         return sscsCaseData;
     }
 
     private EventType findEventType(SscsCaseData caseData, boolean saveAndReturnCase) {
-
-        if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
-            LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
+        Appeal appeal = caseData.getAppeal();
+        MrnDetails mrnDetails = appeal.getMrnDetails();
+        if (mrnDetails != null && mrnDetails.getMrnDate() != null) {
+            LocalDate mrnDate = LocalDate.parse(mrnDetails.getMrnDate());
             boolean moveToNoneCompliant = mrnDate.plusMonths(13L).isBefore(LocalDate.now());
 
             return handleMoveToNonCompliant(caseData, saveAndReturnCase, moveToNoneCompliant);
         } else {
-            log.info("Moving case for NINO {} to incomplete due to MRN Details {} present and MRN Date {} present",
-                caseData.getAppeal().getAppellant().getIdentity().getNino(),
-                (caseData.getAppeal().getMrnDetails() != null ? "" : "not"),
-                (caseData.getAppeal().getMrnDetails().getMrnDate() != null ? "" : "not"));
+            boolean isIba = caseData.getBenefitCode().equals(Benefit.INFECTED_BLOOD_APPEAL.getBenefitCode());
+            Identity identity = appeal.getAppellant().getIdentity();
+            log.info("Moving case for {} {} to incomplete due to MRN Details {} present and MRN Date {} present",
+                isIba ? "Ibca Reference" : "NINO",
+                isIba ? identity.getIbcaReference() : identity.getNino(),
+                (mrnDetails != null ? "" : "not"),
+                (mrnDetails != null && mrnDetails.getMrnDate() != null ? "" : "not"));
             return saveAndReturnCase ? DRAFT_TO_INCOMPLETE_APPLICATION : INCOMPLETE_APPLICATION_RECEIVED;
         }
     }
@@ -215,7 +220,7 @@ public abstract class SubmitAppealServiceBase {
     private SscsCaseDetails createOrUpdateCase(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
         SscsCaseDetails caseDetails = null;
         String benefitShortName = caseData.getAppeal().getBenefitType().getCode();
-        boolean isIba = (caseData.getBenefitCode().equals(Benefit.INFECTED_BLOOD_APPEAL.getBenefitCode()));
+        boolean isIba = caseData.getBenefitCode().equals(Benefit.INFECTED_BLOOD_APPEAL.getBenefitCode());
         String nino = caseData.getAppeal().getAppellant().getIdentity().getNino();
         String ibcaReference = caseData.getAppeal().getAppellant().getIdentity().getIbcaReference();
         try {
@@ -292,8 +297,11 @@ public abstract class SubmitAppealServiceBase {
         }
     }
 
-    private String resolvePostCode(SyaCaseWrapper appeal) {
-        if (Boolean.TRUE.equals(appeal.getIsAppointee())) {
+    private String resolvePostCode(SyaCaseWrapper appeal, boolean isIba) {
+        Boolean inMainlandUk = appeal.getContactDetails().getInMainlandUk();
+        if (isIba && inMainlandUk != null && inMainlandUk.equals(Boolean.FALSE)) {
+            return appeal.getAppellant().getContactDetails().getPortOfEntry();
+        } else if (Boolean.TRUE.equals(appeal.getIsAppointee())) {
             return Optional.ofNullable(appeal.getAppointee())
                 .map(SyaAppointee::getContactDetails)
                 .map(SyaContactDetails::getPostCode)

@@ -36,6 +36,9 @@ public class SyaAppellant {
     @JsonProperty("isAddressSameAsAppointee")
     private Boolean isAddressSameAsAppointee;
 
+    @JsonProperty("ibcRole")
+    private String ibcRole;
+
     public void setNino(String nino) {
         this.nino = normaliseNino(nino);
     }
