@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -415,6 +416,80 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenIsThereAJointPartyHasBeenSetToNo_thenClearJointPartyFieldsOnCaseDetails() {
+        callback.getCaseDetails().getCaseData().setHasJointParty(YesNo.NO);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        JointParty jointParty = response.getData().getJointParty();
+
+        assertNull(jointParty.getIdentity());
+        assertNull(jointParty.getName());
+        assertNull(jointParty.getAddress());
+        assertNull(jointParty.getContact());
+        assertNull(jointParty.getJointPartyAddressSameAsAppellant());
+    }
+
+    @Test
+    public void givenJointPartySameAddressAsAppellantIsYes_validateJointPartyAddressIsUpdated() {
+        JointParty jointParty = JointParty.builder()
+                .name(Name.builder().firstName("Test").lastName("Test").build())
+                .jointPartyAddressSameAsAppellant(YES)
+                .address(Address.builder().line1("Previous Joint party Address").postcode("CF101AE").build())
+                .hasJointParty(YES)
+                .build();
+
+        callback.getCaseDetails().getCaseData().setJointParty(jointParty);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Address appellantAddress = sscsCaseData.getAppeal().getAppellant().getAddress();
+
+        assertThat(response.getData().getJointParty().getAddress(), is(appellantAddress));
+    }
+
+    @Test
+    public void givenJointPartySameAddressAsAppellantIsNull_validateJointPartyAddress() {
+        JointParty jointParty = JointParty.builder()
+                .name(Name.builder().firstName("Test").lastName("Test").build())
+                .jointPartyAddressSameAsAppellant(null)
+                .address(Address.builder().line1(null).postcode(null).build())
+                .hasJointParty(YES)
+                .build();
+
+        callback.getCaseDetails().getCaseData().setJointParty(jointParty);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Set<String> expectedErrorMessages = Set.of("You must enter address line 1 for the joint party",
+                "You must enter a valid UK postcode for the joint party");
+
+        assertThat(response.getErrors().size(), is(2));
+        assertThat(response.getErrors(), is(expectedErrorMessages));
+    }
+
+    @Test
+    public void givenJointSameAddressAsAppeallantIsSetToNo_validateJointPartyAddress() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1("123 The Street");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("CM120NS");
+
+        JointParty jointParty = JointParty.builder()
+                .name(Name.builder().firstName("Test").lastName("Test").build())
+                .jointPartyAddressSameAsAppellant(NO)
+                .address(Address.builder().line1("123 line").postcode(null).build())
+                .hasJointParty(YES)
+                .build();
+
+        callback.getCaseDetails().getCaseData().setJointParty(jointParty);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getErrors(), hasItem("You must enter a valid UK postcode for the joint party"));
+    }
+
+    @Test
     public void givenJointPartySameAddressAsAppeallantIsSetToYes_validateAppeallantAddressNotJointParty() {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1(null);
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("73GH Y7U");
@@ -437,7 +512,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenJointSameAddressAsAppeallantIsSetToNo_validateJointPartyAddress() {
+    public void givenJointSameAddressAsAppeallantIsSetToYes_validateJointPartyAddress() {
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setLine1("123 The Street");
         callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("CM120NS");
 
@@ -979,6 +1054,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         assertEquals(1, response.getErrors().size());
 
         assertThat(response.getWarnings(), hasItems("FTA issuing office is empty"));
+        //TODO: update this test when PR raised to point at new SSCS Common changes for IBCA
         assertThat(response.getErrors(), hasItems("Benefit type code is invalid, should be one of: ESA, JSA, PIP, DLA, UC, carersAllowance, attendanceAllowance, "
             + "bereavementBenefit, industrialInjuriesDisablement, maternityAllowance, socialFund, incomeSupport, bereavementSupportPaymentScheme, "
             + "industrialDeathBenefit, pensionCredit, retirementPension, childSupport, taxCredit, guardiansAllowance, taxFreeChildcare, "
@@ -993,6 +1069,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
+        //TODO: update this test when PR raised to point at new SSCS Common changes for IBCA
         assertThat(response.getErrors(), hasItems("Benefit type code is invalid, should be one of: ESA, JSA, PIP, DLA, UC, carersAllowance, attendanceAllowance, "
             + "bereavementBenefit, industrialInjuriesDisablement, maternityAllowance, socialFund, incomeSupport, bereavementSupportPaymentScheme, "
             + "industrialDeathBenefit, pensionCredit, retirementPension, childSupport, taxCredit, guardiansAllowance, taxFreeChildcare, "

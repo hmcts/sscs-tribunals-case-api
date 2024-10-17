@@ -34,7 +34,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -87,6 +86,7 @@ class AdjournCasePreviewServiceTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final LocalDate LOCAL_DATE = LocalDate.parse("2018-10-10");
     private static final String JUDGE_FULL_NAME = "Judge F Name";
+    private static final String JUDGE_LAST_NAME = "Name";
     private static final String PANEL_MEMBER_1_PERSONAL_CODE = "12";
     private static final String PANEL_MEMBER_1_NAME = "Mr P M 1";
     private static final String PANEL_MEMBER_2_PERSONAL_CODE = "123";
@@ -135,7 +135,6 @@ class AdjournCasePreviewServiceTest {
     void setUp() {
         service = new AdjournCasePreviewService(generateFile, userDetailsService, venueDataLoader, TEMPLATE_ID,
                 airLookupService, signLanguagesService, judicialRefDataService, documentConfiguration);
-        ReflectionTestUtils.setField(service, "adjournmentFeature", true);
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -325,6 +324,8 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void willSetPreviewFileWithNullReasons_WhenReasonsListIsEmpty(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
+
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -349,6 +350,8 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void willSetPreviewFileWithNullReasons_WhenReasonsListIsNotEmpty(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
+
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -373,6 +376,8 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void willSetPreviewFileWithInterpreterDescription_WhenInterpreterRequiredAndLanguageIsSet(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
+
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -400,6 +405,8 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void willNotSetPreviewFileButWillDisplayError_WithInterpreterDescription_WhenInterpreterRequiredAndLanguageIsNotSet(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
+
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
@@ -412,6 +419,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void willSetPreviewFileWithoutInterpreterDescription_WhenInterpreterNotRequiredAndLanguageIsSet(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -439,6 +447,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void willSetPreviewFileWithoutInterpreterDescription_WhenInterpreterRequiredNotSetAndLanguageIsSet(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -466,6 +475,7 @@ class AdjournCasePreviewServiceTest {
     void givenSignedInJudgeNameNotSet_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
 
+
         adjournment.setTypeOfNextHearing(nextHearingType);
 
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenThrow(new IllegalStateException("Unable to obtain signed in user details"));
@@ -477,6 +487,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenSignedInJudgeUserDetailsNotSet_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+
 
         adjournment.setTypeOfNextHearing(nextHearingType);
 
@@ -498,6 +509,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithMultipleHearingsWithVenues_thenCorrectlySetHeldAtUsingTheFirstHearingInList(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -520,6 +532,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithMultipleHearingsWithFirstInListWithNoVenueName_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
@@ -539,6 +552,8 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithMultipleHearingsWithFirstInListWithNoVenue_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
+
 
         adjournment.setTypeOfNextHearing(nextHearingType);
 
@@ -557,6 +572,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenCorrectlySetHeldAtAsInChambers(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
@@ -575,6 +591,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenCorrectlySetHeldAtAsInChambers(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
         adjournment.setTypeOfNextHearing(nextHearingType);
 
@@ -595,6 +612,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithEmptyHearingsList_thenDefaultHearingData(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
@@ -610,6 +628,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithNullHearingsList_thenDefaultHearingData(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
@@ -640,6 +659,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithMultipleHearingsWithHearingDates_thenCorrectlySetTheHeldOnUsingTheFirstHearingInList(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -662,6 +682,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseHasInvalidHearing_thenCorrectlySetTheHeldOnUsingTheSecondHearingInList(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -682,6 +703,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenCorrectlySetTheHeldOnUsingTheSecondHearingInList(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -704,6 +726,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"TELEPHONE", "VIDEO", "FACE_TO_FACE"})
     void givenCaseWithDurationParameterButMissingUnitsWhenOralHearing_thenDisplayErrorAndDoNotGenerateDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
@@ -716,6 +739,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithNoDurationEnumSource_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -732,6 +756,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithDurationParameterButMissingUnitsWhenPaperHearing_thenDisplayErrorAndDoNotGenerateDocument() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -747,6 +772,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWith120MinutesDuration_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -762,6 +788,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithOneMinuteDuration_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -777,6 +804,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithTwoSessionDuration_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -792,6 +820,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithOneSessionDuration_thenCorrectlySetTheNextHearingTimeslot(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -805,30 +834,9 @@ class AdjournCasePreviewServiceTest {
 
     @ParameterizedTest
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
-    void givenCaseWithThreePanelMembers_thenCorrectlySetTheHeldBeforeWithoutFlag(AdjournCaseTypeOfHearing nextHearingType) {
-        ReflectionTestUtils.setField(service, "adjournmentFeature", false);
-        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
-        when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
-        when(generateFile.assemble(any())).thenReturn(URL);
-
-        adjournment.setTypeOfNextHearing(nextHearingType);
-        adjournment.setDisabilityQualifiedPanelMemberName(PANEL_MEMBER_1_NAME);
-        adjournment.setMedicallyQualifiedPanelMemberName(PANEL_MEMBER_2_NAME);
-        adjournment.setOtherPanelMemberName(OTHER_PANEL_MEMBER_NAME);
-
-        String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
-        AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
-
-        assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + ", "
-            + PANEL_MEMBER_1_NAME + ", "
-            + PANEL_MEMBER_2_NAME + " and "
-            + OTHER_PANEL_MEMBER_NAME);
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithThreePanelMembers_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -843,7 +851,7 @@ class AdjournCasePreviewServiceTest {
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-        assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + ", "
+        assertThat(body.getHeldBefore()).isEqualTo("Tribunal Judge " + JUDGE_LAST_NAME + ", "
             + PANEL_MEMBER_1_NAME + ", "
             + PANEL_MEMBER_2_NAME + " and "
             + OTHER_PANEL_MEMBER_NAME);
@@ -853,6 +861,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithTwoPanelMembers_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -866,7 +875,7 @@ class AdjournCasePreviewServiceTest {
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-        assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + ", "
+        assertThat(body.getHeldBefore()).isEqualTo("Tribunal Judge " + JUDGE_LAST_NAME + ", "
             + PANEL_MEMBER_1_NAME + " and "
             + PANEL_MEMBER_2_NAME);
     }
@@ -875,6 +884,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithOnePanelMember_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -887,13 +897,14 @@ class AdjournCasePreviewServiceTest {
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-        assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME + " and " + PANEL_MEMBER_1_NAME);
+        assertThat(body.getHeldBefore()).isEqualTo("Tribunal Judge " + JUDGE_LAST_NAME + " and " + PANEL_MEMBER_1_NAME);
     }
 
     @ParameterizedTest
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithNoPanelMembersWithNullValues_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -902,13 +913,14 @@ class AdjournCasePreviewServiceTest {
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-        assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME);
+        assertThat(body.getHeldBefore()).isEqualTo("Tribunal Judge " + JUDGE_LAST_NAME);
     }
 
     @ParameterizedTest
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithNoPanelMembersWithEmptyValues_thenCorrectlySetTheHeldBefore(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -919,13 +931,14 @@ class AdjournCasePreviewServiceTest {
         String nextHearingTypeText = HearingType.getByKey(nextHearingType.getCcdDefinition()).getValue();
         AdjournCaseTemplateBody body = getAdjournCaseTemplateBodyWithHearingTypeText(nextHearingTypeText);
 
-        assertThat(body.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME);
+        assertThat(body.getHeldBefore()).isEqualTo("Tribunal Judge " + JUDGE_LAST_NAME);
     }
 
     @ParameterizedTest
     @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"FACE_TO_FACE"})
     void givenCaseWithNoSelectedVenueNotSetForFaceToFace_thenCorrectlySetTheVenueToBeTheExistingVenue(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -942,6 +955,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"TELEPHONE", "VIDEO", "PAPER"})
     void givenCaseWithNoSelectedVenueNotSetForNonFaceToFace_thenCorrectlySetTheVenueToBeNull(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -956,6 +970,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAndFirstOnSessionAndMorningSessionSelected_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -969,6 +984,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAndFirstOnSessionAndAfternoonSessionSelected_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -982,6 +998,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAndFirstOnSessionNotSelectedAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -998,6 +1015,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAndFirstOnSessionSelectedAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1011,6 +1029,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAfterPeriodAndFirstOnSessionAndMorningSessionSelected_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1029,6 +1048,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAfterPeriodAndFirstOnSessionAndAfternoonSessionSelected_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1047,6 +1067,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAfterPeriodAndFirstOnSessionAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1065,6 +1086,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAfterPeriodAndNoFirstOnSessionAndMorningSessionSelected_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1083,6 +1105,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAfterPeriodAndNoFirstOnSessionAndAfternoonSessionSelected_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1101,6 +1124,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAfterPeriodAndNoFirstOnSessionAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1119,6 +1143,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAfterWithProvidePeriodAndNoPeriodSpecified_ThenDisplayErrorAndDoNotDisplayTheDocument() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
 
         adjournment.setNextHearingDateType(FIRST_AVAILABLE_DATE_AFTER);
@@ -1133,6 +1158,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAfterAndFirstOnSessionAndMorningSessionSelected_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1149,6 +1175,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAfterAndFirstOnSessionAndAfternoonSessionSelected_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1165,6 +1192,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAfterAndFirstOnSessionAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1181,6 +1209,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAfterAndNoFirstOnSessionAndMorningSessionSelected_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1200,6 +1229,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAfterAndNoFirstOnSessionAndAfternoonSessionSelected_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1219,6 +1249,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAfterAndNoFirstOnSessionAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1235,6 +1266,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithDateToBeFixedAndNoFirstOnSessionAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1249,6 +1281,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithDateToBeFixedAndFirstOnSessionAndMorningSessionProvided_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1263,6 +1296,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithDateToBeFixedAndFirstOnSessionAndAfternoonSessionProvided_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1277,6 +1311,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithDateToBeFixedAndNotFirstOnSessionAndMorningSessionProvided_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1291,6 +1326,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithDateToBeFixedAndNotFirstOnSessionAndAfternoonSessionProvided_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1305,6 +1341,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithDateToBeFixedAndNotFirstOnSessionAndNoAfternoonSessionProvided_thenCorrectlyDisplayTheFixedDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1319,6 +1356,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithDateToBeFixedAndFirstOnSessionAndNoTimeProvided_thenCorrectlyDisplayTheNextHearingDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1333,6 +1371,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAndNotFirstOnSessionAndNoAfternoonSessionProvided_thenCorrectlyDisplayTheFirstAvailableDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1346,6 +1385,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAndNotAdjournCaseTimeAndNoAfternoonSessionProvided_thenCorrectlyDisplayTheFirstAvailableDateAfterDate() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1359,6 +1399,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAfterWithNoDateOrPeriodIndicator_ThenDisplayErrorAndDoNotDisplayTheDocument() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
 
         adjournment.setNextHearingDateType(FIRST_AVAILABLE_DATE_AFTER);
@@ -1370,6 +1411,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAfterWithProvideDateAndNoDateSpecified_ThenDisplayErrorAndDoNotDisplayTheDocument() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
 
         adjournment.setNextHearingDateType(FIRST_AVAILABLE_DATE_AFTER);
@@ -1381,6 +1423,7 @@ class AdjournCasePreviewServiceTest {
     @Test
     void givenCaseWithFirstAvailableDateAfterWithNeitherProvideDateOrPeriodSpecified_ThenDisplayErrorAndDoNotDisplayTheDocument() {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
 
         adjournment.setNextHearingDateType(FIRST_AVAILABLE_DATE_AFTER);
@@ -1392,6 +1435,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"FACE_TO_FACE"})
     void givenCaseWithSameVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeThePreviousVenue(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1414,6 +1458,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"FACE_TO_FACE"})
     void givenCaseWithSelectedVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeTheNewVenue(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getVenueDetailsMap()).thenReturn(venueDetailsMap);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -1437,6 +1482,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"TELEPHONE", "VIDEO", "PAPER"})
     void givenCaseWithSelectedVenueSetForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
@@ -1459,6 +1505,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"FACE_TO_FACE"})
     void givenCaseWithSelectedVenueSetIncorrectlyForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
@@ -1476,6 +1523,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"FACE_TO_FACE"})
     void givenCaseWithSelectedVenueMissingListItemForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
@@ -1493,6 +1541,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"FACE_TO_FACE"})
     void givenCaseWithSelectedVenueMissingListItemCodeForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
@@ -1510,6 +1559,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class, names = {"TELEPHONE", "VIDEO", "PAPER"})
     void givenCaseWithSelectedVenueSetIncorrectlyForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
 
         adjournment.setTypeOfNextHearing(nextHearingType);
@@ -1527,6 +1577,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void scottishRpcWillShowAScottishImage(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1544,6 +1595,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenCaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1567,6 +1619,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenDateIssuedParameterIsTrue_thenShowIssuedDateOnDocument(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1584,6 +1637,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenGeneratedDateIsAlreadySetForGeneratedFlow_thenDoSetNewGeneratedDate(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1602,6 +1656,7 @@ class AdjournCasePreviewServiceTest {
     @EnumSource(value = AdjournCaseTypeOfHearing.class)
     void givenGeneratedDateIsAlreadySetNonGeneratedFlow_thenDoSetNewGeneratedDate(AdjournCaseTypeOfHearing nextHearingType) {
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -1626,7 +1681,7 @@ class AdjournCasePreviewServiceTest {
                 DocumentType.DRAFT_ADJOURNMENT_NOTICE,
                 USER_AUTHORISATION,
                 false);
-
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(UserDetails.builder()
             .forename("Joe").surname("Linton").build().getFullName());
 
@@ -1657,6 +1712,7 @@ class AdjournCasePreviewServiceTest {
     void givenSameVenueSelectedAndGetVenueDetails_thenPayloadContainsUpdatedHearingLocations() {
         when(venueDataLoader.getVenueDetailsMap()).thenReturn(venueDetailsMap);
         when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(JUDGE_FULL_NAME);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn(JUDGE_LAST_NAME);
         when(venueDataLoader.getGapVenueName(any(), any())).thenReturn(GAP_VENUE_NAME);
         when(airLookupService.lookupVenueIdByAirVenueName(any())).thenReturn(123);
         when(generateFile.assemble(any())).thenReturn(URL);

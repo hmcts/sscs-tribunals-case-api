@@ -68,12 +68,6 @@ public class SscsUtil {
         }
     }
 
-    public static void clearAdjournmentTransientFields(SscsCaseData caseData) {
-        log.info("Clearing transient adjournment case fields for caseId {}", caseData.getCcdCaseId());
-
-        caseData.setAdjournment(Adjournment.builder().build());
-    }
-
     public static void clearPostHearingFields(SscsCaseData caseData, boolean isPostHearingsEnabled) {
         if (isPostHearingsEnabled) {
             caseData.setPostHearing(PostHearing.builder().build());
@@ -378,9 +372,10 @@ public class SscsUtil {
 
         return false;
     }
-    
-    public static DynamicList getBenefitDescriptions() {
+
+    public static DynamicList getBenefitDescriptions(boolean isInfectedBloodAppealEnabled) {
         List<DynamicListItem> items = Arrays.stream(Benefit.values())
+                .filter(benefit -> isInfectedBloodAppealEnabled || !benefit.getShortName().equals("infectedBloodAppeal"))
                 .sorted(Comparator.comparing(Benefit::getDescription))
                 .map(SscsUtil::getBenefitDescriptionList)
                 .flatMap(List::stream)
@@ -457,6 +452,37 @@ public class SscsUtil {
         hearingSubtype.setWantsHearingTypeVideo(hearingChannelToYesNoString(VIDEO, hearingChannel));
 
         caseData.getSchedulingAndListingFields().getOverrideFields().setAppellantHearingChannel(hearingChannel);
+    }
+
+    public static void updateHearingInterpreter(SscsCaseData caseData,
+                                                PreSubmitCallbackResponse<SscsCaseData> response, HearingInterpreter appellantInterpreter) {
+        Appeal appeal = caseData.getAppeal();
+
+        if (nonNull(appellantInterpreter.getIsInterpreterWanted())) {
+
+            HearingOptions hearingOptions = appeal.getHearingOptions();
+            if (isNull(hearingOptions)) {
+                hearingOptions = HearingOptions.builder().build();
+                appeal.setHearingOptions(hearingOptions);
+            }
+
+            String interpreterWanted = appellantInterpreter.getIsInterpreterWanted().getValue();
+            hearingOptions.setLanguageInterpreter(interpreterWanted);
+
+            if (interpreterWanted.equals(YES.toString())) {
+                if (nonNull(appellantInterpreter.getInterpreterLanguage()) && nonNull(appellantInterpreter.getInterpreterLanguage().getValue())) {
+                    String interpreterLanguage = appellantInterpreter.getInterpreterLanguage().getValue().getLabel();
+                    hearingOptions.setLanguages(interpreterLanguage);
+                } else {
+                    response.addError("Interpreter language must be selected if an interpreter is wanted.");
+                }
+            } else {
+                appellantInterpreter.setInterpreterLanguage(null);
+                hearingOptions.setLanguages(null);
+            }
+        }
+
+        caseData.getSchedulingAndListingFields().getOverrideFields().setAppellantInterpreter(appellantInterpreter);
     }
 
     private static String hearingChannelToYesNoString(HearingChannel expectedHearingChannel, HearingChannel hearingChannel) {

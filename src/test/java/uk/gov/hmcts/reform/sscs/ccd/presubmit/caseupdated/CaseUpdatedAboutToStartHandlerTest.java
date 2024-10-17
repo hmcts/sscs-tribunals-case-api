@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -68,13 +69,30 @@ public class CaseUpdatedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenBenefitType_shouldHaveCorrectBenefitSelection() {
+    void givenBenefitType_shouldHaveCorrectBenefitSelectionWithInfectedBloodAppealDisabled() {
+        ReflectionTestUtils.setField(handler, "isInfectedBloodAppealEnabled", false);
+
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var benefitSelection = result.getData().getAppeal().getBenefitType().getDescriptionSelection();
 
         assertThat(benefitSelection).isNotNull();
         assertThat(benefitSelection.getValue()).isNotNull();
         assertThat(benefitSelection.getValue().getCode()).isEqualTo("002");
+        assertThat(benefitSelection.getListItems().size()).isEqualTo(34);
+    }
+
+    @Test
+    void givenBenefitType_shouldHaveCorrectBenefitSelectionWithInfectedBloodAppealEnabled() {
+        ReflectionTestUtils.setField(handler, "isInfectedBloodAppealEnabled", true);
+
+        var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+        var benefitSelection = result.getData().getAppeal().getBenefitType().getDescriptionSelection();
+
+        assertThat(benefitSelection).isNotNull();
+        assertThat(benefitSelection.getValue()).isNotNull();
+        assertThat(benefitSelection.getValue().getCode()).isEqualTo("002");
+        //TODO: update this test when PR raised to point at new SSCS Common changes for IBCA
+        assertThat(benefitSelection.getListItems().size()).isEqualTo(34);
     }
 
     @Test

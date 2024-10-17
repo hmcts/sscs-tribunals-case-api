@@ -24,6 +24,9 @@ public class SendToFirstTierSubmittedHandler implements PreSubmitCallbackHandler
     @Value("${feature.postHearingsB.enabled}")
     private final boolean isPostHearingsBEnabled;
 
+    @Value("${feature.handle-ccd-callbackMap-v2.enabled}")
+    private boolean isHandleCcdCallbackMapV2Enabled;
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -42,8 +45,14 @@ public class SendToFirstTierSubmittedHandler implements PreSubmitCallbackHandler
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        caseData = ccdCallbackMapService.handleCcdCallbackMap(caseData.getPostHearing().getSendToFirstTier().getAction(), caseData);
-
+        if (isHandleCcdCallbackMapV2Enabled) {
+            caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
+                    caseData.getPostHearing().getSendToFirstTier().getAction(),
+                    callback.getCaseDetails().getId()
+            );
+        } else {
+            caseData = ccdCallbackMapService.handleCcdCallbackMap(caseData.getPostHearing().getSendToFirstTier().getAction(), caseData);
+        }
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }

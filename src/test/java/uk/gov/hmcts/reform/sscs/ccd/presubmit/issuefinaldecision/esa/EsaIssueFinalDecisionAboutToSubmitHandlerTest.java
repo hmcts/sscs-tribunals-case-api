@@ -313,7 +313,6 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueFinalDecisionEvent_shouldUpdateIssueFinalDecisionDateToToday() {
-        ReflectionTestUtils.setField(handler, "isAdjournmentEnabled", true);
 
         SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
         sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(documentLink);
@@ -366,7 +365,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice(YES);
         sscsFinalDecisionCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         callback.getCaseDetails().getCaseData().setState(State.VOID_STATE);
-        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(" judge name");
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn("judge name");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getState(), is(State.VOID_STATE));
@@ -433,13 +432,15 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setState(State.WITH_DWP);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.DIRECTION_RESPONDED);
         sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionIssuedDate(null);
-        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn("judge name");
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn("judge name");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
 
         assertEquals(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionIssuedDate(), LocalDate.now());
+        assertEquals(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionJudge(), "judge name");
+        assertEquals(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionHeldAt(), "In chambers");
     }
 
     private SscsDocument buildSscsDocumentWithDocumentType(String documentType) {

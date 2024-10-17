@@ -1,0 +1,12 @@
+[
+  {"LiveFrom": "01/01/2018", "ID": "KeyValue", "ListElementCode": "key", "FieldType": "Text", "ElementLabel": "Key", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "KeyValue", "ListElementCode": "value", "FieldType": "Text", "ElementLabel": "Value", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "ScannedDocument", "ListElementCode": "# Record Meta data", "FieldType": "Label", "ElementLabel": "Scanned Records", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "ScannedDocument", "ListElementCode": "type", "FieldType": "FixedList", "FieldTypeParameter": "ScannedDocumentType", "ElementLabel": "Document Type", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "ScannedDocument", "ListElementCode": "subtype", "FieldType": "Text", "ElementLabel": "Subtype", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "ScannedDocument", "ListElementCode": "url", "FieldType": "Document", "ElementLabel": "Scanned document url", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "ScannedDocument", "ListElementCode": "controlNumber", "FieldType": "Text", "ElementLabel": "Document Control Number", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "ScannedDocument", "ListElementCode": "fileName", "FieldType": "Text", "ElementLabel": "File Name", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "ScannedDocument", "ListElementCode": "scannedDate", "FieldType": "DateTime", "ElementLabel": "Scanned Date", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "ScannedDocument", "ListElementCode": "deliveryDate", "FieldType": "DateTime", "ElementLabel": "Delivery Date", "SecurityClassification": "PUBLIC"}
+]

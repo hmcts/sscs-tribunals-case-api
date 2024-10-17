@@ -3,11 +3,11 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REJECT_HEARING_RECORDING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
@@ -15,7 +15,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +30,6 @@ import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.reference.data.model.ConfidentialityType;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
-import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
 @Service
@@ -39,8 +37,6 @@ import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final FooterService footerService;
-    private final ServiceRequestExecutor serviceRequestExecutor;
-    private final String bulkScanEndpoint;
     private final DwpAddressLookupService dwpAddressLookupService;
     private final int dwpResponseDueDays;
     private final int dwpResponseDueDaysChildSupport;
@@ -48,16 +44,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private final boolean isPostHearingsEnabled;
 
     @Autowired
-    public DirectionIssuedAboutToSubmitHandler(FooterService footerService, ServiceRequestExecutor serviceRequestExecutor,
-                                               @Value("${bulk_scan.url}") String bulkScanUrl,
-                                               @Value("${bulk_scan.validateEndpoint}") String validateEndpoint,
+    public DirectionIssuedAboutToSubmitHandler(FooterService footerService,
                                                DwpAddressLookupService dwpAddressLookupService,
                                                @Value("${dwp.response.due.days}") int dwpResponseDueDays,
                                                @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport,
                                                @Value("${feature.postHearings.enabled}") boolean isPostHearingsEnabled) {
         this.footerService = footerService;
-        this.serviceRequestExecutor = serviceRequestExecutor;
-        this.bulkScanEndpoint = String.format("%s%s", trimToEmpty(bulkScanUrl), trimToEmpty(validateEndpoint));
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.dwpResponseDueDays = dwpResponseDueDays;
         this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
@@ -255,8 +247,9 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 new PreSubmitCallbackResponse<>(caseData);
 
         DocumentLink url = null;
-
-        if (nonNull(caseData.getDocumentStaging().getPreviewDocument()) && callback.getEvent() == EventType.DIRECTION_ISSUED) {
+        if (isYes(callback.getCaseDetails().getCaseData().getDocumentGeneration().getGenerateNotice())
+                && nonNull(caseData.getDocumentStaging().getPreviewDocument())
+                && callback.getEvent() == EventType.DIRECTION_ISSUED) {
             url = caseData.getDocumentStaging().getPreviewDocument();
         } else if (caseData.getSscsInterlocDirectionDocument() != null && callback.getEvent() == EventType.DIRECTION_ISSUED) {
 
@@ -306,24 +299,11 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
             caseData.setTimeExtensionRequested("No");
 
-            if (caseDetails.getState().equals(State.INTERLOCUTORY_REVIEW_STATE) && caseData.getDirectionTypeDl() != null && StringUtils.equals(DirectionType.APPEAL_TO_PROCEED.toString(), caseData.getDirectionTypeDl().getValue().getCode())) {
-                PreSubmitCallbackResponse<SscsCaseData> response = serviceRequestExecutor.post(callback, bulkScanEndpoint);
-                sscsCaseDataPreSubmitCallbackResponse.addErrors(response.getErrors());
-            }
         } else {
             caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION);
             caseData.setTranslationWorkOutstanding("Yes");
             clearBasicTransientFields(caseData);
             log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
-
-            if (caseDetails.getState().equals(State.INTERLOCUTORY_REVIEW_STATE)
-                    && caseData.getDirectionTypeDl() != null
-                    && StringUtils.equals(DirectionType.APPEAL_TO_PROCEED.toString(), caseData.getDirectionTypeDl().getValue().getCode())) {
-
-                PreSubmitCallbackResponse<SscsCaseData> response = serviceRequestExecutor.post(callback, bulkScanEndpoint);
-                sscsCaseDataPreSubmitCallbackResponse.addErrors(response.getErrors());
-
-            }
             log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
         }
 

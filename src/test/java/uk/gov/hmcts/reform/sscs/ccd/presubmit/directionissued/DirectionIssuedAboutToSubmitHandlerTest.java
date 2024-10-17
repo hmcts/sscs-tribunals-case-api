@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static java.util.Collections.emptySet;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
@@ -83,8 +84,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net",
-                "/validate", dwpAddressLookupService, 35, 42, false);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, false);
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
@@ -129,7 +129,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
         when(caseDetailsBefore.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
-        when(serviceRequestExecutor.post(eq(callback), eq("https://sscs-bulk-scan.net/validate"))).thenReturn(response);
         when(response.getErrors()).thenReturn(emptySet());
 
         when(dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(anyString(), anyString())).thenReturn(DUMMY_REGIONAL_CENTER);
@@ -178,7 +177,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenDirectionNoticeAlreadyExistsAndThenManuallyUploadANewNotice_thenIssueTheNewDocumentWithFooter() {
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", dwpAddressLookupService, 35, 42, true);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, true);
         sscsCaseData.setPrePostHearing(PrePostHearing.PRE);
         sscsCaseData.getDocumentStaging().setPreviewDocument(null);
 
@@ -266,15 +265,14 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenDirectionTypeOfAppealToProceedAndCaseIsPreValidInterloc_willReturnValidationErrorsFromExternalService() {
+    public void givenDirectionTypeOfAppealToProceedAndCaseIsPreValidInterloc_willNotReturnValidationErrorsFromExternalService() {
         String errorMessage = "There was an error in the external service";
         when(response.getErrors()).thenReturn(ImmutableSet.of(errorMessage));
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
         when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getErrors().size());
-        assertEquals(errorMessage, response.getErrors().iterator().next());
+        assertEquals(0, response.getErrors().size());
     }
 
     @Test
@@ -692,8 +690,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void shouldClearInterlocReferralReason() {
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net",
-                "/validate", dwpAddressLookupService, 35, 42, true);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, dwpAddressLookupService, 35, 42, true);
         sscsCaseData.setInterlocReferralReason(InterlocReferralReason.REVIEW_CORRECTION_APPLICATION);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -709,5 +706,64 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getHmctsDwpState(), is("sentToDwp"));
         assertThat(response.getData().getDateSentToDwp(), is(LocalDate.now().toString()));
         assertThat(response.getData().getDwpDueDate(), is(LocalDate.now().plusDays(expectedResponseDays).toString()));
+    }
+
+    @Test
+    public void givenNoUploadedAndGeneratedDoc_thenReturnError() {
+        sscsCaseData.getDocumentGeneration().setGenerateNotice(NO);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertFalse(response.getErrors().isEmpty());
+        assertThat(response.getErrors(), hasItem("You need to upload a PDF document"));
+    }
+
+    @Test
+    public void givenGenerateNoticeIsYes_thenReturnCaseDataPreviewDoc() {
+        DocumentLink url = sscsCaseData.getDocumentStaging().getPreviewDocument();
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(footerService).createFooterAndAddDocToCase(eq(url), any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void givenGenerateNoticeIsSetToNoAndInterlocDocIsNotNull_thenReturnRelevantDocLink() {
+        sscsCaseData.getDocumentGeneration().setGenerateNotice(NO);
+        assertFalse(sscsCaseData.getDocumentGeneration().getGenerateNotice().toBoolean());
+
+        SscsInterlocDirectionDocument interlocDoc = SscsInterlocDirectionDocument.builder()
+                .documentType("Doc type")
+                .documentFileName("Doc filename")
+                .documentLink(DocumentLink.builder()
+                        .documentFilename("testingDoc")
+                        .documentBinaryUrl(DOCUMENT_URL)
+                        .documentUrl(DOCUMENT_URL)
+                        .build()).build();
+
+        sscsCaseData.setSscsInterlocDirectionDocument(interlocDoc);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(interlocDoc.getDocumentLink(), response.getData().getSscsInterlocDirectionDocument().getDocumentLink());
+    }
+
+    public void givenGenerateNoticeIsSetToYesAndInterlocDocIsNotNull_thenReturnNull() {
+        assertTrue(sscsCaseData.getDocumentGeneration().getGenerateNotice().toBoolean());
+
+        SscsInterlocDirectionDocument interlocDoc = SscsInterlocDirectionDocument.builder()
+                .documentType("Doc type")
+                .documentFileName("Doc filename")
+                .documentLink(DocumentLink.builder()
+                        .documentFilename("testingDoc")
+                        .documentBinaryUrl(DOCUMENT_URL)
+                        .documentUrl(DOCUMENT_URL)
+                        .build()).build();
+
+        sscsCaseData.setSscsInterlocDirectionDocument(interlocDoc);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getSscsInterlocDirectionDocument());
     }
 }

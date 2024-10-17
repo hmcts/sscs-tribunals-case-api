@@ -30,7 +30,13 @@ def secrets = [
         secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
         secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
         secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
-        secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
+
+        // tya notifications
+        secret('notification-key', 'NOTIFICATION_API_KEY'),
+        secret('notification-test-key', 'NOTIFICATION_API_TEST_KEY'),
+        secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
+        secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
+        secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD')
     ]
 ]
 
@@ -48,6 +54,9 @@ withNightlyPipeline(type, product, component) {
     env.POST_HEARINGS_FEATURE = false
     env.Rules = params.SecurityRules
     env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
+    env.DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
+    env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
 
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')

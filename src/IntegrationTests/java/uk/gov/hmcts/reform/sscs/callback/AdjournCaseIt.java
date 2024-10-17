@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
@@ -10,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWi
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -57,7 +60,9 @@ public class AdjournCaseIt extends AbstractEventIt {
         "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithoutDirectionsMade.json";
     public static final String CCD_ABOUT_TO_SUBMIT = "/ccdAboutToSubmit";
     public static final String CCD_MID_EVENT_PREVIEW_ADJOURN_CASE = "/ccdMidEventPreviewAdjournCase";
+    public static final String CCD_ABOUT_TO_START = "/ccdAboutToStart";
     public static final String CCD_MID_EVENT_ADJOURN_CASE_POPULATE_VENUE_DROPDOWN = "/ccdMidEventAdjournCasePopulateVenueDropdown";
+    public static final String CCD_MID_EVENT_ADJOURN_CASE_DUE_DATE = "/ccdMidEventAdjournCaseDirectionDueDate";
     public static final String CCD_MID_EVENT = "/ccdMidEvent";
     public static final String TEST_NAME = "AN Test";
     public static final String CHESTER_MAGISTRATE_S_COURT = "Chester Magistrate's Court";
@@ -67,6 +72,7 @@ public class AdjournCaseIt extends AbstractEventIt {
     public static final String JUDGE_GIVEN_NAME = "Judge";
     public static final String JUDGE_FAMILY_NAME = "Family Name";
     public static final String JUDGE_FULL_NAME = "Judge Family Name";
+    public static final String HELD_BEFORE_NAME = "Tribunal Judge Family Name";
     public static final String DATE_2017 = "2017-07-17";
     public static final String DATE_2019 = "2019-10-10";
     public static final String DOCUMENT_URL = "document.url";
@@ -76,6 +82,8 @@ public class AdjournCaseIt extends AbstractEventIt {
     private GenerateFile generateFile;
     @MockBean
     private UserInfo userInfo;
+    @MockBean
+    private JudicialRefDataService judicialRefDataService;
 
     @DisplayName("Call to mid event callback when path is YES NO YES will validate the data when due date in past")
     @Test
@@ -85,7 +93,7 @@ public class AdjournCaseIt extends AbstractEventIt {
             List.of(DIRECTIONS_DUE_DATE_PLACEHOLDER),
             List.of(DATE_2019));
 
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_MID_EVENT));
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_MID_EVENT_ADJOURN_CASE_DUE_DATE));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
@@ -257,6 +265,20 @@ public class AdjournCaseIt extends AbstractEventIt {
         );
     }
 
+    @DisplayName("Call to  adjourn case about to start handler will remove all adjournment data from case")
+    @Test
+    public void givenCallToAboutToStartThenRemovesAdjournmentData() throws Exception {
+        setup();
+        json = getJson(GENERATED_PAPER_WHEN_CASE_NOT_LISTED_STRAIGHT_AWAY_WITHOUT_DIRECTIONS_MADE_JSON);
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_ABOUT_TO_START));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+        assertThat(result.getData().getAdjournment().getInterpreterLanguage().getValue()).isNull();
+        result.getData().getAdjournment().setInterpreterLanguage(null);
+        assertThat(result.getData().getAdjournment()).hasAllNullFieldsOrProperties();
+
+    }
+
     @DisplayName("Call to populate venue dropdown will populate next hearing venue selected list")
     @Test
     public void givenCallToPopulateVenueDropdownThenPopulatesNextHearingVenueSelectedList() throws Exception {
@@ -351,12 +373,12 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertThat(parentPayload.getUserName()).isEqualTo(JUDGE_FULL_NAME);
         assertThat(payload.getHeldOn()).isEqualTo(LocalDate.parse(DATE_2017));
         assertThat(payload.getHeldAt()).isEqualTo(CHESTER_MAGISTRATE_S_COURT);
-        assertThat(payload.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME);
+        assertThat(payload.getHeldBefore()).isEqualTo(HELD_BEFORE_NAME);
         assertThat(payload.getNextHearingDate()).isEqualTo(nextHearingDate);
         assertThat(payload.getNextHearingType()).isEqualTo(nextHearingType);
         assertThat(payload.getNextHearingTimeslot()).isEqualTo(nextHearingTimeslot);
         assertThat(payload.getHeldAt()).isEqualTo(CHESTER_MAGISTRATE_S_COURT);
-        assertThat(payload.getHeldBefore()).isEqualTo(JUDGE_FULL_NAME);
+        assertThat(payload.getHeldBefore()).isEqualTo(HELD_BEFORE_NAME);
         assertThat(payload.getHeldOn()).isEqualTo(LocalDate.parse(DATE_2017));
         assertThat(payload.getHearingType()).isEqualTo(hearingType);
         assertThat(payload.getAdditionalDirections().get(0)).isEqualTo("something else");
@@ -381,6 +403,9 @@ public class AdjournCaseIt extends AbstractEventIt {
         when(userInfo.getFamilyName()).thenReturn(JUDGE_FAMILY_NAME);
 
         when(idamClient.getUserInfo("Bearer userToken")).thenReturn(userInfo);
+
+        given(judicialRefDataService.getAllJudicialUsersFullNames(any()))
+                .willReturn(Collections.emptyList());
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, CCD_MID_EVENT_PREVIEW_ADJOURN_CASE));
         assertHttpStatus(response, HttpStatus.OK);
