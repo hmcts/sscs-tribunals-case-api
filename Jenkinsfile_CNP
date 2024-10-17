@@ -136,11 +136,10 @@ withPipeline(type, product, component) {
 
         if (isHearingsPr) {
             env.CASE_TYPE = "Benefit-${CHANGE_ID}"
-            setAatEnvVars();
+            // setPreviewEnvVars();
             env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
             env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
             env.HEARINGS_ENABLED = "Yes"
-            env.ENVIRONMENT = "pr"
         }
 
         def tests = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "test-suite")
