@@ -374,6 +374,22 @@ public abstract class AbstractSubmitAppealServiceTest {
     }
 
     @Test
+    public void givenCaseDoesNotExistInCcdAndMrnDateIsMissing_shouldCreateCaseWithAppealDetailsWithIncompleteApplicationEventIba() {
+        byte[] expected = {};
+        appealData.getMrn().setDate(null);
+
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
+        appealData.setBenefitType(new SyaBenefitType("Infected blood appeal", "infectedBloodAppeal"));
+        submitAppealService.submitAppeal(appealData, userToken);
+
+        verify(ccdService).createCase(capture.capture(), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("No", capture.getValue().getIsSaveAndReturn());
+    }
+
+    @Test
     public void givenDraftCaseDoesExistAndMrnDateIsMissingAndCaseSubmitted_shouldUpdateCaseWithAppealDetailsWithDraftToIncompleteApplicationEvent() {
         byte[] expected = {};
         appealData.getMrn().setDate(null);
@@ -699,6 +715,33 @@ public abstract class AbstractSubmitAppealServiceTest {
     }
 
     @Test
+    @Parameters(method = "generateDifferentRpcScenariosIba")
+    public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectlyIba(String expectedRpc, String appellantPostCode) throws JsonProcessingException {
+        RegionalProcessingCenter rpc = getRpcObjectForGivenJsonRpc(expectedRpc);
+        when(regionalProcessingCenterService.getByPostcode(RegionalProcessingCenterService.getFirstHalfOfPostcode(appellantPostCode)))
+            .thenReturn(getRpcObjectForGivenJsonRpc(expectedRpc));
+        when(airLookupService.lookupAirVenueNameByPostCode(eq(appellantPostCode), any())).thenReturn(rpc.getCity());
+        when(venueService.getEpimsIdForVenue(rpc.getCity())).thenReturn("1234");
+        when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("1").build());
+
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        appealData.getAppellant().getContactDetails().setPostCode(appellantPostCode);
+
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+
+        RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
+        RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
+        assertThat(actualRpc)
+            .usingRecursiveComparison()
+            .ignoringFields("hearingRoute","epimsId")
+            .isEqualTo(expectedRpcObject);
+        assertThat(actualRpc)
+            .extracting("hearingRoute","epimsId")
+            .doesNotContainNull();
+        assertEquals(expectedRpcObject.getName(), caseData.getRegion());
+    }
+
+    @Test
     public void givenAppointeePostCode_shouldSetRegionAndRpcToAppointee() throws JsonProcessingException {
         when(regionalProcessingCenterService.getByPostcode("B1")).thenReturn(getRpcObjectForGivenJsonRpc(BIRMINGHAM_RPC));
         when(airLookupService.lookupAirVenueNameByPostCode(eq("B1 1AA"), any())).thenReturn("Birmingham");
@@ -783,6 +826,13 @@ public abstract class AbstractSubmitAppealServiceTest {
             new Object[]{SUTTON_RPC, "EN1 1AA"},
             new Object[]{SUTTON_RPC, "KT19 0SZ"},
             new Object[]{BIRMINGHAM_RPC, "DE23 2PD"}
+        };
+    }
+
+    public Object[] generateDifferentRpcScenariosIba() {
+        return new Object[]{
+            new Object[]{BRADFORD_RPC, "GB000084"},
+            new Object[]{BRADFORD_RPC, "GB003090"}
         };
     }
 
