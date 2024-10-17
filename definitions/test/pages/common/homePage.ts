@@ -105,7 +105,7 @@ export class HomePage {
         console.log(`url of the page is ######## ${this.page.url()}`);
         const expUrl = this.page.url();
         
-        if(environment.name == 'preview') {
+        if(environment.name == 'pr') {
             
             if(environment.hearingsEnabled == 'Yes') {
                 let matches = expUrl.match(/(\d+)/);
