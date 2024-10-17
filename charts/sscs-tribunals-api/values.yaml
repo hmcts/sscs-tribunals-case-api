@@ -63,7 +63,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
           alias: NOTIFICATION_API_KEY
         - name: notification-test-key
           alias: NOTIFICATION_API_TEST_KEY
-        - name: tya-notif-POSTGRES-PASS-FLEX-V15
+        - name: tribunals-api-POSTGRES-PASS
           alias: JOB_SCHEDULER_DB_PASSWORD
         - name: sscs-email-mac-secret-text
           alias: EMAIL_MAC_SECRET_TEXT
