@@ -437,7 +437,7 @@
   {"LiveFrom": "19/05/2022", "CaseTypeID": "Benefit", "ID": "workBasketHearingDate", "Label": "Hearing Date", "FieldType": "Date", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/12/2023", "CaseTypeID": "Benefit", "ID": "workBasketHearingDateIssued", "Label": "Hearing Date Issued", "FieldType": "Text", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "19/05/2022", "CaseTypeID": "Benefit", "ID": "workBasketHearingEpimsId", "Label": "Hearing Venue", "FieldType": "FixedList", "FieldTypeParameter": "FL_hearingEpimsId", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "04/07/2022", "CaseTypeID": "Benefit", "ID": "caseOutcome", "Label": "Hearing Outcome", "FieldType": "FixedList", "FieldTypeParameter": "FL_caseOutcome", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "04/07/2022", "CaseTypeID": "Benefit", "ID": "caseOutcome", "Label": "Case Outcome", "FieldType": "FixedList", "FieldTypeParameter": "FL_caseOutcome", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "04/07/2022", "CaseTypeID": "Benefit", "ID": "didPoAttend", "Label": "Did PO Attend?", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "08/03/2022", "CaseTypeID": "Benefit", "ID": "workBasketHearingRoute", "Label": "Hearing Route", "FieldType": "FixedRadioList", "FieldTypeParameter": "FL_hearingRoute", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "08/03/2022", "CaseTypeID": "Benefit", "ID": "activeHearingId", "Label": "Active Hearing ID", "FieldType": "Number","SecurityClassification": "PUBLIC"},
