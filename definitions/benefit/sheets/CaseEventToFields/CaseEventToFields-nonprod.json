@@ -10,5 +10,27 @@
     "PageID": "setHearingRoute",
     "PageLabel": "Set Hearing Route",
     "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "04/07/2022",
+    "CaseEventID": "addHearingOutcome",
+    "CaseFieldID": "hearingOutcome",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "04/07/2022",
+    "CaseEventID": "addHearingOutcome",
+    "CaseFieldID": "didPoAttendHearing",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
   }
 ]

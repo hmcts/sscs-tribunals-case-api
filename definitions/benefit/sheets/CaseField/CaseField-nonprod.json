@@ -1,3 +1,5 @@
 [
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "functionalTest", "Label": "From functional test", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"}
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "ID": "functionalTest", "Label": "From functional test", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "04/07/2022", "CaseTypeID": "Benefit", "ID": "hearingOutcome", "Label": "Hearing Outcome", "FieldType": "FixedList", "FieldTypeParameter": "FL_caseOutcome", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "04/07/2022", "CaseTypeID": "Benefit", "ID": "didPoAttendHearing", "Label": "Did PO Attend?", "FieldType": "YesOrNo", "SecurityClassification": "PUBLIC"}
 ]
