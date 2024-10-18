@@ -406,7 +406,58 @@ public abstract class AbstractSubmitAppealServiceTest {
 
         verify(ccdService).updateCase(capture.capture(), eq(123L), eq(DRAFT_TO_INCOMPLETE_APPLICATION.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         assertEquals("Yes", capture.getValue().getIsSaveAndReturn());
+    }
 
+
+    @Test
+    public void givenCaseDoesNotExistInCcdAndMrnIsMissing_shouldCreateCaseWithAppealDetailsWithIncompleteApplicationEvent() {
+        byte[] expected = {};
+        appealData.setMrn(null);
+
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
+
+        submitAppealService.submitAppeal(appealData, userToken);
+
+        verify(ccdService).createCase(capture.capture(), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("No", capture.getValue().getIsSaveAndReturn());
+    }
+
+    @Test
+    public void givenCaseDoesNotExistInCcdAndMrnIsMissing_shouldCreateCaseWithAppealDetailsWithIncompleteApplicationEventIba() {
+        byte[] expected = {};
+        appealData.setMrn(null);
+
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
+        appealData.setBenefitType(new SyaBenefitType("Infected blood appeal", "infectedBloodAppeal"));
+        submitAppealService.submitAppeal(appealData, userToken);
+
+        verify(ccdService).createCase(capture.capture(), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("No", capture.getValue().getIsSaveAndReturn());
+    }
+
+    @Test
+    public void givenDraftCaseDoesExistAndMrnIsMissingAndCaseSubmitted_shouldUpdateCaseWithAppealDetailsWithDraftToIncompleteApplicationEvent() {
+        byte[] expected = {};
+        appealData.setMrn(null);
+
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
+
+        given(ccdService.getByCaseId(eq(123L), any())).willReturn(SscsCaseDetails.builder().build());
+
+        appealData.setCcdCaseId("123");
+        appealData.setIsSaveAndReturn("Yes");
+        submitAppealService.submitAppeal(appealData, userToken);
+
+        verify(ccdService).updateCase(capture.capture(), eq(123L), eq(DRAFT_TO_INCOMPLETE_APPLICATION.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals("Yes", capture.getValue().getIsSaveAndReturn());
     }
 
     @Test
@@ -697,7 +748,6 @@ public abstract class AbstractSubmitAppealServiceTest {
         when(venueService.getEpimsIdForVenue(rpc.getCity())).thenReturn("1234");
         when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("1").build());
 
-        SyaCaseWrapper appealData = getSyaCaseWrapper();
         appealData.getAppellant().getContactDetails().setPostCode(appellantPostCode);
 
         SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
@@ -716,19 +766,18 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     @Test
     @Parameters(method = "generateDifferentRpcScenariosIba")
-    public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectlyIba(String expectedRpc, String appellantPostCode) throws JsonProcessingException {
+    public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectlyIba(String expectedRpc, String appellantLocationCode) throws JsonProcessingException {
         RegionalProcessingCenter rpc = getRpcObjectForGivenJsonRpc(expectedRpc);
-        when(regionalProcessingCenterService.getByPostcode(RegionalProcessingCenterService.getFirstHalfOfPostcode(appellantPostCode)))
+        when(regionalProcessingCenterService.getByPostcode(appellantLocationCode))
             .thenReturn(getRpcObjectForGivenJsonRpc(expectedRpc));
-        when(airLookupService.lookupAirVenueNameByPostCode(eq(appellantPostCode), any())).thenReturn(rpc.getCity());
+        when(airLookupService.lookupAirVenueNameByPostCode(eq(appellantLocationCode), any())).thenReturn(rpc.getCity());
         when(venueService.getEpimsIdForVenue(rpc.getCity())).thenReturn("1234");
         when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("1").build());
-
-        SyaCaseWrapper appealData = getSyaCaseWrapper();
-        appealData.getAppellant().getContactDetails().setPostCode(appellantPostCode);
-
+        SyaBenefitType syaBenefitType = new SyaBenefitType("Infected Blood Appeal", "infectedBloodAppeal");
+        appealData.setBenefitType(syaBenefitType);
+        appealData.getAppellant().getContactDetails().setPortOfEntry(appellantLocationCode);
+        appealData.getAppellant().getContactDetails().setInMainlandUk(Boolean.FALSE);
         SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
-
         RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
         RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
         assertThat(actualRpc)
@@ -805,7 +854,6 @@ public abstract class AbstractSubmitAppealServiceTest {
         SyaAppointee appointee = new SyaAppointee();
         appointee.setContactDetails(appointeeContact);
 
-        SyaCaseWrapper appealData = getSyaCaseWrapper();
         appealData.getAppellant().getContactDetails().setPostCode("TN32 6PL");
         appealData.setAppointee(appointee);
         appealData.setIsAppointee(true);
@@ -838,7 +886,6 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     @Test
     public void givenAPipCase_thenSetCreatedInGapsFromFieldToReadyToList() {
-        SyaCaseWrapper appealData = getSyaCaseWrapper();
         SyaBenefitType syaBenefitType = new SyaBenefitType("PIP", "PIP");
         appealData.setBenefitType(syaBenefitType);
 
@@ -852,7 +899,6 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     @Test
     public void givenAEsaCase_thenSetCreatedInGapsFromToReadyToList() {
-        SyaCaseWrapper appealData = getSyaCaseWrapper();
         SyaBenefitType syaBenefitType = new SyaBenefitType("ESA", "ESA");
         appealData.setBenefitType(syaBenefitType);
 
@@ -866,7 +912,6 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     @Test
     public void givenAUcCaseWithRecoveryFromEstatesOffice_thenSetOfficeCorrectly() {
-        SyaCaseWrapper appealData = getSyaCaseWrapper();
         SyaBenefitType syaBenefitType = new SyaBenefitType("Universal Credit", "UC");
         appealData.setBenefitType(syaBenefitType);
 
@@ -883,6 +928,17 @@ public abstract class AbstractSubmitAppealServiceTest {
     @Test(expected = CcdException.class)
     public void givenExceptionWhenSearchingForCaseInCcd_shouldThrowException() {
         given(ccdService.findCaseBy(eq("data.appeal.appellant.identity.nino"), eq(appealData.getAppellant().getNino()), any(IdamTokens.class)))
+            .willThrow(RuntimeException.class);
+
+        submitAppealService.submitAppeal(appealData, userToken);
+    }
+
+
+    @Test(expected = CcdException.class)
+    public void givenExceptionWhenCreatingOrUpdatingIbaCase_shouldThrowException() {
+        SyaBenefitType syaBenefitType = new SyaBenefitType("Infected Blood Appeal", "infectedBloodAppeal");
+        appealData.setBenefitType(syaBenefitType);
+        given(ccdService.createCase(any(SscsCaseData.class), anyString(), anyString(), anyString(), any(IdamTokens.class)))
             .willThrow(RuntimeException.class);
 
         submitAppealService.submitAppeal(appealData, userToken);
