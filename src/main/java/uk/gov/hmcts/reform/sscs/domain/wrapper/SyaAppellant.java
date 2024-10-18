@@ -28,11 +28,16 @@ public class SyaAppellant {
 
     private String nino;
 
+    private String ibcaReference;
+
     @JsonProperty("contactDetails")
     private SyaContactDetails contactDetails;
 
     @JsonProperty("isAddressSameAsAppointee")
     private Boolean isAddressSameAsAppointee;
+
+    @JsonProperty("ibcRole")
+    private String ibcRole;
 
     public void setNino(String nino) {
         this.nino = normaliseNino(nino);

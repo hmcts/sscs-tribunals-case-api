@@ -195,6 +195,7 @@ def setAatEnvVars() {
     env.PREVIEW_BRANCH_WITH_LOCAL_CCD = false;
     env.TEST_E2E_URL_WEB = "https://manage-case.aat.platform.hmcts.net/"
     env.TEST_E2E_API_URI = "http://sscs-tribunals-api-aat.service.core-compute-aat.internal"
+    env.TEST_URL = "http://sscs-tribunals-api-aat.service.core-compute-aat.internal"
     env.CCD_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     env.CCD_GW_API = "https://gateway-ccd.aat.platform.hmcts.net"
@@ -206,6 +207,7 @@ def setPreviewEnvVars() {
     env.PREVIEW_BRANCH_WITH_LOCAL_CCD = true;
     env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.TEST_URL = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CCD_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
