@@ -237,6 +237,9 @@ public class Personalisation<E extends NotificationWrapper> {
             personalisation.put(HEARING, latestHearing.getValue());
 
             if (nonNull(hearingDateTime) && nonNull(latestHearingValue.getVenue())) {
+                Locale locale = Locale.forLanguageTag("cy-GB");
+                var formatter = DateTimeFormatter.ofPattern("E, dd MMM yyyy").withLocale(locale);
+                personalisation.put(HEARING_DATE_WEEKDAY_WELSH, formatter.format(hearingDateTime.toLocalDate()));
                 personalisation.put(HEARING_DATE_LITERAL, hearingDateTime.toLocalDate().toString());
                 translateToWelshDate(hearingDateTime.toLocalDate(), ccdResponse, value -> personalisation.put(HEARING_DATE_WELSH, value));
                 personalisation.put(HEARING_TIME, formatLocalTime(hearingDateTime));
