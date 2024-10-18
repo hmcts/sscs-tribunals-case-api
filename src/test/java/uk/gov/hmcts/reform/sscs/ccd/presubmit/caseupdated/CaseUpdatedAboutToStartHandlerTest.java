@@ -91,7 +91,7 @@ public class CaseUpdatedAboutToStartHandlerTest {
         assertThat(benefitSelection).isNotNull();
         assertThat(benefitSelection.getValue()).isNotNull();
         assertThat(benefitSelection.getValue().getCode()).isEqualTo("002");
-        assertThat(benefitSelection.getListItems()).hasSize(35);
+        assertThat(benefitSelection.getListItems().size()).isEqualTo(35);
     }
 
     @Test
