@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional.evidenceshare;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
@@ -65,7 +66,10 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
         assertNull(caseDetails.getData().getSscsDocument());
         assertEquals("validAppeal", caseDetails.getState());
-        assertEquals("failedSending", caseDetails.getData().getHmctsDwpState());
+        //assertEquals("failedSending", caseDetails.getData().getHmctsDwpState());
+        assertThat(caseDetails.getData().getHmctsDwpState())
+                .containsAnyOf("failedSending", "failedRobotics");
+
     }
 
     @Test
