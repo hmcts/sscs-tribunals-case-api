@@ -15,16 +15,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -38,7 +41,7 @@ public class ConfirmPanelCompositionHandlerTest {
     private SscsCaseData sscsCaseData;
 
     @Mock
-    private CcdService ccdService;
+    private UpdateCcdCaseService updateCcdCaseService;
     @Mock
     private IdamService idamService;
 
@@ -48,11 +51,14 @@ public class ConfirmPanelCompositionHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Captor
+    private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
+
     @Before
     public void setUp() {
         openMocks(this);
 
-        handler = new ConfirmPanelCompositionHandler(new PanelCompositionService(ccdService, idamService));
+        handler = new ConfirmPanelCompositionHandler(new PanelCompositionService(updateCcdCaseService, idamService));
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
 
@@ -89,8 +95,8 @@ public class ConfirmPanelCompositionHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
-            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())), eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any());
+        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+                eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), any(Consumer.class));
     }
 
     @Test
@@ -108,8 +114,8 @@ public class ConfirmPanelCompositionHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
-            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())), eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any());
+        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+                eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), any(Consumer.class));
     }
 
     @Test
@@ -127,8 +133,8 @@ public class ConfirmPanelCompositionHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
-            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())), eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any());
+        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+                eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), any(Consumer.class));
     }
 
     @Test
@@ -147,8 +153,8 @@ public class ConfirmPanelCompositionHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
-            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())), eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
+        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+                eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any(), any(Consumer.class));
     }
 
     @Test
@@ -166,8 +172,8 @@ public class ConfirmPanelCompositionHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
-            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())), eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
+        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+                eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any(), any(Consumer.class));
     }
 
     @Test
@@ -184,7 +190,7 @@ public class ConfirmPanelCompositionHandlerTest {
                     .build()).build(), DORMANT_APPEAL_STATE, CONFIRM_PANEL_COMPOSITION);
 
         handler.handle(CallbackType.SUBMITTED, callback);
-        verify(ccdService, times(0)).updateCase(any(), anyLong(), anyString(), anyString(), anyString(), any());
+        verify(updateCcdCaseService, times(0)).updateCaseV2(anyLong(), anyString(), anyString(), anyString(), any(), any(Consumer.class));
     }
 
     @Test
@@ -197,8 +203,11 @@ public class ConfirmPanelCompositionHandlerTest {
                     .build()).build(), RESPONSE_RECEIVED, CONFIRM_PANEL_COMPOSITION);
 
         handler.handle(CallbackType.SUBMITTED, callback);
-        verify(ccdService, times(1)).updateCase(any(), anyLong(), anyString(), anyString(), anyString(), any());
-        assertEquals(callback.getCaseDetails().getCaseData().getInterlocReviewState(), InterlocReviewState.NONE);
+        verify(updateCcdCaseService, times(1)).updateCaseV2(anyLong(), anyString(), anyString(), anyString(), any(),
+                consumerArgumentCaptor.capture());
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(callback.getCaseDetails().getCaseData()).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        assertEquals(sscsCaseDetails.getData().getInterlocReviewState(), InterlocReviewState.NONE);
     }
 
     private Object[] generateOtherPartyOptions() {
