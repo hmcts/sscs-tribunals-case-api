@@ -66,7 +66,6 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
         assertNull(caseDetails.getData().getSscsDocument());
         assertEquals("validAppeal", caseDetails.getState());
-        //assertEquals("failedSending", caseDetails.getData().getHmctsDwpState());
         assertThat(caseDetails.getData().getHmctsDwpState())
                 .containsAnyOf("failedSending", "failedRobotics");
 
