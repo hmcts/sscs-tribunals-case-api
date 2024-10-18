@@ -14,7 +14,7 @@ public class SubscriptionTest extends BaseFunctionTest {
     private static final String NO = "no";
 
     @Rule
-    public Retry retry = new Retry(3);z
+    public Retry retry = new Retry(3);
 
     @Test
     public void shouldUpdateSubscription() throws IOException, InterruptedException {
