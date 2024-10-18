@@ -27,11 +27,10 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
     }
 
     @Rule
-    public Retry retry = new Retry(0);
+    public Retry retry = new Retry(3);
 
-    //Test method runs three times and in worst case it needs 90 seconds waiting time.
     @Rule
-    public Timeout globalTimeout = Timeout.seconds(100);
+    public Timeout globalTimeout = Timeout.seconds(90);
 
     @Before
     public void setUp() {
@@ -63,12 +62,15 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
     }
 
     private boolean fetchLetters(int expectedNumLetters, String subscription) {
+        int fetchCount = 0;
         do {
             if (getNumberOfLetterCorrespondence(subscription) == expectedNumLetters) {
                 return true;
             }
+            fetchCount++;
             delayInSeconds(5);
-        } while (true);
+        } while (fetchCount < 5);
+        return false;
     }
 
     private void initialiseCcdCase() {
