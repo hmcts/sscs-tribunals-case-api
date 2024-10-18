@@ -44,7 +44,7 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
         PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
 
         if (IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode())) {
-            if (NO.equals(caseData.getAppeal().getAppellant().getAddress().getIsInUk())) {
+            if (NO.equals(caseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
                 final String selectedPortOfEntryLocationCode = caseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList().getValue().getCode();
                 caseData.getAppeal().getAppellant().getAddress().setPortOfEntry(selectedPortOfEntryLocationCode);
             }
@@ -53,7 +53,7 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
 
             if (YES.equals(caseData.getHasRepresentative())
                     && isNotEmpty(caseData.getAppeal().getRep().getAddress())
-                    && isNull(caseData.getAppeal().getRep().getAddress().getIsInUk())) {
+                    && isNull(caseData.getAppeal().getRep().getAddress().getInMainlandUk())) {
                 errorResponse.addError("You must enter Living in the UK for the representative");
             }
         }
@@ -71,7 +71,7 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
             validationErrors.add("You must enter address line 1 for the appellant");
         }
 
-        if (NO.equals(party.getAddress().getIsInUk())) {
+        if (NO.equals(party.getAddress().getInMainlandUk())) {
             if (isBlank(country)) {
                 validationErrors.add("You must enter a valid country for the appellant");
             }

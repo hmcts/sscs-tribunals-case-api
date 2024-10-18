@@ -215,7 +215,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validatingPartyAddresses(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         if (!IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode())
-                || YES.equals(sscsCaseData.getAppeal().getAppellant().getAddress().getIsInUk())) {
+                || YES.equals(sscsCaseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
             validateAddressAndPostcode(response, sscsCaseData.getAppeal().getAppellant(), "appellant");
         }
 
@@ -549,7 +549,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     private static String resolvePostCode(SscsCaseData sscsCaseData) {
-        if (NO.equals(sscsCaseData.getAppeal().getAppellant().getAddress().getIsInUk())) {
+        if (NO.equals(sscsCaseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
             return sscsCaseData.getAppeal().getAppellant().getAddress().getPortOfEntry();
         } else {
             if (YES.getValue().equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {

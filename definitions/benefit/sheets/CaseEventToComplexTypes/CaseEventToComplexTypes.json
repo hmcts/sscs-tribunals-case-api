@@ -747,7 +747,7 @@
   {
     "CaseEventID": "caseUpdated",
     "CaseFieldID": "appeal",
-    "ListElementCode": "appellant.address.isInUk",
+    "ListElementCode": "appellant.address.inMainlandUk",
     "DisplayContext": "MANDATORY",
     "FieldShowCondition": "appeal.benefitType.descriptionSelection=\"093\"",
     "LiveFrom": "01/01/2018",
@@ -760,7 +760,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.address.ukPortOfEntryList",
     "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "appeal.appellant.address.isInUk=\"No\"",
+    "FieldShowCondition": "appeal.appellant.address.inMainlandUk=\"No\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 16,
     "PageID": "1.0"
@@ -5163,7 +5163,7 @@
   {
     "CaseEventID": "incompleteApplicationReceived",
     "CaseFieldID": "appeal",
-    "ListElementCode": "appellant.address.isInUk",
+    "ListElementCode": "appellant.address.inMainlandUk",
     "DisplayContext": "MANDATORY",
     "FieldShowCondition": "appeal.benefitType.descriptionSelection=\"093\"",
     "LiveFrom": "01/01/2018",
@@ -5176,7 +5176,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.address.ukPortOfEntryList",
     "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "appeal.appellant.address.isInUk=\"No\"",
+    "FieldShowCondition": "appeal.appellant.address.inMainlandUk=\"No\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 9,
     "PageID": "1.0"
@@ -6016,7 +6016,7 @@
   {
     "CaseEventID": "incompleteApplicationReceived",
     "CaseFieldID": "appeal",
-    "ListElementCode": "rep.address.isInUk",
+    "ListElementCode": "rep.address.inMainlandUk",
     "DisplayContext": "OPTIONAL",
     "FieldShowCondition": "appeal.benefitType.descriptionSelection=\"093\"",
     "LiveFrom": "01/01/2018",
