@@ -19,9 +19,11 @@ import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Reason;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
@@ -100,6 +102,146 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
         SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
                 regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         assertNull(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+    }
+
+
+    @Test
+    public void givenAIbaNullValueMainlandUkCaseFromSya_thenAddressBuildsCorrectly() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Appeal", "infectedBloodAppeal");
+        syaCaseWrapper.setBenefitType(benefitType);
+        syaCaseWrapper.getContactDetails().setInMainlandUk(null);
+        syaCaseWrapper.getContactDetails().setAddressLine1("line1");
+        syaCaseWrapper.getContactDetails().setAddressLine2("line2");
+        syaCaseWrapper.getContactDetails().setTownCity("townCity");
+        syaCaseWrapper.getContactDetails().setCounty("county");
+        syaCaseWrapper.getContactDetails().setPostCode("postcode");
+        syaCaseWrapper.getContactDetails().setPostcodeLookup("postcodeLookup");
+        syaCaseWrapper.getContactDetails().setPostcodeAddress("postcodeAddress");
+        SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
+        Address expectedAddress = Address.builder()
+            .line1("line1")
+            .line2("line2")
+            .town("townCity")
+            .county("county")
+            .postcode("postcode")
+            .postcodeLookup("postcodeLookup")
+            .postcodeAddress("postcodeAddress")
+            .build();
+        assertEquals(expectedAddress, caseData.getAppeal().getAppellant().getAddress());
+    }
+
+    @Test
+    public void givenAIbaMainlandUkCaseFromSya_thenAddressBuildsCorrectly() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Appeal", "infectedBloodAppeal");
+        syaCaseWrapper.setBenefitType(benefitType);
+        syaCaseWrapper.getContactDetails().setInMainlandUk(Boolean.TRUE);
+        syaCaseWrapper.getContactDetails().setAddressLine1("line1");
+        syaCaseWrapper.getContactDetails().setAddressLine2("line2");
+        syaCaseWrapper.getContactDetails().setTownCity("townCity");
+        syaCaseWrapper.getContactDetails().setCounty("county");
+        syaCaseWrapper.getContactDetails().setPostCode("postcode");
+        syaCaseWrapper.getContactDetails().setPostcodeLookup("postcodeLookup");
+        syaCaseWrapper.getContactDetails().setPostcodeAddress("postcodeAddress");
+        SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
+        Address expectedAddress = Address.builder()
+            .line1("line1")
+            .line2("line2")
+            .town("townCity")
+            .county("county")
+            .postcode("postcode")
+            .postcodeLookup("postcodeLookup")
+            .postcodeAddress("postcodeAddress")
+            .inMainlandUk(YesNo.YES)
+            .build();
+        assertEquals(expectedAddress, caseData.getAppeal().getAppellant().getAddress());
+    }
+
+    @Test
+    public void givenAIbaNonMainlandUkCaseFromSya_thenAddressBuildsCorrectly() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Appeal", "infectedBloodAppeal");
+        syaCaseWrapper.setBenefitType(benefitType);
+        syaCaseWrapper.getContactDetails().setInMainlandUk(Boolean.FALSE);
+        syaCaseWrapper.getContactDetails().setAddressLine1("line1");
+        syaCaseWrapper.getContactDetails().setAddressLine2("line2");
+        syaCaseWrapper.getContactDetails().setTownCity("townCity");
+        syaCaseWrapper.getContactDetails().setCountry("country");
+        syaCaseWrapper.getContactDetails().setPortOfEntry("GB100100");
+        SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
+        Address expectedAddress = Address.builder()
+            .line1("line1")
+            .line2("line2")
+            .town("townCity")
+            .country("country")
+            .portOfEntry("GB100100")
+            .inMainlandUk(YesNo.NO)
+            .build();
+        assertEquals(expectedAddress, caseData.getAppeal().getAppellant().getAddress());
+    }
+
+    @Test
+    public void givenAIbaCaseWithIbcRoleFromSya_thenAppellantBuildsWithIbcRole() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Appeal", "infectedBloodAppeal");
+        syaCaseWrapper.setBenefitType(benefitType);
+        syaCaseWrapper.getAppellant().setIbcRole("someRole");
+        SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
+        assertEquals("someRole", caseData.getAppeal().getAppellant().getIbcRole());
+    }
+
+    @Test
+    public void givenANonIbaCaseWithIbcRoleFromSya_thenAppellantBuildsCorrectlyWithoutIbcRole() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        syaCaseWrapper.getAppellant().setIbcRole("someRole");
+        SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
+        assertNull(caseData.getAppeal().getAppellant().getIbcRole());
+    }
+
+    @Test
+    public void givenAIbaCaseWithNoIbcRoleFromSya_thenAppellantBuildsCorrectlyWithoutIbcRole() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Appeal", "infectedBloodAppeal");
+        syaCaseWrapper.setBenefitType(benefitType);
+        syaCaseWrapper.getAppellant().setIbcRole(null);
+        SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
+        assertNull(caseData.getAppeal().getAppellant().getIbcRole());
+    }
+
+    @Test
+    public void givenANonIbaCaseWithNoIbcRoleFromSya_thenAppellantBuildsCorrectlyWithoutIbcRole() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        syaCaseWrapper.getAppellant().setIbcRole(null);
+        SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
+        assertNull(caseData.getAppeal().getAppellant().getIbcRole());
+    }
+
+    @Test
+    public void givenAIbaCaseWithNoSyaAppellantFromSya_thenAppellantBuildsCorrectlyWithoutIbcRole() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Appeal", "infectedBloodAppeal");
+        syaCaseWrapper.setBenefitType(benefitType);
+        syaCaseWrapper.setAppellant(null);
+        SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
+        assertNull(caseData.getAppeal().getAppellant().getIbcRole());
+    }
+
+    @Test
+    public void givenANonIbaCaseWithNoSyaAppellantFromSya_thenAppellantBuildsCorrectlyWithoutIbcRole() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        syaCaseWrapper.setAppellant(null);
+        SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter, false);
+        assertNull(caseData.getAppeal().getAppellant().getIbcRole());
     }
 
     @Test

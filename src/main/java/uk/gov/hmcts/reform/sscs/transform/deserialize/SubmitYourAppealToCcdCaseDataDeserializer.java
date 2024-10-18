@@ -290,7 +290,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             .line2(contactDetails.getAddressLine2())
             .town(contactDetails.getTownCity());
         if (isIba && contactDetails.getInMainlandUk() != null) {
-            YesNo inMainlandUkYesNo = contactDetails.getInMainlandUk().equals(Boolean.FALSE) ? YesNo.YES : YesNo.NO;
+            YesNo inMainlandUkYesNo = contactDetails.getInMainlandUk().equals(Boolean.TRUE) ? YesNo.YES : YesNo.NO;
             addressBuilder.inMainlandUk(inMainlandUkYesNo);
             if (inMainlandUkYesNo.equals(YesNo.NO)) {
                 addressBuilder
