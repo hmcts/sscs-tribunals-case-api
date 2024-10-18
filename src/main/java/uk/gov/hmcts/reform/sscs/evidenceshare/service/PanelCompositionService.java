@@ -1,24 +1,25 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 
+import java.util.function.Consumer;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 
 @Service
 public class PanelCompositionService {
 
-    private final CcdService ccdService;
     private final IdamService idamService;
+    private final UpdateCcdCaseService updateCcdCaseService;
 
     @Autowired
-    public PanelCompositionService(CcdService ccdService, IdamService idamService) {
-        this.ccdService = ccdService;
+    public PanelCompositionService(UpdateCcdCaseService updateCcdCaseService, IdamService idamService) {
+        this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
     }
 
@@ -26,12 +27,14 @@ public class PanelCompositionService {
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
 
         if (State.RESPONSE_RECEIVED.equals(caseDetails.getState())) {
-            caseData.setInterlocReviewState(InterlocReviewState.NONE);
-            updateCase(caseData,
-                caseDetails.getId(),
+            updateCase(caseDetails.getId(),
                 EventType.INTERLOC_REVIEW_STATE_AMEND,
                 "",
-                "");
+                "",
+                sscsCaseDetails -> {
+                    SscsCaseData sscsCaseData = sscsCaseDetails.getData();
+                    sscsCaseData.setInterlocReviewState(InterlocReviewState.NONE);
+                });
             return;
         }
 
@@ -39,21 +42,24 @@ public class PanelCompositionService {
             if (caseData.getIsFqpmRequired() == null
                 || hasDueDateSetAndOtherPartyWithoutHearingOption(caseData)) {
                 if (stateNotWithFtaOrResponseReceived(caseDetails)) {
-                    updateCase(caseData,
-                        caseDetails.getId(),
+                    updateCase(caseDetails.getId(),
                         EventType.NOT_LISTABLE,
                         "Not listable",
-                        "Update to Not Listable as the case is either awaiting hearing enquiry form or for FQPM to be set");
+                        "Update to Not Listable as the case is either awaiting hearing enquiry form or for FQPM to be set",
+                         sscsCaseDetails -> { }
+                    );
                 }
             } else {
-                if (eventType.equals(EventType.UPDATE_OTHER_PARTY_DATA)) {
-                    caseData.setDirectionDueDate(null);
-                }
-                updateCase(caseData,
-                    caseDetails.getId(),
+                updateCase(caseDetails.getId(),
                     EventType.READY_TO_LIST,
                     "Ready to list",
-                    "Update to ready to list event as there is no further information to assist the tribunal and no dispute.");
+                    "Update to ready to list event as there is no further information to assist the tribunal and no dispute.",
+                    sscsCaseDetails -> {
+                        SscsCaseData sscsCaseData = sscsCaseDetails.getData();
+                        if (eventType.equals(EventType.UPDATE_OTHER_PARTY_DATA)) {
+                            sscsCaseData.setDirectionDueDate(null);
+                        }
+                    });
             }
         }
     }
@@ -95,7 +101,7 @@ public class PanelCompositionService {
             && StringUtils.isBlank(hearingOptions.getOther()));
     }
 
-    private void updateCase(SscsCaseData caseData, Long caseId, EventType eventType, String summary, String description) {
-        ccdService.updateCase(caseData, caseId, eventType.getCcdType(), summary, description, idamService.getIdamTokens());
+    private void updateCase(Long caseId, EventType eventType, String summary, String description, Consumer<SscsCaseDetails> caseDetailsConsumer) {
+        updateCcdCaseService.updateCaseV2(caseId, eventType.getCcdType(), summary, description, idamService.getIdamTokens(), caseDetailsConsumer);
     }
 }
