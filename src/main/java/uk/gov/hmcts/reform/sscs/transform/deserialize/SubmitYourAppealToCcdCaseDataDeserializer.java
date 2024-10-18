@@ -284,6 +284,34 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             null;
     }
 
+    private static Address handleAddress(SyaContactDetails contactDetails, boolean isIba) {
+        Address.AddressBuilder addressBuilder = Address.builder()
+            .line1(contactDetails.getAddressLine1())
+            .line2(contactDetails.getAddressLine2())
+            .town(contactDetails.getTownCity());
+        if (isIba && contactDetails.getInMainlandUk() != null) {
+            YesNo inMainlandUkYesNo = contactDetails.getInMainlandUk().equals(Boolean.FALSE) ? YesNo.YES : YesNo.NO;
+            addressBuilder.inMainlandUk(inMainlandUkYesNo);
+            if (inMainlandUkYesNo.equals(YesNo.NO)) {
+                addressBuilder
+                    .country(contactDetails.getCountry())
+                    .portOfEntry(contactDetails.getPortOfEntry());
+            } else {
+                addressBuilder
+                    .county(contactDetails.getCounty())
+                    .postcode(contactDetails.getPostCode())
+                    .postcodeLookup(contactDetails.getPostcodeLookup())
+                    .postcodeAddress(contactDetails.getPostcodeAddress());
+            }
+        } else {
+            addressBuilder
+                .county(contactDetails.getCounty())
+                .postcode(contactDetails.getPostCode())
+                .postcodeLookup(contactDetails.getPostcodeLookup())
+                .postcodeAddress(contactDetails.getPostcodeAddress());
+        }
+        return addressBuilder.build();
+    }
     private static Appellant getAppellant(SyaCaseWrapper syaCaseWrapper, boolean isIba) {
 
         SyaAppellant syaAppellant = syaCaseWrapper.getAppellant();
@@ -292,32 +320,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         Address address = null;
         Contact contact;
         if (null != contactDetails) {
-            Address.AddressBuilder addressBuilder = Address.builder()
-                .line1(contactDetails.getAddressLine1())
-                .line2(contactDetails.getAddressLine2())
-                .town(contactDetails.getTownCity());
-            if (isIba && contactDetails.getInMainlandUk() != null) {
-                YesNo inMainlandUkYesNo = contactDetails.getInMainlandUk() ? YesNo.YES : YesNo.NO;
-                addressBuilder.inMainlandUk(inMainlandUkYesNo);
-                if (inMainlandUkYesNo.equals(YesNo.NO)) {
-                    addressBuilder
-                        .country(contactDetails.getCountry())
-                        .portOfEntry(contactDetails.getPortOfEntry());
-                } else {
-                    addressBuilder
-                        .county(contactDetails.getCounty())
-                        .postcode(contactDetails.getPostCode())
-                        .postcodeLookup(contactDetails.getPostcodeLookup())
-                        .postcodeAddress(contactDetails.getPostcodeAddress());
-                }
-            } else {
-                addressBuilder
-                    .county(contactDetails.getCounty())
-                    .postcode(contactDetails.getPostCode())
-                    .postcodeLookup(contactDetails.getPostcodeLookup())
-                    .postcodeAddress(contactDetails.getPostcodeAddress());
-            }
-            address = addressBuilder.build();
+            address = handleAddress(contactDetails, isIba);
             contact = Contact.builder()
                 .email(contactDetails.getEmailAddress())
                 .mobile(getPhoneNumberWithOutSpaces(contactDetails.getPhoneNumber()))
