@@ -44,6 +44,7 @@ java:
     CITIZEN_LOGIN_SERVICE_V2: true
     ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: true
     BYPASS_NOTIFICATIONS_SERVICE: true
+    BYPASS_HEARING_API_SERVICE: true
     HANDLE_CCD_CALLBACKMAP_V2: true
     TESTING_SUPPORT_ENABLED: true
     TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
@@ -148,7 +149,7 @@ xui-webapp:
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       SERVICES_S2S: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       SERVICES_HEARINGS_COMPONENT_API: http://jurisdiction-hearings-api-aat.service.core-compute-aat.internal
-      SERVICES_HEARINGS_COMPONENT_API_SSCS: http://${SERVICE_NAME}-sscs-hearings-api
+      SERVICES_HEARINGS_COMPONENT_API_SSCS: http://${SERVICE_NAME}-java
       SERVICES_PRD_LOCATION_API: http://rd-location-ref-api-aat.service.core-compute-aat.internal
       SERVICES_PRD_JUDICIAL_API: http://rd-judicial-api-aat.service.core-compute-aat.internal
       SERVICES_PRD_COMMONDATA_API: http://rd-commondata-api-aat.service.core-compute-aat.internal
@@ -584,7 +585,7 @@ redis:
 sscs-hearings-api:
   enabled: true
   java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-646" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     ingressHost: hearings-${SERVICE_FQDN}
     environment:
@@ -604,7 +605,7 @@ sscs-hearings-api:
       #Messaging
       HMC_HEARINGS_LISTENING_ENABLED: true
       HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
-      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-3973"
+      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-4056"
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
       TRIBUNALS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
@@ -615,6 +616,7 @@ sscs-hearings-api:
       CORE_CASE_DATA_CASE_TYPE_ID: Benefit-${CHANGE_ID}
       HEARINGS_CASE_UPDATE_V2_ENABLED: true
       ADJOURNMENT_ENABLED: true
+      BYPASS_HEARING_API_SERVICE: true
     secrets:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: sscs-sb-preview
