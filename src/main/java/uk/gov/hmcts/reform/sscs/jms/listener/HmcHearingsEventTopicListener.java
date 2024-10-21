@@ -54,13 +54,9 @@ public class HmcHearingsEventTopicListener {
     )
     public void onMessage(JmsBytesMessage message) throws JMSException, HmcEventProcessingException {
 
-        log.info("isByPassHearingServiceEnabled && isDeploymentFilterEnabled ------------------------> {}, {}", isByPassHearingServiceEnabled,
-                isDeploymentFilterEnabled);
         if (isDeploymentFilterEnabled && !isMessageReleventForDeployment(message)) {
             return;
         }
-
-        log.info("Handling request by tribunal hearing api merge code");
 
         byte[] messageBytes = new byte[(int) message.getBodyLength()];
         message.readBytes(messageBytes);
