@@ -1,0 +1,433 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "DOW": {
+      "enum": [
+        "Friday",
+        "Monday",
+        "Saturday",
+        "Sunday",
+        "Thursday",
+        "Tuesday",
+        "Wednesday"
+      ],
+      "type": "string"
+    },
+    "DOWUnavailabilityType": {
+      "enum": [
+        "ALL",
+        "AM",
+        "PM"
+      ],
+      "type": "string"
+    },
+    "HearingLocationModel": {
+      "properties": {
+        "locationId": {
+          "type": "string"
+        },
+        "locationName": {
+          "type": "string"
+        },
+        "locationType": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "HearingWindowModel": {
+      "properties": {
+        "hearingWindowDateRange": {
+          "properties": {
+            "hearingWindowEndDateRange": {
+              "type": "string"
+            },
+            "hearingWindowStartDateRange": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "hearingWindowFirstDate": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "IndividualDetailsModel": {
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "hearingChannelEmail": {
+          "type": "string"
+        },
+        "hearingChannelPhone": {
+          "type": "string"
+        },
+        "interpreterLanguage": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "preferredHearingChannel": {
+          "type": "string"
+        },
+        "reasonableAdjustments": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "relatedParties": {
+          "items": {
+            "$ref": "#/definitions/RelatedPartiesModel"
+          },
+          "type": "array"
+        },
+        "title": {
+          "type": "string"
+        },
+        "vulnerabilityDetails": {
+          "type": "string"
+        },
+        "vulnerableFlag": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "JudiciaryModel": {
+      "properties": {
+        "authorisationSubType": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "authorisationTypes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "judiciaryPreferences": {
+          "items": {
+            "$ref": "#/definitions/PanelPreferenceModel"
+          },
+          "type": "array"
+        },
+        "judiciarySpecialisms": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "panelComposition": {
+          "items": [
+            {
+              "properties": {
+                "count": {
+                  "type": "number"
+                },
+                "memberType": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          ],
+          "maxItems": 1,
+          "minItems": 1,
+          "type": "array"
+        },
+        "roleType": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "NavigationModel": {
+      "properties": {
+        "conditionOperator": {
+          "type": "string"
+        },
+        "conditionValue": {
+          "type": "string"
+        },
+        "resultValue": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "OrganisationDetailsModel": {
+      "properties": {
+        "cftOrganisationID": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "organisationType": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "PanelPreferenceModel": {
+      "properties": {
+        "memberID": {
+          "type": "string"
+        },
+        "memberType": {
+          "type": "string"
+        },
+        "requirementType": {
+          "$ref": "#/definitions/RequirementType"
+        }
+      },
+      "type": "object"
+    },
+    "PartyDetailsModel": {
+      "properties": {
+        "individualDetails": {
+          "$ref": "#/definitions/IndividualDetailsModel"
+        },
+        "organisationDetails": {
+          "$ref": "#/definitions/OrganisationDetailsModel"
+        },
+        "partyChannel": {
+          "type": "string"
+        },
+        "partyID": {
+          "type": "string"
+        },
+        "partyName": {
+          "type": "string"
+        },
+        "partyRole": {
+          "type": "string"
+        },
+        "partyType": {
+          "$ref": "#/definitions/PartyType"
+        },
+        "unavailabilityDOW": {
+          "items": {
+            "$ref": "#/definitions/UnavailabilityDOWModel"
+          },
+          "type": "array"
+        },
+        "unavailabilityRanges": {
+          "items": {
+            "$ref": "#/definitions/UnavailabilityRangeModel"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "PartyFlagsModel": {
+      "properties": {
+        "flagDescription": {
+          "type": "string"
+        },
+        "flagId": {
+          "type": "string"
+        },
+        "flagParentId": {
+          "type": "string"
+        },
+        "flagStatus": {
+          "type": "string"
+        },
+        "partyName": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "PartyType": {
+      "enum": [
+        "IND",
+        "ORG"
+      ],
+      "type": "string"
+    },
+    "RelatedPartiesModel": {
+      "properties": {
+        "relatedPartyID": {
+          "type": "string"
+        },
+        "relationshipType": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "RequirementType": {
+      "enum": [
+        "EXCLUDE",
+        "MUSTINC",
+        "OPTINC"
+      ],
+      "type": "string"
+    },
+    "ScreenNavigationModel": {
+      "properties": {
+        "conditionKey": {
+          "type": "string"
+        },
+        "navigation": {
+          "items": {
+            "$ref": "#/definitions/NavigationModel"
+          },
+          "type": "array"
+        },
+        "screenName": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "UnavailabilityDOWModel": {
+      "properties": {
+        "DOW": {
+          "$ref": "#/definitions/DOW"
+        },
+        "DOWUnavailabilityType": {
+          "$ref": "#/definitions/DOWUnavailabilityType"
+        }
+      },
+      "type": "object"
+    },
+    "UnavailabilityRangeModel": {
+      "properties": {
+        "unavailableFromDate": {
+          "type": "string"
+        },
+        "unavailableToDate": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "VocabularyModel": {
+      "properties": {
+        "word1": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+
+  "properties": {
+    "autoListFlag": {
+      "type": "boolean"
+    },
+    "caseAdditionalSecurityFlag": {
+      "type": "boolean"
+    },
+    "caseFlags": {
+      "properties": {
+        "flagAmendURL": {
+          "type": "string"
+        },
+        "flags": {
+          "items": {
+            "$ref": "#/definitions/PartyFlagsModel"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "caseName": {
+      "type": "string"
+    },
+    "caseSubTypes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "caseType": {
+      "type": "string"
+    },
+    "duration": {
+      "type": "number"
+    },
+    "facilitiesRequired": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "hearingInWelshFlag": {
+      "type": "boolean"
+    },
+    "hearingIsLinkedFlag": {
+      "type": "boolean"
+    },
+    "hearingLocations": {
+      "items": {
+        "$ref": "#/definitions/HearingLocationModel"
+      },
+      "type": "array"
+    },
+    "hearingPriorityType": {
+      "type": "string"
+    },
+    "hearingRequester": {
+      "type": "string"
+    },
+    "hearingType": {
+      "type": "string"
+    },
+    "hearingWindow": {
+      "$ref": "#/definitions/HearingWindowModel"
+    },
+    "judiciary": {
+      "$ref": "#/definitions/JudiciaryModel"
+    },
+    "leadJudgeContractType": {
+      "type": "string"
+    },
+    "listingComments": {
+      "type": "string"
+    },
+    "numberOfPhysicalAttendees": {
+      "type": "number"
+    },
+    "parties": {
+      "items": {
+        "$ref": "#/definitions/PartyDetailsModel"
+      },
+      "type": "array"
+    },
+    "privateHearingRequiredFlag": {
+      "type": "boolean"
+    },
+    "screenFlow": {
+      "items": {
+        "$ref": "#/definitions/ScreenNavigationModel"
+      },
+      "type": "array"
+    },
+    "vocabulary": {
+      "items": {
+        "$ref": "#/definitions/VocabularyModel"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}

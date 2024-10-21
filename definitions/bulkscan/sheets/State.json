@@ -1,0 +1,7 @@
+[
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "ID": "ScannedRecordReceived", "Name": "Received", "Description": "A scanned record has been received", "DisplayOrder": 1},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "ID": "ScannedRecordAttachedToCase", "Name": "Attached to case", "Description": "The scanned record has been attached to existing case", "DisplayOrder": 2},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "ID": "ScannedRecordCaseCreated", "Name": "Case created", "Description": "A new case is created from scanned record", "DisplayOrder": 3},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "ID": "ScannedRecordRejected", "Name": "Rejected", "Description": "The scanned record has been rejected", "DisplayOrder": 4},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "SSCS_ExceptionRecord", "ID": "ScannedRecordManuallyHandled", "Name": "Manually handled", "Description": "The scanned record has been handled byCW manually", "DisplayOrder": 5}
+]
