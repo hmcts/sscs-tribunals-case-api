@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -23,7 +22,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -94,24 +92,10 @@ public class ValidateAppealAboutToSubmitHandler extends ResponseEventsAboutToSub
 
         setUnsavedFieldsOnCallback(callback);
 
-        FormType formType = callback.getCaseDetails().getCaseData().getFormType();
         Map<String, Object> appealData = new HashMap<>();
-        sscsDataHelper.addSscsDataToMap(appealData,
-                callback.getCaseDetails().getCaseData().getAppeal(),
-                callback.getCaseDetails().getCaseData().getSscsDocument(),
-                callback.getCaseDetails().getCaseData().getSubscriptions(),
-                formType,
-                callback.getCaseDetails().getCaseData().getChildMaintenanceNumber(),
-                callback.getCaseDetails().getCaseData().getOtherParties()
-        );
+        sscsDataHelper.addSscsDataToMap(appealData, callback.getCaseDetails().getCaseData());
 
         boolean ignoreMrnValidation = false;
-        if (callback.getEvent() != null && (EventType.DIRECTION_ISSUED.equals(callback.getEvent())
-                || EventType.DIRECTION_ISSUED_WELSH.equals(callback.getEvent()))
-                && callback.getCaseDetails().getCaseData().getDirectionTypeDl() != null) {
-            ignoreMrnValidation = StringUtils.equals(DirectionType.APPEAL_TO_PROCEED.toString(),
-                    callback.getCaseDetails().getCaseData().getDirectionTypeDl().getValue().getCode());
-        }
 
         return appealValidator.validateAppeal(callback.getCaseDetails(), appealData, ignoreMrnValidation);
     }
