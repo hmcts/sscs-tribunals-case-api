@@ -108,7 +108,7 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
     @Test
     public void givenAIbaNullValueMainlandUkCaseFromSya_thenAddressBuildsCorrectly() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
-        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Appeal", "infectedBloodAppeal");
+        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Compensation", "infectedBloodAppeal");
         syaCaseWrapper.setBenefitType(benefitType);
         syaCaseWrapper.getContactDetails().setInMainlandUk(null);
         syaCaseWrapper.getContactDetails().setAddressLine1("line1");
@@ -135,7 +135,7 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
     @Test
     public void givenAIbaMainlandUkCaseFromSya_thenAddressBuildsCorrectly() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
-        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Appeal", "infectedBloodAppeal");
+        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Compensation", "infectedBloodAppeal");
         syaCaseWrapper.setBenefitType(benefitType);
         syaCaseWrapper.getContactDetails().setInMainlandUk(Boolean.TRUE);
         syaCaseWrapper.getContactDetails().setAddressLine1("line1");
@@ -163,7 +163,7 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
     @Test
     public void givenAIbaNonMainlandUkCaseFromSya_thenAddressBuildsCorrectly() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
-        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Appeal", "infectedBloodAppeal");
+        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Compensation", "infectedBloodAppeal");
         syaCaseWrapper.setBenefitType(benefitType);
         syaCaseWrapper.getContactDetails().setInMainlandUk(Boolean.FALSE);
         syaCaseWrapper.getContactDetails().setAddressLine1("line1");
@@ -187,7 +187,7 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
     @Test
     public void givenAIbaCaseWithIbcRoleFromSya_thenAppellantBuildsWithIbcRole() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
-        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Appeal", "infectedBloodAppeal");
+        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Compensation", "infectedBloodAppeal");
         syaCaseWrapper.setBenefitType(benefitType);
         syaCaseWrapper.getAppellant().setIbcRole("someRole");
         SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
@@ -207,7 +207,7 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
     @Test
     public void givenAIbaCaseWithNoIbcRoleFromSya_thenAppellantBuildsCorrectlyWithoutIbcRole() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
-        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Appeal", "infectedBloodAppeal");
+        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Compensation", "infectedBloodAppeal");
         syaCaseWrapper.setBenefitType(benefitType);
         syaCaseWrapper.getAppellant().setIbcRole(null);
         SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
@@ -227,7 +227,7 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
     @Test
     public void givenAIbaCaseWithNoSyaAppellantFromSya_thenAppellantBuildsCorrectlyWithoutIbcRole() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
-        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Appeal", "infectedBloodAppeal");
+        SyaBenefitType benefitType = new SyaBenefitType("Infected Blood Compensation", "infectedBloodAppeal");
         syaCaseWrapper.setBenefitType(benefitType);
         syaCaseWrapper.setAppellant(null);
         SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,

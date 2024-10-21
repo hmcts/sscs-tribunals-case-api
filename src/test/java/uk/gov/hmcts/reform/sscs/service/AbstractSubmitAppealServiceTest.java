@@ -227,7 +227,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
-        appealData.setBenefitType(new SyaBenefitType("Infected blood appeal", "infectedBloodAppeal"));
+        appealData.setBenefitType(new SyaBenefitType("Infected Blood Compensation", "infectedBloodAppeal"));
         submitAppealService.submitAppeal(appealData, userToken);
         appealData.setBenefitType(null);
         verify(ccdService).createCase(capture.capture(), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
@@ -381,7 +381,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
-        appealData.setBenefitType(new SyaBenefitType("Infected blood appeal", "infectedBloodAppeal"));
+        appealData.setBenefitType(new SyaBenefitType("Infected Blood Compensation", "infectedBloodAppeal"));
         submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(capture.capture(), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
@@ -433,7 +433,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
-        appealData.setBenefitType(new SyaBenefitType("Infected blood appeal", "infectedBloodAppeal"));
+        appealData.setBenefitType(new SyaBenefitType("Infected Blood Compensation", "infectedBloodAppeal"));
         submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(capture.capture(), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
@@ -773,7 +773,7 @@ public abstract class AbstractSubmitAppealServiceTest {
         when(airLookupService.lookupAirVenueNameByPostCode(eq(appellantLocationCode), any())).thenReturn(rpc.getCity());
         when(venueService.getEpimsIdForVenue(rpc.getCity())).thenReturn("1234");
         when(refDataService.getCourtVenueRefDataByEpimsId("1234")).thenReturn(CourtVenue.builder().courtStatus("Open").regionId("1").build());
-        SyaBenefitType syaBenefitType = new SyaBenefitType("Infected Blood Appeal", "infectedBloodAppeal");
+        SyaBenefitType syaBenefitType = new SyaBenefitType("Infected Blood Compensation", "infectedBloodAppeal");
         appealData.setBenefitType(syaBenefitType);
         appealData.getAppellant().getContactDetails().setPortOfEntry(appellantLocationCode);
         appealData.getAppellant().getContactDetails().setInMainlandUk(Boolean.FALSE);
@@ -936,7 +936,7 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     @Test(expected = CcdException.class)
     public void givenExceptionWhenCreatingOrUpdatingIbaCase_shouldThrowException() {
-        SyaBenefitType syaBenefitType = new SyaBenefitType("Infected Blood Appeal", "infectedBloodAppeal");
+        SyaBenefitType syaBenefitType = new SyaBenefitType("Infected Blood Compensation", "infectedBloodAppeal");
         appealData.setBenefitType(syaBenefitType);
         given(ccdService.createCase(any(SscsCaseData.class), anyString(), anyString(), anyString(), any(IdamTokens.class)))
             .willThrow(RuntimeException.class);
