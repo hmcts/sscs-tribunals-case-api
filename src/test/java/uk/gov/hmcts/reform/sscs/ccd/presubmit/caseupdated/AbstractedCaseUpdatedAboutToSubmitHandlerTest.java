@@ -1044,6 +1044,18 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
+    void givenIbaCaseAndIbcaReferenceEmpty_thenAddWarningMessages() {
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder()
+            .code("infectedBloodAppeal").description("Infected Blood Compensation").build());
+        callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(2, response.getWarnings().size());
+        assertThat(response.getWarnings(), hasItems("FTA issuing office is empty", "IBCA Reference Number has not been provided for the Appellant, do you want to ignore this warning and proceed?"));
+    }
+
+    @Test
     void givenInvalidBenefitTypeAndDwpIssuingOfficeEmpty_thenAddWarningMessages() {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("INVALID").build());
         callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().build());

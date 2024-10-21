@@ -373,7 +373,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private List<String> validatePartyCaseData(Entity entity, String partyType) {
+    private List<String> validatePartyCaseData(Entity entity, String partyType, boolean isIba) {
         List<String> listOfWarnings = new ArrayList<>();
 
         if (entity != null) {
@@ -389,8 +389,11 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                 if (isBlank(entity.getIdentity().getDob())) {
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "Date of Birth", partyType));
                 }
-                if (isBlank(entity.getIdentity().getNino())) {
+                if (isBlank(entity.getIdentity().getNino()) && !isIba) {
                     listOfWarnings.add(String.format(WARNING_MESSAGE, "National Insurance Number", partyType));
+                }
+                if (isBlank(entity.getIdentity().getIbcaReference()) && isIba) {
+                    listOfWarnings.add(String.format(WARNING_MESSAGE, "IBCA Reference Number", partyType));
                 }
             }
         }
@@ -400,8 +403,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateAppellantCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         Appellant appellantInfo = sscsCaseData.getAppeal().getAppellant();
-
-        List<String> warnings = validatePartyCaseData(appellantInfo, "Appellant");
+        String benefitCode = sscsCaseData.getAppeal().getBenefitType() != null ?
+            sscsCaseData.getAppeal().getBenefitType().getCode() : "";
+        boolean isIba = benefitCode.equals("infectedBloodAppeal");
+        List<String> warnings = validatePartyCaseData(appellantInfo, "Appellant", isIba);
 
         if (!warnings.isEmpty()) {
             response.addWarnings(warnings);
@@ -413,7 +418,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         String isAppointee = sscsCaseData.getAppeal().getAppellant().getIsAppointee();
 
         if (isAppointee != null && isAppointee.equals("Yes") && appointeeInfo != null) {
-            List<String> warnings = validatePartyCaseData(appointeeInfo, "Appointee");
+            List<String> warnings = validatePartyCaseData(appointeeInfo, "Appointee", false);
 
             if (!warnings.isEmpty()) {
                 response.addWarnings(warnings);
