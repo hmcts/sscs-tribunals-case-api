@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -42,7 +43,7 @@ public class SyaAppealValidator extends AppealValidator {
                               CcdService ccdService,
                               DwpAddressLookupService dwpAddressLookupService,
                               AddressValidator addressValidator,
-                              List<String> titles) {
+                              @Value("#{'${validation.titles}'.split(',')}") List<String> titles) {
         super(dwpAddressLookupService, addressValidator, SYA_APPEAL, titles);
         this.idamService = idamService;
         this.ccdService = ccdService;

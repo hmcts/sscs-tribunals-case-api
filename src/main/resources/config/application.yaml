@@ -232,6 +232,18 @@ evidence:
         hmctsImgVal: '"[userImage:welshhmcts.png]"'
         template: TB-SCS-GNO-WEL-00479.docx
 
+ccd:
+    case:
+        jurisdiction: SSCS
+        type: Benefit
+        caseCreatedEventId: appealCreated
+        validAppealCreatedEventId: validAppealCreated
+        incompleteApplicationEventId: incompleteApplicationReceived
+        nonCompliantEventId: nonCompliant
+
+validation:
+    titles: Cllr,Count,DC,Dr,DS,Insp,Lady,Lord,Miss,Mr & Mrs,Mr,Mrs,Ms,PC,Rev,S/M,Sgt
+
 evidenceDescription:
     html:
         template:
