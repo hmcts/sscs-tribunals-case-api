@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
+import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -75,6 +76,9 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
     private AirLookupService airLookupService;
 
     @Mock
+    private PostcodeValidator postcodeValidator;
+
+    @Mock
     private IdamService idamService;
 
     @Mock
@@ -106,6 +110,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
             regionalProcessingCenterService,
             associatedCaseLinkHelper,
             airLookupService,
+            postcodeValidator,
             new DwpAddressLookupService(),
             idamService,
             refDataService,
