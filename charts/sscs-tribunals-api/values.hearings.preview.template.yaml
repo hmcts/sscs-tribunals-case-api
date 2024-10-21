@@ -102,3 +102,9 @@ java:
       key: primaryKey
   postgresql:
     enabled: false
+
+ccd-def-cleanup:
+  enabled: true
+  change_id: ${CHANGE_ID}
+  case_type_ids:
+    - Benefit
