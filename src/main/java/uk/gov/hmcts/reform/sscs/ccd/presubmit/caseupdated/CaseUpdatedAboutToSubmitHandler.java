@@ -403,8 +403,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private void validateAppellantCaseData(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
         Appellant appellantInfo = sscsCaseData.getAppeal().getAppellant();
-        String benefitCode = sscsCaseData.getAppeal().getBenefitType() != null ?
-            sscsCaseData.getAppeal().getBenefitType().getCode() : "";
+        String benefitCode = sscsCaseData.getAppeal().getBenefitType() != null
+            ? sscsCaseData.getAppeal().getBenefitType().getCode() : "";
         boolean isIba = benefitCode.equals("infectedBloodAppeal");
         List<String> warnings = validatePartyCaseData(appellantInfo, "Appellant", isIba);
 
