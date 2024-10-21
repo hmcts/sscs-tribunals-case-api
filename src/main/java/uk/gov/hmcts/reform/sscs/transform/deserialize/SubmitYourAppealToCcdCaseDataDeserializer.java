@@ -198,7 +198,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         AppealReasons appealReasons = getReasonsForAppealing(syaCaseWrapper.getReasonsForAppealing());
 
-        Representative representative = getRepresentative(syaCaseWrapper);
+        Representative representative = getRepresentative(syaCaseWrapper, isIba);
 
         HearingSubtype hearingSubtype = getHearingSubType(syaCaseWrapper.getSyaHearingOptions());
 
@@ -284,7 +284,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             null;
     }
 
-    private static Address handleAddress(SyaContactDetails contactDetails, boolean isIba) {
+    private static Address handleAddress(SyaContactDetails contactDetails, boolean isIba, String party) {
         Address.AddressBuilder addressBuilder = Address.builder()
             .line1(contactDetails.getAddressLine1())
             .line2(contactDetails.getAddressLine2())
@@ -293,23 +293,18 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             YesNo inMainlandUkYesNo = contactDetails.getInMainlandUk().equals(Boolean.TRUE) ? YesNo.YES : YesNo.NO;
             addressBuilder.inMainlandUk(inMainlandUkYesNo);
             if (inMainlandUkYesNo.equals(YesNo.NO)) {
-                addressBuilder
-                    .country(contactDetails.getCountry())
-                    .portOfEntry(contactDetails.getPortOfEntry());
-            } else {
-                addressBuilder
-                    .county(contactDetails.getCounty())
-                    .postcode(contactDetails.getPostCode())
-                    .postcodeLookup(contactDetails.getPostcodeLookup())
-                    .postcodeAddress(contactDetails.getPostcodeAddress());
+                addressBuilder.country(contactDetails.getCountry());
+                if (party.equalsIgnoreCase("appellant")) {
+                    addressBuilder.portOfEntry(contactDetails.getPortOfEntry());
+                }
+                return addressBuilder.build();
             }
-        } else {
-            addressBuilder
-                .county(contactDetails.getCounty())
-                .postcode(contactDetails.getPostCode())
-                .postcodeLookup(contactDetails.getPostcodeLookup())
-                .postcodeAddress(contactDetails.getPostcodeAddress());
         }
+        addressBuilder
+            .county(contactDetails.getCounty())
+            .postcode(contactDetails.getPostCode())
+            .postcodeLookup(contactDetails.getPostcodeLookup())
+            .postcodeAddress(contactDetails.getPostcodeAddress());
         return addressBuilder.build();
     }
 
@@ -321,7 +316,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         Address address = null;
         Contact contact;
         if (null != contactDetails) {
-            address = handleAddress(contactDetails, isIba);
+            address = handleAddress(contactDetails, isIba, "appellant");
             contact = Contact.builder()
                 .email(contactDetails.getEmailAddress())
                 .mobile(getPhoneNumberWithOutSpaces(contactDetails.getPhoneNumber()))
@@ -723,7 +718,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             : contactDetails.getPhoneNumber();
     }
 
-    private static Representative getRepresentative(SyaCaseWrapper syaCaseWrapper) {
+    private static Representative getRepresentative(SyaCaseWrapper syaCaseWrapper, boolean isIba) {
         if (syaCaseWrapper.getHasRepresentative() != null) {
 
             if (syaCaseWrapper.getHasRepresentative()) {
@@ -744,15 +739,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                     .lastName(repLastName)
                     .build();
 
-                Address address = Address.builder()
-                    .line1(syaRepresentative.getContactDetails().getAddressLine1())
-                    .line2(syaRepresentative.getContactDetails().getAddressLine2())
-                    .town(syaRepresentative.getContactDetails().getTownCity())
-                    .county(syaRepresentative.getContactDetails().getCounty())
-                    .postcode(syaRepresentative.getContactDetails().getPostCode())
-                    .postcodeLookup(syaRepresentative.getContactDetails().getPostcodeLookup())
-                    .postcodeAddress(syaRepresentative.getContactDetails().getPostcodeAddress())
-                    .build();
+                SyaContactDetails contactDetails = syaRepresentative.getContactDetails();
+                Address address = handleAddress(contactDetails, isIba, "representative");
 
                 Contact contact = Contact.builder()
                     .email(syaRepresentative.getContactDetails().getEmailAddress())
