@@ -189,7 +189,8 @@
       "setAside": {},
       "issueCode": "CC",
       "correction": {
-        "isCorrectionFinalDecisionInProgress": "No"
+        "adminCorrectionType": "headerCorrection",
+        "isCorrectionFinalDecisionInProgress": "Yes"
       },
       "dwpDueDate": "2024-07-23",
       "benefitCode": "002",

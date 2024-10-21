@@ -72,7 +72,7 @@ public class AdminActionCorrectionSubmittedHandlerIt extends AbstractEventIt {
         CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.registerModule(new JavaTimeModule());
-        json = getJson("callback/postHearingRequest.json");
+        json = getJson("callback/adminActionCorrection.json");
         json = json.replaceFirst("invoking_event", "adminActionCorrection");
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }
