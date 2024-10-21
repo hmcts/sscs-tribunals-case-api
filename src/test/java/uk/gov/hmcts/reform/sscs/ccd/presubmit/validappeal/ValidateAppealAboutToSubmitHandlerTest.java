@@ -45,9 +45,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AppealPostcodeHelper;
-import uk.gov.hmcts.reform.sscs.exception.CaseManagementLocationService;
-import uk.gov.hmcts.reform.sscs.helper.SscsDataHelper;
+import uk.gov.hmcts.reform.sscs.ccd.validation.helper.AppealPostcodeHelper;
+import uk.gov.hmcts.reform.sscs.ccd.validation.helper.SscsDataHelper;
+import uk.gov.hmcts.reform.sscs.service.CaseManagementLocationService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -92,7 +92,7 @@ public class ValidateAppealAboutToSubmitHandlerTest {
                 State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now(), "Benefit");
         callback = new Callback<>(c, Optional.empty(), EventType.VALID_APPEAL, false);
         handler =
-                new ValidateAppealAboutToSubmitHandler(appealValidator, appealPostcodeHelper, sscsDataHelper, dwpAddressLookupService, caseManagementLocationService, true);
+                new ValidateAppealAboutToSubmitHandler(appealValidator, appealPostcodeHelper, sscsDataHelper, dwpAddressLookupService, caseManagementLocationService);
     }
 
     @Test

@@ -35,7 +35,7 @@ public class EventPublisherTest {
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         eventPublisher = new EventPublisher(topicPublisher, mapper);
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("1")

@@ -3,7 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validappeal;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.ValidationType.SYA_APPEAL;
-import static uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AddressValidator.IS_NOT_A_VALID_POSTCODE;
+import static uk.gov.hmcts.reform.sscs.ccd.validation.address.AddressValidator.IS_NOT_A_VALID_POSTCODE;
+import static uk.gov.hmcts.reform.sscs.ccd.validation.appeal.PartyValidator.ninoExists;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,8 +23,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AddressValidator;
-import uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AppealValidator;
+import uk.gov.hmcts.reform.sscs.ccd.validation.address.AddressValidator;
+import uk.gov.hmcts.reform.sscs.ccd.validation.appeal.AppealValidator;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
@@ -58,7 +59,7 @@ public class SyaAppealValidator extends AppealValidator {
                 .transformedCase(appealData)
                 .build();
 
-        PreSubmitCallbackResponse<SscsCaseData> validationErrorResponse = convertWarningsToErrors(caseDetails.getCaseData(), caseValidationResponse); //convertWarn.. can be in tribs.
+        PreSubmitCallbackResponse<SscsCaseData> validationErrorResponse = convertWarningsToErrors(caseDetails.getCaseData(), caseValidationResponse);
 
         if (validationErrorResponse != null) {
             log.info(LOGSTR_VALIDATION_ERRORS, caseDetails.getId(), ".");
@@ -82,11 +83,7 @@ public class SyaAppealValidator extends AppealValidator {
 
     public Map<String, Object> checkForMatches(Map<String, Object> sscsCaseData, IdamTokens token) {
         Appeal appeal = (Appeal) sscsCaseData.get("appeal");
-        String nino = "";
-        if (appeal != null && appeal.getAppellant() != null
-                && appeal.getAppellant().getIdentity() != null && appeal.getAppellant().getIdentity().getNino() != null) {
-            nino = appeal.getAppellant().getIdentity().getNino();
-        }
+        String nino = ninoExists(appeal) ? appeal.getAppellant().getIdentity().getNino() : "";
 
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
 

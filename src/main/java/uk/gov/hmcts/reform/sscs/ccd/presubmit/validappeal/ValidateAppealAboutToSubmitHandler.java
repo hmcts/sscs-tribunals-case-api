@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -34,9 +33,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
-import uk.gov.hmcts.reform.sscs.ccd.validation.sscscasedata.AppealPostcodeHelper;
-import uk.gov.hmcts.reform.sscs.exception.CaseManagementLocationService;
-import uk.gov.hmcts.reform.sscs.helper.SscsDataHelper;
+import uk.gov.hmcts.reform.sscs.ccd.validation.helper.AppealPostcodeHelper;
+import uk.gov.hmcts.reform.sscs.ccd.validation.helper.SscsDataHelper;
+import uk.gov.hmcts.reform.sscs.service.CaseManagementLocationService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 @Component
@@ -48,20 +47,17 @@ public class ValidateAppealAboutToSubmitHandler extends ResponseEventsAboutToSub
     private final DwpAddressLookupService dwpAddressLookupService;
     private final AppealPostcodeHelper appealPostcodeHelper;
     private final CaseManagementLocationService caseManagementLocationService;
-    private final boolean caseAccessManagementFeature;
 
     public ValidateAppealAboutToSubmitHandler(SyaAppealValidator appealValidator,
                                               AppealPostcodeHelper appealPostcodeHelper,
                                               SscsDataHelper sscsDataHelper,
                                               DwpAddressLookupService dwpAddressLookupService,
-                                              CaseManagementLocationService caseManagementLocationService,
-                                              @Value("${feature.case-access-management.enabled}") boolean caseAccessManagementFeature) { ////check if feature toggle exists, if does remove.
+                                              CaseManagementLocationService caseManagementLocationService) {
         this.appealPostcodeHelper = appealPostcodeHelper;
         this.appealValidator = appealValidator;
         this.sscsDataHelper = sscsDataHelper;
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.caseManagementLocationService = caseManagementLocationService;
-        this.caseAccessManagementFeature = caseAccessManagementFeature;
 
     }
 
@@ -170,26 +166,22 @@ public class ValidateAppealAboutToSubmitHandler extends ResponseEventsAboutToSub
     }
 
     private void setCaseAccessManagementCategories(Appeal appeal, Callback<SscsCaseData> callback) {
-        if (caseAccessManagementFeature) {
-            Optional<Benefit> benefit = Benefit.getBenefitOptionalByCode(appeal.getBenefitType().getCode());
-            benefit.ifPresent(
-                    value -> callback.getCaseDetails().getCaseData().getCaseAccessManagementFields()
-                            .setCategories(value));
-        }
+        Optional<Benefit> benefit = Benefit.getBenefitOptionalByCode(appeal.getBenefitType().getCode());
+        benefit.ifPresent(
+                value -> callback.getCaseDetails().getCaseData().getCaseAccessManagementFields()
+                        .setCategories(value));
     }
 
     private void setCaseAccessManagementFields(Appeal appeal, Callback<SscsCaseData> callback) {
-        if (caseAccessManagementFeature) {
-            if (appeal != null && appeal.getAppellant() != null && appeal.getAppellant().getName() != null
-                    && appeal.getAppellant().getName().getFirstName() != null && appeal.getAppellant().getName().getLastName() != null) {
-                callback.getCaseDetails().getCaseData().getCaseAccessManagementFields().setCaseNames(appeal.getAppellant().getName().getFullNameNoTitle());
-            }
-            if (appeal != null && appeal.getBenefitType() != null) {
-                FormType formType = callback.getCaseDetails().getCaseData().getFormType();
-                Optional<Benefit> benefit = Benefit.getBenefitOptionalByCode(appeal.getBenefitType().getCode());
-                String ogdType = isHmrcBenefit(benefit, formType) ? "HMRC" : "DWP";
-                callback.getCaseDetails().getCaseData().getCaseAccessManagementFields().setOgdType(ogdType);
-            }
+        if (appeal != null && appeal.getAppellant() != null && appeal.getAppellant().getName() != null
+                && appeal.getAppellant().getName().getFirstName() != null && appeal.getAppellant().getName().getLastName() != null) {
+            callback.getCaseDetails().getCaseData().getCaseAccessManagementFields().setCaseNames(appeal.getAppellant().getName().getFullNameNoTitle());
+        }
+        if (appeal != null && appeal.getBenefitType() != null) {
+            FormType formType = callback.getCaseDetails().getCaseData().getFormType();
+            Optional<Benefit> benefit = Benefit.getBenefitOptionalByCode(appeal.getBenefitType().getCode());
+            String ogdType = isHmrcBenefit(benefit, formType) ? "HMRC" : "DWP";
+            callback.getCaseDetails().getCaseData().getCaseAccessManagementFields().setOgdType(ogdType);
         }
     }
 
