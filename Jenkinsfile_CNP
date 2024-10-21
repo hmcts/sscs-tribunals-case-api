@@ -136,13 +136,9 @@ withPipeline(type, product, component) {
 
         if (isHearingsPr) {
             env.CASE_TYPE = "Benefit-${CHANGE_ID}"
-            // setPreviewEnvVars();
+            setAatEnvVars();
             env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
             env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-            env.CCD_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-            env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-            env.CCD_GW_API = "https://gateway-ccd.aat.platform.hmcts.net"
-            env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
             env.HEARINGS_ENABLED = "Yes"
             env.ENVIRONMENT = "pr"
         }
