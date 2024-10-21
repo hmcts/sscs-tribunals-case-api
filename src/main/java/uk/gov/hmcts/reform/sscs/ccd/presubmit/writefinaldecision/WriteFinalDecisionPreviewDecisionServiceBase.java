@@ -100,10 +100,11 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         setHearings(writeFinalDecisionBuilder, caseData);
 
-        String heldAt = writeFinalDecisionBuilder.build().getHeldAt();
-        String heldBefore = buildHeldBefore(caseData, userAuthorisation);
+        String heldAt = SscsUtil.buildWriteFinalDecisionHeldAt(caseData, venueDataLoader);
+        String heldBefore = buildHeldBefore(caseData, userAuthorisation, isPostHearingsEnabled);
 
-        if (isPostHearingsEnabled && nonNull(finalDecisionCaseData.getFinalDecisionHeldAt())) {
+        if (isPostHearingsEnabled && nonNull(finalDecisionCaseData.getFinalDecisionHeldAt())
+                && SscsUtil.isCorrectionInProgress(caseData, isPostHearingsEnabled)) {
             heldAt = finalDecisionCaseData.getFinalDecisionHeldAt();
         }
 
@@ -262,11 +263,13 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         }
     }
 
-    protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
-        String judgeName = caseData.getSscsFinalDecisionCaseData().getFinalDecisionJudge();
-
-        if (isNull(judgeName)) {
-            judgeName = buildSignedInJudgeName(userAuthorisation);
+    protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation, boolean isPostHearingsEnabled) {
+        String judgeName = "Tribunal Judge ";
+        String originalJudgeName = caseData.getSscsFinalDecisionCaseData().getFinalDecisionJudge();
+        if (SscsUtil.isCorrectionInProgress(caseData, isPostHearingsEnabled) && !isNull(originalJudgeName)) {
+            judgeName += originalJudgeName;
+        } else {
+            judgeName += buildSignedInJudgeSurname(userAuthorisation);
         }
 
         return SscsUtil.buildWriteFinalDecisionHeldBefore(caseData, judgeName);

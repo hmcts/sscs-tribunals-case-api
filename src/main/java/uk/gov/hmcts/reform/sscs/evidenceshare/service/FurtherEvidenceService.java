@@ -64,19 +64,19 @@ public class FurtherEvidenceService {
 
         for (AbstractDocument<AbstractDocumentDetails> doc : documents) {
             if (doc.getValue() != null
-                && documentType.getValue().equals(doc.getValue().getDocumentType())
-                && doc.getValue().getResizedDocumentLink() != null) {
+                    && documentType.getValue().equals(doc.getValue().getDocumentType())
+                    && doc.getValue().getResizedDocumentLink() != null) {
                 if (doc.getValue().getClass().isAssignableFrom(SscsDocumentDetails.class)) {
                     sscsCaseDocuments
-                        .stream()
-                        .filter(d -> d.getValue().getDocumentLink().getDocumentBinaryUrl().equals(doc.getValue().getDocumentLink().getDocumentBinaryUrl()))
-                        .map(d -> {
-                            DocumentLink resizedLink = doc.getValue().getResizedDocumentLink();
-                            d.getValue().setResizedDocumentLink(resizedLink);
-                            log.info("Sending resized document to bulk print link: DocumentLink(documentUrl= {} , documentFilename= {} and caseId {} )",
-                                resizedLink.getDocumentUrl(), resizedLink.getDocumentFilename(), caseData.getCcdCaseId());
-                            return d;
-                        }).findFirst();
+                            .stream()
+                            .filter(d -> d.getValue().getDocumentLink().getDocumentBinaryUrl().equals(doc.getValue().getDocumentLink().getDocumentBinaryUrl()))
+                            .map(d -> {
+                                DocumentLink resizedLink = doc.getValue().getResizedDocumentLink();
+                                d.getValue().setResizedDocumentLink(resizedLink);
+                                log.info("Sending resized document to bulk print link: DocumentLink(documentUrl= {} , documentFilename= {} and caseId {} )",
+                                        resizedLink.getDocumentUrl(), resizedLink.getDocumentFilename(), caseData.getCcdCaseId());
+                                return d;
+                            }).findFirst();
                 }
             }
         }
@@ -135,19 +135,19 @@ public class FurtherEvidenceService {
 
     private void addOtherPartyOrAppointeeTo609_98Map(String otherPartyOriginalSenderId, CcdValue<OtherParty> otherParty, Multimap<FurtherEvidenceLetterType, String> partiesMap) {
         if ((otherPartyOriginalSenderId == null && !YesNo.isYes(otherParty.getValue().getIsAppointee()))
-            || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getId()) && !YesNo.isYes(otherParty.getValue().getIsAppointee()))) {
+                || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getId()) && !YesNo.isYes(otherParty.getValue().getIsAppointee()))) {
             partiesMap.put(OTHER_PARTY_LETTER, otherParty.getValue().getId());
         } else if (otherParty.getValue().getAppointee() != null
-            && ((otherPartyOriginalSenderId == null && YesNo.isYes(otherParty.getValue().getIsAppointee())
-            || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getAppointee().getId()) && YesNo.isYes(otherParty.getValue().getIsAppointee()))))) {
+                && ((otherPartyOriginalSenderId == null && YesNo.isYes(otherParty.getValue().getIsAppointee())
+                || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getAppointee().getId()) && YesNo.isYes(otherParty.getValue().getIsAppointee()))))) {
             partiesMap.put(OTHER_PARTY_LETTER, otherParty.getValue().getAppointee().getId());
         }
     }
 
     private void addOtherPartyRepTo609_98Map(String otherPartyOriginalSenderId, CcdValue<OtherParty> otherParty, Multimap<FurtherEvidenceLetterType, String> partiesMap) {
         if (otherParty.getValue().getRep() != null
-            && ((otherPartyOriginalSenderId == null && YesNo.isYes(otherParty.getValue().getRep().getHasRepresentative())
-            || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getRep().getId()) && YesNo.isYes(otherParty.getValue().getRep().getHasRepresentative()))))) {
+                && ((otherPartyOriginalSenderId == null && YesNo.isYes(otherParty.getValue().getRep().getHasRepresentative())
+                || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getRep().getId()) && YesNo.isYes(otherParty.getValue().getRep().getHasRepresentative()))))) {
             partiesMap.put(OTHER_PARTY_REP_LETTER, otherParty.getValue().getRep().getId());
         }
     }
@@ -185,27 +185,27 @@ public class FurtherEvidenceService {
 
     private byte[] buildPdfsFor609_97(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String pdfName, String otherPartyId) {
         return coverLetterService.generateCoverLetter(caseData, letterType,
-            getTemplateNameBasedOnLanguagePreference(caseData.getLanguagePreference(), "d609-97"), pdfName, otherPartyId);
+                getTemplateNameBasedOnLanguagePreference(caseData.getLanguagePreference(), "d609-97"), pdfName, otherPartyId);
     }
 
     private byte[] buildPdfsFor609_98(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String pdfName, String otherPartyId) {
         return coverLetterService.generateCoverLetter(caseData, letterType,
-            getTemplateNameBasedOnLanguagePreference(caseData.getLanguagePreference(), "d609-98"), pdfName, otherPartyId);
+                getTemplateNameBasedOnLanguagePreference(caseData.getLanguagePreference(), "d609-98"), pdfName, otherPartyId);
     }
 
     public boolean canHandleAnyDocument(List<SscsDocument> sscsDocumentList) {
         return null != sscsDocumentList && sscsDocumentList.stream()
-            .anyMatch(this::canHandleDocument);
+                .anyMatch(this::canHandleDocument);
     }
 
     private boolean canHandleDocument(SscsDocument sscsDocument) {
         return sscsDocument != null && sscsDocument.getValue() != null
-            && "No".equals(sscsDocument.getValue().getEvidenceIssued())
-            && null != sscsDocument.getValue().getDocumentType();
+                && "No".equals(sscsDocument.getValue().getEvidenceIssued())
+                && null != sscsDocument.getValue().getDocumentType();
     }
 
     private String getTemplateNameBasedOnLanguagePreference(LanguagePreference languagePreference, String documentType) {
         return docmosisTemplateConfig.getTemplate().get(languagePreference)
-            .get(documentType).get("name");
+                .get(documentType).get("name");
     }
 }

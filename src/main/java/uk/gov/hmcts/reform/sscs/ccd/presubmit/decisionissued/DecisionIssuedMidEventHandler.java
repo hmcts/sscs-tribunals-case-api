@@ -24,6 +24,7 @@ public class DecisionIssuedMidEventHandler extends IssueDocumentHandler implemen
     private final GenerateFile generateFile;
     private final DocumentConfiguration documentConfiguration;
 
+
     @Autowired
     public DecisionIssuedMidEventHandler(GenerateFile generateFile, DocumentConfiguration documentConfiguration) {
         this.generateFile = generateFile;

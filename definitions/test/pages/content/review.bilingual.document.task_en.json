@@ -1,0 +1,32 @@
+{
+    "name": "Review Bi-Lingual Document - CTSC",
+    "priority": "high",
+    "assignedToWhenNotAssigned": "Unassigned",
+    "assignedTo": "SSCS ctscadmin",
+    "unassignedManageOptions" : [
+        "Assign to me"
+    ],
+    "assignedManageOptions" : [
+        "Mark as done",
+        "Reassign task",
+        "Unassign task"
+    ],
+    "unassignedManageOptionsForCaseAllocator": [
+            "Assign task",
+            "Cancel task",
+            "Assign to me"
+    ],
+    "assignedManageOptionsForCaseAllocator" : [
+        "Cancel task",
+        "Mark as done",
+        "Reassign task",
+        "Unassign task"
+    ],
+    "nextStepsOptions": [
+        "Request translation from WLU"
+    ],
+    "requestTranslationFromWlu": {
+        "link": "Request translation from WLU",
+        "eventTitle": "Welsh - request translations"
+    }
+}
