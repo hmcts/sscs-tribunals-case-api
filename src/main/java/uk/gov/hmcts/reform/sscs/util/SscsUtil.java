@@ -435,13 +435,6 @@ public class SscsUtil {
         caseData.getAppeal().getMrnDetails().setDwpIssuingOffice("IBCA");
     }
 
-    public static UkPortOfEntry getUkPortOfEntry(String selectedPortOfEntryLocationCode) {
-        return Arrays.stream(UkPortOfEntry.values())
-                .filter(ukPortOfEntry -> selectedPortOfEntryLocationCode.equals(ukPortOfEntry.getLocationCode()))
-                .findFirst()
-                .orElse(null);
-    }
-
     public static String generateUniqueIbcaId(Appellant appellant) {
         String appellantLastName = appellant.getName().getLastName();
         String ibcaReference = appellant.getIdentity().getIbcaReference();
