@@ -145,10 +145,15 @@ withPipeline(type, product, component) {
         if (isHearingsPr) {
             env.CASE_TYPE = "Benefit-${CHANGE_ID}"
             setAatEnvVars();
+            env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+            env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+            env.HEARINGS_ENABLED = "Yes"
+            env.ENVIRONMENT = "pr"
         }
 
         def tests = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "test-suite")
         env.TEST_SUITE = tests.size() > 0 ? tests.collect { it.replace("test-suite:", "@") }.join("|") : "@preview-pipeline"
+        echo "Tags added on case is  " + {env.TEST_SUITE}
     }
     onDemo {
         env.ENVIRONMENT = "demo"
@@ -184,7 +189,6 @@ withPipeline(type, product, component) {
     }
 
     afterSuccess('smoketest:preview') {
-        env.ENVIRONMENT = isHearingsPr ? "aat" : "preview"
         runE2eTests()
     }
     afterSuccess('smoketest:aat') {
@@ -219,6 +223,7 @@ def setPreviewEnvVars() {
     env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
     env.CASE_DOCUMENT_AM_URL = "https://ccd-case-document-am-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.ENVIRONMENT = "pr"
+    env.HEARINGS_ENABLED = 'No'
 }
 
 def runE2eTests() {
