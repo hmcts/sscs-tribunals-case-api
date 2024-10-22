@@ -74,10 +74,6 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
 
     @Mock
     private AirLookupService airLookupService;
-
-    @Mock
-    private PostcodeValidator postcodeValidator;
-
     @Mock
     private IdamService idamService;
 
@@ -89,6 +85,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
 
     @Mock
     private SessionCategoryMapService categoryMapService;
+    private PostcodeValidator postcodeValidator = new PostcodeValidator();
 
     private CaseUpdatedAboutToSubmitHandler handler;
 
