@@ -1046,8 +1046,7 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     void givenIbaCaseAndIbcaReferenceEmpty_thenAddWarningMessages() {
-        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder()
-            .code("infectedBloodAppeal").description("Infected Blood Compensation").build());
+        callback.getCaseDetails().getCaseData().setBenefitCode(IBCA_BENEFIT_CODE);
         callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

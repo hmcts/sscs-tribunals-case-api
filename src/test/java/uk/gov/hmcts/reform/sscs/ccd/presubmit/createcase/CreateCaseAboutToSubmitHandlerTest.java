@@ -134,8 +134,10 @@ public class CreateCaseAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(mockedCaseData);
         when(mockedCaseData.getCaseCreated()).thenReturn("");
         when(mockedCaseData.getCcdCaseId()).thenReturn("1021");
-        when(mockedCaseData.getBenefitType()).thenReturn(Optional.of(Benefit.INFECTED_BLOOD_APPEAL));
+        when(mockedCaseData.getBenefitCode()).thenReturn(IBCA_BENEFIT_CODE);
         when(mockedCaseData.getAppeal()).thenReturn(mockedAppeal);
+        when(mockedAppeal.getHearingOptions()).thenReturn(HearingOptions.builder().build());
+        when(mockedAppeal.getMrnDetails()).thenReturn(MrnDetails.builder().build());
         when(mockedAppeal.getAppellant()).thenReturn(mockedAppellant);
         when(mockedAppellant.getName()).thenReturn(mockedName);
         when(mockedAppellant.getIdentity()).thenReturn(mockedIdentity);
@@ -155,7 +157,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(mockedCaseData);
         when(mockedCaseData.getCaseCreated()).thenReturn("");
         when(mockedCaseData.getCcdCaseId()).thenReturn("1021");
-        when(mockedCaseData.getBenefitType()).thenReturn(Optional.empty());
+        when(mockedCaseData.getBenefitCode()).thenReturn("");
         when(mockedCaseData.getAppeal()).thenReturn(mockedAppeal);
         when(mockedAppeal.getAppellant()).thenReturn(mockedAppellant);
 
