@@ -8,6 +8,7 @@
     "DisplayOrder": 9990,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "appeal.benefitType.code!=\"infectedBloodAppeal\""
   }
 ]

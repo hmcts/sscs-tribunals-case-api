@@ -46,7 +46,8 @@ public class CreateCaseMidEventHandlerTest {
     @CsvSource({
         "VALID_APPEAL_CREATED",
         "NON_COMPLIANT",
-        "INCOMPLETE_APPLICATION_RECEIVED"
+        "INCOMPLETE_APPLICATION_RECEIVED",
+        "CASE_UPDATED"
     })
     void canHandleTest(EventType eventType) {
         SscsCaseData caseData = SscsCaseData.builder().build();
@@ -70,12 +71,12 @@ public class CreateCaseMidEventHandlerTest {
                                 .build()
                         )
                         .rep(Representative.builder()
+                                .hasRepresentative("Yes")
                                 .address(Address.builder().build())
                                 .build()
                         )
                         .build()
                 )
-                .hasRepresentative(YES)
                 .benefitCode(IBCA_BENEFIT_CODE)
                 .build();
 
@@ -106,12 +107,12 @@ public class CreateCaseMidEventHandlerTest {
                                         .build())
                                 .build())
                         .rep(Representative.builder()
+                                .hasRepresentative("Yes")
                                 .address(Address.builder().build())
                                 .build()
                         )
                         .build()
                 )
-                .hasRepresentative(YES)
                 .benefitCode(IBCA_BENEFIT_CODE)
                 .build();
 
@@ -142,8 +143,11 @@ public class CreateCaseMidEventHandlerTest {
                                                 )
                                         )
                                         .inMainlandUk(NO)
-                                        .build())
-                                .build())
+                                        .build()
+                                )
+                                .build()
+                        )
+                        .rep(Representative.builder().build())
                         .build()
                 )
                 .benefitCode(IBCA_BENEFIT_CODE)

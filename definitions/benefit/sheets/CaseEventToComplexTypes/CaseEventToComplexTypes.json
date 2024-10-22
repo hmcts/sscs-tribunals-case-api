@@ -1430,7 +1430,6 @@
     "ListElementCode": "appellant.role",
     "ID": "appealAppellantRole",
     "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "appeal.benefitType.code = \"childSupport\"",
     "LiveFrom": "19/11/2019",
     "FieldDisplayOrder": 67,
     "PageID": "1.0"
@@ -1457,7 +1456,7 @@
     "PageID": "1.0"
   },
   {
-    "CaseEventID": "incompleteApplicationReceived",
+    "CaseEventID": "caseUpdated",
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.ibcRole",
     "DisplayContext": "OPTIONAL",
