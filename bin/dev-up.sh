@@ -23,6 +23,6 @@ export TRIBUNALS_API_URL=${TEST_E2E_API_URI}
 ./bin/create-xlsx.sh benefit tag pr
 ./bin/create-xlsx.sh bulkscan tag pr
 
-npx @hmcts/dev-env  --import-ccd
+npx @hmcts/dev-env --import-ccd
 
 rm befta_recent_executions_info_PREVIEW.json
