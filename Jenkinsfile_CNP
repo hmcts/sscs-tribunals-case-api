@@ -141,7 +141,7 @@ withPipeline(type, product, component) {
     }
     onPR() {
         setPreviewEnvVars();
-
+        echo "isHearingsPr  " + isHearingsPr
         if (isHearingsPr) {
             env.CASE_TYPE = "Benefit-${CHANGE_ID}"
             setAatEnvVars();
