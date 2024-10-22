@@ -105,7 +105,7 @@ withNightlyPipeline(type, product, component) {
     // enableFortifyScan()
     // enableSecurityScan()
 
-    before('functionalTest:aat') {
+    before('fullFunctionalTest:aat') {
         runE2eTestsNightly()
     }
     enableFullFunctionalTest()
