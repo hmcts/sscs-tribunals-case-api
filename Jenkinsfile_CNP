@@ -189,6 +189,7 @@ withPipeline(type, product, component) {
     }
 
     afterSuccess('smoketest:preview') {
+        env.ENVIRONMENT = isHearingsPr ? "aat" : "preview"
         runE2eTests()
     }
     afterSuccess('smoketest:aat') {
