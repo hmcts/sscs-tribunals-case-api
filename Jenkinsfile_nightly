@@ -36,7 +36,7 @@ def secrets = [
         secret('notification-test-key', 'NOTIFICATION_API_TEST_KEY'),
         secret('sscs-email-mac-secret-text', 'EMAIL_MAC_SECRET_TEXT'),
         secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
-        secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD')
+        secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD'),
 
         //e2e tests
         secret('test-e2e-caseofficer-username', 'TEST_CASEOFFICER_USERNAME'),
