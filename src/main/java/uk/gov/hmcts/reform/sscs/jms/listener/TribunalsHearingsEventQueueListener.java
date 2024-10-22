@@ -45,8 +45,6 @@ public class TribunalsHearingsEventQueueListener {
             return;
         }
 
-        log.info("Handling request by tribunal hearing api merge code");
-
         if (isNull(message)) {
             throw new TribunalsEventProcessingException("An exception occurred as message did not match format");
         }
