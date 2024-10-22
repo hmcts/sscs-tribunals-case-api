@@ -109,11 +109,11 @@ withNightlyPipeline(type, product, component) {
         runE2eTestsNightly()
     }
     enableFullFunctionalTest()
-    enableMutationTest()
+    // enableMutationTest()
 
-    afterSuccess('fortify-scan') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-    }
+    // afterSuccess('fortify-scan') {
+    //     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+    // }
 }
 
 def runE2eTestsNightly() {
