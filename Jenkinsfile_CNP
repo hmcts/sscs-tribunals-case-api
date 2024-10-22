@@ -38,6 +38,14 @@ def secrets = [
         secret('tya-link', 'SSCS_TRACK_YOUR_APPEAL_LINK'),
         secret('evidence-share-topic-shared-access-key', 'AMQP_PASSWORD'),
 
+        // hearing-api
+        secret('idam-s2s-api', 'IDAM_S2S_URL'),
+        secret('caseworker-ref-api', 'CASEWORKER_REF_API_URL'),
+        secret('ccd-api', 'CORE_CASE_DATA_API_URL'),
+        secret('judicial-ref-api', 'JUDICIAL_REF_API_URL'),
+        secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICES'),
+        secret('common-ref-data-api', 'COMMON_REF_API_URL'),
+
         // e2es
         secret('test-e2e-caseofficer-username', 'TEST_CASEOFFICER_USERNAME'),
         secret('test-e2e-caseofficer-password', 'TEST_CASEOFFICER_PASSWORD'),
@@ -137,10 +145,15 @@ withPipeline(type, product, component) {
         if (isHearingsPr) {
             env.CASE_TYPE = "Benefit-${CHANGE_ID}"
             setAatEnvVars();
+            env.TEST_E2E_URL_WEB = "https://xui-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+            env.TEST_E2E_API_URI = "https://sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+            env.HEARINGS_ENABLED = "Yes"
+            env.ENVIRONMENT = "pr"
         }
 
         def tests = githubApi.getLabelsbyPattern(env.BRANCH_NAME, "test-suite")
         env.TEST_SUITE = tests.size() > 0 ? tests.collect { it.replace("test-suite:", "@") }.join("|") : "@preview-pipeline"
+        echo "Tags added on case is  " + {env.TEST_SUITE}
     }
     onDemo {
         env.ENVIRONMENT = "demo"
@@ -176,7 +189,6 @@ withPipeline(type, product, component) {
     }
 
     afterSuccess('smoketest:preview') {
-        env.ENVIRONMENT = isHearingsPr ? "aat" : "preview"
         runE2eTests()
     }
     afterSuccess('smoketest:aat') {
@@ -211,6 +223,7 @@ def setPreviewEnvVars() {
     env.CCD_GW_API = "http://sscs-tribunals-api-pr-${CHANGE_ID}-ccd-api-gw"
     env.CASE_DOCUMENT_AM_URL = "https://ccd-case-document-am-api-sscs-tribunals-api-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.ENVIRONMENT = "pr"
+    env.HEARINGS_ENABLED = 'No'
 }
 
 def runE2eTests() {
