@@ -89,7 +89,7 @@ public class PanelCompositionServiceTest {
     @Test
     public void givenNonDormantCase_caseShouldUpdate() {
         panelCompositionService.processCaseState(callback,sscsCaseData, EventType.CONFIRM_PANEL_COMPOSITION);
-        verify(updateCcdCaseService, times(1)).updateCaseV2(any(), any(), anyString(), anyString(), any(), any());
+        verify(updateCcdCaseService, times(1)).triggerCaseEventV2(any(), any(), anyString(), anyString(), any());
     }
 
     @Test

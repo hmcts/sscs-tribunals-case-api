@@ -160,8 +160,8 @@ public class UpdateOtherPartyHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
-            eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any(), any(Consumer.class));
+        verify(updateCcdCaseService).triggerCaseEventV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
     @Test
@@ -178,8 +178,8 @@ public class UpdateOtherPartyHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
-            eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any(), any(Consumer.class));
+        verify(updateCcdCaseService).triggerCaseEventV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
     @Test
@@ -196,8 +196,8 @@ public class UpdateOtherPartyHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
-            eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any(), any(Consumer.class));
+        verify(updateCcdCaseService).triggerCaseEventV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
     @Test
@@ -215,8 +215,8 @@ public class UpdateOtherPartyHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
-            eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any(), any(Consumer.class));
+        verify(updateCcdCaseService).triggerCaseEventV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
     @Test
@@ -236,8 +236,8 @@ public class UpdateOtherPartyHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(updateCcdCaseService, times(wantedNumberOfInvocations)).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
-            eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any(), any(Consumer.class));
+        verify(updateCcdCaseService, times(wantedNumberOfInvocations)).triggerCaseEventV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
     private Object[] generateAllPossibleOtherPartyWithHearingOptions() {

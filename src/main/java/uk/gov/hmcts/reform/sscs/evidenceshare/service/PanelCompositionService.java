@@ -42,11 +42,11 @@ public class PanelCompositionService {
             if (caseData.getIsFqpmRequired() == null
                 || hasDueDateSetAndOtherPartyWithoutHearingOption(caseData)) {
                 if (stateNotWithFtaOrResponseReceived(caseDetails)) {
-                    updateCase(caseDetails.getId(),
+                    triggerCaseEventV2(
+                        caseDetails.getId(),
                         EventType.NOT_LISTABLE,
                         "Not listable",
-                        "Update to Not Listable as the case is either awaiting hearing enquiry form or for FQPM to be set",
-                         sscsCaseDetails -> { }
+                        "Update to Not Listable as the case is either awaiting hearing enquiry form or for FQPM to be set"
                     );
                 }
             } else {
@@ -103,5 +103,9 @@ public class PanelCompositionService {
 
     private void updateCase(Long caseId, EventType eventType, String summary, String description, Consumer<SscsCaseDetails> caseDetailsConsumer) {
         updateCcdCaseService.updateCaseV2(caseId, eventType.getCcdType(), summary, description, idamService.getIdamTokens(), caseDetailsConsumer);
+    }
+
+    private void triggerCaseEventV2(Long caseId, EventType eventType, String summary, String description) {
+        updateCcdCaseService.triggerCaseEventV2(caseId, eventType.getCcdType(), summary, description, idamService.getIdamTokens());
     }
 }
