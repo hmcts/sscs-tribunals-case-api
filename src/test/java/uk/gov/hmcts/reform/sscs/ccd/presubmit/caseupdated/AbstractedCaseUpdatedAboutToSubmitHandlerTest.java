@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.CTSC_CLERK;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -1853,5 +1854,17 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         String language = sscsCaseData.getAppeal().getHearingOptions().getLanguages();
 
         assertEquals(language, item.getLabel());
+    }
+
+    @Test
+    void shouldSuccessfullyUpdateCaseWithIbcaBenefitType() {
+        sscsCaseData.setBenefitCode(IBCA_BENEFIT_CODE);
+        sscsCaseData.getAppeal().getAppellant().getIdentity().setIbcaReference("IBCA12345");
+        sscsCaseData.getAppeal().getAppellant().getAddress().setInMainlandUk(NO);
+        sscsCaseData.getAppeal().getAppellant().getAddress().setPortOfEntry("GB000434");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
     }
 }

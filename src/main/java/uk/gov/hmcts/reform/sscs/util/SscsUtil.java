@@ -40,6 +40,8 @@ public class SscsUtil {
     public static final String INVALID_BENEFIT_ISSUE_CODE = "Incorrect benefit/issue code combination";
     public static final String BENEFIT_CODE_NOT_IN_USE = "The benefit code selected is not in use";
 
+    private static final String ID_FORMAT = "%s_%s";
+
     private SscsUtil() {
         //
     }
@@ -373,6 +375,15 @@ public class SscsUtil {
         return false;
     }
 
+    public static DynamicList getPortsOfEntry() {
+        List<DynamicListItem> items = Arrays.stream(UkPortOfEntry.values())
+                .sorted(Comparator.comparing(UkPortOfEntry::getLabel))
+                .map(ukPortOfEntry -> new DynamicListItem(ukPortOfEntry.getLocationCode(), ukPortOfEntry.getLabel()))
+                .toList();
+
+        return new DynamicList(null, items);
+    }
+
     public static DynamicList getBenefitDescriptions(boolean isInfectedBloodAppealEnabled) {
         List<DynamicListItem> items = Arrays.stream(Benefit.values())
                 .filter(benefit -> isInfectedBloodAppealEnabled || !benefit.getShortName().equals("infectedBloodAppeal"))
@@ -417,6 +428,17 @@ public class SscsUtil {
         benefitType.setDescription(benefit.getDescription());
         benefitType.setDescriptionSelection(null);
         caseData.setBenefitCode(code);
+    }
+
+    public static void handleIbcaCase(SscsCaseData caseData) {
+        caseData.getAppeal().getHearingOptions().setHearingRoute(LIST_ASSIST);
+        caseData.getAppeal().getMrnDetails().setDwpIssuingOffice("IBCA");
+    }
+
+    public static String generateUniqueIbcaId(Appellant appellant) {
+        String appellantLastName = appellant.getName().getLastName();
+        String ibcaReference = appellant.getIdentity().getIbcaReference();
+        return String.format(ID_FORMAT, appellantLastName, ibcaReference);
     }
 
     public static void updateHearingChannel(SscsCaseData caseData, HearingChannel hearingChannel) {

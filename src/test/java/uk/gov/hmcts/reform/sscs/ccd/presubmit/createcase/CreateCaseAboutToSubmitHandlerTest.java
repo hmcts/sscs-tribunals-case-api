@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +23,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
-import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.reference.data.model.Language;
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
@@ -224,6 +225,40 @@ public class CreateCaseAboutToSubmitHandlerTest {
     }
 
     @Test
+    void shouldSetPdfFileNameWithIbcaReferenceWhenBenefitIsIbca() {
+        SscsCaseData caseDataWithSscsDocument = buildCaseData("Test", "infectedBloodAppeal", "IBCA");
+        caseDataWithSscsDocument.setCcdCaseId(CCD_CASE_ID.toString());
+        caseDataWithSscsDocument.setBenefitCode(IBCA_BENEFIT_CODE);
+        caseDataWithSscsDocument.getAppeal().getAppellant().getIdentity().setIbcaReference("IBCA12345");
+        caseDataWithSscsDocument.setSscsDocument(buildDocuments());
+
+        when(caseDetails.getCaseData()).thenReturn(caseDataWithSscsDocument);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("Yes", response.getData().getEvidencePresent());
+
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
+    }
+
+    @Test
+    void shouldCallPdfServiceWhenSscsDocumentIsNullWhenBenefitCodeIsIbca() {
+        SscsCaseData caseDataWithNullSscsDocument = buildCaseData("Test", "infectedBloodAppeal", "IBCA");
+        caseDataWithNullSscsDocument.setCcdCaseId(CCD_CASE_ID.toString());
+        caseDataWithNullSscsDocument.setBenefitCode(IBCA_BENEFIT_CODE);
+        caseDataWithNullSscsDocument.getAppeal().getAppellant().getIdentity().setIbcaReference("IBCA12345");
+        caseDataWithNullSscsDocument.setSscsDocument(null);
+
+        when(caseDetails.getCaseData()).thenReturn(caseDataWithNullSscsDocument);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("No", response.getData().getEvidencePresent());
+
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
+    }
+
+    @Test
     void givenPdfAlreadyExists_shouldNotCallPdfService() throws CcdException {
 
         SscsCaseData caseDataWithPdf = buildCaseDataWithPdf();
@@ -304,7 +339,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
 
     private SscsCaseData buildCaseDataWithoutPdf() {
-        SscsCaseData caseData = CaseDataUtils.buildCaseData();
+        SscsCaseData caseData = buildCaseData();
         caseData.setSscsDocument(Collections.emptyList());
         caseData.setCcdCaseId(CCD_CASE_ID.toString());
         return caseData;
@@ -317,7 +352,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
     }
 
     private SscsCaseData buildCaseDataWithNullSscsDocument() {
-        SscsCaseData caseData = CaseDataUtils.buildCaseData();
+        SscsCaseData caseData = buildCaseData();
         caseData.setSscsDocument(null);
         caseData.setCcdCaseId(CCD_CASE_ID.toString());
         return caseData;
@@ -363,5 +398,4 @@ public class CreateCaseAboutToSubmitHandlerTest {
         );
         return list;
     }
-
 }
