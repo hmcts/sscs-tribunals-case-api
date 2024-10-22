@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
-import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.util.Collection;
@@ -31,9 +31,10 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType.equals(CallbackType.MID_EVENT)
-                && ((callback.getEvent() == EventType.VALID_APPEAL_CREATED
+                && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
                 || callback.getEvent() == EventType.NON_COMPLIANT
-                || callback.getEvent() == EventType.INCOMPLETE_APPLICATION_RECEIVED))
+                || callback.getEvent() == EventType.INCOMPLETE_APPLICATION_RECEIVED
+                || callback.getEvent() == EventType.CASE_UPDATED)
                 && Objects.nonNull(callback.getCaseDetails())
                 && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
@@ -51,9 +52,9 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
 
             errorResponse.addErrors(validateAddress(caseData.getAppeal().getAppellant()));
 
-            if (YES.equals(caseData.getHasRepresentative())
+            if (isYes(caseData.getAppeal().getRep().getHasRepresentative())
                     && isNotEmpty(caseData.getAppeal().getRep().getAddress())
-                    && isNull(caseData.getAppeal().getRep().getAddress().getInMainlandUk())) {
+                    && isEmpty(caseData.getAppeal().getRep().getAddress().getInMainlandUk())) {
                 errorResponse.addError("You must enter Living in the UK for the representative");
             }
         }

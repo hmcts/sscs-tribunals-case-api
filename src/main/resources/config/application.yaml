@@ -259,7 +259,7 @@ feature:
     hearing-recording-filter:
         enabled: ${UPLOAD_HEARING_FILTER_ENABLED:false}
     infected-blood-appeal:
-        enabled: ${INFECTED_BLOOD_APPEAL_ENABLED:false}
+        enabled: ${INFECTED_BLOOD_APPEAL_ENABLED:true}
     postHearings:
         enabled: ${POST_HEARINGS_FEATURE:false}
     postHearingsB:
