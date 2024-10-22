@@ -40,6 +40,7 @@ public class TribunalsHearingsEventQueueListener {
     )
     public void handleIncomingMessage(HearingRequest message) throws TribunalsEventProcessingException, GetCaseException, UpdateCaseException {
 
+        log.info("isByPassHearingServiceEnabled ------------------------> {}", isByPassHearingServiceEnabled);
         if (!isByPassHearingServiceEnabled) {
             return;
         }
