@@ -637,7 +637,7 @@ task runE2eTests(type: Exec) {
 task runE2eTestsNightly(type: Exec) {
     dependsOn yarnInstall
     workingDir = file("${project.projectDir}/definitions/test")
-    commandLine 'yarn', 'test:nigthly'
+    commandLine 'yarn', 'test:nightly'
 }
 
 task highLevelDataSetup(type: JavaExec) {
