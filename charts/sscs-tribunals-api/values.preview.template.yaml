@@ -44,6 +44,7 @@ java:
     CITIZEN_LOGIN_SERVICE_V2: true
     ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2: true
     BYPASS_NOTIFICATIONS_SERVICE: true
+    BYPASS_HEARING_API_SERVICE: true
     HANDLE_CCD_CALLBACKMAP_V2: true
     TESTING_SUPPORT_ENABLED: true
     TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
@@ -67,6 +68,8 @@ java:
     HOURS_END_TIME: 23
     RUN_DB_MIGRATION_ON_STARTUP: true
     TEST_RECIPIENTS_POSTCODE: "*"
+    INFECTED_BLOOD_APPEAL_ENABLED: true
+    SUBMIT_APPEAL_SERVICE_V2_ENABLED: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
@@ -146,7 +149,7 @@ xui-webapp:
       SERVICES_IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       SERVICES_S2S: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
       SERVICES_HEARINGS_COMPONENT_API: http://jurisdiction-hearings-api-aat.service.core-compute-aat.internal
-      SERVICES_HEARINGS_COMPONENT_API_SSCS: http://${SERVICE_NAME}-sscs-hearings-api
+      SERVICES_HEARINGS_COMPONENT_API_SSCS: http://${SERVICE_NAME}-java
       SERVICES_PRD_LOCATION_API: http://rd-location-ref-api-aat.service.core-compute-aat.internal
       SERVICES_PRD_JUDICIAL_API: http://rd-judicial-api-aat.service.core-compute-aat.internal
       SERVICES_PRD_COMMONDATA_API: http://rd-commondata-api-aat.service.core-compute-aat.internal
@@ -450,7 +453,7 @@ ccd:
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,aac_manage_case_assignment,xui_webapp,sscs,sscs_bulkscan,em_ccd_orchestrator,ccd_case_document_am_api
-        DEFINITION_STORE_TX_TIMEOUT_DEFAULT: 60
+        DEFINITION_STORE_TX_TIMEOUT_DEFAULT: 360
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
         WELSH_TRANSLATION_ENABLED: false
@@ -529,78 +532,6 @@ ccd:
 elastic:
   enabled: true
 
-# tya disabled by default due of requirements of additional topic subscriptions which is not possible currently configure and should be done manually
-# if your PR requires tya-notif change enabled to true
-# deploy to preview as usual
-# and when go to azure portal and search for sscs-sb-preview
-# click topics and select your PR topic
-# click subscriptions and click add subscription button (+ subscription)
-# into name field add name: sscs-tribunals-api-pr-##YOUR PR NUMBER ##-servicebus-tya (example: sscs-tribunals-api-pr-3290-servicebus-tya)
-# click create
-# azure steps should be repeated every time PR is undeployed from preview
-sscs-tya-notif:
-  enabled: true
-  java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
-    releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
-    ingressHost: sscs-tya-notification-${SERVICE_FQDN}
-    readinessDelay: 45
-    environment:
-      CORE_CASE_DATA_API_URL: ${CORE_CASE_DATA_API_URL}
-      AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
-      AMQP_USERNAME: "RootManageSharedAccessKey"
-      TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
-      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
-      JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscs-job-scheduler"
-      JOB_SCHEDULER_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
-      JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
-      JOB_SCHEDULER_DB_USERNAME: hmcts
-      HOURS_START_TIME: 0
-      HOURS_END_TIME: 23
-      RUN_DB_MIGRATION_ON_STARTUP: true
-      TEST_RECIPIENTS_POSTCODE: "*"
-      POST_HEARINGS_FEATURE: true
-      POST_HEARINGS_B_FEATURE: true
-      DUMMY: true
-      BYPASS_NOTIFICATIONS_SERVICE: true
-    secrets:
-      JOB_SCHEDULER_DB_PASSWORD:
-        secretRef: postgres
-        key: PASSWORD
-        disabled: false
-      AMQP_PASSWORD:
-        secretRef: sscs-sb-preview
-        key: primaryKey
-    keyVaults:
-      sscs:
-        secrets:
-          - name: idam-api
-            alias: IDAM_URL
-          - name: idam-oauth-user
-            alias: IDAM_OAUTH2_CLIENT_ID
-          - name: idam-redirect
-            alias: IDAM_OAUTH2_REDIRECT_URL
-          - name: idam-sscs-systemupdate-user
-            alias: IDAM_SSCS_SYSTEMUPDATE_USER
-          - name: idam-sscs-systemupdate-password
-            alias: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
-          - name: sscs-email-mac-secret-text
-            alias: EMAIL_MAC_SECRET_TEXT
-          - name: idam-sscs-oauth2-client-secret
-            alias: IDAM_OAUTH2_CLIENT_SECRET
-          - name: sscs-s2s-secret
-            alias: IDAM_S2S_AUTH_TOTP_SECRET
-          - name: s2s-micro
-            alias: IDAM_S2S_AUTH_MICROSERVICES
-          - name: evidence-share-topic-shared-access-key
-            alias: AMQP_PASSWORD
-          - name: docmosis-api-key
-            alias: PDF_SERVICE_ACCESS_KEY
-          - name: notification-key
-            alias: NOTIFICATION_API_KEY
-          - name: notification-test-key
-            alias: NOTIFICATION_API_TEST_KEY
-
 #Enable for SYA
 sscs-tribunals-frontend:
   enabled: true
@@ -609,6 +540,10 @@ sscs-tribunals-frontend:
     cpuLimits: 2000m
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
+    registerAdditionalDns:
+      enabled: true
+      prefix: iba
+      primaryIngressHost: sya-${SERVICE_FQDN}
     environment:
       REDIS_URL: redis://${SERVICE_NAME}-redis-master
       APPINSIGHTS_ROLE_NAME: ${SERVICE_NAME}
@@ -650,7 +585,7 @@ redis:
 sscs-hearings-api:
   enabled: true
   java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
+    image: "hmctspublic.azurecr.io/sscs/hearings-api:pr-646" #Change to pr if required
     releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
     ingressHost: hearings-${SERVICE_FQDN}
     environment:
@@ -670,7 +605,7 @@ sscs-hearings-api:
       #Messaging
       HMC_HEARINGS_LISTENING_ENABLED: true
       HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
-      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-3973"
+      HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-4064"
       TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
       TRIBUNALS_EVENT_QUEUE_NAME: ${SERVICE_NAME}-servicebus-tribunals-to-hearing-api
       TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
@@ -681,6 +616,7 @@ sscs-hearings-api:
       CORE_CASE_DATA_CASE_TYPE_ID: Benefit-${CHANGE_ID}
       HEARINGS_CASE_UPDATE_V2_ENABLED: true
       ADJOURNMENT_ENABLED: true
+      BYPASS_HEARING_API_SERVICE: true
     secrets:
       TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
         secretRef: sscs-sb-preview

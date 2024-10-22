@@ -146,7 +146,9 @@ feature.add-link-to-other-associated-cases-v2.enabled: ${ADD_LINK_TO_OTHER_ASSOC
 feature.log-selected-properties.enabled: ${LOG_SELECTED_ENVIRONMENT_VARIABLES:false}
 feature.hearings-recording-request.case-updateV2.enabled: ${HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED:false}
 feature.trigger-eventV2.enabled: ${TRIGGER_EVENT_V2_ENABLED:false}
+feature.submit-appeal-service-v2.enabled: ${SUBMIT_APPEAL_SERVICE_V2_ENABLED:false}
 feature.handle-ccd-callbackMap-v2.enabled: ${HANDLE_CCD_CALLBACKMAP_V2:false}
+feature.bypass-hearing-api-service.enabled: ${BYPASS_HEARING_API_SERVICE:false}
 
 case_document_am.url=${CASE_DOCUMENT_AM_URL:http://localhost:4455}
 
@@ -257,3 +259,23 @@ wlu.email.subject=${WLU_EMAIL_SUBJECT:Welsh translation –}
 wlu.email.message=${WLU_EMAIL_MESSAGE:Please find attached the files along with request translation form.\nThank you very much}
 wlu.email.dateOfReturn=${WLU_RETURN_DATE:24 hours from requested date.}
 
+# Hearing-api
+exui.url=${EXUI_API_URL:http://localhost:3455}
+hmc.url=${HMC_API_URL:http://localhost:8084}
+hmc.deployment-id=${HMC_DEPLOYMENT_ID:}
+sscs.serviceCode=${SSCS_SERVICE_CODE:BBA3}
+flags.hmc-to-hearings-api.enabled=${HMC_HEARINGS_LISTENING_ENABLED:false}
+flags.tribunals-to-hearings-api.enabled=${TRIBUNALS_HEARINGS_LISTENING_ENABLED:false}
+flags.adjournment.enabled=${ADJOURNMENT_ENABLED:false}
+flags.postHearings.enabled=${POST_HEARING_ENABLED:false}
+flags.deployment-filter.enabled=${HMC_DEPLOYMENT_FILTER_ENABLED:false}
+feign.httpclient.enabled=true
+feign.client.config.default.connectTimeout=10000
+feign.client.config.default.readTimeout=10000
+feign.client.config.default.loggerLevel=full
+feign.client.retryer.period=500
+feign.client.retryer.maxPeriod=2000
+feign.client.retryer.maxAttempts=3
+retry.hearing-response-update.max-retries=3
+# 3 seconds
+retry.hearing-response-update.backoff=3000

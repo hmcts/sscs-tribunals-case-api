@@ -258,6 +258,8 @@ feature:
         enabled: ${GAPS_SWITCHOVER_FEATURE:false}
     hearing-recording-filter:
         enabled: ${UPLOAD_HEARING_FILTER_ENABLED:false}
+    infected-blood-appeal:
+        enabled: ${INFECTED_BLOOD_APPEAL_ENABLED:false}
     postHearings:
         enabled: ${POST_HEARINGS_FEATURE:false}
     postHearingsB:
@@ -288,6 +290,11 @@ feature:
         enabled: ${BYPASS_NOTIFICATIONS_SERVICE:false}
     handle-ccd-callbackMap-v2:
         enabled: ${HANDLE_CCD_CALLBACKMAP_V2:false}
+    submit-appeal-service-v2:
+        enabled: ${SUBMIT_APPEAL_SERVICE_V2_ENABLED:false}    
+    bypass-hearing-api-service:
+        enabled: ${BYPASS_HEARING_API_SERVICE:false}
+
 
 
 idam:
@@ -1721,10 +1728,21 @@ outOfHours:
     endHour: ${HOURS_END_TIME:19}
 
 feign:
+    httpclient:
+        enabled: true
     client:
         config:
             core-case-data-api:
                 decode404: true
+            default:
+                connect-timeout: 10000
+                read-timeout: 10000
+                logger-level: full
+        retryer:
+            period: 500
+            maxPeriod: 2000
+            maxAttempts: 3
+
 
 # Document store
 document_management.url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:5005}
@@ -1763,6 +1781,9 @@ retry:
         1: ${RETRY_DELAY_1:60}
         2: ${RETRY_DELAY_2:120}
         3: ${RETRY_DELAY_3:1800}
+    hearing-response-update:
+        max-retries: 3
+        backoff: 3000
 
 pdf-service:
     uri: ${PDF_SERVICE_BASE_URL:https://docmosis.aat.platform.hmcts.net/rs/render}
@@ -1954,6 +1975,45 @@ wlu:
         subject: ${WLU_EMAIL_SUBJECT:Welsh translation –}
         to: ${WLU_EMAIL_TO:sscs-tests@HMCTS.NET}
 
+
+---
+
+# Hearing-api
+
+azure:
+    service-bus:
+        amqp-connection-string-template : ${AMQP_CONNECTION_STRING:amqps://%1s?amqp.idleTimeout=%2d}
+        connection-postfix: ${HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX:.servicebus.windows.net}
+        hmc-to-hearings-api:
+            namespace: ${HMC_HEARINGS_TOPIC_NAMESPACE:}
+            topicName: ${HMC_HEARINGS_TOPIC_NAME:}
+            subscriptionName: ${HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME:}
+            receiveTimeout: ${HMC_HEARINGS_TOPIC_RECEIVE_TIMEOUT:1}
+            idleTimeout: ${HMC_HEARINGS_TOPIC_IDLE_TIMEOUT:3600000}
+            username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
+            password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
+        tribunals-to-hearings-api:
+            namespace: ${TRIBUNALS_EVENT_QUEUE_NAMESPACE:}
+            queueName: ${TRIBUNALS_EVENT_QUEUE_NAME:}
+            receiveTimeout: ${TRIBUNALS_EVENT_QUEUE_RECEIVE_TIMEOUT:1}
+            idleTimeout: ${TRIBUNALS_EVENT_QUEUE_IDLE_TIMEOUT:3600000}
+            username: ${TRIBUNALS_EVENT_QUEUE_POLICY_NAME:}
+            password: ${TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:}
+
+exui:
+    url: ${EXUI_API_URL:http://localhost:3455}
+hmc:
+    url: ${HMC_API_URL:http://localhost:8084}
+    deployment-id: ${HMC_DEPLOYMENT_ID:}
+
+sscs.serviceCode: ${SSCS_SERVICE_CODE:BBA3}
+
+flags:
+    hmc-to-hearings-api.enabled: ${HMC_HEARINGS_LISTENING_ENABLED:false}
+    tribunals-to-hearings-api.enabled: ${TRIBUNALS_HEARINGS_LISTENING_ENABLED:false}
+    adjournment.enabled: ${ADJOURNMENT_ENABLED:false}
+    postHearings.enabled: ${POST_HEARING_ENABLED:false}
+    deployment-filter.enabled: ${HMC_DEPLOYMENT_FILTER_ENABLED:false}
 
 ---
 
