@@ -16,7 +16,6 @@
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "summaryName", "TabFieldDisplayOrder": 10},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "summaryAddress", "TabFieldDisplayOrder": 11},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "summaryNino", "TabFieldDisplayOrder": 12, "FieldShowCondition": "appeal.benefitType.code!=\"infectedBloodAppeal\""},
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "summaryIbcaReference", "TabFieldDisplayOrder": 12, "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "summaryDOB", "TabFieldDisplayOrder": 13},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "summaryRole", "FieldShowCondition": "appeal.appellant.role.name!=\"\"", "TabFieldDisplayOrder": 14},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "summaryRoleDescription", "FieldShowCondition": "appeal.appellant.role.description!=\"\"", "TabFieldDisplayOrder": 15},
@@ -35,6 +34,7 @@
 
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "summaryBenefitType", "TabFieldDisplayOrder": 27, "FieldShowCondition": "appeal.benefitType.code!=\"infectedBloodAppeal\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "summaryAppealType", "TabFieldDisplayOrder": 27, "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\""},
+  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "summaryIbcaReference", "TabFieldDisplayOrder": 28, "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "summaryCaseReference", "TabFieldDisplayOrder": 28, "FieldShowCondition": "appeal.benefitType.code!=\"infectedBloodAppeal\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "summaryState", "TabFieldDisplayOrder": 29},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "summary_sscs", "TabLabel": "Summary", "TabDisplayOrder": 1, "CaseFieldID": "summaryHearingType", "TabFieldDisplayOrder": 30},

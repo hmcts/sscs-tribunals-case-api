@@ -1851,6 +1851,9 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         sscsCaseData.getAppeal().getAppellant().getAddress().setInMainlandUk(NO);
         sscsCaseData.getAppeal().getAppellant().getAddress().setPortOfEntry("GB000434");
 
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().build());
+        sscsCaseData.getAppeal().setMrnDetails(MrnDetails.builder().build());
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));

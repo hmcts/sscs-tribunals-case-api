@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.idam.UserRole.SUPER_USER;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isConfidential;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -119,6 +120,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         final boolean hasSuperUserRole = userDetails.hasRole(SUPER_USER);
 
         handleBenefitType(sscsCaseData);
+        if (IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode())) {
+            handleIbcaCase(sscsCaseData);
+        }
 
         if (isNotEmpty(sscsCaseData.getBenefitCode())) {
             validateBenefitIssueCode(sscsCaseData, preSubmitCallbackResponse);

@@ -1440,6 +1440,7 @@
     "ListElementCode": "appellant.role.name",
     "ID": "appealAppellantRole",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "19/11/2019",
     "FieldDisplayOrder": 67,
     "PageID": "1.0"
@@ -1450,7 +1451,7 @@
     "ListElementCode": "appellant.role.description",
     "ID": "appealAppellantRole",
     "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "appeal.appellant.role.name = \"Other\"",
+    "FieldShowCondition": "appeal.appellant.role.name = \"Other\" AND appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "19/11/2019",
     "FieldDisplayOrder": 68,
     "PageID": "1.0"
@@ -5500,6 +5501,7 @@
     "CaseFieldID": "appeal",
     "ListElementCode": "appellant.role.description",
     "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.appellant.role.name = \"Other\" AND appeal.benefitType.descriptionSelection!=\"093\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 2,
     "PageID": "1.0"
