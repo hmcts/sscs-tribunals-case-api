@@ -1,11 +1,11 @@
 plugins {
     id 'application'
     id 'pmd'
-    id 'org.sonarqube' version '4.3.0.3225'
+    id 'org.sonarqube' version '5.1.0.4882'
     id 'jacoco'
     id 'org.springframework.boot' version '2.7.18'
     id 'uk.gov.hmcts.java' version '0.12.43'
-    id 'com.gorylenko.gradle-git-properties' version '2.4.1'
+    id 'com.gorylenko.gradle-git-properties' version '2.4.2'
     id 'com.github.ben-manes.versions' version '0.46.0'
     id "info.solidsoft.pitest" version '1.9.11'
     id 'org.owasp.dependencycheck' version '10.0.3'
@@ -52,7 +52,7 @@ application {
 }
 
 pmd {
-    toolVersion = "6.55.0"
+    toolVersion = "7.6.0"
     ignoreFailures = true
     sourceSets = [sourceSets.main, sourceSets.test]
     reportsDir = layout.buildDirectory.dir("reports/pmd").get().asFile
@@ -338,7 +338,7 @@ dependencies {
 
     implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '2.1.5'
 
-    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.4'
+    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.0'
 
     implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.0.1'
     implementation group: 'com.github.hmcts', name: 'doc-assembly-client', version: '1.07'
@@ -351,9 +351,9 @@ dependencies {
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.12.2'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.13'
 
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.12.8'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.14'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
@@ -363,9 +363,11 @@ dependencies {
     implementation group:'org.overviewproject', name: 'mime-types', version: '1.0.4'
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.15.2'
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.15.2'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.15.2'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.2'
 
     implementation group:'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation group: 'org.springframework', name: 'spring-jms'
@@ -378,7 +380,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '1.5.7', {
         exclude group: "uk.gov.hmcts.reform", module:"properties-volume-spring-boot-starter"
     }
-    implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.0-RELEASE'
+    implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
     implementation group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.17.0'
 
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.3.1'
@@ -415,7 +417,7 @@ dependencies {
     // Remove this dependency once the secure doc-store is in use
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
-    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.0.2', {
+    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.1.0', {
         exclude group: 'org.apache.commons', module: 'commons-compress'
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'org.apache.poi', module: 'poi-ooxml'
@@ -465,17 +467,21 @@ dependencies {
     testImplementation platform(group: 'org.junit', name: 'junit-bom', version: '5.9.3')
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
     testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine'
-    testImplementation group: 'com.h2database', name: 'h2', version: '2.1.214'
+    testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'
 
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
-    testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.0'
+    testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.2'
 
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-core', version: '8.0.6'
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-amqp-1-0-protocol', version: '8.0.6'
     testImplementation group: 'org.apache.qpid', name: 'qpid-broker-plugins-memory-store', version: '8.0.6'
+    testImplementation group: 'com.github.tomakehurst', name: 'wiremock', version: '2.27.2'
     //pact contract testing
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.16'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.7'
+    contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.16'
+    contractTestRuntimeOnly group: 'au.com.dius.pact.consumer', name: 'java8',  version: '4.1.7'
 
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.18'
 
