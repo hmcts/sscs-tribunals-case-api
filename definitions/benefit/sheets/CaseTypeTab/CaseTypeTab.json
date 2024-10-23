@@ -76,7 +76,6 @@
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "caseInfo_sscs", "TabLabel": "Appeal Details", "TabDisplayOrder": 4, "CaseFieldID": "isConfidentialityRequestUnderReviewLabel", "TabFieldDisplayOrder": 4, "FieldShowCondition": "confidentialityRequestOutcomeAppellant.requestOutcome =\"inProgress\" OR confidentialityRequestOutcomeJointParty.requestOutcome =\"inProgress\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "caseInfo_sscs", "TabLabel": "Appeal Details", "TabDisplayOrder": 4, "CaseFieldID": "appellantDeceasedLabel", "TabFieldDisplayOrder": 5, "FieldShowCondition": "isAppellantDeceased =\"Yes\""},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "caseInfo_sscs", "TabLabel": "Appeal Details", "TabDisplayOrder": 4, "CaseFieldID": "caseReference", "TabFieldDisplayOrder": 6},
-  {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "caseInfo_sscs", "TabLabel": "Appeal Details", "TabDisplayOrder": 4, "CaseFieldID": "summaryIbcaReference", "TabFieldDisplayOrder": 6},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "caseInfo_sscs", "TabLabel": "Appeal Details", "TabDisplayOrder": 4, "CaseFieldID": "caseCreated", "TabFieldDisplayOrder": 7},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "caseInfo_sscs", "TabLabel": "Appeal Details", "TabDisplayOrder": 4, "CaseFieldID": "dateOfAppellantDeath", "TabFieldDisplayOrder": 8},
   {"LiveFrom": "", "CaseTypeID": "Benefit", "TabID": "caseInfo_sscs", "TabLabel": "Appeal Details", "TabDisplayOrder": 4, "CaseFieldID": "appeal", "TabFieldDisplayOrder": 9},
