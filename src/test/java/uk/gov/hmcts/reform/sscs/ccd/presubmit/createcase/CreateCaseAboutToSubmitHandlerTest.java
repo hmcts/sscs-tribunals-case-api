@@ -142,6 +142,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
         when(mockedAppellant.getIdentity()).thenReturn(mockedIdentity);
         when(mockedName.getLastName()).thenReturn("appellantLastName");
         when(mockedIdentity.getIbcaReference()).thenReturn("ibcaRef");
+        when(mockedCaseData.getRegionalProcessingCenter()).thenReturn(RegionalProcessingCenter.builder().build());
 
         createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
