@@ -18,6 +18,7 @@
     "Description": "Add a hearing outcome",
     "DisplayOrder": 140,
     "PreConditionState(s)": "dormantAppealState;postHearing;withUT;hearing;readyToList",
+    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
     "PostConditionState": "*",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
