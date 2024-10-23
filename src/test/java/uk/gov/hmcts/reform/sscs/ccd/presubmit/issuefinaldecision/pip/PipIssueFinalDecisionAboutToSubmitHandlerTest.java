@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -555,6 +556,32 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
         verify(hearingMessageHelper).sendListAssistCancelHearingMessage(eq(sscsCaseData.getCcdCaseId()), eq(CancellationReason.OTHER));
+    }
+
+    @Test
+    public void givenWriteFinalDecisionPostHearingsEnabledAndNoIssueFinalDate_shouldUpdateFinalCaseData() {
+        String filename = String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+        DocumentLink docLink = DocumentLink.builder()
+                .documentUrl("bla.com")
+                .documentFilename(filename)
+                .build();
+        ReflectionTestUtils.setField(handler, "isPostHearingsEnabled", true);
+        SscsFinalDecisionCaseData sscsFinalDecisionCaseData = callback.getCaseDetails().getCaseData().getSscsFinalDecisionCaseData();
+        sscsFinalDecisionCaseData.setWriteFinalDecisionPreviewDocument(docLink);
+        sscsFinalDecisionCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsFinalDecisionCaseData.setWriteFinalDecisionGenerateNotice(YES);
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("same");
+        callback.getCaseDetails().getCaseData().getSscsPipCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("same");
+        sscsCaseData.getSscsFinalDecisionCaseData().setFinalDecisionIssuedDate(null);
+        when(userDetailsService.buildLoggedInUserSurname(USER_AUTHORISATION)).thenReturn("judge name");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+
+        assertEquals(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionIssuedDate(), LocalDate.now());
+        assertEquals(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionJudge(), "judge name");
+        assertEquals(sscsCaseData.getSscsFinalDecisionCaseData().getFinalDecisionHeldAt(), "In chambers");
     }
 
     private SscsDocument buildSscsDocumentWithDocumentType(String documentType) {

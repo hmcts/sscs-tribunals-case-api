@@ -1,0 +1,7 @@
+[
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "01/04/2023", "CaseTypeID": "SSCS_ExceptionRecord", "AccessProfile": "caseworker-sscs-bulkscan", "CRUD": "CRUD"}
+]
+

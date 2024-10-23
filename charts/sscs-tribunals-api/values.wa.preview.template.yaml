@@ -668,6 +668,7 @@ ccd:
       - caseworker-sscs-bulkscan
       - caseworker-sscs-pcqextractor
       - caseworker-sscs-hmrcresponsewriter
+      - caseworker-sscs-ibcaresponsewriter
       - caseworker-wa-task-configuration
       - caseworker-ras-validation
       - GS_profile
@@ -700,64 +701,6 @@ sscs-evidence-share:
       AMQP_PASSWORD:
         secretRef: sscs-sb-preview
         key: primaryKey
-
-# tya disabled by default due of requirements of additional topic subscriptions which is not possible currently configure and should be done manually
-# if your PR requires tya-notif change enabled to true
-# deploy to preview as usual
-# and when go to azure portal and search for sscs-sb-preview
-# click topics and select your PR topic
-# click subscriptions and click add subscription button (+ subscription)
-# into name field add name: sscs-tribunals-api-pr-##YOUR PR NUMBER ##-servicebus-tya (example: sscs-tribunals-api-pr-3290-servicebus-tya)
-# click create
-# azure steps should be repeated every time PR is undeployed from preview
-sscs-tya-notif:
-  enabled: false
-  java:
-    image: hmctspublic.azurecr.io/sscs/tya-notif:latest
-    releaseNameOverride: ${SERVICE_NAME}-sscs-tya-notification
-    readinessDelay: 45
-    environment:
-      CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
-      AMQP_HOST: "sscs-sb-preview.servicebus.windows.net"
-      AMQP_USERNAME: "RootManageSharedAccessKey"
-      TOPIC_NAME: "${SERVICE_NAME}-servicebus-main-topic"
-      SUBSCRIPTION_NAME: "${SERVICE_NAME}-servicebus-tya"
-      JOB_SCHEDULER_DB_NAME: "pr-${CHANGE_ID}-sscsjobscheduler"
-      JOB_SCHEDULER_DB_HOST: sscs-preview.postgres.database.azure.com
-      JOB_SCHEDULER_DB_CONNECTION_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
-      JOB_SCHEDULER_DB_USERNAME: hmcts
-      JOB_SCHEDULER_DB_PASSWORD: "${JOB_SCHEDULER:hmcts}"
-      HOURS_START_TIME: 0
-      HOURS_END_TIME: 23
-      RUN_DB_MIGRATION_ON_STARTUP: true
-      TEST_RECIPIENTS_POSTCODE: "*"
-      POST_HEARINGS_FEATURE: true
-      POST_HEARINGS_B_FEATURE: true
-      DUMMY: true
-    secrets:
-      AMQP_PASSWORD:
-        secretRef: sscs-sb-preview
-        key: primaryKey
-      JOB_SCHEDULER_DB_PASSWORD:
-        secretRef: "{{ .Values.global.postgresSecret }}"
-        key: PASSWORD
-        disabled: false
-    keyVaults:
-      sscs:
-        secrets:
-          - idam-api
-          - idam-oauth-user
-          - idam-redirect
-          - idam-sscs-systemupdate-user
-          - idam-sscs-systemupdate-password
-          - sscs-email-mac-secret-text
-          - idam-sscs-oauth2-client-secret
-          - sscs-s2s-secret
-          - s2s-micro
-          - evidence-share-topic-shared-access-key
-          - docmosis-api-key
-          - notification-key
-          - notification-test-key
 
 #Enable for SYA
 sscs-tribunals-frontend:
@@ -802,49 +745,6 @@ redis:
   master:
     persistence:
       enabled: false
-
-#Turning either hearings api (with either listener on) or cft hearing service on requires
-#service bus to be turned on.
-sscs-hearings-api:
-  enabled: false
-  java:
-    image: "hmctspublic.azurecr.io/sscs/hearings-api:latest" #Change to pr if required
-    releaseNameOverride: ${SERVICE_NAME}-sscs-hearings-api
-    environment:
-      ROOT_LOGGING_LEVEL: INFO
-      SSCS_LOG_LEVEL: INFO #Switch to debug to see requests being sent.
-      SERVICE_BUS_LOG_LEVEL: ERROR
-      LOG_OUTPUT: single
-      CREATE_CCD_ENDPOINT: false
-      IDAM_S2S_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-      CASEWORKER_REF_API_URL: "http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal"
-      IDAM_API_URL: "https://idam-api.aat.platform.hmcts.net"
-      CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-ccd-data-store-api"
-      COMMON_REF_API_URL: "http://rd-commondata-api-aat.service.core-compute-aat.internal"
-      JUDICIAL_REF_API_URL: "http://rd-judicial-api-aat.service.core-compute-aat.internal"
-      EXUI_API_URL: "https://${SERVICE_NAME}-xui"
-      HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
-      #Messaging
-      HMC_HEARING_LISTENING_ENABLED: false
-      HEARINGS_TOPIC_NAME: "hmc-to-cft"
-      HEARINGS_TOPIC_SUBSCRIPTION_NAME: "tribunals-to-hearing-api"
-      HMC_HEARINGS_TOPIC_POLICY_NAME: RootManageSharedAccessKey
-      TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
-      TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api"
-      TRIBUNALS_EVENT_QUEUE_POLICY_NAME: RootManageSharedAccessKey
-    secrets:
-      TRIBUNALS_EVENT_QUEUE_NAMESPACE:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
-        key: namespaceName
-      TRIBUNALS_EVENT_QUEUE_ACCESS_KEY:
-        secretRef: servicebus-secret-queue-{{ .Release.Name }}-servicebus-tribunals-to-hearing-api
-        key: primaryKey
-      HMC_HEARINGS_TOPIC_NAMESPACE:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: namespaceName
-      HMC_HEARINGS_TOPIC_ACCESS_KEY:
-        secretRef: servicebus-secret-topic-{{ .Release.Name }}-servicebus-hmc-to-cft
-        key: primaryKey
 
 hmc-cft-hearing-service:
   enabled: false

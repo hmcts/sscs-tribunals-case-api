@@ -68,6 +68,11 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker-sscs",
             "caseworker-sscs-hmrcresponsewriter"
         );
+        lib.createIdamUser("ibcauser@example.com",
+                "caseworker",
+                "caseworker-sscs",
+                "caseworker-sscs-ibcaresponsewriter"
+        );
         lib.createIdamUser("ctsc-administrator@hmcts.net",
             "caseworker",
             "caseworker-sscs"
@@ -107,6 +112,7 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-sscs-judge-salaried",
                 "caseworker-sscs-dwpresponsewriter",
                 "caseworker-sscs-hmrcresponsewriter",
+                "caseworker-sscs-ibcaresponsewriter",
                 "caseworker-sscs-registrar",
                 "caseworker-sscs-callagent",
                 "caseworker-sscs-teamleader",
@@ -124,7 +130,7 @@ public class CftlibConfig implements CFTLibConfigurer {
                 "caseworker-ras-validation",
                 "GS_profile"
         );
-        var def = Files.readAllBytes(Path.of("../sscs-ccd-definitions/releases/CCD_SSCSDefinition_vdev_LOCAL.xlsx"));
+        var def = Files.readAllBytes(Path.of("./definitions/benefit/CCD_SSCSDefinition_LOCAL.xlsx"));
         lib.importDefinition(def);
 
         var roleAssignments = Resources.toString(Resources.getResource("am-role-assignments.json"), StandardCharsets.UTF_8);

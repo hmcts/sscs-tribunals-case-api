@@ -90,7 +90,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             builder.dateIssued(finalDecisionCaseData.getFinalDecisionIssuedDate());
             builder.correctedJudgeName(buildSignedInJudgeName(userAuthorisation));
             builder.correctedDateIssued(showIssueDate ? LocalDate.now() : null);
-            builder.idamSurname(buildSignedInJudgeSurname(userAuthorisation));
+            builder.idamSurname(finalDecisionCaseData.getFinalDecisionIdamSurname());
         } else {
             builder.userName(buildSignedInJudgeName(userAuthorisation));
             builder.idamSurname(buildSignedInJudgeSurname(userAuthorisation));
@@ -264,12 +264,12 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
     }
 
     protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation, boolean isPostHearingsEnabled) {
-        String judgeName = null;
+        String judgeName = "Tribunal Judge ";
         String originalJudgeName = caseData.getSscsFinalDecisionCaseData().getFinalDecisionJudge();
         if (SscsUtil.isCorrectionInProgress(caseData, isPostHearingsEnabled) && !isNull(originalJudgeName)) {
-            judgeName = originalJudgeName;
+            judgeName += originalJudgeName;
         } else {
-            judgeName = buildSignedInJudgeName(userAuthorisation);
+            judgeName += buildSignedInJudgeSurname(userAuthorisation);
         }
 
         return SscsUtil.buildWriteFinalDecisionHeldBefore(caseData, judgeName);

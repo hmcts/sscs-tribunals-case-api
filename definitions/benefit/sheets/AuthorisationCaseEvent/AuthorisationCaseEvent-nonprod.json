@@ -1,0 +1,9 @@
+[
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createWithDwpTestCase", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createWithDwpTestCase", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createResponseReceivedTestCase", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createResponseReceivedTestCase", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createTestCase", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createTestCase", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
+  {"LiveFrom": "23/11/2022", "CaseTypeID": "Benefit", "CaseEventID": "setHearingRoute", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"}
+]
