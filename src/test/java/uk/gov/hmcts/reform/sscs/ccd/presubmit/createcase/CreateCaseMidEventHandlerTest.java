@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createcase;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -12,25 +13,16 @@ import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateCaseMidEventHandlerTest {
-
     private static final String USER_AUTHORISATION = "Bearer token";
 
     @Mock
@@ -43,13 +35,13 @@ public class CreateCaseMidEventHandlerTest {
     private CreateCaseMidEventHandler midEventHandler;
 
     @ParameterizedTest
-    @CsvSource({
+    @EnumSource(value = EventType.class, names = {
         "VALID_APPEAL_CREATED",
         "NON_COMPLIANT",
         "INCOMPLETE_APPLICATION_RECEIVED",
         "CASE_UPDATED"
     })
-    void canHandleTest(EventType eventType) {
+    void cannotHandleTest(EventType eventType) {
         SscsCaseData caseData = SscsCaseData.builder().build();
 
         when(callback.getEvent()).thenReturn(eventType);
@@ -59,11 +51,22 @@ public class CreateCaseMidEventHandlerTest {
         assertTrue(midEventHandler.canHandle(MID_EVENT, callback));
     }
 
+    @ParameterizedTest
+    @EnumSource(value = EventType.class, mode = EnumSource.Mode.EXCLUDE, names = {
+        "VALID_APPEAL_CREATED",
+        "NON_COMPLIANT",
+        "INCOMPLETE_APPLICATION_RECEIVED",
+        "CASE_UPDATED"
+    })
+    void canHandleTest(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
+        assertFalse(midEventHandler.canHandle(MID_EVENT, callback));
+    }
+
     @Test
     void shouldReturnErrorsOnMidEventErrorsForUkIbcaCase() {
         SscsCaseData caseData = SscsCaseData.builder()
                 .appeal(Appeal.builder()
-
                         .appellant(Appellant.builder()
                                 .address(Address.builder()
                                         .inMainlandUk(YES)
@@ -77,6 +80,7 @@ public class CreateCaseMidEventHandlerTest {
                         )
                         .build()
                 )
+            .regionalProcessingCenter(RegionalProcessingCenter.builder().hearingRoute(HearingRoute.GAPS).build())
                 .benefitCode(IBCA_BENEFIT_CODE)
                 .build();
 
@@ -85,10 +89,11 @@ public class CreateCaseMidEventHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = midEventHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getErrors()).hasSize(3);
+        assertThat(response.getErrors()).hasSize(4);
         assertThat(response.getErrors()).contains("You must enter address line 1 for the appellant");
         assertThat(response.getErrors()).contains("You must enter a valid UK postcode for the appellant");
         assertThat(response.getErrors()).contains("You must enter Living in the UK for the representative");
+        assertThat(response.getErrors()).contains("Hearing route must be List Assist");
     }
 
     @Test
@@ -113,6 +118,7 @@ public class CreateCaseMidEventHandlerTest {
                         )
                         .build()
                 )
+                .regionalProcessingCenter(RegionalProcessingCenter.builder().hearingRoute(HearingRoute.LIST_ASSIST).build())
                 .benefitCode(IBCA_BENEFIT_CODE)
                 .build();
 
