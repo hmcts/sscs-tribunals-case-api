@@ -240,6 +240,8 @@ evidenceDescription:
             template:
                 path: /templates/evidenceDescriptionWelsh.html
 feature:
+    add-hearing-outcome:
+        enabled: ${ADD_HEARING_OUTCOME_ENABLED:false}
     add-link-to-other-associated-cases-v2:
         enabled: ${ADD_LINK_TO_OTHER_ASSOCIATED_CASES_V2:false}
     case-access-management:
