@@ -89,6 +89,39 @@ public class CreateCaseMidEventHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = midEventHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
+        assertThat(response.getErrors()).hasSize(3);
+        assertThat(response.getErrors()).contains("You must enter address line 1 for the appellant");
+        assertThat(response.getErrors()).contains("You must enter a valid UK postcode for the appellant");
+        assertThat(response.getErrors()).contains("You must enter Living in the UK for the representative");
+    }
+
+    @Test
+    void shouldReturnErrorsOnMidEventForCaseUpdateErrorsForUkIbcaCase() {
+        SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .appellant(Appellant.builder()
+                    .address(Address.builder()
+                        .inMainlandUk(YES)
+                        .build())
+                    .build()
+                )
+                .rep(Representative.builder()
+                    .hasRepresentative("Yes")
+                    .address(Address.builder().build())
+                    .build()
+                )
+                .build()
+            )
+            .regionalProcessingCenter(RegionalProcessingCenter.builder().hearingRoute(HearingRoute.GAPS).build())
+            .benefitCode(IBCA_BENEFIT_CODE)
+            .build();
+
+        when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = midEventHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
         assertThat(response.getErrors()).hasSize(4);
         assertThat(response.getErrors()).contains("You must enter address line 1 for the appellant");
         assertThat(response.getErrors()).contains("You must enter a valid UK postcode for the appellant");
