@@ -10,12 +10,18 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -44,7 +50,7 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
 
-        if (IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode())) {
+        if (isIbcaCase(caseData)) {
             if (NO.equals(caseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
                 final String selectedPortOfEntryLocationCode = caseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList().getValue().getCode();
                 caseData.getAppeal().getAppellant().getAddress().setPortOfEntry(selectedPortOfEntryLocationCode);
@@ -83,5 +89,18 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
         }
 
         return validationErrors;
+    }
+
+    private boolean isIbcaCase(SscsCaseData caseData) {
+        final String selectedBenefitType = Optional.of(caseData)
+                .map(SscsCaseData::getAppeal)
+                .map(Appeal::getBenefitType)
+                .map(BenefitType::getDescriptionSelection)
+                .map(DynamicList::getValue)
+                .filter(ObjectUtils::isNotEmpty)
+                .map(DynamicListItem::getCode)
+                .orElse(null);
+
+        return IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode()) || IBCA_BENEFIT_CODE.equals(selectedBenefitType);
     }
 }

@@ -1046,13 +1046,15 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
 
     @Test
     void givenIbaCaseAndIbcaReferenceEmpty_thenAddWarningMessages() {
-        callback.getCaseDetails().getCaseData().setBenefitCode(IBCA_BENEFIT_CODE);
+        DynamicListItem item = new DynamicListItem("093", "Infected Blood Appeal");
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(new BenefitType("093", "Infected Blood Appeal", new DynamicList(item, null)));
         callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().build());
-
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().build());
+        callback.getCaseDetails().getCaseData().setRegionalProcessingCenter(RegionalProcessingCenter.builder().build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(2, response.getWarnings().size());
-        assertThat(response.getWarnings(), hasItems("FTA issuing office is empty", "IBCA Reference Number has not been provided for the Appellant, do you want to ignore this warning and proceed?"));
+        assertEquals(1, response.getWarnings().size());
+        assertThat(response.getWarnings(), hasItems("IBCA Reference Number has not been provided for the Appellant, do you want to ignore this warning and proceed?"));
     }
 
     @Test
@@ -1861,6 +1863,10 @@ public abstract class AbstractedCaseUpdatedAboutToSubmitHandlerTest {
         sscsCaseData.getAppeal().getAppellant().getIdentity().setIbcaReference("IBCA12345");
         sscsCaseData.getAppeal().getAppellant().getAddress().setInMainlandUk(NO);
         sscsCaseData.getAppeal().getAppellant().getAddress().setPortOfEntry("GB000434");
+
+        sscsCaseData.getAppeal().setHearingOptions(HearingOptions.builder().build());
+        sscsCaseData.getAppeal().setMrnDetails(MrnDetails.builder().build());
+        sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

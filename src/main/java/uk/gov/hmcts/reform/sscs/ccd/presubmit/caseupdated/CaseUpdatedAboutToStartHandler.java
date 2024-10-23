@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -79,6 +80,7 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
                     interpreterLanguages.getListItems().size(), caseId);
         }
         setupBenefitSelection(sscsCaseData);
+        setupUkPortOfEntries(sscsCaseData);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
@@ -88,17 +90,29 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
 
         if (!isNull(benefitType)) {
             DynamicList benefitDescriptions = SscsUtil.getBenefitDescriptions(isInfectedBloodAppealEnabled);
-            DynamicListItem selectedBenefit = getSelectedBenefit(benefitDescriptions.getListItems(), sscsCaseData.getBenefitCode());
+            DynamicListItem selectedBenefit = getSelectedDynamicListItem(benefitDescriptions.getListItems(), sscsCaseData.getBenefitCode());
             benefitDescriptions.setValue(selectedBenefit);
             benefitType.setDescriptionSelection(benefitDescriptions);
         }
     }
 
-    private DynamicListItem getSelectedBenefit(List<DynamicListItem> listItems, String benefitCode) {
-        if (isNull(benefitCode) || isNull(listItems)) {
+    private void setupUkPortOfEntries(SscsCaseData sscsCaseData) {
+        final DynamicList ukPortOfEntries = SscsUtil.getPortsOfEntry();
+        String portOfEntryCode = sscsCaseData.getAppeal().getAppellant().getAddress().getPortOfEntry();
+
+        if (isNotEmpty(portOfEntryCode)) {
+            DynamicListItem selectedPortOfEntry = getSelectedDynamicListItem(ukPortOfEntries.getListItems(), portOfEntryCode);
+            ukPortOfEntries.setValue(selectedPortOfEntry);
+        }
+
+        sscsCaseData.getAppeal().getAppellant().getAddress().setUkPortOfEntryList(ukPortOfEntries);
+    }
+
+    private DynamicListItem getSelectedDynamicListItem(List<DynamicListItem> listItems, String code) {
+        if (isNull(code) || isNull(listItems)) {
             return null;
         }
 
-        return listItems.stream().filter(item -> benefitCode.equals(item.getCode())).findFirst().orElse(null);
+        return listItems.stream().filter(item -> code.equals(item.getCode())).findFirst().orElse(null);
     }
 }
