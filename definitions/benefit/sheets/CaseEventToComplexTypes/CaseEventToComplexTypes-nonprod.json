@@ -15,6 +15,15 @@
     "ID": "hearingOutcomeValueDidPoAttendHearing",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 1
+    "FieldDisplayOrder": 2
+  },
+  {
+    "CaseEventID": "addHearingOutcome",
+    "CaseFieldID": "hearingOutcomeValue",
+    "ListElementCode": "completedHearings",
+    "ID": "hearingOutcomeValueCompletedHearings",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 3
   }
 ]
