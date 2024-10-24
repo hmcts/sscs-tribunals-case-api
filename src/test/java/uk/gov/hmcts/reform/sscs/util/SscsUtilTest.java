@@ -31,10 +31,11 @@ import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService
 @ExtendWith(MockitoExtension.class)
 class SscsUtilTest {
     public static final String UNEXPECTED_POST_HEARING_REVIEW_TYPE_AND_ACTION = "getting the document type has an unexpected postHearingReviewType and action";
-  
+
     private SessionCategoryMapService categoryMapService = new SessionCategoryMapService();
     private PostHearing postHearing;
     private SscsCaseData caseData;
+    private RegionalProcessingCenter regionalProcessingCenter;
 
     @BeforeEach
     void setUp() {
@@ -127,7 +128,7 @@ class SscsUtilTest {
     void givenActionTypePta_shouldReturnPtaDocument(PermissionToAppealActions action, DocumentType expectedDocumentType) {
         postHearing.setReviewType(PostHearingReviewType.PERMISSION_TO_APPEAL);
         postHearing.getPermissionToAppeal().setAction(action);
-      
+
         DocumentType documentType = getPostHearingReviewDocumentType(postHearing, true);
 
         assertThat(documentType).isEqualTo(expectedDocumentType);
@@ -180,7 +181,7 @@ class SscsUtilTest {
         postHearing.getCorrection().setIsCorrectionFinalDecisionInProgress(YesNo.YES);
         assertThat(getIssueFinalDecisionDocumentType(caseData, false)).isEqualTo(FINAL_DECISION_NOTICE);
     }
-  
+
     @Test
     void givenPostHearingsEnabledFalse_clearPostHearingsFieldClearsDocumentFields_butDoesNotAlterPostHearing() {
         postHearing.setRequestType(PostHearingRequestType.SET_ASIDE);
@@ -447,17 +448,19 @@ class SscsUtilTest {
     @Test
     void shouldPopulateIbcaFieldsOnHandleIbcaCase() {
         final SscsCaseData caseData = SscsCaseData.builder()
-                .appeal(Appeal.builder()
-                        .mrnDetails(MrnDetails.builder().build())
-                        .hearingOptions(HearingOptions.builder().build())
-                        .build()
-                )
-                .build();
+            .appeal(Appeal.builder()
+                .mrnDetails(MrnDetails.builder().build())
+                .hearingOptions(HearingOptions.builder().build())
+                .build()
+            )
+            .regionalProcessingCenter(RegionalProcessingCenter.builder().build())
+            .build();
 
         handleIbcaCase(caseData);
 
         assertThat(caseData.getAppeal().getHearingOptions().getHearingRoute()).isEqualTo(LIST_ASSIST);
         assertThat(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice()).isEqualTo("IBCA");
+        assertThat(caseData.getRegionalProcessingCenter().getHearingRoute()).isEqualTo(LIST_ASSIST);
     }
 
     @Test

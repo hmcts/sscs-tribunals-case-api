@@ -39,6 +39,8 @@ public class AppConstants {
     public static final String DATE_FORMAT_YYYYMMDD = "yyyy-MM-dd";
 
     public static final String IBCA_BENEFIT_CODE = "093";
+    public static final int FUNCTIONAL_FETCH_ATTEMPTS = 5;
+    public static final int FUNCTIONAL_RETRY_LIMIT = 3;
 
     private AppConstants() {
         //
