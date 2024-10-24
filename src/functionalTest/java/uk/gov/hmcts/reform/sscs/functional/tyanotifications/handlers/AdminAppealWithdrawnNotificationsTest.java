@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.functional.tyanotifications.handlers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.FUNCTIONAL_FETCH_ATTEMPTS;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_APPEAL_WITHDRAWN;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CASE_UPDATED;
 
@@ -27,7 +28,7 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
     }
 
     @Rule
-    public Retry retry = new Retry(3);
+    public Retry retry = new Retry(0);
 
     @Rule
     public Timeout globalTimeout = Timeout.seconds(90);
@@ -69,7 +70,7 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
             }
             fetchCount++;
             delayInSeconds(5);
-        } while (fetchCount < 5);
+        } while (fetchCount < FUNCTIONAL_FETCH_ATTEMPTS);
         return false;
     }
 
