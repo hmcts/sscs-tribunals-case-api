@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.UNKNOWN;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus.ADJOURNED;
@@ -29,7 +28,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
+import uk.gov.hmcts.reform.sscs.exception.CaseException;
+import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
+import uk.gov.hmcts.reform.sscs.exception.MessageProcessingException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
+import uk.gov.hmcts.reform.sscs.helper.processing.ProcessHmcMessageHelper;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HearingUpdate;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HmcMessage;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
@@ -44,7 +49,7 @@ import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 
 @ExtendWith(MockitoExtension.class)
-class ProcessHmcMessageServiceTest {
+abstract class AbstractProcessHmcMessageServiceTest {
 
     public static final String HEARING_ID = "abcdef";
     public static final long CASE_ID = 123L;
@@ -58,8 +63,20 @@ class ProcessHmcMessageServiceTest {
     @Mock
     private HearingUpdateService hearingUpdateService;
 
+    @Mock
+    private UpdateCcdCaseService updateCcdCaseService;
+
+    @Mock
+    private IdamService idamService;
+
+    @Mock
+    private ProcessHmcMessageHelper processHmcMessageHelper;
+
     @InjectMocks
     private ProcessHmcMessageService processHmcMessageService;
+
+    @InjectMocks
+    private ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
 
     private SscsCaseDetails sscsCaseDetails;
     private SscsCaseData caseData;
@@ -95,6 +112,12 @@ class ProcessHmcMessageServiceTest {
                 .build();
     }
 
+    abstract void givenWillReturn(CcdCaseService ccdCaseService, UpdateCcdCaseService updateCcdCaseService, Long caseId, SscsCaseDetails sscsCaseDetails, IdamService idamService) throws GetCaseException;
+
+    abstract void callProcessEventMessage(ProcessHmcMessageService processHmcMessageService, ProcessHmcMessageServiceV2 processHmcMessageServiceV2, HmcMessage hmcMessage) throws CaseException, MessageProcessingException;
+
+    abstract void assertThatCall(UpdateCcdCaseService updateCcdCaseService, SscsCaseDetails sscsCaseDetails, DwpState dwpState);
+
     @DisplayName("When listing Status is Fixed and and HmcStatus is valid, "
             + "updateHearing and updateCaseData are called once")
     @ParameterizedTest
@@ -110,14 +133,15 @@ class ProcessHmcMessageServiceTest {
         given(hmcHearingApiService.getHearingRequest(HEARING_ID))
                 .willReturn(hearingGetResponse);
 
-        given(ccdCaseService.getCaseDetails(CASE_ID))
-                .willReturn(sscsCaseDetails);
+        given(processHmcMessageHelper.isHearingUpdated(hmcStatus, hearingGetResponse)).willReturn(true);
+
+        givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         // when
-        processHmcMessageService.processEventMessage(hmcMessage);
+        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
 
         // then
-        verifyUpdateCaseDataCalledCorrectlyForHmcStatus(caseData, hmcStatus);
+        verifyUpdateCaseDataCalledCorrectlyForHmcStatus(ccdCaseService, updateCcdCaseService, caseData, hmcStatus, hearingGetResponse);
         verify(hearingUpdateService).updateHearing(hearingGetResponse, caseData);
     }
 
@@ -136,14 +160,13 @@ class ProcessHmcMessageServiceTest {
         given(hmcHearingApiService.getHearingRequest(HEARING_ID))
             .willReturn(hearingGetResponse);
 
-        given(ccdCaseService.getCaseDetails(CASE_ID))
-            .willReturn(sscsCaseDetails);
+        givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         // when
-        processHmcMessageService.processEventMessage(hmcMessage);
+        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
 
         // then
-        verifyUpdateCaseDataCalledCorrectlyForHmcStatus(caseData, hmcStatus);
+        verifyUpdateCaseDataCalledCorrectlyForHmcStatus(ccdCaseService, updateCcdCaseService, caseData, hmcStatus, hearingGetResponse);
         verify(hearingUpdateService, never()).updateHearing(any(),any());
         verify(hearingUpdateService).setHearingStatus(HEARING_ID, caseData, hmcStatus);
         verify(hearingUpdateService).setWorkBasketFields(HEARING_ID, caseData, hmcStatus);
@@ -159,17 +182,16 @@ class ProcessHmcMessageServiceTest {
         given(hmcHearingApiService.getHearingRequest(HEARING_ID))
             .willReturn(hearingGetResponse);
 
-        given(ccdCaseService.getCaseDetails(CASE_ID))
-            .willReturn(sscsCaseDetails);
+        givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         given(hearingUpdateService.resolveDwpState(LISTED))
             .willReturn(DwpState.HEARING_DATE_ISSUED);
 
         // when
-        processHmcMessageService.processEventMessage(hmcMessage);
+        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
 
         // then
-        assertThat(sscsCaseDetails.getData().getDwpState()).isEqualTo(DwpState.HEARING_DATE_ISSUED);
+        assertThatCall(updateCcdCaseService, sscsCaseDetails, DwpState.HEARING_DATE_ISSUED);
     }
 
     @Test
@@ -182,11 +204,10 @@ class ProcessHmcMessageServiceTest {
         given(hmcHearingApiService.getHearingRequest(HEARING_ID))
             .willReturn(hearingGetResponse);
 
-        given(ccdCaseService.getCaseDetails(CASE_ID))
-            .willReturn(sscsCaseDetails);
+        givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         // when
-        processHmcMessageService.processEventMessage(hmcMessage);
+        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
 
         // then
         assertThat(sscsCaseDetails.getData().getDwpState()).isNull();
@@ -203,8 +224,10 @@ class ProcessHmcMessageServiceTest {
         given(hmcHearingApiService.getHearingRequest(HEARING_ID))
             .willReturn(hearingGetResponse);
 
+        given(processHmcMessageHelper.stateNotHandled(any(), any())).willReturn(true);
+
         // when
-        processHmcMessageService.processEventMessage(hmcMessage);
+        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
 
         // then
         verify(ccdCaseService, never()).updateCaseData(any(),any(),any(),any());
@@ -224,8 +247,10 @@ class ProcessHmcMessageServiceTest {
         given(hmcHearingApiService.getHearingRequest(HEARING_ID))
                 .willReturn(hearingGetResponse);
 
+        given(processHmcMessageHelper.stateNotHandled(LISTED, hearingGetResponse)).willReturn(true);
+
         // when
-        processHmcMessageService.processEventMessage(hmcMessage);
+        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
 
         // then
         verify(ccdCaseService, never()).updateCaseData(any(),any(),any(),any());
@@ -248,14 +273,13 @@ class ProcessHmcMessageServiceTest {
         given(hmcHearingApiService.getHearingRequest(HEARING_ID))
                 .willReturn(hearingGetResponse);
 
-        given(ccdCaseService.getCaseDetails(CASE_ID))
-                .willReturn(sscsCaseDetails);
+        givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         // when
-        processHmcMessageService.processEventMessage(hmcMessage);
+        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
 
         // then
-        verifyUpdateCaseDataCalledCorrectlyForHmcStatus(caseData, status);
+        verifyUpdateCaseDataCalledCorrectlyForHmcStatus(ccdCaseService, updateCcdCaseService, caseData, status, hearingGetResponse);
     }
 
     @DisplayName("Should update the case state to Dormant for correct cancellation reasons")
@@ -273,14 +297,13 @@ class ProcessHmcMessageServiceTest {
         given(hmcHearingApiService.getHearingRequest(HEARING_ID))
             .willReturn(hearingGetResponse);
 
-        given(ccdCaseService.getCaseDetails(CASE_ID))
-            .willReturn(sscsCaseDetails);
+        givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         // when
-        processHmcMessageService.processEventMessage(hmcMessage);
+        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
 
         // then
-        verifyUpdateCaseDataCalledCorrectlyForHmcStatus(caseData, CANCELLED);
+        verifyUpdateCaseDataCalledCorrectlyForHmcStatus(ccdCaseService, updateCcdCaseService, caseData, CANCELLED, hearingGetResponse);
     }
 
     @DisplayName("Should not update the case state to Dormant for wrong cancellation reasons")
@@ -298,14 +321,13 @@ class ProcessHmcMessageServiceTest {
         given(hmcHearingApiService.getHearingRequest(HEARING_ID))
             .willReturn(hearingGetResponse);
 
-        given(ccdCaseService.getCaseDetails(CASE_ID))
-            .willReturn(sscsCaseDetails);
+        givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         // when
-        processHmcMessageService.processEventMessage(hmcMessage);
+        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
 
         // then
-        verifyUpdateCaseDataCalledCorrectlyForHmcStatus(caseData, CANCELLED);
+        verifyUpdateCaseDataCalledCorrectlyForHmcStatus(ccdCaseService, updateCcdCaseService, caseData, CANCELLED, hearingGetResponse);
     }
 
     @DisplayName("When no cancellation reason is given but status is Cancelled, "
@@ -319,14 +341,13 @@ class ProcessHmcMessageServiceTest {
         given(hmcHearingApiService.getHearingRequest(HEARING_ID))
                 .willReturn(hearingGetResponse);
 
-        given(ccdCaseService.getCaseDetails(CASE_ID))
-                .willReturn(sscsCaseDetails);
+        givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         // when
-        processHmcMessageService.processEventMessage(hmcMessage);
+        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
 
         // then
-        verifyUpdateCaseDataCalledCorrectlyForHmcStatus(caseData, CANCELLED);
+        verifyUpdateCaseDataCalledCorrectlyForHmcStatus(ccdCaseService, updateCcdCaseService, caseData, CANCELLED, hearingGetResponse);
 
     }
 
@@ -340,14 +361,13 @@ class ProcessHmcMessageServiceTest {
         given(hmcHearingApiService.getHearingRequest(HEARING_ID))
                 .willReturn(hearingGetResponse);
 
-        given(ccdCaseService.getCaseDetails(CASE_ID))
-                .willReturn(sscsCaseDetails);
+        givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         // when
-        processHmcMessageService.processEventMessage(hmcMessage);
+        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
 
         // then
-        verifyUpdateCaseDataCalledCorrectlyForHmcStatus(caseData, EXCEPTION);
+        verifyUpdateCaseDataCalledCorrectlyForHmcStatus(ccdCaseService, updateCcdCaseService, caseData, EXCEPTION, hearingGetResponse);
     }
 
     @DisplayName("When HmcStatus is Exception updateFailed and updateCaseData are called")
@@ -360,8 +380,10 @@ class ProcessHmcMessageServiceTest {
         given(hmcHearingApiService.getHearingRequest(HEARING_ID))
             .willReturn(hearingGetResponse);
 
+        given(processHmcMessageHelper.stateNotHandled(HEARING_REQUESTED, hearingGetResponse)).willReturn(true);
+
         // when
-        processHmcMessageService.processEventMessage(hmcMessage);
+        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
 
         // then
         verify(ccdCaseService, never()).updateCaseData(any(),any(),any(),any());
@@ -382,20 +404,16 @@ class ProcessHmcMessageServiceTest {
         given(hmcHearingApiService.getHearingRequest(HEARING_ID))
                 .willReturn(hearingGetResponse);
 
+        given(processHmcMessageHelper.stateNotHandled(value, hearingGetResponse)).willReturn(true);
+
         // when
-        processHmcMessageService.processEventMessage(hmcMessage);
+        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
 
         // then
         verify(ccdCaseService, never()).updateCaseData(any(),any(),any(),any());
     }
 
-    private void verifyUpdateCaseDataCalledCorrectlyForHmcStatus(SscsCaseData caseData, HmcStatus hmcStatus) throws UpdateCaseException {
-        String ccdUpdateDescription = String.format(hmcStatus.getCcdUpdateDescription(), HEARING_ID);
-        verify(ccdCaseService, times(1))
-                .updateCaseData(caseData,
-                        hmcStatus.getEventMapper().apply(hearingGetResponse, caseData),
-                        hmcStatus.getCcdUpdateSummary(),
-                        ccdUpdateDescription);
-    }
+    abstract void verifyUpdateCaseDataCalledCorrectlyForHmcStatus(CcdCaseService ccdCaseService, UpdateCcdCaseService updateCcdCaseService,
+                                                                  SscsCaseData caseData, HmcStatus hmcStatus, HearingGetResponse hearingGetResponse) throws UpdateCaseException;
 
 }

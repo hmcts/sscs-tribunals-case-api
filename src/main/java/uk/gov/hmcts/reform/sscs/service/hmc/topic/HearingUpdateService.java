@@ -51,7 +51,7 @@ public class HearingUpdateService {
     private boolean isPostHearingsEnabled;
 
     public void updateHearing(HearingGetResponse hearingGetResponse, @Valid SscsCaseData sscsCaseData)
-            throws MessageProcessingException, InvalidMappingException {
+        throws MessageProcessingException, InvalidMappingException {
         Long hearingId = Long.valueOf(hearingGetResponse.getRequestDetails().getHearingRequestId());
         HearingDaySchedule hearingDaySchedule = getHearingDaySchedule(hearingGetResponse, sscsCaseData, hearingId);
         String hearingEpimsId = hearingDaySchedule.getHearingVenueEpimsId();
@@ -59,9 +59,9 @@ public class HearingUpdateService {
 
         if (isNull(venueDetails)) {
             throw new InvalidMappingException(String.format(
-                    "Invalid epims Id %s, unable to find active venue with that id, regarding Case Id %s",
-                    hearingEpimsId,
-                    sscsCaseData.getCcdCaseId()
+                "Invalid epims Id %s, unable to find active venue with that id, regarding Case Id %s",
+                hearingEpimsId,
+                sscsCaseData.getCcdCaseId()
             ));
         }
 
@@ -94,19 +94,19 @@ public class HearingUpdateService {
 
         if (isPostHearingsEnabled && nonNull(panelMemberIds)) {
             JudicialUserPanel panel = JudicialUserPanel.builder()
-                    .assignedTo(judicialRefDataService.getJudicialUserFromPersonalCode(hearingDaySchedule.getHearingJudgeId()))
-                    .panelMembers(panelMemberIds.stream().map(id -> new CollectionItem<>(id, judicialRefDataService.getJudicialUserFromPersonalCode(id))).toList())
-                    .build();
+                .assignedTo(judicialRefDataService.getJudicialUserFromPersonalCode(hearingDaySchedule.getHearingJudgeId()))
+                .panelMembers(panelMemberIds.stream().map(id -> new CollectionItem<>(id, judicialRefDataService.getJudicialUserFromPersonalCode(id))).toList())
+                .build();
 
             hearingDetails.setPanel(panel);
         }
 
         log.info(
-                "Venue has been updated from epimsId '{}' to '{}' for Case Id: {} with hearingId {}",
-                hearingDetails.getEpimsId(),
-                hearingEpimsId,
-                sscsCaseData.getCcdCaseId(),
-                hearingId
+            "Venue has been updated from epimsId '{}' to '{}' for Case Id: {} with hearingId {}",
+            hearingDetails.getEpimsId(),
+            hearingEpimsId,
+            sscsCaseData.getCcdCaseId(),
+            hearingId
         );
     }
 
@@ -116,12 +116,12 @@ public class HearingUpdateService {
 
         if (hearingSessions.size() != EXPECTED_SESSIONS) {
             throw new InvalidHearingDataException(
-                    String.format(
-                            "Invalid HearingDaySchedule, should have 1 session but instead has %d sessions, for Case Id %s and Hearing Id %s",
-                            hearingSessions.size(),
-                            sscsCaseData.getCcdCaseId(),
-                            hearingId
-                    ));
+                String.format(
+                    "Invalid HearingDaySchedule, should have 1 session but instead has %d sessions, for Case Id %s and Hearing Id %s",
+                    hearingSessions.size(),
+                    sscsCaseData.getCcdCaseId(),
+                    hearingId
+                ));
         }
         return hearingSessions.get(0);
     }
@@ -161,9 +161,9 @@ public class HearingUpdateService {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
                 String hearingDateIssued = hearingDateIssuedTime.format(formatter);
                 log.debug(
-                        "Setting workBasketField hearingDateIssued {} for case id reference {}",
-                        hearingDateIssued,
-                        sscsCaseData.getCcdCaseId()
+                    "Setting workBasketField hearingDateIssued {} for case id reference {}",
+                    hearingDateIssued,
+                    sscsCaseData.getCcdCaseId()
                 );
                 workBasketFields.setHearingDateIssued(hearingDateIssued);
             }
@@ -179,18 +179,18 @@ public class HearingUpdateService {
 
     public LocalDate getHearingDate(String hearingId, @Valid SscsCaseData sscsCaseData) {
         return Optional.ofNullable(HearingsServiceHelper.getHearingById(Long.valueOf(hearingId), sscsCaseData))
-                .map(Hearing::getValue)
-                .map(HearingDetails::getStart)
-                .map(LocalDateTime::toLocalDate)
-                .orElse(null);
+            .map(Hearing::getValue)
+            .map(HearingDetails::getStart)
+            .map(LocalDateTime::toLocalDate)
+            .orElse(null);
     }
 
     public String getHearingEpimsId(String hearingId, @Valid SscsCaseData sscsCaseData) {
         return Optional.ofNullable(HearingsServiceHelper.getHearingById(Long.valueOf(hearingId), sscsCaseData))
-                .map(Hearing::getValue)
-                .map(HearingDetails::getEpimsId)
-                .filter(StringUtils::isNotBlank)
-                .orElse(null);
+            .map(Hearing::getValue)
+            .map(HearingDetails::getEpimsId)
+            .filter(StringUtils::isNotBlank)
+            .orElse(null);
     }
 
     public boolean isCaseListed(HmcStatus hmcStatus) {
