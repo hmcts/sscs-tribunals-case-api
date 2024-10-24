@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.service.hmc.topic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
@@ -48,7 +47,7 @@ class ProcessHmcMessageServiceTestV1 extends AbstractProcessHmcMessageServiceTes
     void verifyUpdateCaseDataCalledCorrectlyForHmcStatus(CcdCaseService ccdCaseService, UpdateCcdCaseService updateCcdCaseService,
                                                          SscsCaseData caseData, HmcStatus hmcStatus, HearingGetResponse hearingGetResponse) throws UpdateCaseException {
         String ccdUpdateDescription = String.format(hmcStatus.getCcdUpdateDescription(), HEARING_ID);
-        verify(updateCcdCaseService, never()).updateCaseV2DynamicEvent(anyLong(), any(), anyBoolean(), any(), any());
+        verify(updateCcdCaseService, never()).updateCaseV2DynamicEvent(anyLong(), any(), any());
         verify(ccdCaseService, times(1))
             .updateCaseData(caseData,
                             hmcStatus.getEventMapper().apply(hearingGetResponse, caseData),

@@ -86,10 +86,9 @@ public class ProcessHmcMessageServiceV2 {
 
         };
 
-        SscsCaseDetails initialSscsCaseDetails = ccdCaseService.getCaseDetails(caseId);
         IdamTokens idamTokens = idamService.getIdamTokens();
-        DynamicEventUpdateResult dynamicEventUpdateResult = mutator.apply(initialSscsCaseDetails);
-        updateCcdCaseService.updateCaseV2DynamicEvent(caseId, dynamicEventUpdateResult.eventType(), dynamicEventUpdateResult.willCommit(), idamTokens, mutator);
+
+        updateCcdCaseService.updateCaseV2DynamicEvent(caseId, idamTokens, mutator);
 
         log.info(
             "Hearing message {} processed using V2 for case reference {}",
