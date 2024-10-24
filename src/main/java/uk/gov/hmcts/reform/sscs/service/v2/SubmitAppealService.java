@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.service.v2;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseDataV2;
 
 import feign.FeignException;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
@@ -14,7 +16,9 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
@@ -44,6 +48,7 @@ public class SubmitAppealService extends SubmitAppealServiceBase {
                                AirLookupService airLookupService,
                                RefDataService refDataService,
                                VenueService venueService,
+                               UpdateCcdCaseService updateCcdCaseService,
                                @Value("${feature.case-access-management.enabled}") boolean caseAccessManagementFeature) {
         super(ccdService,
                 citizenCcdService,
@@ -53,6 +58,7 @@ public class SubmitAppealService extends SubmitAppealServiceBase {
                 airLookupService,
                 refDataService,
                 venueService,
+                updateCcdCaseService,
                 caseAccessManagementFeature);
     }
 
@@ -150,5 +156,18 @@ public class SubmitAppealService extends SubmitAppealServiceBase {
                 idamTokens.getRoles());
 
         return result;
+    }
+
+    @Override
+    protected SscsCaseDetails getUpdatedCaseDetails(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens, List<SscsCaseDetails> matchedByNinoCases) {
+        return updateCcdCaseService.updateCaseV2(Long.valueOf(caseData.getCcdCaseId()),
+                eventType.getCcdType(),
+                "SSCS - new case created",
+                "Created SSCS case from Submit Your Appeal online draft with event " + eventType.getCcdType(),
+                idamTokens,
+                caseDetails -> {
+                    SscsCaseData sscsCaseData = addAssociatedCases(caseDetails.getData(), matchedByNinoCases);
+                    sscsCaseData.setCaseCreated(LocalDate.now().toString());
+                });
     }
 }

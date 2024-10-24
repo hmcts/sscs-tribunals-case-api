@@ -64,6 +64,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaAppointee;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
@@ -118,6 +119,9 @@ public abstract class AbstractSubmitAppealServiceTest {
 
     @Mock
     private EmailHelper emailHelper;
+
+    @Mock
+    private UpdateCcdCaseService updateCcdCaseService;
 
     private uk.gov.hmcts.reform.sscs.service.SubmitAppealService submitAppealService;
     private SubmitAppealService submitAppealServiceV2;
@@ -201,6 +205,7 @@ public abstract class AbstractSubmitAppealServiceTest {
                 airLookupService,
                 refDataService,
                 venueService,
+                updateCcdCaseService,
                 true);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))

@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaAppointee;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
@@ -60,6 +61,7 @@ public abstract class SubmitAppealServiceBase {
     protected final AirLookupService airLookupService;
     protected final RefDataService refDataService;
     protected final VenueService venueService;
+    protected UpdateCcdCaseService updateCcdCaseService;
     protected final boolean caseAccessManagementFeature;
 
     public SubmitAppealServiceBase(CcdService ccdService,
@@ -82,11 +84,36 @@ public abstract class SubmitAppealServiceBase {
         this.venueService = venueService;
     }
 
+    public SubmitAppealServiceBase(CcdService ccdService,
+                                   CitizenCcdService citizenCcdService,
+                                   IdamService idamService,
+                                   ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
+                                   RegionalProcessingCenterService regionalProcessingCenterService,
+                                   AirLookupService airLookupService,
+                                   RefDataService refDataService,
+                                   VenueService venueService,
+                                   UpdateCcdCaseService updateCcdCaseService,
+                                   boolean caseAccessManagementFeature) {
+        this(ccdService,
+                citizenCcdService,
+                idamService,
+                convertAIntoBService,
+                regionalProcessingCenterService,
+                airLookupService,
+                refDataService,
+                venueService,
+                caseAccessManagementFeature);
+        this.updateCcdCaseService = updateCcdCaseService;
+    }
+
+
     public abstract Optional<SaveCaseResult> submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal, Boolean forceCreate);
 
     public abstract Optional<SaveCaseResult> updateDraftAppeal(String oauth2Token, SyaCaseWrapper syaCaseWrapper);
 
     public abstract Optional<SaveCaseResult> archiveDraftAppeal(String oauth2Token, SyaCaseWrapper syaCaseWrapper, Long ccdCaseId) throws FeignException;
+
+    protected abstract SscsCaseDetails getUpdatedCaseDetails(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens, List<SscsCaseDetails> matchedByNinoCases);
 
     public Optional<SessionDraft> getDraftAppeal(String oauth2Token) {
         SscsCaseData caseDetails = null;
@@ -225,12 +252,7 @@ public abstract class SubmitAppealServiceBase {
                 if (eventType == DRAFT_TO_VALID_APPEAL_CREATED || eventType == DRAFT_TO_INCOMPLETE_APPLICATION || eventType == DRAFT_TO_NON_COMPLIANT) {
                     caseData.setCaseCreated(LocalDate.now().toString());
 
-                    caseDetails = ccdService.updateCase(caseData,
-                            Long.valueOf(caseData.getCcdCaseId()),
-                            eventType.getCcdType(),
-                            "SSCS - new case created",
-                            "Created SSCS case from Submit Your Appeal online draft with event " + eventType.getCcdType(),
-                            idamTokens);
+                    caseDetails = getUpdatedCaseDetails(caseData, eventType, idamTokens, matchedByNinoCases);
 
                     log.info("Case {} successfully converted from Draft to SSCS case in CCD for benefit type {} with event {}",
                             caseDetails.getId(),
@@ -265,6 +287,8 @@ public abstract class SubmitAppealServiceBase {
                 String.format("An appeal has already been submitted, for that decision date %s ",
                         caseData.getAppeal().getMrnDetails().getMrnDate()));
     }
+
+
 
     private void associateCase(IdamTokens idamTokens,
                                SscsCaseDetails caseDetails,
