@@ -41,8 +41,10 @@ public class TribunalsHearingsJmsConfig {
     @Value("${azure.service-bus.amqp-connection-string-template:amqps://%1s?amqp.idleTimeout=%2d}")
     public String amqpConnectionStringTemplate;
 
-    @Bean
-    public ConnectionFactory tribunalsHearingsJmsConnectionFactory(@Value("${spring.application.name}") final String clientId) {
+    @Value("${spring.application.name}")
+    private String clientId;
+
+    private ConnectionFactory tribunalsHearingsJmsConnectionFactory() {
         String connection = String.format(amqpConnectionStringTemplate, namespace + connectionPostfix, idleTimeout);
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(connection);
         jmsConnectionFactory.setUsername(username);
@@ -53,8 +55,8 @@ public class TribunalsHearingsJmsConfig {
 
     @Bean
     public JmsListenerContainerFactory<DefaultMessageListenerContainer> tribunalsHearingsEventQueueContainerFactory(
-        ConnectionFactory tribunalsHearingsJmsConnectionFactory,
         DefaultJmsListenerContainerFactoryConfigurer defaultJmsListenerContainerFactoryConfigurer) {
+        ConnectionFactory tribunalsHearingsJmsConnectionFactory = tribunalsHearingsJmsConnectionFactory();
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         factory.setConnectionFactory(tribunalsHearingsJmsConnectionFactory);
         factory.setReceiveTimeout(receiveTimeout);
