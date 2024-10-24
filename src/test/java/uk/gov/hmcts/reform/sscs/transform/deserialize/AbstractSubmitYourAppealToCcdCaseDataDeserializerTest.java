@@ -7,6 +7,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPortsOfEntry;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
@@ -171,6 +172,7 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
         syaCaseWrapper.getContactDetails().setTownCity("townCity");
         syaCaseWrapper.getContactDetails().setCountry("country");
         syaCaseWrapper.getContactDetails().setPortOfEntry("GB100100");
+
         SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
             regionalProcessingCenter.getName(), regionalProcessingCenter, false);
         Address expectedAddress = Address.builder()
@@ -179,6 +181,7 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
             .town("townCity")
             .country("country")
             .portOfEntry("GB100100")
+            .ukPortOfEntryList(getPortsOfEntry())
             .inMainlandUk(YesNo.NO)
             .build();
         assertEquals(expectedAddress, caseData.getAppeal().getAppellant().getAddress());
