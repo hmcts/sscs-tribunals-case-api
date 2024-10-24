@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_CORRECTED
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.NOT_ATTENDING;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.TELEPHONE;
@@ -433,5 +434,47 @@ class SscsUtilTest {
         assertEquals(1, response.getErrors().size());
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNull();
         assertEquals("Interpreter language must be selected if an interpreter is wanted.", response.getErrors().toArray()[0]);
+    }
+
+    @Test
+    void shouldReturnPortsOfEntry() {
+        final DynamicList portsOfEntry = getPortsOfEntry();
+
+        assertThat(portsOfEntry.getValue()).isNull();
+        assertThat(portsOfEntry.getListItems()).hasSize(90);
+    }
+
+    @Test
+    void shouldPopulateIbcaFieldsOnHandleIbcaCase() {
+        final SscsCaseData caseData = SscsCaseData.builder()
+                .appeal(Appeal.builder()
+                        .mrnDetails(MrnDetails.builder().build())
+                        .hearingOptions(HearingOptions.builder().build())
+                        .build()
+                )
+                .build();
+
+        handleIbcaCase(caseData);
+
+        assertThat(caseData.getAppeal().getHearingOptions().getHearingRoute()).isEqualTo(LIST_ASSIST);
+        assertThat(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice()).isEqualTo("IBCA");
+    }
+
+    @Test
+    void shouldGenerateUniqueIbcaId() {
+        final Appellant appellant = Appellant.builder()
+                .name(Name.builder()
+                        .lastName("Test")
+                        .build()
+                )
+                .identity(Identity.builder()
+                        .ibcaReference("IBCA12345")
+                        .build()
+                )
+                .build();
+
+        final String result = generateUniqueIbcaId(appellant);
+
+        assertThat(result).isEqualTo("Test_IBCA12345");
     }
 }

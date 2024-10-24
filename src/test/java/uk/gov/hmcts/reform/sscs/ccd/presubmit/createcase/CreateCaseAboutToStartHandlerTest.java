@@ -66,9 +66,15 @@ public class CreateCaseAboutToStartHandlerTest {
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         Appeal appeal = result.getData().getAppeal();
         BenefitType benefitType = appeal.getBenefitType();
+        Appellant appellant = appeal.getAppellant();
+        Address address = appellant.getAddress();
+        DynamicList ukPortOfEntryList = address.getUkPortOfEntryList();
         DynamicList descriptionSelection = benefitType.getDescriptionSelection();
         assertThat(appeal).isNotNull();
         assertThat(benefitType).isNotNull();
+        assertThat(appellant).isNotNull();
+        assertThat(address).isNotNull();
+        assertThat(ukPortOfEntryList).isNotNull();
         assertThat(descriptionSelection).isNotNull();
         assertThat(descriptionSelection.getListItems()).isNotEmpty();
     }
@@ -83,5 +89,4 @@ public class CreateCaseAboutToStartHandlerTest {
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertThat(result.getErrors()).isEmpty();
     }
-
 }
