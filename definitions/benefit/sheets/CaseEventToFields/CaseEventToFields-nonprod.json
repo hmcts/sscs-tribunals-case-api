@@ -14,7 +14,7 @@
   {
     "LiveFrom": "21/10/2024",
     "CaseEventID": "addHearingOutcome",
-    "CaseFieldID": "hearingOutcome",
+    "CaseFieldID": "hearingOutcomeId",
     "CaseTypeID": "Benefit",
     "DisplayContext": "MANDATORY",
     "PageDisplayOrder": 1,
