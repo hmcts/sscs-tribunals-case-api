@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -31,6 +32,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 public class RestoreCasesService {
 
     private final CcdService ccdService;
+
+    private final UpdateCcdCaseService updateCcdCaseService;
 
     private final IdamService idamService;
     
@@ -42,8 +45,10 @@ public class RestoreCasesService {
 
     @Autowired
     public RestoreCasesService(CcdService ccdService,
+        UpdateCcdCaseService updateCcdCaseService,
         IdamService idamService, ObjectMapper objectMapper) {
         this.ccdService = ccdService;
+        this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
         this.objectMapper = objectMapper;
     }
@@ -74,7 +79,7 @@ public class RestoreCasesService {
 
         List<SscsCaseDetails> matchedCases = getMatchedCases(idamService.getIdamTokens(), date);
 
-        log.info("About to submit " + matchedCases.size() + " cases to the queue to be restored");
+        log.info("About to submit {} cases to the queue to be restored", matchedCases.size());
 
         for (SscsCaseDetails caseDetails : matchedCases) {
 
@@ -145,7 +150,9 @@ public class RestoreCasesService {
     private void triggerEvent(SscsCaseDetails caseDetails) {
         log.info("About to update case with {} event for id {}", POST_STATE_EVENT_TYPE, caseDetails.getId());
         try {
-            ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), POST_STATE_EVENT_TYPE.getCcdType(), "Ready to list", "Ready to list event triggered", idamService.getIdamTokens());
+            log.info("Triggering case event V2 for case id {}", caseDetails.getEventId());
+            updateCcdCaseService.triggerCaseEventV2(caseDetails.getId(), POST_STATE_EVENT_TYPE.getCcdType(), "Ready to list", "Ready to list event triggered", idamService.getIdamTokens());
+            log.info("Triggered case event V2 for case id {}", caseDetails.getEventId());
         } catch (FeignException.UnprocessableEntity e) {
             log.error(format("%s event failed for caseId %s, root cause is %s", POST_STATE_EVENT_TYPE, caseDetails.getId(), getRootCauseMessage(e)), e);
             throw e;
