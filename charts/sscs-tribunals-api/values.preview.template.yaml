@@ -5,7 +5,7 @@ java:
   image: ${IMAGE_NAME}
   memoryLimits: "8Gi"
   memoryRequests: "1Gi"
-  cpuRequests: "2"
+  cpuRequests: 1000m
   ingressHost: ${SERVICE_FQDN}
   cpuLimits: 2000m
   readinessDelay: 45
@@ -133,7 +133,7 @@ xui-webapp:
     devmemoryLimits: "1Gi"
     devcpuLimits: 1
     devmemoryRequests: "512Mi"
-    devcpuRequests: "500m"
+    devcpuRequests: "200m"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
@@ -443,7 +443,7 @@ ccd:
       disableKeyVaults: true
       devmemoryRequests: '1024Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: '900m'
+      devcpuRequests: '500m'
       autoscaling:
         enabled: false
         minReplicas: 1
@@ -472,7 +472,7 @@ ccd:
       imagePullPolicy: Always
       devmemoryRequests: '1524Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: '900m'
+      devcpuRequests: '500m'
       environment:
         DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         DATA_STORE_DB_USERNAME: hmcts
