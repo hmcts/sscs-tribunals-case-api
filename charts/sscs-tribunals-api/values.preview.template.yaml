@@ -609,5 +609,5 @@ postgresql:
       - name: "pr-${CHANGE_ID}-evidence"
       - name: "pr-${CHANGE_ID}-annotation"
       - name: "pr-${CHANGE_ID}-role-assignment"
-      - name: "pr-${CHANGE_ID}-hmc-cft-hearing-service"
+      - name: "pr-4087-hmc-cft-hearing-service"
       - name: "pr-${CHANGE_ID}-sscs-job-scheduler"
