@@ -88,7 +88,7 @@
   {"LiveFrom": "01/01/2018", "ID": "supporter", "ListElementCode": "name", "FieldType": "name", "ElementLabel": "Name", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "supporter", "ListElementCode": "contact", "FieldType": "contact", "ElementLabel": "Contact Details", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "mrnDetails", "ListElementCode": "dwpIssuingOffice", "FieldType": "Text", "ElementLabel": "FTA Issuing Office", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "01/01/2018", "ID": "mrnDetails", "ListElementCode": "mrnDate", "FieldType": "Date", "ElementLabel": "MRN", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "mrnDetails", "ListElementCode": "mrnDate", "FieldType": "Date", "ElementLabel": "MRN Date", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "mrnDetails", "ListElementCode": "mrnLateReason", "FieldType": "Text", "ElementLabel": "MRN Late Reason", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "mrnDetails", "ListElementCode": "mrnMissingReason", "FieldType": "Text", "ElementLabel": "MRN Missing Reason", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "appellant", "ListElementCode": "name", "FieldType": "name", "ElementLabel": "Name", "SecurityClassification": "PUBLIC"},
