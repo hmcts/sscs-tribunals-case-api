@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOutcomeValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
@@ -50,6 +51,7 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
                     .filter(hearing -> hmcHearings.stream()
                             .anyMatch(hmcHearing -> Objects
                                     .equals(hmcHearing.getHearingId().toString(), hearing.getValue().getHearingId()))).toList();
+            sscsCaseData.setHearingOutcomeValue(HearingOutcomeValue.builder().build());
             sscsCaseData.getHearingOutcomeValue().setCompletedHearings(setHearingOutcomeCompletedHearings(selectedHearings));
         } else {
             preSubmitCallbackResponse.addError("There are no completed hearings on the case");
