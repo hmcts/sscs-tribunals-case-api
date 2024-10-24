@@ -176,8 +176,6 @@ ccd:
   enabled: false
 em-ccdorc:
   enabled: false
-sscs-hearings-api:
-  enabled: false
 servicebus:
   enabled: false
 ccd-case-document-am-api:
