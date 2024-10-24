@@ -60,7 +60,7 @@ export class IssueDirectionPage {
     async enterDirectionDueDate() {
         await webActions.inputField('#directionDueDate-day', '21');
         await webActions.inputField('#directionDueDate-month', '10');
-        await webActions.inputField('#directionDueDate-year', '2024');
+        await webActions.inputField('#directionDueDate-year', '2025');
     }
 
     async chooseNoticeType(optionVal: string) {
@@ -74,7 +74,7 @@ export class IssueDirectionPage {
             await webActions.delay(3000);
             await webActions.inputField('#documentDateAdded-day', '01');
             await webActions.inputField('#documentDateAdded-month', '01');
-            await webActions.inputField('#documentDateAdded-year', '2028');
+            await webActions.inputField('#documentDateAdded-year', '2024');
             await webActions.inputField('#sscsInterlocDirectionDocument_documentFileName','testfile1.pdf');
         } else {
             await webActions.inputField('#bodyContent', 'Test body content');
