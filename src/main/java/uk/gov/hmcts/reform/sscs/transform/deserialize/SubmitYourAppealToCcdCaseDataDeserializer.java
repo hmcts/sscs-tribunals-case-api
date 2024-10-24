@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.transform.deserialize;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CARERS_ALLOWANCE;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.*;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getPortsOfEntry;
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
 import static uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil.cleanPhoneNumber;
 
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -295,7 +297,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             if (inMainlandUkYesNo.equals(YesNo.NO)) {
                 addressBuilder.country(contactDetails.getCountry());
                 if (party.equalsIgnoreCase("appellant")) {
-                    addressBuilder.portOfEntry(contactDetails.getPortOfEntry());
+                    addressBuilder
+                        .portOfEntry(contactDetails.getPortOfEntry())
+                        .ukPortOfEntryList(getPortsOfEntry());
                 }
                 return addressBuilder.build();
             }
