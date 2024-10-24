@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.sendtofirsttier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -104,7 +105,7 @@ public class SendToFirstTierSubmittedHandlerTest {
 
         assertThat(response.getErrors()).isEmpty();
         verify(ccdCallbackMapService, times(1))
-                .handleCcdCallbackMapV2(value, CASE_ID);
+                .handleCcdCallbackMapV2(eq(value), eq(CASE_ID));
     }
 
     @ParameterizedTest
