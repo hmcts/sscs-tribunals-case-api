@@ -10,12 +10,15 @@ import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jms.annotation.JmsListener;
+import org.springframework.retry.ExhaustedRetryException;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.exception.CaseException;
+import uk.gov.hmcts.reform.sscs.exception.HearingUpdateException;
 import uk.gov.hmcts.reform.sscs.exception.HmcEventProcessingException;
 import uk.gov.hmcts.reform.sscs.exception.MessageProcessingException;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HmcMessage;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageService;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceV2;
 
 @Slf4j
 @Component
@@ -28,21 +31,26 @@ public class HmcHearingsEventTopicListener {
 
     private final ProcessHmcMessageService processHmcMessageService;
 
+    private final ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
+
     @Value("${hmc.deployment-id}")
     private String hmctsDeploymentId;
 
     @Value("${flags.deployment-filter.enabled}")
     private boolean isDeploymentFilterEnabled;
-
+    @Value("${feature.process-event-message-v2.enabled}")
+    private boolean processEventMessageV2Enabled;
     @Value("${feature.bypass-hearing-api-service.enabled}")
     private boolean isByPassHearingServiceEnabled;
 
     private static final String HMCTS_DEPLOYMENT_ID = "hmctsDeploymentId";
 
     public HmcHearingsEventTopicListener(@Value("${sscs.serviceCode}") String sscsServiceCode,
-                                         ProcessHmcMessageService processHmcMessageService) {
+                                         ProcessHmcMessageService processHmcMessageService,
+                                         ProcessHmcMessageServiceV2 processHmcMessageServiceV2) {
         this.sscsServiceCode = sscsServiceCode;
         this.processHmcMessageService = processHmcMessageService;
+        this.processHmcMessageServiceV2 = processHmcMessageServiceV2;
         this.objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
     }
@@ -72,18 +80,24 @@ public class HmcHearingsEventTopicListener {
                 String hearingId = hmcMessage.getHearingId();
 
                 log.info(
-                        "Attempting to process message from HMC hearings topic for event {}, Case ID {}, and Hearing ID {}.",
-                        hmcMessage.getHearingUpdate().getHmcStatus(),
-                        caseId,
-                        hearingId
+                    "Attempting to process message from HMC hearings topic for event {}, Case ID {}, and Hearing ID {}.",
+                    hmcMessage.getHearingUpdate().getHmcStatus(),
+                    caseId,
+                    hearingId
                 );
 
-                processHmcMessageService.processEventMessage(hmcMessage);
+                if (processEventMessageV2Enabled) {
+                    processHmcMessageServiceV2.processEventMessageV2(hmcMessage);
+                } else {
+                    processHmcMessageService.processEventMessage(hmcMessage);
+                }
             }
-        } catch (JsonProcessingException | CaseException | MessageProcessingException ex) {
+        } catch (JsonProcessingException | CaseException | MessageProcessingException
+                 | HearingUpdateException | ExhaustedRetryException ex) {
+            log.error("Unable to successfully deliver HMC message: {}", convertedMessage, ex);
             throw new HmcEventProcessingException(String.format(
-                    "Unable to successfully deliver HMC message: %s",
-                    convertedMessage
+                "Unable to successfully deliver HMC message: %s",
+                convertedMessage
             ), ex);
         }
 
@@ -95,8 +109,8 @@ public class HmcHearingsEventTopicListener {
 
     private boolean isMessageReleventForDeployment(JmsBytesMessage message) throws JMSException {
         return hmctsDeploymentId.isEmpty()
-                && message.getStringProperty(HMCTS_DEPLOYMENT_ID) == null
-                || message.getStringProperty(HMCTS_DEPLOYMENT_ID) != null
-                && message.getStringProperty(HMCTS_DEPLOYMENT_ID).equals(hmctsDeploymentId);
+            && message.getStringProperty(HMCTS_DEPLOYMENT_ID) == null
+            || message.getStringProperty(HMCTS_DEPLOYMENT_ID) != null
+            && message.getStringProperty(HMCTS_DEPLOYMENT_ID).equals(hmctsDeploymentId);
     }
 }
