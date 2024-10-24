@@ -324,12 +324,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         } else {
             contact = Contact.builder().build();
         }
-        Identity identity;
-        if (isIba) {
-            identity = buildAppellantIdentity(syaAppellant, true);
-        } else {
-            identity = buildAppellantIdentity(syaAppellant, false);
-        }
+        Identity identity = buildAppellantIdentity(syaAppellant, isIba);
 
         String isAppointee = buildAppellantIsAppointee(syaCaseWrapper);
 
