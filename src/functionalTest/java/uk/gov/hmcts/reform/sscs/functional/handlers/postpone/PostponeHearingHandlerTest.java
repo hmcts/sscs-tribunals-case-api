@@ -83,7 +83,7 @@ public class PostponeHearingHandlerTest extends BaseHandler {
         SscsCaseData result = mapper.readValue(root.path("data").toPrettyString(), new TypeReference<SscsCaseData>(){});
 
         assertThat(result.getPostponement().getUnprocessedPostponement()).isEqualTo(NO);
-        assertThat(result.getPostponement().getPostponementEvent()).isNull();
+        assertThat(result.getPostponement().getPostponementEvent()).isEqualTo(READY_TO_LIST);
         assertThat(result.getDwpState()).isEqualTo(DwpState.HEARING_POSTPONED);
     }
 }
