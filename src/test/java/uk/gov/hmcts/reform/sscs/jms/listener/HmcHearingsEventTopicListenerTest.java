@@ -40,13 +40,15 @@ class HmcHearingsEventTopicListenerTest {
 
     private HmcHearingsEventTopicListener hmcHearingsEventTopicListener;
 
-    protected ProcessHmcMessageServiceFactory processHmcMessageServiceFactory;
+    private ProcessHmcMessageServiceFactory processHmcMessageServiceFactory;
 
     private ProcessHmcMessageService processHmcMessageService;
 
-    @Mock ProcessHmcMessageServiceV1 processHmcMessageServiceV1;
+    @Mock
+    private ProcessHmcMessageServiceV1 processHmcMessageServiceV1;
 
-    @Mock ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
+    @Mock
+    private ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
 
     @Mock
     private JmsBytesMessage bytesMessage;
