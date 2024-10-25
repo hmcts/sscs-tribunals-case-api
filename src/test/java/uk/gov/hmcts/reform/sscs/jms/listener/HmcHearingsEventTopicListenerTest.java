@@ -60,8 +60,6 @@ class HmcHearingsEventTopicListenerTest {
 
     @BeforeEach
     void setup() throws JMSException {
-        given(processHmcMessageServiceV1.isProcessEventMessageV2Enabled()).willReturn(Boolean.FALSE);
-        given(processHmcMessageServiceV2.isProcessEventMessageV2Enabled()).willReturn(Boolean.TRUE);
         processHmcMessageServiceFactory = new ProcessHmcMessageServiceFactory(Lists.newArrayList(processHmcMessageServiceV1, processHmcMessageServiceV2));
         hmcHearingsEventTopicListener = new HmcHearingsEventTopicListener(SERVICE_CODE, processHmcMessageServiceFactory);
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "objectMapper", mockObjectMapper);

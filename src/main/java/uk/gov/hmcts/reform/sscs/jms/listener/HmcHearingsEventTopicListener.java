@@ -46,7 +46,7 @@ public class HmcHearingsEventTopicListener {
     public HmcHearingsEventTopicListener(@Value("${sscs.serviceCode}") String sscsServiceCode,
                                          ProcessHmcMessageServiceFactory processHmcMessageServiceFactory) {
         this.sscsServiceCode = sscsServiceCode;
-        this.processHmcMessageService = processHmcMessageServiceFactory.getProcessHmcMessageService(processEventMessageV2Enabled);
+        this.processHmcMessageService = processHmcMessageServiceFactory.getProcessHmcMessageService();
         this.objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
     }

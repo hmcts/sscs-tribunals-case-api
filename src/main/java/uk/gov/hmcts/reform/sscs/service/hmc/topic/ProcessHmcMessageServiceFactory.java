@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service.hmc.topic;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,16 +9,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProcessHmcMessageServiceFactory {
 
-    private final Map<Boolean, ProcessHmcMessageService> processHmcMessageServiceMap;
+    private final ProcessHmcMessageService processHmcMessageService;
 
     @Autowired
     public ProcessHmcMessageServiceFactory(List<ProcessHmcMessageService> processHmcMessageServices) {
-        this.processHmcMessageServiceMap = processHmcMessageServices.stream().collect(Collectors
-                .toMap(ProcessHmcMessageService::isProcessEventMessageV2Enabled, Function.identity()));
+        this.processHmcMessageService = processHmcMessageServices.stream().findFirst().get();
     }
 
-    public ProcessHmcMessageService getProcessHmcMessageService(Boolean isProcessEventMessageV2Enabled) {
-        return processHmcMessageServiceMap.get(isProcessEventMessageV2Enabled);
+    public ProcessHmcMessageService getProcessHmcMessageService() {
+        return processHmcMessageService;
     }
-
 }

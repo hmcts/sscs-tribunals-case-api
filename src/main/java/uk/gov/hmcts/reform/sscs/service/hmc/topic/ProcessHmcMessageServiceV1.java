@@ -5,6 +5,7 @@ import static java.util.Objects.isNull;
 import java.util.function.BiFunction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "feature.process-event-message-v2.enabled", havingValue = "false")
 public class ProcessHmcMessageServiceV1 implements ProcessHmcMessageService {
 
     private final HmcHearingApiService hmcHearingApiService;
@@ -31,8 +33,6 @@ public class ProcessHmcMessageServiceV1 implements ProcessHmcMessageService {
     private final HearingUpdateService hearingUpdateService;
 
     private final ProcessHmcMessageHelper processHmcMessageHelper;
-
-    private final Boolean versionV2 = Boolean.FALSE;
 
     @Override
     public void processEventMessage(HmcMessage hmcMessage)
@@ -80,11 +80,6 @@ public class ProcessHmcMessageServiceV1 implements ProcessHmcMessageService {
             hmcMessage.getHearingId(),
             hmcMessage.getCaseId()
         );
-    }
-
-    @Override
-    public Boolean isProcessEventMessageV2Enabled() {
-        return Boolean.FALSE;
     }
 
     private void resolveEventAndUpdateCase(HearingGetResponse hearingResponse, HmcStatus hmcStatus, SscsCaseData caseData,
