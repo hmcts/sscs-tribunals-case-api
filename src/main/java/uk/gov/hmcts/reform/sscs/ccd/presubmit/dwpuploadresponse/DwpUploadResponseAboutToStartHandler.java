@@ -44,6 +44,15 @@ public class DwpUploadResponseAboutToStartHandler extends ResponseEventsAboutToS
             updateDwpStateList(sscsCaseData);
         }
 
+        //TODO: update benefit code list if IBCA to only include 093
+        //TODO: update issueCode list if IBCA to only include:
+        //        DD - Directly Lodged - This code will be available but they cannot submit the case with this code - this is the default code in this screen
+        //        CE- Conditions of entitlement
+        //        RA  - Rates of assessment
+        //        OS - Overpayment straightforward
+        //        OX - Overpayment complex
+        //        SP - Supplementary Payment (New Code)
+
         return preSubmitCallbackResponse;
     }
 

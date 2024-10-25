@@ -162,6 +162,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
 
     private void updateEventDetails(SscsCaseData caseData, Long caseId, EventType eventType, String summary, String description) {
 
+        //TODO: if case is an IBCA state or eventType as it is called here must always be: DWP_RESPOND
         log.info("updating to {} for case id: {}", eventType.getCcdType(), caseId);
 
         ccdService.updateCase(caseData, caseId,

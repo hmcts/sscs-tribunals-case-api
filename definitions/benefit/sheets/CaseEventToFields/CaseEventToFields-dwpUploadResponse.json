@@ -21,6 +21,31 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
+    "FieldShowCondition": "appeal.benefitType.code!=\"infectedBloodAppeal\" AND appeal.benefitType.descriptionSelection!=\"015\" AND appeal.benefitType.descriptionSelection!=\"016\" AND appeal.benefitType.descriptionSelection!=\"030\" AND appeal.benefitType.descriptionSelection!=\"034\" AND appeal.benefitType.descriptionSelection!=\"050\" AND appeal.benefitType.descriptionSelection!=\"053\" AND appeal.benefitType.descriptionSelection!=\"054\" AND appeal.benefitType.descriptionSelection!=\"055\" AND appeal.benefitType.descriptionSelection!=\"057\" AND appeal.benefitType.descriptionSelection!=\"058\"",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "dwpUploadResponse",
+    "CaseFieldID": "hmrcResponseDocument",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection=\"015\" OR appeal.benefitType.descriptionSelection=\"016\" OR appeal.benefitType.descriptionSelection=\"030\" OR appeal.benefitType.descriptionSelection=\"034\" OR appeal.benefitType.descriptionSelection=\"050\" OR appeal.benefitType.descriptionSelection=\"053\" OR appeal.benefitType.descriptionSelection=\"054\" OR appeal.benefitType.descriptionSelection=\"055\" OR appeal.benefitType.descriptionSelection=\"057\" OR appeal.benefitType.descriptionSelection=\"058\"",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "dwpUploadResponse",
+    "CaseFieldID": "ibcaResponseDocument",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\"",
     "ShowSummaryChangeOption": "Y"
   },
   {

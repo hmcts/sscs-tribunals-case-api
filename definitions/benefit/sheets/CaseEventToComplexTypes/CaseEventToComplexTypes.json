@@ -223,10 +223,22 @@
     "ListElementCode": "nino",
     "ID": "jointPartyIdentityNino",
     "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "appeal.benefitType.code!=\"infectedBloodAppeal\"",
     "LiveFrom": "19/11/2019",
     "FieldDisplayOrder": 2,
     "PageID": "jointPartyIdentity",
     "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "dwpUploadResponse",
+    "CaseFieldID": "jointPartyIdentity",
+    "ListElementCode": "ibcaReference",
+    "ID": "jointPartyIdentityIbcaReference",
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 3,
+    "PageID": "jointPartyIdentity"
   },
   {
     "CaseEventID": "dwpUploadResponse",
