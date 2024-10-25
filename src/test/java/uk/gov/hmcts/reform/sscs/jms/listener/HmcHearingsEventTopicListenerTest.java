@@ -34,7 +34,7 @@ import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceV1;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceV2;
 
 @ExtendWith(MockitoExtension.class)
-class AbstractHmcHearingsEventTopicListenerTest {
+class HmcHearingsEventTopicListenerTest {
 
     public static final String SERVICE_CODE = "BBA3";
 
