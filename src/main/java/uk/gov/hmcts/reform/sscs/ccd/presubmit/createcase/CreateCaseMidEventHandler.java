@@ -42,7 +42,9 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
                 || callback.getEvent() == EventType.INCOMPLETE_APPLICATION_RECEIVED
                 || callback.getEvent() == EventType.CASE_UPDATED)
                 && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData());
+                && Objects.nonNull(callback.getCaseDetails().getCaseData())
+                && isIbcaCase(callback.getCaseDetails().getCaseData()
+        );
     }
 
     @Override
@@ -50,19 +52,17 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
 
-        if (isIbcaCase(caseData)) {
-            if (NO.equals(caseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
-                final String selectedPortOfEntryLocationCode = caseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList().getValue().getCode();
-                caseData.getAppeal().getAppellant().getAddress().setPortOfEntry(selectedPortOfEntryLocationCode);
-            }
+        if (NO.equals(caseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
+            final String selectedPortOfEntryLocationCode = caseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList().getValue().getCode();
+            caseData.getAppeal().getAppellant().getAddress().setPortOfEntry(selectedPortOfEntryLocationCode);
+        }
 
-            errorResponse.addErrors(validateAddress(caseData.getAppeal().getAppellant()));
+        errorResponse.addErrors(validateAddress(caseData.getAppeal().getAppellant()));
 
-            if (isYes(caseData.getAppeal().getRep().getHasRepresentative())
-                    && isNotEmpty(caseData.getAppeal().getRep().getAddress())
-                    && isEmpty(caseData.getAppeal().getRep().getAddress().getInMainlandUk())) {
-                errorResponse.addError("You must enter Living in the UK for the representative");
-            }
+        if (isYes(caseData.getAppeal().getRep().getHasRepresentative())
+                && isNotEmpty(caseData.getAppeal().getRep().getAddress())
+                && isEmpty(caseData.getAppeal().getRep().getAddress().getInMainlandUk())) {
+            errorResponse.addError("You must enter Living in the UK for the representative");
         }
 
         return errorResponse;
