@@ -3,14 +3,10 @@ tags:
   sscs-ccd-idam-pr: true
 
 java:
-  memoryRequests: 2Gi
-  cpuRequests: 2000m
-  memoryLimits: 8Gi
-  cpuLimits: 3500m
-  devmemoryRequests: 6Gi
-  devcpuRequests: 2000m
-  devmemoryLimits: 8Gi
-  devcpuLimits: 4500m
+  devmemoryRequests: 1Gi
+  devmemoryLimits: 4Gi
+  devcpuRequests: 500m
+  devcpuLimits: 2000m
   image: ${IMAGE_NAME}
   readinessDelay: 45
   environment:
@@ -103,14 +99,10 @@ ccd-case-document-am-api:
 xui-webapp:
   enabled: true
   nodejs:
-    memoryRequests: 2Gi
-    cpuRequests: 2000m
-    memoryLimits: 4Gi
-    cpuLimits: 3500m
-    devmemoryRequests: 6Gi
-    devcpuRequests: 2000m
-    devmemoryLimits: 8Gi
-    devcpuLimits: 4500m
+    devmemoryRequests: "512Mi"
+    devmemoryLimits: "1Gi"
+    devcpuRequests: "200m"
+    devcpuLimits: "1000m"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
@@ -706,8 +698,6 @@ sscs-evidence-share:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
-    memoryLimits: "2Gi"
-    cpuLimits: 2000m
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
     environment:
