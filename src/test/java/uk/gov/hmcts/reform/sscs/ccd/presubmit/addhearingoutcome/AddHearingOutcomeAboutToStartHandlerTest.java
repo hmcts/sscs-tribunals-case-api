@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addhearingoutcome;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsIterableContaining.hasItem;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -63,6 +66,7 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
                 HearingsGetResponse.builder().caseHearings(List.of(CaseHearing.builder().hearingId(1L).build())).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_START,callback,USER_AUTHORISATION);
         assertFalse(response.getData().getHearingOutcomeValue().getCompletedHearings().getListItems().isEmpty());
+        assertEquals(1, response.getData().getHearingOutcomeValue().getCompletedHearings().getListItems().size());
     }
 
     @Test
@@ -71,6 +75,7 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
                 HearingsGetResponse.builder().caseHearings(List.of()).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_START,callback,USER_AUTHORISATION);
         assertFalse(response.getErrors().isEmpty());
+        assertThat(response.getErrors(), hasItem("There are no completed hearings on the case"));
     }
 
     private List<Hearing> buildHearings() {
