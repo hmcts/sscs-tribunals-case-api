@@ -13,7 +13,7 @@ public class ProcessHmcMessageServiceFactory {
 
     @Autowired
     public ProcessHmcMessageServiceFactory(List<ProcessHmcMessageService> processHmcMessageServices) {
-        this.processHmcMessageService = processHmcMessageServices.stream().findFirst().get();
+        this.processHmcMessageService = processHmcMessageServices.stream().findFirst().orElse(null);
     }
 
     public ProcessHmcMessageService getProcessHmcMessageService() {

@@ -17,9 +17,8 @@ import javax.jms.JMSException;
 import org.apache.qpid.jms.message.JmsBytesMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -73,11 +72,9 @@ class HmcHearingsEventTopicListenerTest {
 
     }
 
+    @Test
     @DisplayName("Messages should not be processed if their service code does not match the service.")
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void testOnMessage_serviceCodeNotApplicable(boolean isProcessHmcMessageServiceV2Enabled) throws Exception {
-        ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "processEventMessageV2Enabled", isProcessHmcMessageServiceV2Enabled);
+    void testOnMessage_serviceCodeNotApplicable() throws Exception {
         HmcMessage hmcMessage = createHmcMessage("BBA4");
 
         byte[] messageBytes = OBJECT_MAPPER.writeValueAsString(hmcMessage).getBytes(StandardCharsets.UTF_8);
@@ -90,11 +87,9 @@ class HmcHearingsEventTopicListenerTest {
         verifyNoProcessEventMessageCall();
     }
 
+    @Test
     @DisplayName("Messages should not be processed if their deployment ID does not match ours.")
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void testOnMessage_deploymentNotApplicable(boolean isProcessHmcMessageServiceV2Enabled) throws Exception {
-        ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "processEventMessageV2Enabled", isProcessHmcMessageServiceV2Enabled);
+    void testOnMessage_deploymentNotApplicable() throws Exception {
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "hmctsDeploymentId", "test2");
         HmcMessage hmcMessage = createHmcMessage("BBA3");
 
@@ -105,11 +100,9 @@ class HmcHearingsEventTopicListenerTest {
         verifyNoProcessEventMessageCall();
     }
 
+    @Test
     @DisplayName("Message should be processed if message deployment ID matches ours.")
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void testOnMessage_deploymentApplicable(boolean isProcessHmcMessageServiceV2Enabled) throws Exception {
-        ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "processEventMessageV2Enabled", isProcessHmcMessageServiceV2Enabled);
+    void testOnMessage_deploymentApplicable() throws Exception {
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "hmctsDeploymentId", "test");
         HmcMessage hmcMessage = createHmcMessage("BBA3");
 
@@ -122,11 +115,9 @@ class HmcHearingsEventTopicListenerTest {
     }
 
 
+    @Test
     @DisplayName("Messages should be processed if no deployment id is provided on message and service.")
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void testOnMessage_noDeployment(boolean isProcessHmcMessageServiceV2Enabled) throws Exception {
-        ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "processEventMessageV2Enabled", isProcessHmcMessageServiceV2Enabled);
+    void testOnMessage_noDeployment() throws Exception {
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "hmctsDeploymentId", "");
         given(bytesMessage.getStringProperty("hmctsDeploymentId")).willReturn(null);
         HmcMessage hmcMessage = createHmcMessage("BBA3");
@@ -139,11 +130,9 @@ class HmcHearingsEventTopicListenerTest {
         verifyProcessEventMessageCall(processHmcMessageService);
     }
 
+    @Test
     @DisplayName("Messages should not be processed if deployment id is provided on message but not on service.")
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void testOnMessage_noDeploymentInService(boolean isProcessHmcMessageServiceV2Enabled) throws Exception {
-        ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "processEventMessageV2Enabled", isProcessHmcMessageServiceV2Enabled);
+    void testOnMessage_noDeploymentInService() throws Exception {
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "hmctsDeploymentId", "");
         HmcMessage hmcMessage = createHmcMessage("BBA3");
 
@@ -154,11 +143,9 @@ class HmcHearingsEventTopicListenerTest {
         verifyNoProcessEventMessageCall();
     }
 
+    @Test
     @DisplayName("Messages should be processed if their service code matches the service.")
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void testOnMessage_serviceCodeApplicable(boolean isProcessHmcMessageServiceV2Enabled) throws Exception {
-        ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "processEventMessageV2Enabled", isProcessHmcMessageServiceV2Enabled);
+    void testOnMessage_serviceCodeApplicable() throws Exception {
         HmcMessage hmcMessage = createHmcMessage(SERVICE_CODE);
 
         byte[] messageBytes = OBJECT_MAPPER.writeValueAsString(hmcMessage).getBytes(StandardCharsets.UTF_8);
@@ -171,11 +158,9 @@ class HmcHearingsEventTopicListenerTest {
         verifyProcessEventMessageCall(processHmcMessageService);
     }
 
+    @Test
     @DisplayName("A HmcEventProcessingException should be thrown if a JsonProcessing exception is encountered.")
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void testOnMessage_JsonProcessingException(boolean isProcessHmcMessageServiceV2Enabled) throws JsonProcessingException, JMSException {
-        ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "processEventMessageV2Enabled", isProcessHmcMessageServiceV2Enabled);
+    void testOnMessage_JsonProcessingException() throws JsonProcessingException, JMSException {
         HmcMessage hmcMessage = createHmcMessage(SERVICE_CODE);
 
         byte[] messageBytes = OBJECT_MAPPER.writeValueAsString(hmcMessage).getBytes(StandardCharsets.UTF_8);
@@ -189,11 +174,9 @@ class HmcHearingsEventTopicListenerTest {
             .withCauseInstanceOf(JsonProcessingException.class);
     }
 
+    @Test
     @DisplayName("A HmcEventProcessingException exception should be thrown an exception is encountered.")
-    @ParameterizedTest
-    @CsvSource({"true", "false"})
-    void testOnMessage_HmcEventProcessingException(boolean isProcessHmcMessageServiceV2Enabled) throws Exception {
-        ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "processEventMessageV2Enabled", isProcessHmcMessageServiceV2Enabled);
+    void testOnMessage_HmcEventProcessingException() throws Exception {
         HmcMessage hmcMessage = createHmcMessage(SERVICE_CODE);
 
         byte[] messageBytes = OBJECT_MAPPER.writeValueAsString(hmcMessage).getBytes(StandardCharsets.UTF_8);

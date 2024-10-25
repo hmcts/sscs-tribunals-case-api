@@ -36,8 +36,6 @@ public class HmcHearingsEventTopicListener {
 
     @Value("${flags.deployment-filter.enabled}")
     private boolean isDeploymentFilterEnabled;
-    @Value("${feature.process-event-message-v2.enabled}")
-    private boolean processEventMessageV2Enabled;
     @Value("${feature.bypass-hearing-api-service.enabled}")
     private boolean isByPassHearingServiceEnabled;
 
