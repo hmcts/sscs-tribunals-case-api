@@ -103,12 +103,12 @@ withNightlyPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
     enableFortifyScan()
-
-    before('fullFunctionalTest') {
+    enableMutationTest()
+    enableFullFunctionalTest()
+    
+    afterAlways('fullFunctionalTest') {
         runE2eTestsNightly()
     }
-    enableFullFunctionalTest()
-    enableMutationTest()
 
     afterSuccess('fortify-scan') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
