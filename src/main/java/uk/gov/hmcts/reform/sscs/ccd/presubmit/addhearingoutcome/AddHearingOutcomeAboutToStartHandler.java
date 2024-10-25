@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addhearingoutcome;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -62,7 +64,8 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
     private DynamicList setHearingOutcomeCompletedHearings(List<Hearing> hearings) {
         return new DynamicList(new DynamicListItem("", ""), hearings.stream()
                 .map(hearing -> {
-                    String hearingLabel = hearing.getValue().getStart().toString()
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm", Locale.ENGLISH);
+                    String hearingLabel = hearing.getValue().getStart().format(formatter)
                             + "-" + hearing.getValue().getEnd().toLocalTime()
                             + ", " + hearing.getValue().getVenue().getName();
                     return new DynamicListItem(hearing.getValue().getHearingId(), hearingLabel);
