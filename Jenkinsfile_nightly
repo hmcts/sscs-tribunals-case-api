@@ -91,6 +91,8 @@ def setAatEnvVars() {
     env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     env.CCD_GW_API = "https://gateway-ccd.aat.platform.hmcts.net"
     env.CASE_DOCUMENT_AM_URL = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
+    env.TEST_DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
+    env.DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
     env.ENVIRONMENT="aat"
 }
 
