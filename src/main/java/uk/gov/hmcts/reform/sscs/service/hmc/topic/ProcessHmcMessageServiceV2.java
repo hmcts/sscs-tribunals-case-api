@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ProcessHmcMessageServiceV2 {
+public class ProcessHmcMessageServiceV2 implements ProcessHmcMessageService {
 
     private final HmcHearingApiService hmcHearingApiService;
     private final HearingUpdateService hearingUpdateService;
@@ -38,7 +38,8 @@ public class ProcessHmcMessageServiceV2 {
     private final ProcessHmcMessageHelper processHmcMessageHelper;
     private final CcdCaseService ccdCaseService;
 
-    public void processEventMessageV2(HmcMessage hmcMessage)
+    @Override
+    public void processEventMessage(HmcMessage hmcMessage)
         throws CaseException, MessageProcessingException, InvalidMappingException {
 
         Long caseId = hmcMessage.getCaseId();
@@ -95,6 +96,11 @@ public class ProcessHmcMessageServiceV2 {
             hmcMessage.getHearingId(),
             hmcMessage.getCaseId()
         );
+    }
+
+    @Override
+    public Boolean isProcessEventMessageV2Enabled() {
+        return Boolean.TRUE;
     }
 
     private DynamicEventUpdateResult resolveEventType(SscsCaseData caseData, HmcStatus hmcMessageStatus, HearingGetResponse hearingResponse, String hearingId) {

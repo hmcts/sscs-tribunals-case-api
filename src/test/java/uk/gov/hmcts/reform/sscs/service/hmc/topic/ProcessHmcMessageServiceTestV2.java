@@ -7,6 +7,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.util.function.Function;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -32,6 +33,12 @@ class ProcessHmcMessageServiceTestV2 extends AbstractProcessHmcMessageServiceTes
     @Captor
     ArgumentCaptor<Function<SscsCaseDetails, UpdateCcdCaseService.DynamicEventUpdateResult>> captor;
 
+    @BeforeEach
+    void setUp() {
+        super.setUp();
+        processHmcMessageService = new ProcessHmcMessageServiceV2(hmcHearingApiService, hearingUpdateService, updateCcdCaseService, idamService, processHmcMessageHelper, ccdCaseService);
+    }
+
     @Override
     void givenWillReturn(CcdCaseService ccdCaseService, UpdateCcdCaseService updateCcdCaseService, Long caseId, SscsCaseDetails sscsCaseDetails, IdamService idamService) throws GetCaseException {
         given(idamService.getIdamTokens())
@@ -39,8 +46,8 @@ class ProcessHmcMessageServiceTestV2 extends AbstractProcessHmcMessageServiceTes
     }
 
     @Override
-    void callProcessEventMessage(ProcessHmcMessageService processHmcMessageService, ProcessHmcMessageServiceV2 processHmcMessageServiceV2, HmcMessage hmcMessage) throws CaseException, MessageProcessingException {
-        processHmcMessageServiceV2.processEventMessageV2(hmcMessage);
+    void callProcessEventMessage(ProcessHmcMessageService processHmcMessageService, HmcMessage hmcMessage) throws CaseException, MessageProcessingException {
+        processHmcMessageService.processEventMessage(hmcMessage);
     }
 
     @Override

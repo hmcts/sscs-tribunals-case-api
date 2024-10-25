@@ -8,6 +8,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
@@ -27,6 +28,12 @@ import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 @ExtendWith(MockitoExtension.class)
 class ProcessHmcMessageServiceTestV1 extends AbstractProcessHmcMessageServiceTest {
 
+    @BeforeEach
+    void setUp() {
+        super.setUp();
+        processHmcMessageService = new ProcessHmcMessageServiceV1(hmcHearingApiService, ccdCaseService, hearingUpdateService, processHmcMessageHelper);
+    }
+
     @Override
     void givenWillReturn(CcdCaseService ccdCaseService, UpdateCcdCaseService updateCcdCaseService, Long caseId, SscsCaseDetails sscsCaseDetails, IdamService idamService) throws GetCaseException {
         given(ccdCaseService.getCaseDetails(CASE_ID))
@@ -34,7 +41,7 @@ class ProcessHmcMessageServiceTestV1 extends AbstractProcessHmcMessageServiceTes
     }
 
     @Override
-    void callProcessEventMessage(ProcessHmcMessageService processHmcMessageService, ProcessHmcMessageServiceV2 processHmcMessageServiceV2, HmcMessage hmcMessage) throws CaseException, MessageProcessingException {
+    void callProcessEventMessage(ProcessHmcMessageService processHmcMessageService, HmcMessage hmcMessage) throws CaseException, MessageProcessingException {
         processHmcMessageService.processEventMessage(hmcMessage);
     }
 

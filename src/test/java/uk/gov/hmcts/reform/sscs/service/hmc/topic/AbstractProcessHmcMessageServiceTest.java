@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
@@ -55,28 +54,24 @@ abstract class AbstractProcessHmcMessageServiceTest {
     public static final long CASE_ID = 123L;
 
     @Mock
-    private HmcHearingApiService hmcHearingApiService;
+    protected HmcHearingApiService hmcHearingApiService;
 
     @Mock
-    private CcdCaseService ccdCaseService;
+    protected CcdCaseService ccdCaseService;
 
     @Mock
-    private HearingUpdateService hearingUpdateService;
+    protected HearingUpdateService hearingUpdateService;
 
     @Mock
-    private UpdateCcdCaseService updateCcdCaseService;
+    protected UpdateCcdCaseService updateCcdCaseService;
 
     @Mock
-    private IdamService idamService;
+    protected IdamService idamService;
 
     @Mock
-    private ProcessHmcMessageHelper processHmcMessageHelper;
+    protected ProcessHmcMessageHelper processHmcMessageHelper;
 
-    @InjectMocks
-    private ProcessHmcMessageService processHmcMessageService;
-
-    @InjectMocks
-    private ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
+    protected ProcessHmcMessageService processHmcMessageService;
 
     private SscsCaseDetails sscsCaseDetails;
     private SscsCaseData caseData;
@@ -114,7 +109,7 @@ abstract class AbstractProcessHmcMessageServiceTest {
 
     abstract void givenWillReturn(CcdCaseService ccdCaseService, UpdateCcdCaseService updateCcdCaseService, Long caseId, SscsCaseDetails sscsCaseDetails, IdamService idamService) throws GetCaseException;
 
-    abstract void callProcessEventMessage(ProcessHmcMessageService processHmcMessageService, ProcessHmcMessageServiceV2 processHmcMessageServiceV2, HmcMessage hmcMessage) throws CaseException, MessageProcessingException;
+    abstract void callProcessEventMessage(ProcessHmcMessageService processHmcMessageService, HmcMessage hmcMessage) throws CaseException, MessageProcessingException;
 
     abstract void assertThatCall(UpdateCcdCaseService updateCcdCaseService, SscsCaseDetails sscsCaseDetails, DwpState dwpState);
 
@@ -138,7 +133,7 @@ abstract class AbstractProcessHmcMessageServiceTest {
         givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         // when
-        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
+        callProcessEventMessage(processHmcMessageService, hmcMessage);
 
         // then
         verifyUpdateCaseDataCalledCorrectlyForHmcStatus(ccdCaseService, updateCcdCaseService, caseData, hmcStatus, hearingGetResponse);
@@ -163,7 +158,7 @@ abstract class AbstractProcessHmcMessageServiceTest {
         givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         // when
-        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
+        callProcessEventMessage(processHmcMessageService, hmcMessage);
 
         // then
         verifyUpdateCaseDataCalledCorrectlyForHmcStatus(ccdCaseService, updateCcdCaseService, caseData, hmcStatus, hearingGetResponse);
@@ -188,7 +183,7 @@ abstract class AbstractProcessHmcMessageServiceTest {
             .willReturn(DwpState.HEARING_DATE_ISSUED);
 
         // when
-        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
+        callProcessEventMessage(processHmcMessageService, hmcMessage);
 
         // then
         assertThatCall(updateCcdCaseService, sscsCaseDetails, DwpState.HEARING_DATE_ISSUED);
@@ -207,7 +202,7 @@ abstract class AbstractProcessHmcMessageServiceTest {
         givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         // when
-        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
+        callProcessEventMessage(processHmcMessageService, hmcMessage);
 
         // then
         assertThat(sscsCaseDetails.getData().getDwpState()).isNull();
@@ -227,7 +222,7 @@ abstract class AbstractProcessHmcMessageServiceTest {
         given(processHmcMessageHelper.stateNotHandled(any(), any())).willReturn(true);
 
         // when
-        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
+        callProcessEventMessage(processHmcMessageService, hmcMessage);
 
         // then
         verify(ccdCaseService, never()).updateCaseData(any(),any(),any(),any());
@@ -250,7 +245,7 @@ abstract class AbstractProcessHmcMessageServiceTest {
         given(processHmcMessageHelper.stateNotHandled(LISTED, hearingGetResponse)).willReturn(true);
 
         // when
-        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
+        callProcessEventMessage(processHmcMessageService, hmcMessage);
 
         // then
         verify(ccdCaseService, never()).updateCaseData(any(),any(),any(),any());
@@ -276,7 +271,7 @@ abstract class AbstractProcessHmcMessageServiceTest {
         givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         // when
-        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
+        callProcessEventMessage(processHmcMessageService, hmcMessage);
 
         // then
         verifyUpdateCaseDataCalledCorrectlyForHmcStatus(ccdCaseService, updateCcdCaseService, caseData, status, hearingGetResponse);
@@ -300,7 +295,7 @@ abstract class AbstractProcessHmcMessageServiceTest {
         givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         // when
-        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
+        callProcessEventMessage(processHmcMessageService, hmcMessage);
 
         // then
         verifyUpdateCaseDataCalledCorrectlyForHmcStatus(ccdCaseService, updateCcdCaseService, caseData, CANCELLED, hearingGetResponse);
@@ -324,7 +319,7 @@ abstract class AbstractProcessHmcMessageServiceTest {
         givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         // when
-        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
+        callProcessEventMessage(processHmcMessageService, hmcMessage);
 
         // then
         verifyUpdateCaseDataCalledCorrectlyForHmcStatus(ccdCaseService, updateCcdCaseService, caseData, CANCELLED, hearingGetResponse);
@@ -344,7 +339,7 @@ abstract class AbstractProcessHmcMessageServiceTest {
         givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         // when
-        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
+        callProcessEventMessage(processHmcMessageService, hmcMessage);
 
         // then
         verifyUpdateCaseDataCalledCorrectlyForHmcStatus(ccdCaseService, updateCcdCaseService, caseData, CANCELLED, hearingGetResponse);
@@ -364,7 +359,7 @@ abstract class AbstractProcessHmcMessageServiceTest {
         givenWillReturn(ccdCaseService, updateCcdCaseService, CASE_ID, sscsCaseDetails, idamService);
 
         // when
-        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
+        callProcessEventMessage(processHmcMessageService, hmcMessage);
 
         // then
         verifyUpdateCaseDataCalledCorrectlyForHmcStatus(ccdCaseService, updateCcdCaseService, caseData, EXCEPTION, hearingGetResponse);
@@ -383,7 +378,7 @@ abstract class AbstractProcessHmcMessageServiceTest {
         given(processHmcMessageHelper.stateNotHandled(HEARING_REQUESTED, hearingGetResponse)).willReturn(true);
 
         // when
-        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
+        callProcessEventMessage(processHmcMessageService, hmcMessage);
 
         // then
         verify(ccdCaseService, never()).updateCaseData(any(),any(),any(),any());
@@ -407,7 +402,7 @@ abstract class AbstractProcessHmcMessageServiceTest {
         given(processHmcMessageHelper.stateNotHandled(value, hearingGetResponse)).willReturn(true);
 
         // when
-        callProcessEventMessage(processHmcMessageService, processHmcMessageServiceV2, hmcMessage);
+        callProcessEventMessage(processHmcMessageService, hmcMessage);
 
         // then
         verify(ccdCaseService, never()).updateCaseData(any(),any(),any(),any());

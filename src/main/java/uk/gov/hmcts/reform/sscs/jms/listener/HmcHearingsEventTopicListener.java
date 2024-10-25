@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.sscs.exception.HmcEventProcessingException;
 import uk.gov.hmcts.reform.sscs.exception.MessageProcessingException;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HmcMessage;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageService;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceV2;
+import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceFactory;
 
 @Slf4j
 @Component
@@ -30,8 +30,6 @@ public class HmcHearingsEventTopicListener {
     private final String sscsServiceCode;
 
     private final ProcessHmcMessageService processHmcMessageService;
-
-    private final ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
 
     @Value("${hmc.deployment-id}")
     private String hmctsDeploymentId;
@@ -46,11 +44,9 @@ public class HmcHearingsEventTopicListener {
     private static final String HMCTS_DEPLOYMENT_ID = "hmctsDeploymentId";
 
     public HmcHearingsEventTopicListener(@Value("${sscs.serviceCode}") String sscsServiceCode,
-                                         ProcessHmcMessageService processHmcMessageService,
-                                         ProcessHmcMessageServiceV2 processHmcMessageServiceV2) {
+                                         ProcessHmcMessageServiceFactory processHmcMessageServiceFactory) {
         this.sscsServiceCode = sscsServiceCode;
-        this.processHmcMessageService = processHmcMessageService;
-        this.processHmcMessageServiceV2 = processHmcMessageServiceV2;
+        this.processHmcMessageService = processHmcMessageServiceFactory.getProcessHmcMessageService(processEventMessageV2Enabled);
         this.objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
     }
@@ -86,11 +82,8 @@ public class HmcHearingsEventTopicListener {
                     hearingId
                 );
 
-                if (processEventMessageV2Enabled) {
-                    processHmcMessageServiceV2.processEventMessageV2(hmcMessage);
-                } else {
-                    processHmcMessageService.processEventMessage(hmcMessage);
-                }
+                processHmcMessageService.processEventMessage(hmcMessage);
+
             }
         } catch (JsonProcessingException | CaseException | MessageProcessingException
                  | HearingUpdateException | ExhaustedRetryException ex) {
