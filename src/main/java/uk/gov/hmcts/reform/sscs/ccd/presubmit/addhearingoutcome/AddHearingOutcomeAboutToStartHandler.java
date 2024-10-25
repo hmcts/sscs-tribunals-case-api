@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addhearingoutcome;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -12,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOutcomeValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus;
@@ -43,13 +46,14 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-        HearingsGetResponse response = hmcHearingsApiService.getHearingsRequest(sscsCaseData.getCaseReference(), HmcStatus.COMPLETED);
+        HearingsGetResponse response = hmcHearingsApiService.getHearingsRequest(Long.toString(caseDetails.getId()), HmcStatus.COMPLETED);
         List<CaseHearing> hmcHearings = response.getCaseHearings();
         if (!hmcHearings.isEmpty()) {
             List<Hearing> selectedHearings = sscsCaseData.getHearings().stream()
                     .filter(hearing -> hmcHearings.stream()
                             .anyMatch(hmcHearing -> Objects
                                     .equals(hmcHearing.getHearingId().toString(), hearing.getValue().getHearingId()))).toList();
+            sscsCaseData.setHearingOutcomeValue(HearingOutcomeValue.builder().build());
             sscsCaseData.getHearingOutcomeValue().setCompletedHearings(setHearingOutcomeCompletedHearings(selectedHearings));
         } else {
             preSubmitCallbackResponse.addError("There are no completed hearings on the case");
@@ -60,7 +64,8 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
     private DynamicList setHearingOutcomeCompletedHearings(List<Hearing> hearings) {
         return new DynamicList(new DynamicListItem("", ""), hearings.stream()
                 .map(hearing -> {
-                    String hearingLabel = hearing.getValue().getStart().toString()
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm", Locale.ENGLISH);
+                    String hearingLabel = hearing.getValue().getStart().format(formatter)
                             + "-" + hearing.getValue().getEnd().toLocalTime()
                             + ", " + hearing.getValue().getVenue().getName();
                     return new DynamicListItem(hearing.getValue().getHearingId(), hearingLabel);
