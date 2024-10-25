@@ -50,7 +50,9 @@ public class CreateCaseMidEventHandlerTest {
         "CASE_UPDATED"
     })
     void canHandleTest(EventType eventType) {
-        SscsCaseData caseData = SscsCaseData.builder().build();
+        SscsCaseData caseData = SscsCaseData.builder()
+                .benefitCode(IBCA_BENEFIT_CODE)
+                .build();
 
         when(callback.getEvent()).thenReturn(eventType);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -153,18 +155,6 @@ public class CreateCaseMidEventHandlerTest {
                 .benefitCode(IBCA_BENEFIT_CODE)
                 .build();
 
-
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = midEventHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void shouldNotReturnErrorsOnMidEventForNonIbcaCase() {
-        SscsCaseData caseData = SscsCaseData.builder().benefitCode("091").build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);

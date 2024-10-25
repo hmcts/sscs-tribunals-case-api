@@ -80,7 +80,7 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
                     interpreterLanguages.getListItems().size(), caseId);
         }
         setupBenefitSelection(sscsCaseData);
-        setupUkPortOfEntries(sscsCaseData);
+        setupUkPortsOfEntry(sscsCaseData);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
@@ -96,7 +96,7 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
         }
     }
 
-    private void setupUkPortOfEntries(SscsCaseData sscsCaseData) {
+    private void setupUkPortsOfEntry(SscsCaseData sscsCaseData) {
         final DynamicList ukPortOfEntries = SscsUtil.getPortsOfEntry();
         String portOfEntryCode = sscsCaseData.getAppeal().getAppellant().getAddress().getPortOfEntry();
 
