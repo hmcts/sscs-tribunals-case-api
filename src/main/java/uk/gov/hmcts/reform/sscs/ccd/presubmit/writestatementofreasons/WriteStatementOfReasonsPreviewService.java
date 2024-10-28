@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writestatementofreasons;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.IN_CHAMBERS;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.JudicialRefDataService;
 import uk.gov.hmcts.reform.sscs.service.UserDetailsService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Component
@@ -56,14 +58,14 @@ public class WriteStatementOfReasonsPreviewService extends IssueNoticeHandler {
 
         NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
 
-        setHearings(builder, caseData);
-
+        String finalHeldBefore = buildHeldBefore(caseData, userAuthorisation, isPostHearingsEnabled);
+        setHearings(builder, caseData, finalHeldBefore);
         builder.dateIssued(LocalDate.now());
 
         return builder.build();
     }
 
-    protected void setHearings(NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder noticeBuilder, SscsCaseData caseData) {
+    protected void setHearings(NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder noticeBuilder, SscsCaseData caseData, String finalHeldBefore) {
         HearingDetails finalHearing = getLastValidHearing(caseData);
         if (nonNull(finalHearing)) {
             if (nonNull(finalHearing.getHearingDate())) {
@@ -87,7 +89,20 @@ public class WriteStatementOfReasonsPreviewService extends IssueNoticeHandler {
             }
         } else {
             setInChambers(noticeBuilder);
+            noticeBuilder.heldBefore(finalHeldBefore);
         }
+    }
+
+    protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation, boolean isPostHearingsEnabled) {
+        String judgeName = null;
+        String originalJudgeName = caseData.getSscsFinalDecisionCaseData().getFinalDecisionJudge();
+        if (SscsUtil.isCorrectionInProgress(caseData, isPostHearingsEnabled) && !isNull(originalJudgeName)) {
+            judgeName = originalJudgeName;
+        } else {
+            judgeName = buildSignedInJudgeName(userAuthorisation);
+        }
+
+        return SscsUtil.buildWriteFinalDecisionHeldBefore(caseData, judgeName);
     }
 
     private void setInChambers(NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder noticeBuilder) {
