@@ -63,13 +63,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName()) || isBenefitTypeSscs5(callback.getCaseDetails().getCaseData().getBenefitType())) {
             handleChildSupportAndSscs5Case(callback);
         } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.INFECTED_BLOOD_APPEAL.getShortName())) {
-            updateEventDetails(
-                    sscsCaseData,
-                    caseDetails.getId(),
-                    EventType.DWP_RESPOND,
-                    "Response received.",
-                    "IBC case must move to responseReceived."
-            );
+            handleIbcaCase(callback);
         } else {
             handleNonUc(callback);
         }
@@ -149,6 +143,24 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
                                 callback.getCaseDetails().getId());
                     });
         }
+    }
+
+    private void handleIbcaCase(Callback<SscsCaseData> callback) {
+        final long caseId = callback.getCaseDetails().getId();
+        updateEventDetails(
+                caseId,
+                EventType.DWP_RESPOND,
+                "Response received.",
+                "IBC case must move to responseReceived.",
+                sscsCaseDetails -> {
+                    SscsCaseData sscsCaseData = sscsCaseDetails.getData();
+                    sscsCaseData.setDwpState(RESPONSE_SUBMITTED_DWP); //TODO: check if we need this
+                    log.info("Updated case v2 with dwp respond event {} for id {}",
+                            EventType.DWP_RESPOND,
+                            caseId
+                    );
+                }
+        );
     }
 
     private void triggerDwpRespondEventForUc(Callback<SscsCaseData> callback, boolean dwpFurtherInfo, boolean disputedDecision, SscsCaseData caseData) {
