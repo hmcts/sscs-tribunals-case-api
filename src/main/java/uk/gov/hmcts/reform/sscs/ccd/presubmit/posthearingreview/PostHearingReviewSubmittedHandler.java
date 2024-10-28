@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingReviewType.SET_ASIDE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
@@ -56,7 +57,7 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
 
-        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        long caseId = Long.parseLong(caseData.getCcdCaseId());
 
         PostHearing postHearing = caseData.getPostHearing();
         PostHearingReviewType typeSelected = postHearing.getReviewType();
@@ -73,9 +74,13 @@ public class PostHearingReviewSubmittedHandler implements PreSubmitCallbackHandl
 
         boolean isSetAsideRefusedSor = isSetAsideRefusedSor(postHearing);
 
-        SscsUtil.clearPostHearingFields(caseData, isPostHearingsEnabled);
+        Consumer<SscsCaseData> sscsCaseDataConsumer = sscsCaseData -> SscsUtil.clearPostHearingFields(sscsCaseData, isPostHearingsEnabled);
 
-        caseData = ccdCallbackMapService.handleCcdCallbackMap(callbackMap, caseData);
+        caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
+                callbackMap,
+                caseId,
+                sscsCaseDataConsumer
+        );
 
         if (isSetAsideRefusedSor) {
             handleSetAsideRefusedSor(caseData);
