@@ -3,11 +3,7 @@ tags:
 
 java:
   image: ${IMAGE_NAME}
-  memoryLimits: "8Gi"
-  memoryRequests: "1Gi"
-  cpuRequests: "2"
   ingressHost: ${SERVICE_FQDN}
-  cpuLimits: 2000m
   readinessDelay: 45
   devmemoryRequests: 1Gi
   devmemoryLimits: 2Gi
@@ -130,10 +126,10 @@ ccd-case-document-am-api:
 xui-webapp:
   enabled: true
   nodejs:
-    devmemoryLimits: "1Gi"
-    devcpuLimits: 1
     devmemoryRequests: "512Mi"
-    devcpuRequests: "500m"
+    devmemoryLimits: "1Gi"
+    devcpuRequests: "200m"
+    devcpuLimits: "1000m"
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctspublic.azurecr.io/xui/webapp:latest
@@ -443,7 +439,7 @@ ccd:
       disableKeyVaults: true
       devmemoryRequests: '1024Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: '900m'
+      devcpuRequests: '500m'
       autoscaling:
         enabled: false
         minReplicas: 1
@@ -472,7 +468,7 @@ ccd:
       imagePullPolicy: Always
       devmemoryRequests: '1524Mi'
       devmemoryLimits: '2048Mi'
-      devcpuRequests: '900m'
+      devcpuRequests: '500m'
       environment:
         DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
         DATA_STORE_DB_USERNAME: hmcts
@@ -537,8 +533,6 @@ elastic:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
-    memoryLimits: "2Gi"
-    cpuLimits: 2000m
     image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
     registerAdditionalDns:
