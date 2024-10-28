@@ -53,13 +53,22 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        BenefitType benefitType = callback.getCaseDetails().getCaseData().getAppeal().getBenefitType();
-
+        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
+        final SscsCaseData sscsCaseData = caseDetails.getCaseData();
+        final BenefitType benefitType = sscsCaseData.getAppeal().getBenefitType();
 
         if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.UC.getShortName())) {
             handleUc(callback);
         } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName()) || isBenefitTypeSscs5(callback.getCaseDetails().getCaseData().getBenefitType())) {
             handleChildSupportAndSscs5Case(callback);
+        } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.INFECTED_BLOOD_APPEAL.getShortName())) {
+            updateEventDetails(
+                    sscsCaseData,
+                    caseDetails.getId(),
+                    EventType.DWP_RESPOND,
+                    "Response received.",
+                    "IBC case must move to responseReceived."
+            );
         } else {
             handleNonUc(callback);
         }
@@ -161,8 +170,6 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private void updateEventDetails(SscsCaseData caseData, Long caseId, EventType eventType, String summary, String description) {
-
-        //TODO: if case is an IBCA state or eventType as it is called here must always be: DWP_RESPOND
         log.info("updating to {} for case id: {}", eventType.getCcdType(), caseId);
 
         ccdService.updateCase(caseData, caseId,

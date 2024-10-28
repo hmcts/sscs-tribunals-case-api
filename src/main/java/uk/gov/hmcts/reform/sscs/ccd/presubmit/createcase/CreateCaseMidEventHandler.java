@@ -6,6 +6,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -89,18 +90,5 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
         }
 
         return validationErrors;
-    }
-
-    private boolean isIbcaCase(SscsCaseData caseData) {
-        final String selectedBenefitType = Optional.of(caseData)
-                .map(SscsCaseData::getAppeal)
-                .map(Appeal::getBenefitType)
-                .map(BenefitType::getDescriptionSelection)
-                .map(DynamicList::getValue)
-                .filter(ObjectUtils::isNotEmpty)
-                .map(DynamicListItem::getCode)
-                .orElse(null);
-
-        return IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode()) || IBCA_BENEFIT_CODE.equals(selectedBenefitType);
     }
 }

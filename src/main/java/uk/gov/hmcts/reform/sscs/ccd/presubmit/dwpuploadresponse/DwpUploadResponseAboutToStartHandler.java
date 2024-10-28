@@ -3,9 +3,14 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.INFECTED_BLOOD_COMPENSATION;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -44,11 +49,13 @@ public class DwpUploadResponseAboutToStartHandler extends ResponseEventsAboutToS
             updateDwpStateList(sscsCaseData);
         }
 
-        final String benefitCode = sscsCaseData.getBenefitCode();
-        final String issueCode = sscsCaseData.getIssueCode();
-        // TODO: IF IBCA case then assign value for 2 dropdowns so that previously selected value is already assigned in the dropdown:
-        //  benefit code ibca only
-        //  issue code ibca only
+        if (isIbcaCase(sscsCaseData)) {
+            final String benefitCode = sscsCaseData.getBenefitCode();
+            sscsCaseData.setBenefitCodeIbcaOnly(benefitCode);
+
+            final String issueCode = sscsCaseData.getIssueCode();
+            sscsCaseData.setIssueCodeIbcaOnly(issueCode);
+        }
 
         return preSubmitCallbackResponse;
     }

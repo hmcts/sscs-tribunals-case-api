@@ -11,11 +11,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReferralReason.REVIEW_
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.INFECTED_BLOOD_COMPENSATION;
 import static uk.gov.hmcts.reform.sscs.util.AudioVideoEvidenceUtil.setHasUnprocessedAudioVideoEvidenceFlag;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyUcb;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.isValidBenefitTypeForConfidentiality;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.sendNewOtherPartyNotification;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -30,6 +33,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AudioVideoEvidenceDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Benefit;
@@ -91,16 +95,18 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        //TODO: if ibca case then take value from ibca field and assign it to regular fields for:
-        //  benefit code
-        //  issue code
-        //TODO: update issueCode list if IBCA to only include:
-
-
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = checkErrors(sscsCaseData);
 
         if (isNotEmpty(preSubmitCallbackResponse.getErrors())) {
             return preSubmitCallbackResponse;
+        }
+
+        if (isIbcaCase(sscsCaseData)) {
+            final String benefitCode = sscsCaseData.getBenefitCodeIbcaOnly();
+            sscsCaseData.setBenefitCode(benefitCode);
+
+            final String issueCode = sscsCaseData.getIssueCodeIbcaOnly();
+            sscsCaseData.setIssueCode(issueCode);
         }
 
         updateDwpState(sscsCaseData);
