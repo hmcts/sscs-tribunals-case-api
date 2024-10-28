@@ -4,11 +4,11 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.*;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.truncateAddressLine;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.lines;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,28 +114,11 @@ public class PlaceholderService {
 
     private void buildRecipientAddressPlaceholders(Address address, Map<String, Object> placeholders) {
         String[] lines = lines(address);
+        List<String> addressConstants = List.of(RECIPIENT_ADDRESS_LINE_1_LITERAL, RECIPIENT_ADDRESS_LINE_2_LITERAL, RECIPIENT_ADDRESS_LINE_3_LITERAL,
+                RECIPIENT_ADDRESS_LINE_4_LITERAL, RECIPIENT_ADDRESS_LINE_5_LITERAL);
 
-        if (lines.length >= 1) {
-            placeholders.put(RECIPIENT_ADDRESS_LINE_1_LITERAL, truncateAddressLine(defaultToEmptyStringIfNull(lines[0])));
-        }
-        if (lines.length >= 2) {
-            placeholders.put(RECIPIENT_ADDRESS_LINE_2_LITERAL, truncateAddressLine(defaultToEmptyStringIfNull(lines[1])));
-        }
-        if (lines.length >= 3) {
-            placeholders.put(RECIPIENT_ADDRESS_LINE_3_LITERAL, truncateAddressLine(defaultToEmptyStringIfNull(lines[2])));
-        }
-        if (lines.length >= 4) {
-            placeholders.put(RECIPIENT_ADDRESS_LINE_4_LITERAL, truncateAddressLine(defaultToEmptyStringIfNull(lines[3])));
-        }
-        if (lines.length >= 5) {
-            placeholders.put(RECIPIENT_ADDRESS_LINE_5_LITERAL, truncateAddressLine(defaultToEmptyStringIfNull(lines[4])));
+        for (int i = 0; i < lines.length; i++) {
+            placeholders.put(addressConstants.get(i), truncateAddressLine(defaultToEmptyStringIfNull(lines[i])));
         }
     }
-
-    public static String[] lines(Address address) {
-        return Stream.of(address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode())
-            .filter(Objects::nonNull)
-            .toArray(String[]::new);
-    }
-
 }

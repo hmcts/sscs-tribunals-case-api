@@ -11,10 +11,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtil
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -321,5 +318,17 @@ public class LetterUtils {
             }
         }
         return false;
+    }
+
+    public static String[] lines(Address address) {
+        if (isYes(address.getInMainlandUk()) || address.getInMainlandUk() == null) {
+            return Stream.of(address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode())
+                    .filter(x -> x != null)
+                    .toArray(String[]::new);
+        } else {
+            return Stream.of(address.getLine1(), address.getLine2(), address.getTown(), address.getPostcode(), address.getCountry())
+                    .filter(x -> x != null)
+                    .toArray(String[]::new);
+        }
     }
 }

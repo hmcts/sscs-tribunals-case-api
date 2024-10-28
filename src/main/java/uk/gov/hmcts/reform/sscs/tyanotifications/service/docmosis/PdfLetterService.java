@@ -1,5 +1,10 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service.docmosis;
 
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_1;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_2;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_3;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_4;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_POSTCODE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.Personalisation.translateToWelshDate;
@@ -12,7 +17,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -114,6 +118,7 @@ public class PdfLetterService {
 
             Address addressToUse = getAddressToUseForLetter(wrapper, subscriptionWithType);
             buildRecipientAddressPlaceholders(addressToUse, placeholders);
+
             placeholders.put(docmosisTemplatesConfig.getHmctsImgKey(), docmosisTemplatesConfig.getHmctsImgVal());
             placeholders.put(docmosisTemplatesConfig.getHmctsWelshImgKey(), docmosisTemplatesConfig.getHmctsWelshImgVal());
 
@@ -129,28 +134,12 @@ public class PdfLetterService {
 
     private void buildRecipientAddressPlaceholders(Address address, Map<String, Object> placeholders) {
         String[] lines = lines(address);
+        List<String> addressConstants = List.of(LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
+                LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE);
 
-        if (lines.length >= 1) {
-            placeholders.put(LETTER_ADDRESS_LINE_1, truncateAddressLine(defaultToEmptyStringIfNull(lines[0])));
+        for (int i = 0; i < lines.length; i++) {
+            placeholders.put(addressConstants.get(i), truncateAddressLine(defaultToEmptyStringIfNull(lines[i])));
         }
-        if (lines.length >= 2) {
-            placeholders.put(LETTER_ADDRESS_LINE_2, truncateAddressLine(defaultToEmptyStringIfNull(lines[1])));
-        }
-        if (lines.length >= 3) {
-            placeholders.put(LETTER_ADDRESS_LINE_3, truncateAddressLine(defaultToEmptyStringIfNull(lines[2])));
-        }
-        if (lines.length >= 4) {
-            placeholders.put(LETTER_ADDRESS_LINE_4, truncateAddressLine(defaultToEmptyStringIfNull(lines[3])));
-        }
-        if (lines.length >= 5) {
-            placeholders.put(LETTER_ADDRESS_POSTCODE, truncateAddressLine(defaultToEmptyStringIfNull(lines[4])));
-        }
-    }
-
-    private static String[] lines(Address address) {
-        return Stream.of(address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode())
-            .filter(x -> x != null)
-            .toArray(String[]::new);
     }
 
     private static String defaultToEmptyStringIfNull(String value) {
@@ -162,4 +151,3 @@ public class PdfLetterService {
     }
 
 }
-

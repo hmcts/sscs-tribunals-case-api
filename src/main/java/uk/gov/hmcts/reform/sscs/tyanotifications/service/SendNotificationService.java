@@ -1,9 +1,13 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_1;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_2;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_3;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_4;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_POSTCODE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CORRECTION_GRANTED;
@@ -20,11 +24,13 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -228,13 +234,14 @@ public class SendNotificationService {
         if (addressToUse != null) {
             Map<String, Object> placeholders = notification.getPlaceholders();
             String fullNameNoTitle = getNameToUseForLetter(wrapper, subscriptionWithType);
+            placeholders.put(ADDRESS_NAME, fullNameNoTitle);
 
-            placeholders.put(ADDRESS_LINE_1, fullNameNoTitle);
-            placeholders.put(ADDRESS_LINE_2, addressToUse.getLine1());
-            placeholders.put(ADDRESS_LINE_3, isEmpty(addressToUse.getLine2()) ? " " : addressToUse.getLine2());
-            placeholders.put(ADDRESS_LINE_4, addressToUse.getTown() == null ? " " : addressToUse.getTown());
-            placeholders.put(ADDRESS_LINE_5, addressToUse.getCounty() == null ? " " : addressToUse.getCounty());
-            placeholders.put(POSTCODE_LITERAL, addressToUse.getPostcode());
+            String[] lines = lines(addressToUse);
+            List<String> addressConstants = List.of(LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
+                    LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE);
+            for (int i = 0; i < lines.length; i++) {
+                placeholders.put(addressConstants.get(i), defaultToEmptyStringIfNull(lines[i]));
+            }
 
             placeholders.put(NAME, fullNameNoTitle);
             if (SubscriptionType.REPRESENTATIVE.equals(subscriptionWithType.getSubscriptionType())) {
@@ -250,7 +257,6 @@ public class SendNotificationService {
             }
 
             log.info("In sendLetterNotificationToAddress method notificationSender is available {} ", notificationSender != null);
-
             notificationLog(notification, "GovNotify letter", addressToUse.getPostcode(), wrapper);
 
             notificationSender.sendLetter(
@@ -263,7 +269,7 @@ public class SendNotificationService {
             );
         }
     }
-
+    
     private static boolean isValidLetterAddress(Address addressToUse) {
         return null != addressToUse
             && isNotBlank(addressToUse.getLine1())
@@ -402,6 +408,10 @@ public class SendNotificationService {
             return sscsDocument.getValue().getDocumentLink().getDocumentUrl();
         }
         return null;
+    }
+
+    private static String defaultToEmptyStringIfNull(String value) {
+        return (value == null) ? StringUtils.EMPTY : value;
     }
 
 }

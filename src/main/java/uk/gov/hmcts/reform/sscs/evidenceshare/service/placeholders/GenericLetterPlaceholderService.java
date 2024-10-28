@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.*;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderService.lines;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.truncateAddressLine;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.lines;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;

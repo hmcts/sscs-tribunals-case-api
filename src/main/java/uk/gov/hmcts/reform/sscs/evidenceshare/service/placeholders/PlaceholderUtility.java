@@ -4,7 +4,7 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isNoneBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.*;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderService.lines;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.lines;
 
 import java.util.HashMap;
 import java.util.Map;
