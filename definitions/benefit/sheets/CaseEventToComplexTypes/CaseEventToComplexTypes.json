@@ -1515,6 +1515,26 @@
   },
   {
     "CaseEventID": "addHearing",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "benefitType",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "hearings=\"DoNotShow\"",
+    "LiveFrom": "01/01/2018",
+    "FieldDisplayOrder": 4,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addHearing",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "benefitType.code",
+    "FieldShowCondition": "hearings=\"DoNotShow\"",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "addHearing",
     "CaseFieldID": "hearings",
     "ListElementCode": "venue.address",
     "ID": "addHearingVenueAddress",
@@ -1589,7 +1609,7 @@
     "ListElementCode": "venue.address.country",
     "ID": "addHearingVenueAddressCountry",
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "code=\"DO_NOT_SHOW\"",
+    "FieldShowCondition": "appeal.benefitType.code=\"DO_NOT_SHOW\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 9,
     "PageID": "1.0"
@@ -1600,7 +1620,7 @@
     "ListElementCode": "venue.address.inMainlandUk",
     "ID": "addHearingVenueAddressLivingInTheUk",
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "code=\"DO_NOT_SHOW\"",
+    "FieldShowCondition": "appeal.benefitType.code=\"DO_NOT_SHOW\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 10,
     "PageID": "1.0"
