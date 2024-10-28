@@ -60,6 +60,7 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
         assertEquals(expectedNumEmailNotifications, getNumberOfNotificationsForGivenEmailOrSmsTemplateId(notifications, emailId));
         assertEquals(expectedNumSmsNotifications, getNumberOfNotificationsForGivenEmailOrSmsTemplateId(notifications, smsId));
         assertTrue(fetchLetters(expectedNumLetters, subscription));
+        delayInSeconds(10);
     }
 
     private boolean fetchLetters(int expectedNumLetters, String subscription) {
