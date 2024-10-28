@@ -67,19 +67,6 @@ java:
     TEST_RECIPIENTS_POSTCODE: "*"
     INFECTED_BLOOD_APPEAL_ENABLED: true
     SUBMIT_APPEAL_SERVICE_V2_ENABLED: true
-    HMC_HEARINGS_LISTENING_ENABLED: true
-    TRIBUNALS_HEARINGS_LISTENING_ENABLED: true
-    #Messaging
-    HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
-    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-3882"
-    TRIBUNALS_EVENT_QUEUE_NAME: "${SERVICE_NAME}-servicebus-tribunals-to-hearing-api"
-    TRIBUNALS_EVENT_QUEUE_POLICY_NAME: "RootManageSharedAccessKey"
-    TRIBUNALS_EVENT_QUEUE_NAMESPACE: "sscs-sb-preview"
-    HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
-    HMC_DEPLOYMENT_ID: "deployment-${SERVICE_NAME}"
-    HMC_DEPLOYMENT_FILTER_ENABLED: true
-    HEARINGS_CASE_UPDATE_V2_ENABLED: true
-    ADJOURNMENT_ENABLED: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
       secretRef: postgres
