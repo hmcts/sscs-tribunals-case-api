@@ -626,10 +626,10 @@ public class NotificationConfigTestIt extends AbstractNotificationConfigTest {
             new Object[]{REQUEST_FOR_INFORMATION, true, JOINT_PARTY, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00589.docx"},
             new Object[]{REQUEST_FOR_INFORMATION, true, REPRESENTATIVE, PAPER, LIST_ASSIST, null, null, Collections.emptyList(), null, "TB-SCS-GNO-WEL-00589.docx"},
 
-            new Object[]{RESEND_APPEAL_CREATED, false, APPELLANT, ORAL, LIST_ASSIST, null, "01293b93-b23e-40a3-ad78-2c6cd01cd21c", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"},
-            new Object[]{RESEND_APPEAL_CREATED, false, APPELLANT, PAPER, LIST_ASSIST, null, "01293b93-b23e-40a3-ad78-2c6cd01cd21c", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"},
-            new Object[]{RESEND_APPEAL_CREATED, false, APPOINTEE, ORAL, LIST_ASSIST, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"},
-            new Object[]{RESEND_APPEAL_CREATED, false, APPOINTEE, PAPER, LIST_ASSIST, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx"},
+            new Object[]{RESEND_APPEAL_CREATED, false, APPELLANT, ORAL, LIST_ASSIST, null, "01293b93-b23e-40a3-ad78-2c6cd01cd21c", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant-IB.docx"},
+            new Object[]{RESEND_APPEAL_CREATED, false, APPELLANT, PAPER, LIST_ASSIST, null, "01293b93-b23e-40a3-ad78-2c6cd01cd21c", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant-IB.docx"},
+            new Object[]{RESEND_APPEAL_CREATED, false, APPOINTEE, ORAL, LIST_ASSIST, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant-IB.docx"},
+            new Object[]{RESEND_APPEAL_CREATED, false, APPOINTEE, PAPER, LIST_ASSIST, null, "362d9a85-e0e4-412b-b874-020c0464e2b4", List.of("f41222ef-c05c-4682-9634-6b034a166368"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Appellant-IB.docx"},
             new Object[]{RESEND_APPEAL_CREATED, false, REPRESENTATIVE, ORAL, LIST_ASSIST, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"},
             new Object[]{RESEND_APPEAL_CREATED, false, REPRESENTATIVE, PAPER, LIST_ASSIST, null, "652753bf-59b4-46eb-9c24-bd762338a098", List.of("a6c09fad-6265-4c7c-8b95-36245ffa5352"), null, "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"},
 
