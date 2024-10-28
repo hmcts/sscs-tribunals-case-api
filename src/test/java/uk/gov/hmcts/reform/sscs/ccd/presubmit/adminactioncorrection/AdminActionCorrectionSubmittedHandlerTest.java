@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adminactioncorrection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,18 +13,25 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADMIN_ACTION_CORRECT
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType.CORRECTION;
 
+import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdminCorrectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
 import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.PostHearingRequestType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
 
@@ -43,6 +53,9 @@ class AdminActionCorrectionSubmittedHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     private SscsCaseData caseData;
+
+    @Captor
+    private ArgumentCaptor<Consumer<SscsCaseData>> consumerArgumentCaptor;
 
     @BeforeEach
     void setUp() {
@@ -116,5 +129,40 @@ class AdminActionCorrectionSubmittedHandlerTest {
                 .hasSize(1)
                 .containsOnly("Invalid Admin Correction Type Selected or correction "
                         + "selected as callback is null");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = AdminCorrectionType.class)
+    void givenAdminCorrectionTypes_shouldReturnCallCorrectCallback_WhenCcdCallbackMapV2IsEnabled(AdminCorrectionType value) {
+        caseData.getPostHearing().getCorrection().setAdminCorrectionType(value);
+        ReflectionTestUtils.setField(handler, "isHandleCcdCallbackMapV2Enabled", true);
+        caseData.getPostHearing().setRequestType(PostHearingRequestType.STATEMENT_OF_REASONS);
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        when(ccdCallbackMapService.handleCcdCallbackMapV2(eq(value), eq(CASE_ID), any()))
+                .thenReturn(SscsCaseData.builder().build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        verify(ccdCallbackMapService)
+                .handleCcdCallbackMapV2(eq(value), eq(CASE_ID), consumerArgumentCaptor.capture());
+
+        verify(ccdCallbackMapService, never())
+                .handleCcdCallbackMap(value, caseData);
+
+        consumerArgumentCaptor.getValue().accept(caseData);
+
+        assertThat(caseData.getPostHearing())
+                .isEqualTo(PostHearing.builder().build());
+        assertThat(caseData.getDocumentGeneration())
+                .isEqualTo(DocumentGeneration.builder().build());
+        assertThat(caseData.getDocumentStaging())
+                .isEqualTo(DocumentStaging.builder().build());
     }
 }
