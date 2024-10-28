@@ -91,6 +91,12 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
+        //TODO: if ibca case then take value from ibca field and assign it to regular fields for:
+        //  benefit code
+        //  issue code
+        //TODO: update issueCode list if IBCA to only include:
+
+
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = checkErrors(sscsCaseData);
 
         if (isNotEmpty(preSubmitCallbackResponse.getErrors())) {
