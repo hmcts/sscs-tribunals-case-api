@@ -52,7 +52,7 @@ public class TribunalsHearingsEventQueueListener {
         HearingState event = message.getHearingState();
 
         log.info("Attempting to process hearing event {} from hearings event queue for case ID {}",
-                 event, caseId);
+                event, caseId);
         try {
             hearingsService.processHearingRequest(message);
             log.info("Hearing event {} for case ID {} successfully processed", event, caseId);
@@ -69,10 +69,10 @@ public class TribunalsHearingsEventQueueListener {
 
             SscsCaseData caseData = ccdCaseService.getCaseDetails(caseId).getData();
             ccdCaseService.updateCaseData(
-                caseData,
-                LISTING_ERROR,
-                listingException.getSummary(),
-                listingException.getDescription());
+                    caseData,
+                    LISTING_ERROR,
+                    listingException.getSummary(),
+                    listingException.getDescription());
 
             log.info("Listing Error handled. State is now {}.", State.LISTING_ERROR);
         } else if (throwable instanceof Exception exception) {

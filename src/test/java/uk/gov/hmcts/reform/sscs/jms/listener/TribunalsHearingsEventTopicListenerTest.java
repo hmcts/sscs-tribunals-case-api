@@ -61,7 +61,6 @@ class TribunalsHearingsEventTopicListenerTest {
     @DisplayName("When an invalid request comes in make sure exception is thrown")
     @MethodSource("throwableParameters")
     void whenAnInvalidRequestComesIn_makeSureExceptionIsThrown(Class<? extends Throwable> throwable) throws Exception {
-
         ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "isByPassHearingServiceEnabled", true);
         HearingRequest hearingRequest = new HearingRequest();
 

@@ -88,18 +88,18 @@ public class HearingsService {
     }
 
     public void processHearingWrapper(HearingWrapper wrapper)
-        throws UnhandleableHearingStateException, UpdateCaseException, ListingException {
+            throws UnhandleableHearingStateException, UpdateCaseException, ListingException {
 
         String caseId = wrapper.getCaseData().getCcdCaseId();
         log.info("Processing Hearing Wrapper for Case ID {}, Case State {} and Hearing State {}",
-                 caseId,
-                 wrapper.getCaseState().toString(),
-                 wrapper.getHearingState().getState());
+                caseId,
+                wrapper.getCaseState().toString(),
+                wrapper.getHearingState().getState());
 
         if (caseStatusInvalid(wrapper)) {
             log.info("Case is in an invalid state for a hearing request. No requests sent to the HMC. Case ID {} and Case State {}",
-                     caseId,
-                     wrapper.getCaseState().toString());
+                    caseId,
+                    wrapper.getCaseState().toString());
             return;
         }
 
@@ -112,13 +112,13 @@ public class HearingsService {
             case CREATE_HEARING -> createHearing(wrapper);
             case UPDATE_HEARING -> updateHearing(wrapper);
             case UPDATED_CASE -> log.info(
-                "Updated case API not supported. Case ID {}",
-                caseId
+                    "Updated case API not supported. Case ID {}",
+                    caseId
             );
             case CANCEL_HEARING -> cancelHearing(wrapper);
             case PARTY_NOTIFIED -> log.info(
-                "Parties notified API not supported. Case ID {}",
-                caseId
+                    "Parties notified API not supported. Case ID {}",
+                    caseId
             );
             default -> {
                 UnhandleableHearingStateException err = new UnhandleableHearingStateException(wrapper.getHearingState());
@@ -148,22 +148,22 @@ public class HearingsService {
             hmcUpdateResponse = hmcHearingApiService.sendCreateHearingRequest(hearingPayload);
 
             log.debug("Received Create Hearing Request Response for Case ID {}, Hearing State {} and Response:\n{}",
-                caseId,
-                wrapper.getHearingState().getState(),
-                hmcUpdateResponse.toString());
+                    caseId,
+                    wrapper.getHearingState().getState(),
+                    hmcUpdateResponse.toString());
         } else {
             hmcUpdateResponse = HmcUpdateResponse.builder()
-                .hearingRequestId(hearing.getHearingId())
-                .versionNumber(getHearingVersionNumber(hearing))
-                .status(hearing.getHmcStatus())
-                .build();
+                    .hearingRequestId(hearing.getHearingId())
+                    .versionNumber(getHearingVersionNumber(hearing))
+                    .status(hearing.getHmcStatus())
+                    .build();
 
             log.debug("Existing hearing found, skipping Create Hearing Request for Case ID {}, Hearing State {}, Hearing version {} and "
-                    + "Hearing Id {}",
-                caseId,
-                hearing.getHmcStatus(),
-                hearing.getRequestVersion(),
-                hearing.getHearingId());
+                            + "Hearing Id {}",
+                    caseId,
+                    hearing.getHmcStatus(),
+                    hearing.getRequestVersion(),
+                    hearing.getHearingId());
         }
 
         hearingResponseUpdate(wrapper, hmcUpdateResponse);
@@ -185,10 +185,10 @@ public class HearingsService {
             OverridesMapping.setOverrideValues(wrapper.getCaseData(), refData);
         }
         Integer duration = wrapper
-            .getCaseData()
-            .getSchedulingAndListingFields()
-            .getOverrideFields()
-            .getDuration();
+                .getCaseData()
+                .getSchedulingAndListingFields()
+                .getOverrideFields()
+                .getDuration();
         boolean isMultipleOfFive = duration % 5 == 0;
         if (!isMultipleOfFive) {
             throw new ListingException("Listing duration must be multiple of 5.0 minutes");
@@ -225,9 +225,9 @@ public class HearingsService {
         String caseId = caseData.getCcdCaseId();
 
         log.info("Updating Case with Hearing Response for Case ID {}, Hearing ID {} and Hearing State {}",
-            caseId,
-            hearingRequestId,
-            wrapper.getHearingState().getState());
+                caseId,
+                hearingRequestId,
+                wrapper.getHearingState().getState());
 
         HearingEvent event = HearingsServiceHelper.getHearingEvent(wrapper.getHearingState());
         log.info("Updating case with event {} description is {}", event, event.getDescription());
@@ -241,47 +241,47 @@ public class HearingsService {
 
             if (nonNull(details)) {
                 log.info("Case update details CCD state {}  event id: {} event token: {} callbackresponsestatus: {} caseid {}",
-                         details.getState(),
-                         details.getEventId(),
-                         details.getEventToken(),
-                         details.getCallbackResponseStatus(),
-                         details.getCaseTypeId()
+                        details.getState(),
+                        details.getEventId(),
+                        details.getEventToken(),
+                        details.getCallbackResponseStatus(),
+                        details.getCaseTypeId()
                 );
             }
         }
 
         log.info("Case Updated with Hearing Response for Case ID {}, Hearing ID {}, Hearing State {} and CCD Event {}",
-            caseId,
-            hearingRequestId,
-            wrapper.getHearingState().getState(),
-            event.getEventType().getCcdType());
+                caseId,
+                hearingRequestId,
+                wrapper.getHearingState().getState(),
+                event.getEventType().getCcdType());
     }
 
     private void updateCaseWithHearingResponseV2(HearingWrapper wrapper, HmcUpdateResponse response, Long hearingRequestId, HearingEvent event, String caseId) throws UpdateCaseException, ListingException {
         log.info("Updating case with hearing response using updateCaseDataV2 for event {} description {}",
-                 event, event.getDescription());
+                event, event.getDescription());
 
         try {
             Consumer<SscsCaseDetails> caseDataConsumer = hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(response, hearingRequestId);
 
             updateCcdCaseService.updateCaseV2(
-                Long.parseLong(caseId),
-                event.getEventType().getCcdType(),
-                event.getSummary(),
-                event.getDescription(),
-                idamService.getIdamTokens(),
-                caseDataConsumer
+                    Long.parseLong(caseId),
+                    event.getEventType().getCcdType(),
+                    event.getSummary(),
+                    event.getDescription(),
+                    idamService.getIdamTokens(),
+                    caseDataConsumer
             );
             log.info("Case Updated using updateCaseDataV2 with Hearing Response for Case ID {}, Hearing ID {}, Hearing State {} and CCD Event {}",
-                     caseId,
-                     hearingRequestId,
-                     wrapper.getHearingState().getState(),
-                     event.getEventType().getCcdType());
+                    caseId,
+                    hearingRequestId,
+                    wrapper.getHearingState().getState(),
+                    event.getEventType().getCcdType());
 
         } catch (FeignException e) {
             UpdateCaseException exc = new UpdateCaseException(
-                String.format("The case with Case id: %s could not be updated using updateCaseV2 with status %s, %s",
-                              caseId, e.status(), e));
+                    String.format("The case with Case id: %s could not be updated using updateCaseV2 with status %s, %s",
+                            caseId, e.status(), e));
             log.error(exc.getMessage(), exc);
             throw exc;
         }
@@ -291,11 +291,11 @@ public class HearingsService {
     @Recover
     public void hearingResponseUpdateRecover(UpdateCaseException exception, HearingWrapper wrapper, HmcUpdateResponse response) {
         log.info("Updating Case with Hearing Response has failed {} times, rethrowing exception, for Case ID {}, Hearing ID {} and Hearing State {} with the exception: {}",
-            hearingResponseUpdateMaxRetries,
-            wrapper.getCaseData().getCcdCaseId(),
-            response.getHearingRequestId(),
-            wrapper.getHearingState().getState(),
-            exception.toString());
+                hearingResponseUpdateMaxRetries,
+                wrapper.getCaseData().getCcdCaseId(),
+                response.getHearingRequestId(),
+                wrapper.getHearingState().getState(),
+                exception.toString());
 
         throw new ExhaustedRetryException("Cancellation request Response received, rethrowing exception", exception);
     }
