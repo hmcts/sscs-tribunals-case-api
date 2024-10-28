@@ -234,7 +234,7 @@
     "ListElementCode": "ibcaReference",
     "ID": "jointPartyIdentityIbcaReference",
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\"",
+    "FieldShowCondition": "appeal.benefitType.code=\"PIP\"",
     "LiveFrom": "19/11/2019",
     "FieldDisplayOrder": 3,
     "PageID": "jointPartyIdentity"
@@ -1508,7 +1508,7 @@
     "CaseFieldID": "hearings",
     "ListElementCode": "venue",
     "ID": "addHearingVenue",
-    "DisplayContext": "MANDATORY",
+    "DisplayContext": "COMPLEX",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 1,
     "PageID": "1.0"
@@ -1609,7 +1609,6 @@
     "ListElementCode": "venue.address.country",
     "ID": "addHearingVenueAddressCountry",
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "appeal.benefitType.code=\"DO_NOT_SHOW\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 9,
     "PageID": "1.0"
@@ -1619,8 +1618,8 @@
     "CaseFieldID": "hearings",
     "ListElementCode": "venue.address.inMainlandUk",
     "ID": "addHearingVenueAddressLivingInTheUk",
-    "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "appeal.benefitType.code=\"DO_NOT_SHOW\"",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 10,
     "PageID": "1.0"
@@ -1630,8 +1629,8 @@
     "CaseFieldID": "hearings",
     "ListElementCode": "venue.address.portOfEntry",
     "ID": "addHearingVenueAddressPortOfEntryCode",
-    "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\"",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\" AND hearings.venue.address.inMainlandUk=\"No\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 11,
     "PageID": "1.0"
@@ -1641,8 +1640,8 @@
     "CaseFieldID": "hearings",
     "ListElementCode": "venue.address.ukPortOfEntryList",
     "ID": "addHearingVenueAddressUkPortOfEntryList",
-    "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\"",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\" AND hearings.venue.address.inMainlandUk=\"No\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 12,
     "PageID": "1.0"
