@@ -55,12 +55,12 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
         simulateCcdCallback(ADMIN_APPEAL_WITHDRAWN, "tyanotifications/handlers/" + ADMIN_APPEAL_WITHDRAWN.getId() + subscription
             + "Callback.json");
 
+        delayInSeconds(5);
         List<Notification> notifications = tryFetchNotificationsForTestCase(emailId, smsId);
 
         assertEquals(expectedNumEmailNotifications, getNumberOfNotificationsForGivenEmailOrSmsTemplateId(notifications, emailId));
         assertEquals(expectedNumSmsNotifications, getNumberOfNotificationsForGivenEmailOrSmsTemplateId(notifications, smsId));
         assertTrue(fetchLetters(expectedNumLetters, subscription));
-        delayInSeconds(10);
     }
 
     private boolean fetchLetters(int expectedNumLetters, String subscription) {
