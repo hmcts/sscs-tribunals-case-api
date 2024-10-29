@@ -59,6 +59,19 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
           alias: ld.sdk-key
         - name: sscs-sendgrid-api-key
           alias: send-grid.apiKey
+        - name: notification-key
+          alias: NOTIFICATION_API_KEY
+        - name: notification-test-key
+          alias: NOTIFICATION_API_TEST_KEY
+        - name: tribunals-api-POSTGRES-PASS
+          alias: JOB_SCHEDULER_DB_PASSWORD
+        - name: sscs-email-mac-secret-text
+          alias: EMAIL_MAC_SECRET_TEXT
+        #         hearings=api
+        - name: hmc-servicebus-shared-access-key-tf
+          alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
+        - name: sscs-servicebus-shared-access-key
+          alias: TRIBUNALS_EVENT_QUEUE_ACCESS_KEY
 
   environment:
     SERVER_PORT: 8080
@@ -71,9 +84,9 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     CREATE_CCD_ENDPOINT: false
     MAX_FILE_SIZE: "10MB"
     MAX_REQUEST_SIZE: "10MB"
-    PDF_SERVICE_CONVERT_URL: https://docmosis.aat.platform.hmcts.net/rs/convert
-    PDF_SERVICE_HEALTH_URL: https://docmosis.aat.platform.hmcts.net/rs/status
-    DOCMOSIS_SERVICE_BASE_URL: https://docmosis.aat.platform.hmcts.net/rs/render
+    PDF_SERVICE_CONVERT_URL: https://docmosis.{{ .Values.global.environment }}.platform.hmcts.net/rs/convert
+    PDF_SERVICE_HEALTH_URL: https://docmosis.{{ .Values.global.environment }}.platform.hmcts.net/rs/status
+    DOCMOSIS_SERVICE_BASE_URL: https://docmosis.{{ .Values.global.environment }}.platform.hmcts.net/rs/render
     DOC_ASSEMBLY_URL: "http://dg-docassembly-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_OAUTH2_REDIRECT_URL: "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
     PDF_API_URL: "http://rpe-pdf-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
@@ -108,7 +121,7 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     AMQP_HOST: "sscs-servicebus-{{ .Values.global.environment }}.servicebus.windows.net"
     AMQP_USERNAME: "SendAndListenSharedAccessKey"
     MAX_RETRY_ATTEMPTS: 3
-    PDF_SERVICE_BASE_URL: https://docmosis.aat.platform.hmcts.net/rs/render
+    PDF_SERVICE_BASE_URL: https://docmosis.{{ .Values.global.environment }}.platform.hmcts.net/rs/render
     ROBOTICS_EMAIL_MESSAGE: "Please find attached the robotics json file \nPlease do not respond to this email"
     EMAIL_SERVER_HOST: "mta.reform.hmcts.net"
     EMAIL_SERVER_PORT: "25"
@@ -116,7 +129,36 @@ java: &javavalues #This is an anchor to reuse settings in Job mode.
     EMAIL_SMTP_SSL_TRUST: "*"
     HEARING_RECORDING_REQUEST_CASE_UPDATE_V2_ENABLED: false
     TRIGGER_EVENT_V2_ENABLED: false
+    SUBMIT_APPEAL_SERVICE_V2_ENABLED: false
     HANDLE_CCD_CALLBACKMAP_V2: false
+    CALLBACK_MAX_RETRY_ATTEMPTS: 3
+    SSCS_TRACK_YOUR_APPEAL_LINK: https://track-appeal.nonprod.platform.hmcts.net/trackyourappeal/appeal_id
+    JOB_SCHEDULER_DB_USERNAME: pgadmin
+    JOB_SCHEDULER_DB_NAME: notification
+    JOB_SCHEDULER_DB_HOST: sscs-tya-notif-postgres-v15-db-{{ .Values.global.environment }}.postgres.database.azure.com
+    RUN_DB_MIGRATION_ON_STARTUP: false
+    POST_HEARINGS_FEATURE: true
+    POST_HEARINGS_B_FEATURE: true
+
+    #    hearings=api
+    IDAM_S2S_URL: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    CASEWORKER_REF_API_URL: "http://rd-caseworker-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    COMMON_REF_API_URL: "http://rd-commondata-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-{{ .Values.global.environment }}"
+    HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-{{ .Values.global.environment }}"
+    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-{{ .Values.global.environment }}"
+    HMC_HEARINGS_LISTENING_ENABLED: false
+    HMC_HEARINGS_TOPIC_POLICY_NAME: SendAndListenSharedAccessKey
+    TRIBUNALS_EVENT_QUEUE_NAMESPACE: "sscs-servicebus-{{ .Values.global.environment }}"
+    TRIBUNALS_EVENT_QUEUE_NAME: "tribunals-to-hearing-api-{{ .Values.global.environment }}"
+    TRIBUNALS_HEARINGS_LISTENING_ENABLED: false
+    TRIBUNALS_EVENT_QUEUE_POLICY_NAME: SendAndListenSharedAccessKey
+    EXUI_API_URL: "https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net"
+    HMC_API_URL: "http://hmc-cft-hearing-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
+    SSCS_SERVICE_CODE: BBA3
+    HMC_DEPLOYMENT_FILTER_ENABLED: false
+    HEARINGS_CASE_UPDATE_V2_ENABLED: true
+    BYPASS_HEARING_API_SERVICE: true
 
 postgresql:
   enabled: false
@@ -126,8 +168,6 @@ xui-webapp:
   enabled: false
 elastic:
   enabled: false
-sscs-tya-notif:
-  enabled: false
 sscs-tribunals-frontend:
   enabled: false
 redis:
@@ -135,8 +175,6 @@ redis:
 ccd:
   enabled: false
 em-ccdorc:
-  enabled: false
-sscs-hearings-api:
   enabled: false
 servicebus:
   enabled: false
