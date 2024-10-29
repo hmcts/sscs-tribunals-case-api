@@ -256,7 +256,7 @@ public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
                 "paper",
                 Collections.emptyList(),
                 Collections.emptyList(),
-                Arrays.asList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx", "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"),
+                Arrays.asList("TB-SCS-LET-ENG-Appeal-Lodged-Appellant-IB.docx", "TB-SCS-LET-ENG-Appeal-Lodged-Representative.docx"),
                 "no",
                 "no",
                 "no",
