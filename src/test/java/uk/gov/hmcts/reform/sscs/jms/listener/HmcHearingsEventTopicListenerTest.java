@@ -11,7 +11,6 @@ import static uk.gov.hmcts.reform.sscs.model.hmc.reference.HmcStatus.ADJOURNED;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import java.nio.charset.StandardCharsets;
 import javax.jms.JMSException;
 import org.apache.qpid.jms.message.JmsBytesMessage;
@@ -28,9 +27,7 @@ import uk.gov.hmcts.reform.sscs.exception.MessageProcessingException;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HearingUpdate;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HmcMessage;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageService;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceFactory;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceV1;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceV2;
 
 @ExtendWith(MockitoExtension.class)
 class HmcHearingsEventTopicListenerTest {
@@ -39,15 +36,10 @@ class HmcHearingsEventTopicListenerTest {
 
     private HmcHearingsEventTopicListener hmcHearingsEventTopicListener;
 
-    private ProcessHmcMessageServiceFactory processHmcMessageServiceFactory;
-
     private ProcessHmcMessageService processHmcMessageService;
 
     @Mock
     private ProcessHmcMessageServiceV1 processHmcMessageServiceV1;
-
-    @Mock
-    private ProcessHmcMessageServiceV2 processHmcMessageServiceV2;
 
     @Mock
     private JmsBytesMessage bytesMessage;
@@ -59,8 +51,8 @@ class HmcHearingsEventTopicListenerTest {
 
     @BeforeEach
     void setup() throws JMSException {
-        processHmcMessageServiceFactory = new ProcessHmcMessageServiceFactory(Lists.newArrayList(processHmcMessageServiceV1, processHmcMessageServiceV2));
-        hmcHearingsEventTopicListener = new HmcHearingsEventTopicListener(SERVICE_CODE, processHmcMessageServiceFactory);
+        processHmcMessageService = processHmcMessageServiceV1;
+        hmcHearingsEventTopicListener = new HmcHearingsEventTopicListener(SERVICE_CODE, processHmcMessageService);
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "objectMapper", mockObjectMapper);
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "sscsServiceCode", SERVICE_CODE);
         ReflectionTestUtils.setField(hmcHearingsEventTopicListener, "isByPassHearingServiceEnabled", true);

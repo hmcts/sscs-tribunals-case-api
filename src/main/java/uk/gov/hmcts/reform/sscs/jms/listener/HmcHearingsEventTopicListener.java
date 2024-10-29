@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.sscs.exception.HmcEventProcessingException;
 import uk.gov.hmcts.reform.sscs.exception.MessageProcessingException;
 import uk.gov.hmcts.reform.sscs.model.hmc.message.HmcMessage;
 import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageService;
-import uk.gov.hmcts.reform.sscs.service.hmc.topic.ProcessHmcMessageServiceFactory;
 
 @Slf4j
 @Component
@@ -42,9 +41,9 @@ public class HmcHearingsEventTopicListener {
     private static final String HMCTS_DEPLOYMENT_ID = "hmctsDeploymentId";
 
     public HmcHearingsEventTopicListener(@Value("${sscs.serviceCode}") String sscsServiceCode,
-                                         ProcessHmcMessageServiceFactory processHmcMessageServiceFactory) {
+                                         ProcessHmcMessageService processHmcMessageService) {
         this.sscsServiceCode = sscsServiceCode;
-        this.processHmcMessageService = processHmcMessageServiceFactory.getProcessHmcMessageService();
+        this.processHmcMessageService = processHmcMessageService;
         this.objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
     }
