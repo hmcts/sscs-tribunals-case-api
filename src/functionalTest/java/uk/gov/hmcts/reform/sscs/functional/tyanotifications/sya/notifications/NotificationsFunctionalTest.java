@@ -150,6 +150,12 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Value("${notification.english.paper.dwpUploadResponse.appellant.smsId}")
     private String paperDwpUploadResponseSmsId;
 
+    @Value("${notification.english.appealReceived.appellant.emailId}")
+    private String appealReceivedAppellantEmailId;
+
+    @Value("${notification.english.appealReceived.representative.emailId}")
+    private String appealReceivedRepresentativeEmailId;
+
     public NotificationsFunctionalTest() {
         super(30);
     }
@@ -456,28 +462,32 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
-    public void shouldSaveReasonableAdjustmentNotificationForAppellant() throws IOException {
+    public void shouldSaveReasonableAdjustmentNotificationForAppellant() throws IOException, NotificationClientException {
         simulateCcdCallback(APPEAL_RECEIVED, BASE_PATH_TYAN + APPEAL_RECEIVED.getId() + "AppellantReasonableAdjustmentCallback.json");
 
-        delayInSeconds(30);
+        delayInSeconds(10);
+        List<Notification> notifications = tryFetchNotificationsForTestCase(appealReceivedAppellantEmailId);
 
         SscsCaseDetails caseDetails = findCaseById(caseId);
         SscsCaseData caseData = caseDetails.getData();
 
+        assertEquals(1, notifications.size());
         assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
         assertEquals(1, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
         assertEquals(ReasonableAdjustmentStatus.REQUIRED, caseData.getReasonableAdjustmentsLetters().getAppellant().get(0).getValue().getReasonableAdjustmentStatus());
     }
 
     @Test
-    public void shouldSaveReasonableAdjustmentNotificationForAppellantAndRep() throws IOException {
+    public void shouldSaveReasonableAdjustmentNotificationForAppellantAndRep() throws IOException, NotificationClientException {
         simulateCcdCallback(APPEAL_RECEIVED, BASE_PATH_TYAN + APPEAL_RECEIVED.getId() + "AppellantRepReasonableAdjustmentCallback.json");
 
-        delayInSeconds(30);
+        delayInSeconds(10);
+        List<Notification> notifications = tryFetchNotificationsForTestCase(appealReceivedAppellantEmailId, appealReceivedRepresentativeEmailId);
 
         SscsCaseDetails caseDetails = findCaseById(caseId);
         SscsCaseData caseData = caseDetails.getData();
 
+        assertEquals(2, notifications.size());
         assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
         assertEquals(1, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
         assertEquals(1, caseData.getReasonableAdjustmentsLetters().getRepresentative().size());
