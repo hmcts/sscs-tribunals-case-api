@@ -1325,6 +1325,34 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenValidIbcaCase_thenNoError() {
+        sscsCaseData = SscsCaseData.builder()
+                .ccdCaseId("1234")
+                .benefitCode("093")
+                .benefitCodeIbcaOnly("093")
+                .issueCode("SP")
+                .issueCodeIbcaOnly("RA")
+                .dwpFurtherInfo("Yes")
+                .dynamicDwpState(new DynamicList(""))
+                .dwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("a.pdf").documentFilename("a.pdf").build()).build())
+                .dwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentUrl("b.pdf").documentFilename("b.pdf").build()).build())
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("infectedBloodAppeal").build()).build())
+                .build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(response.getWarnings().size(), is(0));
+        assertThat(response.getData().getBenefitCode(), is("093"));
+        assertThat(response.getData().getIssueCode(), is("RA"));
+        assertNull(response.getData().getBenefitCodeIbcaOnly());
+        assertNull(response.getData().getIssueCodeIbcaOnly());
+
+    }
+
+    @Test
     @Parameters({"childSupport", "taxCredit", "guardiansAllowance", "taxFreeChildcare", "homeResponsibilitiesProtection",
         "childBenefit","thirtyHoursFreeChildcare","guaranteedMinimumPension","nationalInsuranceCredits"})
     public void givenChildSupportCaseAppellantWantsConfidentialNoEditedDocs_thenShowError(String shortName) {

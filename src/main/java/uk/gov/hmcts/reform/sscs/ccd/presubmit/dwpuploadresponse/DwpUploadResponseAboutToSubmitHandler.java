@@ -134,6 +134,10 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         }
         sscsCaseData.setDirectionDueDate(getUpdatedDirectionDueDate(sscsCaseData));
         updateBenefitType(sscsCaseData);
+
+        sscsCaseData.setBenefitCodeIbcaOnly(null);
+        sscsCaseData.setIssueCodeIbcaOnly(null);
+
         return preSubmitCallbackResponse;
     }
 

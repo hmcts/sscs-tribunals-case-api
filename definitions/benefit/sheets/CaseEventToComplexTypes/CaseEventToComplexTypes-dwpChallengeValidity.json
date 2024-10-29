@@ -1,0 +1,60 @@
+[
+  {
+    "CaseEventID": "dwpChallengeValidity",
+    "CaseFieldID": "dwpChallengeValidityDocument",
+    "ListElementCode": "dwpResponseDocumentTitle",
+    "ID": "dwpChallengeValidityDocumentDwpTitle",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.code!=\"infectedBloodAppeal\" AND appeal.benefitType.descriptionSelection!=\"015\" AND appeal.benefitType.descriptionSelection!=\"016\" AND appeal.benefitType.descriptionSelection!=\"030\" AND appeal.benefitType.descriptionSelection!=\"034\" AND appeal.benefitType.descriptionSelection!=\"050\" AND appeal.benefitType.descriptionSelection!=\"053\" AND appeal.benefitType.descriptionSelection!=\"054\" AND appeal.benefitType.descriptionSelection!=\"055\" AND appeal.benefitType.descriptionSelection!=\"057\" AND appeal.benefitType.descriptionSelection!=\"058\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseEventID": "dwpChallengeValidity",
+    "CaseFieldID": "dwpChallengeValidityDocument",
+    "ListElementCode": "hmrcResponseDocumentTitle",
+    "ID": "dwpChallengeValidityDocumentHmrcTitle",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.descriptionSelection=\"015\" OR appeal.benefitType.descriptionSelection=\"016\" OR appeal.benefitType.descriptionSelection=\"030\" OR appeal.benefitType.descriptionSelection=\"034\" OR appeal.benefitType.descriptionSelection=\"050\" OR appeal.benefitType.descriptionSelection=\"053\" OR appeal.benefitType.descriptionSelection=\"054\" OR appeal.benefitType.descriptionSelection=\"055\" OR appeal.benefitType.descriptionSelection=\"057\" OR appeal.benefitType.descriptionSelection=\"058\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseEventID": "dwpChallengeValidity",
+    "CaseFieldID": "dwpChallengeValidityDocument",
+    "ListElementCode": "ibcaResponseDocumentTitle",
+    "ID": "dwpChallengeValidityDocumentIbcaTitle",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseEventID": "dwpChallengeValidity",
+    "CaseFieldID": "dwpChallengeValidityDocument",
+    "ListElementCode": "documentFileName",
+    "ID": "dwpChallengeValidityDocumentDocumentFileName",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 2,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "dwpChallengeValidity",
+    "CaseFieldID": "dwpChallengeValidityDocument",
+    "ListElementCode": "documentLink",
+    "ID": "dwpChallengeValidityDocumentDocumentLink",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 3,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
+  }
+]
