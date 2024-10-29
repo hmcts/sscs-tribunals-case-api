@@ -795,6 +795,7 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "summaryRoleDescription", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "summaryDOB", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "summaryBenefitType", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "summaryAppealType", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "summaryCaseReference", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "summaryHearingType", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "summaryAreAppointee", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
@@ -1624,5 +1625,7 @@
   {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "CaseFieldID": "ignoreCallbackWarnings", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "CaseFieldID": "ignoreCallbackWarnings", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
   {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "CaseFieldID": "ignoreCallbackWarnings", "AccessProfile": "caseworker-sscs-registrar", "CRUD": "CRUD"},
-  {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "CaseFieldID": "ibcaReference", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CRUD": "CRUD"}
+  {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "CaseFieldID": "summaryIbcaReference", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "CaseFieldID": "summaryIbcaReference", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "07/08/2024", "CaseTypeID": "Benefit", "CaseFieldID": "summaryIbcaReference", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CRUD": "CRUD"}
 ]
