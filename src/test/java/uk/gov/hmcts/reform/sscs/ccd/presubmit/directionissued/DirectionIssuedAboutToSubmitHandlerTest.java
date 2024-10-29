@@ -535,6 +535,21 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenDirectionTypeOfIssueAndSendToAdmin_setInterlocReviewStateOnly() {
+        callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
+        callback.getCaseDetails().getCaseData().setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED);
+
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.ISSUE_AND_SEND_TO_ADMIN.toString()));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
+        assertTrue(response.getData().getInterlocReviewState().equals(AWAITING_ADMIN_ACTION));
+        assertNull(response.getData().getInterlocReferralReason());
+        assertEquals(DIRECTION_ACTION_REQUIRED, response.getData().getDwpState());
+    }
+
+    @Test
     @Parameters({"file.png", "file.jpg", "file.doc"})
     public void givenManuallyUploadedFileIsNotAPdf_thenAddAnErrorToResponse(String filename) {
         sscsCaseData.getDocumentStaging().setPreviewDocument(null);
