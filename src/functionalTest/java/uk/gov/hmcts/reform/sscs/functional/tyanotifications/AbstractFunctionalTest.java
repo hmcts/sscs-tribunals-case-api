@@ -215,6 +215,8 @@ public abstract class AbstractFunctionalTest {
                 delayInSeconds(5);
 
                 allNotifications = client.getNotifications("", "", caseReference, "").getNotifications();
+                String allNotifText = allNotifications.stream().map(notif -> notif.getId() + notif.getBody() + notif.getTemplateId()).collect(Collectors.joining(","));
+                log.info("allNotifications for case {}: {}", caseReference, allNotifText);
 
                 matchingNotifications =
                     allNotifications
