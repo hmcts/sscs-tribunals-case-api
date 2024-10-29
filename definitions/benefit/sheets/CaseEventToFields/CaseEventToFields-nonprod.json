@@ -20,7 +20,7 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 15,
     "PageID": "1.0",
-    "FieldShowCondition": "isAppellantDeceased =\"Yes\""
+    "FieldShowCondition": "appeal.benefitType.code=\"UC\""
   },
   {
     "LiveFrom": "05/07/2022",
@@ -31,6 +31,6 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 16,
     "PageID": "1.0",
-    "FieldShowCondition":"isAppellantDeceased =\"Yes\""
+    "FieldShowCondition":"appeal.benefitType.code=\"childSupport\""
   }
 ]
