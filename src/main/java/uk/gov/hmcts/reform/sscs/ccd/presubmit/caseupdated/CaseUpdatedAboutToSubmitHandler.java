@@ -299,7 +299,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private boolean isBenefitTypeValidForHearingTypeValidation(Optional<Benefit> benefitType) {
         return benefitType.filter(benefit ->
                 SscsType.SSCS2.equals(benefit.getSscsType())
-                        || SscsType.SSCS5.equals(benefit.getSscsType()))
+                        || SscsType.SSCS5.equals(benefit.getSscsType())
+                        || SscsType.SSCS8.equals(benefit.getSscsType()))
                 .isPresent();
     }
 
