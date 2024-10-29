@@ -2472,7 +2472,7 @@
     "DisplayOrder": 1800,
     "PreConditionState(s)": "incompleteApplication;incompleteApplicationInformationReqsted;interlocutoryReviewState",
     "PostConditionState": "validAppeal",
-    "CallBackURLAboutToSubmitEvent": "${CCD_DEF_BULK_SCAN_API_URL}/validate-record",
+    "CallBackURLAboutToSubmitEvent": "https://sscs-bulk-scan-pr-1517.preview.platform.hmcts.net/validate-record",
     "RetriesTimeoutURLAboutToSubmitEvent": "5,5",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "RetriesTimeoutURLSubmittedEvent": "5,5",
