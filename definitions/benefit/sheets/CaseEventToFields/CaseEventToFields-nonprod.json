@@ -10,27 +10,5 @@
     "PageID": "setHearingRoute",
     "PageLabel": "Set Hearing Route",
     "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "LiveFrom": "05/07/2022",
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "caseOutcome",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 15,
-    "PageID": "1.0",
-    "FieldShowCondition": "appeal.benefitType.code=\"UC\""
-  },
-  {
-    "LiveFrom": "05/07/2022",
-    "CaseEventID": "caseUpdated",
-    "CaseFieldID": "didPoAttend",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "OPTIONAL",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 16,
-    "PageID": "1.0",
-    "FieldShowCondition":"appeal.benefitType.code=\"childSupport\""
   }
 ]
