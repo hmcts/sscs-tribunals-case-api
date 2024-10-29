@@ -60,8 +60,6 @@ public class HmcHearingsEventTopicListener {
             return;
         }
 
-        log.info("Handling request by tribunal hearing api merge code");
-
         byte[] messageBytes = new byte[(int) message.getBodyLength()];
         message.readBytes(messageBytes);
         String convertedMessage = new String(messageBytes, StandardCharsets.UTF_8);

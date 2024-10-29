@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writestatementofreasons;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,6 +43,8 @@ import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 class WriteStatementOfReasonsMidEventHandlerTest {
     public static final String URL = "http://dm-store/documents/123";
     private static final String USER_AUTHORISATION = "Bearer token";
+    protected static final String LOGGED_IN_JUDGE_NAME = "Judge Full Name";
+    protected static final String ORIGINAL_JUDGE_NAME = "test judge name name";
     public static final String CASE_ID = "123123";
     public static final String GENERATE_DOCUMENT = "generateDocument";
     public static final String TEMPLATE_ID = "template.docx";
@@ -150,6 +153,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(LOGGED_IN_JUDGE_NAME);
 
         caseData.getDocumentGeneration().setBodyContent("Something");
         caseData.getDocumentGeneration().setSignedBy("A name");
@@ -201,6 +205,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
         when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(LOGGED_IN_JUDGE_NAME);
         caseData.setHearings(null);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -213,10 +218,50 @@ class WriteStatementOfReasonsMidEventHandlerTest {
     }
 
     @Test
+    void givenCorrectionInProgressAndFinalDecisionJudgeExists_thenJudgeNameIsOriginalJudgeName() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        caseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(YES);
+
+        caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionGenerateNotice(YES);
+        caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDateOfDecision("2018-10-10");
+        caseData.getSscsFinalDecisionCaseData().setFinalDecisionJudge(ORIGINAL_JUDGE_NAME);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        verify(userDetailsService, atMostOnce()).buildLoggedInUserName(USER_AUTHORISATION);
+
+        assertThat(response.getData().getSscsFinalDecisionCaseData().getFinalDecisionJudge()).isEqualTo(ORIGINAL_JUDGE_NAME);
+    }
+
+    @Test
+    void givenNoValidHearingsOnCase_thenSetFinalDecisionHeldBefore() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(LOGGED_IN_JUDGE_NAME);
+        caseData.setHearings(null);
+
+        caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDisabilityQualifiedPanelMemberName("PM1");
+        caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionMedicallyQualifiedPanelMemberName("PM2");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors()).isEmpty();
+
+        verify(generateFile, atLeastOnce()).assemble(capture.capture());
+        NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
+        assertThat(payload.getHeldBefore()).isNotNull();
+        assertThat(payload.getHeldBefore()).isEqualTo("Judge Full Name, PM1 and PM2");
+    }
+
+    @Test
     void givenPanelIsEmpty_thenDontUpdateHeldBefore() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
         when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(LOGGED_IN_JUDGE_NAME);
         caseData.getLatestHearing().getValue().setPanel(new JudicialUserPanel());
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -229,10 +274,12 @@ class WriteStatementOfReasonsMidEventHandlerTest {
     }
 
     @Test
-    void givenPanelIsSet_thenUpdateHeldBefore() {
+    void givenPanelIsSet_thenCorrectlyUpdateHeldBefore() {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
         when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(LOGGED_IN_JUDGE_NAME);
+        caseData.getSscsFinalDecisionCaseData().setWriteFinalDecisionDisabilityQualifiedPanelMemberName("PM1");
 
         List<String> listOfNames = List.of("panel member 1", "panel member 2");
         caseData.getLatestHearing().getValue().setPanel(new JudicialUserPanel(new JudicialUserBase("1234", "1234"), List.of(new CollectionItem<>("", new JudicialUserBase("12345", "12345")))));
@@ -253,6 +300,7 @@ class WriteStatementOfReasonsMidEventHandlerTest {
         when(callback.getPageId()).thenReturn(GENERATE_DOCUMENT);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(venueDataLoader.getGapVenueName(VENUE, "123")).thenReturn(VENUE.getName());
+        when(userDetailsService.buildLoggedInUserName(USER_AUTHORISATION)).thenReturn(LOGGED_IN_JUDGE_NAME);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
