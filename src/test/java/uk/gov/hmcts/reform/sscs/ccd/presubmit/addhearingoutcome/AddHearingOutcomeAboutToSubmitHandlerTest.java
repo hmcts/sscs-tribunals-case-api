@@ -195,6 +195,6 @@ public class AddHearingOutcomeAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors())
                 .hasSize(1)
-                .contains("Cannot find hearing with hearing ID");
+                .contains("Cannot find hearing details for hearing Hearing 3 Date and Time start and End time, venue_name3 with hearing ID: 3");
     }
 }
