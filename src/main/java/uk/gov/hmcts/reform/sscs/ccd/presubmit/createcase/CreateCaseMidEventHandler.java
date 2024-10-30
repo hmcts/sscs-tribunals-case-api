@@ -18,7 +18,14 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Entity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.validation.address.PostcodeValidator;
 
@@ -37,7 +44,9 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
                 || callback.getEvent() == EventType.INCOMPLETE_APPLICATION_RECEIVED
                 || callback.getEvent() == EventType.CASE_UPDATED)
                 && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData());
+                && Objects.nonNull(callback.getCaseDetails().getCaseData())
+                && isIbcaCase(callback.getCaseDetails().getCaseData()
+        );
     }
 
     @Override
@@ -45,11 +54,10 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
 
-        if (isIbcaCase(caseData)) {
-            if (NO.equals(caseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
-                final String selectedPortOfEntryLocationCode = caseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList().getValue().getCode();
-                caseData.getAppeal().getAppellant().getAddress().setPortOfEntry(selectedPortOfEntryLocationCode);
-            }
+        if (NO.equals(caseData.getAppeal().getAppellant().getAddress().getInMainlandUk())) {
+            final String selectedPortOfEntryLocationCode = caseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList().getValue().getCode();
+            caseData.getAppeal().getAppellant().getAddress().setPortOfEntry(selectedPortOfEntryLocationCode);
+        }
 
             if (callback.getEvent() == EventType.CASE_UPDATED && isNotEmpty(caseData.getRegionalProcessingCenter()) && caseData.getRegionalProcessingCenter().getHearingRoute().equals(HearingRoute.GAPS)) {
                 errorResponse.addError(HEARING_ROUTE_ERROR_MESSAGE);
@@ -57,11 +65,10 @@ public class CreateCaseMidEventHandler implements PreSubmitCallbackHandler<SscsC
 
             errorResponse.addErrors(validateAddress(caseData.getAppeal().getAppellant()));
 
-            if (isYes(caseData.getAppeal().getRep().getHasRepresentative())
-                    && isNotEmpty(caseData.getAppeal().getRep().getAddress())
-                    && isEmpty(caseData.getAppeal().getRep().getAddress().getInMainlandUk())) {
-                errorResponse.addError("You must enter Living in the UK for the representative");
-            }
+        if (isYes(caseData.getAppeal().getRep().getHasRepresentative())
+                && (isEmpty(caseData.getAppeal().getRep().getAddress())
+                || isEmpty(caseData.getAppeal().getRep().getAddress().getInMainlandUk()))) {
+            errorResponse.addError("You must enter Living in the UK for the representative");
         }
 
         return errorResponse;

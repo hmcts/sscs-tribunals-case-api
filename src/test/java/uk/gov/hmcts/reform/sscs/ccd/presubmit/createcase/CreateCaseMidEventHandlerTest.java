@@ -19,7 +19,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateCaseMidEventHandlerTest {
@@ -41,8 +51,10 @@ public class CreateCaseMidEventHandlerTest {
         "INCOMPLETE_APPLICATION_RECEIVED",
         "CASE_UPDATED"
     })
-    void cannotHandleTest(EventType eventType) {
-        SscsCaseData caseData = SscsCaseData.builder().build();
+    void canHandleTest(EventType eventType) {
+        SscsCaseData caseData = SscsCaseData.builder()
+            .benefitCode(IBCA_BENEFIT_CODE)
+            .build();
 
         when(callback.getEvent()).thenReturn(eventType);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -58,7 +70,7 @@ public class CreateCaseMidEventHandlerTest {
         "INCOMPLETE_APPLICATION_RECEIVED",
         "CASE_UPDATED"
     })
-    void canHandleTest(EventType eventType) {
+    void cannotHandleTest(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
         assertFalse(midEventHandler.canHandle(MID_EVENT, callback));
     }
@@ -192,18 +204,6 @@ public class CreateCaseMidEventHandlerTest {
                 .benefitCode(IBCA_BENEFIT_CODE)
                 .build();
 
-
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = midEventHandler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getErrors()).isEmpty();
-    }
-
-    @Test
-    void shouldNotReturnErrorsOnMidEventForNonIbcaCase() {
-        SscsCaseData caseData = SscsCaseData.builder().benefitCode("091").build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
