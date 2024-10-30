@@ -89,7 +89,7 @@ public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCase
             return response;
         }
 
-        log.info("About to update case v2 with postponed hearing event for id {}", caseId);
+        log.info("About to update case v2 with {} event for id {}", postponementEvent, caseId);
         SscsCaseDetails updatedSscsCaseDetails = updateCcdCaseService.updateCaseV2(
                 caseId,
                 postponementEvent.getCcdType(),
@@ -102,7 +102,7 @@ public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCase
                     sscsCaseData.setPostponement(Postponement.builder()
                             .unprocessedPostponement(NO)
                             .build());
-                    log.info("Updated case v2 with postponed hearing event for id {}", caseId);
+                    log.info("Updated case v2 with {} event for id {}", postponementEvent, caseId);
                 }
         );
         response.setData(updatedSscsCaseDetails.getData());
