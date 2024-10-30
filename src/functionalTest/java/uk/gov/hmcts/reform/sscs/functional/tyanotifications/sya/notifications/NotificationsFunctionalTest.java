@@ -479,10 +479,8 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void shouldSaveReasonableAdjustmentNotificationForAppellantAndRep() throws IOException, NotificationClientException {
         simulateCcdCallback(APPEAL_RECEIVED, BASE_PATH_TYAN + APPEAL_RECEIVED.getId() + "AppellantRepReasonableAdjustmentCallback.json");
-        log.info("caseRef={}, caseId={} for AppellantAndRep test", caseReference, caseId);
         delayInSeconds(10);
         List<Notification> notifications = tryFetchNotificationsForTestCaseWithFlag(true, null, appealCreatedAppellantEmailId, appealCreatedAppellantSmsId);
-        log.info("for caseRef={}, notifications={}", caseReference, notifications);
 
         SscsCaseDetails caseDetails = findCaseById(caseId);
         SscsCaseData caseData = caseDetails.getData();

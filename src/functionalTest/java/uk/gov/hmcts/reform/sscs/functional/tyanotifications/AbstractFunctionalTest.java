@@ -58,7 +58,7 @@ import uk.gov.service.notify.NotificationClientException;
 @ProfileValueSourceConfiguration(EnvironmentProfileValueSource.class)
 public abstract class AbstractFunctionalTest {
 
-    protected static final Logger log = getLogger(AuthorisationService.class);
+    private static final Logger log = getLogger(AuthorisationService.class);
 
     // Below rules are needed to use the junitParamsRunner together with SpringRunner
     @ClassRule
@@ -215,9 +215,9 @@ public abstract class AbstractFunctionalTest {
                 delayInSeconds(5);
 
                 allNotifications = client.getNotifications("", "", caseReference, "").getNotifications();
-                String allNotifText = allNotifications.stream().map(notif ->
+                String allNotifTemplateIds = allNotifications.stream().map(notif ->
                         notif.getTemplateId().toString()).collect(Collectors.joining(","));
-                log.info("allNotifications for case {}: templateIds:{}", caseReference, allNotifText);
+                log.info("allNotifications for case {}: templateIds:{}", caseReference, allNotifTemplateIds);
 
                 matchingNotifications =
                     allNotifications
