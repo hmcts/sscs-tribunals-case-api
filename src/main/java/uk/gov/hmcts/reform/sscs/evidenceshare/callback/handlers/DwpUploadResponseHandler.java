@@ -154,7 +154,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
                 "IBC case must move to responseReceived.",
                 sscsCaseDetails -> {
                     SscsCaseData sscsCaseData = sscsCaseDetails.getData();
-                    sscsCaseData.setDwpState(RESPONSE_SUBMITTED_DWP); //TODO: check if we need this
+                    sscsCaseData.setDwpState(RESPONSE_SUBMITTED_DWP);
                     log.info("Updated case v2 with dwp respond event {} for id {}",
                             EventType.DWP_RESPOND,
                             caseId
