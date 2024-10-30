@@ -466,7 +466,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         simulateCcdCallback(APPEAL_RECEIVED, BASE_PATH_TYAN + APPEAL_RECEIVED.getId() + "AppellantReasonableAdjustmentCallback.json");
 
         delayInSeconds(10);
-        List<Notification> notifications = tryFetchNotificationsForTestCase(appealReceivedAppellantEmailId);
+        List<Notification> notifications = tryFetchNotificationsForTestCaseWithFlag(true, null, appealReceivedAppellantEmailId);
 
         SscsCaseDetails caseDetails = findCaseById(caseId);
         SscsCaseData caseData = caseDetails.getData();
@@ -482,7 +482,7 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         simulateCcdCallback(APPEAL_RECEIVED, BASE_PATH_TYAN + APPEAL_RECEIVED.getId() + "AppellantRepReasonableAdjustmentCallback.json");
 
         delayInSeconds(10);
-        List<Notification> notifications = tryFetchNotificationsForTestCase(appealReceivedAppellantEmailId, appealReceivedRepresentativeEmailId);
+        List<Notification> notifications = tryFetchNotificationsForTestCaseWithFlag(true, null, appealReceivedAppellantEmailId, appealReceivedRepresentativeEmailId);
 
         SscsCaseDetails caseDetails = findCaseById(caseId);
         SscsCaseData caseData = caseDetails.getData();

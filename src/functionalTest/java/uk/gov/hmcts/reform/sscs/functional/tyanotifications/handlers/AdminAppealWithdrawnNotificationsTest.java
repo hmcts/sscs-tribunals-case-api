@@ -68,7 +68,8 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
             if (getNumberOfLetterCorrespondence(subscription) == expectedNumLetters) {
                 return true;
             }
-            delayInSeconds(5);
+            System.out.println("retring fetchLetters");
+            delayInSeconds(10);
         } while (true);
     }
 
