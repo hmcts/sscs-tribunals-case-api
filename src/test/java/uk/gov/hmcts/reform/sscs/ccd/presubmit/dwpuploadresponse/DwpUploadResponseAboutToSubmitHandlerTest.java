@@ -99,6 +99,15 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     @Mock
     private UserDetailsService userDetailsService;
 
+    @Mock
+    private Callback<SscsCaseData> ibcaCallback;
+
+    @Mock
+    private CaseDetails<SscsCaseData> ibcaCaseDetails;
+
+    @Mock
+    private CaseDetails<SscsCaseData> ibcaCaseDetailsBefore;
+
     private DwpDocumentService dwpDocumentService;
 
     private AddedDocumentsUtil addedDocumentsUtil;
@@ -1326,11 +1335,12 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Test
     public void givenValidIbcaCase_thenNoError() {
-        sscsCaseData = SscsCaseData.builder()
+        final SscsCaseData caseDataBefore = SscsCaseData.builder().build();
+        final SscsCaseData caseData = SscsCaseData.builder()
                 .ccdCaseId("1234")
                 .benefitCode("093")
                 .benefitCodeIbcaOnly("093")
-                .issueCode("SP")
+                .issueCode("DD")
                 .issueCodeIbcaOnly("RA")
                 .dwpFurtherInfo("Yes")
                 .dynamicDwpState(new DynamicList(""))
@@ -1339,9 +1349,14 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("infectedBloodAppeal").build()).build())
                 .build();
 
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(ibcaCallback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
+        when(ibcaCallback.getCaseDetails()).thenReturn(ibcaCaseDetails);
+        when(ibcaCallback.getCaseDetailsBefore()).thenReturn(Optional.of(ibcaCaseDetailsBefore));
+        when(ibcaCaseDetails.getId()).thenReturn(Long.valueOf(sscsCaseData.getCcdCaseId()));
+        when(ibcaCaseDetails.getCaseData()).thenReturn(caseData);
+        when(ibcaCaseDetailsBefore.getCaseData()).thenReturn(caseDataBefore);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, ibcaCallback, USER_AUTHORISATION);
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getWarnings().size(), is(0));
@@ -1349,7 +1364,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getData().getIssueCode(), is("RA"));
         assertNull(response.getData().getBenefitCodeIbcaOnly());
         assertNull(response.getData().getIssueCodeIbcaOnly());
-
     }
 
     @Test
