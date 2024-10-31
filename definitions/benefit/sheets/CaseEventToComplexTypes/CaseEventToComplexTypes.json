@@ -234,7 +234,7 @@
     "ListElementCode": "ibcaReference",
     "ID": "jointPartyIdentityIbcaReference",
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "appeal.benefitType.code=\"PIP\"",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\"",
     "LiveFrom": "19/11/2019",
     "FieldDisplayOrder": 3,
     "PageID": "jointPartyIdentity"
