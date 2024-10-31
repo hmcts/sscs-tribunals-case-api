@@ -352,7 +352,7 @@ dependencies {
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5ca93ac'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.14'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.15'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
@@ -631,6 +631,12 @@ task runE2eTests(type: Exec) {
     dependsOn yarnInstall
     workingDir = file("${project.projectDir}/definitions/test")
     commandLine 'yarn', 'test:' + System.getenv('ENVIRONMENT')
+}
+
+task runE2eTestsNightly(type: Exec) {
+    dependsOn yarnInstall
+    workingDir = file("${project.projectDir}/definitions/test")
+    commandLine 'yarn', 'test:nightly'
 }
 
 task highLevelDataSetup(type: JavaExec) {
