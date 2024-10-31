@@ -52,7 +52,7 @@ public class MessagingConfig {
             jmsConnectionFactory.setPrefetchPolicy(prefetchPolicy);
         }
         CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(jmsConnectionFactory);
-        if(reconnectOnException){
+        if (reconnectOnException) {
             cachingConnectionFactory.setReconnectOnException(true);
         }
         return cachingConnectionFactory;
