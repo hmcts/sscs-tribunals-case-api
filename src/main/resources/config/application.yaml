@@ -526,7 +526,7 @@ notification:
                 emailId: d5fd9f65-1283-4533-a1be-10043dae7af6
                 smsId: ede384aa-0b6e-4311-9f01-ee547573a07b
                 letterId: 91143b85-dd9d-430c-ba23-e42ec90f44f8
-                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx
+                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant-IB.docx
             representative:
                 emailId: 3d05393a-e593-400a-963f-a26893a0b672
                 smsId: 99bd4a56-256c-4de8-b187-d43a8dde466f
@@ -536,7 +536,7 @@ notification:
                 emailId: 78cf9c9c-e2b8-44d7-bcf1-220311f114cb
                 smsId: ede384aa-0b6e-4311-9f01-ee547573a07b
                 letterId: 747d026e-1bec-4e96-8a34-28f36e30bba5
-                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx
+                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant-IB.docx
         hearingAdjourned:
             appellant:
                 emailId: 77ea995b-9744-4167-9250-e627c85e5eda
@@ -692,7 +692,7 @@ notification:
             appellant:
                 emailId: 01293b93-b23e-40a3-ad78-2c6cd01cd21c
                 smsId: f41222ef-c05c-4682-9634-6b034a166368
-                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx
+                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant-IB.docx
             representative:
                 emailId: 652753bf-59b4-46eb-9c24-bd762338a098
                 smsId: a6c09fad-6265-4c7c-8b95-36245ffa5352
@@ -700,7 +700,7 @@ notification:
             appointee:
                 emailId: 362d9a85-e0e4-412b-b874-020c0464e2b4
                 smsId: f41222ef-c05c-4682-9634-6b034a166368
-                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant.docx
+                docmosisId: TB-SCS-LET-ENG-Appeal-Lodged-Appellant-IB.docx
         struckOut:
             docmosisId: TB-SCS-GNO-ENG-00466.docx
         processAudioVideo:
