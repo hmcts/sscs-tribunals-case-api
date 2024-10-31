@@ -773,6 +773,7 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "dwpIsOfficerAttending", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRU"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "dwpUCB", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRU"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "dwpUCB", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CRUD": "CRU"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "dwpUCB", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CRUD": "CRU"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "dwpPHME", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRU"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "dwpPHME", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CRUD": "CRU"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "dwpComplexAppeal", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRU"},
