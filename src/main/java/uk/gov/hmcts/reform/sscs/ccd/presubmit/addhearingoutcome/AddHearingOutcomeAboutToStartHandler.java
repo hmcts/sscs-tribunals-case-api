@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addhearingoutcome;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -49,17 +50,24 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-        HearingsGetResponse response = hmcHearingsApiService.getHearingsRequest(Long.toString(caseDetails.getId()), HmcStatus.COMPLETED);
-        List<CaseHearing> hmcHearings = response.getCaseHearings();
-        if (!hmcHearings.isEmpty()) {
-            List<Hearing> selectedHearings = sscsCaseData.getHearings().stream()
-                    .filter(hearing -> hmcHearings.stream()
-                            .anyMatch(hmcHearing -> Objects
-                                    .equals(hmcHearing.getHearingId().toString(), hearing.getValue().getHearingId()))).toList();
-            sscsCaseData.setHearingOutcomeValue(HearingOutcomeValue.builder().build());
-            sscsCaseData.getHearingOutcomeValue().setCompletedHearings(setHearingOutcomeCompletedHearings(selectedHearings));
-        } else {
-            preSubmitCallbackResponse.addError("There are no completed hearings on the case");
+
+        try {
+            HearingsGetResponse response = hmcHearingsApiService.getHearingsRequest(Long.toString(caseDetails.getId()), HmcStatus.COMPLETED);
+            List<CaseHearing> hmcHearings = response.getCaseHearings();
+            if (!hmcHearings.isEmpty()) {
+                List<Hearing> selectedHearings = sscsCaseData.getHearings().stream()
+                        .filter(hearing -> hmcHearings.stream()
+                                .anyMatch(hmcHearing -> Objects
+                                        .equals(hmcHearing.getHearingId().toString(), hearing.getValue().getHearingId())))
+                        .sorted(Comparator.comparing(hearing -> hearing.getValue().getStart()))
+                        .toList();
+                sscsCaseData.setHearingOutcomeValue(HearingOutcomeValue.builder().build());
+                sscsCaseData.getHearingOutcomeValue().setCompletedHearings(setHearingOutcomeCompletedHearings(selectedHearings));
+            } else {
+                preSubmitCallbackResponse.addError("There are no completed hearings on the case.");
+            }
+        } catch (Exception e) {
+            preSubmitCallbackResponse.addError("There was an error while retrieving hearing details; please try again after some time.");
         }
         return preSubmitCallbackResponse;
     }
