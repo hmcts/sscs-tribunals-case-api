@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOutcomeValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -55,11 +56,12 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
             HearingsGetResponse response = hmcHearingsApiService.getHearingsRequest(Long.toString(caseDetails.getId()), HmcStatus.COMPLETED);
             List<CaseHearing> hmcHearings = response.getCaseHearings();
             if (!hmcHearings.isEmpty()) {
-                List<Hearing> selectedHearings = sscsCaseData.getHearings().stream()
-                        .filter(hearing -> hmcHearings.stream()
+                List<HearingDetails> selectedHearings = sscsCaseData.getHearings().stream()
+                        .map(Hearing::getValue)
+                        .filter(value -> hmcHearings.stream()
                                 .anyMatch(hmcHearing -> Objects
-                                        .equals(hmcHearing.getHearingId().toString(), hearing.getValue().getHearingId())))
-                        .sorted(Comparator.comparing(hearing -> hearing.getValue().getStart()))
+                                        .equals(hmcHearing.getHearingId().toString(), value.getHearingId())))
+                        .sorted(Comparator.comparing(HearingDetails::getStart).reversed())
                         .toList();
                 sscsCaseData.setHearingOutcomeValue(HearingOutcomeValue.builder().build());
                 sscsCaseData.getHearingOutcomeValue().setCompletedHearings(setHearingOutcomeCompletedHearings(selectedHearings));
@@ -72,14 +74,14 @@ public class AddHearingOutcomeAboutToStartHandler implements PreSubmitCallbackHa
         return preSubmitCallbackResponse;
     }
 
-    private DynamicList setHearingOutcomeCompletedHearings(List<Hearing> hearings) {
+    private DynamicList setHearingOutcomeCompletedHearings(List<HearingDetails> hearings) {
         return new DynamicList(new DynamicListItem("", ""), hearings.stream()
                 .map(hearing -> {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm", Locale.ENGLISH);
-                    String hearingLabel = hearing.getValue().getStart().format(formatter)
-                            + "-" + hearing.getValue().getEnd().toLocalTime()
-                            + ", " + hearing.getValue().getVenue().getName();
-                    return new DynamicListItem(hearing.getValue().getHearingId(), hearingLabel);
+                    String hearingLabel = hearing.getStart().format(formatter)
+                            + "-" + hearing.getEnd().toLocalTime()
+                            + ", " + hearing.getVenue().getName();
+                    return new DynamicListItem(hearing.getHearingId(), hearingLabel);
                 }).toList());
     }
 }

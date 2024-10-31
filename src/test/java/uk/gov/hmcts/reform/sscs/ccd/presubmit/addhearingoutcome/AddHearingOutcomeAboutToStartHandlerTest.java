@@ -72,31 +72,31 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
     }
 
     @Test
-    void givenMultipleCompletedHearingOnCase_ThenPopulateDropdownInAscendingOrderByDate() {
+    void givenMultipleCompletedHearingOnCase_ThenPopulateDropdownInDescendingOrderByDate() {
         when(hmcHearingsApiService.getHearingsRequest(any(),any())).thenReturn(
                 HearingsGetResponse.builder().caseHearings(
                         List.of(CaseHearing.builder().hearingId(1L).build(),
-                                CaseHearing.builder().hearingId(3L).build())).build());
+                                CaseHearing.builder().hearingId(2L).build())).build());
 
         List<Hearing> updatedHearings = new ArrayList<>();
 
-        Hearing latestHearing = Hearing.builder().value(
-                HearingDetails.builder().hearingId("1").start(LocalDateTime.now().minusHours(1))
-                        .end(LocalDateTime.now()).venue(Venue.builder().name("Cardiff").build()).build()).build();
-
         Hearing earliestHearing = Hearing.builder().value(
-                HearingDetails.builder().hearingId("3").start(LocalDateTime.now().minusMonths(1).minusHours(1))
+                HearingDetails.builder().hearingId("1").start(LocalDateTime.now().minusMonths(1).minusHours(1))
                         .end(LocalDateTime.now().minusMonths(1)).venue(Venue.builder().name("Cardiff").build()).build()).build();
 
-        updatedHearings.add(latestHearing);
+        Hearing latestHearing = Hearing.builder().value(
+                HearingDetails.builder().hearingId("2").start(LocalDateTime.now().minusHours(1))
+                        .end(LocalDateTime.now()).venue(Venue.builder().name("Cardiff").build()).build()).build();
+
         updatedHearings.add(earliestHearing);
+        updatedHearings.add(latestHearing);
         sscsCaseData.setHearings(updatedHearings);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_START,callback,USER_AUTHORISATION);
         List<DynamicListItem> hearings = response.getData().getHearingOutcomeValue().getCompletedHearings().getListItems();
         assertFalse(hearings.isEmpty());
         assertEquals(2, hearings.size());
-        assertTrue(hearings.get(0).getCode().equals("3") && hearings.get(1).getCode().equals("1"));
+        assertTrue(hearings.get(0).getCode().equals("2") && hearings.get(1).getCode().equals("1"));
     }
 
     @Test
