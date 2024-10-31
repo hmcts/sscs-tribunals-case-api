@@ -2007,7 +2007,8 @@
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2020",
     "FieldDisplayOrder": 17,
-    "PageID": "1.0"
+    "PageID": "1.0",
+    "FieldShowCondition": "appeal.benefitType.code!= \"infectedBloodAppeal\""
   },
   {
     "CaseEventID": "updateOtherPartyData",
