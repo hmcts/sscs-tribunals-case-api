@@ -2232,13 +2232,34 @@
   },
   {
     "CaseEventID": "updateOtherPartyData",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "benefitType",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "FieldDisplayOrder": 4,
+    "PageID": "1.0",
+    "FieldShowCondition": "otherParties=\"DoNotShow\""
+  },
+  {
+    "CaseEventID": "updateOtherPartyData",
+    "CaseFieldID": "appeal",
+    "ListElementCode": "benefitType.code",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "01/01/2018",
+    "FieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "FieldShowCondition": "otherParties=\"DoNotShow\""
+  },
+  {
+    "CaseEventID": "updateOtherPartyData",
     "CaseFieldID": "otherParties",
     "ListElementCode": "isAppointee",
     "ID": "otherPartyIsAppointee",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2020",
     "FieldDisplayOrder": 38,
-    "PageID": "1.0"
+    "PageID": "1.0",
+    "FieldShowCondition": "appeal.benefitType.code!=\"infectedBloodAppeal\""
   },
   {
     "CaseEventID": "updateOtherPartyData",
@@ -2249,7 +2270,7 @@
     "LiveFrom": "19/11/2020",
     "FieldDisplayOrder": 39,
     "PageID": "1.0",
-    "FieldShowCondition": "otherParties.isAppointee = \"Yes\""
+    "FieldShowCondition": "otherParties.isAppointee = \"Yes\" AND appeal.benefitType.code!=\"infectedBloodAppeal\""
   },
   {
     "CaseEventID": "updateOtherPartyData",

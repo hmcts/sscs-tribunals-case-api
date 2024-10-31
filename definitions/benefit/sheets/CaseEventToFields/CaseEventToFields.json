@@ -4032,6 +4032,18 @@
     "PageLabel": "Update other party data"
   },
   {
+    "CaseEventID": "updateOtherPartyData",
+    "CaseFieldID": "appeal",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "COMPLEX",
+    "FieldShowCondition": "otherParties=\"DoNotShow\"",
+    "LiveFrom": "01/01/2018",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "PageLabel": "Update other party data"
+  },
+  {
     "CaseEventID": "confirmPanelComposition",
     "CaseFieldID": "isFqpmRequired",
     "CaseTypeID": "Benefit",
