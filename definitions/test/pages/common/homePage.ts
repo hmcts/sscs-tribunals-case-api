@@ -203,8 +203,6 @@ export class HomePage {
             }
             case "Summary": {
                 if (expect(this.summaryTab).toBeVisible()){
-                    await this.reloadPage();
-                    await this.delay(3000);
                     await this.summaryTab.click();
                 } else {
                     await this.clickBeforeTabBtn();
