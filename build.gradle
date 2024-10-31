@@ -349,11 +349,10 @@ dependencies {
 
     implementation group: 'com.mchange', name: 'c3p0', version: '0.10.1'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
 
     implementation group: 'com.github.hmcts', name: 'sscs-common', version: '30f7108'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.15'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.16'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
@@ -632,6 +631,12 @@ task runE2eTests(type: Exec) {
     dependsOn yarnInstall
     workingDir = file("${project.projectDir}/definitions/test")
     commandLine 'yarn', 'test:' + System.getenv('ENVIRONMENT')
+}
+
+task runE2eTestsNightly(type: Exec) {
+    dependsOn yarnInstall
+    workingDir = file("${project.projectDir}/definitions/test")
+    commandLine 'yarn', 'test:nightly'
 }
 
 task highLevelDataSetup(type: JavaExec) {

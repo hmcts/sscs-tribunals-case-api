@@ -15,7 +15,7 @@ test.describe("Process audio/video evidence test", {tag: "@nightly-pipeline"}, a
         await processAVEvidenceSteps.acceptEvidenceUploadedByDWP(caseId);
     });
 
-    test("Grant - Audio/video evidence uploaded by CTSC", async ({ uploadDocumentFurtherEvidenceSteps, processAVEvidenceSteps }) => {
+    test("Grant - Audio/video evidence uploaded by CTSC", {tag: "@preview-regression"}, async ({ uploadDocumentFurtherEvidenceSteps, processAVEvidenceSteps }) => {
         await uploadDocumentFurtherEvidenceSteps.performUploadDocumentFurtherEvidence(caseId, true);
         await processAVEvidenceSteps.acceptEvidenceUploadedByCTSC(caseId);
     });

@@ -18,8 +18,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Postponement;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
@@ -28,8 +29,8 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @RequiredArgsConstructor
 public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final CcdService ccdService;
     private final IdamService idamService;
+    private final UpdateCcdCaseService updateCcdCaseService;
 
     @Value("${feature.snl.enabled}")
     private boolean isScheduleListingEnabled;
@@ -88,13 +89,23 @@ public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCase
             return response;
         }
 
-        caseData.setDwpState(DwpState.HEARING_POSTPONED);
-        caseData.setPostponement(Postponement.builder()
-                .unprocessedPostponement(NO)
-                .build());
-
-        ccdService.updateCase(caseData, caseId, postponementEvent.getCcdType(),
-            summary, description, idamService.getIdamTokens());
+        log.info("About to update case v2 with {} event for id {}", postponementEvent, caseId);
+        SscsCaseDetails updatedSscsCaseDetails = updateCcdCaseService.updateCaseV2(
+                caseId,
+                postponementEvent.getCcdType(),
+                summary,
+                description,
+                idamService.getIdamTokens(),
+                sscsCaseDetails -> {
+                    SscsCaseData sscsCaseData = sscsCaseDetails.getData();
+                    sscsCaseData.setDwpState(DwpState.HEARING_POSTPONED);
+                    sscsCaseData.setPostponement(Postponement.builder()
+                            .unprocessedPostponement(NO)
+                            .build());
+                    log.info("Updated case v2 with {} event for id {}", postponementEvent, caseId);
+                }
+        );
+        response.setData(updatedSscsCaseDetails.getData());
 
         return response;
     }
