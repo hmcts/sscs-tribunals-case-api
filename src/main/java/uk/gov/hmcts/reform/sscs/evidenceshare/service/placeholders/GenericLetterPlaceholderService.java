@@ -114,8 +114,6 @@ public class GenericLetterPlaceholderService {
         for (int i = 0; i < addressList.size(); i++) {
             addressPlaceHolders.put(addressConstants.get(i), truncateAddressLine(defaultToEmptyStringIfNull(addressList.get(i))));
         }
-        System.out.printf(addressPlaceHolders.toString());
-
         return addressPlaceHolders;
     }
 }
