@@ -23,10 +23,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationVali
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
@@ -230,17 +227,20 @@ public class SendNotificationService {
         return false;
     }
 
-    protected void sendLetterNotificationToAddress(NotificationWrapper wrapper, Notification notification, final Address addressToUse, SubscriptionWithType subscriptionWithType) throws NotificationClientException {
-        if (addressToUse != null) {
+    protected void sendLetterNotificationToAddress(NotificationWrapper wrapper, Notification notification, final Address address, SubscriptionWithType subscriptionWithType) throws NotificationClientException {
+        if (address != null) {
             Map<String, Object> placeholders = notification.getPlaceholders();
             String fullNameNoTitle = getNameToUseForLetter(wrapper, subscriptionWithType);
             placeholders.put(ADDRESS_NAME, fullNameNoTitle);
 
-            String[] lines = lines(addressToUse);
             List<String> addressConstants = List.of(LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
                     LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE);
-            for (int i = 0; i < lines.length; i++) {
-                placeholders.put(addressConstants.get(i), defaultToEmptyStringIfNull(lines[i]));
+
+            String addressString = address.getFullAddress();
+            List<String> addressList = !addressString.isEmpty() ? Arrays.asList(addressString.split(", ")) : List.of();
+
+            for (int i = 0; i < addressList.size(); i++) {
+                placeholders.put(addressConstants.get(i), defaultToEmptyStringIfNull(addressList.get(i)));
             }
 
             placeholders.put(NAME, fullNameNoTitle);
@@ -257,11 +257,11 @@ public class SendNotificationService {
             }
 
             log.info("In sendLetterNotificationToAddress method notificationSender is available {} ", notificationSender != null);
-            notificationLog(notification, "GovNotify letter", addressToUse.getPostcode(), wrapper);
+            notificationLog(notification, "GovNotify letter", address.getPostcode(), wrapper);
 
             notificationSender.sendLetter(
                 notification.getLetterTemplate(),
-                addressToUse,
+                address,
                 notification.getPlaceholders(),
                 wrapper.getNotificationType(),
                 fullNameNoTitle,

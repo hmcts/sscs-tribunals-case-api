@@ -4,9 +4,9 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.*;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.truncateAddressLine;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.lines;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -113,12 +113,14 @@ public class PlaceholderService {
     }
 
     private void buildRecipientAddressPlaceholders(Address address, Map<String, Object> placeholders) {
-        String[] lines = lines(address);
         List<String> addressConstants = List.of(RECIPIENT_ADDRESS_LINE_1_LITERAL, RECIPIENT_ADDRESS_LINE_2_LITERAL, RECIPIENT_ADDRESS_LINE_3_LITERAL,
                 RECIPIENT_ADDRESS_LINE_4_LITERAL, RECIPIENT_ADDRESS_LINE_5_LITERAL);
 
-        for (int i = 0; i < lines.length; i++) {
-            placeholders.put(addressConstants.get(i), truncateAddressLine(defaultToEmptyStringIfNull(lines[i])));
+        String addressString = address.getFullAddress();
+        List<String> addressList = !addressString.isEmpty() ? Arrays.asList(addressString.split(", ")) : List.of();
+
+        for (int i = 0; i < addressList.size(); i++) {
+            placeholders.put(addressConstants.get(i), truncateAddressLine(defaultToEmptyStringIfNull(addressList.get(i))));
         }
     }
 }

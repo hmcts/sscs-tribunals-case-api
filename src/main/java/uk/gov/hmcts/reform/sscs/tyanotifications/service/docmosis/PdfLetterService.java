@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.*;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -133,12 +134,14 @@ public class PdfLetterService {
     }
 
     private void buildRecipientAddressPlaceholders(Address address, Map<String, Object> placeholders) {
-        String[] lines = lines(address);
         List<String> addressConstants = List.of(LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
                 LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE);
 
-        for (int i = 0; i < lines.length; i++) {
-            placeholders.put(addressConstants.get(i), truncateAddressLine(defaultToEmptyStringIfNull(lines[i])));
+        String addressString = address.getFullAddress();
+        List<String> addressList = !addressString.isEmpty() ? Arrays.asList(addressString.split(", ")) : List.of();
+
+        for (int i = 0; i < addressList.size(); i++) {
+            placeholders.put(addressConstants.get(i), truncateAddressLine(defaultToEmptyStringIfNull(addressList.get(i))));
         }
     }
 
