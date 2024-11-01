@@ -202,14 +202,7 @@ export class HomePage {
                 break;
             }
             case "Summary": {
-                // if (expect(this.summaryTab).toBeVisible()){
-                //     await this.summaryTab.click();
-                // } else {
-                //     await this.clickBeforeTabBtn();
-                //     await this.summaryTab.click();
-                // }
-
-                if (this.summaryTab.isVisible()) {
+                if (expect(this.summaryTab).toBeVisible()){
                     await this.summaryTab.click();
                 } else {
                     await this.clickBeforeTabBtn();
