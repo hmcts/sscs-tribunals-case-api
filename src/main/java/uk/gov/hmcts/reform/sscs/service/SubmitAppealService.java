@@ -1,25 +1,37 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_INCOMPLETE_APPLICATION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseDataV1;
 
 import feign.FeignException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
+import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
@@ -122,6 +134,131 @@ public class SubmitAppealService extends SubmitAppealServiceBase {
             .build());
     }
 
+    public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
+
+        IdamTokens idamTokens = idamService.getIdamTokens();
+
+        Long caseId = appeal.getCcdCaseId() != null ? Long.valueOf(appeal.getCcdCaseId()) : null;
+
+        log.info("Converting sya appeal data to sscs case");
+
+        SscsCaseData caseData = convertAppealToSscsCaseData(appeal);
+
+        EventType event = findEventType(caseData, caseId != null);
+        SscsCaseDetails caseDetails = createOrUpdateCase(caseData, event, idamTokens);
+
+        associateCase(idamTokens, caseDetails, userToken);
+
+        return caseDetails.getId();
+    }
+
+
+    SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal) {
+
+        String postCode = resolvePostCode(appeal);
+        String firstHalfOfPostcode = getFirstHalfOfPostcode(postCode);
+        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
+
+        SscsCaseData sscsCaseData = rpc == null
+                ? convertSyaToCcdCaseDataV1(appeal, caseAccessManagementFeature)
+                : convertSyaToCcdCaseDataV1(appeal, rpc.getName(), rpc, caseAccessManagementFeature);
+
+        sscsCaseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
+        String processingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
+        sscsCaseData.setProcessingVenue(processingVenue);
+
+        if (caseAccessManagementFeature
+                && StringUtils.isNotEmpty(processingVenue)
+                && rpc != null) {
+            String venueEpimsId = venueService.getEpimsIdForVenue(processingVenue);
+            CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
+
+            sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
+                    .baseLocation(rpc.getEpimsId())
+                    .region(courtVenue.getRegionId()).build());
+
+            log.info("Successfully updated case management location details for case {}. Processing venue {}, epimsId {}",
+                    appeal.getCcdCaseId(), processingVenue, venueEpimsId);
+        }
+
+        log.info("{} - setting venue name to {}",
+                sscsCaseData.getAppeal().getAppellant().getIdentity().getNino(),
+                sscsCaseData.getProcessingVenue());
+
+        return sscsCaseData;
+    }
+
+    private SscsCaseDetails createOrUpdateCase(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
+        SscsCaseDetails caseDetails = null;
+
+        try {
+            List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(caseData.getAppeal().getAppellant().getIdentity().getNino(), idamTokens);
+            if (!matchedByNinoCases.isEmpty()) {
+                log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino "
+                        + caseData.getAppeal().getAppellant().getIdentity().getNino() + " before filtering non exact matches");
+            } else {
+                log.info("No matching cases for Nino {}", caseData.getAppeal().getAppellant().getIdentity().getNino());
+            }
+            caseDetails = matchedByNinoCases.stream().filter(createNinoAndBenefitTypeAndMrnDatePredicate(caseData)).findFirst().orElse(null);
+
+            if (caseDetails == null) {
+                if (!matchedByNinoCases.isEmpty()) {
+                    log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino "
+                            + caseData.getAppeal().getAppellant().getIdentity().getNino());
+                    addAssociatedCases(caseData, matchedByNinoCases);
+                }
+
+                log.info("About to attempt creating case or updating draft case in CCD with event {} for benefit type {} and event {} and isScottish {} and languagePreference {}",
+                        eventType,
+                        caseData.getAppeal().getBenefitType().getCode(),
+                        eventType,
+                        caseData.getIsScottishCase(),
+                        caseData.getLanguagePreference().getCode());
+
+                if (eventType == DRAFT_TO_VALID_APPEAL_CREATED || eventType == DRAFT_TO_INCOMPLETE_APPLICATION || eventType == DRAFT_TO_NON_COMPLIANT) {
+                    caseData.setCaseCreated(LocalDate.now().toString());
+
+                    caseDetails = ccdService.updateCase(caseData,
+                            Long.valueOf(caseData.getCcdCaseId()),
+                            eventType.getCcdType(),
+                            "SSCS - new case created",
+                            "Created SSCS case from Submit Your Appeal online draft with event " + eventType.getCcdType(),
+                            idamTokens);
+
+                    log.info("Case {} successfully converted from Draft to SSCS case in CCD for benefit type {} with event {}",
+                            caseDetails.getId(),
+                            caseData.getAppeal().getBenefitType().getCode(),
+                            eventType);
+                } else {
+                    caseDetails = ccdService.createCase(caseData,
+                            eventType.getCcdType(),
+                            "SSCS - new case created",
+                            "Created SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
+                            idamTokens);
+                    log.info("Case {} successfully created in CCD for benefit type {} with event {}",
+                            caseDetails.getId(),
+                            caseData.getAppeal().getBenefitType().getCode(),
+                            eventType);
+                }
+                return caseDetails;
+            }
+        } catch (Exception e) {
+            throw new CcdException(
+                    String.format("Error found in the creating case process for case with Id - %s"
+                                    + " and Nino - %s and Benefit type - %s and exception: %s",
+                            caseDetails != null ? caseDetails.getId() : "", caseData.getAppeal().getAppellant().getIdentity().getNino(),
+                            caseData.getAppeal().getBenefitType().getCode(), e.getMessage()), e);
+        }
+
+        log.info("Duplicate case {} found for Nino {} and benefit type {}. "
+                        + "No need to continue with post create case processing.",
+                caseDetails.getId(), caseData.getAppeal().getAppellant().getIdentity().getNino(),
+                caseData.getAppeal().getBenefitType().getCode());
+        throw new DuplicateCaseException(
+                String.format("An appeal has already been submitted, for that decision date %s ",
+                        caseData.getAppeal().getMrnDetails().getMrnDate()));
+    }
+
     private SaveCaseResult saveDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens, Boolean forceCreate) {
 
         SaveCaseResult result;
@@ -143,15 +280,5 @@ public class SubmitAppealService extends SubmitAppealServiceBase {
 
         log.info("Draft Case {} successfully {} in CCD", result.getCaseDetailsId(), result.getSaveCaseOperation().name());
         return result;
-    }
-
-    @Override
-    protected SscsCaseDetails getUpdatedCaseDetails(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens, List<SscsCaseDetails> matchedByNinoCases) {
-        return ccdService.updateCase(caseData,
-                Long.valueOf(caseData.getCcdCaseId()),
-                eventType.getCcdType(),
-                "SSCS - new case created",
-                "Created SSCS case from Submit Your Appeal online draft with event " + eventType.getCcdType(),
-                idamTokens);
     }
 }

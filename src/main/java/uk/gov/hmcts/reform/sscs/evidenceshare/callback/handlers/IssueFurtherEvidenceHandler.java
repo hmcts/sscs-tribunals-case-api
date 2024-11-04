@@ -2,11 +2,21 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toMap;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.HMCTS_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.JOINT_PARTY_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_PARTY_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_PARTY_REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers.HandlerUtils.distinctByKey;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.*;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.JOINT_PARTY_LETTER;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.OTHER_PARTY_LETTER;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
 
 import java.util.Arrays;
 import java.util.List;
@@ -157,7 +167,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
                         final String description = determineDescription(sscsCaseDetails.getData().getSscsDocument());
                         setEvidenceIssuedFlagToYes(sscsCaseDetails.getData().getSscsDocument());
-                        return new UpdateCcdCaseService.UpdateResult("Update case data", description);
+                        return new UpdateCcdCaseService.UpdateResult(sscsCaseDetails, "Update case data", description);
 
                     }
             );
