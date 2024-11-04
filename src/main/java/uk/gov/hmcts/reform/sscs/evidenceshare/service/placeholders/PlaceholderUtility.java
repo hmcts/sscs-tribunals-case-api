@@ -4,8 +4,8 @@ import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isNoneBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.lines;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -178,11 +178,10 @@ public final class PlaceholderUtility {
         List<String> addressConstants = List.of(LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
                 LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE);
 
-        String addressString = address.getFullAddress();
-        List<String> addressList = !addressString.isEmpty() ? Arrays.asList(addressString.split(", ")) : List.of();
+        String[] lines = lines(address);
 
-        for (int i = 0; i < addressList.size(); i++) {
-            addressPlaceHolders.put(addressConstants.get(i), truncateAddressLine(defaultToEmptyStringIfNull(addressList.get(i))));
+        for (int i = 0; i < lines.length; i++) {
+            addressPlaceHolders.put(addressConstants.get(i), truncateAddressLine(defaultToEmptyStringIfNull(lines[i])));
         }
         return addressPlaceHolders;
     }

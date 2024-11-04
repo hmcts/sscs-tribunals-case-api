@@ -322,4 +322,16 @@ public class LetterUtils {
         }
         return false;
     }
+
+    public static String[] lines(Address address) {
+        if (isYes(address.getInMainlandUk()) || address.getInMainlandUk() == null) {
+            return Stream.of(address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode())
+                    .filter(x -> x != null)
+                    .toArray(String[]::new);
+        } else {
+            return Stream.of(address.getLine1(), address.getLine2(), address.getTown(), address.getPostcode(), address.getCountry())
+                    .filter(x -> x != null)
+                    .toArray(String[]::new);
+        }
+    }
 }
