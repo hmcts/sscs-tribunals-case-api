@@ -116,10 +116,10 @@ public class PlaceholderService {
         List<String> addressConstants = List.of(RECIPIENT_ADDRESS_LINE_1_LITERAL, RECIPIENT_ADDRESS_LINE_2_LITERAL, RECIPIENT_ADDRESS_LINE_3_LITERAL,
                 RECIPIENT_ADDRESS_LINE_4_LITERAL, RECIPIENT_ADDRESS_LINE_5_LITERAL);
 
-        String[] lines = lines(address);
+        List<String> lines = lines(address);
 
-        for (int i = 0; i < lines.length; i++) {
-            placeholders.put(addressConstants.get(i), truncateAddressLine(defaultToEmptyStringIfNull(lines[i])));
+        for (int i = 0; i < lines.size(); i++) {
+            placeholders.put(addressConstants.get(i), truncateAddressLine(defaultToEmptyStringIfNull(lines.get(i))));
         }
     }
 }

@@ -685,11 +685,11 @@ public class LetterUtilsTest {
                 .postcode("WC2R 1LA")
                 .build();
 
-        String[] addressLines = lines(testAddress);
+        List<String> addressLines = lines(testAddress);
         List<String> expectedLines = List.of("Somerset House", "Strand", "London", "Greater London", "WC2R 1LA");
 
-        for (int i = 0; i < addressLines.length; i++) {
-            assertEquals(expectedLines.get(i), addressLines[i]);
+        for (int i = 0; i < addressLines.size(); i++) {
+            assertEquals(expectedLines.get(i), addressLines.get(i));
         }
     }
 
@@ -705,11 +705,11 @@ public class LetterUtilsTest {
                 .inMainlandUk(YesNo.YES)
                 .build();
 
-        String[] addressLines = lines(testAddress);
+        List<String> addressLines = lines(testAddress);
         List<String> expectedLines = List.of("Somerset House", "Strand", "London", "Greater London", "WC2R 1LA");
 
-        for (int i = 0; i < addressLines.length; i++) {
-            assertEquals(expectedLines.get(i), addressLines[i]);
+        for (int i = 0; i < addressLines.size(); i++) {
+            assertEquals(expectedLines.get(i), addressLines.get(i));
         }
     }
 
@@ -726,11 +726,11 @@ public class LetterUtilsTest {
                 .inMainlandUk(YesNo.NO)
                 .build();
 
-        String[] addressLines = lines(testAddress);
+        List<String> addressLines = lines(testAddress);
         List<String> expectedLines = List.of("Catherdrale Notre-Dame de Paris", "6 Parvis Notre-dame - Pl. Jean-Paul II", "Paris", "75004", "France");
 
-        for (int i = 0; i < addressLines.length; i++) {
-            assertEquals(expectedLines.get(i), addressLines[i]);
+        for (int i = 0; i < addressLines.size(); i++) {
+            assertEquals(expectedLines.get(i), addressLines.get(i));
         }
     }
 
@@ -746,11 +746,11 @@ public class LetterUtilsTest {
                 .inMainlandUk(YesNo.NO)
                 .build();
 
-        String[] addressLines = lines(testAddress);
+        List<String> addressLines = lines(testAddress);
         List<String> expectedLines = List.of("Catherdrale Notre-Dame de Paris", "6 Parvis Notre-dame - Pl. Jean-Paul II", "Paris", "France");
 
-        for (int i = 0; i < addressLines.length; i++) {
-            assertEquals(expectedLines.get(i), addressLines[i]);
+        for (int i = 0; i < addressLines.size(); i++) {
+            assertEquals(expectedLines.get(i), addressLines.get(i));
         }
     }
 
@@ -765,11 +765,11 @@ public class LetterUtilsTest {
                 .postcode("Test Postcode")
                 .build();
 
-        String[] addressLines = lines(testAddress);
+        List<String> addressLines = lines(testAddress);
         List<String> expectedLines = List.of("Test House", "Test Town", "Test County", "Test Postcode");
 
-        for (int i = 0; i < addressLines.length; i++) {
-            assertEquals(expectedLines.get(i), addressLines[i]);
+        for (int i = 0; i < addressLines.size(); i++) {
+            assertEquals(expectedLines.get(i), addressLines.get(i));
         }
     }
 }

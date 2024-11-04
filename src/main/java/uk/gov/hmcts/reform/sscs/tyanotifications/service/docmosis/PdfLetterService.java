@@ -135,10 +135,10 @@ public class PdfLetterService {
     private void buildRecipientAddressPlaceholders(Address address, Map<String, Object> placeholders) {
         List<String> addressConstants = List.of(LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
                 LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE);
-        String[] lines = lines(address);
+        List<String> lines = lines(address);
 
-        for (int i = 0; i < lines.length; i++) {
-            placeholders.put(addressConstants.get(i), truncateAddressLine(defaultToEmptyStringIfNull(lines[i])));
+        for (int i = 0; i < lines.size(); i++) {
+            placeholders.put(addressConstants.get(i), truncateAddressLine(defaultToEmptyStringIfNull(lines.get(i))));
         }
     }
 
