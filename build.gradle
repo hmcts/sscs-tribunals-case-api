@@ -444,6 +444,7 @@ dependencies {
     testImplementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
 
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
+    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.37.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
     testImplementation group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.37.0'
