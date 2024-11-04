@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.sscs.functional.handlers.addhearingoutcome;
 
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
+import java.io.IOException;
 import junitparams.JUnitParamsRunner;
 import org.apache.http.HttpStatus;
 import org.junit.ClassRule;
@@ -15,9 +18,7 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
-import java.io.IOException;
 
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 
 @RunWith(JUnitParamsRunner.class)
