@@ -21,7 +21,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.createUploadResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -132,7 +131,7 @@ public class SyaEndpointsIt extends AbstractEventIt {
 
     @Before
     public void setup() throws IOException {
-        mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        mapper = new ObjectMapper().findAndRegisterModules();
 
         given(pdfServiceClient.generateFromHtml(eq(getTemplate()), captor.capture()))
             .willReturn(PDF.getBytes());
