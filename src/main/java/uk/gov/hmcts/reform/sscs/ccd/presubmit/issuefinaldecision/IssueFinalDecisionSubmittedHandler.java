@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
+import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,9 @@ public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
     @Value("${feature.postHearings.enabled}")
     private final boolean isPostHearingsEnabled;
 
+    @Value("${feature.handle-ccd-callbackMap-v2.enabled}")
+    private boolean isHandleCcdCallbackMapV2Enabled;
+
 
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -49,10 +53,20 @@ public class IssueFinalDecisionSubmittedHandler implements PreSubmitCallbackHand
         if (isPostHearingsEnabled) {
             Correction correction = caseData.getPostHearing().getCorrection();
 
-            if (isYes(correction.getIsCorrectionFinalDecisionInProgress())) {
-                correction.setIsCorrectionFinalDecisionInProgress(NO);
-                caseData = ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, caseData);
+            Consumer<SscsCaseData> sscsCaseDataConsumer = sscsCaseData ->
+                    sscsCaseData.getPostHearing().getCorrection().setIsCorrectionFinalDecisionInProgress(NO);
 
+            if (isYes(correction.getIsCorrectionFinalDecisionInProgress())) {
+                if (isHandleCcdCallbackMapV2Enabled) {
+                    caseData = ccdCallbackMapService.handleCcdCallbackMapV2(
+                            CorrectionActions.GRANT,
+                            callback.getCaseDetails().getId(),
+                            sscsCaseDataConsumer);
+                } else {
+                    sscsCaseDataConsumer.accept(caseData);
+                    caseData = ccdCallbackMapService.handleCcdCallbackMap(CorrectionActions.GRANT, caseData);
+
+                }
                 return new PreSubmitCallbackResponse<>(caseData);
             }
         }
