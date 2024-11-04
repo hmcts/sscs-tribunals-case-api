@@ -10,7 +10,8 @@
     "PageID": "1.0",
     "FieldShowCondition": "issueCode=\"doNotUse\"",
     "PageLabel": "Hmcts review response",
-    "ShowSummaryChangeOption": "N"
+    "ShowSummaryChangeOption": "N",
+    "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent?pageId=hmctsResponseReviewed1.0"
   },
   {
     "CaseEventID": "hmctsResponseReviewed",

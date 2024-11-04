@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +55,7 @@ public class HmctsResponseReviewedSubmittedHandler extends ResponseEventsAboutTo
         if (sscsCaseData.getIsInterlocRequired() != null && sscsCaseData.getIsInterlocRequired().equals("Yes")) {
             String whoToReview = sscsCaseData.getSelectWhoReviewsCase().getValue().getCode().equals("reviewByJudge") ? "Judge" : "TCW";
             updateCase(sscsCaseData, callback.getCaseDetails().getId(), EventType.VALID_SEND_TO_INTERLOC, "Send to interloc", "Send a case to a " + whoToReview + " for review");
-        } else {
+        } else if (!isIbcaCase(sscsCaseData)) {
             sscsCaseData.setIgnoreCallbackWarnings(YesNo.YES);
             updateCase(sscsCaseData, callback.getCaseDetails().getId(), EventType.READY_TO_LIST, "Ready to list", "Makes an appeal ready to list");
         }
