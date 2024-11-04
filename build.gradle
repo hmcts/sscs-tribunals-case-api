@@ -357,8 +357,8 @@ dependencies {
     implementation group: 'com.mchange', name: 'c3p0', version: '0.10.1'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '304cc79'
-    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '85637af'
+    implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.12.12'
+    implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.17'
 
     implementation group: 'com.azure', name: 'azure-core', version: '1.46.0'
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.15.1'
@@ -381,7 +381,7 @@ dependencies {
     implementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: pitest.pitestVersion.get()
     implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: '0.5'
 
-    implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '649e4b4', {
+    implementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '1.6.1', {
         exclude group: "uk.gov.hmcts.reform", module:"properties-volume-spring-boot-starter"
     }
     implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.2'
@@ -394,7 +394,7 @@ dependencies {
     testImplementation group: 'com.github.hmcts', name: 'fortify-client', version: '1.4.5', classifier: 'all', {
         exclude group: 'commons-io', module: 'commons-io'
     }
-    testImplementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '649e4b4', {
+    testImplementation group: 'com.github.hmcts', name: 'sscs-job-scheduler', version: '1.6.1', {
         exclude group: "uk.gov.hmcts.reform", module:"properties-volume-spring-boot-starter"
     }
 
