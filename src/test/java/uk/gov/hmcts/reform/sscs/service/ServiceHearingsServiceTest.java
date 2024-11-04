@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,12 +27,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.service.ServiceHearingRequest;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
 import uk.gov.hmcts.reform.sscs.model.service.linkedcases.ServiceLinkedCases;
@@ -56,17 +62,27 @@ class ServiceHearingsServiceTest {
     @Mock
     private CcdCaseService ccdCaseService;
 
+    @Mock
+    private UpdateCcdCaseService updateCcdCaseService;
+
+    @Mock
+    private IdamService idamService;
+
+    private ArgumentCaptor<Consumer<SscsCaseDetails>> captor;
+
     @InjectMocks
     private ServiceHearingsService serviceHearingsService;
 
     private SscsCaseData caseData;
     private SscsCaseDetails caseDetails;
+    private IdamTokens idamTokens;
 
 
     @BeforeEach
     void setup() {
+        idamTokens = IdamTokens.builder().build();
         caseData = SscsCaseData.builder()
-            .ccdCaseId("1234")
+            .ccdCaseId(String.valueOf(CASE_ID))
             .benefitCode(BENEFIT_CODE)
             .issueCode(ISSUE_CODE)
             .urgentCase("Yes")
@@ -149,6 +165,40 @@ class ServiceHearingsServiceTest {
             .doesNotContainNull();
 
         verify(ccdCaseService, times(1)).updateCaseData(any(SscsCaseData.class), eq(UPDATE_CASE_ONLY), anyString(), anyString());
+    }
+
+    @DisplayName("When a case V2 data is retrieved an entity which does not have a Id, that a new Id will be generated and the method updateCaseData will be called once")
+    @Test
+    void testGetServiceHearingValuesNoIdsForV2() throws Exception {
+        ReflectionTestUtils.setField(serviceHearingsService, "updatCaseOnlyHearingV2Enabled", true);
+        ServiceHearingRequest request = ServiceHearingRequest.builder()
+                .caseId(String.valueOf(CASE_ID))
+                .build();
+
+        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,true,false))
+                .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
+                        false,false, SessionCategory.CATEGORY_03,null));
+
+        given(idamService.getIdamTokens()).willReturn(idamTokens);
+        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
+
+        given(venueService.getEpimsIdForVenue(caseData.getProcessingVenue())).willReturn("9876");
+
+        given(refData.getVenueService()).willReturn(venueService);
+
+        given(ccdCaseService.getCaseDetails(String.valueOf(CASE_ID))).willReturn(caseDetails);
+
+        ServiceHearingValues result = serviceHearingsService.getServiceHearingValues(request);
+
+        assertThat(result.getParties())
+                .extracting("partyID")
+                .doesNotContainNull();
+
+        verify(updateCcdCaseService, times(1)).updateCaseV2(eq(CASE_ID),
+                eq(UPDATE_CASE_ONLY.getCcdType()),
+                eq("Updating caseDetails IDs"),
+                eq("IDs updated for caseDetails due to ServiceHearingValues request"),
+                eq(idamTokens), any(Consumer.class));
     }
 
     @DisplayName("When a listing error is throw due to invalid excluded dates, then catch the error, send a listing error event and rethrow the error")

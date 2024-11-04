@@ -10,17 +10,20 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
 import uk.gov.hmcts.reform.sscs.helper.mapping.HearingsCaseMapping;
 import uk.gov.hmcts.reform.sscs.helper.mapping.ServiceHearingValuesMapping;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.service.ServiceHearingRequest;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
 import uk.gov.hmcts.reform.sscs.model.service.linkedcases.ServiceLinkedCases;
@@ -39,6 +42,13 @@ public class ServiceHearingsService {
 
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
+    private final UpdateCcdCaseService updateCcdCaseService;
+
+    private final IdamService idamService;
+
+    @Value("${feature.update-case-only-hearing-v2.enabled}")
+    private boolean updatCaseOnlyHearingV2Enabled;
+
     public ServiceHearingValues getServiceHearingValues(ServiceHearingRequest request)
             throws GetCaseException, UpdateCaseException, ListingException, JsonProcessingException {
         SscsCaseDetails caseDetails = ccdCaseService.getCaseDetails(request.getCaseId());
@@ -51,12 +61,24 @@ public class ServiceHearingsService {
         String updatedCaseData = objectMapper.writeValueAsString(caseData);
 
         if (!originalCaseData.equals(updatedCaseData)) {
-            log.debug("Updating case data with Service Hearing Values for Case ID {}", caseData.getCcdCaseId());
-            ccdCaseService.updateCaseData(
-                    caseData,
-                    EventType.UPDATE_CASE_ONLY,
-                    "Updating caseDetails IDs",
-                    "IDs updated for caseDetails due to ServiceHearingValues request");
+            if (updatCaseOnlyHearingV2Enabled) {
+                log.debug("Updating case V2 data with Service Hearing Values for Case ID {}", caseData.getCcdCaseId());
+                Long currentCaseId = Long.parseLong(caseData.getCcdCaseId());
+                updateCcdCaseService.updateCaseV2(currentCaseId,
+                        EventType.UPDATE_CASE_ONLY.getType(),
+                        "Updating caseDetails IDs",
+                        "IDs updated for caseDetails due to ServiceHearingValues request",
+                        idamService.getIdamTokens(),
+                        sscsCaseDetails -> caseDetails.getData());
+
+            } else {
+                log.debug("Updating case data with Service Hearing Values for Case ID {}", caseData.getCcdCaseId());
+                ccdCaseService.updateCaseData(
+                        caseData,
+                        EventType.UPDATE_CASE_ONLY,
+                        "Updating caseDetails IDs",
+                        "IDs updated for caseDetails due to ServiceHearingValues request");
+            }
         }
 
         return model;
