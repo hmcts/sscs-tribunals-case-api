@@ -3,11 +3,6 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_1;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_2;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_3;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_4;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_POSTCODE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CORRECTION_GRANTED;
@@ -23,10 +18,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationVali
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
@@ -234,16 +226,8 @@ public class SendNotificationService {
         if (address != null) {
             Map<String, Object> placeholders = notification.getPlaceholders();
             String fullNameNoTitle = getNameToUseForLetter(wrapper, subscriptionWithType);
-            placeholders.put(ADDRESS_NAME, fullNameNoTitle);
 
-            List<String> addressConstants = List.of(LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
-                    LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE);
-
-            List<String> lines = lines(address);
-
-            for (int i = 0; i < lines.size(); i++) {
-                placeholders.put(addressConstants.get(i), defaultToEmptyStringIfNull(lines.get(i)));
-            }
+            placeholders.putAll(getAddressPlaceholders(address, fullNameNoTitle));
 
             placeholders.put(NAME, fullNameNoTitle);
             if (SubscriptionType.REPRESENTATIVE.equals(subscriptionWithType.getSubscriptionType())) {
@@ -272,6 +256,22 @@ public class SendNotificationService {
         }
     }
     
+    public static Map<String, Object> getAddressPlaceholders(final Address address, String fullNameNoTitle) {
+        Map<String, Object> addressPlaceHolders = new HashMap<>();
+
+        addressPlaceHolders.put(ADDRESS_LINE_1, fullNameNoTitle);
+
+        List<String> addressConstants = List.of(ADDRESS_LINE_2, ADDRESS_LINE_3, ADDRESS_LINE_4,
+                ADDRESS_LINE_5, POSTCODE_LITERAL);
+
+        List<String> lines = lines(address);
+
+        for (int i = 0; i < lines.size(); i++) {
+            addressPlaceHolders.put(addressConstants.get(i), defaultToEmptyStringIfNull(lines.get(i)));
+        }
+        return addressPlaceHolders;
+    }
+
     private static boolean isValidLetterAddress(Address addressToUse) {
         return null != addressToUse
             && isNotBlank(addressToUse.getLine1())

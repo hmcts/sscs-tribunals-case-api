@@ -8,12 +8,19 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.REP_SALUTATION;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists.EVENT_TYPES_FOR_BUNDLED_LETTER;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_1;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_2;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_3;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_4;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_5;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.POSTCODE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressToUseForLetter;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationServiceTest.verifyExpectedLogMessage;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationServiceTest.verifyNoErrorsLogged;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationHelper.getRepSalutation;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationService.getAddressPlaceholders;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.SendNotificationService.getBundledLetterDocumentUrl;
 
 import ch.qos.logback.classic.Level;
@@ -21,10 +28,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -496,6 +500,73 @@ public class SendNotificationServiceTest {
         classUnderTest.sendEmailSmsLetterNotification(buildBaseWrapper(APPELLANT_WITH_ADDRESS, NotificationEventType.APPEAL_RECEIVED, State.VALID_APPEAL.getId()), LETTER, appellantEmptySubscription, NotificationEventType.APPEAL_RECEIVED);
         verifyNoInteractions(notificationHandler);
     }
+
+    @Test
+    public void getAddressPlaceholders_returnsExpectedValuesUKkAddress() {
+        String fullNameNoTitle = "Jane Doe";
+        Address testAddress = Address.builder()
+                .line1("Somerset House")
+                .line2("Strand")
+                .town("London")
+                .county("Greater London")
+                .postcode("WC2R 1LA")
+                .inMainlandUk(YesNo.YES)
+                .build();
+
+        Map<String, Object> placeholders = getAddressPlaceholders(testAddress, fullNameNoTitle);
+
+        assertEquals("Jane Doe", placeholders.get(ADDRESS_LINE_1));
+        assertEquals("Somerset House", placeholders.get(ADDRESS_LINE_2));
+        assertEquals("Strand", placeholders.get(ADDRESS_LINE_3));
+        assertEquals("London", placeholders.get(ADDRESS_LINE_4));
+        assertEquals("Greater London", placeholders.get(ADDRESS_LINE_5));
+        assertEquals("WC2R 1LA", placeholders.get(POSTCODE_LITERAL));
+    }
+
+    public void getAddressPlaceholders_returnsExpectedValuesInternationalAddressNoPostcode() {
+        String fullNameNoTitle = "Jane Doe";
+        Address testAddress = Address.builder()
+                .line1("Catherdrale Notre-Dame de Paris")
+                .line2("6 Parvis Notre-dame - Pl. Jean-Paul II")
+                .town("Paris")
+                .county("Ile-de_France")
+                .country("France")
+                .inMainlandUk(YesNo.NO)
+                .build();
+
+        Map<String, Object> placeholders = getAddressPlaceholders(testAddress, fullNameNoTitle);
+
+        assertEquals("Jane Doe", placeholders.get(ADDRESS_LINE_1));
+        assertEquals("Catherdrale Notre-Dame de Paris", placeholders.get(ADDRESS_LINE_2));
+        assertEquals("6 Parvis Notre-dame - Pl. Jean-Paul II", placeholders.get(ADDRESS_LINE_3));
+        assertEquals("Paris", placeholders.get(ADDRESS_LINE_4));
+        assertEquals("Ile-de_France", placeholders.get(ADDRESS_LINE_5));
+        assertEquals("France", placeholders.get(POSTCODE_LITERAL));
+    }
+
+    @Test
+    public void getAddressPlaceholders_returnsExpectedKeys() {
+        String fullNameNoTitle = "Jane Doe";
+        Address testAddress = Address.builder()
+                .line1("Catherdrale Notre-Dame de Paris")
+                .line2("6 Parvis Notre-dame - Pl. Jean-Paul II")
+                .town("Paris")
+                .county("Ile-de_France")
+                .postcode("75004")
+                .country("France")
+                .inMainlandUk(YesNo.NO)
+                .build();
+
+        List<String> addressConstants = List.of(ADDRESS_LINE_1, ADDRESS_LINE_2, ADDRESS_LINE_3, ADDRESS_LINE_4,
+                ADDRESS_LINE_5, POSTCODE_LITERAL);
+
+        Map<String, Object> actualPlaceholders = getAddressPlaceholders(testAddress, fullNameNoTitle);
+        for (String addressConstant : addressConstants) {
+            assertTrue(actualPlaceholders.containsKey(addressConstant) && actualPlaceholders.get(addressConstant) != null);
+        }
+    }
+
+
 
     private void verifyNotificationIsSaved(NotificationHandler.SendNotification sender, NotificationEventType eventType, String ccdCaseId, SubscriptionType subscriptionType) {
         try {

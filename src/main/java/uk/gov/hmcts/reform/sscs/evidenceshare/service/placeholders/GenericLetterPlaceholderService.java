@@ -37,12 +37,12 @@ public class GenericLetterPlaceholderService {
         Address address = PlaceholderUtility.getAddress(caseData, letterType, otherPartyId);
         String name = PlaceholderUtility.getName(caseData, letterType, otherPartyId);
 
-        placeholders.putAll(getAddressPlaceHolders(address));
 
         if (name != null) {
             placeholders.put(ADDRESS_NAME, truncateAddressLine(name));
             placeholders.put(NAME, name);
         }
+        placeholders.putAll(getAddressPlaceHolders(address));
 
         String appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
         placeholders.put(APPELLANT_NAME, appellantName);
