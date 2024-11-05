@@ -150,7 +150,7 @@
     "LiveFrom": "18/03/2023",
     "CaseTypeID": "Benefit",
     "RoleName": "idam:caseworker-sscs-ibcaresponsewriter",
-    "CaseAccessCategories": "infectedBloodAppeal",
+    "CaseAccessCategories": "infectedBloodCompensation",
     "Authorisation": "",
     "ReadOnly": "N",
     "AccessProfiles": "caseworker,caseworker-sscs,caseworker-sscs-ibcaresponsewriter",
