@@ -79,6 +79,7 @@ public class EvidenceUploadServiceTest {
     private static final String JP_EMAIL = "jp@gmail.com";
     private static final String REP_EMAIL = "rep@gmail.com";
     private static final String APPELLANT_EMAIL = "app@gmail.com";
+    private static final String APPOINTEE_EMAIL = "appointee@gmail.com";
     private static final String OTHER_PARTY_EMAIL = "op@gmail.com";
     private static final String OTHER_PARTY_REP_EMAIL = "op-rep@gmail.com";
     private static final String OTHER_PARTY_APPOINTEE_EMAIL = "op-appointee@gmail.com";
@@ -758,6 +759,7 @@ public class EvidenceUploadServiceTest {
         JP_EMAIL + ", JOINT_PARTY, null, null",
         REP_EMAIL + ", REP, null, null",
         APPELLANT_EMAIL + ", APPELLANT, null, null",
+        APPOINTEE_EMAIL + ", APPOINTEE, null, null",
         OTHER_PARTY_EMAIL + ", OTHER_PARTY, 1, Oyster Smith",
         OTHER_PARTY_REP_EMAIL + ", OTHER_PARTY_REP, 2, Raj Smith",
         OTHER_PARTY_APPOINTEE_EMAIL + ", OTHER_PARTY_APPOINTEE, 4, Apple Smith"})
@@ -1162,7 +1164,10 @@ public class EvidenceUploadServiceTest {
                                 .appellantSubscription(Subscription.builder()
                                         .email(APPELLANT_EMAIL)
                                         .build())
-                                .build())
+                                .appointeeSubscription(Subscription.builder()
+                                    .email(APPOINTEE_EMAIL)
+                                    .build())
+                            .build())
                         .otherParties(List.of(new CcdValue<>(OtherParty.builder()
                                         .id("1")
                                         .name(Name.builder().firstName("Oyster").lastName("Smith").build())
