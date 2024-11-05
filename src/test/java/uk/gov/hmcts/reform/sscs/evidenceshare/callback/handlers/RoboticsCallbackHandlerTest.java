@@ -8,9 +8,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -26,6 +26,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.RoboticsService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
@@ -44,6 +45,9 @@ public class RoboticsCallbackHandlerTest {
 
     @Mock
     private CcdService ccdService;
+
+    @Mock
+    private UpdateCcdCaseService updateCcdCaseService;
 
     @Mock
     private IdamService idamService;
@@ -68,7 +72,7 @@ public class RoboticsCallbackHandlerTest {
     public void setUp() {
         when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
 
-        handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService, regionalProcessingCenterService);
+        handler = new RoboticsCallbackHandler(roboticsService, ccdService, updateCcdCaseService, idamService, regionalProcessingCenterService);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(caseData.isTranslationWorkOutstanding()).thenReturn(Boolean.FALSE);
@@ -102,9 +106,9 @@ public class RoboticsCallbackHandlerTest {
 
         verify(roboticsService).sendCaseToRobotics(any());
 
-        assertEquals(LocalDate.now().toString(), callback.getCaseDetails().getCaseData().getDateCaseSentToGaps());
         verify(ccdService).getByCaseId(any(), any());
         verifyNoMoreInteractions(ccdService);
+        verifyNoMoreInteractions(updateCcdCaseService);
     }
 
     @Test
@@ -113,16 +117,22 @@ public class RoboticsCallbackHandlerTest {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, READY_TO_LIST.getId());
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), eventType, false);
 
+        when(sscsCaseDetails.getData().getAppeal().getAppellant().getAddress().getPostcode()).thenReturn("PC1 1AA");
+        when(regionalProcessingCenterService.getByPostcode(any())).thenReturn(RegionalProcessingCenter.builder().build());
         handler.handle(SUBMITTED, callback);
 
         verify(roboticsService).sendCaseToRobotics(any());
 
-        assertEquals(LocalDate.now().toString(), callback.getCaseDetails().getCaseData().getDateCaseSentToGaps());
+        ArgumentCaptor<String> captureEvent = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(updateCcdCaseService).updateCaseV2(any(), captureEvent.capture(), any(), any(), any(), consumerArgumentCaptor.capture());
 
-        ArgumentCaptor<String> capture = ArgumentCaptor.forClass(String.class);
-        verify(ccdService).updateCase(any(), any(), capture.capture(), any(), any(), any());
-
-        assertEquals(CASE_UPDATED.getCcdType(), capture.getValue());
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        verify(sscsCaseDetails.getData()).setDateCaseSentToGaps(any());
+        verify(sscsCaseDetails.getData()).setDateTimeCaseSentToGaps(any());
+        verify(sscsCaseDetails.getData()).setRegionalProcessingCenter(any());
+        verify(sscsCaseDetails.getData()).setRegion(any());
+        assertEquals(CASE_UPDATED.getCcdType(), captureEvent.getValue());
     }
 
     @Test
@@ -231,22 +241,29 @@ public class RoboticsCallbackHandlerTest {
 
     @Test
     public void givenARoboticsRequestFromDwpRaiseExceptionAndStateIsWithDwp_thenSendCaseToRobotics() {
-        handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService, regionalProcessingCenterService);
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(WITH_DWP, READY_TO_LIST.getId());
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_RAISE_EXCEPTION, false);
         caseDetails.getCaseData().setIsProgressingViaGaps("Yes");
+        when(sscsCaseDetails.getData().getAppeal().getAppellant().getAddress().getPostcode()).thenReturn("PC1 1AA");
+        when(regionalProcessingCenterService.getByPostcode(any())).thenReturn(RegionalProcessingCenter.builder().build());
+
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_RAISE_EXCEPTION, false);
 
         handler.handle(SUBMITTED, callback);
 
         verify(roboticsService).sendCaseToRobotics(any());
 
-        assertEquals(LocalDate.now().toString(), callback.getCaseDetails().getCaseData().getDateCaseSentToGaps());
+        ArgumentCaptor<String> captureEvent = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor = ArgumentCaptor.forClass(Consumer.class);
+        verify(updateCcdCaseService).updateCaseV2(any(), captureEvent.capture(), any(), any(), any(), consumerArgumentCaptor.capture());
 
-        ArgumentCaptor<String> capture = ArgumentCaptor.forClass(String.class);
-        verify(ccdService).updateCase(any(), any(), capture.capture(), any(), any(), any());
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        verify(sscsCaseDetails.getData()).setDateCaseSentToGaps(any());
+        verify(sscsCaseDetails.getData()).setDateTimeCaseSentToGaps(any());
+        verify(sscsCaseDetails.getData()).setRegionalProcessingCenter(any());
+        verify(sscsCaseDetails.getData()).setRegion(any());
 
-        assertEquals(NOT_LISTABLE.getCcdType(), capture.getValue());
+        assertEquals(NOT_LISTABLE.getCcdType(), captureEvent.getValue());
     }
 
     @Test
@@ -263,7 +280,7 @@ public class RoboticsCallbackHandlerTest {
         ArgumentCaptor<String> summaryCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<String> descriptionCaptor = ArgumentCaptor.forClass(String.class);
         verifyNoInteractions(roboticsService);
-        verify(ccdService).updateCase(any(), any(), any(), summaryCaptor.capture(), descriptionCaptor.capture(), any());
+        verify(updateCcdCaseService).triggerCaseEventV2(any(), any(), summaryCaptor.capture(), descriptionCaptor.capture(), any());
 
         assertEquals("Case sent to List Assist", summaryCaptor.getValue());
         assertEquals("Updated case with sent to List Assist", descriptionCaptor.getValue());

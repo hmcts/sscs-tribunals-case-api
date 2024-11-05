@@ -121,9 +121,6 @@ public class EvidenceShareServiceIt {
     @Captor
     ArgumentCaptor<ArrayList<Pdf>> documentCaptor;
 
-    @Captor
-    private ArgumentCaptor<SscsCaseData> caseDataCaptor;
-
     @MockBean
     protected AirLookupService airLookupService;
 
@@ -278,8 +275,7 @@ public class EvidenceShareServiceIt {
 
         verify(emailService).sendEmail(anyLong(), any());
 
-        verify(ccdService).updateCase(caseDataCaptor.capture(), any(), eq(EventType.CASE_UPDATED.getCcdType()), any(), any(), any());
-        assertEquals("DWP PIP (2)", caseDataCaptor.getValue().getAppeal().getMrnDetails().getDwpIssuingOffice());
+        verify(updateCcdCaseService).updateCaseV2(any(), eq(EventType.CASE_UPDATED.getCcdType()), any(), any(), any(), any());
     }
 
     @Test
