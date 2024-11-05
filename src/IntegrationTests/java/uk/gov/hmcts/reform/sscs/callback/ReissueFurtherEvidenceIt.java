@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,7 +41,7 @@ public class ReissueFurtherEvidenceIt extends AbstractEventIt {
     public void setup() throws IOException {
         CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        mapper.registerModule(new JavaTimeModule());
+        mapper.findAndRegisterModules();
         json = getJson("callback/reissueFurtherEvidenceCallback.json");
         midEventPartialJson = getJson("callback/reissueFurtherEvidenceDocumentPartial.json");
         aboutToSubmitPartialJson = getJson("callback/reissueFurtherEvidenceOriginalSenderPartial.json");
