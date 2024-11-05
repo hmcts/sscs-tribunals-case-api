@@ -466,11 +466,12 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
 
         delayInSeconds(10);
         List<Notification> notifications = tryFetchNotificationsForTestCaseWithFlag(true, null, appealReceivedAppellantEmailId);
+        assertEquals(1, notifications.size());
 
+        delayInSeconds(10);
         SscsCaseDetails caseDetails = findCaseById(caseId);
         SscsCaseData caseData = caseDetails.getData();
 
-        assertEquals(1, notifications.size());
         assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
         assertEquals(1, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
         assertEquals(ReasonableAdjustmentStatus.REQUIRED, caseData.getReasonableAdjustmentsLetters().getAppellant().get(0).getValue().getReasonableAdjustmentStatus());
@@ -481,11 +482,12 @@ public class NotificationsFunctionalTest extends AbstractFunctionalTest {
         simulateCcdCallback(APPEAL_RECEIVED, BASE_PATH_TYAN + APPEAL_RECEIVED.getId() + "AppellantRepReasonableAdjustmentCallback.json");
         delayInSeconds(10);
         List<Notification> notifications = tryFetchNotificationsForTestCaseWithFlag(true, null, appealCreatedAppellantEmailId, appealCreatedAppellantSmsId);
+        assertEquals(2, notifications.size());
 
+        delayInSeconds(10);
         SscsCaseDetails caseDetails = findCaseById(caseId);
         SscsCaseData caseData = caseDetails.getData();
 
-        assertEquals(2, notifications.size());
         assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
         assertEquals(1, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
         assertEquals(1, caseData.getReasonableAdjustmentsLetters().getRepresentative().size());
