@@ -9,11 +9,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,11 +33,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentGeneration;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentStaging;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SendToFirstTier;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SendToFirstTierActions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdCallbackMap;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
@@ -44,11 +43,11 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @SpringBootTest(properties = {
-    "feature.postHearingsB.enabled=true",
+    "feature.postHearings.enabled=true",
     "feature.handle-ccd-callbackMap-v2.enabled=true"
 })
 @AutoConfigureMockMvc
-public class SendToFirstTierIt extends AbstractEventIt {
+public class IssueFinalDecisionSubmittedHandlerIt extends AbstractEventIt {
 
     @SpyBean
     private CcdCallbackMapService ccdCallbackMapService;
@@ -69,13 +68,15 @@ public class SendToFirstTierIt extends AbstractEventIt {
     public void setup() throws IOException {
         CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        mapper.findAndRegisterModules();
-        json = getJson("callback/sendToFirstTierRequest.json");
+        mapper.registerModule(new JavaTimeModule());
+        json = getJson("callback/postHearingRequest.json");
+        json = json.replaceFirst("invoking_event", "issueFinalDecision");
+        json = json.replaceFirst("\"isCorrectionFinalDecisionInProgress\": \"No\"", "\"isCorrectionFinalDecisionInProgress\": \"Yes\"");
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }
 
     @Test
-    public void callToSubmittedHandler_SendToFirstTierSubmittedHandler() throws Exception {
+    public void callToSubmittedHandler_willTriggerPostHearingRequestSubmittedHandler() throws Exception {
         CaseDetails caseDetails = CaseDetails.builder().data(Collections.EMPTY_MAP).build();
 
         Callback<SscsCaseData> callback = sscsCaseCallbackDeserializer.deserialize(json);
@@ -106,33 +107,21 @@ public class SendToFirstTierIt extends AbstractEventIt {
 
         assertThat(sscsCaseDetails.getData().getPostHearing().getSetAside())
                 .isNotNull();
+        assertThat(sscsCaseDetails.getData().getDocumentStaging().getPreviewDocument())
+                .isNotNull();
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdSubmittedEvent"));
 
         assertHttpStatus(response, HttpStatus.OK);
 
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-
-        SendToFirstTier sendToFirstTier = SendToFirstTier.builder()
-                .action(SendToFirstTierActions.DECISION_REMITTED)
-                .decisionDocument(DocumentLink.builder()
-                        .documentUrl("http://dm-store-aat.service.core-compute-aat.internal/documents/534405a9-f1d6-4b1f-aa6f-6cac5139da8d")
-                        .documentBinaryUrl("http://dm-store-aat.service.core-compute-aat.internal/documents/534405a9-f1d6-4b1f-aa6f-6cac5139da8d/binary")
-                        .documentFilename("hello.pdf")
-                        .build())
-                .build();
-
-        verify(ccdCallbackMapService).handleCcdCallbackMapV2(eq(sendToFirstTier.getAction()), anyLong());
+        verify(ccdCallbackMapService).handleCcdCallbackMapV2(isA(CcdCallbackMap.class), anyLong(), any(Consumer.class));
 
         assertThat(result.getErrors())
                 .isEmpty();
         assertThat(result.getData())
                 .isNotNull();
-        assertThat(result.getData().getPostHearing().getSendToFirstTier())
-                .isEqualTo(sendToFirstTier);
-        assertThat(result.getData().getDocumentGeneration())
-                .isEqualTo(DocumentGeneration.builder().build());
-        assertThat(result.getData().getDocumentStaging())
-                .isEqualTo(DocumentStaging.builder().build());
+        assertThat(result.getData().getPostHearing().getCorrection().getIsCorrectionFinalDecisionInProgress())
+                .isEqualTo(NO);
     }
 }
