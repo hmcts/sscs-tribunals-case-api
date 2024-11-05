@@ -12,7 +12,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState.REVIEW_BY_
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -71,7 +70,7 @@ public class ProcessAudioVideoIt extends AbstractEventIt {
 
         CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        mapper.registerModule(new JavaTimeModule());
+        mapper.findAndRegisterModules();
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }

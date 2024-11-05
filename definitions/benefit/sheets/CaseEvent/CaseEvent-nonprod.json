@@ -10,5 +10,17 @@
     "PostConditionState": "*",
     "SecurityClassification": "Public",
     "EventEnablingCondition": "appeal.benefitType.code!=\"infectedBloodAppeal\""
+  },
+  {
+    "LiveFrom": "30/10/2024",
+    "CaseTypeID": "Benefit",
+    "ID": "addHearingOutcome",
+    "Name": "Add hearing outcome",
+    "Description": "Add a hearing outcome",
+    "DisplayOrder": 140,
+    "PreConditionState(s)": "dormantAppealState;postHearing;withUT;hearing;readyToList",
+    "PostConditionState": "*",
+    "ShowEventNotes": "Y",
+    "SecurityClassification": "Public"
   }
 ]
