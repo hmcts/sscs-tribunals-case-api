@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -31,7 +30,7 @@ public class EventPublisherTest {
 
     private static final String JURISDICTION = "Benefit";
 
-    private ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
     @BeforeEach
     public void setup() {
