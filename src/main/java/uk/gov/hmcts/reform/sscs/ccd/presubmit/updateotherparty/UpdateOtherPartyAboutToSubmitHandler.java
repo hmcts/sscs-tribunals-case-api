@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_D
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
 import static uk.gov.hmcts.reform.sscs.idam.UserRole.SYSTEM_USER;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.clearOtherPartiesIfEmpty;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartiesWithClearedRoles;
 import static uk.gov.hmcts.reform.sscs.util.OtherPartyDataUtil.getOtherPartyUcb;
@@ -104,7 +105,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
             return response;
         }
         //Check if role is not entered for a Child support case
-        if (roleAbsentForOtherParties(sscsCaseData.getOtherParties())) {
+        if (!IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode()) && roleAbsentForOtherParties(sscsCaseData.getOtherParties())) {
             response.addError(ERR_ROLE_REQUIRED);
         }
         return response;
