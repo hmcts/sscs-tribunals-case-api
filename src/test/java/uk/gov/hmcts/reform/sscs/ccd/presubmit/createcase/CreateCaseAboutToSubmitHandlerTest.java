@@ -219,9 +219,11 @@ public class CreateCaseAboutToSubmitHandlerTest {
     @Test
     void shouldReturnErrorIfNullCreatedDate() throws CcdException {
         callback.getCaseDetails().getCaseData().setCaseCreated(null);
+        callback.getCaseDetails().getCaseData().setBenefitCode("015");
         PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
+        assertTrue(response.getErrors().contains("The Case Created Date must be set to generate the SSCS5"));
     }
 
     @Test

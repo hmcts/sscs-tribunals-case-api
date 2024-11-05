@@ -434,4 +434,24 @@ class SscsUtilTest {
         assertThat(response.getData().getAppeal().getHearingOptions().getLanguages()).isNull();
         assertEquals("Interpreter language must be selected if an interpreter is wanted.", response.getErrors().toArray()[0]);
     }
+
+    @Test
+    void givenEmploymentAndSupportAllowanceBenefitCodeThenReturnSscs1Type() {
+        assertEquals("SSCS1", getSscsType(SscsCaseData.builder().benefitCode("051").build()));
+    }
+
+    @Test
+    void givenChildSupportBenefitCodeThenReturnSscs2Type() {
+        assertEquals("SSCS2", getSscsType(SscsCaseData.builder().benefitCode("022").build()));
+    }
+
+    @Test
+    void givenGuardiansAllowanceBenefitCodeThenReturnSscs5Type() {
+        assertEquals("SSCS5", getSscsType(SscsCaseData.builder().benefitCode("015").build()));
+    }
+
+    @Test
+    void givenInfectedBloodCompensationBenefitCodeThenReturnSscs8Type() {
+        assertEquals("SSCS8", getSscsType(SscsCaseData.builder().benefitCode("093").build()));
+    }
 }

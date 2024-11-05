@@ -543,5 +543,11 @@ public class SscsUtil {
             }
         }
     }
+
+    public static String getSscsType(SscsCaseData caseData) {
+        return !isNull(caseData.getBenefitCode())
+                ? Benefit.getBenefitFromBenefitCode(caseData.getBenefitCode()).getSscsType().getId().toUpperCase()
+                : null;
+    }
 }
 
