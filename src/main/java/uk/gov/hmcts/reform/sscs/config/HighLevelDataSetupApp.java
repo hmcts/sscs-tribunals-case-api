@@ -5,6 +5,7 @@ import javax.crypto.AEADBadTagException;
 import javax.net.ssl.SSLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.befta.BeftaMain;
 import uk.gov.hmcts.befta.dse.ccd.CcdEnvironment;
 import uk.gov.hmcts.befta.dse.ccd.CcdRoleConfig;
@@ -88,21 +89,21 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     }
 
     @Override
-    protected boolean shouldTolerateDataSetupFailure() {
-        return BeftaMain.getConfig().getDefinitionStoreUrl().contains(".demo.");
-    }
-
-    @Override
     protected boolean shouldTolerateDataSetupFailure(Throwable e) {
-        int httpStatusCode504 = 504;
-        if (e instanceof ImportException) {
-            ImportException importException = (ImportException) e;
-            return importException.getHttpStatusCode() == httpStatusCode504;
+          /*
+            Sometimes a heavy CCD definition would take more than 30 secs and throws 504 error.
+            But still the CCD definition will eventually get imported without any issues.
+            So, the 504 error code can be tolerated.
+          */
+        if (e instanceof ImportException importException) {
+            return importException.getHttpStatusCode()==HttpStatus.GATEWAY_TIMEOUT.value();
         }
-        if (e instanceof SSLException) {
-            return true;
-        }
-        if (e instanceof AEADBadTagException) {
+
+        /*
+           ClassNotFoundException sometimes it times out
+           but throws java.lang.ClassNotFoundException: groovy.xml.XmlParser but def still gets uploaded
+        */
+        if (e instanceof SSLException || e instanceof AEADBadTagException || e instanceof ClassNotFoundException) {
             return true;
         }
         return shouldTolerateDataSetupFailure();
