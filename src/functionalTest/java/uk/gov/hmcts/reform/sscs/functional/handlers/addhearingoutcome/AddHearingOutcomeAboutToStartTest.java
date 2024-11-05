@@ -8,29 +8,33 @@ import io.restassured.http.Header;
 import java.io.IOException;
 import junitparams.JUnitParamsRunner;
 import org.apache.http.HttpStatus;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
 
-
-
 @RunWith(JUnitParamsRunner.class)
-@TestPropertySource(locations = "classpath:config/application_functional.properties")
+@TestPropertySource(locations = "classpath:config/application_functional.procperties")
 @SpringBootTest
 public class AddHearingOutcomeAboutToStartTest extends BaseHandler {
 
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
 
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
+    @Value("${idam.oauth2.user.email}")
+    private String idamSystemUpdateUser;
+
+    @Value("${idam.oauth2.user.password}")
+    private String idamSystemUpdatePassword;
+
+    private final IdamClient idamClient;
+
+    public AddHearingOutcomeAboutToStartTest(IdamClient idamClient) {
+        this.idamClient = idamClient;
+    }
+
 
     //based on aat case 1708512409621510
     @Test
@@ -39,10 +43,13 @@ public class AddHearingOutcomeAboutToStartTest extends BaseHandler {
         String jsonCallbackForTest = BaseHandler.getJsonCallbackForTest(
                 "handlers/addhearingoutcome/AddHearingOutcomeRequestAboutToStart.json");
 
+        String userAuthToken = idamClient.getAccessToken(idamSystemUpdateUser,  idamSystemUpdatePassword);
+
+
         RestAssured.given()
                 .contentType(ContentType.JSON)
                 .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
-                .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
+                .header(new Header("Authorization", userAuthToken))
                 .body(jsonCallbackForTest)
                 .post("/ccdAboutToStart")
                 .then()
