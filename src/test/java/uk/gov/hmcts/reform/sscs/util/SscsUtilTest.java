@@ -454,4 +454,9 @@ class SscsUtilTest {
     void givenInfectedBloodCompensationBenefitCodeThenReturnSscs8Type() {
         assertEquals("SSCS8", getSscsType(SscsCaseData.builder().benefitCode("093").build()));
     }
+
+    @Test
+    void givenNullBenefitCodeThenReturnNull() {
+        assertNull(getSscsType(SscsCaseData.builder().build()));
+    }
 }
