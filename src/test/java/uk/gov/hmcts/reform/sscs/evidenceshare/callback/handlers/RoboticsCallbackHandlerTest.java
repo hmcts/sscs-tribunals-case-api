@@ -117,13 +117,13 @@ public class RoboticsCallbackHandlerTest {
     @Parameters({"READY_TO_LIST", "RESEND_CASE_TO_GAPS2"})
     public void givenARoboticsRequestAndCreatedInGapsMatchesState_thenSendCaseToRoboticsAndSetSentToGapsDateAndTriggerUpdateCaseEvent(EventType eventType) {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, READY_TO_LIST.getId());
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), eventType, false);
 
         Appeal appeal = Mockito.mock(Appeal.class);
         when(appeal.getAppellant()).thenReturn(Appellant.builder().address(Address.builder().postcode("PC1 1AA").build()).build());
         caseDetails.getCaseData().setAppeal(appeal);
         when(regionalProcessingCenterService.getByPostcode(any())).thenReturn(RegionalProcessingCenter.builder().name("MyRPC").build());
 
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), eventType, false);
         handler.handle(SUBMITTED, callback);
 
         verify(roboticsService).sendCaseToRobotics(any());
