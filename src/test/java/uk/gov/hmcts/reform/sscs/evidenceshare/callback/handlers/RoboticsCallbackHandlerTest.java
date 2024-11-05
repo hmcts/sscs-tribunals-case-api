@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -20,6 +21,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -117,8 +119,11 @@ public class RoboticsCallbackHandlerTest {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, READY_TO_LIST.getId());
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), eventType, false);
 
-        when(sscsCaseDetails.getData().getAppeal().getAppellant().getAddress().getPostcode()).thenReturn("PC1 1AA");
-        when(regionalProcessingCenterService.getByPostcode(any())).thenReturn(RegionalProcessingCenter.builder().build());
+        Appeal appeal = Mockito.mock(Appeal.class);
+        when(appeal.getAppellant()).thenReturn(Appellant.builder().address(Address.builder().postcode("PC1 1AA").build()).build());
+        caseDetails.getCaseData().setAppeal(appeal);
+        when(regionalProcessingCenterService.getByPostcode(any())).thenReturn(RegionalProcessingCenter.builder().name("MyRPC").build());
+
         handler.handle(SUBMITTED, callback);
 
         verify(roboticsService).sendCaseToRobotics(any());
@@ -127,12 +132,15 @@ public class RoboticsCallbackHandlerTest {
         ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor = ArgumentCaptor.forClass(Consumer.class);
         verify(updateCcdCaseService).updateCaseV2(any(), captureEvent.capture(), any(), any(), any(), consumerArgumentCaptor.capture());
 
-        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
-        verify(sscsCaseDetails.getData()).setDateCaseSentToGaps(any());
-        verify(sscsCaseDetails.getData()).setDateTimeCaseSentToGaps(any());
-        verify(sscsCaseDetails.getData()).setRegionalProcessingCenter(any());
-        verify(sscsCaseDetails.getData()).setRegion(any());
         assertEquals(CASE_UPDATED.getCcdType(), captureEvent.getValue());
+
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        assertEquals(LocalDate.now().toString(), sscsCaseDetails.getData().getDateCaseSentToGaps());
+        assertNotNull(sscsCaseDetails.getData().getDateTimeCaseSentToGaps());
+        assertNotNull(sscsCaseDetails.getData().getRegionalProcessingCenter());
+        assertEquals("MyRPC", sscsCaseDetails.getData().getRegion());
     }
 
     @Test
@@ -244,8 +252,10 @@ public class RoboticsCallbackHandlerTest {
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(WITH_DWP, READY_TO_LIST.getId());
         caseDetails.getCaseData().setIsProgressingViaGaps("Yes");
-        when(sscsCaseDetails.getData().getAppeal().getAppellant().getAddress().getPostcode()).thenReturn("PC1 1AA");
-        when(regionalProcessingCenterService.getByPostcode(any())).thenReturn(RegionalProcessingCenter.builder().build());
+        Appeal appeal = Mockito.mock(Appeal.class);
+        when(appeal.getAppellant()).thenReturn(Appellant.builder().address(Address.builder().postcode("PC1 1AA").build()).build());
+        caseDetails.getCaseData().setAppeal(appeal);
+        when(regionalProcessingCenterService.getByPostcode(any())).thenReturn(RegionalProcessingCenter.builder().name("MyRPC").build());
 
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_RAISE_EXCEPTION, false);
 
@@ -253,15 +263,18 @@ public class RoboticsCallbackHandlerTest {
 
         verify(roboticsService).sendCaseToRobotics(any());
 
+
         ArgumentCaptor<String> captureEvent = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor = ArgumentCaptor.forClass(Consumer.class);
         verify(updateCcdCaseService).updateCaseV2(any(), captureEvent.capture(), any(), any(), any(), consumerArgumentCaptor.capture());
 
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(sscsCaseData).build();
         consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
-        verify(sscsCaseDetails.getData()).setDateCaseSentToGaps(any());
-        verify(sscsCaseDetails.getData()).setDateTimeCaseSentToGaps(any());
-        verify(sscsCaseDetails.getData()).setRegionalProcessingCenter(any());
-        verify(sscsCaseDetails.getData()).setRegion(any());
+        assertEquals(LocalDate.now().toString(), sscsCaseDetails.getData().getDateCaseSentToGaps());
+        assertNotNull(sscsCaseDetails.getData().getDateTimeCaseSentToGaps());
+        assertNotNull(sscsCaseDetails.getData().getRegionalProcessingCenter());
+        assertEquals("MyRPC", sscsCaseDetails.getData().getRegion());
 
         assertEquals(NOT_LISTABLE.getCcdType(), captureEvent.getValue());
     }
