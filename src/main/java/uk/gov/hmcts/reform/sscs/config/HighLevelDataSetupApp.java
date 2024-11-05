@@ -17,28 +17,29 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
     private static final Logger logger = LoggerFactory.getLogger(HighLevelDataSetupApp.class);
 
     private static final CcdRoleConfig[] CCD_ROLES = {
-         new CcdRoleConfig("citizen", "PUBLIC"),
-         new CcdRoleConfig("caseworker", "PUBLIC"),
-         new CcdRoleConfig("caseworker-sscs", "PUBLIC"),
-         new CcdRoleConfig("caseworker-sscs-systemupdate", "PUBLIC"),
-         new CcdRoleConfig("caseworker-sscs-anonymouscitizen", "PUBLIC"),
-         new CcdRoleConfig("caseworker-sscs-callagent", "PUBLIC"),
-         new CcdRoleConfig("caseworker-sscs-judge", "PUBLIC"),
-         new CcdRoleConfig("caseworker-sscs-judge-salaried", "PUBLIC"),
-         new CcdRoleConfig("caseworker-sscs-clerk", "PUBLIC"),
-         new CcdRoleConfig("caseworker-sscs-dwpresponsewriter", "PUBLIC"),
-         new CcdRoleConfig("caseworker-sscs-registrar", "PUBLIC"),
-         new CcdRoleConfig("caseworker-sscs-superuser", "PUBLIC"),
-         new CcdRoleConfig("caseworker-sscs-teamleader", "PUBLIC"),
-         new CcdRoleConfig("caseworker-sscs-panelmember", "PUBLIC"),
-         new CcdRoleConfig("caseworker-sscs-bulkscan", "PUBLIC"),
-         new CcdRoleConfig("caseworker-sscs-pcqextractor", "PUBLIC"),
-         new CcdRoleConfig("caseworker-sscs-hmrcresponsewriter", "PUBLIC"),
-         new CcdRoleConfig("caseworker-sscs-ibcaresponsewriter", "PUBLIC"),
-         new CcdRoleConfig("caseworker-wa-task-configuration", "PUBLIC"),
-         new CcdRoleConfig("caseworker-ras-validation", "PUBLIC"),
-         new CcdRoleConfig("GS_profile", "PUBLIC")
-     };
+        new CcdRoleConfig("citizen", "PUBLIC"),
+        new CcdRoleConfig("caseworker", "PUBLIC"),
+        new CcdRoleConfig("caseworker-sscs", "PUBLIC"),
+        new CcdRoleConfig("caseworker-sscs-systemupdate", "PUBLIC"),
+        new CcdRoleConfig("caseworker-sscs-anonymouscitizen", "PUBLIC"),
+        new CcdRoleConfig("caseworker-sscs-callagent", "PUBLIC"),
+        new CcdRoleConfig("caseworker-sscs-judge", "PUBLIC"),
+        new CcdRoleConfig("caseworker-sscs-judge-salaried", "PUBLIC"),
+        new CcdRoleConfig("caseworker-sscs-clerk", "PUBLIC"),
+        new CcdRoleConfig("caseworker-sscs-dwpresponsewriter", "PUBLIC"),
+        new CcdRoleConfig("caseworker-sscs-registrar", "PUBLIC"),
+        new CcdRoleConfig("caseworker-sscs-superuser", "PUBLIC"),
+        new CcdRoleConfig("caseworker-sscs-teamleader", "PUBLIC"),
+        new CcdRoleConfig("caseworker-sscs-panelmember", "PUBLIC"),
+        new CcdRoleConfig("caseworker-sscs-bulkscan", "PUBLIC"),
+        new CcdRoleConfig("caseworker-sscs-pcqextractor", "PUBLIC"),
+        new CcdRoleConfig("caseworker-sscs-hmrcresponsewriter", "PUBLIC"),
+        new CcdRoleConfig("caseworker-sscs-ibcaresponsewriter", "PUBLIC"),
+        new CcdRoleConfig("caseworker-wa-task-configuration", "PUBLIC"),
+        new CcdRoleConfig("caseworker-ras-validation", "PUBLIC"),
+        new CcdRoleConfig("GS_profile", "PUBLIC")
+    };
+
 
     private final CcdEnvironment environment;
 
