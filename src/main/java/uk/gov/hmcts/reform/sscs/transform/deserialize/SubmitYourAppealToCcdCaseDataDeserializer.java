@@ -604,7 +604,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     private static Subscriptions populateSubscriptions(SyaCaseWrapper syaCaseWrapper) {
 
         return Subscriptions.builder()
-            .appellantSubscription(syaCaseWrapper.getIsAppointee() != null && !syaCaseWrapper.getIsAppointee()
+            .appellantSubscription(syaCaseWrapper.getIsAppointee() == null || !syaCaseWrapper.getIsAppointee()
                 ? getAppellantSubscription(syaCaseWrapper) : null)
             .appointeeSubscription(syaCaseWrapper.getIsAppointee() != null && syaCaseWrapper.getIsAppointee()
                 ? getAppointeeSubscription(syaCaseWrapper) : null)
