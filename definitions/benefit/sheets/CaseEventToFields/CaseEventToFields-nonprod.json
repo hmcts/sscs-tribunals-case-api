@@ -21,16 +21,5 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
     "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "LiveFrom": "04/07/2022",
-    "CaseEventID": "addHearingOutcome",
-    "CaseFieldID": "hearingOutcomeValue",
-    "CaseTypeID": "Benefit",
-    "DisplayContext": "COMPLEX",
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
-    "PageID": "1.0",
-    "ShowSummaryChangeOption": "Y"
   }
 ]
