@@ -12,7 +12,7 @@
     "ShowSummaryChangeOption": "Y"
   },
   {
-    "LiveFrom": "04/07/2022",
+    "LiveFrom": "30/10/2024",
     "CaseEventID": "addHearingOutcome",
     "CaseFieldID": "hearingOutcomeValue",
     "CaseTypeID": "Benefit",
