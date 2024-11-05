@@ -152,16 +152,7 @@ public class AddHearingOutcomeAboutToSubmitHandlerTest {
 
         assertEquals(2, response.getData().getHearingOutcomes().size());
 
-        HearingOutcomeDetails hearingOutcomeDetails2 = response.getData().getHearingOutcomes().get(0).getValue();
-        assertEquals("2", hearingOutcomeDetails2.getCompletedHearingId());
-        assertEquals(start2, hearingOutcomeDetails2.getHearingStartDateTime());
-        assertEquals(end2, hearingOutcomeDetails2.getHearingEndDateTime());
-        assertEquals(hearingOutcomeId2, hearingOutcomeDetails2.getHearingOutcomeId());
-        assertEquals(YES, hearingOutcomeDetails2.getDidPoAttendHearing());
-        assertEquals(HearingChannel.FACE_TO_FACE, hearingOutcomeDetails2.getHearingChannelId());
-        assertEquals(epims2, hearingOutcomeDetails2.getEpimsId());
-
-        HearingOutcomeDetails hearingOutcomeDetails1 = response.getData().getHearingOutcomes().get(1).getValue();
+        HearingOutcomeDetails hearingOutcomeDetails1 = response.getData().getHearingOutcomes().get(0).getValue();
         assertEquals("1", hearingOutcomeDetails1.getCompletedHearingId());
         assertEquals(start1, hearingOutcomeDetails1.getHearingStartDateTime());
         assertEquals(end1, hearingOutcomeDetails1.getHearingEndDateTime());
@@ -169,6 +160,15 @@ public class AddHearingOutcomeAboutToSubmitHandlerTest {
         assertEquals(YES, hearingOutcomeDetails1.getDidPoAttendHearing());
         assertEquals(HearingChannel.FACE_TO_FACE, hearingOutcomeDetails1.getHearingChannelId());
         assertEquals(epims1, hearingOutcomeDetails1.getEpimsId());
+
+        HearingOutcomeDetails hearingOutcomeDetails2 = response.getData().getHearingOutcomes().get(1).getValue();
+        assertEquals("2", hearingOutcomeDetails2.getCompletedHearingId());
+        assertEquals(start2, hearingOutcomeDetails2.getHearingStartDateTime());
+        assertEquals(end2, hearingOutcomeDetails2.getHearingEndDateTime());
+        assertEquals(hearingOutcomeId2, hearingOutcomeDetails2.getHearingOutcomeId());
+        assertEquals(YES, hearingOutcomeDetails2.getDidPoAttendHearing());
+        assertEquals(HearingChannel.FACE_TO_FACE, hearingOutcomeDetails2.getHearingChannelId());
+        assertEquals(epims2, hearingOutcomeDetails2.getEpimsId());
     }
 
     @Test
