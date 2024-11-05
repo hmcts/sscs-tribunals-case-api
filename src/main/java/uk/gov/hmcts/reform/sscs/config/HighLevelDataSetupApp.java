@@ -40,6 +40,7 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
         new CcdRoleConfig("GS_profile", "PUBLIC")
     };
 
+
     private final CcdEnvironment environment;
 
     public HighLevelDataSetupApp(CcdEnvironment dataSetupEnvironment) {
@@ -89,7 +90,7 @@ public class HighLevelDataSetupApp extends DataLoaderToDefinitionStore {
 
     @Override
     protected boolean shouldTolerateDataSetupFailure() {
-        return BeftaMain.getConfig().getDefinitionStoreUrl().contains(".demo.");
+        return BeftaMain.getConfig().getDefinitionStoreUrl().contains("demo");
     }
 
     @Override
