@@ -3,11 +3,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.addhearingoutcome;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -81,16 +79,12 @@ public class AddHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbackH
         if (sscsCaseData.getHearingOutcomes() == null) {
             sscsCaseData.setHearingOutcomes(new ArrayList<>());
         }
+
         sscsCaseData.getHearingOutcomes().add(hearingOutcome);
-
-//        List<HearingOutcome> hearingOutcomeList = sscsCaseData.getHearingOutcomes();
-
-//        Collections.sort(hearingOutcomeList, Comparator.comparing(a -> a.getValue().getHearingStartDateTime()));
 
         List<HearingOutcome> hearingOutcomeSortedList = sscsCaseData.getHearingOutcomes().stream()
                 .sorted(Comparator.comparing(a -> a.getValue().getHearingStartDateTime()))
                         .collect(Collectors.toList());
-
         sscsCaseData.setHearingOutcomes(hearingOutcomeSortedList);
 
         sscsCaseData.getHearingOutcomeValue().setHearingOutcomeId(null);
