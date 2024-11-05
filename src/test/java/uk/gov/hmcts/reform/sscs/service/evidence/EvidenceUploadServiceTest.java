@@ -54,6 +54,7 @@ import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.service.ReadCcdCaseService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
@@ -103,6 +104,7 @@ public class EvidenceUploadServiceTest {
     private PdfStoreService pdfStoreService;
     private IdamService idamService;
     private SscsCcdConvertService sscsCcdConvertService;
+    private ReadCcdCaseService readCcdCaseService;
     private CcdClient ccdClient;
     private FileToPdfConversionService fileToPdfConversionService;
     @Captor
@@ -132,6 +134,7 @@ public class EvidenceUploadServiceTest {
         evidenceManagementService = mock(EvidenceManagementService.class);
         pdfStoreService = mock(PdfStoreService.class);
         documentStoreService = mock(DocumentStoreService.class);
+        readCcdCaseService = mock(ReadCcdCaseService.class);
 
         evidenceUploadService(new AddedDocumentsUtil(false));
 
@@ -414,7 +417,7 @@ public class EvidenceUploadServiceTest {
         ccdClient = mock(CcdClient.class);
 
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
-        updateCcdCaseService = new UpdateCcdCaseService(idamService, sscsCcdConvertService, ccdClient);
+        updateCcdCaseService = new UpdateCcdCaseService(idamService, sscsCcdConvertService, ccdClient, readCcdCaseService);
 
         evidenceUploadService = new EvidenceUploadService(
                 documentStoreService,
@@ -455,7 +458,7 @@ public class EvidenceUploadServiceTest {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
 
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
-        updateCcdCaseService = new UpdateCcdCaseService(idamService, sscsCcdConvertService, ccdClient);
+        updateCcdCaseService = new UpdateCcdCaseService(idamService, sscsCcdConvertService, ccdClient, readCcdCaseService);
 
         evidenceUploadService = new EvidenceUploadService(
                 documentStoreService,
