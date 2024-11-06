@@ -194,11 +194,11 @@ class ServiceHearingsServiceTest {
                 .extracting("partyID")
                 .doesNotContainNull();
 
-        verify(updateCcdCaseService, times(1)).updateCaseV2(eq(CASE_ID),
+        verify(updateCcdCaseService, times(1)).triggerCaseEventV2(eq(CASE_ID),
                 eq(UPDATE_CASE_ONLY.getCcdType()),
                 eq("Updating caseDetails IDs"),
                 eq("IDs updated for caseDetails due to ServiceHearingValues request"),
-                eq(idamTokens), any(Consumer.class));
+                eq(idamTokens));
     }
 
     @DisplayName("When a listing error is throw due to invalid excluded dates, then catch the error, send a listing error event and rethrow the error")
