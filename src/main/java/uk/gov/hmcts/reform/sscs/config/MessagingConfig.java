@@ -34,7 +34,9 @@ public class MessagingConfig {
                                                   @Autowired final String jmsUrlString,
                                                   @Autowired(required = false) final SSLContext jmsSslContext,
                                                   @Value("${amqp.prefetch.override}") final boolean prefetchOverride,
-                                                  @Value("${amqp.prefetch.topicPrefetch}") final int topicPrefetch) {
+                                                  @Value("${amqp.prefetch.topicPrefetch}") final int topicPrefetch,
+                                                  @Value("${amqp.reconnectOnException}") final boolean reconnectOnException
+                                                  ) {
         JmsConnectionFactory jmsConnectionFactory = new JmsConnectionFactory(jmsUrlString);
         jmsConnectionFactory.setUsername(username);
         jmsConnectionFactory.setPassword(password);
@@ -49,7 +51,11 @@ public class MessagingConfig {
             prefetchPolicy.setDurableTopicPrefetch(topicPrefetch);
             jmsConnectionFactory.setPrefetchPolicy(prefetchPolicy);
         }
-        return new CachingConnectionFactory(jmsConnectionFactory);
+        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(jmsConnectionFactory);
+        if (reconnectOnException) {
+            cachingConnectionFactory.setReconnectOnException(true);
+        }
+        return cachingConnectionFactory;
     }
 
     @Bean
