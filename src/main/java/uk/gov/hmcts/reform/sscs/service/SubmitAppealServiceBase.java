@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_INCOMPLETE_APPLICATION;
@@ -211,18 +209,16 @@ public abstract class SubmitAppealServiceBase {
     protected void addAssociatedCases(final SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
         log.info("Adding {} associated cases for case id {}", matchedByNinoCases.size(), caseData.getCcdCaseId());
 
-        matchedByNinoCases.stream().map(sscsCaseDetails -> CaseLink.builder().value(
+        List<CaseLink> caseLinks = matchedByNinoCases.stream().map(sscsCaseDetails -> CaseLink.builder().value(
                         CaseLinkDetails.builder().caseReference(sscsCaseDetails.getId().toString()).build()).build())
-                .collect(collectingAndThen(toList(),
-                        caseLinks -> {
-                            if (caseLinks.isEmpty()) {
-                                caseData.setLinkedCasesBoolean("No");
-                            } else {
-                                caseData.setAssociatedCase(caseLinks);
-                                caseData.setLinkedCasesBoolean("Yes");
-                            }
-                            return true;
-                        }));
+                .toList();
+
+        if (caseLinks.isEmpty()) {
+            caseData.setLinkedCasesBoolean("No");
+        } else {
+            caseData.setAssociatedCase(caseLinks);
+            caseData.setLinkedCasesBoolean("Yes");
+        }
     }
 
     protected IdamTokens getUserTokens(String oauth2Token) {
