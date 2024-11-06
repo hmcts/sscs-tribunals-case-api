@@ -234,8 +234,8 @@ public class SubmitAppealServiceTestV2 extends AbstractSubmitAppealServiceTest {
 
         assertThat(updatedSscsCaseDetails.getData().getLinkedCasesBoolean())
                 .isEqualTo("Yes");
-        assertThat(updatedSscsCaseDetails.getData().getAssociatedCase().size())
-                .isEqualTo(1);
+        assertThat(updatedSscsCaseDetails.getData().getAssociatedCase())
+                .hasSize(1);
         assertThat(updatedSscsCaseDetails.getData().getAssociatedCase().get(0))
                 .isEqualTo(CaseLink.builder().value(
                         CaseLinkDetails.builder().caseReference(String.valueOf(linkedCaseId)).build()).build());

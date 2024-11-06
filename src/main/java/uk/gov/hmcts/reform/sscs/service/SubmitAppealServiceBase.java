@@ -62,7 +62,7 @@ public abstract class SubmitAppealServiceBase {
     protected UpdateCcdCaseService updateCcdCaseService;
     protected final boolean caseAccessManagementFeature;
 
-    public SubmitAppealServiceBase(CcdService ccdService,
+    protected SubmitAppealServiceBase(CcdService ccdService,
                                    CitizenCcdService citizenCcdService,
                                    IdamService idamService,
                                    ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
@@ -82,7 +82,7 @@ public abstract class SubmitAppealServiceBase {
         this.venueService = venueService;
     }
 
-    public SubmitAppealServiceBase(CcdService ccdService,
+    protected SubmitAppealServiceBase(CcdService ccdService,
                                    CitizenCcdService citizenCcdService,
                                    IdamService idamService,
                                    ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
