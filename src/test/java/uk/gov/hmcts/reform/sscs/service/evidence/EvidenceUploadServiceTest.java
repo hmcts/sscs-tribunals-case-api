@@ -104,7 +104,6 @@ public class EvidenceUploadServiceTest {
     private PdfStoreService pdfStoreService;
     private IdamService idamService;
     private SscsCcdConvertService sscsCcdConvertService;
-    private ReadCcdCaseService readCcdCaseService;
     private CcdClient ccdClient;
     private FileToPdfConversionService fileToPdfConversionService;
     private ReadCcdCaseService readCcdCaseService;
@@ -136,7 +135,6 @@ public class EvidenceUploadServiceTest {
         evidenceManagementService = mock(EvidenceManagementService.class);
         pdfStoreService = mock(PdfStoreService.class);
         documentStoreService = mock(DocumentStoreService.class);
-        readCcdCaseService = mock(ReadCcdCaseService.class);
 
         evidenceUploadService(new AddedDocumentsUtil(false));
 
