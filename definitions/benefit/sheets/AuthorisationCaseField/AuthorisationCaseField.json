@@ -990,6 +990,7 @@
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "dwpEditedResponseDocument", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "dwpChallengeValidityDocument", "AccessProfile": "caseworker-sscs-teamleader", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "dwpChallengeValidityDocument", "AccessProfile": "caseworker-sscs-hmrcresponsewriter", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "dwpChallengeValidityDocument", "AccessProfile": "caseworker-sscs-ibcaresponsewriter", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "responseRequired", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "pcqId", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
   {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseFieldID": "pcqId", "AccessProfile": "caseworker-sscs-pcqextractor", "CRUD": "CRUD"},
