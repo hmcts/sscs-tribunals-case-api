@@ -9,11 +9,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_VALID_APPEA
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
 
 import feign.FeignException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -21,7 +24,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -34,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
@@ -249,6 +255,41 @@ public abstract class SubmitAppealServiceBase {
             log.error("The case data has been altered outside of this transaction for idam id {}",
                     idamTokens.getUserId());
         }
+    }
+
+
+    protected SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal,
+                                             Function<RegionalProcessingCenter, SscsCaseData> getCaseData) {
+
+        String postCode = resolvePostCode(appeal);
+        String firstHalfOfPostcode = getFirstHalfOfPostcode(postCode);
+        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
+
+        SscsCaseData sscsCaseData = getCaseData.apply(rpc);
+
+        sscsCaseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
+        String processingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
+        sscsCaseData.setProcessingVenue(processingVenue);
+
+        if (caseAccessManagementFeature
+                && StringUtils.isNotEmpty(processingVenue)
+                && rpc != null) {
+            String venueEpimsId = venueService.getEpimsIdForVenue(processingVenue);
+            CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
+
+            sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
+                    .baseLocation(rpc.getEpimsId())
+                    .region(courtVenue.getRegionId()).build());
+
+            log.info("Successfully updated case management location details for case {}. Processing venue {}, epimsId {}",
+                    appeal.getCcdCaseId(), processingVenue, venueEpimsId);
+        }
+
+        log.info("{} - setting venue name to {}",
+                sscsCaseData.getAppeal().getAppellant().getIdentity().getNino(),
+                sscsCaseData.getProcessingVenue());
+
+        return sscsCaseData;
     }
 
 }

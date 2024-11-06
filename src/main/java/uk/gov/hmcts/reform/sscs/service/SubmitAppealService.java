@@ -3,24 +3,20 @@ package uk.gov.hmcts.reform.sscs.service;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_INCOMPLETE_APPLICATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_NON_COMPLIANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_TO_VALID_APPEAL_CREATED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseDataV1;
 
 import feign.FeignException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseManagementLocation;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
@@ -31,7 +27,6 @@ import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
 import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.model.CourtVenue;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
@@ -152,40 +147,13 @@ public class SubmitAppealService extends SubmitAppealServiceBase {
         return caseDetails.getId();
     }
 
-
     SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal) {
-
-        String postCode = resolvePostCode(appeal);
-        String firstHalfOfPostcode = getFirstHalfOfPostcode(postCode);
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
-
-        SscsCaseData sscsCaseData = rpc == null
-                ? convertSyaToCcdCaseDataV1(appeal, caseAccessManagementFeature)
-                : convertSyaToCcdCaseDataV1(appeal, rpc.getName(), rpc, caseAccessManagementFeature);
-
-        sscsCaseData.setCreatedInGapsFrom(READY_TO_LIST.getId());
-        String processingVenue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
-        sscsCaseData.setProcessingVenue(processingVenue);
-
-        if (caseAccessManagementFeature
-                && StringUtils.isNotEmpty(processingVenue)
-                && rpc != null) {
-            String venueEpimsId = venueService.getEpimsIdForVenue(processingVenue);
-            CourtVenue courtVenue = refDataService.getCourtVenueRefDataByEpimsId(venueEpimsId);
-
-            sscsCaseData.setCaseManagementLocation(CaseManagementLocation.builder()
-                    .baseLocation(rpc.getEpimsId())
-                    .region(courtVenue.getRegionId()).build());
-
-            log.info("Successfully updated case management location details for case {}. Processing venue {}, epimsId {}",
-                    appeal.getCcdCaseId(), processingVenue, venueEpimsId);
-        }
-
-        log.info("{} - setting venue name to {}",
-                sscsCaseData.getAppeal().getAppellant().getIdentity().getNino(),
-                sscsCaseData.getProcessingVenue());
-
-        return sscsCaseData;
+        return convertAppealToSscsCaseData(
+                appeal,
+                rpc -> Objects.isNull(rpc)
+                        ? convertSyaToCcdCaseDataV1(appeal, caseAccessManagementFeature)
+                        : convertSyaToCcdCaseDataV1(appeal, rpc.getName(), rpc, caseAccessManagementFeature)
+                );
     }
 
     private SscsCaseDetails createOrUpdateCase(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
