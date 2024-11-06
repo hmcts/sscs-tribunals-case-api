@@ -720,7 +720,7 @@ public class LetterUtilsTest {
                 .line1("Catherdrale Notre-Dame de Paris")
                 .line2("6 Parvis Notre-dame - Pl. Jean-Paul II")
                 .town("Paris")
-                .county("Ile-de_France")
+                .county("Ile-de-France")
                 .postcode("75004")
                 .country("France")
                 .inMainlandUk(YesNo.NO)
@@ -741,7 +741,7 @@ public class LetterUtilsTest {
                 .line1("Catherdrale Notre-Dame de Paris")
                 .line2("6 Parvis Notre-dame - Pl. Jean-Paul II")
                 .town("Paris")
-                .county("Ile-de_France")
+                .county("Ile-de-France")
                 .country("France")
                 .inMainlandUk(YesNo.NO)
                 .build();

@@ -533,7 +533,7 @@ public class SendNotificationServiceTest {
                 .line1("Catherdrale Notre-Dame de Paris")
                 .line2("6 Parvis Notre-dame - Pl. Jean-Paul II")
                 .town("Paris")
-                .county("Ile-de_France")
+                .county("Ile-de-France")
                 .country("France")
                 .inMainlandUk(YesNo.NO)
                 .build();
@@ -544,7 +544,7 @@ public class SendNotificationServiceTest {
         assertEquals("Catherdrale Notre-Dame de Paris", placeholders.get(ADDRESS_LINE_2));
         assertEquals("6 Parvis Notre-dame - Pl. Jean-Paul II", placeholders.get(ADDRESS_LINE_3));
         assertEquals("Paris", placeholders.get(ADDRESS_LINE_4));
-        assertEquals("Ile-de_France", placeholders.get(ADDRESS_LINE_5));
+        assertEquals("Ile-de-France", placeholders.get(ADDRESS_LINE_5));
         assertEquals("France", placeholders.get(POSTCODE_LITERAL));
     }
 
@@ -555,7 +555,7 @@ public class SendNotificationServiceTest {
                 .line1("Catherdrale Notre-Dame de Paris")
                 .line2("6 Parvis Notre-dame - Pl. Jean-Paul II")
                 .town("Paris")
-                .county("Ile-de_France")
+                .county("Ile-de-France")
                 .postcode("75004")
                 .country("France")
                 .inMainlandUk(YesNo.NO)
