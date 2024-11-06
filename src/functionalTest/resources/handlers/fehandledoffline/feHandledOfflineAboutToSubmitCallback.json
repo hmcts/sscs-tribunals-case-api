@@ -4,7 +4,7 @@
     "jurisdiction": "SSCS",
     "state": "validAppeal",
     "version": 2,
-    "case_type_id": "Benefit",
+    "case_type_id": "Benefit-4106",
     "created_date": [
       2019,
       12,
@@ -966,7 +966,7 @@
     "jurisdiction": "SSCS",
     "state": "validAppeal",
     "version": 2,
-    "case_type_id": "Benefit",
+    "case_type_id": "Benefit-4106",
     "created_date": [
       2019,
       12,

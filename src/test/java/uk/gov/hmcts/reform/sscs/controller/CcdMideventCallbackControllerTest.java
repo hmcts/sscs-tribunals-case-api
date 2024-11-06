@@ -128,7 +128,7 @@ public class CcdMideventCallbackControllerTest {
 
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build()).build();
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-                new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
+                new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit-4106"),
                 Optional.empty(), INTERLOC_INFORMATION_RECEIVED, false));
 
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -152,7 +152,7 @@ public class CcdMideventCallbackControllerTest {
 
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-                new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
+                new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit-4106"),
                 Optional.empty(), INTERLOC_INFORMATION_RECEIVED, false));
 
         PreSubmitCallbackResponse<SscsCaseData> response =
@@ -189,7 +189,7 @@ public class CcdMideventCallbackControllerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
 
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit-4106"),
             Optional.empty(), ADMIN_RESTORE_CASES, false));
 
         String expectedErrorsString = List.of("\"" + status + "\"").toString();
@@ -222,7 +222,7 @@ public class CcdMideventCallbackControllerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
 
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit-4106"),
             Optional.empty(), ADMIN_RESTORE_CASES, false));
 
         String expectedErrorsString = Arrays.asList("\"" + status.toString() + "\"").toString();
@@ -255,7 +255,7 @@ public class CcdMideventCallbackControllerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
 
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit-4106"),
             Optional.empty(), ADMIN_RESTORE_CASES, false));
 
         String expectedWarningsString = Arrays.asList("\"" + status.toString() + "\"", "Completed - no more cases").toString();
@@ -285,7 +285,7 @@ public class CcdMideventCallbackControllerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
 
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit-4106"),
             Optional.empty(), ADMIN_RESTORE_CASES, false));
 
         String expectedErrorsString = Arrays.asList("anything").toString();
@@ -313,7 +313,7 @@ public class CcdMideventCallbackControllerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
 
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit-4106"),
             Optional.empty(), ADMIN_RESTORE_CASES, false));
 
         String expectedErrorsString = Arrays.asList("anything").toString();
@@ -351,7 +351,7 @@ public class CcdMideventCallbackControllerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
 
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit-4106"),
             Optional.empty(), ADMIN_RESTORE_CASES, false));
 
         String expectedWarningsString = Arrays.asList("\"" + status.toString() + "\"", "Completed - no more cases").toString();
@@ -487,7 +487,7 @@ public class CcdMideventCallbackControllerTest {
     private Callback returnCallback() {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
         return new Callback<>(
-                new CaseDetails<>(ID, JURISDICTION, State.HEARING, sscsCaseData, LocalDateTime.now(), "Benefit"),
+                new CaseDetails<>(ID, JURISDICTION, State.HEARING, sscsCaseData, LocalDateTime.now(), "Benefit-4106"),
                 Optional.empty(), ADJOURN_CASE, false);
     }
 

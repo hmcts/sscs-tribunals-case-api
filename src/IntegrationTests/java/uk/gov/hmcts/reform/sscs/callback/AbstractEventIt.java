@@ -42,7 +42,7 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 @ActiveProfiles("integration")
 public abstract class AbstractEventIt {
 
-    protected static final String JURISDICTION = "Benefit";
+    protected static final String JURISDICTION = "Benefit-4106";
     protected static final String AN_Test = "AN Test";
 
     @Rule
@@ -93,7 +93,7 @@ public abstract class AbstractEventIt {
 
     protected void setJson(SscsCaseData sscsCaseData, EventType eventType) throws JsonProcessingException {
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(parseLong(sscsCaseData.getCcdCaseId()), JURISDICTION,
-            sscsCaseData.getState(), sscsCaseData, LocalDateTime.now(), "Benefit");
+            sscsCaseData.getState(), sscsCaseData, LocalDateTime.now(), "Benefit-4106");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(),
             eventType, false);
         json = mapper.writeValueAsString(callback);

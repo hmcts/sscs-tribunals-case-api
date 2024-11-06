@@ -39,7 +39,7 @@ public class CitizenCcdClientTest {
         when(idamTokens.getIdamOauth2Token()).thenReturn("token");
         when(idamTokens.getServiceAuthorization()).thenReturn("s2s");
         when(idamTokens.getUserId()).thenReturn("1");
-        when(ccdRequestDetails.getCaseTypeId()).thenReturn("Benefit");
+        when(ccdRequestDetails.getCaseTypeId()).thenReturn("Benefit-4106");
         when(ccdRequestDetails.getJurisdictionId()).thenReturn("SSCS");
     }
 
@@ -49,10 +49,10 @@ public class CitizenCcdClientTest {
         citizenCcdClient.submitForCitizen(idamTokens, null);
 
         verify(coreCaseDataApi)
-            .startForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit"), eq("draft"));
+            .startForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit-4106"), eq("draft"));
 
         verify(coreCaseDataApi)
-            .submitForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit"), eq(true), isNull());
+            .submitForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit-4106"), eq(true), isNull());
     }
 
     @Test
@@ -62,10 +62,10 @@ public class CitizenCcdClientTest {
         citizenCcdClient.submitEventForCitizen(idamTokens, caseId,null);
 
         verify(coreCaseDataApi)
-                .startEventForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit"), eq(caseId), eq("draft"));
+                .startEventForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit-4106"), eq(caseId), eq("draft"));
 
         verify(coreCaseDataApi)
-                .submitEventForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit"), eq(caseId), eq(true), isNull());
+                .submitEventForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit-4106"), eq(caseId), eq(true), isNull());
     }
 
     @Test
@@ -73,7 +73,7 @@ public class CitizenCcdClientTest {
         citizenCcdClient.searchForCitizen(idamTokens);
 
         verify(coreCaseDataApi)
-                .searchForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit"), anyMap());
+                .searchForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit-4106"), anyMap());
 
     }
 
@@ -84,7 +84,7 @@ public class CitizenCcdClientTest {
 
 
         verify(coreCaseDataApi)
-                .searchCases(eq("token"), eq("s2s"), eq("Benefit"), anyString());
+                .searchCases(eq("token"), eq("s2s"), eq("Benefit-4106"), anyString());
 
     }
 }

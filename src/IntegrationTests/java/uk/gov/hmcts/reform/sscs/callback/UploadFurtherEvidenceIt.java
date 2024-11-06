@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
 @RunWith(JUnitParamsRunner.class)
 public class UploadFurtherEvidenceIt extends AbstractEventIt {
 
-    public static final String JURISDICTION = "Benefit";
+    public static final String JURISDICTION = "Benefit-4106";
     private SscsCaseData sscsCaseData;
 
     @Before

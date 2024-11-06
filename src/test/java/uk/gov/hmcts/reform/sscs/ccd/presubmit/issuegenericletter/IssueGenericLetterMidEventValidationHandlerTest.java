@@ -55,7 +55,7 @@ class IssueGenericLetterMidEventValidationHandlerTest {
     protected void setUp() {
         caseData = buildCaseData();
         caseDetails = new CaseDetails<>(1L, "SSCS", VALID_APPEAL, caseData,
-                LocalDateTime.now(), "Benefit");
+                LocalDateTime.now(), "Benefit-4106");
 
         callback = new Callback<>(caseDetails, Optional.empty(), ISSUE_GENERIC_LETTER, false);
 

@@ -188,7 +188,7 @@ public class RoboticsCallbackHandlerTest {
             .createdInGapsFrom(createdInGapsFrom)
             .build();
 
-        return new CaseDetails<>(123L, "jurisdiction", state, caseData, now, "Benefit");
+        return new CaseDetails<>(123L, "jurisdiction", state, caseData, now, "Benefit-4106");
     }
 
     @Test

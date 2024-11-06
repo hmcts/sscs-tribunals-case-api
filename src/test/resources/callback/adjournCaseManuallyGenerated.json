@@ -3,7 +3,7 @@
     "id": 12345656789,
     "jurisdiction": "SSCS",
     "state": "dormantAppealState",
-    "case_type_id": "Benefit",
+    "case_type_id": "Benefit-4106",
     "created_date": [
       2018,
       10,
@@ -716,7 +716,7 @@
     "id": 12345656789,
     "jurisdiction": "SSCS",
     "state": "interlocutoryReviewState",
-    "case_type_id": "Benefit",
+    "case_type_id": "Benefit-4106",
     "created_date": [
       2018,
       10,

@@ -1,13 +1,13 @@
 [
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createWithDwpTestCase", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createWithDwpTestCase", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createResponseReceivedTestCase", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createResponseReceivedTestCase", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createTestCase", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
-  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit", "CaseEventID": "createTestCase", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
-  {"LiveFrom": "23/11/2022", "CaseTypeID": "Benefit", "CaseEventID": "setHearingRoute", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
-  {"LiveFrom": "30/10/2024", "CaseTypeID": "Benefit", "CaseEventID": "addHearingOutcome", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
-  {"LiveFrom": "30/10/2024", "CaseTypeID": "Benefit", "CaseEventID": "addHearingOutcome", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
-  {"LiveFrom": "30/11/2024", "CaseTypeID": "Benefit", "CaseEventID": "amendHearingOutcome", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
-  {"LiveFrom": "30/11/2024", "CaseTypeID": "Benefit", "CaseEventID": "amendHearingOutcome", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"}
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit-4106", "CaseEventID": "createWithDwpTestCase", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit-4106", "CaseEventID": "createWithDwpTestCase", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit-4106", "CaseEventID": "createResponseReceivedTestCase", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit-4106", "CaseEventID": "createResponseReceivedTestCase", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit-4106", "CaseEventID": "createTestCase", "AccessProfile": "caseworker-sscs-systemupdate", "CRUD": "CRUD"},
+  {"LiveFrom": "01/01/2018", "CaseTypeID": "Benefit-4106", "CaseEventID": "createTestCase", "AccessProfile": "caseworker-sscs", "CRUD": "R"},
+  {"LiveFrom": "23/11/2022", "CaseTypeID": "Benefit-4106", "CaseEventID": "setHearingRoute", "AccessProfile": "caseworker-sscs-superuser", "CRUD": "CRUD"},
+  {"LiveFrom": "30/10/2024", "CaseTypeID": "Benefit-4106", "CaseEventID": "addHearingOutcome", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "30/10/2024", "CaseTypeID": "Benefit-4106", "CaseEventID": "addHearingOutcome", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"},
+  {"LiveFrom": "30/11/2024", "CaseTypeID": "Benefit-4106", "CaseEventID": "amendHearingOutcome", "AccessProfile": "caseworker-sscs", "CRUD": "CRUD"},
+  {"LiveFrom": "30/11/2024", "CaseTypeID": "Benefit-4106", "CaseEventID": "amendHearingOutcome", "AccessProfile": "caseworker-sscs-clerk", "CRUD": "CRUD"}
 ]

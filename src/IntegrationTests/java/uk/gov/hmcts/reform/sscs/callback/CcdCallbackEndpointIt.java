@@ -164,7 +164,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
     public void givenFurtherEvidenceIssueToAllParties_onSubmitted_willStart_IssueFurtherEvidenceEvent() throws Exception {
         mockIdam();
         given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
-                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+                eq("userId"), eq("SSCS"), eq("Benefit-4106"), eq("12345656789"),
                 eq("issueFurtherEvidence")))
                 .willReturn(StartEventResponse.builder()
                         .caseDetails(CaseDetails.builder()
@@ -174,7 +174,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
                         .build());
 
         given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
-                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+                eq("userId"), eq("SSCS"), eq("Benefit-4106"), eq("12345656789"),
                 eq("updateCaseOnly")))
                 .willReturn(StartEventResponse.builder()
                         .caseDetails(CaseDetails.builder()
@@ -184,7 +184,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
                         .build());
 
         given(coreCaseDataApi.submitEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
-                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+                eq("userId"), eq("SSCS"), eq("Benefit-4106"), eq("12345656789"),
                 eq(true), any(CaseDataContent.class)))
                 .willReturn(CaseDetails.builder()
                         .id(12345656789L)
@@ -222,7 +222,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
         data.put("furtherEvidenceAction", dynamicList);
 
         given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
-                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+                eq("userId"), eq("SSCS"), eq("Benefit-4106"), eq("12345656789"),
                 eq("updateCaseOnly")))
                 .willReturn(StartEventResponse.builder()
                         .caseDetails(CaseDetails.builder()
@@ -245,7 +245,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
         data.put("interlocReviewState", InterlocReviewState.WELSH_TRANSLATION);
 
         given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
-                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+                eq("userId"), eq("SSCS"), eq("Benefit-4106"), eq("12345656789"),
                 eq("interlocInformationReceivedActionFurtherEvidence")))
                 .willReturn(StartEventResponse.builder()
                         .caseDetails(
@@ -257,7 +257,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
             );
 
         given(coreCaseDataApi.submitEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
-            eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+            eq("userId"), eq("SSCS"), eq("Benefit-4106"), eq("12345656789"),
             eq(true), any(CaseDataContent.class)))
             .willReturn(CaseDetails.builder()
                 .id(123L)

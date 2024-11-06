@@ -434,7 +434,7 @@ public class SendToBulkPrintHandlerTest {
             state,
             caseData,
             now,
-            "Benefit"
+            "Benefit-4106"
         );
     }
 }

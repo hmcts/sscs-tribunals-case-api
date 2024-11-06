@@ -171,7 +171,7 @@
         "document_url": "http://dm-store:5005/documents/4227403e-6bf1-4900-b80c-d6657caabf8d"
       }
     },
-    "case_type_id": "Benefit",
+    "case_type_id": "Benefit-4106",
     "created_date": [
       2020,
       4,
@@ -874,7 +874,7 @@
       },
       "writeFinalDecisionAllowedOrRefused": "allowed"
     },
-    "case_type_id": "Benefit",
+    "case_type_id": "Benefit-4106",
     "created_date": [
       2020,
       4,

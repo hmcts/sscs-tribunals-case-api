@@ -86,7 +86,7 @@ public class BundlingHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(caseDetails.getCaseTypeId()).thenReturn("Benefit");
+        when(caseDetails.getCaseTypeId()).thenReturn("Benefit-4106");
         when(caseDetails.getJurisdiction()).thenReturn("SSCS");
         when(serviceRequestExecutor.post(any(), any())).thenReturn(new PreSubmitCallbackResponse<>(sscsCaseData));
     }
@@ -120,7 +120,7 @@ public class BundlingHandlerTest {
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
         assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("Benefit-4106", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
@@ -138,7 +138,7 @@ public class BundlingHandlerTest {
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
         assertEquals("bundleWelshEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("bundleWelshConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("Benefit-4106", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
@@ -159,7 +159,7 @@ public class BundlingHandlerTest {
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
         assertEquals(1, response.getData().getMultiBundleConfiguration().size());
         assertEquals(expectedConfigFile, response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("Benefit-4106", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
@@ -222,7 +222,7 @@ public class BundlingHandlerTest {
 
         verify(bundleAudioVideoPdfService).createAudioVideoPdf(sscsCaseData);
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("Benefit-4106", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
@@ -320,7 +320,7 @@ public class BundlingHandlerTest {
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
         assertEquals(expectedBundleConfig1, response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals(expectedBundleConfig2, response.getData().getMultiBundleConfiguration().get(1).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("Benefit-4106", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
@@ -339,7 +339,7 @@ public class BundlingHandlerTest {
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
         assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("Benefit-4106", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
@@ -358,7 +358,7 @@ public class BundlingHandlerTest {
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
         assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("Benefit-4106", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
@@ -378,7 +378,7 @@ public class BundlingHandlerTest {
         assertEquals(0, response.getWarnings().size());
         assertEquals(1, response.getData().getMultiBundleConfiguration().size());
         assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("Benefit-4106", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
@@ -397,7 +397,7 @@ public class BundlingHandlerTest {
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
         assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("Benefit-4106", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
@@ -418,7 +418,7 @@ public class BundlingHandlerTest {
         assertEquals(2, response.getData().getMultiBundleConfiguration().size());
         assertEquals("bundleEnglishEditedConfig", response.getData().getMultiBundleConfiguration().get(0).getValue());
         assertEquals("bundleEnglishConfig", response.getData().getMultiBundleConfiguration().get(1).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("Benefit-4106", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
@@ -456,7 +456,7 @@ public class BundlingHandlerTest {
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
         assertEquals(1, response.getData().getMultiBundleConfiguration().size());
         assertEquals(expectedBundleName, response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("Benefit-4106", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
@@ -474,7 +474,7 @@ public class BundlingHandlerTest {
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
         assertEquals(1, response.getData().getMultiBundleConfiguration().size());
         assertEquals(expectedBundleName, response.getData().getMultiBundleConfiguration().get(0).getValue());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("Benefit-4106", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }
@@ -504,7 +504,7 @@ public class BundlingHandlerTest {
         verify(serviceRequestExecutor).post(capture.capture(), eq("bundleUrl.com/api/new-bundle"));
         assertNull(response.getData().getCaseBundles());
         assertEquals("1", response.getData().getHistoricalBundles().get(0).getValue().getId());
-        assertEquals("Benefit", capture.getValue().getCaseTypeId());
+        assertEquals("Benefit-4106", capture.getValue().getCaseTypeId());
         assertEquals("SSCS", capture.getValue().getJurisdictionId());
         assertEquals(callback.getCaseDetails(), capture.getValue().getCaseDetails());
     }

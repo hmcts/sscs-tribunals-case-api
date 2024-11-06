@@ -79,7 +79,7 @@ public class RequestTranslationServiceTest {
                 .build());
 
         sscsCaseData.setSscsDocument(documents);
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit-4106");
 
         requestTranslationService.sendCaseToWlu(caseData);
 
@@ -118,7 +118,7 @@ public class RequestTranslationServiceTest {
             .build());
 
         sscsCaseData.setDwpDocuments(documents);
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit-4106");
 
         requestTranslationService.sendCaseToWlu(caseData);
 
@@ -144,7 +144,7 @@ public class RequestTranslationServiceTest {
 
         when(docmosisPdfGenerationService.generatePdf(any())).thenReturn(expectedPdf);
         sscsCaseData.setSscsDocument(new ArrayList<>());
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit-4106");
 
         requestTranslationService.sendCaseToWlu(caseData);
 
@@ -173,7 +173,7 @@ public class RequestTranslationServiceTest {
                 .build());
 
         sscsCaseData.setSscsDocument(documents);
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit-4106");
 
         requestTranslationService.sendCaseToWlu(caseData);
 

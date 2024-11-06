@@ -124,7 +124,7 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
         }
 
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1L, "sscs", State.WITH_DWP, caseData,
-            LocalDateTime.now(), "Benefit");
+            LocalDateTime.now(), "Benefit-4106");
         callback = new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 

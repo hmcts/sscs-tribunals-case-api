@@ -108,14 +108,14 @@ public class UploadWelshDocumentsIt extends AbstractEventIt {
 
     private void mockCcd() {
         given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
-                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+                eq("userId"), eq("SSCS"), eq("Benefit-4106"), eq("12345656789"),
                 eq("sendToDwp")))
                 .willReturn(StartEventResponse.builder().build());
 
         Map<String, Object> data = new HashMap<>();
         data.put("sscsWelshPreviewNextEvent", null);
         given(coreCaseDataApi.submitEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
-                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+                eq("userId"), eq("SSCS"), eq("Benefit-4106"), eq("12345656789"),
                 eq(true), any(CaseDataContent.class)))
                 .willReturn(CaseDetails.builder()
                         .id(123L)

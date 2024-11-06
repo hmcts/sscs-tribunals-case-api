@@ -183,7 +183,7 @@
       }],
       "hearingRoute" : "hearingRouteReplace"
     },
-    "case_type_id": "Benefit",
+    "case_type_id": "Benefit-4106",
     "state": "appealCreated",
     "created_date": [2018, 2, 13, 13, 20, 21, 73000000],
     "id": "12345656789"
@@ -326,7 +326,7 @@
         }
       ]
     },
-    "case_type_id": "Benefit",
+    "case_type_id": "Benefit-4106",
     "state": "appealCreated",
     "id": "12345656789"
   },

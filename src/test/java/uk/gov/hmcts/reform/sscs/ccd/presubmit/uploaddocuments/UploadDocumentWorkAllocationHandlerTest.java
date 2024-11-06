@@ -127,11 +127,11 @@ public class UploadDocumentWorkAllocationHandlerTest {
 
     private Callback<SscsCaseData> createCallBack(EventType event, SscsCaseData sscsCaseDataBefore, SscsCaseData sscsCaseData) {
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-                State.VALID_APPEAL, sscsCaseData, LocalDateTime.now(), "Benefit");
+                State.VALID_APPEAL, sscsCaseData, LocalDateTime.now(), "Benefit-4106");
 
         if (sscsCaseDataBefore != null) {
             CaseDetails<SscsCaseData> caseDetailsBefore = new CaseDetails<>(123L, "sscs",
-                    State.VALID_APPEAL, sscsCaseDataBefore, LocalDateTime.now(), "Benefit");
+                    State.VALID_APPEAL, sscsCaseDataBefore, LocalDateTime.now(), "Benefit-4106");
 
             return new Callback<>(caseDetails, Optional.of(caseDetailsBefore), event, false);
         }

@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
 
 public final class ServiceHearingValuesMapping {
 
-    public static final String BENEFIT = "Benefit";
+    public static final String BENEFIT = "Benefit-4106";
 
     private ServiceHearingValuesMapping() {
     }

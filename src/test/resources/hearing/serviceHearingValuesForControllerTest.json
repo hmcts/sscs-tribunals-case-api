@@ -2,7 +2,7 @@
   "publicCaseName":"Test Case Name",
   "autoListFlag":false,
   "hearingType":"BBA3-SUB",
-  "caseType":"Benefit",
+  "caseType":"Benefit-4106",
   "caseManagementLocationCode": "12345",
   "caseCategories":[
     {

@@ -3,7 +3,7 @@
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "appeal",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "READONLY",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 1,
@@ -15,7 +15,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "dwpResponseDocument",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
@@ -26,7 +26,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "dwpAT38Document",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
@@ -37,7 +37,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "dwpEvidenceBundleDocument",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
@@ -48,7 +48,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "dwpEditedEvidenceReason",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
@@ -59,7 +59,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "dwpEditedResponseDocument",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
@@ -71,7 +71,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "dwpEditedEvidenceBundleDocument",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
@@ -83,7 +83,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "appendix12Doc",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
@@ -95,7 +95,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "dwpUploadAudioVideoEvidence",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "COMPLEX",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
@@ -106,7 +106,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "benefitCode",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
@@ -118,7 +118,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "issueCode",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
@@ -130,7 +130,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "dwpFurtherInfo",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
@@ -141,7 +141,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "dwpUCB",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
@@ -152,7 +152,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "dwpUcbEvidenceDocument",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
@@ -164,7 +164,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "dwpFurtherEvidenceStates",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
@@ -176,7 +176,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "dynamicDwpState",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
@@ -189,7 +189,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "dwpIsOfficerAttending",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "25/05/2022",
     "PageDisplayOrder": 1,
@@ -200,7 +200,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "elementsDisputedList",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 2,
@@ -213,7 +213,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "elementsDisputedGeneral",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "COMPLEX",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 3,
@@ -228,7 +228,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "elementsDisputedSanctions",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "COMPLEX",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 3,
@@ -241,7 +241,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "elementsDisputedHousing",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "COMPLEX",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 3,
@@ -254,7 +254,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "elementsDisputedChildCare",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "COMPLEX",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 3,
@@ -267,7 +267,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "elementsDisputedCare",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "COMPLEX",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 3,
@@ -280,7 +280,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "elementsDisputedChildElement",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "COMPLEX",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 3,
@@ -293,7 +293,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "elementsDisputedChildDisabled",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "COMPLEX",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 3,
@@ -306,7 +306,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "elementsDisputedLimitedWork",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "COMPLEX",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 3,
@@ -319,7 +319,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "elementsDisputedIsDecisionDisputedByOthers",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 4,
@@ -332,7 +332,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "elementsDisputedLinkedAppealRef",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 4,
@@ -345,7 +345,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "jointParty",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 5,
@@ -358,7 +358,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "jointPartyName",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 6,
@@ -372,7 +372,7 @@
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "jointPartyIdentity",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 7,
@@ -386,7 +386,7 @@
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "jointPartyAddressSameAsAppellant",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "MANDATORY",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 8,
@@ -399,7 +399,7 @@
   {
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "jointPartyAddress",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "COMPLEX",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 8,
@@ -412,7 +412,7 @@
     "CallBackURLMidEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdMidEvent",
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "otherParties",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "DisplayContext": "COMPLEX",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 9,

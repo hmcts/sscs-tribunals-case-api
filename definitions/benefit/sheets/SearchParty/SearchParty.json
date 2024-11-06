@@ -1,7 +1,7 @@
 [
   {
     "LiveFrom": "1/1/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "SearchPartyName": "appeal.appellant.name.title,appeal.appellant.name.firstName,appeal.appellant.name.lastName",
     "SearchPartyEmailAddress": "appeal.appellant.contact.email",
     "SearchPartyAddressLine1": "appeal.appellant.address.line1",
@@ -11,7 +11,7 @@
   },
   {
     "LiveFrom": "1/1/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "SearchPartyName": "appeal.appellant.appointee.name.title,appeal.appellant.appointee.name.firstName,appeal.appellant.appointee.name.lastName",
     "SearchPartyEmailAddress": "appeal.appellant.appointee.contact.email",
     "SearchPartyAddressLine1": "appeal.appellant.appointee.address.line1",

@@ -42,7 +42,7 @@ public class NotificationsMessageProcessorTest {
             State.APPEAL_CREATED,
             SscsCaseData.builder().build(),
             LocalDateTime.now().minusMinutes(10),
-            "Benefit"
+            "Benefit-4106"
         );
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED, true);
         when(deserializer.deserialize(any())).thenReturn(callback);

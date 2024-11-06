@@ -33,7 +33,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.supplementaryresponse.Supplementar
 @RunWith(JUnitParamsRunner.class)
 public class SupplementaryResponseIt extends AbstractEventIt {
 
-    private static final String JURISDICTION = "Benefit";
+    private static final String JURISDICTION = "Benefit-4106";
     public static final String SUP_RESPONSE_DOC_PDF_NAME = "supResponseDoc.pdf";
     public static final String SUP_RESPONSE_DOC_MP3_NAME = "supResponseDoc.mp3";
     public static final String SUP_RESPONSE_OTHER_DOC_PDF_NAME = "other" + SUP_RESPONSE_DOC_PDF_NAME;
@@ -150,7 +150,7 @@ public class SupplementaryResponseIt extends AbstractEventIt {
 
     private void setJson() throws JsonProcessingException {
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(parseLong(sscsCaseData.getCcdCaseId()), JURISDICTION,
-                sscsCaseData.getState(), sscsCaseData, LocalDateTime.now(), "Benefit");
+                sscsCaseData.getState(), sscsCaseData, LocalDateTime.now(), "Benefit-4106");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(),
                 EventType.DWP_SUPPLEMENTARY_RESPONSE, false);
         json = mapper.writeValueAsString(callback);

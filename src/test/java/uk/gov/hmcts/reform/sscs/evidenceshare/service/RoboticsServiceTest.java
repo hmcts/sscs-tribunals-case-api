@@ -118,7 +118,7 @@ public class RoboticsServiceTest {
         sscsCaseData = buildCaseData("Bloggs");
         sscsCaseData.setCcdCaseId("1");
         sscsCaseData.getAppeal().getAppellant().getIdentity().setNino("789123");
-        caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit-4106");
     }
 
     @Test
@@ -129,7 +129,7 @@ public class RoboticsServiceTest {
 
         given(pdfStoreService.download(any())).willReturn(null);
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit-4106");
         roboticsService.sendCaseToRobotics(caseData);
 
         boolean isScottish = StringUtils.equalsAnyIgnoreCase(rpcName, "GLASGOW");
@@ -154,7 +154,7 @@ public class RoboticsServiceTest {
 
         given(pdfStoreService.download(any())).willReturn(null);
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit-4106");
         caseData.getCaseData().getAppeal().getAppellant().getName().setLastName("");
         when(roboticsJsonValidator.validate(any(), any())).thenReturn(errorSet);
         roboticsService.sendCaseToRobotics(caseData);
@@ -190,7 +190,7 @@ public class RoboticsServiceTest {
 
         sscsCaseData.getAppeal().setReceivedVia(receivedVia);
         sscsCaseData.setSscsDocument(documents);
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit-4106");
 
         roboticsService.sendCaseToRobotics(caseData);
 
@@ -232,7 +232,7 @@ public class RoboticsServiceTest {
 
         sscsCaseData.setSscsDocument(documents);
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit-4106");
 
         roboticsService.sendCaseToRobotics(caseData);
 
@@ -269,7 +269,7 @@ public class RoboticsServiceTest {
         sscsCaseData.getAppeal().getMrnDetails().setDwpIssuingOffice("DWP PIP (AE)");
         sscsCaseData.setSscsDocument(documents);
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit-4106");
 
         JSONObject actual = roboticsService.sendCaseToRobotics(caseData);
 
@@ -306,7 +306,7 @@ public class RoboticsServiceTest {
         sscsCaseData.getAppeal().getMrnDetails().setDwpIssuingOffice("DWP PIP (AE)");
         sscsCaseData.setSscsDocument(documents);
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit-4106");
 
         roboticsService.sendCaseToRobotics(caseData);
 
@@ -343,7 +343,7 @@ public class RoboticsServiceTest {
         sscsCaseData.getAppeal().getMrnDetails().setDwpIssuingOffice("DWP PIP (AE)");
         sscsCaseData.setSscsDocument(documents);
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit-4106");
         caseData.getCaseData().setCreatedInGapsFrom(READY_TO_LIST.getId());
 
         roboticsService.sendCaseToRobotics(caseData);
@@ -369,7 +369,7 @@ public class RoboticsServiceTest {
         sscsCaseData.getAppeal().getMrnDetails().setDwpIssuingOffice(existingOffice);
         sscsCaseData.getAppeal().getBenefitType().setCode(benefitType);
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit-4106");
 
         roboticsService.sendCaseToRobotics(caseData);
 
@@ -388,7 +388,7 @@ public class RoboticsServiceTest {
         DynamicListItem value = new DynamicListItem(existingOffice, existingOffice);
         sscsCaseData.setDwpOriginatingOffice(new DynamicList(value, Collections.singletonList(value)));
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit-4106");
 
         roboticsService.sendCaseToRobotics(caseData);
 
@@ -407,7 +407,7 @@ public class RoboticsServiceTest {
         DynamicListItem value = new DynamicListItem(existingOffice, existingOffice);
         sscsCaseData.setDwpPresentingOffice(new DynamicList(value, Collections.singletonList(value)));
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit-4106");
 
         roboticsService.sendCaseToRobotics(caseData);
 
@@ -428,7 +428,7 @@ public class RoboticsServiceTest {
         sscsCaseData.setDwpOriginatingOffice(new DynamicList(value, Collections.singletonList(value)));
         sscsCaseData.setDwpPresentingOffice(new DynamicList(value, Collections.singletonList(value)));
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit-4106");
 
         roboticsService.sendCaseToRobotics(caseData);
 

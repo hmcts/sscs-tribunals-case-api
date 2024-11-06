@@ -1,7 +1,7 @@
 [
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "secondHearingHoldingReminder",
     "Name": "2nd Hearing Holding Reminder",
     "Description": "Second holding email when hearing not booked",
@@ -13,7 +13,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "thirdHearingHoldingReminder",
     "Name": "3rd Hearing Holding Reminder",
     "Description": "Third holding email when hearing not booked",
@@ -25,7 +25,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "abateCase",
     "Name": "Abate case",
     "Description": "Abate the case",
@@ -40,7 +40,7 @@
   },
   {
     "LiveFrom": "19/11/2019",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpActionDirection",
     "Name": "Action direction",
     "DisplayOrder": 40,
@@ -52,7 +52,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "actionFurtherEvidence",
     "Name": "Action further evidence",
     "Description": "Action further evidence",
@@ -67,7 +67,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "actionHearingRecordingRequest",
     "Name": "Action hearing recording req",
     "Description": "Action hearing recording request",
@@ -82,7 +82,7 @@
   },
   {
     "LiveFrom": "19/11/2019",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpActionRepAdded",
     "Name": "Action new representative",
     "DisplayOrder": 70,
@@ -94,7 +94,7 @@
   },
   {
     "LiveFrom": "01/09/2021",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "actionPostponementRequest",
     "Name": "Action Postponement Request",
     "Description": "Action Postponement Request",
@@ -110,7 +110,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "actionStrikeOut",
     "Name": "Action strikeout",
     "Description": "Action strikeout",
@@ -123,7 +123,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "addSCnumber",
     "Name": "Add / update SC number",
     "Description": "Add a SC number to the case",
@@ -135,7 +135,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "addNote",
     "Name": "Add a note",
     "Description": "The online hearing has resolved the case",
@@ -149,7 +149,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "addRepresentative",
     "Name": "Add a representative",
     "Description": "Add a rep or supporters details to a case",
@@ -162,7 +162,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "addHearing",
     "Name": "Add a hearing",
     "Description": "Add a hearing to the case",
@@ -175,7 +175,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminRestoreCases",
     "Name": "Admin - Restore cases",
     "Description": "Admin - Restore cases",
@@ -188,7 +188,7 @@
   },
   {
     "LiveFrom": "04/07/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "addCaseOutcome",
     "Name": "Add case outcome",
     "Description": "Add a case outcome",
@@ -200,7 +200,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminSendToAppealCreated",
     "Name": "Admin - send to Appeal Created",
     "Description": "Deprecated - Admin - send to Appeal Created",
@@ -212,7 +212,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminSendToDormantAppealState",
     "Name": "Admin - send to Dormant",
     "DisplayOrder": 160,
@@ -224,7 +224,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminSendToDraft",
     "Description": "Deprecated - Admin - send to Draft",
     "Name": "Admin - send to Draft",
@@ -236,7 +236,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminSendToDraftArchived",
     "Description": "Deprecated - Admin - send to Draft Archived",
     "Name": "Admin - send to Draft Archived",
@@ -248,7 +248,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminSendToHearing",
     "Name": "Admin - send to Hearing",
     "DisplayOrder": 190,
@@ -259,7 +259,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminSendToIncompleteApplication",
     "Name": "Admin - send to Incomplete App",
     "DisplayOrder": 200,
@@ -270,7 +270,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminSendToIncompleteApplicationInformationReqsted",
     "Name": "Admin - send to Info Req'd",
     "DisplayOrder": 210,
@@ -281,7 +281,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminSendToInterlocutoryReviewState",
     "Name": "Admin - send to Interloc",
     "DisplayOrder": 220,
@@ -294,7 +294,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminSendToReadyToList",
     "Name": "Admin - send to Ready to List",
     "DisplayOrder": 230,
@@ -305,7 +305,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminSendTorRsponseReceived",
     "Name": "Admin - send to Response Rec'd",
     "DisplayOrder": 240,
@@ -316,7 +316,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminSendToValidAppeal",
     "Name": "Admin - send to Valid",
     "DisplayOrder": 250,
@@ -327,7 +327,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminSendToVoidState",
     "Name": "Admin - send to Void",
     "DisplayOrder": 260,
@@ -339,7 +339,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminSendToWithDwp",
     "Name": "Admin - send to With FTA",
     "DisplayOrder": 270,
@@ -351,7 +351,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminUpdateEvent",
     "Name": "Admin - update event",
     "DisplayOrder": 280,
@@ -362,7 +362,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminAppealWithdrawn",
     "Name": "Admin Appeal Withdrawn",
     "Description": "Admin Appeal Withdrawn",
@@ -376,7 +376,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "judgeDecisionAdmitAppeal",
     "Name": "Admit appeal (Judge)",
     "Description": "Deprecated - Admit appeal (Judge)",
@@ -388,7 +388,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "tcwDecisionAdmitAppeal",
     "Name": "Admit appeal (TCW)",
     "Description": "Deprecated - Admit appeal (TCW)",
@@ -400,7 +400,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "editBundle",
     "Name": "Amend a bundle",
     "Description": "Amend a bundle in the case",
@@ -414,7 +414,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "amendNote",
     "Name": "Amend a note",
     "Description": "Amending a note",
@@ -426,7 +426,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "amendDueDate",
     "Name": "Amend due date",
     "Description": "Amend due date",
@@ -438,7 +438,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "amendElementsIssues",
     "Name": "Amend elements/issues",
     "Description": "Amend elements or issues",
@@ -453,7 +453,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "interlocReviewStateAmend",
     "Name": "Amend interloc review state",
     "Description": "Ability to amend interloc review state flag",
@@ -465,7 +465,7 @@
   },
   {
     "LiveFrom": "24/03/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "panelDoctorSpecialismAmend",
     "Name": "Amend panel doctor specialism",
     "Description": "Ability to amend panel doctor specialism",
@@ -478,7 +478,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "appealCreated",
     "Name": "Appeal created",
     "Description": "Deprecated - Admin - Appeal created in CCD",
@@ -490,7 +490,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "appealDormant",
     "Name": "Appeal dormant",
     "Description": "Dormant appeal - no notification",
@@ -504,7 +504,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "appealLapsed",
     "Name": "Appeal lapsed",
     "Description": "Notification about appeal lapsed sent",
@@ -518,7 +518,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "appealReceived",
     "Name": "Appeal received",
     "Description": "Notification that an appeal has been received",
@@ -531,7 +531,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpAppealRegistered",
     "Name": "Appeal registered (FTA)",
     "Description": "Appeal successfully registered on PIP CS",
@@ -544,7 +544,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "appealToProceed",
     "Name": "Appeal to proceed",
     "Description": "Appeal to proceed doesn't do bulk scan validation as this is done as part of the issueDirection",
@@ -557,7 +557,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "judgeDecisionAppealToProceed",
     "Name": "Appeal to proceed",
     "DisplayOrder": 430,
@@ -570,7 +570,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "tcwDecisionAppealToProceed",
     "Name": "Appeal to proceed",
     "DisplayOrder": 440,
@@ -583,7 +583,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "appealWithdrawn",
     "Name": "Appeal withdrawn",
     "Description": "Notification that an appeal has been withdrawn",
@@ -597,7 +597,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "draftArchived",
     "Name": "Archive Draft appeal",
     "Description": "Draft appeal in CCD",
@@ -609,7 +609,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "assignToJudge",
     "Name": "Assign panel to online hearing",
     "Description": "Assign Judge, Medical member and Disability qualified member",
@@ -622,7 +622,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "associateCase",
     "Name": "Associate case",
     "Description": "Soft links two cases - automatically based on NINO",
@@ -636,7 +636,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "attachRoboticsJson",
     "Name": "Attach robotics jSON",
     "Description": "The Robotics JSON has been attached to the case",
@@ -648,7 +648,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "attachScannedDocs",
     "Name": "Attach scanned docs",
     "Description": "Attach scanned docs",
@@ -661,7 +661,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpCaseInProgress",
     "Name": "Case in-progress",
     "Description": "Flag case as in-progress",
@@ -674,7 +674,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "CCD_ADMIN",
     "Name": "CCD Admin",
     "DisplayOrder": 520,
@@ -686,7 +686,7 @@
   },
   {
     "LiveFrom": "10/10/2019",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpChallengeValidity",
     "Name": "Challenge validity",
     "DisplayOrder": 530,
@@ -699,7 +699,7 @@
   },
   {
     "LiveFrom": "10/10/2019",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "cloneBundle",
     "Name": "Clone bundle",
     "DisplayOrder": 540,
@@ -712,7 +712,7 @@
   },
   {
     "LiveFrom": "10/10/2019",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "confirmLapsed",
     "Name": "Confirm lapsed",
     "DisplayOrder": 550,
@@ -726,7 +726,7 @@
   },
   {
     "LiveFrom": "01/11/2021",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "confirmPanelComposition",
     "Name": "Confirm panel composition",
     "Description": "Confirm panel composition",
@@ -741,7 +741,7 @@
   },
   {
     "LiveFrom": "01/11/2021",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "confirmPoAttendance",
     "Name": "Confirm PO Attendance",
     "Description": "Confirm PO Attendance",
@@ -756,7 +756,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "cohAnswersSubmitted",
     "Name": "COR answers submitted",
     "Description": "The appellant has submitted their answers",
@@ -768,7 +768,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "cohQuestionDeadlineExtensionDenied",
     "Name": "COR deadline extension denied",
     "Description": "The request for the deadline to answer the questions to be extended has been denied",
@@ -780,7 +780,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "cohQuestionDeadlineExtensionGranted",
     "Name": "COR deadline extension granted",
     "Description": "The request for the deadline to answer the questions to be extended has been granted",
@@ -792,7 +792,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "cohDecisionRejected",
     "Name": "COR decision rejected",
     "Description": "The decision has been rejected",
@@ -804,7 +804,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "cohContinuousOnlineHearingRelisted",
     "Name": "COR online hearing relisted",
     "Description": "The online hearing has been relisted to an oral hearing",
@@ -816,7 +816,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "cohDecisionIssued",
     "Name": "COR preliminary view issued",
     "Description": "The tribunal have issued their preliminary view",
@@ -828,7 +828,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "cohQuestionDeadlineElapsed",
     "Name": "COR question deadline elapsed",
     "Description": "The deadline for the appellant to answer the round of questions has expired",
@@ -840,7 +840,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "cohQuestionDeadlineReminder",
     "Name": "COR question deadline reminder",
     "Description": "The appellant has been sent a reminder to answer the questions",
@@ -852,7 +852,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "cohQuestionDeadlineExtended",
     "Name": "COR question dealine extended",
     "Description": "The deadline for the appellant to answer the round of questions been extended",
@@ -864,7 +864,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "cohQuestionRoundIssued",
     "Name": "COR question round issued",
     "Description": "A round of questions has been issued to the appellant",
@@ -876,7 +876,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "createBundle",
     "Name": "Create a bundle",
     "Description": "Create a bundle in the case",
@@ -890,7 +890,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "createEditedBundle",
     "Name": "Create an edited bundle",
     "Description": "Create an edited bundle in the case",
@@ -903,7 +903,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "createDraft",
     "Name": "Create Draft appeal",
     "Description": "Draft appeal in CCD",
@@ -914,7 +914,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "panelUpdate",
     "Name": "Create/update Panel",
     "Description": "Add Judge, Medical member and Disability qualified member",
@@ -926,7 +926,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "deathOfAppellant",
     "Name": "Death of appellant",
     "Description": "Record the death of an appellant",
@@ -941,7 +941,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "deathOfAppellantActioned",
     "Name": "Death of appellant actioned",
     "Description": "Action the death of an appellant",
@@ -955,7 +955,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "logDocsToDwp",
     "Name": "Decisions/directions to FTA",
     "Description": "Log sending decisions or directions to FTA",
@@ -967,7 +967,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "draftToIncompleteApplication",
     "Name": "Draft to incomplete appeal",
     "Description": "Convert draft case to incomplete application received",
@@ -981,7 +981,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "draftToNonCompliant",
     "Name": "Draft to non-compliant appeal",
     "Description": "Convert draft case to non-compliant appeal",
@@ -996,7 +996,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "draftToValidAppealCreated",
     "Name": "Draft to valid appeal created",
     "Description": "Convert draft case to new valid appeal",
@@ -1010,7 +1010,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpActionWithdrawal",
     "Name": "FTA Action Withdrawal",
     "Description": "FTA Action Withdrawal",
@@ -1023,7 +1023,7 @@
   },
   {
     "LiveFrom": "22/10/2019",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpDirectionResponse",
     "Name": "FTA direction response",
     "DisplayOrder": 720,
@@ -1035,7 +1035,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpRaiseException",
     "Name": "FTA Raise an exception",
     "Description": "Raise an exception",
@@ -1049,7 +1049,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpRequestHearingRecording",
     "Name": "FTA Request hearing recording",
     "Description": "Request a hearing recording",
@@ -1064,7 +1064,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpResponseLateReminder",
     "Name": "FTA Response Late Reminder",
     "Description": "Holding email when FTA has not responded in time",
@@ -1076,7 +1076,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "evidenceReceived",
     "Name": "Evidence received",
     "Description": "Notification that evidence has been received",
@@ -1089,7 +1089,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "evidenceReminder",
     "Name": "Evidence reminder",
     "Description": "2 days after submission",
@@ -1101,7 +1101,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "furtherEvidenceHandledOffline",
     "Name": "FE handled offline",
     "Description": "Further evidence handled offline",
@@ -1114,7 +1114,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "finalHearingHoldingReminder",
     "Name": "Final Hearing Holding Reminder",
     "Description": "Final holding email when hearing not booked",
@@ -1126,7 +1126,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "feNoAction",
     "Name": "Further Evidence - No Action",
     "Description": "Further Evidence - No Action",
@@ -1140,7 +1140,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpEvidenceInProgress",
     "Name": "Further evidence in progress",
     "Description": "Further evidence is being considered",
@@ -1153,7 +1153,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "createAppealPDF",
     "Name": "Generate appeal PDF",
     "Description": "Creates an appeal PDF if it's missing",
@@ -1168,7 +1168,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "generateCoversheet",
     "Name": "Generate coversheet",
     "Description": "Generates a coversheet",
@@ -1182,7 +1182,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "handleEvidence",
     "Name": "Handle supplementary evidence",
     "Description": "Handle supplementary evidence",
@@ -1194,7 +1194,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "hearingAdjourned",
     "Name": "Hearing adjourned",
     "Description": "Notification that the hearing has been adjourned",
@@ -1207,7 +1207,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "hearingBooked",
     "Name": "Hearing booked",
     "Description": "Notification about a hearing being booked",
@@ -1220,7 +1220,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "hearingHoldingReminder",
     "Name": "Hearing Holding Reminder",
     "Description": "Holding email when hearing not booked",
@@ -1232,7 +1232,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "hearingPostponed",
     "Name": "Hearing postponed",
     "Description": "Notification that a hearing has been postponed",
@@ -1246,7 +1246,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "hearingReminder",
     "Name": "Hearing reminder",
     "Description": "1 day out and 1 week out",
@@ -1258,7 +1258,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "incompleteApplicationReceived",
     "Name": "Incomplete application rec'd",
     "Description": "Incomplete application received",
@@ -1272,7 +1272,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "interlocInformationReceivedActionFurtherEvidence",
     "Name": "Info received further evidence",
     "Description": "Information received",
@@ -1284,7 +1284,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "interlocInformationReceived",
     "Name": "Information received",
     "Description": "Information received",
@@ -1297,7 +1297,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "issueAdjournmentNotice",
     "Name": "Issue adjournment notice",
     "Description": "Send an adjournment notice",
@@ -1312,7 +1312,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "decisionIssued",
     "Name": "Issue interlocutory decision",
     "Description": "Send an interlocutory decision notice",
@@ -1326,7 +1326,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "judgeDirectionIssued",
     "Name": "Issue direction (Judge)",
     "Description": "Issue direction (Judge)",
@@ -1339,7 +1339,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "tcwDirectionIssued",
     "Name": "Issue direction (TCW)",
     "Description": "Issue direction (TCW)",
@@ -1352,7 +1352,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "directionIssued",
     "Name": "Issue directions notice",
     "Description": "Send a directions notice",
@@ -1367,7 +1367,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "issueFinalDecision",
     "Name": "Issue final decision",
     "Description": "Issue a final decision notice for a case",
@@ -1383,7 +1383,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "issueFurtherEvidence",
     "Name": "Issue further evidence",
     "Description": "Issue further evidence",
@@ -1396,7 +1396,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "issueGenericLetter",
     "Name": "Issue generic letter",
     "Description": "Issue generic letter",
@@ -1412,7 +1412,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "jointPartyAdded",
     "Name": "Joint Party Added",
     "Description": "Joint Party has been registered on case",
@@ -1426,7 +1426,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpLapseCase",
     "Name": "Lapse appeal",
     "Description": "Revise decision",
@@ -1440,7 +1440,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "hmctsLapseCase",
     "Name": "Lapse case",
     "Description": "Lapse case",
@@ -1454,7 +1454,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "linkACase",
     "Name": "Link a case",
     "Description": "Link a case - hard link - if cases need to be heard together",
@@ -1467,7 +1467,7 @@
   },
   {
     "LiveFrom": "10/06/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "listingError",
     "Name": "Listing Error",
     "Description": "A listing Error has occurred",
@@ -1479,7 +1479,7 @@
   },
   {
     "LiveFrom": "10/06/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "handlingError",
     "Name": "Handling Error",
     "Description": "A handling Error has occurred",
@@ -1491,7 +1491,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "sentToJudge",
     "Name": "Log sending to judge",
     "Description": "The online hearing has resolved the case",
@@ -1503,7 +1503,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "manageAudioVideo",
     "Name": "Manage audio/video evidence",
     "Description": "Manage audio video unprocessed list",
@@ -1515,7 +1515,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "manageDwpDocuments",
     "Name": "Manage FTA document(s)",
     "Description": "Manage FTA document(s)",
@@ -1529,7 +1529,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "makeCaseUrgent",
     "Name": "Mark case as urgent",
     "DisplayOrder": 1090,
@@ -1541,7 +1541,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "moveToAppealCreated",
     "Name": "Move to appeal created",
     "Description": "Deprecated - Moves case to appeal created",
@@ -1553,7 +1553,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "citizenRequestHearingRecording",
     "Name": "MYA Request hearing recording",
     "Description": "Request a hearing recording",
@@ -1565,7 +1565,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "manageScannedDocuments",
     "Name": "Manage Unprocessed Corres",
     "Description": "Manage unprocessed correspondence",
@@ -1577,7 +1577,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpNoAction",
     "Name": "No action",
     "Description": "Take no action",
@@ -1590,7 +1590,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "nonCompliant",
     "Name": "Non-compliant appeal",
     "Description": "Non-compliant appeal",
@@ -1604,7 +1604,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpNotAbleToRegister",
     "Name": "Not able to register",
     "Description": "Case can't be registered on DRS",
@@ -1616,7 +1616,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "notListable",
     "Name": "Not listable",
     "Description": "Case is not listable",
@@ -1630,7 +1630,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "notificationSent",
     "Name": "Notification sent",
     "Description": "Notification sent via Gov Notify",
@@ -1642,7 +1642,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "postponementRequest",
     "Name": "Postponement request",
     "Description": "Postponement request",
@@ -1656,7 +1656,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "processAudioVideo",
     "Name": "Process audio/video evidence",
     "Description": "Issue a direction notice based on audio and video evidence",
@@ -1671,7 +1671,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "processReasonableAdjustment",
     "Name": "Process reasonable adjustment",
     "Description": "Process reasonable adjustment",
@@ -1685,7 +1685,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "provideAppointeeDetails",
     "Name": "Provide appointee details",
     "Description": "Provide appointee details for case",
@@ -1700,7 +1700,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "corDecision",
     "Name": "Online hearing decision made",
     "Description": "The online hearing has resolved the case",
@@ -1713,7 +1713,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "reinstateAppeal",
     "Name": "Re-open appeal",
     "Description": "Reinstate case to interloc state",
@@ -1726,7 +1726,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "readyToList",
     "Name": "Ready to list",
     "Description": "Makes an appeal ready to list",
@@ -1742,7 +1742,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "reissueDocument",
     "Name": "Reissue document",
     "Description": "Reissue document",
@@ -1757,7 +1757,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "reissueFurtherEvidence",
     "Name": "Reissue further evidence",
     "Description": "Reissue further evidence",
@@ -1772,7 +1772,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "requestForInformation",
     "Name": "Request info from party",
     "Description": "Request info from party",
@@ -1788,7 +1788,7 @@
   },
   {
     "LiveFrom": "22/10/2019",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpRequestTimeExtension",
     "Name": "Request time extension",
     "Description": "Request time extension",
@@ -1802,7 +1802,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "removeLinkForCase",
     "Name": "Remove a case link",
     "Description": "Remove a case - hard link (linkACase)",
@@ -1815,7 +1815,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "resendAppealCreated",
     "Name": "Resend appeal rec'd message",
     "Description": "Deprecated - Admin - Re-sends the appeal received notification",
@@ -1828,7 +1828,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "resendCaseToGAPS2",
     "Name": "Resend case to GAPS 2",
     "Description": "Re-sends the case to GAPS 2",
@@ -1842,7 +1842,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "resendToDwp",
     "Name": "Resend to FTA via bulk print",
     "Description": "Resend case to FTa via bulk print",
@@ -1855,7 +1855,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "responseReceived",
     "Name": "Response received",
     "Description": "Notification that FTA have responded to the appeal",
@@ -1868,7 +1868,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "hmctsResponseReviewed",
     "Name": "Response reviewed",
     "Description": "FTA response has been reviewed",
@@ -1884,7 +1884,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "reviewConfidentialityRequest",
     "Name": "Review confidentiality request",
     "Description": "Review confidentiality request",
@@ -1900,7 +1900,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "reviewPhmeRequest",
     "Name": "Review PHE request",
     "Description": "Review PHE request",
@@ -1913,7 +1913,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "interlocSendToTcw",
     "Name": "Send case to TCW",
     "Description": "Send case to TCW",
@@ -1926,7 +1926,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "sendFurtherEvidenceError",
     "Name": "Send further evidence error",
     "Description": "Send further evidence error",
@@ -1938,7 +1938,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "sendToAdmin",
     "Name": "Send to admin",
     "Description": "Return the case to an admin with a note",
@@ -1951,7 +1951,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "sendToDwp",
     "Name": "Send to FTA",
     "Description": "Send to FTA",
@@ -1964,7 +1964,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "sendToDwpError",
     "Name": "Send to FTA error",
     "Description": "Flag error to Send to FTA",
@@ -1976,7 +1976,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "sendToDwpOffline",
     "Name": "Send to FTA offline",
     "Description": "Log manually sending a case to FTA",
@@ -1989,7 +1989,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "validSendToInterloc",
     "Name": "Send to interloc",
     "Description": "Send a case to a judge for review",
@@ -2003,7 +2003,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "nonCompliantSendToInterloc",
     "Name": "Send to interloc - pre-valid",
     "Description": "Send a case to a judge for review",
@@ -2016,7 +2016,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "tcwReferToJudge",
     "Name": "Send to Judge",
     "Description": "Send to Judge",
@@ -2030,7 +2030,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "sendToRoboticsError",
     "Name": "Send to robotics error",
     "Description": "Flag error to Send to robotics",
@@ -2042,7 +2042,7 @@
   },
   {
     "LiveFrom": "11/11/2019",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "sendValidCaseToInterloc",
     "Name": "Send valid case to interloc",
     "DisplayOrder": 1490,
@@ -2053,7 +2053,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "sentToDwp",
     "Name": "Sent to FTA",
     "Description": "Case sent to FTA",
@@ -2065,7 +2065,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "asyncStitchingComplete",
     "Name": "Stitching bundle complete",
     "DisplayOrder": 1510,
@@ -2077,7 +2077,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "stopBulkPrintForReasonableAdjustment",
     "Name": "Stop bulk print",
     "Description": "Stop a bulk print request for a reasonable adjustment",
@@ -2090,7 +2090,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "judgeDecisionStrikeout",
     "Name": "Strike out (Judge)",
     "Description": "Strike out (Judge)",
@@ -2102,7 +2102,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "tcwDecisionStrikeOut",
     "Name": "Strike out (TCW)",
     "Description": "Strike out (TCW)",
@@ -2114,7 +2114,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "struckOut",
     "Name": "Strike out case",
     "Description": "Strike out due to no response",
@@ -2128,7 +2128,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpSupplementaryResponse",
     "Name": "Supplementary response",
     "Description": "An additional response from FTA",
@@ -2142,7 +2142,7 @@
   },
   {
     "LiveFrom": "01/01/2017",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "SYSTEM_MAINTENANCE",
     "Name": "System Maintenance",
     "Description": "Maintenance updates to cases, made automatically by the system",
@@ -2155,7 +2155,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "unassignToJudge",
     "Name": "Unassign judge",
     "Description": "Unassign Judge",
@@ -2167,7 +2167,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "updateCaseOnly",
     "Name": "Update case only",
     "Description": "Simply update case data with no callbacks afterwards",
@@ -2179,7 +2179,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "updateDraft",
     "Name": "Update draft appeal",
     "Description": "Draft appeal in CCD",
@@ -2191,7 +2191,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "eventsUpdates",
     "Name": "Update events",
     "Description": "Update Events Data for Notifications",
@@ -2203,7 +2203,7 @@
   },
   {
     "LiveFrom": "01/06/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "updateListingRequirements",
     "Name": "Update Listing Requirements",
     "Description": "Update Listing Requirements for a case",
@@ -2218,7 +2218,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "updateHearingType",
     "Name": "Update hearing type",
     "Description": "Update Hearing Type",
@@ -2230,7 +2230,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "updateIncompleteApplication",
     "Name": "Update incomplete application",
     "Description": "Update incomplete application",
@@ -2242,7 +2242,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "updateNotListable",
     "Name": "Update not listable case",
     "Description": "Update not listable case",
@@ -2256,7 +2256,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "updateOtherPartyData",
     "Name": "Update other party data",
     "Description": "Update other party data",
@@ -2271,7 +2271,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "updateReasonableAdjustment",
     "Name": "Update reasonable adjustment",
     "Description": "Update reasonable adjustment",
@@ -2286,7 +2286,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "subscriptionUpdated",
     "Name": "Update subscription",
     "Description": "Update Subscription",
@@ -2300,7 +2300,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "caseUpdated",
     "Name": "Update to case data",
     "Description": "Automatic update of data from GAPS 2 - no notification",
@@ -2315,7 +2315,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "updateUCB",
     "Name": "Update UCB flag",
     "Description": "Update Unacceptable Customer Behaviour flag",
@@ -2329,7 +2329,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "uploadCorDocument",
     "Name": "Upload Cor document",
     "Description": "Upload cor document",
@@ -2341,7 +2341,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "uploadDocument",
     "Name": "Upload document",
     "Description": "Upload document",
@@ -2353,7 +2353,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "uploadDocumentFurtherEvidence",
     "Name": "Upload document FE",
     "Description": "Upload document Further Evidence",
@@ -2366,7 +2366,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "uploadDraftCorDocument",
     "Name": "Upload draft Cor document",
     "Description": "Upload cor document",
@@ -2378,7 +2378,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "uploadDraftDocument",
     "Name": "Upload draft document",
     "Description": "Upload document",
@@ -2390,7 +2390,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "uploadFurtherEvidence",
     "Name": "Upload further evidence",
     "Description": "Upload further evidence for pre-valid interloc",
@@ -2404,7 +2404,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpUploadResponse",
     "Name": "Upload response",
     "Description": "Upload a response",
@@ -2420,7 +2420,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "uploadHearingRecording",
     "Name": "Upload hearing recording",
     "Description": "Upload the hearing recording",
@@ -2435,7 +2435,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "validAppealCreated",
     "Name": "Valid appeal created",
     "Description": "A new valid appeal",
@@ -2449,7 +2449,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "interlocValidAppeal",
     "Name": "Validate appeal",
     "Description": "Makes an appeal valid",
@@ -2465,7 +2465,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "validAppeal",
     "Name": "Validate appeal",
     "Description": "Validate appeal",
@@ -2482,7 +2482,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "voidCase",
     "Name": "Void case",
     "Description": "Voids the case",
@@ -2495,7 +2495,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "voidIncompleteApplication",
     "Name": "Void incomplete appeal",
     "Description": "Void non-valid appeal (Deprecated)",
@@ -2507,7 +2507,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "interlocVoidAppeal",
     "Name": "Void non-valid case",
     "Description": "Voids the case (Deprecated)",
@@ -2519,7 +2519,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adjournCase",
     "Name": "Write adjournment notice",
     "Description": "Write adjournment notice",
@@ -2534,7 +2534,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "writeFinalDecision",
     "Name": "Write final decision",
     "Description": "Write a final decision notice for a case",
@@ -2549,7 +2549,7 @@
   },
   {
     "LiveFrom": "01/09/2021",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "actionPostponementRequestWelsh",
     "Name": "Welsh- Action Postponement Req",
     "Description": "Welsh- Action Postponement Req",
@@ -2565,7 +2565,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "createWelshNotice",
     "Name": "Welsh - create notice",
     "Description": "Welsh - create notice",
@@ -2581,7 +2581,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "cancelTranslations",
     "Name": "Welsh - cancel translations",
     "Description": "Welsh - cancel translations",
@@ -2597,7 +2597,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "issueAdjournmentNoticeWelsh",
     "Name": "Welsh - adjournment notice",
     "Description": "Send a welsh adjournment notice",
@@ -2611,7 +2611,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "decisionIssuedWelsh",
     "Name": "Welsh - issue decision",
     "Description": "Send a welsh decision notice",
@@ -2625,7 +2625,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "directionIssuedWelsh",
     "Name": "Welsh - issue direction",
     "Description": "Send a welsh directions notice",
@@ -2640,7 +2640,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "issueFinalDecisionWelsh",
     "Name": "Welsh - issue final decision",
     "Description": "Issue a Welsh final decision notice",
@@ -2654,7 +2654,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "manageWelshDocuments",
     "Name": "Welsh – manage Welsh doc(s)",
     "Description": "Manage Welsh document(s)",
@@ -2666,7 +2666,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "markDocumentsForTranslation",
     "Name": "Welsh - mark docs for trans",
     "Description": "Mark documents for translation",
@@ -2681,7 +2681,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "processAudioVideoWelsh",
     "Name": "Welsh - process A/V evidence",
     "Description": "Issue a Welsh direction notice based on audio and video evidence",
@@ -2696,7 +2696,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "requestTranslationFromWLU",
     "Name": "Welsh - request translations",
     "Description": "Request translation from WLU",
@@ -2710,7 +2710,7 @@
   },
   {
     "LiveFrom": "01/01/2017",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "updateWelshPreference",
     "Name": "Welsh - update lang preference",
     "Description": "Update Welsh Preference",
@@ -2723,7 +2723,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "uploadWelshDocument",
     "Name": "Welsh - upload translated doc",
     "Description": "Upload Welsh translated documents",
@@ -2739,7 +2739,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "reinstateVoidAppeal",
     "Name": "Reinstate case",
     "Description": "Deprecated - Resinstates a Void case to valid",
@@ -2751,7 +2751,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "migrateCase",
     "Name": "Migrate Case",
     "Description": "Migrate Case",
@@ -2763,7 +2763,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "createWithDwpTestCase",
     "Name": "Create with FTA test test",
     "Description": "Create a test case in withDwp state",
@@ -2774,7 +2774,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "createResponseReceivedTestCase",
     "Name": "Create response received test",
     "Description": "Create a test case in responseReceived state",
@@ -2785,7 +2785,7 @@
   },
   {
     "LiveFrom": "01/01/2018",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "createTestCase",
     "Name": "Create test case",
     "Description": "Create a test case in validAppealCreated state",
@@ -2796,7 +2796,7 @@
   },
   {
     "LiveFrom": "23/11/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "postHearingRequest",
     "Name": "Post Hearing Request",
     "Description": "Post Hearing Request",
@@ -2813,7 +2813,7 @@
   },
   {
     "LiveFrom": "05/11/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "postHearingReview",
     "Name": "Review Post Hearing App",
     "Description": "Review Post Hearing Application",
@@ -2830,7 +2830,7 @@
   },
   {
     "LiveFrom": "13/10/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "correctionGranted",
     "Name": "Correction Granted",
     "Description": "Correction Granted",
@@ -2842,7 +2842,7 @@
   },
   {
     "LiveFrom": "13/10/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "correctionRefused",
     "Name": "Correction Refused",
     "Description": "Correction Refused",
@@ -2854,7 +2854,7 @@
   },
   {
     "LiveFrom": "13/10/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "sORExtendTime",
     "Name": "SOR Extend Time",
     "Description": "SOR Extend Time",
@@ -2866,7 +2866,7 @@
   },
   {
     "LiveFrom": "13/10/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "sORRefused",
     "Name": "SOR Refused",
     "Description": "SOR Refused",
@@ -2878,7 +2878,7 @@
   },
   {
     "LiveFrom": "13/10/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "sORWrite",
     "Name": "Write and Issue SOR",
     "Description": "Write and Issue SOR",
@@ -2895,7 +2895,7 @@
   },
   {
     "LiveFrom": "13/10/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "postHearingAppSorWritten",
     "Name": "Post hearing app - SOR Issued",
     "Description": "Post hearing application - SOR Issued",
@@ -2907,7 +2907,7 @@
   },
   {
     "LiveFrom": "13/10/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "setAsideGranted",
     "Name": "Set Aside Granted",
     "Description": "Set Aside Granted",
@@ -2919,7 +2919,7 @@
   },
   {
     "LiveFrom": "13/10/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "setAsideRefused",
     "Name": "Set Aside Refused",
     "Description": "Set Aside Refused",
@@ -2931,7 +2931,7 @@
   },
   {
     "LiveFrom": "13/10/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "setAsideRefusedSOR",
     "Name": "Set Aside Refused - SOR",
     "Description": "Set Aside Refused - SOR",
@@ -2943,7 +2943,7 @@
   },
   {
     "LiveFrom": "23/11/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "setAsideRequest",
     "Name": "Set Aside Request",
     "Description": "Set Aside Request",
@@ -2955,7 +2955,7 @@
   },
   {
     "LiveFrom": "23/11/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "correctionRequest",
     "Name": "Correction Request",
     "Description": "Correction Request",
@@ -2967,7 +2967,7 @@
   },
   {
     "LiveFrom": "23/11/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "sORRequest",
     "Name": "Statement of Reasons Request",
     "Description": "SOR Request",
@@ -2979,7 +2979,7 @@
   },
   {
     "LiveFrom": "21/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminActionCorrection",
     "Name": "Admin - action correction",
     "Description": "Admin - action correction",
@@ -2997,7 +2997,7 @@
   },
   {
     "LiveFrom": "23/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminCorrectionBody",
     "Name": "Correction Sent to Judge",
     "Description": "Correction Sent to Judge",
@@ -3008,7 +3008,7 @@
   },
   {
     "LiveFrom": "23/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "adminCorrectionHeader",
     "Name": "Admin Correction Header",
     "Description": "Correction Header",
@@ -3020,7 +3020,7 @@
   },
   {
     "LiveFrom": "23/11/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "permissionToAppealRequest",
     "Name": "Permission to Appeal Request",
     "Description": "Permission to Appeal Request",
@@ -3032,7 +3032,7 @@
   },
   {
     "LiveFrom": "09/05/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "permissionToAppealGranted",
     "Name": "Permission to Appeal Granted",
     "Description": "Permission to Appeal Granted",
@@ -3044,7 +3044,7 @@
   },
   {
     "LiveFrom": "09/05/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "permissionToAppealRefused",
     "Name": "Permission to Appeal Refused",
     "Description": "Permission to Appeal Refused",
@@ -3056,7 +3056,7 @@
   },
   {
     "LiveFrom": "09/05/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "reviewAndSetAside",
     "Name": "Review Granted",
     "Description": "Permission to Appeal Review Granted",
@@ -3068,7 +3068,7 @@
   },
   {
     "LiveFrom": "23/11/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "libertyToApplyRequest",
     "Name": "Liberty to Apply Request",
     "Description": "Liberty to Apply Request",
@@ -3080,7 +3080,7 @@
   },
   {
     "LiveFrom": "09/05/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "libertyToApplyGranted",
     "Name": "Liberty to Apply Granted",
     "Description": "Liberty to Apply Granted",
@@ -3092,7 +3092,7 @@
   },
   {
     "LiveFrom": "09/05/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "libertyToApplyRefused",
     "Name": "Liberty to Apply Refused",
     "Description": "Liberty to Apply Refused",
@@ -3104,7 +3104,7 @@
   },
   {
     "LiveFrom": "09/05/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "reserveToInterlocJudge",
     "Name": "Reserve to Judge Interloc",
     "Description": "Reserve to Judge Interloc",
@@ -3118,7 +3118,7 @@
   },
   {
     "LiveFrom": "07/07/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "sendToFirstTier",
     "Name": "Send to First Tier",
     "Description": "Send to First Tier",
@@ -3134,7 +3134,7 @@
   },
   {
     "LiveFrom": "07/07/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "upperTribunalDecision",
     "Name": "Upper Tribunal Decision",
     "Description": "Upper Tribunal Decision",
@@ -3147,7 +3147,7 @@
   },
   {
     "LiveFrom": "15/06/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "getFirstTierDocuments",
     "Name": "Get first tier documents",
     "Description": "Get first tier documents",
@@ -3163,7 +3163,7 @@
   },
   {
     "LiveFrom": "19/06/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "bundleCreatedForUpperTribunal",
     "Name": "Bundle created for UT",
     "Description": "Bundle created for Upper Tribunal",
@@ -3175,7 +3175,7 @@
   },
   {
     "LiveFrom": "23/11/2022",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "postHearingOther",
     "Name": "Post hearing Other",
     "Description": "Post hearing application 'Other'",
@@ -3186,7 +3186,7 @@
   },
   {
     "LiveFrom": "06/02/2024",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "waCaseMigration",
     "Name": "Migrate case for WA",
     "DisplayOrder": 10003,
@@ -3197,7 +3197,7 @@
   },
   {
     "LiveFrom": "06/02/2024",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "dwpCaseMigration",
     "Name": "Migrate case for DWP",
     "DisplayOrder": 10005,
@@ -3207,7 +3207,7 @@
   },
   {
     "LiveFrom": "17/05/2024",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "ID": "caseManagementLocationMigration",
     "Name": "Migrate case for CML",
     "DisplayOrder": 10006,

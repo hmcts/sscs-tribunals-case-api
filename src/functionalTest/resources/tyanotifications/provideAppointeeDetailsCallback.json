@@ -270,7 +270,7 @@
         }
       ]
     },
-    "case_type_id": "Benefit",
+    "case_type_id": "Benefit-4106",
     "state": "dormantAppealState",
     "created_date": [
       2019,
@@ -422,7 +422,7 @@
         }
       ]
     },
-    "case_type_id": "Benefit",
+    "case_type_id": "Benefit-4106",
     "state": "dormantAppealState",
     "id": "12345656789"
   },

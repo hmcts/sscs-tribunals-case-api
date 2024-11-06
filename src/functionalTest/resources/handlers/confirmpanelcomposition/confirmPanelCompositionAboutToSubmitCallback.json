@@ -4,7 +4,7 @@
     "jurisdiction": "SSCS",
     "state": "interlocutoryReviewState",
     "version": 7,
-    "case_type_id": "Benefit",
+    "case_type_id": "Benefit-4106",
     "created_date": [
       2021,
       11,
@@ -1096,7 +1096,7 @@
     "jurisdiction": "SSCS",
     "state": "interlocutoryReviewState",
     "version": 7,
-    "case_type_id": "Benefit",
+    "case_type_id": "Benefit-4106",
     "created_date": [
       2021,
       11,

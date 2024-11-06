@@ -100,7 +100,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             buildCallback("sendToInterlocReviewByTcw", ACTION_FURTHER_EVIDENCE);
 
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-            State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now(), "Benefit");
+            State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now(), "Benefit-4106");
 
         Callback<SscsCaseData> callbackWithRightEventAndNullField = new Callback<>(caseDetails, Optional.empty(),
             ACTION_FURTHER_EVIDENCE, false);
@@ -124,9 +124,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             .furtherEvidenceAction(dynamicList)
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-            State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit");
+            State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit-4106");
         CaseDetails<SscsCaseData> caseDetailsBefore = new CaseDetails<>(123L, "sscs",
-                State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now(), "Benefit");
+                State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now(), "Benefit-4106");
         return new Callback<>(caseDetails, Optional.of(caseDetailsBefore), eventType, false);
     }
 

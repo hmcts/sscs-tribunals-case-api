@@ -119,7 +119,7 @@ public class MarkDocumentsForTranslationAboutToSubmitHandlerTest {
                 .languagePreferenceWelsh("Yes")
                 .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-                State.VALID_APPEAL, sscsCaseData, LocalDateTime.now(), "Benefit");
+                State.VALID_APPEAL, sscsCaseData, LocalDateTime.now(), "Benefit-4106");
         return new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 

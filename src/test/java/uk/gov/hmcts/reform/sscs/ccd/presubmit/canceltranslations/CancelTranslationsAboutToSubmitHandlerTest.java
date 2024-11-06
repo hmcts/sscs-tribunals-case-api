@@ -157,7 +157,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
                 .languagePreferenceWelsh("Yes")
                 .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-                state, sscsCaseData, LocalDateTime.now(), "Benefit");
+                state, sscsCaseData, LocalDateTime.now(), "Benefit-4106");
         return new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 

@@ -53,7 +53,7 @@ public class DwpDirectionResponseAboutToSubmitHandlerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .dwpState(DwpState.DIRECTION_ACTION_REQUIRED)
                 .build();
-        when(callback.getCaseDetails()).thenReturn(new CaseDetails(1, "Benefit", State.VOID_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"));
+        when(callback.getCaseDetails()).thenReturn(new CaseDetails(1, "Benefit-4106", State.VOID_STATE, sscsCaseData, LocalDateTime.now(), "Benefit-4106"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -66,7 +66,7 @@ public class DwpDirectionResponseAboutToSubmitHandlerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .dwpState(DwpState.FE_ACTIONED_NA)
                 .build();
-        when(callback.getCaseDetails()).thenReturn(new CaseDetails(1, "Benefit", State.VOID_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"));
+        when(callback.getCaseDetails()).thenReturn(new CaseDetails(1, "Benefit-4106", State.VOID_STATE, sscsCaseData, LocalDateTime.now(), "Benefit-4106"));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

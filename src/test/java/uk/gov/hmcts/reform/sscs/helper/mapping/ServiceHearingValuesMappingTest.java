@@ -47,7 +47,7 @@ class ServiceHearingValuesMappingTest extends HearingsMappingBase {
     private static final String NOTE_FROM_OTHER_PARTY = "other party note";
     private static final String NOTE_FROM_APPELLANT = "appellant note";
 
-    public static final String BENEFIT = "Benefit";
+    public static final String BENEFIT = "Benefit-4106";
 
     public static final String APPELLANT_PARTY_ID = "a2b837d5-ee28-4bc9-a3d8-ce2d2de9fb296292997e-14d4-4814-a163-e64018d2c441";
     public static final String REPRESENTATIVE_PARTY_ID = "a2b837d5-ee28-4bc9-a3d8-ce2d2de9fb29";

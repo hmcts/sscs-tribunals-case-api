@@ -154,7 +154,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
         sscsCaseData.setSscsDocument(sscsDocuments);
 
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-                State.VALID_APPEAL, sscsCaseData, LocalDateTime.now(), "Benefit");
+                State.VALID_APPEAL, sscsCaseData, LocalDateTime.now(), "Benefit-4106");
         return new Callback<>(caseDetails, Optional.empty(), EventType.CREATE_WELSH_NOTICE, false);
     }
 

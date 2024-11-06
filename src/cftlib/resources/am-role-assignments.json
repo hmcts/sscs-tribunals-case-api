@@ -11,7 +11,7 @@
         "classification": "PUBLIC",
         "readOnly": false,
         "attributes": {
-          "caseType": "Benefit",
+          "caseType": "Benefit-4106",
           "jurisdiction": "SSCS"
         },
         "authorisations": []
@@ -31,7 +31,7 @@
         "classification": "PUBLIC",
         "readOnly": false,
         "attributes": {
-          "caseType": "Benefit",
+          "caseType": "Benefit-4106",
           "jurisdiction": "SSCS"
         },
         "authorisations": []
@@ -51,7 +51,7 @@
         "classification": "PUBLIC",
         "readOnly": false,
         "attributes": {
-          "caseType": "Benefit",
+          "caseType": "Benefit-4106",
           "jurisdiction": "SSCS"
         },
         "authorisations": []
@@ -71,7 +71,7 @@
         "classification": "PUBLIC",
         "readOnly": false,
         "attributes": {
-          "caseType": "Benefit",
+          "caseType": "Benefit-4106",
           "jurisdiction": "SSCS"
         },
         "authorisations": []
@@ -91,7 +91,7 @@
         "classification": "PUBLIC",
         "readOnly": false,
         "attributes": {
-          "caseType": "Benefit",
+          "caseType": "Benefit-4106",
           "jurisdiction": "SSCS"
         },
         "authorisations": []
@@ -111,7 +111,7 @@
         "classification": "PUBLIC",
         "readOnly": false,
         "attributes": {
-          "caseType": "Benefit",
+          "caseType": "Benefit-4106",
           "jurisdiction": "SSCS"
         },
         "authorisations": []
@@ -131,7 +131,7 @@
         "classification": "PUBLIC",
         "readOnly": false,
         "attributes": {
-          "caseType": "Benefit",
+          "caseType": "Benefit-4106",
           "jurisdiction": "SSCS"
         },
         "authorisations": []

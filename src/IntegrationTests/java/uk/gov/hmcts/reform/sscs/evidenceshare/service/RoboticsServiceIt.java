@@ -88,7 +88,7 @@ public class RoboticsServiceIt {
                 .build())
             .build();
 
-        caseDetails = new CaseDetails<>(1234L, "sscs", APPEAL_CREATED, caseData, null, "Benefit");
+        caseDetails = new CaseDetails<>(1234L, "sscs", APPEAL_CREATED, caseData, null, "Benefit-4106");
 
 
         when(ccdService.getByCaseId(any(), any())).thenReturn(sscsCaseDetails);
@@ -277,7 +277,7 @@ public class RoboticsServiceIt {
 
     @Test
     public void givenReviewConfidentialityRequest_thenAddIsConfidentialFlagToRobotics() {
-        caseDetails = new CaseDetails<>(1234L, "sscs", RESPONSE_RECEIVED, caseData, null, "Benefit");
+        caseDetails = new CaseDetails<>(1234L, "sscs", RESPONSE_RECEIVED, caseData, null, "Benefit-4106");
 
         caseDetails.getCaseData().setConfidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
 
@@ -292,7 +292,7 @@ public class RoboticsServiceIt {
         caseData.setCreatedInGapsFrom(VALID_APPEAL.getId());
         caseData.setIsProgressingViaGaps("Yes");
 
-        caseDetails = new CaseDetails<>(1234L, "sscs", State.NOT_LISTABLE, caseData, null, "Benefit");
+        caseDetails = new CaseDetails<>(1234L, "sscs", State.NOT_LISTABLE, caseData, null, "Benefit-4106");
 
         JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
 

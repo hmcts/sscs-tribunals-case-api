@@ -99,11 +99,11 @@ public class CancelTranslationIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
 
         verify(coreCaseDataApi, atLeast(1)).startEventForCaseWorker(any(), anyString(), anyString(), eq("SSCS"),
-                eq("Benefit"), eq("12345656789"), eq("updateCaseOnly"));
+                eq("Benefit-4106"), eq("12345656789"), eq("updateCaseOnly"));
         verify(coreCaseDataApi, atLeast(1)).startEventForCaseWorker(any(), anyString(), anyString(), eq("SSCS"),
-                eq("Benefit"), eq("12345656789"), eq("sendToDwp"));
+                eq("Benefit-4106"), eq("12345656789"), eq("sendToDwp"));
         verify(coreCaseDataApi).submitEventForCaseWorker(anyString(), anyString(), anyString(), eq("SSCS"),
-                eq("Benefit"), eq("12345656789"), eq(true), any(CaseDataContent.class));
+                eq("Benefit-4106"), eq("12345656789"), eq(true), any(CaseDataContent.class));
     }
 
 
@@ -119,19 +119,19 @@ public class CancelTranslationIt extends AbstractEventIt {
                         .build())
                 .build();
         given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
-                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+                eq("userId"), eq("SSCS"), eq("Benefit-4106"), eq("12345656789"),
                 eq("updateCaseOnly")))
                 .willReturn(startEventResponse);
 
         given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
-                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+                eq("userId"), eq("SSCS"), eq("Benefit-4106"), eq("12345656789"),
                 eq("sendToDwp")))
                 .willReturn(startEventResponse);
 
         Map<String, Object> data = new HashMap<>();
         data.put("sscsWelshPreviewNextEvent", null);
         given(coreCaseDataApi.submitEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
-                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+                eq("userId"), eq("SSCS"), eq("Benefit-4106"), eq("12345656789"),
                 eq(true), any(CaseDataContent.class)))
                 .willReturn(CaseDetails.builder()
                         .id(12345656789L)

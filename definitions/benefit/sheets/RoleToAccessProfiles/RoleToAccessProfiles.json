@@ -1,7 +1,7 @@
 [
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:caseworker-sscs-dwpresponsewriter",
     "CaseAccessCategories": "personalIndependencePayment,carer'sAllowance,jobseeker’sAllowance,employmentAndSupportAllowance,disabilityLivingAllowance,universalCredit,industrialDeathBenefit,pensionCredit,retirementPension,childSupport,bereavementBenefit,industrialInjuriesDisablement,maternityAllowance,socialFund,incomeSupport,bereavementSupportPaymentScheme,attendanceAllowance",
     "Authorisation": "",
@@ -11,7 +11,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:caseworker-sscs-systemupdate",
     "Authorisation": "",
     "ReadOnly": "N",
@@ -20,7 +20,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:caseworker-sscs-clerk",
     "Authorisation": "",
     "ReadOnly": "N",
@@ -29,7 +29,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:caseworker-sscs-judge",
     "Authorisation": "",
     "ReadOnly": "N",
@@ -38,7 +38,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:caseworker-sscs-judge-salaried",
     "Authorisation": "",
     "ReadOnly": "N",
@@ -47,7 +47,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:caseworker-sscs-panelmember",
     "Authorisation": "",
     "ReadOnly": "N",
@@ -56,7 +56,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:caseworker-sscs-superuser",
     "Authorisation": "",
     "ReadOnly": "N",
@@ -65,7 +65,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:caseworker-sscs-registrar",
     "Authorisation": "",
     "ReadOnly": "N",
@@ -74,7 +74,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:caseworker-sscs-anonymouscitizen",
     "Authorisation": "",
     "ReadOnly": "N",
@@ -83,7 +83,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:caseworker-sscs-callagent",
     "Authorisation": "",
     "ReadOnly": "N",
@@ -92,7 +92,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:caseworker-sscs-bulkscan",
     "Authorisation": "",
     "ReadOnly": "N",
@@ -101,7 +101,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:caseworker-sscs-teamleader",
     "Authorisation": "",
     "ReadOnly": "N",
@@ -110,7 +110,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:citizen",
     "Authorisation": "",
     "ReadOnly": "N",
@@ -119,7 +119,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:caseworker-sscs",
     "CaseAccessCategories": "doNotRemove",
     "Authorisation": "",
@@ -129,7 +129,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "[CREATOR]",
     "Authorisation": "",
     "ReadOnly": "N",
@@ -138,7 +138,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:caseworker-sscs-hmrcresponsewriter",
     "CaseAccessCategories": "taxCredit,guardiansAllowance,tax-freeChildcare,homeResponsibilitiesProtection,childBenefit,30HoursFreeChildcare,guaranteedMinimumPension,nationalInsuranceCredits",
     "Authorisation": "",
@@ -148,7 +148,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:caseworker-sscs-ibcaresponsewriter",
     "CaseAccessCategories": "infectedBloodAppeal",
     "Authorisation": "",
@@ -158,7 +158,7 @@
   },
   {
     "LiveFrom": "18/03/2023",
-    "CaseTypeID": "Benefit",
+    "CaseTypeID": "Benefit-4106",
     "RoleName": "idam:caseworker-sscs-pcqextractor",
     "Authorisation": "",
     "ReadOnly": "N",

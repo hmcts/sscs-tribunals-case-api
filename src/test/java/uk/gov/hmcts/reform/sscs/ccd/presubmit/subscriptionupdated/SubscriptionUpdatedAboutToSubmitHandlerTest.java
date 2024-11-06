@@ -195,7 +195,7 @@ public class SubscriptionUpdatedAboutToSubmitHandlerTest {
         SscsCaseData previousCaseData = SscsCaseData.builder()
                 .otherParties(Arrays.asList(CcdValue.<OtherParty>builder().value(OtherParty.builder().id("other_party_1").build()).build())).build();
         Optional<CaseDetails<SscsCaseData>> beforeData =
-                Optional.of(new CaseDetails<SscsCaseData>(33333333L, "", State.APPEAL_CREATED, previousCaseData, LocalDateTime.now(), "Benefit"));
+                Optional.of(new CaseDetails<SscsCaseData>(33333333L, "", State.APPEAL_CREATED, previousCaseData, LocalDateTime.now(), "Benefit-4106"));
         when(callback.getCaseDetailsBefore()).thenReturn(beforeData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -212,7 +212,7 @@ public class SubscriptionUpdatedAboutToSubmitHandlerTest {
         SscsCaseData previousCaseData = SscsCaseData.builder()
                 .otherParties(null).build();
         Optional<CaseDetails<SscsCaseData>> beforeData =
-                Optional.of(new CaseDetails<SscsCaseData>(33333333L, "", State.APPEAL_CREATED, previousCaseData, LocalDateTime.now(), "Benefit"));
+                Optional.of(new CaseDetails<SscsCaseData>(33333333L, "", State.APPEAL_CREATED, previousCaseData, LocalDateTime.now(), "Benefit-4106"));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

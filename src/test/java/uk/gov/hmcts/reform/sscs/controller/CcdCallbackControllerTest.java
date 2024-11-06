@@ -107,7 +107,7 @@ public class CcdCallbackControllerTest {
 
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit-4106"),
             Optional.empty(), ACTION_FURTHER_EVIDENCE, false));
 
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(SscsCaseData.builder().originalSender(
@@ -132,7 +132,7 @@ public class CcdCallbackControllerTest {
 
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit"),
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now(), "Benefit-4106"),
             Optional.empty(), INTERLOC_INFORMATION_RECEIVED, false));
 
         PreSubmitCallbackResponse response =
@@ -172,7 +172,7 @@ public class CcdCallbackControllerTest {
 
     private Callback<SscsCaseData> buildCallbackForTestScenarioForGivenEvent() {
         CaseDetails<SscsCaseData> caseDetail = new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE,
-            SscsCaseData.builder().build(), LocalDateTime.now(), "Benefit");
+            SscsCaseData.builder().build(), LocalDateTime.now(), "Benefit-4106");
         return new Callback<>(caseDetail, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE, false);
     }
 

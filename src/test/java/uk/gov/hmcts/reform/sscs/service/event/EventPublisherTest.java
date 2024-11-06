@@ -28,7 +28,7 @@ public class EventPublisherTest {
 
     private SscsCaseData sscsCaseData;
 
-    private static final String JURISDICTION = "Benefit";
+    private static final String JURISDICTION = "Benefit-4106";
 
     private ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 
@@ -46,7 +46,7 @@ public class EventPublisherTest {
     public void testPublishEvent() throws JsonProcessingException {
 
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(parseLong(sscsCaseData.getCcdCaseId()), JURISDICTION,
-            sscsCaseData.getState(), sscsCaseData, LocalDateTime.now(), "Benefit");
+            sscsCaseData.getState(), sscsCaseData, LocalDateTime.now(), "Benefit-4106");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(),
             EventType.DWP_SUPPLEMENTARY_RESPONSE, false);
         String message = mapper.writeValueAsString(callback);
