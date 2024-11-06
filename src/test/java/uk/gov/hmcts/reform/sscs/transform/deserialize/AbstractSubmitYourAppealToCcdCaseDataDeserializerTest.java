@@ -20,15 +20,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Reason;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 
 @RunWith(JUnitParamsRunner.class)
 public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
@@ -171,17 +168,19 @@ public abstract class AbstractSubmitYourAppealToCcdCaseDataDeserializerTest {
         syaCaseWrapper.getContactDetails().setAddressLine2("line2");
         syaCaseWrapper.getContactDetails().setTownCity("townCity");
         syaCaseWrapper.getContactDetails().setCountry("country");
-        syaCaseWrapper.getContactDetails().setPortOfEntry("GB100100");
+        syaCaseWrapper.getContactDetails().setPortOfEntry("GB000434");
 
         SscsCaseData caseData = callConvertSyaToCcdCaseDataRelevantVersion(syaCaseWrapper,
             regionalProcessingCenter.getName(), regionalProcessingCenter, false);
+        DynamicList expectedPortsOfEntry = getPortsOfEntry();
+        expectedPortsOfEntry.setValue(SscsUtil.getPortOfEntryFromCode("GB000434"));
         Address expectedAddress = Address.builder()
             .line1("line1")
             .line2("line2")
             .town("townCity")
             .country("country")
-            .portOfEntry("GB100100")
-            .ukPortOfEntryList(getPortsOfEntry())
+            .portOfEntry("GB000434")
+            .ukPortOfEntryList(expectedPortsOfEntry)
             .inMainlandUk(YesNo.NO)
             .build();
         assertEquals(expectedAddress, caseData.getAppeal().getAppellant().getAddress());
