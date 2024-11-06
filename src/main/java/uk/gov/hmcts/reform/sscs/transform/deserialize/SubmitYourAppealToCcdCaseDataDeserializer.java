@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 import uk.gov.hmcts.reform.sscs.exception.BenefitMappingException;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Slf4j
@@ -296,9 +297,12 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             if (inMainlandUkYesNo.equals(YesNo.NO)) {
                 addressBuilder.country(contactDetails.getCountry());
                 if (party.equalsIgnoreCase("appellant")) {
+                    String portOfEntryCode = contactDetails.getPortOfEntry();
+                    DynamicList portsOfEntry = getPortsOfEntry();
+                    portsOfEntry.setValue(SscsUtil.getPortOfEntryFromCode(portOfEntryCode));
                     addressBuilder
-                        .portOfEntry(contactDetails.getPortOfEntry())
-                        .ukPortOfEntryList(getPortsOfEntry());
+                        .portOfEntry(portOfEntryCode)
+                        .ukPortOfEntryList(portsOfEntry);
                 }
                 return addressBuilder.build();
             }

@@ -384,6 +384,14 @@ public class SscsUtil {
         return new DynamicList(null, items);
     }
 
+    public static DynamicListItem getPortOfEntryFromCode(String locationCode) {
+        return Arrays.stream(UkPortOfEntry.values())
+            .filter(ukPortOfEntry -> ukPortOfEntry.getLocationCode().equals(locationCode))
+            .findFirst()
+            .map(ukPortOfEntry -> new DynamicListItem(ukPortOfEntry.getLocationCode(), ukPortOfEntry.getLabel()))
+            .orElseGet(() -> new DynamicListItem(null, null));
+    }
+
     public static DynamicList getBenefitDescriptions(boolean isInfectedBloodAppealEnabled) {
         List<DynamicListItem> items = Arrays.stream(Benefit.values())
                 .filter(benefit -> isInfectedBloodAppealEnabled || !benefit.getShortName().equals("infectedBloodAppeal"))
