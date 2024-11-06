@@ -107,6 +107,7 @@ public class EvidenceUploadServiceTest {
     private ReadCcdCaseService readCcdCaseService;
     private CcdClient ccdClient;
     private FileToPdfConversionService fileToPdfConversionService;
+    private ReadCcdCaseService readCcdCaseService;
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> captor;
 
@@ -117,6 +118,7 @@ public class EvidenceUploadServiceTest {
     public void setUp() {
         updateCcdCaseService = mock(UpdateCcdCaseService.class);
         onlineHearingService = mock(OnlineHearingService.class);
+        readCcdCaseService = mock(ReadCcdCaseService.class);
         someOnlineHearingId = "123";
         someQuestionId = "someQuestionId";
         someEvidenceId = "someEvidenceId";
