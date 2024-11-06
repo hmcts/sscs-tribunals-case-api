@@ -221,6 +221,8 @@ export class UploadResponse extends BaseStep {
         for (const linkName of this.presetLinks) {
             await this.verifyHistoryTabLink(linkName);
         }
+
+        await this.homePage.clickBeforeTabBtn();
         await this.homePage.navigateToTab("Summary");
         await this.summaryTab.verifyPresenceOfText("Ready to list");
         // await performAppealDormantOnCase(ucCaseId);
