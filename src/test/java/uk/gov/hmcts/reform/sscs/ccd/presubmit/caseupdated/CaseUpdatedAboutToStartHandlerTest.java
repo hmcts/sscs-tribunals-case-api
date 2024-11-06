@@ -69,8 +69,8 @@ public class CaseUpdatedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenBenefitType_shouldHaveCorrectBenefitSelectionWithInfectedBloodAppealDisabled() {
-        ReflectionTestUtils.setField(handler, "isInfectedBloodAppealEnabled", false);
+    void givenBenefitType_shouldHaveCorrectBenefitSelectionWithInfectedBloodCompensationDisabled() {
+        ReflectionTestUtils.setField(handler, "isInfectedBloodCompensationEnabled", false);
 
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var benefitSelection = result.getData().getAppeal().getBenefitType().getDescriptionSelection();
@@ -82,8 +82,8 @@ public class CaseUpdatedAboutToStartHandlerTest {
     }
 
     @Test
-    void givenBenefitType_shouldHaveCorrectBenefitSelectionWithInfectedBloodAppealEnabled() {
-        ReflectionTestUtils.setField(handler, "isInfectedBloodAppealEnabled", true);
+    void givenBenefitType_shouldHaveCorrectBenefitSelectionWithInfectedBloodCompensationEnabled() {
+        ReflectionTestUtils.setField(handler, "isInfectedBloodCompensationEnabled", true);
 
         var result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         var benefitSelection = result.getData().getAppeal().getBenefitType().getDescriptionSelection();
