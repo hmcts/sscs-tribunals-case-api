@@ -4036,7 +4036,7 @@
     "CaseEventID": "updateOtherPartyData",
     "CaseFieldID": "appeal",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "COMPLEX",
+    "DisplayContext": "READONLY",
     "FieldShowCondition": "otherParties=\"DoNotShow\"",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,

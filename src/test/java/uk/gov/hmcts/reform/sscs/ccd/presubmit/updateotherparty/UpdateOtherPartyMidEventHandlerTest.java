@@ -17,7 +17,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @RunWith(JUnitParamsRunner.class)
 public class UpdateOtherPartyMidEventHandlerTest {
@@ -73,12 +79,33 @@ public class UpdateOtherPartyMidEventHandlerTest {
     }
 
     @Test
+    public void shouldReturnTrueForCanHandleNonIbaCase() {
+        OtherParty party = OtherParty.builder()
+            .address(Address.builder().line1("42 new road").build())
+            .build();
+
+        CcdValue<OtherParty> expectedOtherParty = new CcdValue<>(party);
+        List<CcdValue<OtherParty>> expectedOtherPartyList = List.of(expectedOtherParty);
+
+        SscsCaseData caseData = SscsCaseData.builder()
+            .benefitCode("053")
+            .otherParties(expectedOtherPartyList)
+            .build();
+
+        when(callback.getEvent()).thenReturn(EventType.UPDATE_OTHER_PARTY_DATA);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+
+        assertFalse(midEventHandler.canHandle(MID_EVENT, callback));
+    }
+
+    @Test
     @Parameters({
         "EVENTS_UPDATES",
         "APPEAL_RECEIVED",
         "CASE_UPDATED"
     })
-    public void shouldReturnFalseForCanHandleWhenNotUpdateOtherPartyData(EventType eventType) {
+    public void shouldReturnFalseForCanHandleWhenNotEventUpdateOtherPartyData(EventType eventType) {
         OtherParty party = OtherParty.builder()
                 .address(Address.builder().line1("42 new road").build())
                 .build();
