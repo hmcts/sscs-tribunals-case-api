@@ -2,11 +2,16 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service;
 
 import static java.lang.String.format;
 import static java.util.Base64.getEncoder;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -166,7 +171,7 @@ public class BulkPrintService implements PrintService {
         additionalData.put(RECIPIENTS, getRecipients(recipient));
 
         YesNo isInUk = sscsCaseData.getAppeal().getAppellant().getAddress().getInMainlandUk();
-        if (isInUk != null && !isYes(isInUk)) {
+        if (NO.equals(isInUk)) {
             additionalData.put(IS_INTERNATIONAL, "true");
         }
         return additionalData;

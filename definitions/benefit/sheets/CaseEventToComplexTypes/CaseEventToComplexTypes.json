@@ -1637,23 +1637,12 @@
   {
     "CaseEventID": "addHearing",
     "CaseFieldID": "hearings",
-    "ListElementCode": "venue.address.portOfEntry",
-    "ID": "addHearingVenueAddressPortOfEntryCode",
-    "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\" AND hearings.venue.address.inMainlandUk=\"No\"",
-    "LiveFrom": "01/01/2018",
-    "FieldDisplayOrder": 12,
-    "PageID": "1.0"
-  },
-  {
-    "CaseEventID": "addHearing",
-    "CaseFieldID": "hearings",
     "ListElementCode": "venue.address.ukPortOfEntryList",
     "ID": "addHearingVenueAddressUkPortOfEntryList",
     "DisplayContext": "OPTIONAL",
     "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\" AND hearings.venue.address.inMainlandUk=\"No\"",
     "LiveFrom": "01/01/2018",
-    "FieldDisplayOrder": 13,
+    "FieldDisplayOrder": 12,
     "PageID": "1.0"
   },
   {

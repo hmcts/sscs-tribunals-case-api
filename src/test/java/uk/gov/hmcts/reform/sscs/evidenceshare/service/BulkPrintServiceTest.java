@@ -244,7 +244,7 @@ public class BulkPrintServiceTest {
     }
 
     @Test
-    public void shouldSendToBulkPrint_noAdditionalDataInternationalFlagAsinMainlandUkNull() {
+    public void shouldSendToBulkPrint_noAdditionalDataInternationalFlagAsInMainlandUkNull() {
         SscsCaseData sscsCaseDataNonUK = SscsCaseData.builder()
                 .ccdCaseId("234")
                 .appeal(
