@@ -55,6 +55,7 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
         simulateCcdCallback(ADMIN_APPEAL_WITHDRAWN, "tyanotifications/handlers/" + ADMIN_APPEAL_WITHDRAWN.getId() + subscription
             + "Callback.json");
 
+        delayInSeconds(5);
         List<Notification> notifications = tryFetchNotificationsForTestCase(emailId, smsId);
 
         assertEquals(expectedNumEmailNotifications, getNumberOfNotificationsForGivenEmailOrSmsTemplateId(notifications, emailId));
@@ -67,7 +68,7 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
             if (getNumberOfLetterCorrespondence(subscription) == expectedNumLetters) {
                 return true;
             }
-            delayInSeconds(5);
+            delayInSeconds(10);
         } while (true);
     }
 
