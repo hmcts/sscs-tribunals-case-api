@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseLinkDetails;
@@ -46,9 +45,6 @@ public class ServiceHearingsService {
 
     private final IdamService idamService;
 
-    @Value("${feature.update-case-only-hearing-v2.enabled}")
-    private boolean updatCaseOnlyHearingV2Enabled;
-
     public ServiceHearingValues getServiceHearingValues(ServiceHearingRequest request)
             throws GetCaseException, UpdateCaseException, ListingException, JsonProcessingException {
         SscsCaseDetails caseDetails = ccdCaseService.getCaseDetails(request.getCaseId());
@@ -61,23 +57,13 @@ public class ServiceHearingsService {
         String updatedCaseData = objectMapper.writeValueAsString(caseData);
 
         if (!originalCaseData.equals(updatedCaseData)) {
-            if (updatCaseOnlyHearingV2Enabled) {
-                log.info("Updating case V2 data with Service Hearing Values for Case ID {}", caseData.getCcdCaseId());
-                Long currentCaseId = Long.parseLong(caseData.getCcdCaseId());
-                updateCcdCaseService.triggerCaseEventV2(currentCaseId,
-                        EventType.UPDATE_CASE_ONLY.getType(),
-                        "Updating caseDetails IDs",
-                        "IDs updated for caseDetails due to ServiceHearingValues request",
-                        idamService.getIdamTokens());
-
-            } else {
-                log.info("Updating case data with Service Hearing Values for Case ID {}", caseData.getCcdCaseId());
-                ccdCaseService.updateCaseData(
-                        caseData,
-                        EventType.UPDATE_CASE_ONLY,
-                        "Updating caseDetails IDs",
-                        "IDs updated for caseDetails due to ServiceHearingValues request");
-            }
+            log.info("Updating case V2 data with Service Hearing Values for Case ID {}", caseData.getCcdCaseId());
+            Long currentCaseId = Long.parseLong(caseData.getCcdCaseId());
+            updateCcdCaseService.triggerCaseEventV2(currentCaseId,
+                    EventType.UPDATE_CASE_ONLY.getType(),
+                    "Updating caseDetails IDs",
+                    "IDs updated for caseDetails due to ServiceHearingValues request",
+                    idamService.getIdamTokens());
         }
 
         return model;

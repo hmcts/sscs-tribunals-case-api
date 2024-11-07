@@ -18,7 +18,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,11 +26,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
@@ -67,8 +64,6 @@ class ServiceHearingsServiceTest {
 
     @Mock
     private IdamService idamService;
-
-    private ArgumentCaptor<Consumer<SscsCaseDetails>> captor;
 
     @InjectMocks
     private ServiceHearingsService serviceHearingsService;
@@ -139,38 +134,9 @@ class ServiceHearingsServiceTest {
             .build();
     }
 
-    @DisplayName("When a case data is retrieved an entity which does not have a Id, that a new Id will be generated and the method updateCaseData will be called once")
-    @Test
-    void testGetServiceHearingValuesNoIds() throws Exception {
-        ServiceHearingRequest request = ServiceHearingRequest.builder()
-            .caseId(String.valueOf(CASE_ID))
-            .build();
-
-        given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,true,false))
-            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                false,false, SessionCategory.CATEGORY_03,null));
-
-        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
-
-        given(venueService.getEpimsIdForVenue(caseData.getProcessingVenue())).willReturn("9876");
-
-        given(refData.getVenueService()).willReturn(venueService);
-
-        given(ccdCaseService.getCaseDetails(String.valueOf(CASE_ID))).willReturn(caseDetails);
-
-        ServiceHearingValues result = serviceHearingsService.getServiceHearingValues(request);
-
-        assertThat(result.getParties())
-            .extracting("partyID")
-            .doesNotContainNull();
-
-        verify(ccdCaseService, times(1)).updateCaseData(any(SscsCaseData.class), eq(UPDATE_CASE_ONLY), anyString(), anyString());
-    }
-
     @DisplayName("When a case V2 data is retrieved an entity which does not have a Id, that a new Id will be generated and the method updateCaseData will be called once")
     @Test
-    void testGetServiceHearingValuesNoIdsForV2() throws Exception {
-        ReflectionTestUtils.setField(serviceHearingsService, "updatCaseOnlyHearingV2Enabled", true);
+    void testGetServiceHearingValuesNoIds() throws Exception {
         ServiceHearingRequest request = ServiceHearingRequest.builder()
                 .caseId(String.valueOf(CASE_ID))
                 .build();
