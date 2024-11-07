@@ -125,6 +125,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
         String ccdEventType = getApplicableCcdEventType(callback);
 
+        log.info("updateCaseDataIfEventApplicable.ccdEventType={} for case={}", ccdEventType, callback.getCaseDetails().getId());
         if (ccdEventType != null) {
             // As part of ticket SSCS-6869, a new field was required to let the caseworker know when a case had been sent to GAPS2 via Robotics. However, if this was done as part of this handler it would need to be updated
             // as part of a separate event. Some of the events handled in this class are handled in the SendToBulkPrintHandler, which also triggers an update to CCD. If both these events occur at the same time then we would
