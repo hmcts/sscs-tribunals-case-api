@@ -173,7 +173,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
     @Test
     void shouldSetPdfFileNameWithIbcaReferenceWhenBenefitIsIbca() {
-        SscsCaseData caseDataWithSscsDocument = buildCaseData("Test", "infectedBloodAppeal", "IBCA");
+        SscsCaseData caseDataWithSscsDocument = buildCaseData("Test", "infectedBloodCompensation", "IBCA");
         caseDataWithSscsDocument.setCcdCaseId(CCD_CASE_ID.toString());
         caseDataWithSscsDocument.setBenefitCode(IBCA_BENEFIT_CODE);
         caseDataWithSscsDocument.getAppeal().getAppellant().getIdentity().setIbcaReference("IBCA12345");
@@ -190,7 +190,7 @@ public class CreateCaseAboutToSubmitHandlerTest {
 
     @Test
     void shouldCallPdfServiceWhenSscsDocumentIsNullWhenBenefitCodeIsIbca() {
-        SscsCaseData caseDataWithNullSscsDocument = buildCaseData("Test", "infectedBloodAppeal", "IBCA");
+        SscsCaseData caseDataWithNullSscsDocument = buildCaseData("Test", "infectedBloodCompensation", "IBCA");
         caseDataWithNullSscsDocument.setCcdCaseId(CCD_CASE_ID.toString());
         caseDataWithNullSscsDocument.setBenefitCode(IBCA_BENEFIT_CODE);
         caseDataWithNullSscsDocument.getAppeal().getAppellant().getIdentity().setIbcaReference("IBCA12345");
