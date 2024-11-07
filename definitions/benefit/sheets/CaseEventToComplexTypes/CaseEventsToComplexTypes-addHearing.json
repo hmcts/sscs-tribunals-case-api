@@ -125,7 +125,7 @@
     "ListElementCode": "venue.address.inMainlandUk",
     "ID": "addHearingVenueAddressLivingInTheUk",
     "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\"",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 11,
     "PageID": "1.0"
@@ -136,7 +136,7 @@
     "ListElementCode": "venue.address.ukPortOfEntryList",
     "ID": "addHearingVenueAddressUkPortOfEntryList",
     "DisplayContext": "OPTIONAL",
-    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\" AND hearings.venue.address.inMainlandUk=\"No\"",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\" AND hearings.venue.address.inMainlandUk=\"No\"",
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 12,
     "PageID": "1.0"
