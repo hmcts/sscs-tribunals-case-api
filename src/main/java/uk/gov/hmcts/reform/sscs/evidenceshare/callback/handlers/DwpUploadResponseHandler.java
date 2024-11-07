@@ -62,7 +62,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             handleUc(callback);
         } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName()) || isBenefitTypeSscs5(callback.getCaseDetails().getCaseData().getBenefitType())) {
             handleChildSupportAndSscs5Case(callback);
-        } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.INFECTED_BLOOD_APPEAL.getShortName())) {
+        } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.INFECTED_BLOOD_COMPENSATION.getShortName())) {
             handleIbcaCase(callback);
         } else {
             handleNonUc(callback);
