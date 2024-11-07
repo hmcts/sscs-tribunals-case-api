@@ -125,18 +125,15 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
         String ccdEventType = getApplicableCcdEventType(callback);
 
-        log.info("updateCaseDataIfEventApplicable.ccdEventType={} for case={}", ccdEventType, callback.getCaseDetails().getId());
         if (ccdEventType != null) {
             // As part of ticket SSCS-6869, a new field was required to let the caseworker know when a case had been sent to GAPS2 via Robotics. However, if this was done as part of this handler it would need to be updated
             // as part of a separate event. Some of the events handled in this class are handled in the SendToBulkPrintHandler, which also triggers an update to CCD. If both these events occur at the same time then we would
             // end up with a concurrent case modification error from CCD. Therefore, this is an attempt to safely update the case. For events not handled in SendToBulkPrintHandler then trigger a separate updateCase event.
             // For events that are handled in the SendToBulkPrintHandler then just update the case data here, as the case would be saved to CCD further down the chain as part of the sentToDwp event in SendToBulkPrintHandler.
-            String summary = "Case sent to robotics";
-            String description = "Updated case with date sent to robotics";
 
             updateCcdCaseService.updateCaseV2(
                     Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId()),
-                    ccdEventType, summary, description,
+                    ccdEventType, "Case sent to robotics", "Updated case with date sent to robotics",
                     idamService.getIdamTokens(),
                     sscsCaseDetails -> {
                         sscsCaseDetails.getData().setDateCaseSentToGaps(LocalDate.now().toString());
