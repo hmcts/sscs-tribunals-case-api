@@ -15,17 +15,28 @@ import feign.FeignException.UnprocessableEntity;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.function.Consumer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.io.ClassPathResource;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService2;
@@ -40,6 +51,9 @@ public class RestoreCasesService2Test {
     private CcdService ccdService;
 
     @Mock
+    private UpdateCcdCaseService updateCcdCaseService;
+
+    @Mock
     private IdamService idamService;
 
     @Mock
@@ -48,17 +62,18 @@ public class RestoreCasesService2Test {
     @Mock
     CSVReader reader;
 
+    @Captor
+    private ArgumentCaptor<Consumer<SscsCaseDetails>> sscsCaseDetailsCaptor;
+
+    @Captor
+    private ArgumentCaptor<Long> caseIdCaptor = ArgumentCaptor.forClass(Long.class);
+
     private static final RegionalProcessingCenterService regionalProcessingCenterService;
 
-    private static AirLookupService airLookupService;
-
-    private RegionalProcessingCenter rpc = RegionalProcessingCenter.builder().name("Basildon").build();
-    private RegionalProcessingCenter rpc2 = RegionalProcessingCenter.builder().name("Glasgow").build();
-
-    ArgumentCaptor<SscsCaseData> sscsCaseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
-    ArgumentCaptor<Long> caseIdCaptor = ArgumentCaptor.forClass(Long.class);
+    private static final AirLookupService airLookupService;
 
     private SscsCaseDetails sscsCaseDetails;
+
     private SscsCaseDetails sscsCaseDetails2;
 
     static {
@@ -70,7 +85,7 @@ public class RestoreCasesService2Test {
 
     @Before
     public void setup() {
-        restoreCasesService2 = new RestoreCasesService2(ccdService, idamService, new ObjectMapper(), regionalProcessingCenterService, airLookupService);
+        restoreCasesService2 = new RestoreCasesService2(ccdService, updateCcdCaseService, idamService, new ObjectMapper(), regionalProcessingCenterService, airLookupService);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         sscsCaseDetails = SscsCaseDetails.builder().state(State.WITH_DWP.getId())
@@ -109,29 +124,32 @@ public class RestoreCasesService2Test {
 
         final RestoreCasesStatus status = restoreCasesService2.restoreCases(reader);
 
-        Mockito.verify(ccdService, Mockito.times(2)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
-            eq("appealReceived"), eq("Restore case details"), eq("Automatically restore missing case details"), eq(idamTokens));
+        Mockito.verify(updateCcdCaseService, Mockito.times(2)).updateCaseV2(caseIdCaptor.capture(),
+            eq("appealReceived"), eq("Restore case details"), eq("Automatically restore missing case details"),
+            eq(idamTokens), sscsCaseDetailsCaptor.capture());
+        sscsCaseDetailsCaptor.getValue().accept(sscsCaseDetails);
+        sscsCaseDetailsCaptor.getValue().accept(sscsCaseDetails2);
 
         Assert.assertEquals(Arrays.asList(1234112842952455L, 1234118573817544L), caseIdCaptor.getAllValues());
-        Assert.assertEquals("BRADFORD", sscsCaseDataCaptor.getAllValues().get(0).getRegionalProcessingCenter().getCity());
-        Assert.assertEquals("BRADFORD", sscsCaseDataCaptor.getAllValues().get(0).getRegion());
-        Assert.assertEquals("002", sscsCaseDataCaptor.getAllValues().get(0).getBenefitCode());
-        Assert.assertEquals("DD", sscsCaseDataCaptor.getAllValues().get(0).getIssueCode());
-        Assert.assertEquals("002DD", sscsCaseDataCaptor.getAllValues().get(0).getCaseCode());
-        Assert.assertEquals("No", sscsCaseDataCaptor.getAllValues().get(0).getIsScottishCase());
-        Assert.assertEquals("Basildon CC", sscsCaseDataCaptor.getAllValues().get(0).getProcessingVenue());
-        Assert.assertEquals("Jeff Smith", sscsCaseDataCaptor.getAllValues().get(0).getAppeal().getSigner());
-        Assert.assertEquals(UNREGISTERED, sscsCaseDataCaptor.getAllValues().get(0).getDwpState());
+        Assert.assertEquals("BRADFORD", sscsCaseDetails.getData().getRegionalProcessingCenter().getCity());
+        Assert.assertEquals("BRADFORD", sscsCaseDetails.getData().getRegion());
+        Assert.assertEquals("002", sscsCaseDetails.getData().getBenefitCode());
+        Assert.assertEquals("DD", sscsCaseDetails.getData().getIssueCode());
+        Assert.assertEquals("002DD", sscsCaseDetails.getData().getCaseCode());
+        Assert.assertEquals("No", sscsCaseDetails.getData().getIsScottishCase());
+        Assert.assertEquals("Basildon CC", sscsCaseDetails.getData().getProcessingVenue());
+        Assert.assertEquals("Jeff Smith", sscsCaseDetails.getData().getAppeal().getSigner());
+        Assert.assertEquals(UNREGISTERED, sscsCaseDetails.getData().getDwpState());
 
-        Assert.assertEquals("GLASGOW", sscsCaseDataCaptor.getAllValues().get(1).getRegionalProcessingCenter().getCity());
-        Assert.assertEquals("GLASGOW", sscsCaseDataCaptor.getAllValues().get(1).getRegion());
-        Assert.assertEquals("051", sscsCaseDataCaptor.getAllValues().get(1).getBenefitCode());
-        Assert.assertEquals("DD", sscsCaseDataCaptor.getAllValues().get(1).getIssueCode());
-        Assert.assertEquals("051DD", sscsCaseDataCaptor.getAllValues().get(1).getCaseCode());
-        Assert.assertEquals("Yes", sscsCaseDataCaptor.getAllValues().get(1).getIsScottishCase());
-        Assert.assertEquals("Glasgow", sscsCaseDataCaptor.getAllValues().get(1).getProcessingVenue());
-        Assert.assertEquals("Mary Berry", sscsCaseDataCaptor.getAllValues().get(1).getAppeal().getSigner());
-        Assert.assertEquals(UNREGISTERED, sscsCaseDataCaptor.getAllValues().get(1).getDwpState());
+        Assert.assertEquals("GLASGOW", sscsCaseDetails2.getData().getRegionalProcessingCenter().getCity());
+        Assert.assertEquals("GLASGOW", sscsCaseDetails2.getData().getRegion());
+        Assert.assertEquals("051", sscsCaseDetails2.getData().getBenefitCode());
+        Assert.assertEquals("DD", sscsCaseDetails2.getData().getIssueCode());
+        Assert.assertEquals("051DD", sscsCaseDetails2.getData().getCaseCode());
+        Assert.assertEquals("Yes", sscsCaseDetails2.getData().getIsScottishCase());
+        Assert.assertEquals("Glasgow", sscsCaseDetails2.getData().getProcessingVenue());
+        Assert.assertEquals("Mary Berry", sscsCaseDetails2.getData().getAppeal().getSigner());
+        Assert.assertEquals(UNREGISTERED, sscsCaseDetails2.getData().getDwpState());
 
         Assert.assertFalse(status.isCompleted());
         Assert.assertTrue(status.isOk());
@@ -152,29 +170,32 @@ public class RestoreCasesService2Test {
 
         final RestoreCasesStatus status = restoreCasesService2.restoreCases(reader);
 
-        Mockito.verify(ccdService, Mockito.times(2)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
-                eq("updateCaseOnly"), eq("Restore case details"), eq("Automatically restore missing case details"), eq(idamTokens));
+        Mockito.verify(updateCcdCaseService, Mockito.times(2)).updateCaseV2(caseIdCaptor.capture(),
+            eq("updateCaseOnly"), eq("Restore case details"), eq("Automatically restore missing case details"),
+            eq(idamTokens), sscsCaseDetailsCaptor.capture());
+        sscsCaseDetailsCaptor.getValue().accept(sscsCaseDetails);
+        sscsCaseDetailsCaptor.getValue().accept(sscsCaseDetails2);
 
         Assert.assertEquals(Arrays.asList(1234112842952455L, 1234118573817544L), caseIdCaptor.getAllValues());
-        Assert.assertEquals("BRADFORD", sscsCaseDataCaptor.getAllValues().get(0).getRegionalProcessingCenter().getCity());
-        Assert.assertEquals("BRADFORD", sscsCaseDataCaptor.getAllValues().get(0).getRegion());
-        Assert.assertEquals("002", sscsCaseDataCaptor.getAllValues().get(0).getBenefitCode());
-        Assert.assertEquals("DD", sscsCaseDataCaptor.getAllValues().get(0).getIssueCode());
-        Assert.assertEquals("002DD", sscsCaseDataCaptor.getAllValues().get(0).getCaseCode());
-        Assert.assertEquals("No", sscsCaseDataCaptor.getAllValues().get(0).getIsScottishCase());
-        Assert.assertEquals("Basildon CC", sscsCaseDataCaptor.getAllValues().get(0).getProcessingVenue());
-        Assert.assertEquals("Jeff Smith", sscsCaseDataCaptor.getAllValues().get(0).getAppeal().getSigner());
-        Assert.assertNull(sscsCaseDataCaptor.getAllValues().get(0).getDwpState());
+        Assert.assertEquals("BRADFORD", sscsCaseDetails.getData().getRegionalProcessingCenter().getCity());
+        Assert.assertEquals("BRADFORD", sscsCaseDetails.getData().getRegion());
+        Assert.assertEquals("002", sscsCaseDetails.getData().getBenefitCode());
+        Assert.assertEquals("DD", sscsCaseDetails.getData().getIssueCode());
+        Assert.assertEquals("002DD", sscsCaseDetails.getData().getCaseCode());
+        Assert.assertEquals("No", sscsCaseDetails.getData().getIsScottishCase());
+        Assert.assertEquals("Basildon CC", sscsCaseDetails.getData().getProcessingVenue());
+        Assert.assertEquals("Jeff Smith", sscsCaseDetails.getData().getAppeal().getSigner());
+        Assert.assertNull(sscsCaseDetails.getData().getDwpState());
 
-        Assert.assertEquals("GLASGOW", sscsCaseDataCaptor.getAllValues().get(1).getRegionalProcessingCenter().getCity());
-        Assert.assertEquals("GLASGOW", sscsCaseDataCaptor.getAllValues().get(1).getRegion());
-        Assert.assertEquals("051", sscsCaseDataCaptor.getAllValues().get(1).getBenefitCode());
-        Assert.assertEquals("DD", sscsCaseDataCaptor.getAllValues().get(1).getIssueCode());
-        Assert.assertEquals("051DD", sscsCaseDataCaptor.getAllValues().get(1).getCaseCode());
-        Assert.assertEquals("Yes", sscsCaseDataCaptor.getAllValues().get(1).getIsScottishCase());
-        Assert.assertEquals("Glasgow", sscsCaseDataCaptor.getAllValues().get(1).getProcessingVenue());
-        Assert.assertEquals("Mary Berry", sscsCaseDataCaptor.getAllValues().get(1).getAppeal().getSigner());
-        Assert.assertNull(sscsCaseDataCaptor.getAllValues().get(1).getDwpState());
+        Assert.assertEquals("GLASGOW", sscsCaseDetails2.getData().getRegionalProcessingCenter().getCity());
+        Assert.assertEquals("GLASGOW", sscsCaseDetails2.getData().getRegion());
+        Assert.assertEquals("051", sscsCaseDetails2.getData().getBenefitCode());
+        Assert.assertEquals("DD", sscsCaseDetails2.getData().getIssueCode());
+        Assert.assertEquals("051DD", sscsCaseDetails2.getData().getCaseCode());
+        Assert.assertEquals("Yes", sscsCaseDetails2.getData().getIsScottishCase());
+        Assert.assertEquals("Glasgow", sscsCaseDetails2.getData().getProcessingVenue());
+        Assert.assertEquals("Mary Berry", sscsCaseDetails2.getData().getAppeal().getSigner());
+        Assert.assertNull(sscsCaseDetails2.getData().getDwpState());
 
         Assert.assertFalse(status.isCompleted());
         Assert.assertTrue(status.isOk());
@@ -191,8 +212,8 @@ public class RestoreCasesService2Test {
 
         final RestoreCasesStatus status = restoreCasesService2.restoreCases(reader);
 
-        Mockito.verify(ccdService, Mockito.times(0)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
-            any(), any(), any(), any());
+        Mockito.verify(updateCcdCaseService, Mockito.times(0)).updateCaseV2(caseIdCaptor.capture(),
+            any(), any(), any(), any(), ArgumentMatchers.<Consumer<SscsCaseDetails>>any());
 
         Assert.assertFalse(status.isCompleted());
         Assert.assertFalse(status.isOk());
@@ -209,16 +230,18 @@ public class RestoreCasesService2Test {
         UnprocessableEntity unprocessableEntity = Mockito.mock(UnprocessableEntity.class);
         Mockito.when(unprocessableEntity.getMessage()).thenReturn("some exception message");
 
-        Mockito.when(ccdService.updateCase(any(), Mockito.eq(1234118573817544L), Mockito.anyString(),
-            Mockito.anyString(), Mockito.anyString(), Mockito.eq(idamTokens))).thenThrow(unprocessableEntity);
+        Mockito.when(updateCcdCaseService.updateCaseV2(Mockito.eq(1234118573817544L), Mockito.anyString(),
+            Mockito.anyString(), Mockito.anyString(), Mockito.eq(idamTokens),
+            ArgumentMatchers.<Consumer<SscsCaseDetails>>any())).thenThrow(unprocessableEntity);
 
         ClassPathResource classPathResource = new ClassPathResource("csv/restore-cases-test.csv");
         CSVReader reader = new CSVReader(new InputStreamReader(classPathResource.getInputStream()));
 
         final RestoreCasesStatus status = restoreCasesService2.restoreCases(reader);
 
-        Mockito.verify(ccdService, Mockito.times(2)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
-                eq("appealReceived"), eq("Restore case details"), eq("Automatically restore missing case details"), eq(idamTokens));
+        Mockito.verify(updateCcdCaseService, Mockito.times(2)).updateCaseV2(caseIdCaptor.capture(),
+            eq("appealReceived"), eq("Restore case details"), eq("Automatically restore missing case details"),
+            eq(idamTokens), sscsCaseDetailsCaptor.capture());
 
         Assert.assertEquals(Arrays.asList(1234112842952455L, 1234118573817544L), caseIdCaptor.getAllValues());
 
@@ -234,16 +257,16 @@ public class RestoreCasesService2Test {
         when(ccdService.getByCaseId(eq(1234112842952455L), Mockito.eq(idamTokens))).thenReturn(sscsCaseDetails);
         when(ccdService.getByCaseId(eq(1234118573817544L), Mockito.eq(idamTokens))).thenReturn(sscsCaseDetails2);
 
-        Mockito.when(ccdService.updateCase(any(), Mockito.eq(1234118573817544L), Mockito.anyString(),
-                Mockito.anyString(), Mockito.anyString(), Mockito.eq(idamTokens))).thenThrow(new RuntimeException("some exception message"));
+        when(updateCcdCaseService.updateCaseV2(eq(1234118573817544L), Mockito.anyString(), Mockito.anyString(),
+            Mockito.anyString(), eq(idamTokens), ArgumentMatchers.<Consumer<SscsCaseDetails>>any())).thenThrow(new RuntimeException("some exception message"));
 
         ClassPathResource classPathResource = new ClassPathResource("csv/restore-cases-test.csv");
         CSVReader reader = new CSVReader(new InputStreamReader(classPathResource.getInputStream()));
 
         final RestoreCasesStatus status = restoreCasesService2.restoreCases(reader);
 
-        Mockito.verify(ccdService, Mockito.times(2)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
-                eq("appealReceived"), eq("Restore case details"), eq("Automatically restore missing case details"), eq(idamTokens));
+        Mockito.verify(updateCcdCaseService, Mockito.times(2)).updateCaseV2(caseIdCaptor.capture(),
+                eq("appealReceived"), eq("Restore case details"), eq("Automatically restore missing case details"), eq(idamTokens), ArgumentMatchers.<Consumer<SscsCaseDetails>>any());
 
         Assert.assertEquals(Arrays.asList(1234112842952455L, 1234118573817544L), caseIdCaptor.getAllValues());
 
