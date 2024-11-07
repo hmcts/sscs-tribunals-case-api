@@ -299,6 +299,7 @@ feature:
         enabled: ${BYPASS_HEARING_API_SERVICE:false}
 
 
+
 idam:
     api:
         url: ${IDAM_API_URL:http://localhost:5062}
