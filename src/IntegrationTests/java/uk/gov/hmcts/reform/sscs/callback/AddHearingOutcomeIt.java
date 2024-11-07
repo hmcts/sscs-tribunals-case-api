@@ -13,6 +13,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import java.io.IOException;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,15 +37,12 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
     private static final String PATH_HEARING = "/hearings";
     private static final String PATH_CASE_ID = "12345656789";
     private static final String QUERY_PARAM = "?status=COMPLETED";
-
     private static final String CONTENT_TYPE_HEADER = "Content-Type";
     private static final String JSON_RESPONSE = "application/json;charset=UTF-8";
-
     private static final String WIREMOCK_TOKEN_RESULT = "{\"access_token\":\"TOKEN\",\"token_type\":\"Bearer\","
             + "\"scope\": \"openid profile roles\",\"expires_in\":28800}";
     private static final String WIREMOCK_USERINFO_RESULT = "{\"id\":\"1\",\"email\":\"email\","
             + "\"roles\": [\"role\"]}";
-
     private static final String EMPTY_HMC_RESPONSE = "{\"caseRef\":12345656789, \"caseHearings\":[]}";
 
     private static final String JWT_TEST_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
@@ -57,6 +55,11 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
 
     @BeforeEach
     public void setup() throws IOException {
+        setup("callback/addHearingOutcomeCallback.json");
+    }
+
+    @BeforeAll
+    public static void setupWireMocks() {
         hmcServer = new WireMockServer(options().port(10010));
         hmcServer.start();
         idamServer = new WireMockServer(options().port(10002));
@@ -81,8 +84,6 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
                         .withStatus(200)
                         .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
                         .withBody(JWT_TEST_TOKEN)));
-
-        setup("callback/addHearingOutcomeCallback.json");
     }
 
     @AfterAll
