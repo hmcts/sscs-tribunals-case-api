@@ -12,8 +12,8 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWi
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import java.io.IOException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -32,7 +32,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("integration")
 @TestPropertySource(locations = "classpath:config/application_it.properties")
-public class AddHearingOutcomeIt extends AbstractEventIt{
+public class AddHearingOutcomeIt extends AbstractEventIt {
     private static final String PATH_HEARING = "/hearings";
     private static final String PATH_CASE_ID = "12345656789";
     private static final String QUERY_PARAM = "?status=COMPLETED";
@@ -47,9 +47,9 @@ public class AddHearingOutcomeIt extends AbstractEventIt{
 
     private static final String EMPTY_HMC_RESPONSE = "{\"caseRef\":12345656789, \"caseHearings\":[]}";
 
-    private static final String JWT_TEST_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" +
-            ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlRlc3QgVE9LRU4iLCJpYXQiOjE1MTYyMzkwMjJ9" +
-            ".jnE_Fpsnpfvr7KjlQhduoIb5WlklXGwxuMlLoGIhDo4";
+    private static final String JWT_TEST_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+            + ".eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlRlc3QgVE9LRU4iLCJpYXQiOjE1MTYyMzkwMjJ9"
+            + ".jnE_Fpsnpfvr7KjlQhduoIb5WlklXGwxuMlLoGIhDo4";
 
     private static WireMockServer hmcServer;
     private static WireMockServer idamServer;
@@ -118,7 +118,7 @@ public class AddHearingOutcomeIt extends AbstractEventIt{
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertFalse(result.getErrors().isEmpty());
-        assertTrue( result.getErrors().contains("There are no completed hearings on the case."));
+        assertTrue(result.getErrors().contains("There are no completed hearings on the case."));
     }
 
 
@@ -133,7 +133,7 @@ public class AddHearingOutcomeIt extends AbstractEventIt{
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertFalse(result.getErrors().isEmpty());
-        assertTrue( result.getErrors().contains("There was an error while retrieving hearing details; please try again after some time."));
+        assertTrue(result.getErrors().contains("There was an error while retrieving hearing details; please try again after some time."));
     }
 
 
