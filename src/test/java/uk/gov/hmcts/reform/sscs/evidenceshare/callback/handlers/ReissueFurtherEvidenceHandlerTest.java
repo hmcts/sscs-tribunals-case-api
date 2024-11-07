@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.FurtherEvidenceService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -46,6 +47,8 @@ public class ReissueFurtherEvidenceHandlerTest {
     private IdamService idamService;
     @Mock
     private CcdService ccdService;
+    @Mock
+    private UpdateCcdCaseService updateCcdCaseService;
 
     @InjectMocks
     private ReissueFurtherEvidenceHandler handler;
