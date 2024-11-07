@@ -132,7 +132,7 @@ public class AddHearingOutcomeAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAddHearingOutcomeWithExistingHearingOutcomes_thenAddToHearingOutcome() {
+    public void givenAddHearingOutcomeWithExistingHearingOutcomes_thenAddToHearingOutcomeInDateOrder() {
         sscsCaseData.setHearingOutcomes(new ArrayList<>());
         sscsCaseData.getHearingOutcomes().add(HearingOutcome.builder()
                 .value(HearingOutcomeDetails.builder()
@@ -182,7 +182,7 @@ public class AddHearingOutcomeAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenIncorrectHearingId_thenNoHearingOutcome() {
+    public void givenIncorrectHearingId_thenGiveError() {
 
         List<DynamicListItem> completedHearingsListOptions = new ArrayList<>();
         completedHearingsListOptions.add(new DynamicListItem("1", "Hearing 1 Date and Time start and End time, venue_name1"));

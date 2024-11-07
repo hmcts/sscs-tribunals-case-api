@@ -53,11 +53,11 @@ public class AddHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbackH
         log.info("Add hearing outcome for selected item {} with hearing ID:{} for case ID:{}",
                 selectedHearing, hearingId, callback.getCaseDetails().getId());
 
-        HearingDetails hearingWithOutcome = sscsCaseData.getHearings().stream()
+        HearingDetails selectedHearingDetails = sscsCaseData.getHearings().stream()
                 .filter(hearing -> hearing.getValue().getHearingId().equalsIgnoreCase(hearingId))
                 .findFirst().orElse(Hearing.builder().build()).getValue();
 
-        if (hearingWithOutcome == null) {
+        if (selectedHearingDetails == null) {
             log.info("Add Hearing Outcome: Cannot find hearing with hearing ID:{} and value {} for case ID:{}",
                     hearingId, selectedHearing, callback.getCaseDetails().getId());
             preSubmitCallbackResponse.addError("Cannot find hearing details for hearing " + selectedHearing
@@ -65,14 +65,14 @@ public class AddHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbackH
             return preSubmitCallbackResponse;
         }
         HearingOutcomeDetails hearingOutcomeDetails = HearingOutcomeDetails.builder()
-                .completedHearingId(hearingWithOutcome.getHearingId())
-                .hearingStartDateTime(hearingWithOutcome.getStart())
-                .hearingEndDateTime(hearingWithOutcome.getEnd())
+                .completedHearingId(selectedHearingDetails.getHearingId())
+                .hearingStartDateTime(selectedHearingDetails.getStart())
+                .hearingEndDateTime(selectedHearingDetails.getEnd())
                 .hearingOutcomeId(sscsCaseData.getHearingOutcomeValue().getHearingOutcomeId())
                 .didPoAttendHearing(sscsCaseData.getHearingOutcomeValue().getDidPoAttendHearing())
-                .hearingChannelId(hearingWithOutcome.getHearingChannel())
-                .venue(hearingWithOutcome.getVenue())
-                .epimsId(hearingWithOutcome.getEpimsId())
+                .hearingChannelId(selectedHearingDetails.getHearingChannel())
+                .venue(selectedHearingDetails.getVenue())
+                .epimsId(selectedHearingDetails.getEpimsId())
                 .build();
 
         HearingOutcome hearingOutcome = HearingOutcome.builder().value(hearingOutcomeDetails).build();
