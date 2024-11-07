@@ -298,7 +298,7 @@ feature:
     bypass-hearing-api-service:
         enabled: ${BYPASS_HEARING_API_SERVICE:false}
     update-case-only-hearing-v2:
-        enabled: ${UPDATE_CASE_ONLY_HEARING_V2:false}
+        enabled: ${UPDATE_CASE_ONLY_HEARING_V2_ENABLED:false}
 
 
 

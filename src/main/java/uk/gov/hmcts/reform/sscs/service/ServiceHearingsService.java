@@ -62,7 +62,7 @@ public class ServiceHearingsService {
 
         if (!originalCaseData.equals(updatedCaseData)) {
             if (updatCaseOnlyHearingV2Enabled) {
-                log.debug("Updating case V2 data with Service Hearing Values for Case ID {}", caseData.getCcdCaseId());
+                log.info("Updating case V2 data with Service Hearing Values for Case ID {}", caseData.getCcdCaseId());
                 Long currentCaseId = Long.parseLong(caseData.getCcdCaseId());
                 updateCcdCaseService.triggerCaseEventV2(currentCaseId,
                         EventType.UPDATE_CASE_ONLY.getType(),
@@ -71,7 +71,7 @@ public class ServiceHearingsService {
                         idamService.getIdamTokens());
 
             } else {
-                log.debug("Updating case data with Service Hearing Values for Case ID {}", caseData.getCcdCaseId());
+                log.info("Updating case data with Service Hearing Values for Case ID {}", caseData.getCcdCaseId());
                 ccdCaseService.updateCaseData(
                         caseData,
                         EventType.UPDATE_CASE_ONLY,
