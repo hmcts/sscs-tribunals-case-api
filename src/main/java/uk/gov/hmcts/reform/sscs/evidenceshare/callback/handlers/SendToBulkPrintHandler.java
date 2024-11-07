@@ -157,29 +157,27 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                                        BulkPrintInfo bulkPrintInfo) {
         Long caseId = Long.valueOf(caseData.getCcdCaseId());
         if (bulkPrintInfo != null) {
-             updateCcdCaseService.updateCaseV2(
-                    caseId,
-                    EventType.SENT_TO_DWP.getCcdType(),
-                    SENT_TO_FTA,
-                    bulkPrintInfo.getDesc(),
-                    idamService.getIdamTokens(),
-                    sscsCaseDetails -> {
-                        SscsCaseData sscsCaseData = sscsCaseDetails.getData();
-                        if (State.READY_TO_LIST.getId().equals(sscsCaseData.getCreatedInGapsFrom())) {
-                            sscsCaseData.setDwpState(UNREGISTERED);
-                        }
-                        sscsCaseData.setHmctsDwpState("sentToDwp");
-                        sscsCaseData.setDateSentToDwp(LocalDate.now().toString());
-                        sscsCaseData.setDwpDueDate(LocalDate.now().plusDays(getResponseDueDays(sscsCaseData)).toString());
-                        log.info("inside bulkPrintInfo.isAllowedTypeForBulkPrint() {} ", bulkPrintInfo.isAllowedTypeForBulkPrint());
-                        if (bulkPrintInfo.isAllowedTypeForBulkPrint()) {
-                            log.info("Case sent to fta for case id {} with returned value {}",
-                                    caseId, bulkPrintInfo.getUuid());
-                        }
-                        log.info("Updated case v2 send to bulk print event - dwp for id {}", caseId);
+            updateCcdCaseService.updateCaseV2(
+                caseId,
+                EventType.SENT_TO_DWP.getCcdType(),
+                SENT_TO_FTA,
+                bulkPrintInfo.getDesc(),
+                idamService.getIdamTokens(),
+                sscsCaseDetails -> {
+                    SscsCaseData sscsCaseData = sscsCaseDetails.getData();
+                    if (State.READY_TO_LIST.getId().equals(sscsCaseData.getCreatedInGapsFrom())) {
+                        sscsCaseData.setDwpState(UNREGISTERED);
                     }
-            );
-
+                    sscsCaseData.setHmctsDwpState("sentToDwp");
+                    sscsCaseData.setDateSentToDwp(LocalDate.now().toString());
+                    sscsCaseData.setDwpDueDate(LocalDate.now().plusDays(getResponseDueDays(sscsCaseData)).toString());
+                    log.info("inside bulkPrintInfo.isAllowedTypeForBulkPrint() {} ", bulkPrintInfo.isAllowedTypeForBulkPrint());
+                    if (bulkPrintInfo.isAllowedTypeForBulkPrint()) {
+                        log.info("Case sent to fta for case id {} with returned value {}",
+                                caseId, bulkPrintInfo.getUuid());
+                    }
+                    log.info("Updated case v2 send to bulk print event - dwp for id {}", caseId);
+                });
         }
     }
 
