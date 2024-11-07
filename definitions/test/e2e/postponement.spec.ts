@@ -1,6 +1,6 @@
 import { test } from "../lib/steps.factory";
 
-test.describe("Postponement Request test", {tag: '@nightly-pipeline'}, async() => {
+test.describe("Postponement Request test", {tag: ['@preview-regression', '@nightly-pipeline']}, async() => {
 
     test("Hearing Route as LA with a Grant Option", async ({ postponementSteps }) => {
         test.slow();
