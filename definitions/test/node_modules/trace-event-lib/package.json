@@ -1,0 +1,78 @@
+{
+  "name": "trace-event-lib",
+  "description": "A library to create a trace of your JS app per Google's Trace Event format.",
+  "license": "MIT",
+  "version": "1.4.1",
+  "authors": [
+    "Yaroslav Serhieiev <yaroslavs@wix.com>"
+  ],
+  "keywords": [
+    "trace-event",
+    "trace",
+    "event",
+    "trace-viewer",
+    "google"
+  ],
+  "repository": {
+    "url": "github:wix-incubator/trace-event-lib"
+  },
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "devDependencies": {
+    "@commitlint/cli": "^17.6.3",
+    "@commitlint/config-conventional": "^17.6.3",
+    "@jest/environment": "^29.5.0",
+    "@jest/types": "^29.5.0",
+    "@types/http-server": "^0.12.1",
+    "@types/jest": "^29.5.1",
+    "@typescript-eslint/eslint-plugin": "^5.59.2",
+    "@typescript-eslint/parser": "^5.59.2",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^8.40.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jsdoc": "^43.2.0",
+    "eslint-plugin-no-only-tests": "^3.1.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-unicorn": "^47.0.0",
+    "fs-extra": "^10.1.0",
+    "http-server": "^14.1.1",
+    "husky": "^8.0.3",
+    "jest": "^29.5.0",
+    "jest-environment-node": "^29.5.0",
+    "jest-image-snapshot": "^6.1.0",
+    "lint-staged": "^13.2.2",
+    "prettier": "^2.8.8",
+    "puppeteer": "^16.2.0",
+    "semantic-release": "^21.0.2",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.1",
+    "typedoc": "^0.24.6",
+    "typescript": "^4.9.5",
+    "zx": "^7.2.2"
+  },
+  "dependencies": {
+    "browser-process-hrtime": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "scripts": {
+    "prepare": "husky install && npm run build",
+    "build": "tsc",
+    "start": "http-server -p 8080 __tests__/__jsons__",
+    "docs": "typedoc && cp -r media website",
+    "website": "http-server -p 3000 website",
+    "lint": "eslint . --fix",
+    "lint:ci": "eslint .",
+    "lint:staged": "lint-staged",
+    "test": "jest",
+    "test:ci": "jest --coverage"
+  }
+}

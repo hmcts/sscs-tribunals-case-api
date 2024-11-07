@@ -1,0 +1,81 @@
+{
+  "name": "telnet-client",
+  "description": "A simple node.js telnet client",
+  "author": {
+    "name": "Mario Kozjak",
+    "email": "kozjakm1@gmail.com"
+  },
+  "version": "1.2.8",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "engine": "node >= 6.9.1",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.5.4"
+  },
+  "devDependencies": {
+    "coveralls": "^3.0.3",
+    "extend": "^3.0.2",
+    "nodeunit": "^0.11.3",
+    "telnet": "0.0.1"
+  },
+  "scripts": {
+    "test": "nodeunit test",
+    "coveralls": "jscoverage lib && NODETELNETCLIENT_COV=1 nodeunit --reporter=lcov test | coveralls"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/mkozjak/node-telnet-client.git"
+  },
+  "contributors": [
+    {
+      "name": "Petar Koretic",
+      "email": "petar.koretic@gmail.com"
+    },
+    {
+      "name": "stardast"
+    },
+    {
+      "name": "ChristopherHackett"
+    },
+    {
+      "name": "EyePulp"
+    },
+    {
+      "name": "HaykoKoryun"
+    },
+    {
+      "name": "silverwind"
+    },
+    {
+      "name": "Peter Halliday",
+      "email": "pghalliday@gmail.com"
+    },
+    {
+      "name": "kaYcee"
+    },
+    {
+      "name": "bryanculver"
+    },
+    {
+      "name": "fbertone"
+    },
+    {
+      "name": "Shastel"
+    },
+    {
+      "name": "barak-shirali"
+    },
+    {
+      "name": "HaykoKoryun"
+    },
+    {
+      "name": "Ivan Sieder",
+      "email": "ivan@sieder.xyz"
+    }
+  ],
+  "funding": {
+    "type": "paypal",
+    "url": "https://paypal.me/kozjak"
+  }
+}

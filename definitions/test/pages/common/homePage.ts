@@ -81,6 +81,10 @@ export class HomePage {
         await webActions.clickElementById("//a[contains(.,'Sign out')]");
     }
 
+    async clickStaffLink(): Promise<void> {
+        await webActions.clickElementById("//a[contains(.,'Staff')]");
+    }
+
     async goToHomePage(caseId: string): Promise<void> {
         await this.findAndNavigateToCase(caseId);
     }

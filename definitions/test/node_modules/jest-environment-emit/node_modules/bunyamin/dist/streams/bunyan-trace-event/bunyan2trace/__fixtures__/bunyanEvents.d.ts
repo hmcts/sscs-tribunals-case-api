@@ -1,0 +1,43 @@
+export declare function anEvent(): {
+    cat: string;
+    cname: string;
+    custom: string;
+    hostname: string;
+    msg: string;
+    name: string;
+    pid: number;
+    tid: number;
+    time: string;
+    tts: number;
+};
+export declare function anEventWithStack(): {
+    sf: number;
+    stack: never[];
+    cat: string;
+    cname: string;
+    custom: string;
+    hostname: string;
+    msg: string;
+    name: string;
+    pid: number;
+    tid: number;
+    time: string;
+    tts: number;
+};
+export declare function anInstantEvent(s?: string): any;
+export declare function aDurationBeginEvent(): any;
+export declare function aDurationEndEvent(): {
+    ph: string;
+    sf: number;
+    stack: never[];
+    cat: string;
+    cname: string;
+    custom: string;
+    hostname: string;
+    msg: string;
+    name: string;
+    pid: number;
+    tid: number;
+    time: string;
+    tts: number;
+};

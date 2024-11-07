@@ -1,0 +1,32 @@
+{
+  "name": "funpermaproxy",
+  "version": "1.1.0",
+  "description": "Functional permaproxy — proxying an object mediated through a getter function",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "scripts": {
+    "test": "jest --verbose --coverage",
+    "semantic-release": "semantic-release"
+  },
+  "engines": {
+    "node": ">=8.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wix-incubator/funpermaproxy.git"
+  },
+  "keywords": [
+    "permaproxy",
+    "proxy"
+  ],
+  "author": "Yaroslav Serhieiev <yaroslavs@wix.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/wix-incubator/funpermaproxy/issues"
+  },
+  "homepage": "https://github.com/wix-incubator/funpermaproxy#readme",
+  "devDependencies": {
+    "jest": "^28.1.1",
+    "semantic-release": "^19.0.2"
+  }
+}

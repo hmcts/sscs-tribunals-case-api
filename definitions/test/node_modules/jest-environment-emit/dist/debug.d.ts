@@ -1,0 +1,1 @@
+export { aggregateLogs } from './utils';

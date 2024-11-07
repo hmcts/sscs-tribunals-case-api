@@ -1,0 +1,33 @@
+{
+  "name": "deep-override",
+  "version": "1.0.2",
+  "description": "recursive object extending & overriding",
+  "main": "./src/index.js",
+  "types": "types.d.ts",
+  "files": [
+    "/src",
+    "types.d.ts"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ASaiAnudeep/deep-override.git"
+  },
+  "keywords": [
+    "deep",
+    "object",
+    "array",
+    "extend",
+    "override",
+    "merge",
+    "clone"
+  ],
+  "author": "Anudeep <asa.anudeep4@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ASaiAnudeep/deep-override/issues"
+  },
+  "homepage": "https://github.com/ASaiAnudeep/deep-override#readme"
+}

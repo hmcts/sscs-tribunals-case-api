@@ -45,6 +45,7 @@ import { SendToInterloc } from '../fixtures/steps/send.to.interloc';
 import { ReferredByAdmin } from '../fixtures/steps/referred.by.admin';
 import { SendCaseToTcw } from '../fixtures/steps/send.case.to.tcw';
 import { ReferredByJudge } from '../fixtures/steps/referred.by.judge';
+import {UserStaff} from "../fixtures/steps/user.staff";
 
 type MyStepsFixtures = {
     addNoteSteps: Note
@@ -93,6 +94,7 @@ type MyStepsFixtures = {
     referredByAdminSteps: ReferredByAdmin
     sendCaseToTcwSteps: SendCaseToTcw
     referredByJudgeSteps: ReferredByJudge
+    userStaffSteps: UserStaff
 };
 
 export const test = stepsFactory.extend<MyStepsFixtures>({
@@ -279,5 +281,9 @@ export const test = stepsFactory.extend<MyStepsFixtures>({
     referredByJudgeSteps:async ({page}, use) => {
         const ReferredByJudgeSteps = new ReferredByJudge(page);
         await use(ReferredByJudgeSteps);
+    },
+    userStaffSteps:async ({page}, use) => {
+        const userStaffSteps = new UserStaff(page);
+        await use(userStaffSteps);
     }
 })

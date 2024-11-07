@@ -1,0 +1,28 @@
+{
+  "name": "mime-lite",
+  "version": "1.0.3",
+  "description": "Standard mime types for JavaScript",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "scripts": {
+    "test": "c8 uvu tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pactumjs/mime-lite.git"
+  },
+  "keywords": [
+    "mime",
+    "lite"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pactumjs/mime-lite/issues"
+  },
+  "homepage": "https://github.com/pactumjs/mime-lite#readme",
+  "devDependencies": {
+    "c8": "^7.12.0",
+    "uvu": "^0.5.6"
+  }
+}

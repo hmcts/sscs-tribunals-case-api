@@ -1,0 +1,32 @@
+{
+  "name": "openapi-fuzzer-core",
+  "version": "1.0.6",
+  "description": "A library to generate random requests based on open-api specifications.",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "uvu tests"
+  },
+  "files": [
+    "/src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ASaiAnudeep/openapi-fuzzer-core.git"
+  },
+  "keywords": [
+    "fuzz",
+    "swagger"
+  ],
+  "author": "Anudeep <asa.anudeep4@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ASaiAnudeep/openapi-fuzzer-core/issues"
+  },
+  "homepage": "https://github.com/ASaiAnudeep/openapi-fuzzer-core#readme",
+  "devDependencies": {
+    "uvu": "^0.4.1"
+  },
+  "dependencies": {
+    "klona": "^2.0.4"
+  }
+}

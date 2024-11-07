@@ -1,0 +1,32 @@
+{
+  "name": "lightcookie",
+  "version": "1.0.25",
+  "description": "Super lightweight cookie parser and serializer",
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "test": "node test.js",
+    "prepublishOnly": "npm install --dev && npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ethanent/lightcookie.git"
+  },
+  "keywords": [
+    "cookie",
+    "lightcookie",
+    "cookie-parse",
+    "cookie-serialize"
+  ],
+  "author": "Ethan Davis",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "bugs": {
+    "url": "https://github.com/ethanent/lightcookie/issues"
+  },
+  "homepage": "https://github.com/ethanent/lightcookie#readme",
+  "devDependencies": {
+    "whew": "^1.1.2"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "name": "form-data-lite",
+  "version": "1.0.3",
+  "description": "Module to submit forms and file uploads to other web applications which uses just the standard mime types.",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "scripts": {
+    "test": "c8 uvu tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pactumjs/form-data-lite.git"
+  },
+  "dependencies": {
+    "asynckit": "^0.4.0",
+    "combined-stream": "^1.0.8",
+    "mime-lite": "^1.0.3"
+  },
+  "keywords": [
+    "form-data",
+    "multi-part",
+    "lite"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pactumjs/form-data-lite/issues"
+  },
+  "homepage": "https://github.com/pactumjs/form-data-lite#readme",
+  "devDependencies": {
+    "c8": "^7.12.0",
+    "uvu": "^0.5.6"
+  }
+}

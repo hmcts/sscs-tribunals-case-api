@@ -1,0 +1,1 @@
+{"version":3,"file":"getProcessId.js","sourceRoot":"","sources":["../../src/utils/getProcessId.ts"],"names":[],"mappings":";;;AAEA;;;GAGG;AACH,SAAgB,YAAY;IAC1B,IAAI,OAAO,OAAO,KAAK,QAAQ,IAAI,OAAO,OAAO,CAAC,GAAG,KAAK,QAAQ,EAAE;QAClE,OAAO,OAAO,CAAC,GAAG,CAAC;KACpB;IAED,OAAO,CAAC,CAAC;AACX,CAAC;AAND,oCAMC"}
