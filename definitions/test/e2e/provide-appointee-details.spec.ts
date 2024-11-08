@@ -17,6 +17,7 @@ test.describe('Provide No Appointee Details on a Dormant Case',  {tag: '@nightly
     let caseId: string;
     test.beforeAll("Case has to be Created", async () => {
         caseId = await createCaseBasedOnCaseType('PIP');
+        await new Promise(f => setTimeout(f, 10000)); //Delay required for the Case to be ready
         await performAppealDormantOnCase(caseId);
     });
 
@@ -29,6 +30,7 @@ test.describe('Provide Appointee Details on a Dormant Case', {tag: ['@preview-re
     let caseId: string;
     test.beforeAll("Case has to be Created", async () => {
         caseId = await createCaseBasedOnCaseType('PIP');
+        await new Promise(f => setTimeout(f, 10000)); //Delay required for the Case to be ready
         await performAppealDormantOnCase(caseId);
     });
 
