@@ -72,7 +72,7 @@ public class ManualCaseCreatedHandler implements CallbackHandler<SscsCaseData> {
                             "Case Update - Manual Case Created",
                             "Case was updated in SSCS-Evidence-Share",
                             idamService.getIdamTokens(),
-                            sscsCaseDetails -> setSupplementaryData(caseId, idamTokens));
+                            sscsCaseDetails -> setCaseAccessManagementFields(sscsCaseDetails.getData()));
                 } else {
                     log.info("Setting case access management fields for: {}", caseId);
                     setCaseAccessManagementFields(callback
