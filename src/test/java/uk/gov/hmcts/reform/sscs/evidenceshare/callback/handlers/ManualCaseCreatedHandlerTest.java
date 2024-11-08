@@ -138,7 +138,7 @@ public class ManualCaseCreatedHandlerTest {
     @Test
     public void shouldUpdateCcd_givenCaseAccessManagementFeatureEnabledAndV2FlagEnabled() {
         setField(handler, "caseAccessManagementFeature", true);
-        setField(handler, "updatCaseOnlyHearingV2Enabled", true);
+        setField(handler, "updateCaseOnlyHearingV2Enabled", true);
         Callback<SscsCaseData> callback = buildCallback(SscsCaseData.builder()
                         .createdInGapsFrom(READY_TO_LIST.getId()).build(),
                 READY_TO_LIST,

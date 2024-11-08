@@ -36,7 +36,7 @@ public class ManualCaseCreatedHandler implements CallbackHandler<SscsCaseData> {
     private boolean caseAccessManagementFeature;
 
     @Value("${feature.update-case-only-hearing-v2.enabled}")
-    private boolean updatCaseOnlyHearingV2Enabled;
+    private boolean updateCaseOnlyHearingV2Enabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -65,7 +65,7 @@ public class ManualCaseCreatedHandler implements CallbackHandler<SscsCaseData> {
             log.info("Setting supplementary data for: {}", caseId);
             setSupplementaryData(caseId, idamTokens);
             if (caseAccessManagementFeature) {
-                if (updatCaseOnlyHearingV2Enabled) {
+                if (updateCaseOnlyHearingV2Enabled) {
                     log.info("Setting case V2 access management fields for: {}", caseId);
                     updateCcdCaseService.updateCaseV2(caseId,
                             UPDATE_CASE_ONLY.getCcdType(),
