@@ -5,7 +5,7 @@ properties([
         parameters([
                 string(name: 'UI_URL_TO_TEST', defaultValue: 'https://manage-case.aat.platform.hmcts.net/', description: 'The URL you want to run these tests against'),
                 string(name: 'API_URL_TO_TEST', defaultValue: 'http://sscs-tribunals-api-aat.service.core-compute-aat.internal', description: 'The URL you want to run these tests against'),
-                choice(name: 'Select Env to run test against', choices: ['aat', 'pr'], description: 'This option will choose a test flow based on env selected'),
+                choice(name: 'SELECT_ENV', choices: ['aat', 'pr'], description: 'This option will choose a test flow based on env selected'),
                 string(name: 'SecurityRules',
                         defaultValue: 'https://raw.githubusercontent.com/hmcts/security-test-rules/master/conf/security-rules.conf',
                         description: 'The URL you want to run these tests against'),
@@ -105,6 +105,7 @@ withNightlyPipeline(type, product, component) {
     env.Rules = params.SecurityRules
     setAatEnvVars()
     env.TEST_E2E_URL_WEB = params.UI_URL_TO_TEST
+    env.ENVIRONMENT = params.SELECT_ENV
 
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
