@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseTypeOfHearing.PAPER
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.model.hmc.reference.LocationType.COURT;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,7 +79,7 @@ public final class HearingsLocationMapping {
     private static List<HearingLocation> getPaperCaseLocations(SscsCaseData caseData, ReferenceDataServiceHolder refData) throws ListingException {
         if (HearingChannelUtil.isPaperCase(caseData)) {
             RegionalProcessingCenter rpc = caseData.getRegionalProcessingCenter();
-            validatedRpc(rpc, refData);
+            validatedRpc(rpc, refData, isIbcaCase(caseData));
 
             List<VenueDetails> venueDetailsList = refData
                     .getVenueService()
@@ -99,11 +100,11 @@ public final class HearingsLocationMapping {
         return Collections.emptyList();
     }
 
-    private static void validatedRpc(RegionalProcessingCenter regionalProcessingCenter, ReferenceDataServiceHolder refData) throws ListingException {
+    private static void validatedRpc(RegionalProcessingCenter regionalProcessingCenter, ReferenceDataServiceHolder refData, boolean isIbca) throws ListingException {
         if (nonNull(regionalProcessingCenter)) {
             String regionalProcessingCenterPostCode = regionalProcessingCenter.getPostcode();
             RegionalProcessingCenterService regionalProcessingCenterService = refData.getRegionalProcessingCenterService();
-            RegionalProcessingCenter processingCenterByPostCode = regionalProcessingCenterService.getByPostcode(regionalProcessingCenterPostCode);
+            RegionalProcessingCenter processingCenterByPostCode = regionalProcessingCenterService.getByPostcode(regionalProcessingCenterPostCode, isIbca);
 
             log.info("rpc by postcode {}", processingCenterByPostCode);
 
@@ -124,7 +125,7 @@ public final class HearingsLocationMapping {
             VenueService venueService = refData.getVenueService();
             if (PAPER.equals(adjournment.getTypeOfNextHearing())) {
                 RegionalProcessingCenter rpc = caseData.getRegionalProcessingCenter();
-                validatedRpc(rpc, refData);
+                validatedRpc(rpc, refData, isIbcaCase(caseData));
 
                 List<VenueDetails> paperVenues = venueService.getActiveRegionalEpimsIdsForRpc(rpc.getEpimsId());
 

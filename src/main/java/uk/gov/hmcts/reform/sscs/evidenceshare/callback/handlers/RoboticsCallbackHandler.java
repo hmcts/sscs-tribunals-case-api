@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -135,7 +136,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         // We should update the case details before sending robotics.
         final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
         if (sscsCaseData.getAppeal().getAppellant() != null && sscsCaseData.getAppeal().getAppellant().getAddress() != null && sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode() != null) {
-            RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
+            RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode(), isIbcaCase(sscsCaseData));
             sscsCaseData.setRegionalProcessingCenter(rpc);
 
             if (rpc != null) {

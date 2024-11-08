@@ -444,7 +444,7 @@ class SscsUtilTest {
         final DynamicList portsOfEntry = getPortsOfEntry();
 
         assertThat(portsOfEntry.getValue()).isNull();
-        assertThat(portsOfEntry.getListItems()).hasSize(90);
+        assertThat(portsOfEntry.getListItems()).hasSize(269);
     }
 
     @Test

@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateBenefitCo
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateCaseCode;
 import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateIssueCode;
 import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.isIbcaCase;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -159,7 +160,7 @@ public class RestoreCasesService2 {
 
         String postCode = sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
         String firstHalfOfPostcode = getFirstHalfOfPostcode(postCode);
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
+        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode, isIbcaCase(sscsCaseData));
 
         if (rpc != null) {
             sscsCaseData.setRegion(rpc.getName());
