@@ -140,5 +140,195 @@
     "LiveFrom": "01/01/2018",
     "FieldDisplayOrder": 12,
     "PageID": "1.0"
-  }
+  },
+  {
+  "CaseEventID": "addHearing",
+  "CaseFieldID": "hearings",
+  "ListElementCode": "venue.googleMapLink",
+  "ID": "addHearingGoogleMapLink",
+  "DisplayContext": "MANDATORY",
+  "LiveFrom": "01/01/2018",
+  "FieldDisplayOrder": 13,
+  "PageID": "1.0"
+},
+{
+  "CaseEventID": "addHearing",
+  "CaseFieldID": "hearings",
+  "ListElementCode": "hearingDate",
+  "ID": "addHearingHearingDate",
+  "DisplayContext": "MANDATORY",
+  "LiveFrom": "01/01/2018",
+  "FieldDisplayOrder": 14,
+  "PageID": "1.0"
+},
+{
+  "CaseEventID": "addHearing",
+  "CaseFieldID": "hearings",
+  "ListElementCode": "time",
+  "ID": "addHearingTime",
+  "DisplayContext": "MANDATORY",
+  "LiveFrom": "01/01/2018",
+  "FieldDisplayOrder": 15,
+  "PageID": "1.0"
+},
+{
+  "CaseEventID": "addHearing",
+  "CaseFieldID": "hearings",
+  "ListElementCode": "postponedDate",
+  "ID": "addHearingPostponedDate",
+  "DisplayContext": "MANDATORY",
+  "LiveFrom": "01/01/2018",
+  "FieldDisplayOrder": 16,
+  "PageID": "1.0"
+},
+{
+  "CaseEventID": "addHearing",
+  "CaseFieldID": "hearings",
+  "ListElementCode": "adjourned",
+  "ID": "addHearingAdjourned",
+  "DisplayContext": "MANDATORY",
+  "LiveFrom": "01/01/2018",
+  "FieldDisplayOrder": 17,
+  "PageID": "1.0"
+},
+{
+"CaseEventID": "addHearing",
+"CaseFieldID": "hearings",
+"ListElementCode": "adjournedDate",
+"ID": "addHearingAdjournedDate",
+"DisplayContext": "MANDATORY",
+"LiveFrom": "01/01/2018",
+"FieldDisplayOrder": 18,
+"PageID": "1.0"
+},
+{
+"CaseEventID": "addHearing",
+"CaseFieldID": "hearings",
+"ListElementCode": "hearingId",
+"ID": "addHearingHearingId",
+"DisplayContext": "MANDATORY",
+"LiveFrom": "01/01/2018",
+"FieldDisplayOrder": 19,
+"PageID": "1.0"
+},
+{
+"CaseEventID": "addHearing",
+"CaseFieldID": "hearings",
+"ListElementCode": "eventDate",
+"ID": "addHearingEventDate",
+"DisplayContext": "MANDATORY",
+"LiveFrom": "01/01/2018",
+"FieldDisplayOrder": 20,
+"PageID": "1.0"
+},
+{
+"CaseEventID": "addHearing",
+"CaseFieldID": "hearings",
+"ListElementCode": "venueId",
+"ID": "addHearingVenueId",
+"DisplayContext": "MANDATORY",
+"LiveFrom": "01/01/2018",
+"FieldDisplayOrder": 21,
+"PageID": "1.0"
+},
+{
+"CaseEventID": "addHearing",
+"CaseFieldID": "hearings",
+"ListElementCode": "hearingRequested",
+"ID": "addHearingHearingRequested",
+"DisplayContext": "MANDATORY",
+"LiveFrom": "01/01/2018",
+"FieldDisplayOrder": 22,
+"PageID": "1.0"
+},
+{
+"CaseEventID": "addHearing",
+"CaseFieldID": "hearings",
+"ListElementCode": "versionNumber",
+"ID": "addHearingVersionNumber",
+"DisplayContext": "MANDATORY",
+"LiveFrom": "01/01/2018",
+"FieldDisplayOrder": 23,
+"PageID": "1.0"
+},
+{
+"CaseEventID": "addHearing",
+"CaseFieldID": "hearings",
+"ListElementCode": "hearingStatus",
+"ID": "addHearingHearingStatus",
+"DisplayContext": "MANDATORY",
+"LiveFrom": "01/01/2018",
+"FieldDisplayOrder": 24,
+"PageID": "1.0"
+},
+{
+"CaseEventID": "addHearing",
+"CaseFieldID": "hearings",
+"ListElementCode": "start",
+"ID": "addHearingStart",
+"DisplayContext": "MANDATORY",
+"LiveFrom": "01/01/2018",
+"FieldDisplayOrder": 25,
+"PageID": "1.0"
+},
+{
+"CaseEventID": "addHearing",
+"CaseFieldID": "hearings",
+"ListElementCode": "end",
+"ID": "addHearingEnd",
+"DisplayContext": "MANDATORY",
+"LiveFrom": "01/01/2018",
+"FieldDisplayOrder": 26,
+"PageID": "1.0"
+},
+{
+"CaseEventID": "addHearing",
+"CaseFieldID": "hearings",
+"ListElementCode": "epimsId",
+"ID": "addHearingEpimsId",
+"DisplayContext": "MANDATORY",
+"LiveFrom": "01/01/2018",
+"FieldDisplayOrder": 27,
+"PageID": "1.0"
+},
+{
+"CaseEventID": "addHearing",
+"CaseFieldID": "hearings",
+"ListElementCode": "hearingChannel",
+"ID": "addHearingHearingChannel",
+"DisplayContext": "MANDATORY",
+"LiveFrom": "01/01/2018",
+"FieldDisplayOrder": 28,
+"PageID": "1.0"
+},
+{
+"CaseEventID": "addHearing",
+"CaseFieldID": "hearings",
+"ListElementCode": "panel",
+"ID": "addHearingPanel",
+"DisplayContext": "MANDATORY",
+"LiveFrom": "01/01/2018",
+"FieldDisplayOrder": 29,
+"PageID": "1.0"
+},
+{
+"CaseEventID": "addHearing",
+"CaseFieldID": "hearings",
+"ListElementCode": "panel.assignedTo",
+"ID": "addHearingPanelAssign",
+"DisplayContext": "MANDATORY",
+"LiveFrom": "01/01/2018",
+"FieldDisplayOrder": 30,
+"PageID": "1.0"
+},
+{
+"CaseEventID": "addHearing",
+"CaseFieldID": "hearings",
+"ListElementCode": "panel.panelMembers",
+"ID": "addHearingPanelMembers",
+"DisplayContext": "MANDATORY",
+"LiveFrom": "01/01/2018",
+"FieldDisplayOrder": 31,
+"PageID": "1.0"
+}
 ]
