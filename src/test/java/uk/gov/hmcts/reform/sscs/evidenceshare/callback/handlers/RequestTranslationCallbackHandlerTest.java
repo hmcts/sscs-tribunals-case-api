@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.WelshException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.RequestTranslationService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -43,7 +43,7 @@ public class RequestTranslationCallbackHandlerTest {
     private Callback<SscsCaseData> callback;
 
     @Mock
-    private CcdService ccdCaseService;
+    private UpdateCcdCaseService updateCcdCaseService;
 
     @Mock
     private IdamService idamService;
@@ -58,7 +58,7 @@ public class RequestTranslationCallbackHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new RequestTranslationCallbackHandler(requestTranslationService, ccdCaseService, idamService);
+        handler = new RequestTranslationCallbackHandler(requestTranslationService, updateCcdCaseService, idamService);
 
     }
 
@@ -95,7 +95,7 @@ public class RequestTranslationCallbackHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(requestTranslationService).sendCaseToWlu(any());
-        verify(ccdCaseService).updateCase(captor.capture(), eq(123L), eq(EventType.CASE_UPDATED.getCcdType()), eq("Case translations sent to wlu"), eq("Updated case with date sent to wlu"), any());
+        verify(updateCcdCaseService).triggerCaseEventV2(eq(123L), eq(EventType.CASE_UPDATED.getCcdType()), eq("Case translations sent to wlu"), eq("Updated case with date sent to wlu"), any());
     }
 
     @Test

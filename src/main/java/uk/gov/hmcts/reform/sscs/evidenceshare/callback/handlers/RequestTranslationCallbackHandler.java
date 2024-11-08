@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.WelshException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.RequestTranslationService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -23,15 +23,15 @@ public class RequestTranslationCallbackHandler implements CallbackHandler<SscsCa
 
     private final RequestTranslationService requestTranslationService;
     private final DispatchPriority dispatchPriority;
-    private final CcdService ccdService;
+    private final UpdateCcdCaseService updateCcdCaseService;
     private final IdamService idamService;
 
     @Autowired
     public RequestTranslationCallbackHandler(RequestTranslationService requestTranslationService,
-                                             CcdService ccdService,
+                                             UpdateCcdCaseService updateCcdCaseService,
                                              IdamService idamService) {
         this.requestTranslationService = requestTranslationService;
-        this.ccdService = ccdService;
+        this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
         this.dispatchPriority = DispatchPriority.EARLIEST;
     }
@@ -57,7 +57,7 @@ public class RequestTranslationCallbackHandler implements CallbackHandler<SscsCa
         try {
             log.info("sending email for case  id {}", callback.getCaseDetails().getId());
             if (requestTranslationService.sendCaseToWlu(callback.getCaseDetails()) && callback.getEvent() == REQUEST_TRANSLATION_FROM_WLU) {
-                ccdService.updateCase(callback.getCaseDetails().getCaseData(), Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId()),
+                updateCcdCaseService.triggerCaseEventV2(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId()),
                     CASE_UPDATED.getCcdType(), "Case translations sent to wlu", "Updated case with date sent to wlu",
                     idamService.getIdamTokens());
             }
