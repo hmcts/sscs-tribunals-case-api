@@ -55,6 +55,11 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 rpc);
     }
 
+    public static SscsCaseData convertSyaToCcdCaseDataV2(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled, SscsCaseData sscsCaseData) {
+        SscsCaseData.SscsCaseDataBuilder builder = sscsCaseData.toBuilder();
+        return convertSyaToCcdCaseDataGeneric(syaCaseWrapper, caseAccessManagementEnabled, builder);
+    }
+
     private static SscsCaseData updateAdditionalInfo(SscsCaseData sscsCaseData,
                                                      String region,
                                                      RegionalProcessingCenter rpc) {
@@ -64,11 +69,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .regionalProcessingCenter(rpc)
                 .schedulingAndListingFields(SchedulingAndListingFields.builder().hearingRoute(rpc.getHearingRoute()).build())
                 .build();
-    }
-
-    public static SscsCaseData convertSyaToCcdCaseDataV2(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled, SscsCaseData sscsCaseData) {
-        SscsCaseData.SscsCaseDataBuilder builder = sscsCaseData.toBuilder();
-        return convertSyaToCcdCaseDataGeneric(syaCaseWrapper, caseAccessManagementEnabled, builder);
     }
 
     public static SscsCaseData convertSyaToCcdCaseDataGeneric(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled, SscsCaseData.SscsCaseDataBuilder builder) {
