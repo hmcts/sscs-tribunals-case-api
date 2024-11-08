@@ -36,7 +36,13 @@ public class CftlibConfig implements CFTLibConfigurer {
             "caseworker",
             "caseworker-sscs",
             "caseworker-sscs-superuser",
-            "hearing-manager"
+            "hearing-manager",
+            "caseworker-sscs-clerk",
+            "caseworker-sscs-systemupdate",
+            "hearing-viewer",
+            "hearing-manager",
+            "tribunal-caseworker",
+            "sscs-tribunal-caseworker"
         );
         lib.createIdamUser("sscs-citizen2@hmcts.net",
             "citizen"
