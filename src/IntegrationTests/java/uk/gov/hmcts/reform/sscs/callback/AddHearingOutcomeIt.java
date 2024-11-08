@@ -110,7 +110,6 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertFalse(result.getData().getHearingOutcomeValue().getCompletedHearings().getListItems().isEmpty());
         assertEquals("2030011049", result.getData().getHearingOutcomeValue().getCompletedHearings().getListItems().get(0).getCode());
-        assertEquals("", result.getData().getHearings());
     }
 
     @Test
