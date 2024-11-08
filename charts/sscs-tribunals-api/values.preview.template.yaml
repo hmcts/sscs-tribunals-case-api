@@ -67,6 +67,7 @@ java:
     TEST_RECIPIENTS_POSTCODE: "*"
     INFECTED_BLOOD_COMPENSATION_ENABLED: true
     SUBMIT_APPEAL_SERVICE_V2_ENABLED: true
+    BULK_SCAN_URL: "https://sscs-bulk-scan-pr-1517.preview.platform.hmcts.net"
     PROCESS_EVENT_MESSAGE_V2_ENABLED: true
   secrets:
     JOB_SCHEDULER_DB_PASSWORD:
