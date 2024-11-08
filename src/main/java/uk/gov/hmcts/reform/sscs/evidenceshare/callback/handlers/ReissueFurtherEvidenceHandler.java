@@ -30,7 +30,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
     private final UpdateCcdCaseService updateCcdCaseService;
 
     @Value("${feature.update-case-only-hearing-v2.enabled}")
-    private boolean updatCaseOnlyHearingV2Enabled;
+    private boolean updateCaseOnlyHearingV2Enabled;
 
     @Autowired
     public ReissueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService,
@@ -127,7 +127,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
             caseData = sscsCaseDetails.getData();
         }
 
-        if (updatCaseOnlyHearingV2Enabled) {
+        if (updateCaseOnlyHearingV2Enabled) {
             updateCaseV2(caseData, selectedDocument);
         } else {
             setEvidenceIssuedFlagToYes(selectedDocument);
@@ -217,8 +217,10 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
                 determineDescription(selectedDocument),
                 idamService.getIdamTokens(),
                 sscsCaseDetails -> {
-                    setEvidenceIssuedFlagToYes(selectedDocument);
-                    setReissueFlagsToNull(caseData);
+                    final AbstractDocument documentIssuedFlagToYes =
+                            getSelectedDocumentInUiFromCaseData(sscsCaseDetails.getData(), sscsCaseDetails.getData().getReissueArtifactUi());
+                    setEvidenceIssuedFlagToYes(documentIssuedFlagToYes);
+                    setReissueFlagsToNull(sscsCaseDetails.getData());
                 });
     }
 

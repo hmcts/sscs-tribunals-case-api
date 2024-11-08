@@ -250,7 +250,7 @@ public class ReissueFurtherEvidenceHandlerTest {
                                                                                                 boolean resendToAppellant,
                                                                                                 boolean resendToRepresentative,
                                                                                                 boolean isEnglish) {
-        ReflectionTestUtils.setField(handler, "updatCaseOnlyHearingV2Enabled", true);
+        ReflectionTestUtils.setField(handler, "updateCaseOnlyHearingV2Enabled", true);
 
         if (resendToAppellant || resendToRepresentative) {
             when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
@@ -485,7 +485,7 @@ public class ReissueFurtherEvidenceHandlerTest {
                                                                                                              boolean isEnglish,
                                                                                                              boolean resendToOtherParty,
                                                                                                              boolean resendToOtherPartyRep) {
-        ReflectionTestUtils.setField(handler, "updatCaseOnlyHearingV2Enabled", true);
+        ReflectionTestUtils.setField(handler, "updateCaseOnlyHearingV2Enabled", true);
 
         if (resendToAppellant || resendToRepresentative || resendToOtherParty || resendToOtherPartyRep) {
             when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
