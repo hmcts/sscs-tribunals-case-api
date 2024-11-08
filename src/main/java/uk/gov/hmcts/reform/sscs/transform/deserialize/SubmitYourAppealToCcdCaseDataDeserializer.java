@@ -34,12 +34,10 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                                                        String region,
                                                        RegionalProcessingCenter rpc,
                                                        boolean caseAccessManagementEnabled) {
-        return convertSyaToCcdCaseDataV1(syaCaseWrapper, caseAccessManagementEnabled)
-            .toBuilder()
-            .region(region)
-            .regionalProcessingCenter(rpc)
-            .schedulingAndListingFields(SchedulingAndListingFields.builder().hearingRoute(rpc.getHearingRoute()).build())
-            .build();
+        return updateAdditionalInfo(
+                convertSyaToCcdCaseDataV1(syaCaseWrapper, caseAccessManagementEnabled),
+                region,
+                rpc);
     }
 
     public static SscsCaseData convertSyaToCcdCaseDataV1(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled) {
@@ -51,12 +49,21 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                                                        RegionalProcessingCenter rpc,
                                                        boolean caseAccessManagementEnabled,
                                                        SscsCaseData sscsCaseData) {
-        return convertSyaToCcdCaseDataV2(syaCaseWrapper, caseAccessManagementEnabled, sscsCaseData)
-            .toBuilder()
-            .region(region)
-            .regionalProcessingCenter(rpc)
-            .schedulingAndListingFields(SchedulingAndListingFields.builder().hearingRoute(rpc.getHearingRoute()).build())
-            .build();
+        return updateAdditionalInfo(
+                convertSyaToCcdCaseDataV2(syaCaseWrapper, caseAccessManagementEnabled, sscsCaseData),
+                region,
+                rpc);
+    }
+
+    private static SscsCaseData updateAdditionalInfo(SscsCaseData sscsCaseData,
+                                                     String region,
+                                                     RegionalProcessingCenter rpc) {
+        return sscsCaseData
+                .toBuilder()
+                .region(region)
+                .regionalProcessingCenter(rpc)
+                .schedulingAndListingFields(SchedulingAndListingFields.builder().hearingRoute(rpc.getHearingRoute()).build())
+                .build();
     }
 
     public static SscsCaseData convertSyaToCcdCaseDataV2(SyaCaseWrapper syaCaseWrapper, boolean caseAccessManagementEnabled, SscsCaseData sscsCaseData) {
