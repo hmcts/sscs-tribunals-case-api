@@ -944,6 +944,7 @@ public class LetterUtilsTest {
 
     }
 
+    @DisplayName("getAddressPlaceholders returns the expected keys.")
     @Test
     public void getAddressPlaceholders_returnsExpectedKeys() {
         String fullNameNoTitle = "Jane Doe";
