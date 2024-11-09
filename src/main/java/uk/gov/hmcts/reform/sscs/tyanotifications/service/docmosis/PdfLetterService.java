@@ -5,10 +5,14 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_3;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_4;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_POSTCODE;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_NAME;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.personalisation.Personalisation.translateToWelshDate;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.addBlankPageAtTheEndIfOddPage;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.buildBundledLetter;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressPlaceholders;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressToUseForLetter;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getNameToUseForLetter;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -117,7 +121,11 @@ public class PdfLetterService {
             placeholders.put(ADDRESS_NAME, truncateAddressLine(getNameToUseForLetter(wrapper, subscriptionWithType)));
 
             Address addressToUse = getAddressToUseForLetter(wrapper, subscriptionWithType);
-            buildRecipientAddressPlaceholders(addressToUse, placeholders);
+
+            List<String> addressConstants = List.of(LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
+                    LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE);
+
+            placeholders.putAll(getAddressPlaceholders(addressToUse, addressConstants, true));
 
             placeholders.put(docmosisTemplatesConfig.getHmctsImgKey(), docmosisTemplatesConfig.getHmctsImgVal());
             placeholders.put(docmosisTemplatesConfig.getHmctsWelshImgKey(), docmosisTemplatesConfig.getHmctsWelshImgVal());
@@ -130,16 +138,6 @@ public class PdfLetterService {
             return docmosisPdfService.createPdfFromMap(placeholders, notification.getDocmosisLetterTemplate());
         }
         return new byte[0];
-    }
-
-    private void buildRecipientAddressPlaceholders(Address address, Map<String, Object> placeholders) {
-        List<String> addressConstants = List.of(LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
-                LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE);
-        List<String> lines = lines(address);
-
-        for (int i = 0; i < lines.size(); i++) {
-            placeholders.put(addressConstants.get(i), truncateAddressLine(defaultToEmptyStringIfNull(lines.get(i))));
-        }
     }
 
     private static String defaultToEmptyStringIfNull(String value) {

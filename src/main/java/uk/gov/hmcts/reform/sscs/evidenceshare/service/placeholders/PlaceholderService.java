@@ -1,10 +1,36 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.*;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.APPELLANT_FULL_NAME_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.BENEFIT_TYPE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.CASE_CREATED_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.CASE_ID_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE1_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE2_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_POSTCODE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.GENERATED_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.NINO_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_1_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_2_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_4_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_5_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE4_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_COUNTY_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_FAX_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_PHONE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_POSTCODE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SC_NUMBER_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SHOULD_HIDE_NINO;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.SSCS_URL_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.WELSH_CASE_CREATED_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.WELSH_GENERATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
-import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.truncateAddressLine;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.lines;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressPlaceholders;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -77,7 +103,11 @@ public class PlaceholderService {
         buildExcelaAddress(caseData.getIsScottishCase(), placeholders);
 
         populateRpcPlaceHolders(caseData, placeholders);
-        buildRecipientAddressPlaceholders(address, placeholders);
+
+        List<String> addressConstants = List.of(RECIPIENT_ADDRESS_LINE_1_LITERAL, RECIPIENT_ADDRESS_LINE_2_LITERAL, RECIPIENT_ADDRESS_LINE_3_LITERAL,
+                RECIPIENT_ADDRESS_LINE_4_LITERAL, RECIPIENT_ADDRESS_LINE_5_LITERAL);
+
+        placeholders.putAll(getAddressPlaceholders(address, addressConstants, true));
     }
 
     public void buildExcelaAddress(String isScottish, Map<String, Object> placeholders) {
@@ -110,16 +140,5 @@ public class PlaceholderService {
     public boolean hasRegionalProcessingCenter(SscsCaseData ccdResponse) {
         return nonNull(ccdResponse.getRegionalProcessingCenter())
             && nonNull(ccdResponse.getRegionalProcessingCenter().getName());
-    }
-
-    private void buildRecipientAddressPlaceholders(Address address, Map<String, Object> placeholders) {
-        List<String> addressConstants = List.of(RECIPIENT_ADDRESS_LINE_1_LITERAL, RECIPIENT_ADDRESS_LINE_2_LITERAL, RECIPIENT_ADDRESS_LINE_3_LITERAL,
-                RECIPIENT_ADDRESS_LINE_4_LITERAL, RECIPIENT_ADDRESS_LINE_5_LITERAL);
-
-        List<String> lines = lines(address);
-
-        for (int i = 0; i < lines.size(); i++) {
-            placeholders.put(addressConstants.get(i), truncateAddressLine(defaultToEmptyStringIfNull(lines.get(i))));
-        }
     }
 }

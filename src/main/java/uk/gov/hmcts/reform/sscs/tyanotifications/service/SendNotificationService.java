@@ -2,36 +2,79 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.*;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.AUDIO_VIDEO_EVIDENCE_DIRECTION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.CORRECTED_DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DIRECTION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.POSTPONEMENT_REQUEST_DIRECTION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.STATEMENT_OF_REASONS_GRANTED;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.STATEMENT_OF_REASONS_REFUSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_1;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_2;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_3;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_4;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ADDRESS_LINE_5;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPEAL_RESPOND_DATE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.APPELLANT_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.CLAIMANT_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.ENTITY_TYPE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.PARTY_TYPE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.POSTCODE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.config.PersonalisationMappingConstants.REPRESENTATIVE_NAME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ACTION_POSTPONEMENT_REQUEST_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ADMIN_CORRECTION_HEADER;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.CORRECTION_GRANTED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DECISION_ISSUED_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DIRECTION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.DIRECTION_ISSUED_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_ADJOURNMENT_NOTICE_WELSH;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.ISSUE_FINAL_DECISION_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_GRANTED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PERMISSION_TO_APPEAL_REFUSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PROCESS_AUDIO_VIDEO;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.PROCESS_AUDIO_VIDEO_WELSH;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.REVIEW_AND_SET_ASIDE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SET_ASIDE_GRANTED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SET_ASIDE_REFUSED;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.*;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SOR_EXTEND_TIME;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SOR_REFUSED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.addBlankPageAtTheEndIfOddPage;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.buildBundledLetter;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressPlaceholders;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressToUseForLetter;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getNameToUseForLetter;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.isAlternativeLetterFormatRequired;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.hasLetterTemplate;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendEmailNotification;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.isOkToSendSmsNotification;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationValidService.isBundledLetter;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.NotificationEventTypeLists;
@@ -231,7 +274,10 @@ public class SendNotificationService {
             Map<String, Object> placeholders = notification.getPlaceholders();
             String fullNameNoTitle = getNameToUseForLetter(wrapper, subscriptionWithType);
 
-            placeholders.putAll(getAddressPlaceholders(address, fullNameNoTitle));
+            placeholders.put(ADDRESS_LINE_1, fullNameNoTitle);
+            List<String> addressConstants = List.of(ADDRESS_LINE_2, ADDRESS_LINE_3, ADDRESS_LINE_4, ADDRESS_LINE_5, POSTCODE_LITERAL);
+
+            placeholders.putAll(getAddressPlaceholders(address, addressConstants, false));
 
             placeholders.put(NAME, fullNameNoTitle);
             if (SubscriptionType.REPRESENTATIVE.equals(subscriptionWithType.getSubscriptionType())) {
@@ -258,22 +304,6 @@ public class SendNotificationService {
                 wrapper.getCaseId()
             );
         }
-    }
-    
-    public static Map<String, Object> getAddressPlaceholders(final Address address, String fullNameNoTitle) {
-        Map<String, Object> addressPlaceHolders = new HashMap<>();
-
-        addressPlaceHolders.put(ADDRESS_LINE_1, fullNameNoTitle);
-
-        List<String> addressConstants = List.of(ADDRESS_LINE_2, ADDRESS_LINE_3, ADDRESS_LINE_4,
-                ADDRESS_LINE_5, POSTCODE_LITERAL);
-
-        List<String> lines = lines(address);
-
-        for (int i = 0; i < lines.size(); i++) {
-            addressPlaceHolders.put(addressConstants.get(i), defaultToEmptyStringIfNull(lines.get(i)));
-        }
-        return addressPlaceHolders;
     }
 
     private static boolean isValidLetterAddress(Address addressToUse) {
@@ -415,9 +445,4 @@ public class SendNotificationService {
         }
         return null;
     }
-
-    private static String defaultToEmptyStringIfNull(String value) {
-        return (value == null) ? StringUtils.EMPTY : value;
-    }
-
 }
