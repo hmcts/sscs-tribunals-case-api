@@ -43,22 +43,10 @@ Once the application running locally, please make sure
 If you need to test Tribunals with HMC Hearings you must carry out the following steps:
 1. First you need to create a pull request on github for your branch
 2. The branch should have the labels: enable_keep_helm, pr-values:hearings
-3. Once this is done you then need to upload a CCD Definition file to AAT CCD. This definition file should have a unique CaseType ID in this format (3575 represents the Pull request number):
+3. Once this is done you then need to upload a CCD Definition file to AAT CCD. This definition file should have a unique CaseType ID in this format (4120 represents the Pull request number):
 
 ```bash
-export CHANGE_ID=4120 #CHANGE_ID is the PR number
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS
-  find ./definitions/benefit/sheets/  -type f -exec sed -i '' "s/Benefit/Benefit-$CHANGE_ID/g" {} +
-  sed -i '' "s/-e \"CCD_DEF_ENV=[^\"]*\"/-e \"CCD_DEF_ENV=${CHANGE_ID}\"/" ./bin/create-xlsx.sh
-else
-    # Linux and other Unix-like systems
-  find ./definitions/benefit/sheets/  -type f -exec sed -i "s/Benefit/Benefit-$CHANGE_ID/g" {} +
-  sed -i "s/-e \"CCD_DEF_ENV=[^\"]*\"/-e \"CCD_DEF_ENV=${CHANGE_ID}\"/" ./bin/create-xlsx.sh
-fi
-./bin/create-xlsx.sh benefit dev pr
-git checkout definitions/benefit/sheets bin
-
+./bin/update-benefit-definitions.sh 4120
 ```
 4. You must ensure the callbacks for the CaseEvents match the service ingress values within your PR's preview chart. Here is an example of a callback URL for a tribunals PR with an id of 4120:
 
