@@ -1,10 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addhearingoutcome;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsIterableContaining.hasItem;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -59,7 +55,7 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
 
     @Test
     void givenAddHearingOutcomeEventShouldHandle() {
-        assertTrue(handler.canHandle(CallbackType.ABOUT_TO_START,callback));
+        assertThat(handler.canHandle(CallbackType.ABOUT_TO_START,callback)).isTrue();
     }
 
     @Test
@@ -67,8 +63,8 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
         when(hmcHearingsApiService.getHearingsRequest(any(),any())).thenReturn(
                 HearingsGetResponse.builder().caseHearings(List.of(CaseHearing.builder().hearingId(1L).build())).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_START,callback,USER_AUTHORISATION);
-        assertFalse(response.getData().getHearingOutcomeValue().getCompletedHearings().getListItems().isEmpty());
-        assertEquals(1, response.getData().getHearingOutcomeValue().getCompletedHearings().getListItems().size());
+        assertThat(response.getData().getHearingOutcomeValue().getCompletedHearings().getListItems()).isNotEmpty();
+        assertThat(response.getData().getHearingOutcomeValue().getCompletedHearings().getListItems().size()).isEqualTo(1);
     }
 
     @Test
@@ -94,9 +90,10 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_START,callback,USER_AUTHORISATION);
         List<DynamicListItem> hearings = response.getData().getHearingOutcomeValue().getCompletedHearings().getListItems();
-        assertFalse(hearings.isEmpty());
-        assertEquals(2, hearings.size());
-        assertTrue(hearings.get(0).getCode().equals("2") && hearings.get(1).getCode().equals("1"));
+        assertThat(hearings).isNotEmpty();
+        assertThat(hearings.size()).isEqualTo(2);
+        assertThat(hearings.get(0).getCode()).isEqualTo("2");
+        assertThat(hearings.get(1).getCode()).isEqualTo("1");
     }
 
     @Test
@@ -104,8 +101,8 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
         when(hmcHearingsApiService.getHearingsRequest(any(),any())).thenReturn(
                 HearingsGetResponse.builder().caseHearings(List.of()).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_START,callback,USER_AUTHORISATION);
-        assertFalse(response.getErrors().isEmpty());
-        assertThat(response.getErrors(), hasItem("There are no completed hearings on the case."));
+        assertThat(response.getErrors()).isNotEmpty();
+        assertThat(response.getErrors()).contains("There are no completed hearings on the case.");
     }
 
     @Test
@@ -114,8 +111,8 @@ public class AddHearingOutcomeAboutToStartHandlerTest {
             throw new Exception("exception");
         });
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_START,callback,USER_AUTHORISATION);
-        assertFalse(response.getErrors().isEmpty());
-        assertThat(response.getErrors(), hasItem("There was an error while retrieving hearing details; please try again after some time."));
+        assertThat(response.getErrors()).isNotEmpty();
+        assertThat(response.getErrors()).contains("There was an error while retrieving hearing details; please try again after some time.");
     }
 
     private List<Hearing> buildHearings() {

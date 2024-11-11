@@ -3,15 +3,14 @@ package uk.gov.hmcts.reform.sscs.callback;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +25,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 
 
 @ExtendWith(SpringExtension.class)
@@ -104,8 +105,9 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-        assertFalse(result.getData().getHearingOutcomeValue().getCompletedHearings().getListItems().isEmpty());
-        assertEquals("2030011049", result.getData().getHearingOutcomeValue().getCompletedHearings().getListItems().get(0).getCode());
+        assertThat(result.getData().getHearingOutcomeValue().getCompletedHearings().getListItems()).isNotEmpty();
+        assertThat(result.getData().getHearingOutcomeValue().getCompletedHearings().getListItems().get(0).getCode())
+                .isEqualTo("2030011049");
     }
 
     @Test
@@ -118,8 +120,8 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-        assertFalse(result.getErrors().isEmpty());
-        assertTrue(result.getErrors().contains("There are no completed hearings on the case."));
+        assertThat(result.getErrors()).isNotEmpty();
+        assertThat(result.getErrors()).contains("There are no completed hearings on the case.");
     }
 
 
@@ -133,8 +135,8 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-        assertFalse(result.getErrors().isEmpty());
-        assertTrue(result.getErrors().contains("There was an error while retrieving hearing details; please try again after some time."));
+        assertThat(result.getErrors()).isNotEmpty();
+        assertThat(result.getErrors()).contains("There was an error while retrieving hearing details; please try again after some time.");
     }
 
 
