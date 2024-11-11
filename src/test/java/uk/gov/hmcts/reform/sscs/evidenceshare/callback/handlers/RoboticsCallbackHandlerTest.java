@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.callback.handlers;
 
 import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
@@ -97,6 +98,14 @@ public class RoboticsCallbackHandlerTest {
         assertFalse(handler.canHandle(SUBMITTED, callback));
     }
 
+
+    @Test
+    public void givenARoboticsRequestCannotHandleAndDoNotTriggerUpdateCaseEvent() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, READY_TO_LIST.getId());
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.APPEAL_RECEIVED, false);
+
+        assertThrows(IllegalStateException.class, () -> handler.handle(SUBMITTED, callback));
+    }
 
     @Test
     @Parameters({"VALID_APPEAL", "INTERLOC_VALID_APPEAL", "VALID_APPEAL_CREATED", "APPEAL_TO_PROCEED"})
