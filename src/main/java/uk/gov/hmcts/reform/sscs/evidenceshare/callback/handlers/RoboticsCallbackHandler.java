@@ -88,7 +88,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             log.info("Hearing route is: {}. Case {} will not be sent to robotics.",
                 HearingRoute.LIST_ASSIST, callback.getCaseDetails().getId());
 
-            triggerV2EventIfEventApplicable(callback, "Case sent to List Assist", "Updated case with sent to List Assist");
+            triggerV2EventIfEventApplicable(callback);
 
             return;
         }
@@ -109,8 +109,9 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         }
     }
 
-    private void triggerV2EventIfEventApplicable(Callback<SscsCaseData> callback, String summary,
-                                                 String description) {
+    private void triggerV2EventIfEventApplicable(Callback<SscsCaseData> callback) {
+        String summary = "Case sent to List Assist";
+        String description = "Updated case with sent to List Assist";
         String ccdEventType = getApplicableCcdEventType(callback);
 
         if (ccdEventType != null) {
