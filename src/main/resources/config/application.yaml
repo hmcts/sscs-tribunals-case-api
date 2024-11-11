@@ -301,6 +301,7 @@ feature:
         enabled: ${UPDATE_CASE_ONLY_HEARING_V2_ENABLED:false}
 
 
+
 idam:
     api:
         url: ${IDAM_API_URL:http://localhost:5062}
