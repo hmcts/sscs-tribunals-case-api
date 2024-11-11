@@ -1,12 +1,13 @@
 package uk.gov.hmcts.reform.sscs.helper.adjournment;
 
-import java.time.LocalDate;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingPeriod;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+
+import java.time.LocalDate;
 
 @Slf4j
 public final class AdjournmentCalculateDateHelper {

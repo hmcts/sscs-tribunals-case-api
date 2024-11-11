@@ -1,15 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.tya;
 
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.*;
-
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.UUID;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -51,6 +42,16 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.reminder.JobGroupGenera
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.SendEmailResponse;
 import uk.gov.service.notify.SendSmsResponse;
+
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.UUID;
+
+import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.*;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest

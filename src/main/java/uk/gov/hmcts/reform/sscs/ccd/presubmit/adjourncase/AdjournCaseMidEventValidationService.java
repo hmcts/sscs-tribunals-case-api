@@ -1,21 +1,17 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
-import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
-import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInThePast;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateOrPeriod;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDateType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseNextHearingDurationUnits;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
+import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInThePast;
 
 @Component
 @Slf4j

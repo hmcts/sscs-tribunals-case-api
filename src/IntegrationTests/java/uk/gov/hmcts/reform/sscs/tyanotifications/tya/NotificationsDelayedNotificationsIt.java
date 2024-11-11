@@ -1,7 +1,12 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.tya;
 
-import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
-import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.*;
+import jakarta.servlet.http.HttpServletResponse;
+import junitparams.Parameters;
+import org.apache.commons.io.FileUtils;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.http.HttpStatus;
+import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -9,13 +14,9 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import javax.servlet.http.HttpServletResponse;
-import junitparams.Parameters;
-import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType;
+
+import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.*;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.*;
 
 public class NotificationsDelayedNotificationsIt extends NotificationsItBase {
 

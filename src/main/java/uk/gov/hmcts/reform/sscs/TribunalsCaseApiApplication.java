@@ -1,14 +1,6 @@
 package uk.gov.hmcts.reform.sscs;
 
-import static java.util.Arrays.asList;
-
-import com.microsoft.applicationinsights.web.internal.ApplicationInsightsServletContextListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-import javax.servlet.ServletContextListener;
-import javax.validation.ValidatorFactory;
+import jakarta.validation.ValidatorFactory;
 import okhttp3.OkHttpClient;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.quartz.spi.JobFactory;
@@ -17,11 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
@@ -61,6 +51,13 @@ import uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.RetryNotificationService;
 import uk.gov.hmcts.reform.sscs.tyanotifications.service.scheduler.*;
 import uk.gov.service.notify.NotificationClient;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
+import static java.util.Arrays.asList;
 
 @SpringBootApplication
 @EnableFeignClients(basePackages = {
@@ -189,20 +186,21 @@ public class TribunalsCaseApiApplication implements CommandLineRunner {
     @Value("${gov.uk.notification.api.testKey}")
     private String testApiKey;
 
-    @Bean
-    public ServletListenerRegistrationBean<ServletContextListener> appInsightsServletContextListenerRegistrationBean(
-        ApplicationInsightsServletContextListener applicationInsightsServletContextListener) {
-        ServletListenerRegistrationBean<ServletContextListener> srb =
-            new ServletListenerRegistrationBean<>();
-        srb.setListener(applicationInsightsServletContextListener);
-        return srb;
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public ApplicationInsightsServletContextListener applicationInsightsServletContextListener() {
-        return new ApplicationInsightsServletContextListener();
-    }
+// TODO: SB3
+//    @Bean
+//    public ServletListenerRegistrationBean<ServletContextListener> appInsightsServletContextListenerRegistrationBean(
+//        ApplicationInsightsServletContextListener applicationInsightsServletContextListener) {
+//        ServletListenerRegistrationBean<ServletContextListener> srb =
+//            new ServletListenerRegistrationBean<>();
+//        srb.setListener(applicationInsightsServletContextListener);
+//        return srb;
+//    }
+//
+//    @Bean
+//    @ConditionalOnMissingBean
+//    public ApplicationInsightsServletContextListener applicationInsightsServletContextListener() {
+//        return new ApplicationInsightsServletContextListener();
+//    }
 
 
     @Bean

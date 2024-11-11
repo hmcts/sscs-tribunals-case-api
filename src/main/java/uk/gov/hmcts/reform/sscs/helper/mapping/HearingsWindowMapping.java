@@ -1,19 +1,20 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OverrideFields;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.helper.adjournment.AdjournmentCalculateDateHelper;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingWindow;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 @Slf4j
 public final class HearingsWindowMapping {

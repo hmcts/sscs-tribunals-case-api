@@ -1,13 +1,14 @@
 package uk.gov.hmcts.reform.sscs.evidenceshare.config;
 
-import java.util.Properties;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.validation.annotation.Validated;
+
+import java.util.Properties;
 
 @Validated
 @Configuration

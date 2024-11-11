@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.sscs.service.actionhearingrecordingrequest;
 
-import static java.util.Objects.nonNull;
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.model.RequestStatus.GRANTED;
-import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REFUSED;
-import static uk.gov.hmcts.reform.sscs.model.RequestStatus.REQUESTED;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.PartyItemList;
+import uk.gov.hmcts.reform.sscs.model.RequestStatus;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -13,11 +13,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import javax.validation.constraints.NotNull;
-import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.model.PartyItemList;
-import uk.gov.hmcts.reform.sscs.model.RequestStatus;
+
+import static java.util.Objects.nonNull;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static uk.gov.hmcts.reform.sscs.model.RequestStatus.*;
 
 @Service
 public class ActionHearingRecordingRequestService {

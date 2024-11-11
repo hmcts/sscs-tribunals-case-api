@@ -1,10 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service.servicebus;
 
-import static org.mockito.Mockito.*;
-
-import java.net.NoRouteToHostException;
-import java.util.concurrent.atomic.AtomicReference;
-import javax.jms.Message;
+import jakarta.jms.Message;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +12,11 @@ import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessagePostProcessor;
+
+import java.net.NoRouteToHostException;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TopicPublisherTest {

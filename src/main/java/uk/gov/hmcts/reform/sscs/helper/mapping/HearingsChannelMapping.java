@@ -1,15 +1,16 @@
 package uk.gov.hmcts.reform.sscs.helper.mapping;
 
-import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
-
-import java.util.Arrays;
-import java.util.List;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel;
 import uk.gov.hmcts.reform.sscs.utility.HearingChannelUtil;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.reference.data.model.HearingChannel.PAPER;
 
 @Slf4j
 @SuppressWarnings("PMD.CyclomaticComplexity")

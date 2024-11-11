@@ -1,10 +1,6 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.config;
 
-import static uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference.ENGLISH;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference.WELSH;
-
-import java.util.*;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +10,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Link;
 import uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Template;
 import uk.gov.hmcts.reform.sscs.tyanotifications.factory.NotificationWrapper;
+
+import java.util.*;
+
+import static uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference.ENGLISH;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference.WELSH;
 
 @Component
 public class NotificationConfig {

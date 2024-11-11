@@ -1,19 +1,5 @@
 package uk.gov.hmcts.reform.sscs.tyanotifications.service;
 
-import static java.lang.String.format;
-import static java.time.ZoneId.of;
-import static java.time.ZonedDateTime.now;
-import static java.util.Base64.getEncoder;
-import static javax.crypto.Mac.getInstance;
-import static javax.xml.bind.DatatypeConverter.printBase64Binary;
-import static org.slf4j.LoggerFactory.getLogger;
-
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +7,21 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.MacException;
 import uk.gov.hmcts.reform.sscs.tyanotifications.exception.TokenException;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
+import static jakarta.xml.bind.DatatypeConverter.printBase64Binary;
+import static java.lang.String.format;
+import static java.time.ZoneId.of;
+import static java.time.ZonedDateTime.now;
+import static java.util.Base64.getEncoder;
+import static javax.crypto.Mac.getInstance;
+import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
 public class MessageAuthenticationServiceImpl {

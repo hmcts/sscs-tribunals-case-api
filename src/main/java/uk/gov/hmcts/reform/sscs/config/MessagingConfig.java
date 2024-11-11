@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.config;
 
-import javax.jms.ConnectionFactory;
-import javax.net.ssl.SSLContext;
+import jakarta.jms.ConnectionFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.jms.JmsConnectionFactory;
 import org.apache.qpid.jms.policy.JmsDefaultPrefetchPolicy;
@@ -14,6 +13,8 @@ import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
 import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
+
+import javax.net.ssl.SSLContext;
 
 @Configuration
 @Slf4j
