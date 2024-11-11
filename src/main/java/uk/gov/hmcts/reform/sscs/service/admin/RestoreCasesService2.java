@@ -4,7 +4,9 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler.isScottishCase;
 import static uk.gov.hmcts.reform.sscs.exception.BenefitMappingException.createException;
-import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.*;
+import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateBenefitCode;
+import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateCaseCode;
+import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateIssueCode;
 import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,8 +22,14 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.AirLookupService;
@@ -32,7 +40,7 @@ import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 public class RestoreCasesService2 {
 
     private final CcdService ccdService;
-
+    private final UpdateCcdCaseService updateCcdCaseService;
     private final IdamService idamService;
     private final ObjectMapper objectMapper;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
@@ -40,11 +48,13 @@ public class RestoreCasesService2 {
 
     @Autowired
     public RestoreCasesService2(CcdService ccdService,
+                                UpdateCcdCaseService updateCcdCaseService,
                                 IdamService idamService,
                                 ObjectMapper objectMapper,
                                 RegionalProcessingCenterService regionalProcessingCenterService,
                                 AirLookupService airLookupService) {
         this.ccdService = ccdService;
+        this.updateCcdCaseService = updateCcdCaseService;
         this.idamService = idamService;
         this.objectMapper = objectMapper;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
@@ -118,7 +128,7 @@ public class RestoreCasesService2 {
                 log.error("IOException from RestoreCasesService2 in finally: ", e);
             }
         }
-        log.info("RestoreCasesService2: Found " + allCasesToRestore.size() + " cases to restore. Processing now...");
+        log.info("RestoreCasesService2: Found {} cases to restore. Processing now...", allCasesToRestore.size());
         return allCasesToRestore;
     }
 
@@ -127,57 +137,56 @@ public class RestoreCasesService2 {
     }
 
     public void updateCase(SscsCaseDetails sscsCaseDetails, IdamTokens idamTokens) {
-        SscsCaseData caseData = sscsCaseDetails.getData();
+        EventType eventToTrigger = sscsCaseDetails.getState().equals(State.WITH_DWP.getId()) ?  EventType.APPEAL_RECEIVED : EventType.UPDATE_CASE_ONLY;
 
-        caseData.setCreatedInGapsFrom("readyToList");
+        try {
+            log.info("Preparing to UpdateCaseV2. {} event for id {}", eventToTrigger, sscsCaseDetails.getId());
+            updateCcdCaseService.updateCaseV2(sscsCaseDetails.getId(), eventToTrigger.getCcdType(), "Restore case details", "Automatically restore missing case details", idamTokens,
+                this::restoreData);
 
-        String postCode = caseData.getAppeal().getAppellant().getAddress().getPostcode();
+            log.info("UpdateCaseV2 Complete. {} event for id {}", eventToTrigger, sscsCaseDetails.getId());
+
+        } catch (FeignException.UnprocessableEntity e) {
+            log.error(format("%s event failed for caseId %s, root cause is %s", eventToTrigger, sscsCaseDetails.getId(), getRootCauseMessage(e)), e);
+            throw e;
+        }
+    }
+
+    private void restoreData(SscsCaseDetails sscsCaseDetails) {
+        log.info("Restoring case data as part of UpdateCaseV2");
+        SscsCaseData sscsCaseData = sscsCaseDetails.getData();
+        sscsCaseData.setCreatedInGapsFrom("readyToList");
+
+        String postCode = sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
         String firstHalfOfPostcode = getFirstHalfOfPostcode(postCode);
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
 
         if (rpc != null) {
-            caseData.setRegion(rpc.getName());
-            caseData.setRegionalProcessingCenter(rpc);
+            sscsCaseData.setRegion(rpc.getName());
+            sscsCaseData.setRegionalProcessingCenter(rpc);
         }
 
-        caseData.setProcessingVenue(airLookupService.lookupAirVenueNameByPostCode(postCode, caseData.getAppeal().getBenefitType()));
+        sscsCaseData.setProcessingVenue(airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType()));
 
-        String benefitCode = generateBenefitCode(caseData.getAppeal().getBenefitType().getCode(), "")
-                .orElseThrow(() -> createException(caseData.getAppeal().getBenefitType().getCode()));
+        String benefitCode = generateBenefitCode(sscsCaseData.getAppeal().getBenefitType().getCode(), "")
+            .orElseThrow(() -> createException(sscsCaseData.getAppeal().getBenefitType().getCode()));
         String issueCode = generateIssueCode();
         String caseCode = generateCaseCode(benefitCode, issueCode);
 
-        caseData.setBenefitCode(benefitCode);
-        caseData.setIssueCode(issueCode);
-        caseData.setCaseCode(caseCode);
+        sscsCaseData.setBenefitCode(benefitCode);
+        sscsCaseData.setIssueCode(issueCode);
+        sscsCaseData.setCaseCode(caseCode);
 
         if (sscsCaseDetails.getState().equals(State.WITH_DWP.getId())) {
-            caseData.setDwpState(DwpState.UNREGISTERED);
+            sscsCaseData.setDwpState(DwpState.UNREGISTERED);
         }
 
-        String isScotCase = isScottishCase(caseData.getRegionalProcessingCenter(), caseData);
+        String isScotCase = isScottishCase(sscsCaseData.getRegionalProcessingCenter(), sscsCaseData);
 
-        if (!isScotCase.equals(caseData.getIsScottishCase())) {
-            caseData.setIsScottishCase(isScotCase);
+        if (!isScotCase.equals(sscsCaseData.getIsScottishCase())) {
+            sscsCaseData.setIsScottishCase(isScotCase);
         }
 
-        caseData.getAppeal().setSigner(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
-
-        triggerEvent(sscsCaseDetails, idamTokens);
-    }
-
-    private void triggerEvent(SscsCaseDetails caseDetails, IdamTokens idamTokens) {
-        EventType eventToTrigger = caseDetails.getState().equals(State.WITH_DWP.getId()) ?  EventType.APPEAL_RECEIVED : EventType.UPDATE_CASE_ONLY;
-
-        log.info("About to update case with {} event for id {}", eventToTrigger, caseDetails.getId());
-        try {
-            ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), eventToTrigger.getCcdType(), "Restore case details", "Automatically restore missing case details", idamTokens);
-
-            log.info("Case updated with {} event for id {}", eventToTrigger, caseDetails.getId());
-
-        } catch (FeignException.UnprocessableEntity e) {
-            log.error(format("%s event failed for caseId %s, root cause is %s", eventToTrigger, caseDetails.getId(), getRootCauseMessage(e)), e);
-            throw e;
-        }
+        sscsCaseData.getAppeal().setSigner(sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
     }
 }
