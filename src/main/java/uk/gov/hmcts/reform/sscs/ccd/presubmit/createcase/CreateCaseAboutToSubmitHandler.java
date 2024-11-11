@@ -116,9 +116,10 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
             log.info("Existing pdf document not found, start generating pdf for caseId {}", caseData.getCcdCaseId());
 
             try {
+                String documentType = IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode()) ? "sscs8" : "sscs1";
                 updateAppointeeNullIfNotPresent(caseData);
                 caseData.setEvidencePresent(hasEvidence(caseData, fileName));
-                sscsPdfService.generatePdf(caseData, Long.parseLong(caseData.getCcdCaseId()), "sscs1", fileName);
+                sscsPdfService.generatePdf(caseData, Long.parseLong(caseData.getCcdCaseId()), documentType, fileName);
 
             } catch (PDFServiceClientException pdfServiceClientException) {
                 log.error("Sscs1 form could not be generated for caseId {} for exception ", caseData.getCcdCaseId(), pdfServiceClientException);
