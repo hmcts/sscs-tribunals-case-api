@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addhearingoutcome;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -118,17 +117,16 @@ public class AddHearingOutcomeAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(1, response.getData().getHearingOutcomes().size());
+        assertThat(response.getData().getHearingOutcomes().size()).isEqualTo(1);
 
         HearingOutcomeDetails hearingOutcomeDetails = response.getData().getHearingOutcomes().get(0).getValue();
-        assertEquals("1", hearingOutcomeDetails.getCompletedHearingId());
-        assertEquals(start1, hearingOutcomeDetails.getHearingStartDateTime());
-        assertEquals(end1, hearingOutcomeDetails.getHearingEndDateTime());
-        assertEquals(hearingOutcomeId1, hearingOutcomeDetails.getHearingOutcomeId());
-        assertEquals(YES, hearingOutcomeDetails.getDidPoAttendHearing());
-        assertEquals(HearingChannel.FACE_TO_FACE, hearingOutcomeDetails.getHearingChannelId());
-        assertEquals(epims1, hearingOutcomeDetails.getEpimsId());
-
+        assertThat(hearingOutcomeDetails.getCompletedHearingId()).isEqualTo("1");
+        assertThat(hearingOutcomeDetails.getHearingStartDateTime()).isEqualTo(start1);
+        assertThat(hearingOutcomeDetails.getHearingEndDateTime()).isEqualTo(end1);
+        assertThat(hearingOutcomeDetails.getHearingOutcomeId()).isEqualTo(hearingOutcomeId1);
+        assertThat(hearingOutcomeDetails.getDidPoAttendHearing()).isEqualTo(YES);
+        assertThat(hearingOutcomeDetails.getHearingChannelId()).isEqualTo(HearingChannel.FACE_TO_FACE);
+        assertThat(hearingOutcomeDetails.getEpimsId()).isEqualTo(epims1);
     }
 
     @Test
@@ -150,25 +148,25 @@ public class AddHearingOutcomeAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(2, response.getData().getHearingOutcomes().size());
+        assertThat(response.getData().getHearingOutcomes().size()).isEqualTo(2);
 
         HearingOutcomeDetails hearingOutcomeDetails1 = response.getData().getHearingOutcomes().get(0).getValue();
-        assertEquals("1", hearingOutcomeDetails1.getCompletedHearingId());
-        assertEquals(start1, hearingOutcomeDetails1.getHearingStartDateTime());
-        assertEquals(end1, hearingOutcomeDetails1.getHearingEndDateTime());
-        assertEquals(hearingOutcomeId1, hearingOutcomeDetails1.getHearingOutcomeId());
-        assertEquals(YES, hearingOutcomeDetails1.getDidPoAttendHearing());
-        assertEquals(HearingChannel.FACE_TO_FACE, hearingOutcomeDetails1.getHearingChannelId());
-        assertEquals(epims1, hearingOutcomeDetails1.getEpimsId());
+        assertThat(hearingOutcomeDetails1.getCompletedHearingId()).isEqualTo("1");
+        assertThat(hearingOutcomeDetails1.getHearingStartDateTime()).isEqualTo(start1);
+        assertThat(hearingOutcomeDetails1.getHearingEndDateTime()).isEqualTo(end1);
+        assertThat(hearingOutcomeDetails1.getHearingOutcomeId()).isEqualTo(hearingOutcomeId1);
+        assertThat(hearingOutcomeDetails1.getDidPoAttendHearing()).isEqualTo(YES);
+        assertThat(hearingOutcomeDetails1.getHearingChannelId()).isEqualTo(HearingChannel.FACE_TO_FACE);
+        assertThat(hearingOutcomeDetails1.getEpimsId()).isEqualTo(epims1);
 
         HearingOutcomeDetails hearingOutcomeDetails2 = response.getData().getHearingOutcomes().get(1).getValue();
-        assertEquals("2", hearingOutcomeDetails2.getCompletedHearingId());
-        assertEquals(start2, hearingOutcomeDetails2.getHearingStartDateTime());
-        assertEquals(end2, hearingOutcomeDetails2.getHearingEndDateTime());
-        assertEquals(hearingOutcomeId2, hearingOutcomeDetails2.getHearingOutcomeId());
-        assertEquals(YES, hearingOutcomeDetails2.getDidPoAttendHearing());
-        assertEquals(HearingChannel.FACE_TO_FACE, hearingOutcomeDetails2.getHearingChannelId());
-        assertEquals(epims2, hearingOutcomeDetails2.getEpimsId());
+        assertThat(hearingOutcomeDetails2.getCompletedHearingId()).isEqualTo("2");
+        assertThat(hearingOutcomeDetails2.getHearingStartDateTime()).isEqualTo(start2);
+        assertThat(hearingOutcomeDetails2.getHearingEndDateTime()).isEqualTo(end2);
+        assertThat(hearingOutcomeDetails2.getHearingOutcomeId()).isEqualTo(hearingOutcomeId2);
+        assertThat(hearingOutcomeDetails2.getDidPoAttendHearing()).isEqualTo(YES);
+        assertThat(hearingOutcomeDetails2.getHearingChannelId()).isEqualTo(HearingChannel.FACE_TO_FACE);
+        assertThat(hearingOutcomeDetails2.getEpimsId()).isEqualTo(epims2);
     }
 
     @Test

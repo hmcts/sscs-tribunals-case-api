@@ -3,10 +3,7 @@ package uk.gov.hmcts.reform.sscs.callback;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -108,8 +105,9 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-        assertFalse(result.getData().getHearingOutcomeValue().getCompletedHearings().getListItems().isEmpty());
-        assertEquals("2030011049", result.getData().getHearingOutcomeValue().getCompletedHearings().getListItems().get(0).getCode());
+        assertThat(result.getData().getHearingOutcomeValue().getCompletedHearings().getListItems()).isNotEmpty();
+        assertThat(result.getData().getHearingOutcomeValue().getCompletedHearings().getListItems().get(0).getCode())
+                .isEqualTo("2030011049");
     }
 
     @Test
@@ -122,8 +120,8 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-        assertFalse(result.getErrors().isEmpty());
-        assertTrue(result.getErrors().contains("There are no completed hearings on the case."));
+        assertThat(result.getErrors()).isNotEmpty();
+        assertThat(result.getErrors()).contains("There are no completed hearings on the case.");
     }
 
 
@@ -137,8 +135,8 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-        assertFalse(result.getErrors().isEmpty());
-        assertTrue(result.getErrors().contains("There was an error while retrieving hearing details; please try again after some time."));
+        assertThat(result.getErrors()).isNotEmpty();
+        assertThat(result.getErrors()).contains("There was an error while retrieving hearing details; please try again after some time.");
     }
 
     @Test void callToAboutToSubmitEventHandler_willSaveNewHearingOutcome() throws Exception {
@@ -153,16 +151,23 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-        assertNull(result.getData().getHearingOutcomeValue().getHearingOutcomeId());
-        assertNull(result.getData().getHearingOutcomeValue().getDidPoAttendHearing());
-        assertNull(result.getData().getHearingOutcomeValue().getCompletedHearings());
-        assertEquals(1, result.getData().getHearingOutcomes().size());
-        assertEquals("2030026198", result.getData().getHearingOutcomes().get(0).getValue().getHearingOutcomeId());
-        assertEquals("2030011049", result.getData().getHearingOutcomes().get(0).getValue().getCompletedHearingId());
-        assertEquals(YesNo.YES, result.getData().getHearingOutcomes().get(0).getValue().getDidPoAttendHearing());
-        assertEquals(LocalDateTime.of(2024,2,21,11,00), result.getData().getHearingOutcomes().get(0).getValue().getHearingStartDateTime());
-        assertEquals(HearingChannel.FACE_TO_FACE, result.getData().getHearingOutcomes().get(0).getValue().getHearingChannelId());
-        assertEquals("372653", result.getData().getHearingOutcomes().get(0).getValue().getEpimsId());
+        assertThat(result.getData().getHearingOutcomeValue().getHearingOutcomeId()).isNull();
+        assertThat(result.getData().getHearingOutcomeValue().getDidPoAttendHearing()).isNull();
+        assertThat(result.getData().getHearingOutcomeValue().getCompletedHearings()).isNull();
+        assertThat(result.getData().getHearingOutcomes().size())
+                .isEqualTo(1);
+        assertThat(result.getData().getHearingOutcomes().get(0).getValue().getHearingOutcomeId())
+                .isEqualTo("2030026198");
+        assertThat(result.getData().getHearingOutcomes().get(0).getValue().getCompletedHearingId())
+                .isEqualTo("2030011049");
+        assertThat(result.getData().getHearingOutcomes().get(0).getValue().getDidPoAttendHearing())
+                .isEqualTo(YesNo.YES);
+        assertThat(result.getData().getHearingOutcomes().get(0).getValue().getHearingStartDateTime())
+                .isEqualTo(LocalDateTime.of(2024,2,21,11,00));
+        assertThat(result.getData().getHearingOutcomes().get(0).getValue().getHearingChannelId())
+                .isEqualTo(HearingChannel.FACE_TO_FACE);
+        assertThat(result.getData().getHearingOutcomes().get(0).getValue().getEpimsId())
+                .isEqualTo("372653");
     }
 
     @Test void callToAboutToSubmitEventHandler_withIncorrectHearingIdShouldReturnError() throws Exception {
@@ -177,7 +182,8 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-        assertTrue(result.getErrors().contains("Cannot find hearing details for hearing 21 Feb 2024, 11:00:00 AM, Cardiff with hearing ID: 1030011048"));
+        assertThat(result.getErrors())
+                .contains("Cannot find hearing details for hearing 21 Feb 2024, 11:00:00 AM, Cardiff with hearing ID: 1030011048");
     }
 
 }
