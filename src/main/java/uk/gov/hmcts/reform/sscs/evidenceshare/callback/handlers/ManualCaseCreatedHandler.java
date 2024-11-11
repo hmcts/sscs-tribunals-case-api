@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -29,9 +30,13 @@ public class ManualCaseCreatedHandler implements CallbackHandler<SscsCaseData> {
 
     private final CcdService ccdService;
     private final IdamService idamService;
+    private final UpdateCcdCaseService updateCcdCaseService;
 
     @Value("${feature.case-access-management.enabled}")
     private boolean caseAccessManagementFeature;
+
+    @Value("${feature.update-case-only-hearing-v2.enabled}")
+    private boolean updateCaseOnlyHearingV2Enabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -60,18 +65,28 @@ public class ManualCaseCreatedHandler implements CallbackHandler<SscsCaseData> {
             log.info("Setting supplementary data for: {}", caseId);
             setSupplementaryData(caseId, idamTokens);
             if (caseAccessManagementFeature) {
-                log.info("Setting case access management fields for: {}", caseId);
-                setCaseAccessManagementFields(callback
-                    .getCaseDetails()
-                    .getCaseData());
-                ccdService.updateCase(
-                    callback.getCaseDetails().getCaseData(),
-                    callback.getCaseDetails().getId(),
-                    UPDATE_CASE_ONLY.getCcdType(),
-                    "Case Update - Manual Case Created",
-                    "Case was updated in SSCS-Evidence-Share",
-                    idamService.getIdamTokens()
-                );
+                if (updateCaseOnlyHearingV2Enabled) {
+                    log.info("Setting case V2 access management fields for: {}", caseId);
+                    updateCcdCaseService.updateCaseV2(caseId,
+                            UPDATE_CASE_ONLY.getCcdType(),
+                            "Case Update - Manual Case Created",
+                            "Case was updated in SSCS-Evidence-Share",
+                            idamService.getIdamTokens(),
+                            sscsCaseDetails -> setCaseAccessManagementFields(sscsCaseDetails.getData()));
+                } else {
+                    log.info("Setting case access management fields for: {}", caseId);
+                    setCaseAccessManagementFields(callback
+                            .getCaseDetails()
+                            .getCaseData());
+                    ccdService.updateCase(
+                            callback.getCaseDetails().getCaseData(),
+                            callback.getCaseDetails().getId(),
+                            UPDATE_CASE_ONLY.getCcdType(),
+                            "Case Update - Manual Case Created",
+                            "Case was updated in SSCS-Evidence-Share",
+                            idamService.getIdamTokens()
+                    );
+                }
             }
         } catch (Exception e) {
             log.error("Error sending supplementary for caseId {}", caseId, e);

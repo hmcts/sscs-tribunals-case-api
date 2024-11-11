@@ -30,8 +30,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.service.ServiceHearingRequest;
 import uk.gov.hmcts.reform.sscs.model.service.hearingvalues.ServiceHearingValues;
 import uk.gov.hmcts.reform.sscs.model.service.linkedcases.ServiceLinkedCases;
@@ -56,17 +59,25 @@ class ServiceHearingsServiceTest {
     @Mock
     private CcdCaseService ccdCaseService;
 
+    @Mock
+    private UpdateCcdCaseService updateCcdCaseService;
+
+    @Mock
+    private IdamService idamService;
+
     @InjectMocks
     private ServiceHearingsService serviceHearingsService;
 
     private SscsCaseData caseData;
     private SscsCaseDetails caseDetails;
+    private IdamTokens idamTokens;
 
 
     @BeforeEach
     void setup() {
+        idamTokens = IdamTokens.builder().build();
         caseData = SscsCaseData.builder()
-            .ccdCaseId("1234")
+            .ccdCaseId(String.valueOf(CASE_ID))
             .benefitCode(BENEFIT_CODE)
             .issueCode(ISSUE_CODE)
             .urgentCase("Yes")
@@ -123,17 +134,18 @@ class ServiceHearingsServiceTest {
             .build();
     }
 
-    @DisplayName("When a case data is retrieved an entity which does not have a Id, that a new Id will be generated and the method updateCaseData will be called once")
+    @DisplayName("When a case V2 data is retrieved an entity which does not have a Id, that a new Id will be generated and the method updateCaseData will be called once")
     @Test
     void testGetServiceHearingValuesNoIds() throws Exception {
         ServiceHearingRequest request = ServiceHearingRequest.builder()
-            .caseId(String.valueOf(CASE_ID))
-            .build();
+                .caseId(String.valueOf(CASE_ID))
+                .build();
 
         given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,true,false))
-            .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
-                false,false, SessionCategory.CATEGORY_03,null));
+                .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
+                        false,false, SessionCategory.CATEGORY_03,null));
 
+        given(idamService.getIdamTokens()).willReturn(idamTokens);
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
 
         given(venueService.getEpimsIdForVenue(caseData.getProcessingVenue())).willReturn("9876");
@@ -145,10 +157,14 @@ class ServiceHearingsServiceTest {
         ServiceHearingValues result = serviceHearingsService.getServiceHearingValues(request);
 
         assertThat(result.getParties())
-            .extracting("partyID")
-            .doesNotContainNull();
+                .extracting("partyID")
+                .doesNotContainNull();
 
-        verify(ccdCaseService, times(1)).updateCaseData(any(SscsCaseData.class), eq(UPDATE_CASE_ONLY), anyString(), anyString());
+        verify(updateCcdCaseService, times(1)).triggerCaseEventV2(eq(CASE_ID),
+                eq(UPDATE_CASE_ONLY.getCcdType()),
+                eq("Updating caseDetails IDs"),
+                eq("IDs updated for caseDetails due to ServiceHearingValues request"),
+                eq(idamTokens));
     }
 
     @DisplayName("When a listing error is throw due to invalid excluded dates, then catch the error, send a listing error event and rethrow the error")
