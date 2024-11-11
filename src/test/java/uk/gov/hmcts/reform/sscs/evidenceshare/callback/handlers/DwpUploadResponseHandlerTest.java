@@ -551,7 +551,7 @@ public class DwpUploadResponseHandlerTest {
                 .elementsDisputedIsDecisionDisputedByOthers("No")
                 .appeal(Appeal.builder()
                         .benefitType(BenefitType.builder()
-                                .code("infectedBloodAppeal")
+                                .code("infectedBloodCompensation")
                                 .build()
                         )
                         .build()
