@@ -1081,12 +1081,42 @@
   },
   {
     "CaseEventID": "caseUpdated",
+    "CaseFieldID": "jointPartyIdentity",
+    "ListElementCode": "dob",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "jointParty=\"Yes\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 79,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "caseUpdated",
+    "CaseFieldID": "jointPartyIdentity",
+    "ListElementCode": "nino",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "jointParty=\"Yes\" AND appeal.benefitType.descriptionSelection!=\"093\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 80,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "caseUpdated",
+    "CaseFieldID": "jointPartyIdentity",
+    "ListElementCode": "ibcaReference",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "jointParty=\"Yes\" AND appeal.benefitType.descriptionSelection=\"093\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 81,
+    "PageID": "1.0"
+  },
+  {
+    "CaseEventID": "caseUpdated",
     "CaseFieldID": "jointPartyContact",
     "ListElementCode": "email",
     "ID": "jointPartyContactEmail",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 79,
+    "FieldDisplayOrder": 82,
     "PageID": "1.0"
   },
   {
@@ -1096,7 +1126,7 @@
     "ID": "jointPartyContactPhone",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 80,
+    "FieldDisplayOrder": 83,
     "PageID": "1.0"
   },
   {
@@ -1106,7 +1136,7 @@
     "ID": "jointPartyContactMobile",
     "DisplayContext": "OPTIONAL",
     "LiveFrom": "19/11/2019",
-    "FieldDisplayOrder": 81,
+    "FieldDisplayOrder": 84,
     "PageID": "1.0"
   }
 ]
