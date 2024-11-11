@@ -79,21 +79,21 @@ hmctsServiceId:BBA3
 deploymentId:deployment-sscs-tribunals-api-pr-xxxx
 ```
 
-7. Once this has been completed go to values.hearings.preview.template.yaml and enable sscs-hearings-api. you will need to replace
+7. Once this has been completed go to values.hearings.preview.template.yaml and you will need to replace
 
-```
+```yaml
 HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-aat"
 ```
+with name of the subscription you have created
 
-With the name of the subscription you have created.
-
+```yaml
+HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "hmc-to-sscs-subscription-pr-XXXX"
+```
 
 Once this is done you should be able to deploy to preview with hearings enabled.
 
 Note: When you are finished with preview testing remember to delete the uploaded CCD definition from AAT and the subscription created on hmc-to-cft-aat. 
 ccd-def-cleanup should delete the ccd def file you uploaded, given the enable_keep_helm label is not on your PR. 
-
-
 
 ### Running in Docker(Work in progress...)
 Create the image of the application by executing the following command:
