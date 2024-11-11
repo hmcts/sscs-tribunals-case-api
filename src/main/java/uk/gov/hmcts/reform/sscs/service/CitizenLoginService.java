@@ -5,6 +5,7 @@ import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,10 +28,11 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.AssociateCaseDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.OnlineHearing;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.util.PostcodeUtil;
+import uk.gov.hmcts.reform.sscs.util.CaseAssignmentVerifier;
 import uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator;
 
 @Slf4j
@@ -43,19 +45,22 @@ public class CitizenLoginService {
     private final UpdateCcdCaseService updateCcdCaseService;
     private final SscsCcdConvertService sscsCcdConvertService;
     private final IdamService idamService;
-    private final PostcodeUtil postcodeUtil;
+    private final CaseAssignmentVerifier caseAssignmentVerifier;
     private final OnlineHearingService onlineHearingService;
     @Value("${feature.citizen-login-service-v2.enabled}")
     private boolean citizenLogicServiceV2Enabled;
 
 
-    public CitizenLoginService(CitizenCcdService citizenCcdService, CcdService ccdService, UpdateCcdCaseService updateCcdCaseService, SscsCcdConvertService sscsCcdConvertService, IdamService idamService, PostcodeUtil postcodeUtil, OnlineHearingService onlineHearingService) {
+    public CitizenLoginService(CitizenCcdService citizenCcdService, CcdService ccdService,
+                               UpdateCcdCaseService updateCcdCaseService, SscsCcdConvertService sscsCcdConvertService,
+                               IdamService idamService, CaseAssignmentVerifier caseAssignmentVerifier,
+                               OnlineHearingService onlineHearingService) {
         this.citizenCcdService = citizenCcdService;
         this.ccdService = ccdService;
         this.updateCcdCaseService = updateCcdCaseService;
         this.sscsCcdConvertService = sscsCcdConvertService;
         this.idamService = idamService;
-        this.postcodeUtil = postcodeUtil;
+        this.caseAssignmentVerifier = caseAssignmentVerifier;
         this.onlineHearingService = onlineHearingService;
     }
 
@@ -131,14 +136,18 @@ public class CitizenLoginService {
                 .toList();
     }
 
-    public Optional<OnlineHearing> associateCaseToCitizen(IdamTokens citizenIdamTokens, String tya, String email, String postcode) {
+    public Optional<OnlineHearing> associateCaseToCitizen(IdamTokens citizenIdamTokens, String tya, AssociateCaseDetails searchDetails) {
         SscsCaseDetails caseByAppealNumber = ccdService.findCaseByAppealNumber(tya, idamService.getIdamTokens());
+        String email = searchDetails.getEmail();
+        String postcode = searchDetails.getPostcode();
+        String ibcaReference = searchDetails.getIbcaReference();
 
         if (caseByAppealNumber != null) {
-            log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
-            String appealPostcode = caseByAppealNumber.getData().getAppeal().getAppellant().getAddress().getPostcode();
-            if (appealPostcode != null && !appealPostcode.isEmpty()) {
-                if (postcodeUtil.hasAppellantOrOtherPartyPostcode(caseByAppealNumber, postcode, email)) {
+            log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s]",
+                    caseByAppealNumber.getId(), tya, email, postcode));
+            String appellantPostcode = caseByAppealNumber.getData().getAppeal().getAppellant().getAddress().getPostcode();
+            if (isNotBlank(appellantPostcode) || isNotBlank(ibcaReference)) {
+                if (caseAssignmentVerifier.verifyPostcodeOrIbcaReference(caseByAppealNumber, postcode, ibcaReference, email)) {
                     log.info(format("Associate case: Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] matches postcode", caseByAppealNumber.getId(), tya, email, postcode));
                     if (caseHasSubscriptionWithTyaAndEmail(caseByAppealNumber, tya, email)) {
                         log.info(format("Found case to assign id [%s] for tya [%s] email [%s] postcode [%s] has subscription", caseByAppealNumber.getId(), tya, email, postcode));
@@ -149,10 +158,10 @@ public class CitizenLoginService {
                         log.info(format("Associate case: Subscription does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
                     }
                 } else {
-                    log.info(format("Associate case: Postcode does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
+                    log.info(format("Associate case: Postcode/Ibca reference does not match id [%s] for tya [%s] email [%s] postcode [%s]", caseByAppealNumber.getId(), tya, email, postcode));
                 }
             } else {
-                log.info(format("Associate case: Found case to assign id [%s], however no appellant post code exists", caseByAppealNumber.getId()));
+                log.info(format("Associate case: Found case to assign id [%s], however appellant postcode/ibca reference does not exist", caseByAppealNumber.getId()));
             }
         } else {
             log.info(format("Associate case: No case found for tya [%s] email [%s] postcode [%s]", tya, email, postcode));

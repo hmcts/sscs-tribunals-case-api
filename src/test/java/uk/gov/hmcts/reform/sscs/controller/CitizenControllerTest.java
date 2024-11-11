@@ -103,6 +103,7 @@ public class CitizenControllerTest {
         String userId = "userId";
         String email = "someemail@example.com";
         String postcode = "somePostcode";
+        AssociateCaseDetails matchCaseDetails = new AssociateCaseDetails(email, postcode, null);
 
         when(idamService.generateServiceAuthorization()).thenReturn("serviceAuth");
         when(idamService.getUserDetails(oauthToken)).thenReturn(idamUserDetails);
@@ -110,11 +111,10 @@ public class CitizenControllerTest {
         when(citizenLoginService.associateCaseToCitizen(
                 argThat(tokens -> userId.equals(tokens.getUserId()) && oauthToken.equals(tokens.getIdamOauth2Token())),
                 eq(tya),
-                eq(email),
-                eq(postcode)
+                eq(matchCaseDetails)
         )).thenReturn(Optional.of(onlineHearing));
 
-        ResponseEntity<OnlineHearing> response = underTest.associateUserWithCase(oauthToken, tya, new AssociateCaseDetails(email, postcode));
+        ResponseEntity<OnlineHearing> response = underTest.associateUserWithCase(oauthToken, tya, matchCaseDetails);
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
         assertThat(response.getBody(), is(onlineHearing));
@@ -124,16 +124,15 @@ public class CitizenControllerTest {
     public void cannotAssociateUserWithCase() {
         String oauthToken = "oAuth";
         String tya = "tya";
-        String userId = "userId";
-        String email = "someemail@example.com";
-        String postcode = "somePostcode";
+        AssociateCaseDetails matchCaseDetails =
+                new AssociateCaseDetails("someemail@example.com", "somePostcode", "A12B34");
 
         when(idamService.generateServiceAuthorization()).thenReturn("serviceAuth");
         when(idamService.getUserDetails(oauthToken)).thenReturn(idamUserDetails);
-        when(citizenLoginService.associateCaseToCitizen(null, tya, email, postcode))
+        when(citizenLoginService.associateCaseToCitizen(null, tya, matchCaseDetails))
                 .thenReturn(Optional.empty());
 
-        ResponseEntity<OnlineHearing> response = underTest.associateUserWithCase(oauthToken, tya, new AssociateCaseDetails(email, postcode));
+        ResponseEntity<OnlineHearing> response = underTest.associateUserWithCase(oauthToken, tya, matchCaseDetails);
 
         assertThat(response.getStatusCode(), is(HttpStatus.FORBIDDEN));
     }
