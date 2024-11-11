@@ -41,7 +41,7 @@ public class AppConstants {
     public static final String DATE_FORMAT_YYYYMMDD = "yyyy-MM-dd";
     public static final List<String> BENEFIT_CODES_FOR_ISSUE_AND_SEND_TO_ADMIN = List.of("093", "016", "022");
     public static final String IBCA_BENEFIT_CODE = "093";
-    public static final String INFECTED_BLOOD_COMPENSATION = "infectedBloodAppeal";
+    public static final String INFECTED_BLOOD_COMPENSATION = "infectedBloodCompensation";
 
     private AppConstants() {
         //

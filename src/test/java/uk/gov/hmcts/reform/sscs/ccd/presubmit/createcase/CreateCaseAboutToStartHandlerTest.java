@@ -34,7 +34,7 @@ public class CreateCaseAboutToStartHandlerTest {
     @BeforeEach
     void setUp() {
         handler = new CreateCaseAboutToStartHandler();
-        ReflectionTestUtils.setField(handler, "isInfectedBloodAppealEnabled", true);
+        ReflectionTestUtils.setField(handler, "isInfectedBloodCompensationEnabled", true);
     }
 
     @ParameterizedTest
