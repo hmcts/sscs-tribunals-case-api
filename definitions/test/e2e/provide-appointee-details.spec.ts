@@ -25,7 +25,7 @@ test.describe('Provide No Appointee Details on a Dormant Case',  {tag: '@nightly
     });
 });
 
-test.describe('Provide Appointee Details on a Dormant Case', {tag: '@nightly-pipeline'}, async() => {
+test.describe('Provide Appointee Details on a Dormant Case', {tag: ['@preview-regression', '@nightly-pipeline']}, async() => {
     let caseId: string;
     test.beforeAll("Case has to be Created", async () => {
         caseId = await createCaseBasedOnCaseType('PIP');

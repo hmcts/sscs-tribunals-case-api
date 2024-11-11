@@ -65,6 +65,7 @@ amqp:
     clientId: sscs-evidence-share
     amqp-connection-string-template: ${JMS_AMQP_CONNECTION_TEMPLATE:amqps://%1s?amqp.idleTimeout=%2d}
     idleTimeout: ${JMS_IDLE_TIMEOUT:3600000}
+    reconnectOnException: ${AMQP_RECONNECT_ON_EXCEPTION:false}
     prefetch:
         override: ${AMQP_PREFETCH_OVERRIDE:false}
         topicPrefetch: ${AMQP_TOPIC_PREFETCH:1}
@@ -256,8 +257,8 @@ feature:
         enabled: ${GAPS_SWITCHOVER_FEATURE:false}
     hearing-recording-filter:
         enabled: ${UPLOAD_HEARING_FILTER_ENABLED:false}
-    infected-blood-appeal:
-        enabled: ${INFECTED_BLOOD_APPEAL_ENABLED:false}
+    infected-blood-compensation:
+        enabled: ${INFECTED_BLOOD_COMPENSATION_ENABLED:false}
     postHearings:
         enabled: ${POST_HEARINGS_FEATURE:false}
     postHearingsB:
@@ -289,7 +290,9 @@ feature:
     handle-ccd-callbackMap-v2:
         enabled: ${HANDLE_CCD_CALLBACKMAP_V2:false}
     submit-appeal-service-v2:
-        enabled: ${SUBMIT_APPEAL_SERVICE_V2_ENABLED:false}    
+        enabled: ${SUBMIT_APPEAL_SERVICE_V2_ENABLED:false}
+    process-event-message-v2:
+        enabled: ${PROCESS_EVENT_MESSAGE_V2_ENABLED:false}
     bypass-hearing-api-service:
         enabled: ${BYPASS_HEARING_API_SERVICE:false}
 

@@ -54,6 +54,7 @@ import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.service.ReadCcdCaseService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
@@ -79,6 +80,7 @@ public class EvidenceUploadServiceTest {
     private static final String JP_EMAIL = "jp@gmail.com";
     private static final String REP_EMAIL = "rep@gmail.com";
     private static final String APPELLANT_EMAIL = "app@gmail.com";
+    private static final String APPOINTEE_EMAIL = "appointee@gmail.com";
     private static final String OTHER_PARTY_EMAIL = "op@gmail.com";
     private static final String OTHER_PARTY_REP_EMAIL = "op-rep@gmail.com";
     private static final String OTHER_PARTY_APPOINTEE_EMAIL = "op-appointee@gmail.com";
@@ -104,6 +106,7 @@ public class EvidenceUploadServiceTest {
     private SscsCcdConvertService sscsCcdConvertService;
     private CcdClient ccdClient;
     private FileToPdfConversionService fileToPdfConversionService;
+    private ReadCcdCaseService readCcdCaseService;
     @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> captor;
 
@@ -114,6 +117,7 @@ public class EvidenceUploadServiceTest {
     public void setUp() {
         updateCcdCaseService = mock(UpdateCcdCaseService.class);
         onlineHearingService = mock(OnlineHearingService.class);
+        readCcdCaseService = mock(ReadCcdCaseService.class);
         someOnlineHearingId = "123";
         someQuestionId = "someQuestionId";
         someEvidenceId = "someEvidenceId";
@@ -413,7 +417,7 @@ public class EvidenceUploadServiceTest {
         ccdClient = mock(CcdClient.class);
 
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
-        updateCcdCaseService = new UpdateCcdCaseService(idamService, sscsCcdConvertService, ccdClient);
+        updateCcdCaseService = new UpdateCcdCaseService(idamService, sscsCcdConvertService, ccdClient, readCcdCaseService);
 
         evidenceUploadService = new EvidenceUploadService(
                 documentStoreService,
@@ -454,7 +458,7 @@ public class EvidenceUploadServiceTest {
         SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
 
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
-        updateCcdCaseService = new UpdateCcdCaseService(idamService, sscsCcdConvertService, ccdClient);
+        updateCcdCaseService = new UpdateCcdCaseService(idamService, sscsCcdConvertService, ccdClient, readCcdCaseService);
 
         evidenceUploadService = new EvidenceUploadService(
                 documentStoreService,
@@ -758,6 +762,7 @@ public class EvidenceUploadServiceTest {
         JP_EMAIL + ", JOINT_PARTY, null, null",
         REP_EMAIL + ", REP, null, null",
         APPELLANT_EMAIL + ", APPELLANT, null, null",
+        APPOINTEE_EMAIL + ", APPOINTEE, null, null",
         OTHER_PARTY_EMAIL + ", OTHER_PARTY, 1, Oyster Smith",
         OTHER_PARTY_REP_EMAIL + ", OTHER_PARTY_REP, 2, Raj Smith",
         OTHER_PARTY_APPOINTEE_EMAIL + ", OTHER_PARTY_APPOINTEE, 4, Apple Smith"})
@@ -1162,7 +1167,10 @@ public class EvidenceUploadServiceTest {
                                 .appellantSubscription(Subscription.builder()
                                         .email(APPELLANT_EMAIL)
                                         .build())
-                                .build())
+                                .appointeeSubscription(Subscription.builder()
+                                    .email(APPOINTEE_EMAIL)
+                                    .build())
+                            .build())
                         .otherParties(List.of(new CcdValue<>(OtherParty.builder()
                                         .id("1")
                                         .name(Name.builder().firstName("Oyster").lastName("Smith").build())
