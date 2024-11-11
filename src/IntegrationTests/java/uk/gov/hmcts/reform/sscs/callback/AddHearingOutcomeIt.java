@@ -4,7 +4,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -103,7 +102,7 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
                         .withBody(getJson("json/hmcResponseForTest.json"))));
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
-        assertHttpStatus(response, HttpStatus.OK);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertThat(result.getData().getHearingOutcomeValue().getCompletedHearings().getListItems()).isNotEmpty();
         assertThat(result.getData().getHearingOutcomeValue().getCompletedHearings().getListItems().get(0).getCode())
@@ -118,7 +117,7 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
                         .withStatus(200)
                         .withBody(EMPTY_HMC_RESPONSE)));
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
-        assertHttpStatus(response, HttpStatus.OK);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertThat(result.getErrors()).isNotEmpty();
         assertThat(result.getErrors()).contains("There are no completed hearings on the case.");
@@ -133,7 +132,7 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
                         .withStatus(500)
                         .withBody("Internal server error")));
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
-        assertHttpStatus(response, HttpStatus.OK);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertThat(result.getErrors()).isNotEmpty();
         assertThat(result.getErrors()).contains("There was an error while retrieving hearing details; please try again after some time.");
@@ -149,7 +148,7 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
                         .withBody(getJson("json/hmcResponseForTest.json"))));
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
-        assertHttpStatus(response, HttpStatus.OK);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertThat(result.getData().getHearingOutcomeValue().getHearingOutcomeId()).isNull();
         assertThat(result.getData().getHearingOutcomeValue().getDidPoAttendHearing()).isNull();
@@ -180,7 +179,7 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
                         .withBody(getJson("json/hmcResponseForTest.json"))));
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
-        assertHttpStatus(response, HttpStatus.OK);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertThat(result.getErrors())
                 .contains("Cannot find hearing details for hearing 21 Feb 2024, 11:00:00 AM, Cardiff with hearing ID: 1030011048");
