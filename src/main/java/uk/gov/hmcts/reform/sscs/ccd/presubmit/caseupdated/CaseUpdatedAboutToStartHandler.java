@@ -98,7 +98,10 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
 
     private void setupUkPortsOfEntry(SscsCaseData sscsCaseData) {
         final DynamicList ukPortOfEntries = SscsUtil.getPortsOfEntry();
+        DynamicListItem portOfEntryDli = sscsCaseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList().getValue();
+        String portOfEntryDliCode = portOfEntryDli != null ? portOfEntryDli.getCode() : "";
         String portOfEntryCode = sscsCaseData.getAppeal().getAppellant().getAddress().getPortOfEntry();
+        portOfEntryCode = isNotEmpty(portOfEntryCode) ? portOfEntryCode : portOfEntryDliCode;
 
         if (isNotEmpty(portOfEntryCode)) {
             DynamicListItem selectedPortOfEntry = getSelectedDynamicListItem(ukPortOfEntries.getListItems(), portOfEntryCode);
