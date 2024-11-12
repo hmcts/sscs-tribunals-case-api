@@ -154,6 +154,7 @@ class GenericLetterPlaceholderServiceTest {
 
         Map<String, Object> placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData, APPELLANT_LETTER,
             null);
+
         assertNotNull(placeholders);
         assertFalse(placeholders.containsKey(LETTER_ADDRESS_LINE_1));
         assertFalse(placeholders.containsKey(LETTER_ADDRESS_LINE_2));
