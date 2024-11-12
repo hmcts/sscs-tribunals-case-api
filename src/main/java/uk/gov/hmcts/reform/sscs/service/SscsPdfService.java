@@ -55,8 +55,6 @@ public class SscsPdfService {
             throw new PdfGenerationException("Error getting template", e);
         }
 
-
-
         PdfWrapper pdfWrapper = PdfWrapper.builder()
                 .sscsCaseData(sscsCaseData)
                 .ccdCaseId(caseDetailsId)
