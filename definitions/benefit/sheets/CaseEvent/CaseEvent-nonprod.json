@@ -21,5 +21,17 @@
     "PostConditionState": "*",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
+  },
+  {
+    "LiveFrom": "04/07/2024",
+    "CaseTypeID": "Benefit",
+    "ID": "amendHearingOutcome",
+    "Name": "Amend hearing outcome",
+    "Description": "Amend a hearing outcome",
+    "DisplayOrder": 141,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "EventEnablingCondition": "hearingOutcomes!=\"\"",
+    "SecurityClassification": "Public"
   }
 ]

@@ -21,5 +21,16 @@
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",
     "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "LiveFrom": "30/10/2024",
+    "CaseEventID": "amendHearingOutcome",
+    "CaseFieldID": "hearingOutcomes",
+    "CaseTypeID": "Benefit",
+    "DisplayContext": "MANDATORY",
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageID": "1.0",
+    "ShowSummaryChangeOption": "Y"
   }
 ]
