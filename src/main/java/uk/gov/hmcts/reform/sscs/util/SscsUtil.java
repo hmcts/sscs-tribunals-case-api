@@ -373,9 +373,9 @@ public class SscsUtil {
         return false;
     }
 
-    public static DynamicList getBenefitDescriptions(boolean isInfectedBloodAppealEnabled) {
+    public static DynamicList getBenefitDescriptions(boolean isInfectedBloodCompensationEnabled) {
         List<DynamicListItem> items = Arrays.stream(Benefit.values())
-                .filter(benefit -> isInfectedBloodAppealEnabled || !benefit.getShortName().equals("infectedBloodAppeal"))
+                .filter(benefit -> isInfectedBloodCompensationEnabled || !benefit.getShortName().equals("infectedBloodCompensation"))
                 .sorted(Comparator.comparing(Benefit::getDescription))
                 .map(SscsUtil::getBenefitDescriptionList)
                 .flatMap(List::stream)
