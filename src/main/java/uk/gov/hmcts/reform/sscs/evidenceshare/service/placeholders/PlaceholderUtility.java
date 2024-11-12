@@ -3,19 +3,15 @@ package uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isNoneBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.*;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderService.lines;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
 
 @Slf4j
@@ -27,11 +23,11 @@ public final class PlaceholderUtility {
     private PlaceholderUtility() {
     }
 
-    public static String defaultToEmptyStringIfNull(String value) {
+    static String defaultToEmptyStringIfNull(String value) {
         return (value == null) ? StringUtils.EMPTY : value;
     }
 
-    public static String truncateAddressLine(String addressLine) {
+    static String truncateAddressLine(String addressLine) {
         return addressLine != null && addressLine.length() > 45  ? addressLine.substring(0, 45) : addressLine;
     }
 
@@ -174,5 +170,18 @@ public final class PlaceholderUtility {
 
     private static boolean isValidName(Name name) {
         return isNoneBlank(name.getFirstName()) && isNoneBlank(name.getLastName());
+    }
+
+    static Map<String, Object> getAddressPlaceHolders(Address address) {
+        var addressPlaceHolders = new HashMap<String, Object>();
+        String[] lines = lines(address);
+        String[] addressConstants = {LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
+            LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE};
+
+        for (int i = 0; i < lines.length; i++) {
+            addressPlaceHolders.put(addressConstants[i], truncateAddressLine(defaultToEmptyStringIfNull(lines[i])));
+        }
+
+        return addressPlaceHolders;
     }
 }
