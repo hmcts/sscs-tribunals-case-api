@@ -119,6 +119,62 @@
     "PageID": "1.0"
   },
   {
+    "CaseEventID": "dwpUploadResponse",
+    "CaseFieldID": "jointPartyIdentity",
+    "ListElementCode": "nino",
+    "ID": "jointPartyIdentityNino",
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\"",    
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 2,
+    "PageID": "jointPartyIdentity",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "dwpUploadResponse",
+    "CaseFieldID": "jointPartyIdentity",
+    "ListElementCode": "ibcaReference",
+    "ID": "jointPartyIdentityIbcaReference",
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 3,
+    "PageID": "jointPartyIdentity"
+  },
+  {
+    "CaseEventID": "dwpUploadResponse",
+    "CaseFieldID": "jointPartyAddress",
+    "ListElementCode": "line1",
+    "ID": "jointPartyAddressLine1",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 2,
+    "PageID": "jointPartyAddress",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "dwpUploadResponse",
+    "CaseFieldID": "jointPartyAddress",
+    "ListElementCode": "line2",
+    "ID": "jointPartyAddressLine2",
+    "DisplayContext": "OPTIONAL",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 3,
+    "PageID": "jointPartyAddress",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseEventID": "dwpUploadResponse",
+    "CaseFieldID": "jointPartyAddress",
+    "ListElementCode": "town",
+    "ID": "jointPartyAddressTown",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 4,
+    "PageID": "jointPartyAddress",
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
     "CaseEventID": "updateListingRequirements",
     "CaseFieldID": "overrideFields",
     "ListElementCode": "appellantInterpreter.isInterpreterWanted",
