@@ -397,7 +397,7 @@
     "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "jointPartyIdentity",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
+    "DisplayContext": "COMPLEX",
     "LiveFrom": "19/11/2019",
     "PageDisplayOrder": 7,
     "PageFieldDisplayOrder": 1,
