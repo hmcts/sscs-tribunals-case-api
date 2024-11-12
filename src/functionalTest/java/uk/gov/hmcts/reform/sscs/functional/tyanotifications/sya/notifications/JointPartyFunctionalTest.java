@@ -133,7 +133,6 @@ public class JointPartyFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
-    @Ignore
     public void sendsDirectionIssuedProvideInformationLetterToAppellantRepresentativeAndJointParty() throws IOException, NotificationClientException {
 
         NotificationEventType notificationEventType = NotificationEventType.DIRECTION_ISSUED;
