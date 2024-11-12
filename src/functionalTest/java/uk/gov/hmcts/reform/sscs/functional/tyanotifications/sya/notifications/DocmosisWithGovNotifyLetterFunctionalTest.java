@@ -64,7 +64,6 @@ public class DocmosisWithGovNotifyLetterFunctionalTest extends AbstractFunctiona
     }
 
     @Test
-    @Ignore
     @Parameters(method = "expectedNumberOfLetters")
     public void shouldSendCorrectNumberOfDocmosisLetters(NotificationEventType notificationEventType,
                                                          int expectedNumberOfLetters)
