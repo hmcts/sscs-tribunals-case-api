@@ -115,9 +115,9 @@ bulk_scan:
     validateEndpoint: /validate-record
 bundle:
     english:
-        config: ${BUNDLE_ENGLISH_CONFIG:sscs-bundle-config.yaml}
+        config: ${BUNDLE_ENGLISH_CONFIG:sscs-ib-bundle-config.yaml}
         edited:
-            config: ${BUNDLE_EDITED_CONFIG:sscs-bundle-edited-config.yaml}
+            config: ${BUNDLE_EDITED_CONFIG:sscs-ib-bundle-edited-config.yaml}
     new:
         edited:
             config: ${BUNDLE_EDITED_CONFIG:sscs-new-bundle-edited-config.yaml}
