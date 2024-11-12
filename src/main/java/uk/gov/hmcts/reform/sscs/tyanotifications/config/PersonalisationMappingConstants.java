@@ -79,7 +79,8 @@ public final class PersonalisationMappingConstants {
     public static final String LETTER_ADDRESS_LINE_2 = "letter_address_line_2";
     public static final String LETTER_ADDRESS_LINE_3 = "letter_address_line_3";
     public static final String LETTER_ADDRESS_LINE_4 = "letter_address_line_4";
-    public static final String LETTER_ADDRESS_POSTCODE = "letter_address_postcode";
+    public static final String LETTER_ADDRESS_POSTCODE = "letter_address_line_5";
+
     public static final String NAME = "name";
     public static final String MANAGE_EMAILS_LINK_LITERAL = "manage_emails_link";
     public static final String MRN_DETAILS_LITERAL = "mrn_details";
