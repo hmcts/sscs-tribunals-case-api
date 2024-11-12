@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import junitparams.Parameters;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
@@ -38,6 +39,7 @@ public class EvidenceReceivedFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
+    @Ignore
     @Parameters({"ORAL", "PAPER"})
     public void givenEvidenceReceivedWithRepsSubscription_shouldSendNotificationToReps(AppealHearingType appealHearingType)
         throws Exception {

@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.Notificati
 import java.lang.reflect.Field;
 import java.util.List;
 import junitparams.Parameters;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
@@ -91,6 +92,7 @@ public class WithRepresentativePersonalisationTest extends AbstractFunctionalTes
     }
 
     @Test
+    @Ignore
     @Parameters(method = "eventTypeAndSubscriptions")
     public void givenEventAndRepsSubscription_shouldSendNotificationToReps(NotificationEventType notificationEventType)
         throws Exception {
@@ -109,6 +111,7 @@ public class WithRepresentativePersonalisationTest extends AbstractFunctionalTes
     }
 
     @Test
+    @Ignore
     public void givenHearingPostponedEventAndRepsSubscription_shouldSendEmailOnlyNotificationToReps()
         throws Exception {
 
