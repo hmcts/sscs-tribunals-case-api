@@ -7,6 +7,7 @@ import org.apache.qpid.jms.JmsConnectionFactory;
 import org.apache.qpid.jms.policy.JmsDefaultPrefetchPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.annotation.EnableJms;
@@ -18,6 +19,7 @@ import org.springframework.jms.core.JmsTemplate;
 @Configuration
 @Slf4j
 @EnableJms
+@ConditionalOnProperty(name = "amqp.enabled", havingValue = "true", matchIfMissing = true)
 public class MessagingConfig {
 
     @Bean
