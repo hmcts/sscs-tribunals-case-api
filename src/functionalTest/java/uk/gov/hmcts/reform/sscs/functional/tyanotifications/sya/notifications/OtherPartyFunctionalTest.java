@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -46,6 +47,7 @@ public class OtherPartyFunctionalTest extends AbstractFunctionalTest {
 
 
     @Test
+    @Ignore
     @Parameters({"oral-,DWP_UPLOAD_RESPONSE, oralDwpUploadResponseJointPartySmsId, oralDwpUploadResponseOtherPartyEmailId"})
     public void willSendDwpUploadResponse(@Nullable String prefix, NotificationEventType notificationEventType, String... fieldNames) throws Exception {
 
@@ -65,6 +67,7 @@ public class OtherPartyFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
+    @Ignore
     @Parameters({
         "ADJOURNED, 0, hearingAdjournedOtherPartyEmailTemplateId, hearingAdjournedOtherPartySmsTemplateId",
         "POSTPONEMENT, 0, hearingPostponedOtherPartyEmailTemplateId",

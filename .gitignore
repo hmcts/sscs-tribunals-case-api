@@ -42,5 +42,3 @@ definitions/**/*.xlsx#
 
 # aat env file
 .aat-env
-
-cftlib_log_file_IS_UNDEFINED
