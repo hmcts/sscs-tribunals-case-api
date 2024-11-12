@@ -150,7 +150,7 @@ public abstract class SubmitAppealServiceBase {
     }
 
     SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal) {
-        boolean isIba = appeal.getBenefitType().getCode().equals(Benefit.INFECTED_BLOOD_APPEAL.getShortName());
+        boolean isIba = appeal.getBenefitType().getCode().equals(Benefit.INFECTED_BLOOD_COMPENSATION.getShortName());
         String postCode = resolvePostCode(appeal, isIba);
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(isIba ? postCode : getFirstHalfOfPostcode(postCode));
 
@@ -198,7 +198,7 @@ public abstract class SubmitAppealServiceBase {
 
             return handleMoveToNonCompliant(caseData, saveAndReturnCase, moveToNoneCompliant);
         } else {
-            boolean isIba = caseData.getBenefitCode().equals(Benefit.INFECTED_BLOOD_APPEAL.getBenefitCode());
+            boolean isIba = caseData.getBenefitCode().equals(Benefit.INFECTED_BLOOD_COMPENSATION.getBenefitCode());
             Identity identity = appeal.getAppellant().getIdentity();
             log.info("Moving case for {} {} to incomplete due to MRN Details {} present and MRN Date {} present",
                 isIba ? "Ibca Reference" : "NINO",
@@ -234,7 +234,7 @@ public abstract class SubmitAppealServiceBase {
     private SscsCaseDetails createOrUpdateCase(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
         SscsCaseDetails caseDetails = null;
         String benefitShortName = caseData.getAppeal().getBenefitType().getCode();
-        boolean isIba = caseData.getBenefitCode().equals(Benefit.INFECTED_BLOOD_APPEAL.getBenefitCode());
+        boolean isIba = caseData.getBenefitCode().equals(Benefit.INFECTED_BLOOD_COMPENSATION.getBenefitCode());
         String nino = caseData.getAppeal().getAppellant().getIdentity().getNino();
         String ibcaReference = caseData.getAppeal().getAppellant().getIdentity().getIbcaReference();
         try {

@@ -186,7 +186,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static Appeal getAppeal(SyaCaseWrapper syaCaseWrapper) {
-        boolean isIba = syaCaseWrapper.getBenefitType().getCode().equals(Benefit.INFECTED_BLOOD_APPEAL.getShortName());
+        boolean isIba = syaCaseWrapper.getBenefitType().getCode().equals(Benefit.INFECTED_BLOOD_COMPENSATION.getShortName());
         MrnDetails mrnDetails = getMrnDetails(syaCaseWrapper, isIba);
 
         Appellant appellant = getAppellant(syaCaseWrapper, isIba);
