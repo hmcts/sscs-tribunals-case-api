@@ -129,7 +129,6 @@
   {"LiveFrom": "20/08/2019", "CaseTypeID": "Benefit", "ID": "summaryRole", "Label": "**Role**  \r\n${appeal.appellant.role.name}", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "20/08/2019", "CaseTypeID": "Benefit", "ID": "summaryRoleDescription", "Label": "**Role Description**  \r\n${appeal.appellant.role.description}", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "20/08/2019", "CaseTypeID": "Benefit", "ID": "summaryDOB", "Label": "**Date of birth**  \r\n${appeal.appellant.identity.dob}", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
-  {"LiveFrom": "20/08/2019", "CaseTypeID": "Benefit", "ID": "summaryIbcaReference", "Label": "**IBCA Reference**  \r\n${appeal.appellant.identity.ibcaReference}", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "20/08/2019", "CaseTypeID": "Benefit", "ID": "summaryBenefitType", "Label": "**Benefit type**  \r\n${appeal.benefitType.description}", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "20/08/2019", "CaseTypeID": "Benefit", "ID": "summaryAppealType", "Label": "**Appeal type**  \r\n${appeal.benefitType.description}", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "20/08/2019", "CaseTypeID": "Benefit", "ID": "summaryCaseReference", "Label": "**SC number**  \r\n${caseReference}", "FieldType": "Label", "SecurityClassification": "PUBLIC"},
