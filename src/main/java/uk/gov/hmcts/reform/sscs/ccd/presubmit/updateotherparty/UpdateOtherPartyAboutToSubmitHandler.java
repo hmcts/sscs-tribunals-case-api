@@ -106,7 +106,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
             return response;
         }
         //Check if role is not entered for a Child support case
-        if (!isIbaCase(sscsCaseData) && roleAbsentForOtherParties(sscsCaseData.getOtherParties())) {
+        if (!isIbcCase(sscsCaseData) && roleAbsentForOtherParties(sscsCaseData.getOtherParties())) {
             response.addError(ERR_ROLE_REQUIRED);
         }
         return response;
@@ -148,7 +148,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
         return benefitType.filter(benefit -> SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
     }
 
-    private boolean isIbaCase(SscsCaseData sscsCaseData) {
+    private boolean isIbcCase(SscsCaseData sscsCaseData) {
         return IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode()) || INFECTED_BLOOD_COMPENSATION.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode());
     }
 }
