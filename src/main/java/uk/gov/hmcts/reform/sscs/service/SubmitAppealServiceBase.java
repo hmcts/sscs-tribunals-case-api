@@ -148,7 +148,7 @@ public abstract class SubmitAppealServiceBase {
 
         String postCode = resolvePostCode(appeal);
         String firstHalfOfPostcode = getFirstHalfOfPostcode(postCode);
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode, appeal.getBenefitType().isIba());
+        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode, appeal.getBenefitType().isIbc());
 
         SscsCaseData sscsCaseData = rpc == null
                 ? convertSyaToCcdCaseDataV1(appeal, caseAccessManagementFeature)

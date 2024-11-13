@@ -41,7 +41,7 @@ public class SyaBenefitType {
                 + '}';
     }
 
-    public boolean isIba() {
+    public boolean isIbc() {
         return code.equals(Benefit.INFECTED_BLOOD_COMPENSATION.getShortName());
     }
 }
