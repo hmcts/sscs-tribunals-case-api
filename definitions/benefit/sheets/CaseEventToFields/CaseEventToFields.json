@@ -282,7 +282,7 @@
     "PageFieldDisplayOrder": 7,
     "PageID": "1.0",
     "ShowSummaryChangeOption": "Y",
-    "FieldShowCondition": "appeal.benefitType.code = \"infectedBloodAppeal\""
+    "FieldShowCondition": "appeal.benefitType.code = \"infectedBloodCompensation\""
   },
   {
     "CaseEventID": "adminUpdateEvent",
@@ -4099,7 +4099,7 @@
     "PageFieldDisplayOrder": 2,
     "PageID": "1.0",
     "PageLabel": "Confirm panel composition",
-    "FieldShowCondition": "appeal.benefitType.code = \"infectedBloodAppeal\""
+    "FieldShowCondition": "appeal.benefitType.code = \"infectedBloodCompensation\""
   },
   {
     "CaseEventID": "panelDoctorSpecialismAmend",
