@@ -230,6 +230,17 @@
   },
   {
     "CaseEventID": "dwpUploadResponse",
+    "CaseFieldID": "jointPartyIdentity",
+    "ListElementCode": "ibcaReference",
+    "ID": "jointPartyIdentityIbcaReference",
+    "DisplayContext": "MANDATORY",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
+    "LiveFrom": "19/11/2019",
+    "FieldDisplayOrder": 3,
+    "PageID": "jointPartyIdentity"
+  },
+  {
+    "CaseEventID": "dwpUploadResponse",
     "CaseFieldID": "jointPartyAddress",
     "ListElementCode": "line1",
     "ID": "jointPartyAddressLine1",
