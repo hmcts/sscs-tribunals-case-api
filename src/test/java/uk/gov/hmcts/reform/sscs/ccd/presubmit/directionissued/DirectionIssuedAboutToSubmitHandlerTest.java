@@ -396,8 +396,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.GRANT_REINSTATEMENT.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertTrue(response.getData().getState().equals(State.APPEAL_CREATED));
-        assertTrue(response.getData().getReinstatementOutcome().equals(RequestOutcome.GRANTED));
+        assertEquals(response.getData().getState(), State.APPEAL_CREATED);
+        assertEquals(response.getData().getReinstatementOutcome(), RequestOutcome.GRANTED);
         assertEquals(DwpState.REINSTATEMENT_GRANTED, response.getData().getDwpState());
         assertNull(response.getData().getInterlocReviewState());
     }
@@ -414,9 +414,9 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.GRANT_REINSTATEMENT.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertTrue(response.getData().getState().equals(State.INTERLOCUTORY_REVIEW_STATE));
-        assertTrue(response.getData().getReinstatementOutcome().equals(RequestOutcome.GRANTED));
-        assertTrue(response.getData().getInterlocReviewState().equals(AWAITING_ADMIN_ACTION));
+        assertEquals(response.getData().getState(), State.INTERLOCUTORY_REVIEW_STATE);
+        assertEquals(response.getData().getReinstatementOutcome(), RequestOutcome.GRANTED);
+        assertEquals(response.getData().getInterlocReviewState(), AWAITING_ADMIN_ACTION);
         assertEquals(DwpState.REINSTATEMENT_GRANTED, response.getData().getDwpState());
     }
 
@@ -432,8 +432,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_REINSTATEMENT.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
-        assertTrue(response.getData().getReinstatementOutcome().equals(RequestOutcome.REFUSED));
+        assertEquals(response.getData().getState(), State.DORMANT_APPEAL_STATE);
+        assertEquals(response.getData().getReinstatementOutcome(), RequestOutcome.REFUSED);
         assertNull(response.getData().getInterlocReviewState());
         assertEquals(DwpState.REINSTATEMENT_REFUSED, response.getData().getDwpState());
     }
@@ -452,8 +452,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.GRANT_REINSTATEMENT.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
-        assertTrue(response.getData().getReinstatementOutcome().equals(RequestOutcome.IN_PROGRESS));
+        assertEquals(response.getData().getState(), State.DORMANT_APPEAL_STATE);
+        assertEquals(response.getData().getReinstatementOutcome(), RequestOutcome.IN_PROGRESS);
         assertEquals(DwpState.LAPSED, response.getData().getDwpState());
         assertEquals(WELSH_TRANSLATION, response.getData().getInterlocReviewState());
         assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
@@ -473,8 +473,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_REINSTATEMENT.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
-        assertTrue(response.getData().getReinstatementOutcome().equals(RequestOutcome.IN_PROGRESS));
+        assertEquals(response.getData().getState(), State.DORMANT_APPEAL_STATE);
+        assertEquals(response.getData().getReinstatementOutcome(), RequestOutcome.IN_PROGRESS);
         assertEquals(DwpState.LAPSED, response.getData().getDwpState());
         assertEquals(WELSH_TRANSLATION, response.getData().getInterlocReviewState());
         assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
@@ -492,9 +492,9 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.GRANT_URGENT_HEARING.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertTrue(response.getData().getState().equals(State.INTERLOCUTORY_REVIEW_STATE));
-        assertTrue(response.getData().getUrgentHearingOutcome().equals(RequestOutcome.GRANTED.getValue()));
-        assertTrue(response.getData().getInterlocReviewState().equals(AWAITING_ADMIN_ACTION));
+        assertEquals(response.getData().getState(), State.INTERLOCUTORY_REVIEW_STATE);
+        assertEquals(response.getData().getUrgentHearingOutcome(), RequestOutcome.GRANTED.getValue());
+        assertEquals(response.getData().getInterlocReviewState(), AWAITING_ADMIN_ACTION);
         assertEquals(DIRECTION_ACTION_REQUIRED, response.getData().getDwpState());
     }
 
@@ -511,9 +511,9 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_URGENT_HEARING.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
-        assertTrue(response.getData().getUrgentHearingOutcome().equals(RequestOutcome.REFUSED.getValue()));
-        assertTrue(response.getData().getInterlocReviewState().equals(NONE));
+        assertEquals(response.getData().getState(), State.DORMANT_APPEAL_STATE);
+        assertEquals(response.getData().getUrgentHearingOutcome(), RequestOutcome.REFUSED.getValue());
+        assertEquals(response.getData().getInterlocReviewState(), NONE);
         assertTrue("No".equalsIgnoreCase(response.getData().getUrgentCase()));
         assertEquals(DIRECTION_ACTION_REQUIRED, response.getData().getDwpState());
     }
@@ -528,8 +528,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_HEARING_RECORDING_REQUEST.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
-        assertTrue(response.getData().getInterlocReviewState().equals(AWAITING_ADMIN_ACTION));
+        assertEquals(response.getData().getState(), State.DORMANT_APPEAL_STATE);
+        assertEquals(response.getData().getInterlocReviewState(), AWAITING_ADMIN_ACTION);
         assertEquals(REJECT_HEARING_RECORDING_REQUEST, response.getData().getInterlocReferralReason());
         assertEquals(DIRECTION_ACTION_REQUIRED, response.getData().getDwpState());
     }
@@ -541,12 +541,12 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED);
 
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.ISSUE_AND_SEND_TO_ADMIN.toString()));
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> res = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
-        assertTrue(response.getData().getInterlocReviewState().equals(AWAITING_ADMIN_ACTION));
-        assertNull(response.getData().getInterlocReferralReason());
-        assertEquals(DIRECTION_ACTION_REQUIRED, response.getData().getDwpState());
+        assertEquals(res.getData().getState(), State.DORMANT_APPEAL_STATE);
+        assertEquals(res.getData().getInterlocReviewState(), AWAITING_ADMIN_ACTION);
+        assertNull(res.getData().getInterlocReferralReason());
+        assertEquals(DIRECTION_ACTION_REQUIRED, res.getData().getDwpState());
     }
 
     @Test
