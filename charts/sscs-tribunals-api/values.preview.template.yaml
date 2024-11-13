@@ -538,7 +538,7 @@ elastic:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:master
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:latest
     ingressHost: sya-${SERVICE_FQDN}
     registerAdditionalDns:
       enabled: true
