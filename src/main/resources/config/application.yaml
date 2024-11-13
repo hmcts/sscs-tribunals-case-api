@@ -2097,12 +2097,3 @@ job.scheduler:
                 instanceId: AUTO
             jobStore:
                 class: org.quartz.simpl.RAMJobStore
-
----
-# tya-functional profile
-spring:
-    config:
-        activate:
-            on-profile: functional
-amqp:
-    enabled: false
