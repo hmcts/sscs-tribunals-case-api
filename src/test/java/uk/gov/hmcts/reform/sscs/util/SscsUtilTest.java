@@ -449,7 +449,7 @@ class SscsUtilTest {
 
     @Test
     void shouldPopulateIbcaFieldsOnHandleIbcaCase() {
-        final SscsCaseData caseData = SscsCaseData.builder()
+        final SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .appeal(Appeal.builder()
                         .mrnDetails(MrnDetails.builder().build())
                         .hearingOptions(HearingOptions.builder().build())
@@ -457,10 +457,10 @@ class SscsUtilTest {
                 )
                 .build();
 
-        handleIbcaCase(caseData);
+        handleIbcaCase(sscsCaseData);
 
-        assertThat(caseData.getAppeal().getHearingOptions().getHearingRoute()).isEqualTo(LIST_ASSIST);
-        assertThat(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice()).isEqualTo("IBCA");
+        assertThat(sscsCaseData.getAppeal().getHearingOptions().getHearingRoute()).isEqualTo(LIST_ASSIST);
+        assertThat(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice()).isEqualTo("IBCA");
     }
 
     @Test
@@ -483,7 +483,7 @@ class SscsUtilTest {
 
     @Test
     void shouldReturnTrueWhenIsIbcaCase() {
-        final SscsCaseData caseData = SscsCaseData.builder()
+        final SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .benefitCode("093")
                 .appeal(Appeal.builder()
                         .benefitType(BenefitType.builder()
@@ -501,12 +501,12 @@ class SscsUtilTest {
                         .build()
                 )
                 .build();
-        assertTrue(isIbcaCase(caseData));
+        assertTrue(isIbcaCase(sscsCaseData));
     }
 
     @Test
     void shouldReturnFalseWhenNotIbcaCase() {
-        final SscsCaseData caseData = SscsCaseData.builder()
+        final SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .benefitCode("037")
                 .appeal(Appeal.builder()
                         .benefitType(BenefitType.builder()
@@ -524,6 +524,6 @@ class SscsUtilTest {
                         .build()
                 )
                 .build();
-        assertFalse(isIbcaCase(caseData));
+        assertFalse(isIbcaCase(sscsCaseData));
     }
 }

@@ -27,7 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.BaseHandlerTest;
 
 @RunWith(JUnitParamsRunner.class)
-public class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
+class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private FeNoActionAboutToStartHandler handler = new FeNoActionAboutToStartHandler();
@@ -93,7 +93,7 @@ public class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = DwpState.class, mode = EnumSource.Mode.EXCLUDE, names = {"FE_RECEIVED"})
-    public void returns_dwp_error_for_not_FE_received_non_ibca(DwpState dwpState) {
+    void returns_dwp_error_for_not_FE_received_non_ibca(DwpState dwpState) {
         MockitoAnnotations.openMocks(this);
         when(mockCallback.getEvent()).thenReturn(EventType.FE_NO_ACTION);
         when(mockCallback.getCaseDetails()).thenReturn(mockCaseDetails);
@@ -107,7 +107,7 @@ public class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
 
     @ParameterizedTest
     @EnumSource(value = DwpState.class, mode = EnumSource.Mode.EXCLUDE, names = {"FE_RECEIVED"})
-    public void returns_fta_error_for_not_FE_received_non_ibca(DwpState dwpState) {
+    void returns_fta_error_for_not_FE_received_non_ibca(DwpState dwpState) {
         MockitoAnnotations.openMocks(this);
         when(mockCallback.getEvent()).thenReturn(EventType.FE_NO_ACTION);
         when(mockCallback.getCaseDetails()).thenReturn(mockCaseDetails);
