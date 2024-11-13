@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateCaseMidEventHandlerTest {
+
     private static final String USER_AUTHORISATION = "Bearer token";
 
     @Mock
