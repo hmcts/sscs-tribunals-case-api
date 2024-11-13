@@ -114,8 +114,10 @@ azure:
 bundle:
     english:
         config: ${BUNDLE_ENGLISH_CONFIG:sscs-bundle-config.yaml}
+        # FOR IBCA: config: ${BUNDLE_ENGLISH_CONFIG:sscs-ib-bundle-config.yaml}
         edited:
             config: ${BUNDLE_EDITED_CONFIG:sscs-bundle-edited-config.yaml}
+            # FOR IBCA: config: ${BUNDLE_EDITED_CONFIG:sscs-ib-bundle-edited-config.yaml}
     new:
         edited:
             config: ${BUNDLE_EDITED_CONFIG:sscs-new-bundle-edited-config.yaml}
