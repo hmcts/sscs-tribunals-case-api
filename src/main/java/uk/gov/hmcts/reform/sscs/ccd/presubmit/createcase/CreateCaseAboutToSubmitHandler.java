@@ -4,8 +4,11 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.generateUniqueIbcaId;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.getSscsType;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleBenefitType;
+import static uk.gov.hmcts.reform.sscs.util.SscsUtil.handleIbcaCase;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +63,9 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
         caseData.setTribunalDirectPoToAttend(YesNo.NO);
 
         handleBenefitType(caseData);
+        if (IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode())) {
+            handleIbcaCase(caseData);
+        }
         updateLanguage(caseData);
 
         if (isNull(caseData.getDwpIsOfficerAttending())) {
@@ -100,7 +106,9 @@ public class CreateCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<
     }
 
     private void createAppealPdf(SscsCaseData caseData) {
-        String fileName = emailHelper.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
+        String fileName = IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode())
+                ? generateUniqueIbcaId(caseData.getAppeal().getAppellant()) + ".pdf"
+                : emailHelper.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
 
         boolean hasPdf = hasPdfDocument(caseData, fileName);
 

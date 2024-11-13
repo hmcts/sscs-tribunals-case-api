@@ -100,6 +100,7 @@
   {"LiveFrom": "01/01/2018", "ID": "appellant", "ListElementCode": "isAddressSameAsAppointee", "FieldType": "YesOrNo", "ElementLabel": "Is Address same as Appointee", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/10/2021", "ID": "appellant", "ListElementCode": "confidentialityRequired", "FieldType": "YesOrNo", "ElementLabel": "Confidentiality Status", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "appellant", "ListElementCode": "role", "FieldType": "role", "ElementLabel": "Appellant Role", "SecurityClassification": "PUBLIC"},
+  {"LiveFrom": "01/01/2018", "ID": "appellant", "ListElementCode": "ibcRole", "FieldType": "FixedList", "FieldTypeParameter": "FL_ibcRoles", "ElementLabel": "Role", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "appellant", "ListElementCode": "id", "FieldType": "Text", "ElementLabel": "Id", "FieldShowCondition": "name=\"AnyValueToFailThisCondition\"" ,"SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "appellant", "ListElementCode": "organisation", "FieldType": "Text", "ElementLabel": "Organisation", "SecurityClassification": "PUBLIC"},
   {"LiveFrom": "01/01/2018", "ID": "appellant", "ListElementCode": "pcqId", "FieldType": "Text", "ElementLabel": "PCQ ID", "SecurityClassification": "PUBLIC"},
