@@ -490,8 +490,8 @@ class SscsUtilTest {
                                 .descriptionSelection(
                                         new DynamicList(
                                                 new DynamicListItem(
-                                                        "infectedBloodAppeal",
-                                                        "infectedBloodAppeal"
+                                                        "infectedBloodCompensation",
+                                                        "infectedBloodCompensation"
                                                 ),
                                                 emptyList()
                                         )
