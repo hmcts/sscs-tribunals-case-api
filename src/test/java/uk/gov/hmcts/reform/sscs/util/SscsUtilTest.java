@@ -36,7 +36,6 @@ class SscsUtilTest {
     private SessionCategoryMapService categoryMapService = new SessionCategoryMapService();
     private PostHearing postHearing;
     private SscsCaseData caseData;
-    private RegionalProcessingCenter regionalProcessingCenter;
 
     @BeforeEach
     void setUp() {
