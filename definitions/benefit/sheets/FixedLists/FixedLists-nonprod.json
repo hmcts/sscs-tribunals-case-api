@@ -1,4 +1,5 @@
 [
   {"LiveFrom": "01/01/2018", "ID": "FL_benefitCodes", "ListElementCode": "093", "ListElement": "093"},
-  {"LiveFrom": "01/01/2018", "ID": "FL_dwpRegionalCentre", "ListElementCode": "IBCA", "ListElement": "IBCA"}
+  {"LiveFrom": "01/01/2018", "ID": "FL_dwpRegionalCentre", "ListElementCode": "IBCA", "ListElement": "IBCA"},
+  {"LiveFrom": "01/01/2018", "ID": "documentType", "ListElementCode": "sscs8", "ListElement": "SSCS8"}
 ]
