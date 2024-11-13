@@ -67,7 +67,6 @@ java:
     TEST_RECIPIENTS_POSTCODE: "*"
     INFECTED_BLOOD_COMPENSATION_ENABLED: true
     SUBMIT_APPEAL_SERVICE_V2_ENABLED: true
-    BULK_SCAN_URL: "https://sscs-bulk-scan-pr-1517.preview.platform.hmcts.net"
     PROCESS_EVENT_MESSAGE_V2_ENABLED: true
     UPDATE_CASE_ONLY_HEARING_V2_ENABLED: true
   secrets:
@@ -539,7 +538,7 @@ elastic:
 sscs-tribunals-frontend:
   enabled: true
   nodejs:
-    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:pr-1548
+    image: hmctspublic.azurecr.io/sscs/tribunals-frontend:master
     ingressHost: sya-${SERVICE_FQDN}
     registerAdditionalDns:
       enabled: true
