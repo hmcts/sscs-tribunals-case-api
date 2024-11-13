@@ -38,7 +38,10 @@ public class CallbackDispatcher<T extends CaseData> {
 
     private void dispatchToHandlers(CallbackType callbackType, Callback<T> callback,
                                     List<CallbackHandler<T>> callbackHandlers) {
-        log.info("Dispatching callback of type {} to {} handlers", callbackType, callbackHandlers.size());
+        log.info("Dispatching callback of type {} to {} handlers for case id {}",
+                callbackType,
+                callbackHandlers.size(),
+                callback.getCaseDetails().getId());
         callbackHandlers.stream()
             .filter(handler -> handler.canHandle(callbackType, callback))
             .forEach(handler -> handler.handle(callbackType, callback));
