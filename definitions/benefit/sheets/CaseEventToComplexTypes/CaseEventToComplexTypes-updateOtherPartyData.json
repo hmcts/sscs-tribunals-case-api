@@ -129,7 +129,7 @@
     "LiveFrom": "19/11/2020",
     "FieldDisplayOrder": 11,
     "PageID": "1.0",
-    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\""
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\""
   },
   {
     "CaseEventID": "updateOtherPartyData",
@@ -140,7 +140,7 @@
     "LiveFrom": "19/11/2020",
     "FieldDisplayOrder": 12,
     "PageID": "1.0",
-    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\"",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
     "EventElementLabel": "Does the appellant live in England, Wales or Scotland?"
   },
   {
@@ -212,7 +212,7 @@
     "LiveFrom": "19/11/2020",
     "FieldDisplayOrder": 19,
     "PageID": "1.0",
-    "FieldShowCondition": "appeal.benefitType.code!= \"infectedBloodAppeal\""
+    "FieldShowCondition": "appeal.benefitType.code!= \"infectedBloodCompensation\""
   },
   {
     "CaseEventID": "updateOtherPartyData",
@@ -444,7 +444,7 @@
     "LiveFrom": "19/11/2020",
     "FieldDisplayOrder": 41,
     "PageID": "1.0",
-    "FieldShowCondition": "appeal.benefitType.code!=\"infectedBloodAppeal\""
+    "FieldShowCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\""
   },
   {
     "CaseEventID": "updateOtherPartyData",
@@ -455,7 +455,7 @@
     "LiveFrom": "19/11/2020",
     "FieldDisplayOrder": 42,
     "PageID": "1.0",
-    "FieldShowCondition": "otherParties.isAppointee = \"Yes\" AND appeal.benefitType.code!=\"infectedBloodAppeal\""
+    "FieldShowCondition": "otherParties.isAppointee = \"Yes\" AND appeal.benefitType.code!=\"infectedBloodCompensation\""
   },
   {
     "CaseEventID": "updateOtherPartyData",
@@ -736,7 +736,7 @@
     "LiveFrom": "19/11/2020",
     "FieldDisplayOrder": 70,
     "PageID": "1.0",
-    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\""
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\""
   },
   {
     "CaseEventID": "updateOtherPartyData",
@@ -747,7 +747,7 @@
     "LiveFrom": "19/11/2020",
     "FieldDisplayOrder": 71,
     "PageID": "1.0",
-    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodAppeal\"",
+    "FieldShowCondition": "appeal.benefitType.code=\"infectedBloodCompensation\"",
     "EventElementLabel": "Does the representative live in England, Wales or Scotland?"
   },
   {

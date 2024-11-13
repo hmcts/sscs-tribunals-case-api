@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.updateotherparty;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.INFECTED_BLOOD_COMPENSATION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getUpdatedDirectionDueDate;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.validateHearingOptionsAndExcludeDates;
@@ -105,7 +106,7 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
             return response;
         }
         //Check if role is not entered for a Child support case
-        if (!IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode()) && roleAbsentForOtherParties(sscsCaseData.getOtherParties())) {
+        if (!isIbaCase(sscsCaseData) && roleAbsentForOtherParties(sscsCaseData.getOtherParties())) {
             response.addError(ERR_ROLE_REQUIRED);
         }
         return response;
@@ -145,5 +146,9 @@ public class UpdateOtherPartyAboutToSubmitHandler implements PreSubmitCallbackHa
 
     private boolean isBenefitTypeValidForOtherPartyValidation(final Optional<Benefit> benefitType) {
         return benefitType.filter(benefit -> SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
+    }
+
+    private boolean isIbaCase(SscsCaseData sscsCaseData) {
+        return IBCA_BENEFIT_CODE.equals(sscsCaseData.getBenefitCode()) || INFECTED_BLOOD_COMPENSATION.getShortName().equals(sscsCaseData.getAppeal().getBenefitType().getCode());
     }
 }
