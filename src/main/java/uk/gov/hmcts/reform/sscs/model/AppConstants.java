@@ -43,6 +43,9 @@ public class AppConstants {
     public static final String IBCA_BENEFIT_CODE = "093";
     public static final String INFECTED_BLOOD_COMPENSATION = "infectedBloodCompensation";
 
+    public static final String IBCA_BENEFIT_CODE = "093";
+    public static final String INFECTED_BLOOD_COMPENSATION = "infectedBloodCompensation";
+
     private AppConstants() {
         //
     }
