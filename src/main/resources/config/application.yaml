@@ -2084,6 +2084,8 @@ spring:
             on-profile: integration, functional
     flyway:
         enabled: false
+amqp:
+    enabled: false
 job.scheduler:
     autoStart: false
     retryPolicy:
@@ -2096,4 +2098,11 @@ job.scheduler:
             jobStore:
                 class: org.quartz.simpl.RAMJobStore
 
-
+---
+# tya-functional profile
+spring:
+    config:
+        activate:
+            on-profile: functional
+amqp:
+    enabled: false
