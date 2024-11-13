@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWi
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -26,7 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -37,7 +38,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 public class HmctsResponseReviewedIt extends AbstractEventIt {
 
     @MockBean
-    private CcdService ccdService;
+    private UpdateCcdCaseService updateCcdCaseService;
 
     @MockBean
     private IdamService idamService;
@@ -95,6 +96,12 @@ public class HmctsResponseReviewedIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
-        verify(ccdService).updateCase(any(SscsCaseData.class), eq(12345656789L), eq(eventType.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(updateCcdCaseService).updateCaseV2(
+                eq(12345656789L),
+                eq(eventType.getCcdType()),
+                any(String.class),
+                any(String.class),
+                any(IdamTokens.class),
+                any(Consumer.class));
     }
 }
