@@ -124,11 +124,7 @@
     "ListElementCode": "nino",
     "ID": "jointPartyIdentityNino",
     "DisplayContext": "MANDATORY",
-<<<<<<< Updated upstream
-    "FieldShowCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\"",    
-=======
     "FieldShowCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\"",
->>>>>>> Stashed changes
     "LiveFrom": "19/11/2019",
     "FieldDisplayOrder": 2,
     "PageID": "jointPartyIdentity",
