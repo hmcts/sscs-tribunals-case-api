@@ -206,6 +206,40 @@ public class CreateCaseAboutToSubmitHandlerTest {
     }
 
     @Test
+    void shouldSetPdfFileNameWithIbcaReferenceWhenBenefitIsIbca() {
+        SscsCaseData caseDataWithSscsDocument = buildCaseData("Test", "infectedBloodCompensation", "IBCA");
+        caseDataWithSscsDocument.setCcdCaseId(CCD_CASE_ID.toString());
+        caseDataWithSscsDocument.setBenefitCode(IBCA_BENEFIT_CODE);
+        caseDataWithSscsDocument.getAppeal().getAppellant().getIdentity().setIbcaReference("IBCA12345");
+        caseDataWithSscsDocument.setSscsDocument(buildDocuments());
+
+        when(caseDetails.getCaseData()).thenReturn(caseDataWithSscsDocument);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("Yes", response.getData().getEvidencePresent());
+
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
+    }
+
+    @Test
+    void shouldCallPdfServiceWhenSscsDocumentIsNullWhenBenefitCodeIsIbca() {
+        SscsCaseData caseDataWithNullSscsDocument = buildCaseData("Test", "infectedBloodCompensation", "IBCA");
+        caseDataWithNullSscsDocument.setCcdCaseId(CCD_CASE_ID.toString());
+        caseDataWithNullSscsDocument.setBenefitCode(IBCA_BENEFIT_CODE);
+        caseDataWithNullSscsDocument.getAppeal().getAppellant().getIdentity().setIbcaReference("IBCA12345");
+        caseDataWithNullSscsDocument.setSscsDocument(null);
+
+        when(caseDetails.getCaseData()).thenReturn(caseDataWithNullSscsDocument);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = createCaseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("No", response.getData().getEvidencePresent());
+
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
+    }
+
+    @Test
     void givenPdfAlreadyExists_shouldNotCallPdfService() throws CcdException {
 
         SscsCaseData caseDataWithPdf = buildCaseDataWithPdf();
