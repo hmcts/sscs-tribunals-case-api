@@ -103,15 +103,18 @@ public class CaseUpdatedAboutToStartHandler implements PreSubmitCallbackHandler<
     }
 
     private void setupUkPortsOfEntry(SscsCaseData sscsCaseData) {
-        final DynamicList ukPortOfEntries = SscsUtil.getPortsOfEntry();
-        String portOfEntryCode = sscsCaseData.getAppeal().getAppellant().getAddress().getPortOfEntry();
+        DynamicList portOfEntryDynamicList = sscsCaseData.getAppeal().getAppellant().getAddress().getUkPortOfEntryList();
+        if (portOfEntryDynamicList == null || portOfEntryDynamicList.getValue() == null) {
+            final DynamicList ukPortOfEntries = SscsUtil.getPortsOfEntry();
+            String portOfEntryCode = sscsCaseData.getAppeal().getAppellant().getAddress().getPortOfEntry();
 
-        if (isNotEmpty(portOfEntryCode)) {
-            DynamicListItem selectedPortOfEntry = getSelectedDynamicListItem(ukPortOfEntries.getListItems(), portOfEntryCode);
-            ukPortOfEntries.setValue(selectedPortOfEntry);
+            if (isNotEmpty(portOfEntryCode)) {
+                DynamicListItem selectedPortOfEntry = getSelectedDynamicListItem(ukPortOfEntries.getListItems(), portOfEntryCode);
+                ukPortOfEntries.setValue(selectedPortOfEntry);
+            }
+
+            sscsCaseData.getAppeal().getAppellant().getAddress().setUkPortOfEntryList(ukPortOfEntries);
         }
-
-        sscsCaseData.getAppeal().getAppellant().getAddress().setUkPortOfEntryList(ukPortOfEntries);
     }
 
     private DynamicListItem getSelectedDynamicListItem(List<DynamicListItem> listItems, String code) {
