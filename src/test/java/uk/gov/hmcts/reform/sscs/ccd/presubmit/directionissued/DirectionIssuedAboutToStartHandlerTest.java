@@ -82,7 +82,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
         listOptions.add(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getLabel()));
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
-        assertEquals(2, listOptions.size());
+        assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getCode()), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
-        assertEquals(2, listOptions.size());
+        assertEquals(2, response.getData().getExtensionNextEventDl().getListItems().size());
     }
 
     @Test
@@ -118,7 +118,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
-        assertEquals(3, listOptions.size());
+        assertEquals(3, response.getData().getExtensionNextEventDl().getListItems().size());
     }
 
     @Test
@@ -137,7 +137,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(4, listOptions.size());
+        assertEquals(4, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -155,7 +155,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
             DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
             assertEquals(expected, response.getData().getDirectionTypeDl());
-            assertEquals(3, listOptions.size());
+            assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
         }
     }
 
@@ -172,7 +172,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(2, listOptions.size());
+        assertEquals(2, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -193,7 +193,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(4, listOptions.size());
+        assertEquals(4, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -213,7 +213,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(4, listOptions.size());
+        assertEquals(4, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -231,7 +231,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(2, listOptions.size());
+        assertEquals(2, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -252,7 +252,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem(GRANT_EXTENSION.toString(), GRANT_EXTENSION.toString()), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(4, listOptions.size());
+        assertEquals(4, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -268,7 +268,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(2, listOptions.size());
+        assertEquals(2, response.getData().getDirectionTypeDl().getListItems().size());
     }
 
     @Test
@@ -287,7 +287,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
-        assertEquals(3, listOptions.size());
+        assertEquals(3, response.getData().getDirectionTypeDl().getListItems().size());
         assertEquals(expected, response.getData().getDirectionTypeDl());
     }
 
@@ -306,7 +306,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
-        assertEquals(2, listOptions.size());
+        assertEquals(2, response.getData().getDirectionTypeDl().getListItems().size());
         assertEquals(expected, response.getData().getDirectionTypeDl());
     }
 
