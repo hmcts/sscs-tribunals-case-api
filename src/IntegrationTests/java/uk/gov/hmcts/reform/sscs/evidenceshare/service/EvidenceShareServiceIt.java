@@ -130,9 +130,6 @@ public class EvidenceShareServiceIt {
     ArgumentCaptor<ArrayList<Pdf>> documentCaptor;
 
     @Captor
-    private ArgumentCaptor<SscsCaseData> caseDataCaptor;
-
-    @Captor
     private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
     @MockBean
