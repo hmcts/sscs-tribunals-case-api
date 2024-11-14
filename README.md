@@ -218,5 +218,5 @@ In order to include Bundling & Hearings tests as part of preview pipeline, QA's 
 PRs that start with _"Bump"_ won't have a preview environment. The decision was made after we realised that most the preview environments were created by Depandabot.
 
 ### Preview cases not listing 
-Elastic indices may be missing on preview. They can be recreated by login into ccd admin for e.g. - https://admin-web-sscs-tribunals-api-pr-4091.preview.platform.hmcts.net/ . 
+Elastic indices may be missing on preview. They can be recreated by login into ccd admin for e.g. - https://admin-web-sscs-tribunals-api-pr-4091.preview.platform.hmcts.net/ and clicking on "Create Elasticsearch Indices" link. 
 This would avoid re-triggering the pipeline build and save time.
