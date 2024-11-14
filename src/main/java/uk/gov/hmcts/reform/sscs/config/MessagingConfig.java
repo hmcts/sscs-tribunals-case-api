@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.config;
 
+import javax.annotation.PostConstruct;
 import javax.jms.ConnectionFactory;
 import javax.net.ssl.SSLContext;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,14 @@ import org.springframework.jms.core.JmsTemplate;
 @EnableJms
 @ConditionalOnProperty(name = "amqp.enabled", havingValue = "true", matchIfMissing = true)
 public class MessagingConfig {
+
+    @Value("${amqp.enabled}")
+    private boolean amqpEnabled;
+
+    @PostConstruct
+    public void init() {
+        System.out.println("AMQP Enabled: " + amqpEnabled);
+    }
 
     @Bean
     public String jmsUrlString(@Value("${amqp.amqp-connection-string-template}") final String amqpConnectionStringTemplate,

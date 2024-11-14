@@ -14,6 +14,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CorrespondenceType;
 import uk.gov.hmcts.reform.sscs.functional.tyanotifications.AbstractFunctionalTest;
@@ -22,6 +24,7 @@ import uk.gov.service.notify.Notification;
 
 public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTest {
 
+    private static final Logger logger = LoggerFactory.getLogger(AdminAppealWithdrawnNotificationsTest.class);
     public AdminAppealWithdrawnNotificationsTest() {
         super(30);
     }
@@ -89,12 +92,19 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
         List<Correspondence> correspondence = ccdService
             .getByCaseId(caseId, idamTokens).getData().getCorrespondence();
         if (correspondence == null) {
+            logger.info("Correspondence is null");
             return 0;
         }
+        logger.info("Correspondence: {}", correspondence);
         return correspondence.stream()
+            .peek(c -> logger.info("Correspondence: {}", c))
             .filter(c -> c.getValue().getCorrespondenceType() == CorrespondenceType.Letter)
             .filter(c -> c.getValue().getDocumentLink().getDocumentFilename().contains(ADMIN_APPEAL_WITHDRAWN.getId()))
-            .filter(c -> isAMatch(subscription, c.getValue().getTo()))
+            .filter(c -> {
+                boolean match = isAMatch(subscription, c.getValue().getTo());
+                logger.info("Match: {}", match);
+                return match;
+            })
             .count();
     }
 
