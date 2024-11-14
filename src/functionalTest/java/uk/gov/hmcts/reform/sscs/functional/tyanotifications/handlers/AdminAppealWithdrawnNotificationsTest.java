@@ -25,6 +25,7 @@ import uk.gov.service.notify.Notification;
 public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AdminAppealWithdrawnNotificationsTest.class);
+
     public AdminAppealWithdrawnNotificationsTest() {
         super(30);
     }
