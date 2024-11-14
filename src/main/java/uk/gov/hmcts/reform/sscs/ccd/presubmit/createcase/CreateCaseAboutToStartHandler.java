@@ -66,18 +66,6 @@ public class CreateCaseAboutToStartHandler implements PreSubmitCallbackHandler<S
 
         appeal.getAppellant().getAddress().setUkPortOfEntryList(SscsUtil.getPortsOfEntry());
 
-        if (isNull(appeal.getAppellant())) {
-            Appellant appellant = Appellant.builder().build();
-            appeal.setAppellant(appellant);
-        }
-
-        if (isNull(appeal.getAppellant().getAddress())) {
-            Address address = Address.builder().build();
-            appeal.getAppellant().setAddress(address);
-        }
-
-        appeal.getAppellant().getAddress().setUkPortOfEntryList(SscsUtil.getPortsOfEntry());
-
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }
