@@ -52,7 +52,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.domain.StatementOfReasonsActions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdCallbackMapService;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,7 +68,7 @@ class PostHearingReviewSubmittedHandlerTest {
     @Mock
     private CcdCallbackMapService ccdCallbackMapService;
     @Mock
-    private CcdService ccdService;
+    private UpdateCcdCaseService updateCcdCaseService;
 
     @Mock
     private IdamService idamService;
@@ -84,7 +84,7 @@ class PostHearingReviewSubmittedHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new PostHearingReviewSubmittedHandler(ccdCallbackMapService, ccdService, idamService, true);
+        handler = new PostHearingReviewSubmittedHandler(ccdCallbackMapService, updateCcdCaseService, idamService, true);
 
         caseData = SscsCaseData.builder()
             .schedulingAndListingFields(SchedulingAndListingFields.builder()
@@ -125,7 +125,7 @@ class PostHearingReviewSubmittedHandlerTest {
 
     @Test
     void givenPostHearingsEnabledFalse_thenReturnFalse() {
-        handler = new PostHearingReviewSubmittedHandler(ccdCallbackMapService, ccdService, idamService, false);
+        handler = new PostHearingReviewSubmittedHandler(ccdCallbackMapService, updateCcdCaseService, idamService, false);
         when(callback.getEvent()).thenReturn(POST_HEARING_REVIEW);
         assertThat(handler.canHandle(SUBMITTED, callback)).isFalse();
     }
@@ -169,7 +169,7 @@ class PostHearingReviewSubmittedHandlerTest {
         verify(ccdCallbackMapService, times(1))
                 .handleCcdCallbackMapV2(eq(action), anyLong(), isA(Consumer.class));
 
-        verifyNoInteractions(ccdService);
+        verifyNoInteractions(updateCcdCaseService);
     }
 
     @ParameterizedTest
@@ -245,8 +245,7 @@ class PostHearingReviewSubmittedHandlerTest {
         verify(ccdCallbackMapService, times(1))
                 .handleCcdCallbackMapV2(eq(REFUSE_SOR), anyLong(), isA(Consumer.class));
 
-        verify(ccdService, times(1)).updateCase(returnedCase,
-                Long.valueOf(returnedCase.getCcdCaseId()),
+        verify(updateCcdCaseService, times(1)).triggerCaseEventV2(Long.valueOf(returnedCase.getCcdCaseId()),
                 EventType.SOR_REQUEST.getCcdType(),
                 "Send to hearing Judge for statement of reasons",
                 "",
