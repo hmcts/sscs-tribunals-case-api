@@ -27,7 +27,7 @@
     "CaseEventID": "amendHearingOutcome",
     "CaseFieldID": "hearingOutcomes",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
+    "DisplayContext": "COMPLEX",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
     "PageID": "1.0",

@@ -31,7 +31,6 @@
     "DisplayOrder": 141,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
-    "EventEnablingCondition": "hearingOutcomes!=\"\"",
     "SecurityClassification": "Public"
   }
 ]

@@ -16,5 +16,23 @@
     "DisplayContext": "MANDATORY",
     "LiveFrom": "30/10/2024",
     "FieldDisplayOrder": 1
+  },
+  {
+    "CaseEventID": "amendHearingOutcome",
+    "CaseFieldID": "hearingOutcomes",
+    "ListElementCode": "hearingOutcomeId",
+    "ID": "hearingOutcomeDetailsOutcomeId",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "30/10/2024",
+    "FieldDisplayOrder": 1
+  },
+  {
+    "CaseEventID": "amendHearingOutcome",
+    "CaseFieldID": "hearingOutcomes",
+    "ListElementCode": "didPoAttendHearing",
+    "ID": "hearingOutcomeDetailsDidPoAttendHearing",
+    "DisplayContext": "MANDATORY",
+    "LiveFrom": "30/10/2024",
+    "FieldDisplayOrder": 2
   }
 ]
