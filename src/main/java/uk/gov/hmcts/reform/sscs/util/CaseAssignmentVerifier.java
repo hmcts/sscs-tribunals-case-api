@@ -22,7 +22,7 @@ public class CaseAssignmentVerifier {
         if (isNotBlank(postcode)) {
             return verifyAppellantOrOtherPartyPostcode(sscsCaseDetails, postcode, email);
         } else {
-            return verifyAppellantOrOtherPartyIbcaReference(sscsCaseDetails, ibcaReference);
+            return verifyAppellantIbcaReference(sscsCaseDetails, ibcaReference);
         }
     }
 
@@ -40,7 +40,7 @@ public class CaseAssignmentVerifier {
                 || otherPartyPostcodes.contains(normalise(postcode));
     }
 
-    private boolean verifyAppellantOrOtherPartyIbcaReference(SscsCaseDetails sscsCaseDetails, String ibcaReference) {
+    private boolean verifyAppellantIbcaReference(SscsCaseDetails sscsCaseDetails, String ibcaReference) {
         String appellantIbcaReference =
                 sscsCaseDetails.getData().getAppeal().getAppellant().getIdentity().getIbcaReference();
         return equalsIgnoreCase(appellantIbcaReference, ibcaReference);
