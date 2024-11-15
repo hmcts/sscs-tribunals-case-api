@@ -103,13 +103,12 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
-        verify(updateCcdCaseService).updateCaseV2(
+        verify(updateCcdCaseService).triggerCaseEventV2(
                 eq(123L),
                 eq(VALID_SEND_TO_INTERLOC.getCcdType()),
                 eq("Send to interloc"),
                 eq("Send a case to a Judge for review"),
-                any(IdamTokens.class),
-                any(Consumer.class));
+                any(IdamTokens.class));
     }
 
     @Test
@@ -121,13 +120,12 @@ public class HmctsResponseReviewedSubmittedHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
-        verify(updateCcdCaseService).updateCaseV2(
+        verify(updateCcdCaseService).triggerCaseEventV2(
                 eq(123L),
                 eq(VALID_SEND_TO_INTERLOC.getCcdType()),
                 eq("Send to interloc"),
                 eq("Send a case to a TCW for review"),
-                any(IdamTokens.class),
-                any(Consumer.class));
+                any(IdamTokens.class));
     }
 
     @Test

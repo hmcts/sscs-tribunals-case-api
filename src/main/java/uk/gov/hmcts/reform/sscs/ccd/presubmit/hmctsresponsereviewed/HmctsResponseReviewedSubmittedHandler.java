@@ -6,7 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_SEND_TO_INTERL
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import feign.FeignException;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -60,30 +60,31 @@ public class HmctsResponseReviewedSubmittedHandler extends ResponseEventsAboutTo
             updateCase(
                     callback.getCaseDetails().getId(),
                     VALID_SEND_TO_INTERLOC,
-                    "Send to interloc",
-                    "Send a case to a " + whoToReview + " for review",
-                    sscsCaseDetails -> { });
+                    (caseId, eventType) -> updateCcdCaseService.triggerCaseEventV2(
+                            caseId,
+                            eventType.getCcdType(),
+                            "Send to interloc",
+                            "Send a case to a " + whoToReview + " for review",
+                            idamService.getIdamTokens()));
         } else {
             updateCase(
                     callback.getCaseDetails().getId(),
                     READY_TO_LIST,
+                    (caseId, eventType) -> updateCcdCaseService.updateCaseV2(
+                            caseId,
+                            eventType.getCcdType(),
                     "Ready to list",
                     "Makes an appeal ready to list",
-                    sscsCaseDetails -> sscsCaseDetails.getData().setIgnoreCallbackWarnings(YES));
+                            idamService.getIdamTokens(),
+                            (SscsCaseDetails sscsCaseDetails) -> sscsCaseDetails.getData().setIgnoreCallbackWarnings(YES)));
         }
 
         return preSubmitCallbackResponse;
     }
 
-    private void updateCase(Long caseId, EventType eventType, String summary, String description, Consumer<SscsCaseDetails> mutator) {
+    private void updateCase(Long caseId, EventType eventType, BiConsumer<Long, EventType> updateCcdCaseServiceConsumer) {
         try {
-            updateCcdCaseService.updateCaseV2(
-                    caseId,
-                    eventType.getCcdType(),
-                    summary,
-                    description,
-                    idamService.getIdamTokens(),
-                    mutator);
+            updateCcdCaseServiceConsumer.accept(caseId, eventType);
         } catch (FeignException e) {
             log.error(
                     "{}. CCD response: {}",
