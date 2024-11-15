@@ -79,7 +79,7 @@ public class UpdateOtherPartyMidEventHandlerTest {
     }
 
     @Test
-    public void shouldReturnTrueForCanHandleNonIbaCase() {
+    public void shouldReturnFalseForCanHandleNonIbaCase() {
         OtherParty party = OtherParty.builder()
             .address(Address.builder().line1("42 new road").build())
             .build();
