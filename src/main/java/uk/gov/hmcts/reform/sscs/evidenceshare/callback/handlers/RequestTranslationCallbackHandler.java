@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REQUEST_TRANSLATION_FROM_WLU;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,6 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.WelshException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.RequestTranslationService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import java.util.List;
 
 @Slf4j
 @Service
