@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.exception.WelshException;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.RequestTranslationService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-
 import java.util.List;
 
 @Slf4j
@@ -67,7 +66,7 @@ public class RequestTranslationCallbackHandler implements CallbackHandler<SscsCa
                     idamService.getIdamTokens(), sscsCaseDetails -> {
                         updateDocumentStatus(sscsCaseDetails.getData().getSscsDocument());
                         updateDocumentStatus(sscsCaseDetails.getData().getDwpDocuments());
-                        });
+                    });
             }
         } catch (WelshException e) {
             log.error("Error when sending to request translation from wlu: {}", callback.getCaseDetails().getId(), e);
@@ -75,10 +74,10 @@ public class RequestTranslationCallbackHandler implements CallbackHandler<SscsCa
     }
 
     private void updateDocumentStatus(List<? extends AbstractDocument> docs) {
-    ListUtils.emptyIfNull(docs).stream().filter(doc -> SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(doc.getValue().getDocumentTranslationStatus()))
-            .forEach(doc -> {
-                doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED);
-            });
+        ListUtils.emptyIfNull(docs).stream().filter(doc -> SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(doc.getValue().getDocumentTranslationStatus()))
+                .forEach(doc -> {
+                    doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED);
+                });
     }
 
     @Override

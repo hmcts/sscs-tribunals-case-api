@@ -12,11 +12,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
