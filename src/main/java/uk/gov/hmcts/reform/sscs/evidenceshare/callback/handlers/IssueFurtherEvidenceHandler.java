@@ -167,7 +167,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
                         final String description = determineDescription(sscsCaseDetails.getData().getSscsDocument());
                         setEvidenceIssuedFlagToYes(sscsCaseDetails.getData().getSscsDocument());
-                        return new UpdateCcdCaseService.UpdateResult(sscsCaseDetails, "Update case data", description);
+                        return new UpdateCcdCaseService.UpdateResult("Update case data", description);
 
                     }
             );
