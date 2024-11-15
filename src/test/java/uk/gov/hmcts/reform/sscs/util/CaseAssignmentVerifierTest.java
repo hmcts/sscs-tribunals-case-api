@@ -52,7 +52,7 @@ public class CaseAssignmentVerifierTest {
     }
 
     @ParameterizedTest
-    @MethodSource("blankPostcodeValues")
+    @MethodSource("nullAndEmptyValues")
     public void ibcaReferenceIsExactMatch(String postcode) {
         assertTrue(underTest.verifyPostcodeOrIbcaReference(sscsCaseDetails, postcode, IBCA_REFERENCE, EMAIL));
     }
@@ -77,6 +77,12 @@ public class CaseAssignmentVerifierTest {
     @Test
     public void shouldNotMatchIbcaReference() {
         assertFalse(underTest.verifyPostcodeOrIbcaReference(sscsCaseDetails, "", "random string", EMAIL));
+    }
+
+    @ParameterizedTest
+    @MethodSource("nullAndEmptyValues")
+    public void shouldNotMatchIfIbcaReferenceIsEmpty(String ibaReference) {
+        assertFalse(underTest.verifyPostcodeOrIbcaReference(sscsCaseDetails, "", ibaReference, EMAIL));
     }
 
     @Test
@@ -129,51 +135,6 @@ public class CaseAssignmentVerifierTest {
     }
 
     @Test
-    public void shouldMatchOtherPartyIbcaReference() {
-        OtherParty otherParty = OtherParty.builder()
-                .otherPartySubscription(Subscription.builder().email(EMAIL).build())
-                .identity(Identity.builder().ibcaReference(IBCA_REFERENCE).build()).build();
-        sscsCaseDetails.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
-        assertTrue(underTest.verifyPostcodeOrIbcaReference(sscsCaseDetails, null, IBCA_REFERENCE, EMAIL));
-    }
-
-    @Test
-    public void shouldMatchOtherPartyAppointeeIbcaReference() {
-        OtherParty otherParty = OtherParty.builder()
-                .isAppointee("Yes")
-                .otherPartyAppointeeSubscription(Subscription.builder().email(EMAIL).build())
-                .otherPartySubscription(Subscription.builder().email("otherParty@example.com").build())
-                .identity(Identity.builder().ibcaReference(IBCA_REFERENCE).build())
-                .build();
-        sscsCaseDetails.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
-        assertTrue(underTest.verifyPostcodeOrIbcaReference(sscsCaseDetails, null, IBCA_REFERENCE, EMAIL));
-    }
-
-    @Test
-    public void shouldMatchOtherPartyRepIbcaReference() {
-        OtherParty otherParty = OtherParty.builder()
-                .rep(Representative.builder().hasRepresentative("Yes").build())
-                .otherPartyRepresentativeSubscription(Subscription.builder().email(EMAIL).build())
-                .otherPartySubscription(Subscription.builder().email("otherParty@example.com").build())
-                .identity(Identity.builder().ibcaReference(IBCA_REFERENCE).build()).build();
-        sscsCaseDetails.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
-        assertTrue(underTest.verifyPostcodeOrIbcaReference(sscsCaseDetails, null, IBCA_REFERENCE, EMAIL));
-    }
-
-    @Test
-    public void shouldNotMatchOtherPartyIbcaReferenceIfEmailDoesNotMatch() {
-        OtherParty otherParty1 = OtherParty.builder()
-                .otherPartySubscription(Subscription.builder().email("otherParty@example.com").build())
-                .identity(Identity.builder().ibcaReference("IBCA_REFERENCE_2").build()).build();
-        OtherParty otherParty2 = OtherParty.builder()
-                .otherPartySubscription(Subscription.builder().email(EMAIL).build())
-                .identity(Identity.builder().ibcaReference("random string").build()).build();
-        sscsCaseDetails.getData().setOtherParties(List.of(new CcdValue<>(otherParty1), new CcdValue<>(otherParty2)));
-        assertFalse(underTest
-                .verifyPostcodeOrIbcaReference(sscsCaseDetails, null, "IBCA_REFERENCE_2", EMAIL));
-    }
-
-    @Test
     public void shouldNotMatchOtherPartyPostcodeIfNotInTheList() {
         String otherPartyPostCode = "W1 1LA";
         OtherParty otherParty = OtherParty.builder()
@@ -182,16 +143,7 @@ public class CaseAssignmentVerifierTest {
         assertFalse(underTest.verifyPostcodeOrIbcaReference(sscsCaseDetails, "inc 1ab", IBCA_REFERENCE, EMAIL));
     }
 
-    @Test
-    public void shouldNotMatchAndOtherPartyIbcaReferenceIfNotInTheList() {
-        OtherParty otherParty = OtherParty.builder()
-                .identity(Identity.builder().ibcaReference("IBCA_REFERENCE_2").build()).build();
-        sscsCaseDetails.getData().setOtherParties(List.of(new CcdValue<>(otherParty)));
-        assertFalse(underTest
-                .verifyPostcodeOrIbcaReference(sscsCaseDetails, null, "IBCA_REFERENCE_3", EMAIL));
-    }
-
-    static Stream<String> blankPostcodeValues() {
+    static Stream<String> nullAndEmptyValues() {
         return Stream.of(null, "", " ", "\t", "\n");
     }
 }

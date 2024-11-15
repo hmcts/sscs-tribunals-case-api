@@ -4,7 +4,6 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.RegExUtils.replaceAll;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.lowerCase;
 
@@ -23,7 +22,7 @@ public class CaseAssignmentVerifier {
         if (isNotBlank(postcode)) {
             return verifyAppellantOrOtherPartyPostcode(sscsCaseDetails, postcode, email);
         } else {
-            return verifyAppellantOrOtherPartyIbcaReference(sscsCaseDetails, ibcaReference, email);
+            return verifyAppellantOrOtherPartyIbcaReference(sscsCaseDetails, ibcaReference);
         }
     }
 
@@ -41,23 +40,10 @@ public class CaseAssignmentVerifier {
                 || otherPartyPostcodes.contains(normalise(postcode));
     }
 
-    private boolean verifyAppellantOrOtherPartyIbcaReference(SscsCaseDetails sscsCaseDetails,
-                                                             String ibcaReference, String email) {
-        if (isBlank(ibcaReference)) {
-            return false;
-        }
-        final List<String> otherPartyIbcaReferenceList = emptyIfNull(sscsCaseDetails.getData().getOtherParties())
-                .stream()
-                .map(CcdValue::getValue)
-                .filter(otherParty -> hasOtherPartyGotEmailSubscription(otherParty, email))
-                .map(otherParty -> otherParty.getIdentity().getIbcaReference().toLowerCase())
-                .toList();
-
+    private boolean verifyAppellantOrOtherPartyIbcaReference(SscsCaseDetails sscsCaseDetails, String ibcaReference) {
         String appellantIbcaReference =
                 sscsCaseDetails.getData().getAppeal().getAppellant().getIdentity().getIbcaReference();
-
-        return equalsIgnoreCase(appellantIbcaReference, ibcaReference)
-                || otherPartyIbcaReferenceList.contains(ibcaReference.toLowerCase());
+        return equalsIgnoreCase(appellantIbcaReference, ibcaReference);
     }
 
     private boolean hasOtherPartyGotEmailSubscription(OtherParty otherParty, String email) {
