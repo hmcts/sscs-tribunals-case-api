@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.config;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference.ENGLISH;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference.WELSH;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.*;
-import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

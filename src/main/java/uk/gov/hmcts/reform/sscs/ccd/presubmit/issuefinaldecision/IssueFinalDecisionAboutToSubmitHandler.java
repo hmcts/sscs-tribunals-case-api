@@ -8,11 +8,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.hasHearingScheduledInTheFuture;
 import static uk.gov.hmcts.reform.sscs.util.SscsUtil.clearPostponementTransientFields;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Predicate;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

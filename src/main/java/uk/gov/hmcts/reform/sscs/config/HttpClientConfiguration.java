@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.sscs.config;
 
 import feign.Client;
-import feign.httpclient.ApacheHttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import feign.hc5.ApacheHttp5Client;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.util.Timeout;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -15,7 +16,7 @@ public class HttpClientConfiguration {
 
     @Bean
     public Client getFeignHttpClient() {
-        return new ApacheHttpClient(getHttpClient());
+        return new ApacheHttp5Client(getHttpClient());
     }
 
     @Bean
@@ -25,12 +26,11 @@ public class HttpClientConfiguration {
         return restTemplate;
     }
 
-    private CloseableHttpClient getHttpClient() {
-        int timeout = 10000;
+    private HttpClient getHttpClient() {
+        var timeout = Timeout.ofMilliseconds(10000);
         RequestConfig config = RequestConfig.custom()
                 .setConnectTimeout(timeout)
                 .setConnectionRequestTimeout(timeout)
-                .setSocketTimeout(timeout)
                 .build();
 
         return HttpClientBuilder

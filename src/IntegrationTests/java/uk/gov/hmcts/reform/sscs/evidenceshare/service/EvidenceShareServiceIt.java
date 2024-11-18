@@ -9,14 +9,14 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.UNREGISTERED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SENT_TO_DWP;
 
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Consumer;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
 import org.junit.*;

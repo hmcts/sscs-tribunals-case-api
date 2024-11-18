@@ -4,10 +4,10 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInTheFuture;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.isDateInThePast;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AdjournCaseDaysOffset;

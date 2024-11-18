@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.sscs.service.servicebus;
 
 import static org.mockito.Mockito.*;
 
+import jakarta.jms.Message;
 import java.net.NoRouteToHostException;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.jms.Message;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

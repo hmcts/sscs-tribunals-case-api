@@ -3,13 +3,13 @@ package uk.gov.hmcts.reform.sscs.tyanotifications.tya;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.helper.IntegrationTestHelper.*;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.UUID;
-import javax.servlet.http.HttpServletResponse;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
