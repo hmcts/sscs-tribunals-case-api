@@ -115,7 +115,11 @@ tasks.register('functional', Test) {
     setClasspath(sourceSets.functionalTest.runtimeClasspath)
     include "uk/gov/hmcts/reform/sscs/functional/**"
     exclude "uk/gov/hmcts/reform/sscs/smoke/**"
-    maxParallelForks = Runtime.runtime.availableProcessors()
+    // Use half of available processor to run tests in parallel.
+    // The following maxParallelForks config is suggested by gradle itself, https://docs.gradle.org/current/userguide/performance.html#execute_tests_in_parallel
+
+    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+
 }
 
 tasks.register('smoke', Test) {
