@@ -29,7 +29,7 @@ jobs:
         run: |
           cat build/master/definitions/benefit/sheets/ComplexTypes/ComplexTypes.json
           cat build/branch/definitions/benefit/sheets/ComplexTypes/ComplexTypes.json
-          REPORT="$(npx -q @hmcts/ccd-diff build/master/definitions/benefit/sheets/ build/branch/definitions/benefit/sheets/)"
+          REPORT="$(npx -q @hmcts/ccd-diff build/master/definitions/benefit/sheets build/branch/definitions/benefit/sheets)"
           REPORT="${REPORT//'%'/'%25'}"
           REPORT="${REPORT//$'\n'/'%0A'}"
           REPORT="${REPORT//$'\r'/'%0D'}"
