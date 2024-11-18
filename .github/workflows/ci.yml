@@ -1,4 +1,4 @@
-name: CI
+name: CI - Integration tests
 
 on:
   pull_request:
@@ -27,7 +27,5 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
-      - name: Run checks
-        run: ./gradlew check
       - name: Run integration tests
         run: ./gradlew integration
