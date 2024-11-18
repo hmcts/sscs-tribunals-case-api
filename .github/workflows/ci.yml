@@ -29,3 +29,11 @@ jobs:
           java-version: 17
       - name: Run integration tests
         run: ./gradlew integration
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          check_name: Integration Tests results
+          comment_title: Integration Tests results
+          files: |
+            build/test-results/**/*.xml
