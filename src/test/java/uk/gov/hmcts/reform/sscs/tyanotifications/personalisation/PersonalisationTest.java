@@ -515,14 +515,31 @@ public class PersonalisationTest {
         assertEquals(PHONE_WELSH, result.get(PHONE_NUMBER_WELSH));
         assertEquals("http://link.com/manage-email-notifications/ZYX", result.get(MANAGE_EMAILS_LINK_LITERAL));
         assertEquals("http://tyalink.com/GLSCRR", result.get(TRACK_APPEAL_LINK_LITERAL));
-
-        assertEquals(benefitType.equals("taxCredit") ? HMRC_ACRONYM : DWP_ACRONYM, result.get(FIRST_TIER_AGENCY_ACRONYM));
-        assertEquals(benefitType.equals("taxCredit") ? HMRC_FULL_NAME : DWP_FULL_NAME, result.get(FIRST_TIER_AGENCY_FULL_NAME));
-        assertEquals(benefitType.equals("taxCredit") ? HMRC_FULL_NAME_WELSH : DWP_FULL_NAME_WELSH, result.get(FIRST_TIER_AGENCY_FULL_NAME_WELSH));
-        assertEquals(benefitType.equals("taxCredit") ? HMRC_ACRONYM : DWP_FIRST_TIER_AGENCY_GROUP, result.get(FIRST_TIER_AGENCY_GROUP));
-        assertEquals(benefitType.equals("taxCredit") ? HMRC_ACRONYM : DWP_FIRST_TIER_AGENCY_GROUP_WELSH, result.get(FIRST_TIER_AGENCY_GROUP_WELSH));
-        assertEquals(benefitType.equals("taxCredit") ? "" : THE_STRING, result.get(WITH_OPTIONAL_THE));
-        assertEquals(benefitType.equals("taxCredit") ? "" : THE_STRING_WELSH, result.get(WITH_OPTIONAL_THE_WELSH));
+        if (benefitType.equals("taxCredit")) {
+            assertEquals(HMRC_ACRONYM, result.get(FIRST_TIER_AGENCY_ACRONYM));
+            assertEquals(HMRC_FULL_NAME, result.get(FIRST_TIER_AGENCY_FULL_NAME));
+            assertEquals(HMRC_FULL_NAME_WELSH, result.get(FIRST_TIER_AGENCY_FULL_NAME_WELSH));
+            assertEquals(HMRC_ACRONYM, result.get(FIRST_TIER_AGENCY_GROUP));
+            assertEquals(HMRC_ACRONYM, result.get(FIRST_TIER_AGENCY_GROUP_WELSH));
+            assertEquals("", result.get(WITH_OPTIONAL_THE));
+            assertEquals("", result.get(WITH_OPTIONAL_THE_WELSH));
+        } else if (benefitType.equals("infectedBloodCompensation")) {
+            assertEquals(IBC_ACRONYM, result.get(FIRST_TIER_AGENCY_ACRONYM));
+            assertEquals(IBC_FULL_NAME, result.get(FIRST_TIER_AGENCY_FULL_NAME));
+            assertEquals(IBC_FULL_NAME_WELSH, result.get(FIRST_TIER_AGENCY_FULL_NAME_WELSH));
+            assertEquals(IBC_FIRST_TIER_AGENCY_GROUP, result.get(FIRST_TIER_AGENCY_GROUP));
+            assertEquals(IBC_FIRST_TIER_AGENCY_GROUP_WELSH, result.get(FIRST_TIER_AGENCY_GROUP_WELSH));
+            assertEquals("", result.get(WITH_OPTIONAL_THE));
+            assertEquals("", result.get(WITH_OPTIONAL_THE_WELSH));
+        } else {
+            assertEquals(DWP_ACRONYM, result.get(FIRST_TIER_AGENCY_ACRONYM));
+            assertEquals(DWP_FULL_NAME, result.get(FIRST_TIER_AGENCY_FULL_NAME));
+            assertEquals(DWP_FULL_NAME_WELSH, result.get(FIRST_TIER_AGENCY_FULL_NAME_WELSH));
+            assertEquals(DWP_FIRST_TIER_AGENCY_GROUP, result.get(FIRST_TIER_AGENCY_GROUP));
+            assertEquals(DWP_FIRST_TIER_AGENCY_GROUP_WELSH, result.get(FIRST_TIER_AGENCY_GROUP_WELSH));
+            assertEquals(THE_STRING, result.get(WITH_OPTIONAL_THE));
+            assertEquals(THE_STRING_WELSH, result.get(WITH_OPTIONAL_THE_WELSH));
+        }
 
         assertEquals("29 July 2018", result.get(APPEAL_RESPOND_DATE));
         assertEquals("http://link.com/GLSCRR", result.get(SUBMIT_EVIDENCE_LINK_LITERAL));

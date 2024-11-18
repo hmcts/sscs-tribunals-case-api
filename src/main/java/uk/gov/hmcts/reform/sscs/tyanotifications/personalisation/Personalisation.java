@@ -36,6 +36,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -343,16 +344,38 @@ public class Personalisation<E extends NotificationWrapper> {
     }
 
     private void addFirstTierAgencyFields(Map<String, Object> personalisation, Benefit benefit, SscsCaseData ccdResponse) {
-        personalisation.put(FIRST_TIER_AGENCY_ACRONYM, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_ACRONYM : DWP_ACRONYM);
-        personalisation.put(FIRST_TIER_AGENCY_ACRONYM_WELSH, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_ACRONYM_WELSH : DWP_ACRONYM_WELSH);
-        personalisation.put(FIRST_TIER_AGENCY_FULL_NAME, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_FULL_NAME : DWP_FULL_NAME);
-        personalisation.put(FIRST_TIER_AGENCY_FULL_NAME_WELSH, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_FULL_NAME_WELSH : DWP_FULL_NAME_WELSH);
-        personalisation.put(FIRST_TIER_AGENCY_GROUP, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_ACRONYM : DWP_FIRST_TIER_AGENCY_GROUP);
-        personalisation.put(FIRST_TIER_AGENCY_GROUP_TITLE, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_ACRONYM : DWP_FIRST_TIER_AGENCY_GROUP_TITLE);
-        personalisation.put(FIRST_TIER_AGENCY_GROUP_WELSH, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? HMRC_ACRONYM : DWP_FIRST_TIER_AGENCY_GROUP_WELSH);
+        if (isHmrcBenefit(benefit, ccdResponse.getFormType())) {
+            personalisation.put(FIRST_TIER_AGENCY_ACRONYM, HMRC_ACRONYM);
+            personalisation.put(FIRST_TIER_AGENCY_ACRONYM_WELSH, HMRC_ACRONYM_WELSH);
+            personalisation.put(FIRST_TIER_AGENCY_FULL_NAME, HMRC_FULL_NAME);
+            personalisation.put(FIRST_TIER_AGENCY_FULL_NAME_WELSH, HMRC_FULL_NAME_WELSH);
+            personalisation.put(FIRST_TIER_AGENCY_GROUP, HMRC_ACRONYM);
+            personalisation.put(FIRST_TIER_AGENCY_GROUP_TITLE, HMRC_ACRONYM);
+            personalisation.put(FIRST_TIER_AGENCY_GROUP_WELSH, HMRC_ACRONYM);
+            personalisation.put(WITH_OPTIONAL_THE, "");
+            personalisation.put(WITH_OPTIONAL_THE_WELSH, "");
+        } else if (benefit != null && benefit.equals(Benefit.INFECTED_BLOOD_COMPENSATION)) {
+            personalisation.put(FIRST_TIER_AGENCY_ACRONYM, IBC_ACRONYM);
+            personalisation.put(FIRST_TIER_AGENCY_ACRONYM_WELSH, IBC_ACRONYM_WELSH);
+            personalisation.put(FIRST_TIER_AGENCY_FULL_NAME, IBC_FULL_NAME);
+            personalisation.put(FIRST_TIER_AGENCY_FULL_NAME_WELSH, IBC_FULL_NAME_WELSH);
+            personalisation.put(FIRST_TIER_AGENCY_GROUP, IBC_FIRST_TIER_AGENCY_GROUP);
+            personalisation.put(FIRST_TIER_AGENCY_GROUP_TITLE, IBC_ACRONYM);
+            personalisation.put(FIRST_TIER_AGENCY_GROUP_WELSH, IBC_FIRST_TIER_AGENCY_GROUP_WELSH);
+            personalisation.put(WITH_OPTIONAL_THE, "");
+            personalisation.put(WITH_OPTIONAL_THE_WELSH, "");
+        } else {
+            personalisation.put(FIRST_TIER_AGENCY_ACRONYM, DWP_ACRONYM);
+            personalisation.put(FIRST_TIER_AGENCY_ACRONYM_WELSH, DWP_ACRONYM_WELSH);
+            personalisation.put(FIRST_TIER_AGENCY_FULL_NAME, DWP_FULL_NAME);
+            personalisation.put(FIRST_TIER_AGENCY_FULL_NAME_WELSH, DWP_FULL_NAME_WELSH);
+            personalisation.put(FIRST_TIER_AGENCY_GROUP, DWP_FIRST_TIER_AGENCY_GROUP);
+            personalisation.put(FIRST_TIER_AGENCY_GROUP_TITLE, DWP_FIRST_TIER_AGENCY_GROUP_TITLE);
+            personalisation.put(FIRST_TIER_AGENCY_GROUP_WELSH, DWP_FIRST_TIER_AGENCY_GROUP_WELSH);
+            personalisation.put(WITH_OPTIONAL_THE, THE_STRING);
+            personalisation.put(WITH_OPTIONAL_THE_WELSH, THE_STRING_WELSH);
+        }
         personalisation.put(FIRST_TIER_AGENCY_OFFICE, ccdResponse.getDwpRegionalCentre());
-        personalisation.put(WITH_OPTIONAL_THE, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? "" : THE_STRING);
-        personalisation.put(WITH_OPTIONAL_THE_WELSH, isHmrcBenefit(benefit, ccdResponse.getFormType()) ? "" : THE_STRING_WELSH);
     }
 
     private boolean isHmrcBenefit(Benefit benefit, FormType formType) {
