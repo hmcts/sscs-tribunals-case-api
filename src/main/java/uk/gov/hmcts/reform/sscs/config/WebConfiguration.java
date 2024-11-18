@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfiguration implements WebMvcConfigurer {
 
     /**
-     * Match paths with a trailing slash to keep compatibility with Spring Boot 2
+     * Match paths with a trailing slash to keep compatibility with Spring Boot 2.
      */
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {

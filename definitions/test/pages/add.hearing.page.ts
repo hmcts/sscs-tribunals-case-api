@@ -54,6 +54,9 @@ export class AddHearingPage {
         await webActions.inputField('#hearingRequested-day', '20');
         await webActions.inputField('#hearingRequested-month', '2');
         await webActions.inputField('#hearingRequested-year', '2024');
+        await webActions.inputField('#hearingRequested-hour', '0');
+        await webActions.inputField('#hearingRequested-minute', '0');
+        await webActions.inputField('#hearingRequested-second', '0');
 
         
         await webActions.inputField('#hearings_0_versionNumber', '123');
@@ -62,10 +65,16 @@ export class AddHearingPage {
         await webActions.inputField('#start-day', '20');
         await webActions.inputField('#start-month', '2');
         await webActions.inputField('#start-year', '2024');
+        await webActions.inputField('#start-hour', '0');
+        await webActions.inputField('#start-minute', '0');
+        await webActions.inputField('#start-second', '0');
 
         await webActions.inputField('#end-day', '20');
         await webActions.inputField('#end-month', '2');
         await webActions.inputField('#end-year', '2024');
+        await webActions.inputField('#end-hour', '0');
+        await webActions.inputField('#end-minute', '0');
+        await webActions.inputField('#end-second', '0');
 
         
         await webActions.inputField('#hearings_0_epimsId', '1234');

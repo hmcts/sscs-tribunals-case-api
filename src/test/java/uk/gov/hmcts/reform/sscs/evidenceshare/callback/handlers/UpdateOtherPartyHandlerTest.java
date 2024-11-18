@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -27,7 +28,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.PanelCompositionService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -41,7 +42,7 @@ public class UpdateOtherPartyHandlerTest {
     private SscsCaseData sscsCaseData;
 
     @Mock
-    private CcdService ccdService;
+    private UpdateCcdCaseService updateCcdCaseService;
     @Mock
     private IdamService idamService;
 
@@ -52,13 +53,13 @@ public class UpdateOtherPartyHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     @Captor
-    private ArgumentCaptor<SscsCaseData> captor;
+    private ArgumentCaptor<Consumer<SscsCaseDetails>> consumerArgumentCaptor;
 
     @Before
     public void setUp() {
         openMocks(this);
 
-        handler = new UpdateOtherPartyHandler(new PanelCompositionService(ccdService, idamService));
+        handler = new UpdateOtherPartyHandler(new PanelCompositionService(updateCcdCaseService, idamService));
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").build();
 
@@ -95,11 +96,12 @@ public class UpdateOtherPartyHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(ccdService).updateCase(captor.capture(),
-            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
-            eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any());
+        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), consumerArgumentCaptor.capture());
 
-        assertThat(captor.getValue().getDirectionDueDate(), is(nullValue()));
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(callback.getCaseDetails().getCaseData()).build();
+        consumerArgumentCaptor.getValue().accept(sscsCaseDetails);
+        assertThat(sscsCaseDetails.getData().getDirectionDueDate(), is(nullValue()));
     }
 
     @Test
@@ -117,9 +119,8 @@ public class UpdateOtherPartyHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
-            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
-            eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any());
+        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), any(Consumer.class));
     }
 
     @Test
@@ -139,9 +140,8 @@ public class UpdateOtherPartyHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
-            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
-            eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any());
+        verify(updateCcdCaseService).updateCaseV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any(), any(Consumer.class));
     }
 
     @Test
@@ -160,8 +160,7 @@ public class UpdateOtherPartyHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
-            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+        verify(updateCcdCaseService).triggerCaseEventV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
             eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
@@ -179,8 +178,7 @@ public class UpdateOtherPartyHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
-            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+        verify(updateCcdCaseService).triggerCaseEventV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
             eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
@@ -198,8 +196,7 @@ public class UpdateOtherPartyHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
-            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+        verify(updateCcdCaseService).triggerCaseEventV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
             eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
@@ -218,8 +215,7 @@ public class UpdateOtherPartyHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
-            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+        verify(updateCcdCaseService).triggerCaseEventV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
             eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
@@ -240,8 +236,7 @@ public class UpdateOtherPartyHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(ccdService, times(wantedNumberOfInvocations)).updateCase(eq(callback.getCaseDetails().getCaseData()),
-            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+        verify(updateCcdCaseService, times(wantedNumberOfInvocations)).triggerCaseEventV2(eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
             eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 

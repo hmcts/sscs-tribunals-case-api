@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.evidenceshare.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.evidenceshare.service.FurtherEvidenceService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -25,14 +27,20 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
     private final FurtherEvidenceService furtherEvidenceService;
     private final CcdService ccdService;
     private final IdamService idamService;
+    private final UpdateCcdCaseService updateCcdCaseService;
+
+    @Value("${feature.update-case-only-hearing-v2.enabled}")
+    private boolean updateCaseOnlyHearingV2Enabled;
 
     @Autowired
     public ReissueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService,
                                          CcdService ccdService,
-                                         IdamService idamService) {
+                                         IdamService idamService,
+                                         UpdateCcdCaseService updateCcdCaseService) {
         this.furtherEvidenceService = furtherEvidenceService;
         this.ccdService = ccdService;
         this.idamService = idamService;
+        this.updateCcdCaseService = updateCcdCaseService;
     }
 
     @Override
@@ -118,9 +126,14 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
             final SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(Long.valueOf(caseData.getCcdCaseId()), idamService.getIdamTokens());
             caseData = sscsCaseDetails.getData();
         }
-        setEvidenceIssuedFlagToYes(selectedDocument);
-        setReissueFlagsToNull(caseData);
-        updateCase(caseData, selectedDocument);
+
+        if (updateCaseOnlyHearingV2Enabled) {
+            updateCaseV2(caseData, selectedDocument);
+        } else {
+            setEvidenceIssuedFlagToYes(selectedDocument);
+            setReissueFlagsToNull(caseData);
+            updateCase(caseData, selectedDocument);
+        }
     }
 
     private List<FurtherEvidenceLetterType> getAllowedFurtherEvidenceLetterTypes(SscsCaseData caseData) {
@@ -193,6 +206,22 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         if (doc.getValue().getEvidenceIssued() != null && doc.getValue().getEvidenceIssued().equals("No")) {
             doc.getValue().setEvidenceIssued("Yes");
         }
+    }
+
+    private void updateCaseV2(final SscsCaseData caseData, AbstractDocument selectedDocument) {
+
+        updateCcdCaseService.updateCaseV2(
+                Long.valueOf(caseData.getCcdCaseId()),
+                EventType.UPDATE_CASE_ONLY.getCcdType(),
+                "Update case data only",
+                determineDescription(selectedDocument),
+                idamService.getIdamTokens(),
+                sscsCaseDetails -> {
+                    final AbstractDocument documentIssuedFlagToYes =
+                            getSelectedDocumentInUiFromCaseData(sscsCaseDetails.getData(), sscsCaseDetails.getData().getReissueArtifactUi());
+                    setEvidenceIssuedFlagToYes(documentIssuedFlagToYes);
+                    setReissueFlagsToNull(sscsCaseDetails.getData());
+                });
     }
 
     private void updateCase(SscsCaseData caseData, AbstractDocument selectedDocument) {
