@@ -33,5 +33,7 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
+          check_name: Integration Tests results
+          comment_title: Integration Tests results
           files: |
             build/test-results/**/*.xml
