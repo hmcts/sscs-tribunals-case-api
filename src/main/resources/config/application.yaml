@@ -111,9 +111,7 @@ azure:
         hearings:
             connection-string: ${HEARINGS_EVENT_SERVICE_BUS_CONNECTION_STRING}
             destination: ${HEARINGS_EVENT_QUEUE_NAME}
-bulk_scan:
-    url: ${BULK_SCAN_URL:http://localhost:8090}
-    validateEndpoint: /validate-record
+
 bundle:
     english:
         config: ${BUNDLE_ENGLISH_CONFIG:sscs-bundle-config.yaml}
