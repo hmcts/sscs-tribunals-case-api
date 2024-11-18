@@ -1,11 +1,10 @@
-package uk.gov.hmcts.reform.sscs.tyanotifications.controller;
+package uk.gov.hmcts.reform.sscs.tyanotifications.tya;
 
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.getNotificationByCcdEvent;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.NotificationUtils.buildSscsCaseDataWrapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +31,6 @@ public class ReminderTestController {
     private final SscsCaseCallbackDeserializer deserializer;
     private final IdamService idamService;
 
-    @Autowired
     public ReminderTestController(NotificationService notificationService,
                                   AuthorisationService authorisationService,
                                   CcdService ccdService,
