@@ -169,8 +169,8 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
                 .isEqualTo("372653");
     }
 
-    @Test void callToAboutToSubmitEventHandler_withIncorrectHearingIdShouldReturnError() throws Exception {
-        setup("callback/addHearingOutcomeWithMissingHearingDetailsCallback.json");
+    @Test void callToAboutToSubmitEventHandler_hearingIdWithExistingOutcomeShouldReturnError() throws Exception {
+        setup("callback/addHearingOutcomeWithPreExistingHearingOutcomeCallback.json");
 
         hmcServer.stubFor(WireMock.get(
                         urlEqualTo(PATH_HEARING + "/" + PATH_CASE_ID + QUERY_PARAM))
@@ -182,7 +182,7 @@ public class AddHearingOutcomeIt extends AbstractEventIt {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertThat(result.getErrors())
-                .contains("Cannot find hearing details for hearing 21 Feb 2024, 11:00:00 AM, Cardiff with hearing ID: 1030011048");
+                .contains("A hearing outcome already exists for this hearing date. Please select a different hearing date");
     }
 
 }

@@ -181,18 +181,15 @@ public class AddHearingOutcomeAboutToSubmitHandlerTest {
 
     @Test
     public void givenIncorrectHearingId_thenGiveError() {
+        sscsCaseData.setHearingOutcomes(new ArrayList<>());
+        sscsCaseData.getHearingOutcomes().add(HearingOutcome.builder().value(
+                HearingOutcomeDetails.builder().completedHearingId("1").build()).build());
 
-        List<DynamicListItem> completedHearingsListOptions = new ArrayList<>();
-        completedHearingsListOptions.add(new DynamicListItem("1", "Hearing 1 Date and Time start and End time, venue_name1"));
-        completedHearingsListOptions.add(new DynamicListItem("2", "Hearing 2 Date and Time start and End time, venue_name2"));
-        DynamicList completedHearings = new DynamicList(new DynamicListItem("3", "Hearing 3 Date and Time start and End time, venue_name3"), completedHearingsListOptions);
-
-        sscsCaseData.getHearingOutcomeValue().setCompletedHearings(completedHearings);
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getErrors())
                 .hasSize(1)
-                .contains("Cannot find hearing details for hearing Hearing 3 Date and Time start and End time, venue_name3 with hearing ID: 3");
+                .contains("A hearing outcome already exists for this hearing date. Please select a different hearing date");
     }
 }

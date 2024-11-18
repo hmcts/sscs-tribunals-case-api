@@ -47,23 +47,16 @@ public class AddHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbackH
 
         DynamicList completedHearings = sscsCaseData.getHearingOutcomeValue().getCompletedHearings();
 
-        String hearingId = completedHearings.getValue().getCode();
+        String selectedHearingId = completedHearings.getValue().getCode();
         String selectedHearing = completedHearings.getValue().getLabel();
 
         log.info("Add hearing outcome for selected item {} with hearing ID:{} for case ID:{}",
-                selectedHearing, hearingId, callback.getCaseDetails().getId());
+                selectedHearing, selectedHearingId, callback.getCaseDetails().getId());
 
         HearingDetails selectedHearingDetails = sscsCaseData.getHearings().stream()
-                .filter(hearing -> hearing.getValue().getHearingId().equalsIgnoreCase(hearingId))
+                .filter(hearing -> hearing.getValue().getHearingId().equalsIgnoreCase(selectedHearingId))
                 .findFirst().orElse(Hearing.builder().build()).getValue();
 
-        if (selectedHearingDetails == null) {
-            log.info("Add Hearing Outcome: Cannot find hearing with hearing ID:{} and value {} for case ID:{}",
-                    hearingId, selectedHearing, callback.getCaseDetails().getId());
-            preSubmitCallbackResponse.addError("Cannot find hearing details for hearing " + selectedHearing
-                    + " with hearing ID: " + hearingId);
-            return preSubmitCallbackResponse;
-        }
         HearingOutcomeDetails hearingOutcomeDetails = HearingOutcomeDetails.builder()
                 .completedHearingId(selectedHearingDetails.getHearingId())
                 .hearingStartDateTime(selectedHearingDetails.getStart())
@@ -76,8 +69,24 @@ public class AddHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbackH
                 .build();
 
         HearingOutcome hearingOutcome = HearingOutcome.builder().value(hearingOutcomeDetails).build();
+
         if (sscsCaseData.getHearingOutcomes() == null) {
             sscsCaseData.setHearingOutcomes(new ArrayList<>());
+        }
+
+        HearingOutcome checkExisting = sscsCaseData.getHearingOutcomes().stream()
+                .filter(hearingOutcome1 -> hearingOutcome1.getValue().getCompletedHearingId()
+                        .equalsIgnoreCase(selectedHearingId))
+                .findFirst()
+                .orElse(null);
+
+        if (checkExisting != null) {
+            log.info("Add Hearing Outcome: There is already an existing hearing outcome with hearing ID:{} " +
+                            "and value {} for case ID:{}",
+                    selectedHearingId, selectedHearing, callback.getCaseDetails().getId());
+            preSubmitCallbackResponse.addError("A hearing outcome already exists for this hearing date. " +
+                    "Please select a different hearing date");
+            return preSubmitCallbackResponse;
         }
 
         sscsCaseData.getHearingOutcomes().add(hearingOutcome);
