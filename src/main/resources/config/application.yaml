@@ -2084,7 +2084,7 @@ spring:
     flyway:
         enabled: false
 amqp:
-    enabled: true
+    enabled: false
 job.scheduler:
     autoStart: false
     retryPolicy:
