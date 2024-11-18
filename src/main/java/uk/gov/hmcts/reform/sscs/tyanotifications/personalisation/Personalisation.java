@@ -164,6 +164,7 @@ public class Personalisation<E extends NotificationWrapper> {
         try {
             if (hasBenefitType(ccdResponse)) {
                 benefit = getBenefitByCodeOrThrowException(ccdResponse.getAppeal().getBenefitType().getCode());
+                // TODO use common isIbc boolean when available
                 if (benefit.equals(Benefit.INFECTED_BLOOD_COMPENSATION)) {
                     personalisation.put(BENEFIT_NAME_ACRONYM_LITERAL, "IBC");
                     personalisation.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, "IGH");
@@ -354,6 +355,7 @@ public class Personalisation<E extends NotificationWrapper> {
             personalisation.put(FIRST_TIER_AGENCY_GROUP_WELSH, HMRC_ACRONYM);
             personalisation.put(WITH_OPTIONAL_THE, "");
             personalisation.put(WITH_OPTIONAL_THE_WELSH, "");
+            // TODO use common isIbc boolean when available
         } else if (benefit != null && benefit.equals(Benefit.INFECTED_BLOOD_COMPENSATION)) {
             personalisation.put(FIRST_TIER_AGENCY_ACRONYM, IBC_ACRONYM);
             personalisation.put(FIRST_TIER_AGENCY_ACRONYM_WELSH, IBC_ACRONYM_WELSH);
@@ -388,6 +390,9 @@ public class Personalisation<E extends NotificationWrapper> {
     private void setHelplineTelephone(SscsCaseData ccdResponse, Map<String, Object> personalisation) {
         if ("yes".equalsIgnoreCase(ccdResponse.getIsScottishCase())) {
             personalisation.put(HELPLINE_PHONE_NUMBER, config.getHelplineTelephoneScotland());
+        // TODO use common isIbc boolean when available
+        } else if (ccdResponse.getBenefitType().isPresent() && ccdResponse.getBenefitType().get().equals(Benefit.INFECTED_BLOOD_COMPENSATION)) {
+            personalisation.put(HELPLINE_PHONE_NUMBER, "03001231234");
         } else {
             personalisation.put(HELPLINE_PHONE_NUMBER, config.getHelplineTelephone());
         }
@@ -582,9 +587,14 @@ public class Personalisation<E extends NotificationWrapper> {
             personalisation.put(POSTCODE_LITERAL, rpc.getPostcode());
             personalisation.put(REGIONAL_OFFICE_POSTCODE_LITERAL, rpc.getPostcode());
         }
-
-        personalisation.put(PHONE_NUMBER_WELSH, evidenceProperties.getAddress().getTelephoneWelsh());
-        personalisation.put(PHONE_NUMBER, determinePhoneNumber(rpc));
+        // TODO use common isIbc boolean when available
+        if (!Objects.equals(ccdResponse.getIsScottishCase(), "Yes") && ccdResponse.getBenefitType().isPresent() && ccdResponse.getBenefitType().get().equals(Benefit.INFECTED_BLOOD_COMPENSATION)) {
+            personalisation.put(PHONE_NUMBER_WELSH, "03001234567");
+            personalisation.put(PHONE_NUMBER, "03001231234");
+        } else {
+            personalisation.put(PHONE_NUMBER_WELSH, evidenceProperties.getAddress().getTelephoneWelsh());
+            personalisation.put(PHONE_NUMBER, determinePhoneNumber(rpc));
+        }
 
         setHearingArrangementDetails(personalisation, ccdResponse);
 

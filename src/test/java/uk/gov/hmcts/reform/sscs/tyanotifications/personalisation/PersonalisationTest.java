@@ -466,7 +466,7 @@ public class PersonalisationTest {
         "attendanceAllowance,judge\\, doctor and disability expert, Attendance Allowance, Lwfans Gweini, barnwr\\, meddyg ac arbenigwr anableddau, Attendance Allowance, Lwfans Gweini",
         "bereavementBenefit,judge, Bereavement Benefit, Budd-dal Profedigaeth, barnwr, Bereavement Benefit, Budd-dal Profedigaeth",
         "taxCredit, judge and Financially Qualified Panel Member (if applicable), Tax Credit, Credyd Treth, Barnwr ac Aelod Panel sydd â chymhwyster i ddelio gyda materion Ariannol (os yw’n berthnasol), Tax Credit, Credyd Treth",
-        "infectedBloodCompensation,judge\\, doctor and disability expert (if applicable), Infected Blood Compensation, Apêl Gwaed Heintiedig, barnwr\\, meddyg ac arbenigwr anabledd (os yw’n berthnasol), IBC, IGH"
+        "infectedBloodCompensation,judge and if applicable a medical member and/or a qualified tribunal member, Infected Blood Compensation, Iawndal Gwaed Heintiedig, barnwr ac os yw’n berthnasol\\, aelod meddygol ac/neu aelod tribiwnlys cymwys, IBC, IGH"
     })
     public void customisePersonalisation(String benefitType,
                                          String expectedPanelComposition,
@@ -504,6 +504,7 @@ public class PersonalisationTest {
         assertEquals(expectedWelshAcronym, result.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH));
         assertEquals(expectedBenefitDesc, result.get(BENEFIT_FULL_NAME_LITERAL));
         assertEquals(welshExpectedBenefitDesc, result.get(BENEFIT_FULL_NAME_LITERAL_WELSH));
+
         assertEquals(getLongBenefitNameDescriptionWithOptionalAcronym(benefitType, true), result.get(BENEFIT_NAME_AND_OPTIONAL_ACRONYM));
         assertEquals(getLongBenefitNameDescriptionWithOptionalAcronym(benefitType, false), result.get(BENEFIT_NAME_AND_OPTIONAL_ACRONYM_WELSH));
         assertEquals("SC/1234/5", result.get(APPEAL_REF));
@@ -511,8 +512,6 @@ public class PersonalisationTest {
         assertEquals("GLSCRR", result.get(APPEAL_ID_LITERAL));
         assertEquals("Harry Kane", result.get(NAME));
         assertEquals("Harry Kane", result.get(APPELLANT_NAME));
-        assertEquals("0300 999 8888", result.get(PHONE_NUMBER));
-        assertEquals(PHONE_WELSH, result.get(PHONE_NUMBER_WELSH));
         assertEquals("http://link.com/manage-email-notifications/ZYX", result.get(MANAGE_EMAILS_LINK_LITERAL));
         assertEquals("http://tyalink.com/GLSCRR", result.get(TRACK_APPEAL_LINK_LITERAL));
         if (benefitType.equals("taxCredit")) {
@@ -523,6 +522,8 @@ public class PersonalisationTest {
             assertEquals(HMRC_ACRONYM, result.get(FIRST_TIER_AGENCY_GROUP_WELSH));
             assertEquals("", result.get(WITH_OPTIONAL_THE));
             assertEquals("", result.get(WITH_OPTIONAL_THE_WELSH));
+            assertEquals("0300 999 8888", result.get(PHONE_NUMBER));
+            assertEquals(PHONE_WELSH, result.get(PHONE_NUMBER_WELSH));
         } else if (benefitType.equals("infectedBloodCompensation")) {
             assertEquals(IBC_ACRONYM, result.get(FIRST_TIER_AGENCY_ACRONYM));
             assertEquals(IBC_FULL_NAME, result.get(FIRST_TIER_AGENCY_FULL_NAME));
@@ -531,6 +532,9 @@ public class PersonalisationTest {
             assertEquals(IBC_FIRST_TIER_AGENCY_GROUP_WELSH, result.get(FIRST_TIER_AGENCY_GROUP_WELSH));
             assertEquals("", result.get(WITH_OPTIONAL_THE));
             assertEquals("", result.get(WITH_OPTIONAL_THE_WELSH));
+            assertEquals("03001231234", result.get(HELPLINE_PHONE_NUMBER));
+            assertEquals("03001234567", result.get(PHONE_NUMBER_WELSH));
+            assertEquals("03001231234", result.get(PHONE_NUMBER));
         } else {
             assertEquals(DWP_ACRONYM, result.get(FIRST_TIER_AGENCY_ACRONYM));
             assertEquals(DWP_FULL_NAME, result.get(FIRST_TIER_AGENCY_FULL_NAME));
@@ -539,6 +543,8 @@ public class PersonalisationTest {
             assertEquals(DWP_FIRST_TIER_AGENCY_GROUP_WELSH, result.get(FIRST_TIER_AGENCY_GROUP_WELSH));
             assertEquals(THE_STRING, result.get(WITH_OPTIONAL_THE));
             assertEquals(THE_STRING_WELSH, result.get(WITH_OPTIONAL_THE_WELSH));
+            assertEquals("0300 999 8888", result.get(PHONE_NUMBER));
+            assertEquals(PHONE_WELSH, result.get(PHONE_NUMBER_WELSH));
         }
 
         assertEquals("29 July 2018", result.get(APPEAL_RESPOND_DATE));
