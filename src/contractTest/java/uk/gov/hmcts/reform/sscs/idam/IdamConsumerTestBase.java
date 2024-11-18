@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.sscs.idam;
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.annotations.PactDirectory;
-import org.apache.http.client.fluent.Executor;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,9 +38,11 @@ public abstract class IdamConsumerTestBase {
         Thread.sleep(SLEEP_TIME);
     }
 
-    @AfterEach
-    void teardown() {
-        Executor.closeIdleConnections();
-    }
+
+    //    TODO: SB3
+    //    @AfterEach
+    //    void teardown() {
+    //        Executor.closeIdleConnections();
+    //    }
 
 }
