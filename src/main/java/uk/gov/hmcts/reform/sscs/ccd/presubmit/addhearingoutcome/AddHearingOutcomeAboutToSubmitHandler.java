@@ -81,11 +81,11 @@ public class AddHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbackH
                 .orElse(null);
 
         if (checkExisting != null) {
-            log.info("Add Hearing Outcome: There is already an existing hearing outcome with hearing ID:{} " +
-                            "and value {} for case ID:{}",
+            log.info("Add Hearing Outcome: There is already an existing hearing outcome with hearing ID:{} "
+                            + "and value {} for case ID:{}",
                     selectedHearingId, selectedHearing, callback.getCaseDetails().getId());
-            preSubmitCallbackResponse.addError("A hearing outcome already exists for this hearing date. " +
-                    "Please select a different hearing date");
+            preSubmitCallbackResponse.addError("A hearing outcome already exists for this hearing date. "
+                    + "Please select a different hearing date");
             return preSubmitCallbackResponse;
         }
 
