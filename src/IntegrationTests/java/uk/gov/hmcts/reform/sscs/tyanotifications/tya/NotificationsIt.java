@@ -182,6 +182,25 @@ public class NotificationsIt extends NotificationsItBase {
     }
 
     @Test
+    public void shouldSetInfectedBloodCompensationDescriptionInAcronymField() throws Exception {
+        String path = getClass().getClassLoader().getResource("json/ccdResponseTest.json").getFile();
+        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        json = updateEmbeddedJson(json, "infectedBloodCompensation", "case_details", "case_data", "appeal", "benefitType", "code");
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json));
+        assertHttpStatus(response, HttpStatus.OK);
+
+        ArgumentCaptor<String> emailTemplateIdCaptor = ArgumentCaptor.forClass(String.class);
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Map<String, ?>> emailPersonalisationCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(notificationClient, times(1))
+            .sendEmail(emailTemplateIdCaptor.capture(), any(), emailPersonalisationCaptor.capture(), any());
+        Map<String, ?> personalisation = emailPersonalisationCaptor.getValue();
+        assertEquals("IBC", personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL));
+        assertEquals("IGH", personalisation.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH));
+    }
+
+    @Test
     public void shouldSetBereavementBenefitDescriptionInAcronymField() throws Exception {
         String path = getClass().getClassLoader().getResource("json/ccdResponseTest.json").getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());

@@ -163,8 +163,10 @@ public class Personalisation<E extends NotificationWrapper> {
         try {
             if (hasBenefitType(ccdResponse)) {
                 benefit = getBenefitByCodeOrThrowException(ccdResponse.getAppeal().getBenefitType().getCode());
-
-                if (benefit.isHasAcronym()) {
+                if (benefit.equals(Benefit.INFECTED_BLOOD_COMPENSATION)) {
+                    personalisation.put(BENEFIT_NAME_ACRONYM_LITERAL, "IBC");
+                    personalisation.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, "IGH");
+                } else if (benefit.isHasAcronym()) {
                     personalisation.put(BENEFIT_NAME_ACRONYM_LITERAL, benefit.name());
                     personalisation.put(BENEFIT_NAME_ACRONYM_LITERAL_WELSH, benefit.name());
                 } else {
