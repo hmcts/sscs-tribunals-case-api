@@ -42,7 +42,7 @@ Once the application running locally, please make sure
 ## Running tribunals with hearings enabled
 If you need to test Tribunals with HMC Hearings you must carry out the following steps:
 1. First you need to create a pull request on github for your branch
-2. The branch should have the labels: enable_keep_helm, pr-values:hearings
+2. The branch should have the labels: `enable_keep_helm`, `pr-values:hearings`
 3. Once this is done you then need to upload a CCD Definition file to AAT CCD. This definition file should have a unique CaseType ID in this format (4120 represents the Pull request number):
 
 ```bash
