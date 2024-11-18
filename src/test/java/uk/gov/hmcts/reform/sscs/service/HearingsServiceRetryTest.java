@@ -11,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingRoute.LIST_ASSIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.CREATE_HEARING;
 
 import java.util.function.Consumer;
@@ -23,7 +24,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.retry.ExhaustedRetryException;
@@ -31,13 +31,12 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.HearingEvent;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingCancelRequestPayload;
+import uk.gov.hmcts.reform.sscs.model.single.hearing.HearingRequestPayload;
 import uk.gov.hmcts.reform.sscs.model.single.hearing.HmcUpdateResponse;
 import uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason;
 import uk.gov.hmcts.reform.sscs.reference.data.model.SessionCategoryMap;
@@ -47,9 +46,10 @@ import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @EnableRetry
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {HearingsService.class})
+@SpringBootTest(classes = {HearingsServiceV1.class})
 @TestPropertySource(properties = {
     "retry.hearing-response-update.backoff=100",
+    "feature.hearings-case-updateV2.enabled=false"
 })
 class HearingsServiceRetryTest {
     private static final long HEARING_REQUEST_ID = 12345;
@@ -79,29 +79,28 @@ class HearingsServiceRetryTest {
     private SessionCategoryMapService sessionCategoryMaps;
 
     @MockBean
-    private IdamService idamService;
-
-    @MockBean
-    private UpdateCcdCaseService updateCcdCaseService;
-
-    @MockBean
     private HearingServiceConsumer hearingServiceConsumer;
 
     @MockBean
     private Consumer<SscsCaseDetails> sscsCaseDetailsConsumer;
 
+    @MockBean
+    private VenueService venueService;
+
     @Mock
     private Consumer<SscsCaseData> sscsCaseDataConsumer;
 
-    @Autowired
     private HearingsService hearingsService;
 
     private HearingWrapper wrapper;
 
     private SscsCaseDetails caseDetails;
 
+    private HearingRequest hearingRequest;
+
     @BeforeEach
     void setup() {
+        hearingsService = new HearingsServiceV1(hmcHearingApiService, hmcHearingsApiService, ccdCaseService, refData, hearingServiceConsumer);
         MockitoAnnotations.openMocks(this);
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId(String.valueOf(CASE_ID))
@@ -114,7 +113,7 @@ class HearingsServiceRetryTest {
                         .hearingType("test")
                         .hearingSubtype(HearingSubtype.builder().wantsHearingTypeFaceToFace("yes").build())
                         .appellant(Appellant.builder()
-                                       .name(Name.builder().build())
+                                       .name(Name.builder().firstName("firstname").lastName("lastname").build())
                                        .build())
                         .build())
             .build();
@@ -131,6 +130,12 @@ class HearingsServiceRetryTest {
             .eventToken(EVENT_TOKEN)
             .build();
 
+        hearingRequest = HearingRequest
+                .builder(String.valueOf(CASE_ID))
+                .hearingState(CREATE_HEARING)
+                .hearingRoute(LIST_ASSIST)
+                .build();
+
         when(hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(any(), any())).thenReturn(
             sscsCaseDetailsConsumer);
         when(hearingServiceConsumer.getCreateHearingCaseDataConsumer(any(), any())).thenReturn(sscsCaseDataConsumer);
@@ -141,31 +146,39 @@ class HearingsServiceRetryTest {
     @ParameterizedTest
     @CsvSource(value = {
         "CREATE_HEARING,CREATE_HEARING",
-        "UPDATED_CASE,UPDATED_CASE",
+        "UPDATE_HEARING,UPDATE_HEARING",
     }, nullValues = {"null"})
     void updateHearingResponse(HearingState state, HearingEvent event) throws UpdateCaseException {
-        given(ccdCaseService.getStartEventResponse(eq(CASE_ID), any(EventType.class))).willReturn(caseDetails);
-
-        given(ccdCaseService.updateCaseData(
-            any(SscsCaseData.class),
-            any(EventType.class),
-            anyString(), anyString()
-        ))
-            .willReturn(caseDetails);
-
-        wrapper.setHearingState(state);
-
+        var category = SessionCategory.CATEGORY_06;
+        var sessionCategoryMap = new SessionCategoryMap();
+        sessionCategoryMap.setCategory(category);
         HmcUpdateResponse response = HmcUpdateResponse.builder()
-            .versionNumber(VERSION)
-            .hearingRequestId(HEARING_REQUEST_ID)
-            .build();
+                .versionNumber(VERSION)
+                .hearingRequestId(HEARING_REQUEST_ID)
+                .build();
+
+        given(ccdCaseService.getStartEventResponse(eq(CASE_ID), any(EventType.class))).willReturn(caseDetails);
+        given(refData.getHearingDurations()).willReturn(hearingDurations);
+        given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
+        given(refData.getVenueService()).willReturn(venueService);
+        given(venueService.getEpimsIdForVenue(anyString())).willReturn("");
+        given(hmcHearingApiService.sendCreateHearingRequest(any(HearingRequestPayload.class)))
+                .willReturn(response);
+
+        given(hmcHearingApiService.sendUpdateHearingRequest(any(HearingRequestPayload.class), any()))
+                .willReturn(response);
+        given(sessionCategoryMaps.getSessionCategory(anyString(), anyString(), anyBoolean(), anyBoolean()))
+                .willReturn(sessionCategoryMap);
+
+        hearingRequest.setHearingState(state);
+
         assertThatNoException()
-            .isThrownBy(() -> hearingsService.hearingResponseUpdate(wrapper, response));
+            .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest));
 
         verify(ccdCaseService, times(1))
             .updateCaseData(
-                any(SscsCaseData.class),
-                eq(wrapper),
+                eq(caseDetails.getData()),
+                any(HearingWrapper.class),
                 any(HearingEvent.class)
             );
     }

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -18,12 +17,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATED_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.HearingState.UPDATE_HEARING;
 import static uk.gov.hmcts.reform.sscs.reference.data.model.CancellationReason.OTHER;
 
-import feign.FeignException;
-import feign.Request;
-import feign.RequestTemplate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,21 +29,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.GetHearingException;
 import uk.gov.hmcts.reform.sscs.exception.ListingException;
 import uk.gov.hmcts.reform.sscs.exception.UnhandleableHearingStateException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.HearingEvent;
 import uk.gov.hmcts.reform.sscs.model.HearingWrapper;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
@@ -68,7 +58,7 @@ import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @ExtendWith(MockitoExtension.class)
-class HearingsServiceTest {
+class HearingsServiceV1Test {
     private static final long HEARING_REQUEST_ID = 12345;
     private static final long CASE_ID = 1625080769409918L;
     private static final String BENEFIT_CODE = "002";
@@ -77,8 +67,9 @@ class HearingsServiceTest {
 
 
     private HearingWrapper wrapper;
-    private HearingRequest request;
+    private HearingRequest hearingRequest;
     private SscsCaseDetails expectedCaseDetails;
+    private SscsCaseDetails sscsCaseDetails;
 
     @Mock
     private HmcHearingApiService hmcHearingApiService;
@@ -102,12 +93,6 @@ class HearingsServiceTest {
     private VenueService venueService;
 
     @Mock
-    private IdamService idamService;
-
-    @Mock
-    private UpdateCcdCaseService updateCcdCaseService;
-
-    @Mock
     private HearingServiceConsumer hearingServiceConsumer;
 
     @Mock
@@ -120,7 +105,7 @@ class HearingsServiceTest {
     private ArgumentCaptor<Consumer<SscsCaseDetails>> caseDataConsumerCaptor;
 
     @InjectMocks
-    private HearingsService hearingsService;
+    private HearingsServiceV1 hearingsService;
 
     @BeforeEach
     void setup() {
@@ -148,7 +133,7 @@ class HearingsServiceTest {
             .caseState(State.READY_TO_LIST)
             .build();
 
-        request = HearingRequest
+        hearingRequest = HearingRequest
                 .builder(String.valueOf(CASE_ID))
                 .hearingState(CREATE_HEARING)
                 .hearingRoute(LIST_ASSIST)
@@ -159,6 +144,8 @@ class HearingsServiceTest {
                 .ccdCaseId(String.valueOf(CASE_ID))
                 .build())
             .build();
+
+        sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
     }
 
     @DisplayName("When wrapper with a valid Hearing State is given addHearingResponse should run without error")
@@ -169,9 +156,9 @@ class HearingsServiceTest {
     void processHearingRequest(HearingState state) {
         given(ccdCaseService.getStartEventResponse(eq(CASE_ID), any())).willReturn(expectedCaseDetails);
 
-        request.setHearingState(state);
+        hearingRequest.setHearingState(state);
         assertThatNoException()
-                .isThrownBy(() -> hearingsService.processHearingRequest(request));
+                .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest));
     }
 
     @DisplayName("When wrapper with a valid Hearing State and Cancellation reason is given addHearingResponse should run without error")
@@ -179,19 +166,19 @@ class HearingsServiceTest {
     void processHearingRequest() {
         given(ccdCaseService.getStartEventResponse(eq(CASE_ID), any())).willReturn(expectedCaseDetails);
 
-        request.setHearingState(UPDATED_CASE);
-        request.setCancellationReason(OTHER);
+        hearingRequest.setHearingState(UPDATED_CASE);
+        hearingRequest.setCancellationReason(OTHER);
         assertThatNoException()
-            .isThrownBy(() -> hearingsService.processHearingRequest(request));
+            .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest));
     }
 
     @DisplayName("When wrapper with a invalid Hearing State is given addHearingResponse should throw an Unhandled HearingState error")
     @ParameterizedTest
     @NullSource
     void processHearingRequestInvalidState(HearingState state) {
-        request.setHearingState(state);
+        hearingRequest.setHearingState(state);
 
-        UnhandleableHearingStateException thrown = assertThrows(UnhandleableHearingStateException.class, () -> hearingsService.processHearingRequest(request));
+        UnhandleableHearingStateException thrown = assertThrows(UnhandleableHearingStateException.class, () -> hearingsService.processHearingRequest(hearingRequest));
 
         assertThat(thrown.getMessage()).isNotEmpty();
     }
@@ -204,85 +191,38 @@ class HearingsServiceTest {
             .build();
         wrapper.setHearingState(CREATE_HEARING);
         wrapper.setCaseData(caseData);
-        for (State invalidState : HearingsService.INVALID_CASE_STATES) {
+        for (State invalidState : HearingsServiceV1.INVALID_CASE_STATES) {
             wrapper.setCaseState(invalidState);
             assertThatNoException()
-                .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
+                .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest));
         }
     }
 
     @DisplayName("When wrapper with a valid adjourn create Hearing State is given addHearingResponse should run without error")
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void processHearingWrapperAdjournmentCreate(boolean caseUpdateV2Enabled) throws UpdateCaseException {
-        ReflectionTestUtils.setField(hearingsService, "hearingsCaseUpdateV2Enabled", caseUpdateV2Enabled);
-        mockHearingResponseForAdjournmentCreate(caseUpdateV2Enabled);
+    @Test
+    void processHearingWrapperAdjournmentCreate() throws UpdateCaseException {
+        mockHearingResponseForAdjournmentCreate();
+        given(ccdCaseService.getStartEventResponse(eq(CASE_ID), any())).willReturn(sscsCaseDetails);
 
         HearingEvent hearingEvent = HearingEvent.ADJOURN_CREATE_HEARING;
-        wrapper.setHearingState(ADJOURN_CREATE_HEARING);
+        hearingRequest.setHearingState(ADJOURN_CREATE_HEARING);
         wrapper.setEventId(hearingEvent.getEventType().getCcdType());
 
-        if (caseUpdateV2Enabled) {
-            when(hearingServiceConsumer.getCreateHearingCaseDetailsConsumerV2(any(), any())).thenReturn(sscsCaseDetailsConsumer);
-        } else {
-            when(hearingServiceConsumer.getCreateHearingCaseDataConsumer(any(), any())).thenReturn(sscsCaseDataConsumer);
-        }
+        when(hearingServiceConsumer.getCreateHearingCaseDataConsumer(any(), any())).thenReturn(sscsCaseDataConsumer);
+
 
         assertThatNoException()
-            .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
+            .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest));
 
-        if (caseUpdateV2Enabled) {
-            verify(updateCcdCaseService).updateCaseV2(
-                eq(CASE_ID),
-                eq(hearingEvent.getEventType().getCcdType()),
-                eq(hearingEvent.getSummary()),
-                eq(hearingEvent.getDescription()),
-                any(),
-                caseDataConsumerCaptor.capture()
-            );
-            SscsCaseData caseData = wrapper.getCaseData();
-            SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(caseData).build();
-            assertThat(caseData.getHearings()).isNull(); // before case updated with new hearing
+        verify(ccdCaseService).updateCaseData(
+            eq(sscsCaseDetails.getData()),
+            any(HearingWrapper.class),
+            any(HearingEvent.class)
+        );
 
-            Consumer<SscsCaseDetails> sscsCaseDataConsumer = caseDataConsumerCaptor.getValue();
-            assertThat(sscsCaseDataConsumer).isEqualTo(sscsCaseDetailsConsumer);
-
-        } else {
-            verify(ccdCaseService).updateCaseData(
-                any(SscsCaseData.class),
-                eq(wrapper),
-                any(HearingEvent.class)
-            );
-        }
     }
 
-    @Test
-    void shouldThrowUpdateCaseExceptionWhenCaseUpdateWithHearingResponseV2Fails() {
-        ReflectionTestUtils.setField(hearingsService, "hearingsCaseUpdateV2Enabled", true);
-        mockHearingResponseForAdjournmentCreate(true);
-
-        HearingEvent event = HearingEvent.ADJOURN_CREATE_HEARING;
-        wrapper.setHearingState(ADJOURN_CREATE_HEARING);
-        wrapper.setEventId(event.getEventType().getCcdType());
-        Request request = Request.create(Request.HttpMethod.GET, "url", new HashMap<>(), null, new RequestTemplate());
-
-        given(updateCcdCaseService.updateCaseV2(
-            eq(CASE_ID),
-            eq(event.getEventType().getCcdType()),
-            eq(event.getSummary()),
-            eq(event.getDescription()),
-            any(),
-            any()
-        )).willThrow(new FeignException.InternalServerError("test error", request, null, null));
-
-        assertThatExceptionOfType(UpdateCaseException.class).isThrownBy(
-            () -> hearingsService.processHearingWrapper(wrapper));
-    }
-
-    private void mockHearingResponseForAdjournmentCreate(boolean caseUpdateV2Enabled) {
-        if (caseUpdateV2Enabled) {
-            given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
-        }
+    private void mockHearingResponseForAdjournmentCreate() {
         given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
             .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
                                                false, false, SessionCategory.CATEGORY_03, null));
@@ -307,7 +247,7 @@ class HearingsServiceTest {
         given(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE,ISSUE_CODE,false,false))
             .willReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
                 false,false,SessionCategory.CATEGORY_03,null));
-
+        given(ccdCaseService.getStartEventResponse(eq(CASE_ID), any())).willReturn(sscsCaseDetails);
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
         given(refData.getVenueService()).willReturn(venueService);
@@ -321,10 +261,10 @@ class HearingsServiceTest {
         given(hmcHearingsApiService.getHearingsRequest(anyString(),eq(null)))
             .willReturn(HearingsGetResponse.builder().build());
 
-        wrapper.setHearingState(CREATE_HEARING);
+        hearingRequest.setHearingState(CREATE_HEARING);
 
         assertThatNoException()
-            .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
+            .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest));
     }
 
     @DisplayName("When create Hearing is given and there is already a hearing requested/awaiting listing addHearingResponse should run without error")
@@ -346,6 +286,7 @@ class HearingsServiceTest {
             .partyDetails(List.of())
             .hearingResponse(HearingResponse.builder().build())
             .build();
+        given(ccdCaseService.getStartEventResponse(eq(CASE_ID), any())).willReturn(sscsCaseDetails);
         given(hmcHearingApiService.getHearingRequest(anyString())).willReturn(hearingGetResponse);
         HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder()
             .caseHearings(List.of(CaseHearing.builder()
@@ -361,7 +302,7 @@ class HearingsServiceTest {
         wrapper.setHearingState(CREATE_HEARING);
 
         assertThatNoException()
-            .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
+            .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest));
     }
 
     @Test
@@ -372,8 +313,10 @@ class HearingsServiceTest {
         given(refData.getVenueService()).willReturn(venueService);
         given(refData.getHearingDurations()).willReturn(hearingDurations);
         given(refData.getSessionCategoryMaps()).willReturn(sessionCategoryMaps);
+
         given(hmcHearingApiService.getHearingRequest(anyString())).willThrow(new GetHearingException(""));
         given(hearingServiceConsumer.getCreateHearingCaseDataConsumer(any(), any())).willReturn(sscsCaseDataConsumer);
+        given(ccdCaseService.getStartEventResponse(eq(CASE_ID), any())).willReturn(sscsCaseDetails);
         HearingsGetResponse hearingsGetResponse = HearingsGetResponse.builder()
             .caseHearings(List.of(CaseHearing.builder()
                                       .hearingId(HEARING_REQUEST_ID)
@@ -385,10 +328,10 @@ class HearingsServiceTest {
         given(hmcHearingsApiService.getHearingsRequest(anyString(),eq(null)))
             .willReturn(hearingsGetResponse);
 
-        wrapper.setHearingState(CREATE_HEARING);
+        hearingRequest.setHearingState(CREATE_HEARING);
 
         assertThatNoException()
-            .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
+            .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest));
     }
 
     @DisplayName("When wrapper with a valid create Hearing State is given addHearingResponse should run without error")
@@ -405,11 +348,13 @@ class HearingsServiceTest {
 
         given(refData.getVenueService()).willReturn(venueService);
 
+        given(ccdCaseService.getStartEventResponse(eq(CASE_ID), any())).willReturn(sscsCaseDetails);
+
         given(hmcHearingApiService.sendUpdateHearingRequest(any(HearingRequestPayload.class), anyString()))
                 .willReturn(HmcUpdateResponse.builder().build());
         given(hearingServiceConsumer.getCreateHearingCaseDataConsumer(any(), any())).willReturn(sscsCaseDataConsumer);
 
-        wrapper.setHearingState(UPDATE_HEARING);
+        hearingRequest.setHearingState(UPDATE_HEARING);
         wrapper.getCaseData()
             .setHearings(new ArrayList<>(Collections.singletonList(Hearing.builder()
                 .value(HearingDetails.builder()
@@ -418,7 +363,7 @@ class HearingsServiceTest {
                 .build())));
 
         assertThatNoException()
-            .isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
+            .isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest));
     }
 
     @DisplayName("When wrapper with a valid cancel Hearing State is given addHearingResponse should run without error")
@@ -426,8 +371,8 @@ class HearingsServiceTest {
     void processHearingWrapperCancel() {
         given(hmcHearingApiService.sendCancelHearingRequest(any(HearingCancelRequestPayload.class), anyString()))
                 .willReturn(HmcUpdateResponse.builder().build());
-
-        wrapper.setHearingState(CANCEL_HEARING);
+        given(ccdCaseService.getStartEventResponse(eq(CASE_ID), any())).willReturn(sscsCaseDetails);
+        hearingRequest.setHearingState(CANCEL_HEARING);
         wrapper.getCaseData()
             .setHearings(Collections.singletonList(Hearing.builder()
                 .value(HearingDetails.builder()
@@ -436,7 +381,7 @@ class HearingsServiceTest {
                 .build()));
         wrapper.setCancellationReasons(List.of(OTHER));
 
-        assertThatNoException().isThrownBy(() -> hearingsService.processHearingWrapper(wrapper));
+        assertThatNoException().isThrownBy(() -> hearingsService.processHearingRequest(hearingRequest));
     }
 
     @DisplayName("When wrapper with a valid create Hearing State is given but hearing duration is not multiple of five then send to listing error")
@@ -449,10 +394,11 @@ class HearingsServiceTest {
     })
     void testGetServiceHearingValueWithListingDurationNotMultipleOfFive(Integer hearingDuration) throws Exception {
 
-        wrapper.setHearingState(UPDATE_HEARING);
+        given(ccdCaseService.getStartEventResponse(eq(CASE_ID), any())).willReturn(sscsCaseDetails);
+        hearingRequest.setHearingState(UPDATE_HEARING);
         wrapper.getCaseData().getSchedulingAndListingFields().setOverrideFields(OverrideFields.builder().duration(hearingDuration).build());
 
-        assertThrows(ListingException.class, () -> hearingsService.processHearingWrapper(wrapper));
+        assertThrows(ListingException.class, () -> hearingsService.processHearingRequest(hearingRequest));
     }
 
 }

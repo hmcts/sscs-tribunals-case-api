@@ -91,8 +91,6 @@ public class TribunalsHearingsEventTopicListenerItTest {
     @Test
     public void testHearingsUpdateCase() throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
 
-        ReflectionTestUtils.setField(hearingsService, "hearingsCaseUpdateV2Enabled", false);
-
         tribunalsHearingsEventQueueListener = new TribunalsHearingsEventQueueListener(hearingsService, ccdCaseService);
         ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "isByPassHearingServiceEnabled", true);
 

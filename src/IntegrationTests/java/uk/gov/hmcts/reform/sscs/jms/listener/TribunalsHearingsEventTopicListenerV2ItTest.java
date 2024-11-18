@@ -24,8 +24,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
+import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.exception.GetCaseException;
 import uk.gov.hmcts.reform.sscs.exception.TribunalsEventProcessingException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
@@ -42,10 +44,16 @@ import uk.gov.hmcts.reform.sscs.reference.data.service.SessionCategoryMapService
 import uk.gov.hmcts.reform.sscs.reference.data.service.VerbalLanguagesService;
 import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
 import uk.gov.hmcts.reform.sscs.service.HearingsService;
+import uk.gov.hmcts.reform.sscs.service.HearingsServiceV2;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingApi;
+import uk.gov.hmcts.reform.sscs.service.HmcHearingApiService;
 import uk.gov.hmcts.reform.sscs.service.HmcHearingsApi;
+import uk.gov.hmcts.reform.sscs.service.HmcHearingsApiService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.VenueService;
+import uk.gov.hmcts.reform.sscs.service.hearings.AdjournCreateHearingCaseUpdater;
+import uk.gov.hmcts.reform.sscs.service.hearings.CreateHearingCaseUpdater;
+import uk.gov.hmcts.reform.sscs.service.hearings.UpdateHearingCaseUpdater;
 import uk.gov.hmcts.reform.sscs.service.holder.ReferenceDataServiceHolder;
 
 @ExtendWith(SpringExtension.class)
@@ -61,8 +69,11 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
 
     @Autowired
     private ObjectMapper mapper;
-    @Autowired
+
     private HearingsService hearingsService;
+    private CreateHearingCaseUpdater createHearingCaseUpdater;
+    private AdjournCreateHearingCaseUpdater adjournCreateHearingCaseUpdater;
+    private UpdateHearingCaseUpdater updateHearingCaseUpdater;
 
     @MockBean
     private IdamService idamService;
@@ -80,25 +91,40 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
     private VenueService venueService;
     @MockBean
     private VerbalLanguagesService verbalLanguages;
+    @MockBean
+    private CcdClient ccdClient;
+    @MockBean
+    private SscsCcdConvertService sscsCcdConvertService;
 
     @MockBean
     private HmcHearingApi hearingApi;
     @MockBean
     private HmcHearingsApi hmcHearingsApi;
+
     @MockBean
-    private UpdateCcdCaseService updateCcdCaseService;
+    private HmcHearingApiService hmcHearingApiService;
+    @MockBean
+    private HmcHearingsApiService hmcHearingsApiService;
 
     @Test
     public void testHearingsUpdateCaseV2() throws UpdateCaseException, TribunalsEventProcessingException, GetCaseException {
-        ReflectionTestUtils.setField(hearingsService, "hearingsCaseUpdateV2Enabled", true);
 
+        createHearingCaseUpdater = new CreateHearingCaseUpdater(ccdClient, sscsCcdConvertService, hmcHearingApiService, hmcHearingsApiService, refData, idamService);
+        adjournCreateHearingCaseUpdater = new AdjournCreateHearingCaseUpdater(ccdClient, sscsCcdConvertService, hmcHearingApiService, hmcHearingsApiService, refData, idamService);
+        updateHearingCaseUpdater = new UpdateHearingCaseUpdater(ccdClient, sscsCcdConvertService, hmcHearingApiService, refData, idamService);
+
+        hearingsService = new HearingsServiceV2(hmcHearingApiService, ccdCaseService, createHearingCaseUpdater, adjournCreateHearingCaseUpdater, updateHearingCaseUpdater);
         tribunalsHearingsEventQueueListener = new TribunalsHearingsEventQueueListener(hearingsService, ccdCaseService);
         ReflectionTestUtils.setField(tribunalsHearingsEventQueueListener, "isByPassHearingServiceEnabled", true);
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails();
+        StartEventResponse startEventResponse = StartEventResponse.builder().build();
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
-        when(ccdCaseService.getStartEventResponse(anyLong(), any())).thenReturn(createSscsCaseDetails());
+        when(ccdClient.startEvent(any(), anyLong(), any())).thenReturn(startEventResponse);
+        when(sscsCcdConvertService.getCaseDetails(startEventResponse)).thenReturn(sscsCaseDetails);
         when(hmcHearingsApi.getHearingsRequest(any(), any(), any(), any(), any()))
             .thenReturn(HearingsGetResponse.builder().build());
+        when(hmcHearingApiService.sendCreateHearingRequest(any())).thenReturn(HmcUpdateResponse.builder().build());
 
         when(sessionCategoryMaps.getSessionCategory(BENEFIT_CODE, ISSUE_CODE, false, false))
             .thenReturn(new SessionCategoryMap(BenefitCode.PIP_NEW_CLAIM, Issue.DD,
@@ -126,8 +152,8 @@ public class TribunalsHearingsEventTopicListenerV2ItTest {
 
         verify(ccdCaseService, never()).updateCaseData(any(), any(), any());
 
-        verify(updateCcdCaseService).updateCaseV2(
-            eq(Long.parseLong(CASE_ID)), any(), any(), any(), any(), any());
+        verify(ccdClient).submitEventForCaseworker(any(),
+            eq(Long.parseLong(CASE_ID)), any());
     }
 
     private SscsCaseDetails createSscsCaseDetails() {

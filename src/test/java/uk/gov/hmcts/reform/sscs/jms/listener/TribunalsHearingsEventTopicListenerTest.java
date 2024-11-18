@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.exception.UnhandleableHearingStateException;
 import uk.gov.hmcts.reform.sscs.exception.UpdateCaseException;
 import uk.gov.hmcts.reform.sscs.model.hearings.HearingRequest;
 import uk.gov.hmcts.reform.sscs.service.CcdCaseService;
-import uk.gov.hmcts.reform.sscs.service.HearingsService;
+import uk.gov.hmcts.reform.sscs.service.HearingsServiceV1;
 
 @ExtendWith(MockitoExtension.class)
 class TribunalsHearingsEventTopicListenerTest {
@@ -38,7 +38,7 @@ class TribunalsHearingsEventTopicListenerTest {
     private TribunalsHearingsEventQueueListener tribunalsHearingsEventQueueListener;
 
     @Mock
-    private HearingsService hearingsService;
+    private HearingsServiceV1 hearingsService;
 
     @Mock
     private CcdCaseService ccdCaseService;
