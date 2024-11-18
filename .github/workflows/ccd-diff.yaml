@@ -27,8 +27,8 @@ jobs:
       - name: Generate report
         id: ccd-diff
         run: |
-          ls build/master/definitions/benefit/sheets/
-          ls build/branch/definitions/benefit/sheets/
+          cat build/master/definitions/benefit/sheets/ComplexTypes/ComplexTypes.json
+          cat build/branch/definitions/benefit/sheets/ComplexTypes/ComplexTypes.json
           REPORT="$(npx -q @hmcts/ccd-diff build/master/definitions/benefit/sheets/ build/branch/definitions/benefit/sheets/)"
           REPORT="${REPORT//'%'/'%25'}"
           REPORT="${REPORT//$'\n'/'%0A'}"
