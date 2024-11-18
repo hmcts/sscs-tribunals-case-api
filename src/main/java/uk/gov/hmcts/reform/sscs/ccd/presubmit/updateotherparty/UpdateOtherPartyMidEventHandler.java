@@ -54,28 +54,26 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-        Set<String> validationErrors = new HashSet<>();
 
         caseData.getOtherParties().forEach(party -> {
-            validateAddress(party.getValue().getAddress(), OTHER_PARTY, validationErrors);
+            response.addErrors(validateAddress(party.getValue().getAddress(), OTHER_PARTY));
 
             if (party.getValue().hasRepresentative()) {
-                validateAddress(
-                        party.getValue().getRep().getAddress(),
-                        OTHER_PARTY_REPRESENTATIVE,
-                        validationErrors
-                );
+                response.addErrors(validateAddress(
+                    party.getValue().getRep().getAddress(),
+                    OTHER_PARTY_REPRESENTATIVE
+                ));
             }
         });
-
-        response.addErrors(validationErrors);
         return response;
     }
 
-    private void validateAddress(Address address, String addressPrefix, Set<String> validationErrors) {
+    private Set<String> validateAddress(Address address, String addressPrefix) {
+        Set<String> validationErrors = new HashSet<>();
+
         if (address == null) {
             validationErrors.add(String.format(ERROR_ADDRESS_MISSING, addressPrefix));
-            return;
+            return validationErrors;
         }
 
         if (isEmpty(address.getLine1())) {
@@ -94,6 +92,7 @@ public class UpdateOtherPartyMidEventHandler implements PreSubmitCallbackHandler
                 validationErrors.add(String.format(ERROR_POSTCODE, addressPrefix));
             }
         }
+        return validationErrors;
     }
 
     private boolean isIbcaCase(SscsCaseData caseData) {
