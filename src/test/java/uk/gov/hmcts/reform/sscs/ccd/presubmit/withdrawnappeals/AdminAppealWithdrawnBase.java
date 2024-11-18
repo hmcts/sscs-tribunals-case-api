@@ -6,7 +6,6 @@ import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_US
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -32,7 +31,7 @@ public class AdminAppealWithdrawnBase {
                 .serializationInclusion(JsonInclude.Include.NON_ABSENT);
 
         mapper = objectMapperBuilder.createXmlMapper(false).build();
-        mapper.registerModule(new JavaTimeModule());
+        mapper.findAndRegisterModules();
     }
 
     Callback<SscsCaseData> buildTestCallbackGivenEvent(EventType eventType, final String callbackName) throws IOException {

@@ -17,8 +17,8 @@ import uk.gov.hmcts.reform.sscs.util.SscsUtil;
 @Slf4j
 public class CreateCaseAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    @Value("${feature.infected-blood-appeal.enabled}")
-    private boolean isInfectedBloodAppealEnabled;
+    @Value("${feature.infected-blood-compensation.enabled}")
+    private boolean isInfectedBloodCompensationEnabled;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -52,7 +52,19 @@ public class CreateCaseAboutToStartHandler implements PreSubmitCallbackHandler<S
             appeal.setBenefitType(type);
         }
 
-        appeal.getBenefitType().setDescriptionSelection(SscsUtil.getBenefitDescriptions(isInfectedBloodAppealEnabled));
+        appeal.getBenefitType().setDescriptionSelection(SscsUtil.getBenefitDescriptions(isInfectedBloodCompensationEnabled));
+
+        if (isNull(appeal.getAppellant())) {
+            Appellant appellant = Appellant.builder().build();
+            appeal.setAppellant(appellant);
+        }
+
+        if (isNull(appeal.getAppellant().getAddress())) {
+            Address address = Address.builder().build();
+            appeal.getAppellant().setAddress(address);
+        }
+
+        appeal.getAppellant().getAddress().setUkPortOfEntryList(SscsUtil.getPortsOfEntry());
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
