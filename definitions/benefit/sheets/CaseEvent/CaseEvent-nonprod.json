@@ -8,7 +8,8 @@
     "DisplayOrder": 9990,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\""
   },
   {
     "LiveFrom": "30/10/2024",
@@ -18,6 +19,7 @@
     "Description": "Add a hearing outcome",
     "DisplayOrder": 140,
     "PreConditionState(s)": "dormantAppealState;postHearing;withUT;hearing;readyToList",
+    "CallBackURLAboutToStartEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToStart",
     "PostConditionState": "*",
     "ShowEventNotes": "Y",
     "SecurityClassification": "Public"
