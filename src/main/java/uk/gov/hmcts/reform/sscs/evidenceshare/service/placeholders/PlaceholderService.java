@@ -45,17 +45,14 @@ public class PlaceholderService {
             description = Benefit.getBenefitOptionalByCode(appeal.getBenefitType().getCode()).map(Benefit::getDescription).orElse(StringUtils.EMPTY);
         }
 
-        //TODO: update logic around when to show/hide Nino
-        String shouldHideNino = appeal.getBenefitType() != null && Benefit.CHILD_SUPPORT.getShortName().equals(appeal.getBenefitType().getCode()) ? YesNo.YES.getValue() : YesNo.NO.getValue();
-
-        //TODO: set logic for when to show/hide ibca
-        String shouldHideIbcaReference = "";
-
         if (description != null) {
             description = description.toUpperCase();
         } else {
             description = StringUtils.EMPTY;
         }
+
+        String shouldHideNino = shouldHideNino(appeal);
+        String shouldHideIbcaReference = shouldHideIbcaReference(appeal);
 
         placeholders.put(BENEFIT_TYPE_LITERAL, description);
         placeholders.put(APPELLANT_FULL_NAME_LITERAL, appeal.getAppellant().getName().getAbbreviatedFullName());
@@ -146,4 +143,17 @@ public class PlaceholderService {
             .toArray(String[]::new);
     }
 
+    private String shouldHideNino(Appeal appeal) {
+        return appeal.getBenefitType() != null
+                && (Benefit.CHILD_SUPPORT.getShortName().equals(appeal.getBenefitType().getCode())
+                        || Benefit.INFECTED_BLOOD_COMPENSATION.getShortName().equals(appeal.getBenefitType().getCode()))
+                ? YesNo.YES.getValue()
+                : YesNo.NO.getValue();
+    }
+
+    private String shouldHideIbcaReference(Appeal appeal) {
+        return appeal.getBenefitType() != null && Benefit.INFECTED_BLOOD_COMPENSATION.getShortName().equals(appeal.getBenefitType().getCode())
+                ? YesNo.NO.getValue()
+                : YesNo.YES.getValue();
+    }
 }
