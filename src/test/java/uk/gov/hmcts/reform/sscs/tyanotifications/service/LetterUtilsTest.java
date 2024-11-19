@@ -12,6 +12,11 @@ import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.Placeh
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_3;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_4;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_POSTCODE;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_1_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_2_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_4_LITERAL;
+import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_5_LITERAL;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.DWP;
 import static uk.gov.hmcts.reform.sscs.model.PartyItemList.HMCTS;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.config.AppConstants.REP_SALUTATION;
@@ -29,6 +34,9 @@ import static uk.gov.hmcts.reform.sscs.tyanotifications.config.SubscriptionType.
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.LIBERTY_TO_APPLY_REQUEST;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.domain.notify.NotificationEventType.SYA_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.DOCMOSIS;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.GOV_NOTIFY;
+import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.LetterType.PLACEHOLDER_SERVICE;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.addBlankPageAtTheEndIfOddPage;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.buildBundledLetter;
 import static uk.gov.hmcts.reform.sscs.tyanotifications.service.LetterUtils.getAddressPlaceholders;
@@ -844,9 +852,7 @@ public class LetterUtilsTest {
                 .inMainlandUk(YesNo.YES)
                 .build();
 
-        List<String> addressConstants = List.of(LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
-                LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE);
-        Map<String, Object> placeholders = getAddressPlaceholders(testAddress, addressConstants, true);
+        Map<String, Object> placeholders = getAddressPlaceholders(testAddress, true, DOCMOSIS);
 
         assertEquals("Somerset House", placeholders.get(LETTER_ADDRESS_LINE_1));
         assertEquals("Strand", placeholders.get(LETTER_ADDRESS_LINE_2));
@@ -864,9 +870,7 @@ public class LetterUtilsTest {
                 .postcode("TD11 3RY")
                 .build();
 
-        List<String> addressConstants = List.of(LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
-                LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE);
-        Map<String, Object> placeholders = getAddressPlaceholders(testAddress, addressConstants, true);
+        Map<String, Object> placeholders = getAddressPlaceholders(testAddress, true, DOCMOSIS);
 
         assertEquals("Elba", placeholders.get(LETTER_ADDRESS_LINE_1));
         assertEquals("Duns", placeholders.get(LETTER_ADDRESS_LINE_2));
@@ -886,9 +890,8 @@ public class LetterUtilsTest {
                 .inMainlandUk(YesNo.YES)
                 .build();
 
-        List<String> addressConstants = List.of(ADDRESS_LINE_2, ADDRESS_LINE_3, ADDRESS_LINE_4, ADDRESS_LINE_5, POSTCODE_LITERAL);
+        Map<String, Object> placeholders = getAddressPlaceholders(testAddress, true, GOV_NOTIFY);
 
-        Map<String, Object> placeholders = getAddressPlaceholders(testAddress, addressConstants, true);
         placeholders.put(ADDRESS_LINE_1, fullNameNoTitle);
 
         assertEquals("Jane Doe", placeholders.get(ADDRESS_LINE_1));
@@ -910,9 +913,7 @@ public class LetterUtilsTest {
                 .inMainlandUk(YesNo.NO)
                 .build();
 
-        List<String> addressConstants = List.of(LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
-                LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE);
-        Map<String, Object> placeholders = getAddressPlaceholders(testAddress, addressConstants, true);
+        Map<String, Object> placeholders = getAddressPlaceholders(testAddress, true, DOCMOSIS);
 
         assertEquals("Catherdrale Notre-Dame de Paris", placeholders.get(LETTER_ADDRESS_LINE_1));
         assertEquals("6 Parvis Notre-dame - Pl. Jean-Paul II", placeholders.get(LETTER_ADDRESS_LINE_2));
@@ -932,9 +933,7 @@ public class LetterUtilsTest {
                 .inMainlandUk(YesNo.NO)
                 .build();
 
-        List<String> addressConstants = List.of(LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
-                LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE);
-        Map<String, Object> placeholders = getAddressPlaceholders(testAddress, addressConstants, true);
+        Map<String, Object> placeholders = getAddressPlaceholders(testAddress, true, DOCMOSIS);
 
         assertEquals("Catherdrale Notre-Dame de Paris", placeholders.get(LETTER_ADDRESS_LINE_1));
         assertEquals("6 Parvis Notre-dame - Pl. Jean-Paul II", placeholders.get(LETTER_ADDRESS_LINE_2));
@@ -944,9 +943,9 @@ public class LetterUtilsTest {
 
     }
 
-    @DisplayName("getAddressPlaceholders returns the expected keys.")
+    @DisplayName("getAddressPlaceholders returns the expected keys for Docmosis.")
     @Test
-    public void getAddressPlaceholders_returnsExpectedKeys() {
+    public void getAddressPlaceholders_returnsExpectedKeys_for_Docmosis() {
         String fullNameNoTitle = "Jane Doe";
         Address testAddress = Address.builder()
                 .line1("Catherdrale Notre-Dame de Paris")
@@ -958,11 +957,60 @@ public class LetterUtilsTest {
                 .inMainlandUk(YesNo.NO)
                 .build();
 
-        List<String> addressConstants = List.of(ADDRESS_LINE_2, ADDRESS_LINE_3, ADDRESS_LINE_4,
-                ADDRESS_LINE_5, POSTCODE_LITERAL);
-        Map<String, Object> actualPlaceholders = getAddressPlaceholders(testAddress, addressConstants, true);
+        List<String> addressConstants = List.of(LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
+                LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE);
+
+        Map<String, Object> actualPlaceholders = getAddressPlaceholders(testAddress, true, DOCMOSIS);
+
+        for (String addressConstant : addressConstants) {
+            assertTrue(actualPlaceholders.containsKey(addressConstant) && actualPlaceholders.get(addressConstant) != null);
+        }
+    }
+
+    @DisplayName("getAddressPlaceholders returns the expected keys for Gov_Notify.")
+    @Test
+    public void getAddressPlaceholders_returnsExpectedKeys_for_Gov_Notify() {
+        String fullNameNoTitle = "Jane Doe";
+        Address testAddress = Address.builder()
+                .line1("Catherdrale Notre-Dame de Paris")
+                .line2("6 Parvis Notre-dame - Pl. Jean-Paul II")
+                .town("Paris")
+                .county("Ile-de-France")
+                .postcode("75004")
+                .country("France")
+                .inMainlandUk(YesNo.NO)
+                .build();
+
+        List<String> addressConstants = List.of(ADDRESS_LINE_2, ADDRESS_LINE_3, ADDRESS_LINE_4, ADDRESS_LINE_5,
+                POSTCODE_LITERAL);
+
+        Map<String, Object> actualPlaceholders = getAddressPlaceholders(testAddress, true, GOV_NOTIFY);
 
         actualPlaceholders.put(ADDRESS_LINE_1, fullNameNoTitle);
+
+        for (String addressConstant : addressConstants) {
+            assertTrue(actualPlaceholders.containsKey(addressConstant) && actualPlaceholders.get(addressConstant) != null);
+        }
+    }
+
+    @DisplayName("getAddressPlaceholders returns the expected keys for Placeholder_Service.")
+    @Test
+    public void getAddressPlaceholders_returnsExpectedKeys_for_Placeholder_Service() {
+        String fullNameNoTitle = "Jane Doe";
+        Address testAddress = Address.builder()
+                .line1("Catherdrale Notre-Dame de Paris")
+                .line2("6 Parvis Notre-dame - Pl. Jean-Paul II")
+                .town("Paris")
+                .county("Ile-de-France")
+                .postcode("75004")
+                .country("France")
+                .inMainlandUk(YesNo.NO)
+                .build();
+
+        List<String> addressConstants = List.of(RECIPIENT_ADDRESS_LINE_1_LITERAL, RECIPIENT_ADDRESS_LINE_2_LITERAL,
+                RECIPIENT_ADDRESS_LINE_3_LITERAL, RECIPIENT_ADDRESS_LINE_4_LITERAL, RECIPIENT_ADDRESS_LINE_5_LITERAL);
+
+        Map<String, Object> actualPlaceholders = getAddressPlaceholders(testAddress, true, PLACEHOLDER_SERVICE);
 
         for (String addressConstant : addressConstants) {
             assertTrue(actualPlaceholders.containsKey(addressConstant) && actualPlaceholders.get(addressConstant) != null);
@@ -980,10 +1028,8 @@ public class LetterUtilsTest {
                 .postcode("TT1 1TT")
                 .build();
 
-        List<String> addressConstants = List.of(ADDRESS_LINE_2, ADDRESS_LINE_3, ADDRESS_LINE_4,
-                ADDRESS_LINE_5, POSTCODE_LITERAL);
+        Map<String, Object> placeholders = getAddressPlaceholders(testAddress, true, GOV_NOTIFY);
 
-        Map<String, Object> placeholders = getAddressPlaceholders(testAddress, addressConstants, true);
         assertEquals("This is a very long test address, it should b", placeholders.get(ADDRESS_LINE_2));
         assertEquals("Test Street", placeholders.get(ADDRESS_LINE_3));
         assertEquals("Test Town", placeholders.get(ADDRESS_LINE_4));
@@ -1002,10 +1048,8 @@ public class LetterUtilsTest {
                 .postcode("TT1 1TT")
                 .build();
 
-        List<String> addressConstants = List.of(ADDRESS_LINE_2, ADDRESS_LINE_3, ADDRESS_LINE_4,
-                ADDRESS_LINE_5, POSTCODE_LITERAL);
+        Map<String, Object> placeholders = getAddressPlaceholders(testAddress, false, GOV_NOTIFY);
 
-        Map<String, Object> placeholders = getAddressPlaceholders(testAddress, addressConstants, false);
         assertEquals("This is a very long test address, it should be long string when getAddressPlaceholders truncate argument is false", placeholders.get(ADDRESS_LINE_2));
         assertEquals("Test Street", placeholders.get(ADDRESS_LINE_3));
         assertEquals("Test Town", placeholders.get(ADDRESS_LINE_4));

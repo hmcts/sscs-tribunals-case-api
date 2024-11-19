@@ -43,4 +43,8 @@ definitions/**/*.xlsx#
 # aat env file
 .aat-env
 
+<<<<<<< HEAD
 cftlib_log_file_IS_UNDEFINED
+=======
+NotificationsFunctionalTest.java
+>>>>>>> SSCSCI-1137
