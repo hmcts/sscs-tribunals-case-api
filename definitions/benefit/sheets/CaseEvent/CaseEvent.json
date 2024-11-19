@@ -718,6 +718,7 @@
     "DisplayOrder": 550,
     "PreConditionState(s)": "hearing;incompleteApplication;incompleteApplicationInformationReqsted;interlocutoryReviewState;notListable;readyToList;responseReceived;validAppeal;withDwp;handlingError",
     "PostConditionState": "dormantAppealState",
+    "EventEnablingCondition": "appeal.benefitType.code!=\"infectedBloodCompensation\"",
     "CallBackURLAboutToSubmitEvent": "${CCD_DEF_TRIBUNALS_API_URL}/ccdAboutToSubmit",
     "CallBackURLSubmittedEvent": "${CCD_DEF_TRIBUNALS_API_URL}/send",
     "ShowEventNotes": "Y",

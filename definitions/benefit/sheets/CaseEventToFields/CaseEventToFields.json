@@ -650,7 +650,7 @@
     "CaseEventID": "dwpLapseCase",
     "CaseFieldID": "dwpLT203",
     "CaseTypeID": "Benefit",
-    "DisplayContext": "MANDATORY",
+    "DisplayContext": "OPTIONAL",
     "LiveFrom": "01/01/2018",
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
