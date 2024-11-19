@@ -458,21 +458,23 @@ public class PersonalisationTest {
 
     @Test
     @Parameters({
-        "PIP,judge\\, doctor and disability expert, Personal Independence Payment, Taliad Annibyniaeth Personol, barnwr\\, meddyg ac arbenigwr anableddau, PIP",
-        "ESA,judge and a doctor, Employment and Support Allowance, Lwfans Cyflogaeth a Chymorth, barnwr a meddyg, ESA",
-        "UC,judge\\, doctor and disability expert (if applicable), Universal Credit, Credyd Cynhwysol, barnwr\\, meddyg ac arbenigwr anabledd (os yw’n berthnasol), UC",
-        "DLA,judge\\, doctor and disability expert, Disability Living Allowance, Lwfans Byw i’r Anabl, barnwr\\, meddyg ac arbenigwr anableddau, DLA",
-        "carersAllowance,judge, Carer's Allowance, Lwfans Gofalwr, barnwr, Carer's Allowance",
-        "attendanceAllowance,judge\\, doctor and disability expert, Attendance Allowance, Lwfans Gweini, barnwr\\, meddyg ac arbenigwr anableddau, Attendance Allowance",
-        "bereavementBenefit,judge, Bereavement Benefit, Budd-dal Profedigaeth, barnwr, Bereavement Benefit",
-        "taxCredit, judge and Financially Qualified Panel Member (if applicable), Tax Credit, Credyd Treth, Barnwr ac Aelod Panel sydd â chymhwyster i ddelio gyda materion Ariannol (os yw’n berthnasol), Tax Credit",
+        "PIP,judge\\, doctor and disability expert, Personal Independence Payment, Taliad Annibyniaeth Personol, barnwr\\, meddyg ac arbenigwr anableddau, PIP, PIP",
+        "ESA,judge and a doctor, Employment and Support Allowance, Lwfans Cyflogaeth a Chymorth, barnwr a meddyg, ESA, ESA",
+        "UC,judge\\, doctor and disability expert (if applicable), Universal Credit, Credyd Cynhwysol, barnwr\\, meddyg ac arbenigwr anabledd (os yw’n berthnasol), UC, UC",
+        "DLA,judge\\, doctor and disability expert, Disability Living Allowance, Lwfans Byw i’r Anabl, barnwr\\, meddyg ac arbenigwr anableddau, DLA,DLA",
+        "carersAllowance,judge, Carer's Allowance, Lwfans Gofalwr, barnwr, Carer's Allowance, Lwfans Gofalwr",
+        "attendanceAllowance,judge\\, doctor and disability expert, Attendance Allowance, Lwfans Gweini, barnwr\\, meddyg ac arbenigwr anableddau, Attendance Allowance, Lwfans Gweini",
+        "bereavementBenefit,judge, Bereavement Benefit, Budd-dal Profedigaeth, barnwr, Bereavement Benefit, Budd-dal Profedigaeth",
+        "taxCredit, judge and Financially Qualified Panel Member (if applicable), Tax Credit, Credyd Treth, Barnwr ac Aelod Panel sydd â chymhwyster i ddelio gyda materion Ariannol (os yw’n berthnasol), Tax Credit, Credyd Treth",
+        "infectedBloodCompensation,judge and if applicable a medical member and/or a qualified tribunal member, Infected Blood Compensation, Iawndal Gwaed Heintiedig, barnwr ac os yw’n berthnasol\\, aelod meddygol ac/neu aelod tribiwnlys cymwys, IBC, IGH"
     })
     public void customisePersonalisation(String benefitType,
                                          String expectedPanelComposition,
                                          String expectedBenefitDesc,
                                          String welshExpectedBenefitDesc,
                                          String welshExpectedPanelComposition,
-                                         String expectedAcronym) {
+                                         String expectedAcronym,
+                                         String expectedWelshAcronym) {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
 
@@ -499,6 +501,7 @@ public class PersonalisationTest {
         assertEquals(welshExpectedPanelComposition, result.get(PANEL_COMPOSITION_WELSH));
 
         assertEquals(expectedAcronym, result.get(BENEFIT_NAME_ACRONYM_LITERAL));
+        assertEquals(expectedWelshAcronym, result.get(BENEFIT_NAME_ACRONYM_LITERAL_WELSH));
         assertEquals(expectedBenefitDesc, result.get(BENEFIT_FULL_NAME_LITERAL));
         assertEquals(welshExpectedBenefitDesc, result.get(BENEFIT_FULL_NAME_LITERAL_WELSH));
         assertEquals(getLongBenefitNameDescriptionWithOptionalAcronym(benefitType, true), result.get(BENEFIT_NAME_AND_OPTIONAL_ACRONYM));
@@ -508,18 +511,41 @@ public class PersonalisationTest {
         assertEquals("GLSCRR", result.get(APPEAL_ID_LITERAL));
         assertEquals("Harry Kane", result.get(NAME));
         assertEquals("Harry Kane", result.get(APPELLANT_NAME));
-        assertEquals("0300 999 8888", result.get(PHONE_NUMBER));
-        assertEquals(PHONE_WELSH, result.get(PHONE_NUMBER_WELSH));
         assertEquals("http://link.com/manage-email-notifications/ZYX", result.get(MANAGE_EMAILS_LINK_LITERAL));
         assertEquals("http://tyalink.com/GLSCRR", result.get(TRACK_APPEAL_LINK_LITERAL));
 
-        assertEquals(benefitType.equals("taxCredit") ? HMRC_ACRONYM : DWP_ACRONYM, result.get(FIRST_TIER_AGENCY_ACRONYM));
-        assertEquals(benefitType.equals("taxCredit") ? HMRC_FULL_NAME : DWP_FULL_NAME, result.get(FIRST_TIER_AGENCY_FULL_NAME));
-        assertEquals(benefitType.equals("taxCredit") ? HMRC_FULL_NAME_WELSH : DWP_FULL_NAME_WELSH, result.get(FIRST_TIER_AGENCY_FULL_NAME_WELSH));
-        assertEquals(benefitType.equals("taxCredit") ? HMRC_ACRONYM : DWP_FIRST_TIER_AGENCY_GROUP, result.get(FIRST_TIER_AGENCY_GROUP));
-        assertEquals(benefitType.equals("taxCredit") ? HMRC_ACRONYM : DWP_FIRST_TIER_AGENCY_GROUP_WELSH, result.get(FIRST_TIER_AGENCY_GROUP_WELSH));
-        assertEquals(benefitType.equals("taxCredit") ? "" : THE_STRING, result.get(WITH_OPTIONAL_THE));
-        assertEquals(benefitType.equals("taxCredit") ? "" : THE_STRING_WELSH, result.get(WITH_OPTIONAL_THE_WELSH));
+        if (benefitType.equals("taxCredit")) {
+            assertEquals(HMRC_ACRONYM, result.get(FIRST_TIER_AGENCY_ACRONYM));
+            assertEquals(HMRC_FULL_NAME, result.get(FIRST_TIER_AGENCY_FULL_NAME));
+            assertEquals(HMRC_FULL_NAME_WELSH, result.get(FIRST_TIER_AGENCY_FULL_NAME_WELSH));
+            assertEquals(HMRC_ACRONYM, result.get(FIRST_TIER_AGENCY_GROUP));
+            assertEquals(HMRC_ACRONYM, result.get(FIRST_TIER_AGENCY_GROUP_WELSH));
+            assertEquals("", result.get(WITH_OPTIONAL_THE));
+            assertEquals("", result.get(WITH_OPTIONAL_THE_WELSH));
+            assertEquals("0300 999 8888", result.get(PHONE_NUMBER));
+            assertEquals(PHONE_WELSH, result.get(PHONE_NUMBER_WELSH));
+        } else if (benefitType.equals("infectedBloodCompensation")) {
+            assertEquals(IBCA_ACRONYM, result.get(FIRST_TIER_AGENCY_ACRONYM));
+            assertEquals(IBCA_FULL_NAME, result.get(FIRST_TIER_AGENCY_FULL_NAME));
+            assertEquals(IBCA_FULL_NAME_WELSH, result.get(FIRST_TIER_AGENCY_FULL_NAME_WELSH));
+            assertEquals(IBCA_FIRST_TIER_AGENCY_GROUP, result.get(FIRST_TIER_AGENCY_GROUP));
+            assertEquals(IBCA_FIRST_TIER_AGENCY_GROUP_WELSH, result.get(FIRST_TIER_AGENCY_GROUP_WELSH));
+            assertEquals("", result.get(WITH_OPTIONAL_THE));
+            assertEquals("", result.get(WITH_OPTIONAL_THE_WELSH));
+            assertEquals("03001231234", result.get(HELPLINE_PHONE_NUMBER));
+            assertEquals("03001234567", result.get(PHONE_NUMBER_WELSH));
+            assertEquals("03001231234", result.get(PHONE_NUMBER));
+        } else {
+            assertEquals(DWP_ACRONYM, result.get(FIRST_TIER_AGENCY_ACRONYM));
+            assertEquals(DWP_FULL_NAME, result.get(FIRST_TIER_AGENCY_FULL_NAME));
+            assertEquals(DWP_FULL_NAME_WELSH, result.get(FIRST_TIER_AGENCY_FULL_NAME_WELSH));
+            assertEquals(DWP_FIRST_TIER_AGENCY_GROUP, result.get(FIRST_TIER_AGENCY_GROUP));
+            assertEquals(DWP_FIRST_TIER_AGENCY_GROUP_WELSH, result.get(FIRST_TIER_AGENCY_GROUP_WELSH));
+            assertEquals(THE_STRING, result.get(WITH_OPTIONAL_THE));
+            assertEquals(THE_STRING_WELSH, result.get(WITH_OPTIONAL_THE_WELSH));
+            assertEquals("0300 999 8888", result.get(PHONE_NUMBER));
+            assertEquals(PHONE_WELSH, result.get(PHONE_NUMBER_WELSH));
+        }
 
         assertEquals("29 July 2018", result.get(APPEAL_RESPOND_DATE));
         assertEquals("http://link.com/GLSCRR", result.get(SUBMIT_EVIDENCE_LINK_LITERAL));
@@ -544,7 +570,7 @@ public class PersonalisationTest {
     }
 
     @Test
-    @Parameters({"null, SSCS1", "null, SSCS2", "null, SSCS5", "null, null", ",null"})
+    @Parameters({"null, SSCS1", "null, SSCS2", "null, SSCS5", "null, SSCS8", "null, null", ",null"})
     public void givenFormTypeWithNoBenefitType_customisePersonalisation(@Nullable String benefitType, @Nullable FormType formType) {
         List<Event> events = new ArrayList<>();
         events.add(Event.builder().value(EventDetails.builder().date(DATE).type(EventType.APPEAL_RECEIVED.getCcdType()).build()).build());
@@ -584,13 +610,31 @@ public class PersonalisationTest {
         assertNull(result.get(MANAGE_EMAILS_LINK_LITERAL));
         assertEquals("http://tyalink.com/GLSCRR", result.get(TRACK_APPEAL_LINK_LITERAL));
 
-        assertEquals(FormType.SSCS5.equals(formType) ? HMRC_ACRONYM : DWP_ACRONYM, result.get(FIRST_TIER_AGENCY_ACRONYM));
-        assertEquals(FormType.SSCS5.equals(formType) ? HMRC_FULL_NAME : DWP_FULL_NAME, result.get(FIRST_TIER_AGENCY_FULL_NAME));
-        assertEquals(FormType.SSCS5.equals(formType) ? HMRC_FULL_NAME_WELSH : DWP_FULL_NAME_WELSH, result.get(FIRST_TIER_AGENCY_FULL_NAME_WELSH));
-        assertEquals(FormType.SSCS5.equals(formType) ? HMRC_ACRONYM : DWP_FIRST_TIER_AGENCY_GROUP, result.get(FIRST_TIER_AGENCY_GROUP));
-        assertEquals(FormType.SSCS5.equals(formType) ? HMRC_ACRONYM : DWP_FIRST_TIER_AGENCY_GROUP_WELSH, result.get(FIRST_TIER_AGENCY_GROUP_WELSH));
-        assertEquals(FormType.SSCS5.equals(formType) ? "" : THE_STRING, result.get(WITH_OPTIONAL_THE));
-        assertEquals(FormType.SSCS5.equals(formType) ? "" : THE_STRING_WELSH, result.get(WITH_OPTIONAL_THE_WELSH));
+        if (FormType.SSCS5.equals(formType)) {
+            assertEquals(HMRC_ACRONYM, result.get(FIRST_TIER_AGENCY_ACRONYM));
+            assertEquals(HMRC_FULL_NAME, result.get(FIRST_TIER_AGENCY_FULL_NAME));
+            assertEquals(HMRC_FULL_NAME_WELSH, result.get(FIRST_TIER_AGENCY_FULL_NAME_WELSH));
+            assertEquals(HMRC_ACRONYM, result.get(FIRST_TIER_AGENCY_GROUP));
+            assertEquals(HMRC_ACRONYM, result.get(FIRST_TIER_AGENCY_GROUP_WELSH));
+            assertEquals("", result.get(WITH_OPTIONAL_THE));
+            assertEquals("", result.get(WITH_OPTIONAL_THE_WELSH));
+        } else if (FormType.SSCS8.equals(formType)) {
+            assertEquals(IBCA_ACRONYM, result.get(FIRST_TIER_AGENCY_ACRONYM));
+            assertEquals(IBCA_FULL_NAME, result.get(FIRST_TIER_AGENCY_FULL_NAME));
+            assertEquals(IBCA_FULL_NAME_WELSH, result.get(FIRST_TIER_AGENCY_FULL_NAME_WELSH));
+            assertEquals(IBCA_FULL_NAME, result.get(FIRST_TIER_AGENCY_GROUP));
+            assertEquals(IBCA_FULL_NAME_WELSH, result.get(FIRST_TIER_AGENCY_GROUP_WELSH));
+            assertEquals("", result.get(WITH_OPTIONAL_THE));
+            assertEquals("", result.get(WITH_OPTIONAL_THE_WELSH));
+        } else {
+            assertEquals(DWP_ACRONYM, result.get(FIRST_TIER_AGENCY_ACRONYM));
+            assertEquals(DWP_FULL_NAME, result.get(FIRST_TIER_AGENCY_FULL_NAME));
+            assertEquals(DWP_FULL_NAME_WELSH, result.get(FIRST_TIER_AGENCY_FULL_NAME_WELSH));
+            assertEquals(DWP_FIRST_TIER_AGENCY_GROUP, result.get(FIRST_TIER_AGENCY_GROUP));
+            assertEquals(DWP_FIRST_TIER_AGENCY_GROUP_WELSH, result.get(FIRST_TIER_AGENCY_GROUP_WELSH));
+            assertEquals(THE_STRING, result.get(WITH_OPTIONAL_THE));
+            assertEquals(THE_STRING_WELSH, result.get(WITH_OPTIONAL_THE_WELSH));
+        }
 
         assertEquals("29 July 2018", result.get(APPEAL_RESPOND_DATE));
         assertEquals("http://link.com/GLSCRR", result.get(SUBMIT_EVIDENCE_LINK_LITERAL));

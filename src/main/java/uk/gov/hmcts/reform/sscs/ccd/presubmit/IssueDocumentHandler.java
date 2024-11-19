@@ -99,6 +99,8 @@ public class IssueDocumentHandler {
                 respondents.add(Respondent.builder().name(Respondent.HMRC).build());
             } else if (benefitType.get().getSscsType().equals(SscsType.SSCS1) || benefitType.get().getSscsType().equals(SscsType.SSCS2)) {
                 respondents.add(Respondent.builder().name(Respondent.DWP).build());
+            } else if (benefitType.get().getSscsType().equals(SscsType.SSCS8)) {
+                respondents.add(Respondent.builder().name(Respondent.IBCA).build());
             }
         }
         List<CcdValue<OtherParty>> otherParties = caseData.getOtherParties();
@@ -118,8 +120,11 @@ public class IssueDocumentHandler {
     }
 
     protected boolean isBenefitTypeValidToHideNino(Optional<Benefit> benefitType) {
-        return benefitType.filter(benefit -> SscsType.SSCS2.equals(benefit.getSscsType())
-                || SscsType.SSCS5.equals(benefit.getSscsType())).isPresent();
+        return benefitType.filter(benefit ->
+                SscsType.SSCS2.equals(benefit.getSscsType())
+                        || SscsType.SSCS5.equals(benefit.getSscsType())
+                        || SscsType.SSCS8.equals(benefit.getSscsType())
+                ).isPresent();
     }
 
     protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType,

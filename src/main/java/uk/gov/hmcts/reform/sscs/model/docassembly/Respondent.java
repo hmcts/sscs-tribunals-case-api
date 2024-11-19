@@ -21,4 +21,7 @@ public class Respondent {
 
     @JsonIgnore
     public static String DWP = "Respondent: Secretary of State for Work and Pensions";
+
+    @JsonIgnore
+    public static String IBCA = "Respondent: Infected Blood Compensation Authority";
 }
