@@ -1,12 +1,13 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -101,16 +102,36 @@ public class UploadWelshDocumentsIt extends AbstractEventIt {
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdSubmittedEvent"));
         assertHttpStatus(response, HttpStatus.OK);
-        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-        assertNull(result.getData().getSscsWelshPreviewNextEvent());
+        verify(coreCaseDataApi, atLeast(1)).startEventForCaseWorker(any(), anyString(), anyString(), eq("SSCS"),
+                eq("Benefit"), eq("12345656789"), eq("updateCaseOnly"));
+        verify(coreCaseDataApi, atLeast(1)).startEventForCaseWorker(any(), anyString(), anyString(), eq("SSCS"),
+                eq("Benefit"), eq("12345656789"), eq("sendToDwp"));
+        verify(coreCaseDataApi).submitEventForCaseWorker(anyString(), anyString(), anyString(), eq("SSCS"),
+                eq("Benefit"), eq("12345656789"), eq(true), any(CaseDataContent.class));
     }
 
 
     private void mockCcd() {
+        Map<String, Object> caseData = new HashMap<>();
+        caseData.put("sscsWelshPreviewNextEvent", "sendToDwp");
+        caseData.put("ccdCaseId", "12345656789");
+
+        StartEventResponse startEventResponse = StartEventResponse.builder()
+                .caseDetails(CaseDetails.builder()
+                        .id(12345656789L)
+                        .data(caseData)
+                        .build())
+                .build();
+
+        given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
+                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+                eq("updateCaseOnly")))
+                .willReturn(startEventResponse);
+
         given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
                 eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
                 eq("sendToDwp")))
-                .willReturn(StartEventResponse.builder().build());
+                .willReturn(startEventResponse);
 
         Map<String, Object> data = new HashMap<>();
         data.put("sscsWelshPreviewNextEvent", null);
