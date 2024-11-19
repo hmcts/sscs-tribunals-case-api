@@ -160,6 +160,8 @@ xui-webapp:
       SERVICES_PRD_JUDICIAL_API: http://rd-judicial-api-aat.service.core-compute-aat.internal
       SERVICES_PRD_COMMONDATA_API: http://rd-commondata-api-aat.service.core-compute-aat.internal
       SERVICES_DOCUMENTS_API_V2: http://${SERVICE_NAME}-ccd-case-document-am-api
+      SERVICES_ROLE_ASSIGNMENT_API: http://${SERVICE_NAME}-am-role-assignment-service
+      HEALTH_ROLE_ASSIGNMENT_API: http://${SERVICE_NAME}-am-role-assignment-service/health
       GLOBAL_SEARCH_SERVICES: IA,CIVIL,PRIVATELAW,PUBLICLAW,SSCS
       JURISDICTIONS: SSCS
       LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
@@ -501,6 +503,8 @@ ccd:
         CCD_DOCUMENT_URL_PATTERN: ^https?://(((?:dm-store-aat\.service\.core-compute-aat\.internal(?::\d+)?)\/documents\/[A-Za-z0-9-]+(?:\/binary)?))
         CASE_DOCUMENT_AM_URL: ${CASE_DOCUMENT_AM_URL}
         UPLOAD_TIMESTAMP_FEATURED_CASE_TYPES: CARE_SUPERVISION_EPO
+        ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
+
       secrets:
         DATA_STORE_DB_PASSWORD:
           secretRef: postgres
