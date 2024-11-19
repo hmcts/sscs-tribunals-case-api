@@ -3214,15 +3214,5 @@
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
     "SecurityClassification": "Public"
-  },
-  {
-    "LiveFrom": "17/05/2024",
-    "CaseTypeID": "Benefit",
-    "ID": "caseManagementLocationTest",
-    "Name": "Migrate case for CML",
-    "DisplayOrder": 10007,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "SecurityClassification": "Public"
   }
 ]
