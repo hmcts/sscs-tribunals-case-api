@@ -391,7 +391,7 @@ public class Personalisation<E extends NotificationWrapper> {
         if ("yes".equalsIgnoreCase(ccdResponse.getIsScottishCase())) {
             personalisation.put(HELPLINE_PHONE_NUMBER, config.getHelplineTelephoneScotland());
         // TODO use common isIbc boolean when available
-        } else if (ccdResponse.getBenefitType().isPresent() && ccdResponse.getBenefitType().get().equals(Benefit.INFECTED_BLOOD_COMPENSATION)) {
+        } else if (ccdResponse.getBenefitType().orElse(Benefit.PIP).equals(Benefit.INFECTED_BLOOD_COMPENSATION)) {
             personalisation.put(HELPLINE_PHONE_NUMBER, "03001231234");
         } else {
             personalisation.put(HELPLINE_PHONE_NUMBER, config.getHelplineTelephone());
@@ -588,7 +588,7 @@ public class Personalisation<E extends NotificationWrapper> {
             personalisation.put(REGIONAL_OFFICE_POSTCODE_LITERAL, rpc.getPostcode());
         }
         // TODO use common isIbc boolean when available
-        if (!Objects.equals(ccdResponse.getIsScottishCase(), "Yes") && ccdResponse.getBenefitType().isPresent() && ccdResponse.getBenefitType().get().equals(Benefit.INFECTED_BLOOD_COMPENSATION)) {
+        if (!Objects.equals(ccdResponse.getIsScottishCase(), "Yes") && ccdResponse.getBenefitType().orElse(Benefit.PIP).equals(Benefit.INFECTED_BLOOD_COMPENSATION)) {
             personalisation.put(PHONE_NUMBER_WELSH, "03001234567");
             personalisation.put(PHONE_NUMBER, "03001231234");
         } else {
