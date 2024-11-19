@@ -4,6 +4,7 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderConstants.*;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 import static uk.gov.hmcts.reform.sscs.evidenceshare.service.placeholders.PlaceholderUtility.truncateAddressLine;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.IBCA_BENEFIT_CODE;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -43,7 +44,12 @@ public class PlaceholderService {
         if (description == null && appeal.getBenefitType() != null && appeal.getBenefitType().getCode() != null) {
             description = Benefit.getBenefitOptionalByCode(appeal.getBenefitType().getCode()).map(Benefit::getDescription).orElse(StringUtils.EMPTY);
         }
+
+        //TODO: update logic around when to show/hide Nino
         String shouldHideNino = appeal.getBenefitType() != null && Benefit.CHILD_SUPPORT.getShortName().equals(appeal.getBenefitType().getCode()) ? YesNo.YES.getValue() : YesNo.NO.getValue();
+
+        //TODO: set logic for when to show/hide ibca
+        String shouldHideIbcaReference = "";
 
         if (description != null) {
             description = description.toUpperCase();
@@ -51,12 +57,14 @@ public class PlaceholderService {
             description = StringUtils.EMPTY;
         }
 
-        placeholders.put(SHOULD_HIDE_NINO, shouldHideNino);
         placeholders.put(BENEFIT_TYPE_LITERAL, description);
         placeholders.put(APPELLANT_FULL_NAME_LITERAL, appeal.getAppellant().getName().getAbbreviatedFullName());
         placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
+        placeholders.put(SHOULD_HIDE_NINO, shouldHideNino);
         placeholders.put(NINO_LITERAL, defaultToEmptyStringIfNull(appeal.getAppellant().getIdentity().getNino()));
-        placeholders.put(SSCS_URL_LITERAL, PlaceholderConstants.SSCS_URL);
+        placeholders.put(SHOULD_HIDE_IBCA_REFERENCE, shouldHideIbcaReference);
+        placeholders.put(IBCA_REFERENCE_LITERAL, defaultToEmptyStringIfNull(appeal.getAppellant().getIdentity().getIbcaReference()));
+        placeholders.put(SSCS_URL_LITERAL, IBCA_BENEFIT_CODE.equals(caseData.getBenefitCode()) ? IBCA_URL : SSCS_URL);
         placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
         placeholders.put(pdfDocumentConfig.getHmctsImgKey(), pdfDocumentConfig.getHmctsImgVal());
         if (caseData.isLanguagePreferenceWelsh()) {
