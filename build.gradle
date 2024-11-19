@@ -238,6 +238,7 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/servicebus/messaging/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/config/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/hearings/CreateHearingCaseUpdater.java," + // can be removed when deleting HearingServiceV1
                 "src/main/java/uk/gov/hmcts/reform/sscs/EnvironmentPropertiesPrinter.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/controller/FunctionalTestController.java,"
         property "sonar.host.url", "https://sonar.reform.hmcts.net/"
