@@ -74,13 +74,13 @@ public class AddHearingOutcomeAboutToSubmitHandler implements PreSubmitCallbackH
             sscsCaseData.setHearingOutcomes(new ArrayList<>());
         }
 
-        HearingOutcome checkExisting = sscsCaseData.getHearingOutcomes().stream()
-                .filter(hearingOutcome1 -> hearingOutcome1.getValue().getCompletedHearingId()
+        HearingOutcome checkIfOutcomeExists = sscsCaseData.getHearingOutcomes().stream()
+                .filter(hearingOutcomeWithSelectedId -> hearingOutcomeWithSelectedId.getValue().getCompletedHearingId()
                         .equalsIgnoreCase(selectedHearingId))
                 .findFirst()
                 .orElse(null);
 
-        if (checkExisting != null) {
+        if (checkIfOutcomeExists != null) {
             log.info("Add Hearing Outcome: There is already an existing hearing outcome with hearing ID:{} "
                             + "and value {} for case ID:{}",
                     selectedHearingId, selectedHearing, callback.getCaseDetails().getId());
