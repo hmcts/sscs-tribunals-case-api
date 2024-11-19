@@ -503,7 +503,6 @@ ccd:
         CCD_DOCUMENT_URL_PATTERN: ^https?://(((?:dm-store-aat\.service\.core-compute-aat\.internal(?::\d+)?)\/documents\/[A-Za-z0-9-]+(?:\/binary)?))
         CASE_DOCUMENT_AM_URL: ${CASE_DOCUMENT_AM_URL}
         UPLOAD_TIMESTAMP_FEATURED_CASE_TYPES: CARE_SUPERVISION_EPO
-        ROLE_ASSIGNMENT_URL: "http://${SERVICE_NAME}-am-role-assignment-service"
       secrets:
         DATA_STORE_DB_PASSWORD:
           secretRef: postgres
