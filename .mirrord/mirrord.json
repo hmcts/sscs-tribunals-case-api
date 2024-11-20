@@ -1,0 +1,16 @@
+{
+    "feature": {
+        "network": {
+            "incoming": "mirror",
+            "outgoing": true
+        },
+        "fs": "read",
+        "env": true
+    },
+    "target": {
+        "path": {
+            "pod": "sscs-tribunals-api-pr-4137-java-8d48fd6d-jsrpf"
+        },
+        "namespace": "sscs"
+    }
+}
