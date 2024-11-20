@@ -66,8 +66,12 @@ public class AdminAppealWithdrawnNotificationsTest extends AbstractFunctionalTes
 
         List<Notification> notifications = tryFetchNotificationsForTestCase(emailId, smsId);
 
+        List<Notification> letterNotifications = tryFetchLetterNotificationsForTestCase();
+
+
         assertEquals(expectedNumEmailNotifications, getNumberOfNotificationsForGivenEmailOrSmsTemplateId(notifications, emailId));
         assertEquals(expectedNumSmsNotifications, getNumberOfNotificationsForGivenEmailOrSmsTemplateId(notifications, smsId));
+        assertEquals(expectedNumLetters, letterNotifications.stream().count());
         assertTrue(fetchLetters(expectedNumLetters, subscription));
         logger.info("Test successfully executed for subscription {} ",subscription);
 

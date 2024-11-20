@@ -159,15 +159,19 @@ public abstract class AbstractFunctionalTest {
     }
 
     public List<Notification> tryFetchNotificationsForTestCaseWithExpectedText(String expectedText, String... expectedTemplateIds) throws NotificationClientException {
-        return tryFetchNotificationsForTestCaseWithFlag(false, expectedText, expectedTemplateIds);
+        return tryFetchNotificationsForTestCaseWithFlag(false, expectedText, caseReference, expectedTemplateIds);
     }
 
     public List<Notification> tryFetchNotificationsForTestCase(String... expectedTemplateIds) throws NotificationClientException {
-        return tryFetchNotificationsForTestCaseWithFlag(false, null, expectedTemplateIds);
+        return tryFetchNotificationsForTestCaseWithFlag(false, null, caseReference, expectedTemplateIds);
+    }
+
+    public List<Notification> tryFetchLetterNotificationsForTestCase(String... expectedTemplateIds) throws NotificationClientException {
+        return tryFetchNotificationsForTestCaseWithFlag(false, null, caseId.toString());
     }
 
     public List<Notification> tryFetchNotificationsForTestCaseWithFlag(boolean notificationNotFoundFlag,
-                                                                       String expectedText,
+                                                                       String expectedText, String reference,
                                                                        String... expectedTemplateIds)
         throws NotificationClientException {
 
@@ -214,10 +218,10 @@ public abstract class AbstractFunctionalTest {
 
                 delayInSeconds(5);
 
-                allNotifications = client.getNotifications("", "", caseReference, "").getNotifications();
+                allNotifications = client.getNotifications("", "", reference, "").getNotifications();
                 String allNotifTemplateIds = allNotifications.stream().map(notif ->
                         notif.getTemplateId().toString()).collect(Collectors.joining(","));
-                log.info("allNotifications for case {}: templateIds:{}", caseReference, allNotifTemplateIds);
+                log.info("allNotifications for case {}: templateIds:{}", reference, allNotifTemplateIds);
 
                 matchingNotifications =
                     allNotifications
