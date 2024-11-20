@@ -40,7 +40,7 @@ class CcdNotificationServiceTest {
 
         ccdNotificationService.storeNotificationLetterIntoCcd(event, letter, caseId, recipient);
         verify(ccdNotificationsPdfService, times(1))
-            .mergeLetterCorrespondenceIntoCcd(eq(letter), eq(caseId), any(), eq(senderType));
+            .mergeLetterCorrespondenceIntoCcdV2(eq(letter), eq(caseId), any(), eq(senderType));
     }
 
     @Test
